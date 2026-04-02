@@ -1,6 +1,9 @@
 import "std/system.sm"
 
 def main()
-    x = (1+2*3/4<1)==true
-    print x
-    print "\n"
+    i = &0
+    while i<10
+        print(i)
+        i = i+1
+    i = i+1
+    

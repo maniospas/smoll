@@ -30,35 +30,35 @@ def div(Number x, Number y)
     return z
 
 def lt(Number x, Number y)
-    {builtins::bool z = x<y;}
+    {builtins::bool z = x<y?1:0;}
     return z
 
 def gt(Number x, Number y)
-    {builtins::bool z = x>y;}
+    {builtins::bool z = x>y?1:0;}
     return z
 
 def le(Number x, Number y)
-    {builtins::bool z = x<=y;}
+    {builtins::bool z = x<=y?1:0;}
     return z
 
 def ge(Number x, Number y)
-    {builtins::bool z = x>=y;}
+    {builtins::bool z = x>=y?1:0;}
     return z
 
 def eq(Number x, Number y)
-    {builtins::bool z = x==y;}
+    {builtins::bool z = x==y?1:0;}
     return z
 
 def neq(Number x, Number y)
-    {builtins::bool z = x!=y;}
+    {builtins::bool z = x!=y?1:0;}
     return z
 
 def eq(bool x, bool y)
-    {builtins::bool z = x==y;}
+    {builtins::bool z = x==y?1:0;}
     return z
 
 def neq(bool x, bool y)
-    {builtins::bool z = x!=y;}
+    {builtins::bool z = x!=y?1:0;}
     return z
 
 def sub(Number x, Number y)

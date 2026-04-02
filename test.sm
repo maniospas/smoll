@@ -1,0 +1,6 @@
+import "std/system.sm"
+
+def main()
+    x = (1+2*3/4<1)==true
+    print x
+    print "\n"

@@ -1,0 +1,67 @@
+import "builtins"
+
+def Number = float or int or id
+
+def print(bool value)
+    {printf("%s", value?"true":"false");}
+
+def print(cstr value)
+    {printf("%s", value);}
+
+def print(float value)
+    {printf("%.6f", value);}
+
+def print(int value)
+    {printf("%lld", value);}
+
+def print(id value)
+    {printf("%llu", value);}
+
+def add(Number x, Number y)
+    {type(x) z=x+y;}
+    return z
+
+def mul(Number x, Number y)
+    {type(x) z=x*y;}
+    return z
+
+def div(Number x, Number y)
+    {type(x) z=x/y;}
+    return z
+
+def lt(Number x, Number y)
+    {builtins::bool z = x<y;}
+    return z
+
+def gt(Number x, Number y)
+    {builtins::bool z = x>y;}
+    return z
+
+def le(Number x, Number y)
+    {builtins::bool z = x<=y;}
+    return z
+
+def ge(Number x, Number y)
+    {builtins::bool z = x>=y;}
+    return z
+
+def eq(Number x, Number y)
+    {builtins::bool z = x==y;}
+    return z
+
+def neq(Number x, Number y)
+    {builtins::bool z = x!=y;}
+    return z
+
+def eq(bool x, bool y)
+    {builtins::bool z = x==y;}
+    return z
+
+def neq(bool x, bool y)
+    {builtins::bool z = x!=y;}
+    return z
+
+def sub(Number x, Number y)
+    if x<y print("warning: negative\n")
+    {type(x) z=x-y;}
+    return z

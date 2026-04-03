@@ -278,6 +278,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.needs_failure_mode = True
     impl.implementation.append(CodeWord(";"))
     impl.dependent_implementations.append(callee)
+    if callee==FAIL_TYPE: raise CompfailException()
     return rets
 
 
@@ -303,6 +304,7 @@ def process_linear_type(file: File, tokens: list[Token], pos: int) -> tuple[int,
         ret = UnionType(type.name+"|"+alternatives.name)
         ret.variations.extend(type.variations)
         ret.variations.extend(alternatives.variations)
+        ret.variations = list(set(ret.variations))
         type = ret
     return pos, type
 
@@ -337,13 +339,26 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
         if op_name=="is":
             is_pos = pos
             pos += 1
+            # first parse type extraction statements
+            if peek_text(tokens, pos)=="type":
+                pos, processed_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
+                matched = len(processed_rets)==len(rets)
+                if matched:
+                    for processed_ret, rets_ret in zip(processed_rets, rets):
+                        if processed_ret.type!=rets_ret.type:
+                            matched = False
+                            break
+                tmp = create_temp()
+                rets = [Variable(tmp, TRUE_TYPE) if matched else Variable(tmp, FALSE_TYPE)]
+                impl.vars[tmp] = rets[0]
+                continue
             pos, type = process_linear_type(file, tokens, pos)
             found = False
             for variation in type.variations:
                 matched = len(variation.rets)==len(rets)
                 if matched:
-                    for ret in variation.rets: 
-                        if variation.vars[ret].type!=rets.type:
+                    for variation_ret, rets_ret in zip(variation.rets, rets):
+                        if variation.vars[variation_ret].type!=rets_ret.type:
                             matched = False
                             break
                 if matched:
@@ -369,11 +384,15 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
 def process_statement(file: File, tokens: list[Token], pos: int, impl: ImplementedType, current_operator_priority: int) -> tuple[int, list[Variable]]:
     current_token = get(tokens, pos)
     current = current_token.text
-    if current=="true" or current=="false":
+    if current=="true": # does not have an implementation
         tmp = create_temp()
-        variable = Variable(tmp, BOOL_TYPE)
+        variable = Variable(tmp, TRUE_TYPE) 
         impl.vars[tmp] = variable
-        impl.implementation.extend([variable, CodeWord("="), CodeWord("1" if current=="true" else "0"), CodeWord(";")])
+        return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
+    if current=="false": # does not have an implementation
+        tmp = create_temp()
+        variable = Variable(tmp, FALSE_TYPE)
+        impl.vars[tmp] = variable
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current_token.is_string():
         tmp = create_temp()
@@ -498,7 +517,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                     pos, type = process_type(file, tokens, pos)
                     if len(type.variations)!=1: get(tokens, pos).error("type", "more than one types in union '"+type.name+"'")
                     if type.variations[0].builtin is None: get(tokens, pos).error("type", "only builtin types can be unpacked here '"+type.name+"'")
-                    impl.implementation.append(CodeWord(type.variations[0].builtin))
+                    #impl.implementation.append(CodeWord(type.variations[0].builtin))
                     varname = get(tokens, pos).text
                     variable = Variable(varname, type.variations[0])
                     impl.vars[varname] = variable
@@ -664,10 +683,17 @@ def process_import(file: File, tokens: list[Token], pos: int):
         file.namespaces[name] = imported
         return pos
     for type_name, type_value in imported.types.items():
-        if type_name in file.types: name.error("import", "cannot overwrite existing type '"+name+"'")
+        existing = file.types.get(type_name, None)
+        if existing is not None:
+            new_type = UnionType(type_name)
+            new_type.variations.extend(existing.variations)
+            new_type.variations.extend(type_value.variations)
+            new_type.variations = list(set(new_type.variations))
+            type_value = new_type
         file.types[type_name] = type_value
     for namespace_name, namespace_value in imported.namespaces.items():
-        if namespace_name in file.namespaces: name.error("import", "cannot overwrite existing type '"+name+"'")
+        existing = file.namespaces.get(namespace_name, None)
+        if existing is not None and existing!=namespace_value: name_token.error("import", "cannot overwrite existing type '"+name+"'")
         file.namespaces[namespace_name] = namespace_value
     return pos
 
@@ -829,17 +855,23 @@ UINT_TYPE = ImplementedType("id", "unsigned long long")
 FALSE_TYPE = ImplementedType("false", "int")
 TRUE_TYPE = ImplementedType("true", "int")
 FAIL_TYPE = ImplementedType("fail")
-FAIL_TYPE.vars["message"] = CSTR_TYPE
-FAIL_TYPE.args.append("message") 
+# FAIL_TYPE.vars["message"] = CSTR_TYPE
+# FAIL_TYPE.args.append("message") 
 smol_namespace = File("builtins")
 smol_namespace.types["cstr"] = UnionType("cstr").append(CSTR_TYPE)
 smol_namespace.types["int"] = UnionType("int").append(INT_TYPE)
 smol_namespace.types["id"] = UnionType("id").append(UINT_TYPE)
 smol_namespace.types["float"] = UnionType("float").append(FLOAT_TYPE)
 smol_namespace.types["bool"] = UnionType("bool").append(BOOL_TYPE)
-smol_namespace.types["compfail"] = UnionType("compfail").append(FAIL_TYPE)
 smol_namespace.types["err"] = UnionType("err").append(ImplementedType("err", "int"))
-smol_namespace.types["void"] = UnionType("void").append(ImplementedType("void"))
+smol_namespace.types["empty"] = UnionType("empty").append(ImplementedType("void"))
+
+fixed_namespace = File("comptime")
+fixed_namespace.types["fail"] = UnionType("fail").append(FAIL_TYPE)
+fixed_namespace.types["true"] = UnionType("true").append(TRUE_TYPE)
+fixed_namespace.types["false"] = UnionType("false").append(FALSE_TYPE)
+smol_namespace.namespaces["fixed"] = fixed_namespace
+
 
 file_cache["builtins"] = smol_namespace
 

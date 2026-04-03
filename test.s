@@ -9,5 +9,4 @@ def next(range r)
     return r
 
 def main()
-    x = 1
-    print(x->add 2)
+    print(1-2)

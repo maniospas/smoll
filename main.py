@@ -65,6 +65,7 @@ class ImplementedType:
         self.builtin = builtin
         self.nominal = True if builtin else False
         self.at = at
+        self.nesting: str = list()
         self.has_returned_once = False
         self.needs_failure_mode = False
         self.dependent_implementations: list[ImplementedType] = list()
@@ -465,7 +466,12 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             if not ret: impl.implementation.extend([CodeWord("return"), CodeWord(";")])
             else: impl.implementation.extend([CodeWord("goto"), CodeWord("__temp_return"), CodeWord(";")])
             continue
+        if name.text=="continue" or name.text=="break":
+            if not impl.nesting: name.error("syntax", "need to be in a loop to '"+name.text+"'")
+            impl.implementation.extend([CodeWord(name.text), CodeWord(";")])
+            continue
         if name.text=="while":
+            impl.nesting.append("while")
             if_pos = pos-1
             impl.implementation.extend([
                 CodeWord("while(1)"),
@@ -486,6 +492,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
             else: pos = process_body(file, tokens, pos-1, impl, one_line=True)
             impl.implementation.append(CodeWord("}"))
+            impl.nesting.pop()
             continue
         if name.text=="if":
             if_pos = pos-1

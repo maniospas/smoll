@@ -2,8 +2,8 @@
 
 ## import
 
-Here is how to import the entire contents of another file.
-The `print` function is imported from the core.
+Here is how to import the entire contents of another source code
+file; the `print` function is imported from the core.
 
 ```python
 import "std/core.s"
@@ -194,4 +194,77 @@ def main()
     print "sign is: "
     print sgn
     print "\n"
+```
+
+## unions
+
+You can declare alteratives between types (unions) by separating them
+with `|`. Below is an example that defines a function for
+adding either a float or an integer to a float. The brackets
+are used to add some C code, inside which `builtins::float` is
+injected by *smoλ* as the appropriate builtin type. 
+
+This particular functionality is not part of the standard library, because the latter
+aims to lossy conversions between numeric types. Usually, you will
+not see any unsafe C code in front of you either (unless you are contributing 
+to the standard library).
+
+```python
+import "builtins"
+
+def unsafe_add(float x, float|int y)
+    {builtins::float z=x+y;}
+    return z
+```
+
+Type alteratives can also be named so that they can be reused.
+An example follows.
+
+```python
+import "builtins"
+
+def Number = float|int|id
+def unsafe_add(Number x, Number y)
+    {builtins::float z=x+y;}
+    return z
+```
+
+## conditional compilation and default arguments
+
+You can use the `[value] is [type]` operator to check that a value/tuple
+adheres to a at least one variation of a union. The result is not
+merely a boolean, but in fact of type `compile::true` or `compile::false`;
+these values are significant because they let *smoλ* actually identify 
+whether conditions will always be true or false and **eliminate code without parsing it**.
+
+In other words, you can make `is` checks to determine conditionally which code
+segment to compile. This incurs *zero* runtime overhead. 
+At the same type, you can mingle them together with other condition checking,
+as the standard library's core. Below is an example of a conditional check.
+
+```python
+def typed_print(int|float|cstr value) 
+    if value is int|float
+        print("this is a number:")
+    else
+        print("this is a string:")
+    print(value)
+```
+
+
+The same mechanism can be used to create optional arguments
+using the `empty` builtin type; that has no contents and therefore
+skips respective variable definition. Conversely, non-existing
+variables are considered `empty`, and checks like the one below 
+can be made. 
+
+There, the defined function implements either an increment
+by one, or by a value provided as second argument. Use the
+same mechanism to have any number of optional arguments.
+
+```python
+def inc(int x, int|empty value)
+    if value is empty
+        value = 1
+    return x+value
 ```

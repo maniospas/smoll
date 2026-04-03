@@ -34,62 +34,62 @@ def print(bool value, cstr|empty endl)
 
 def add(Number x, Number y)
     if is_different(x,y)
-        fixed::fail()
+        compiler::skipdef()
     {type(x) z=x+y;}
     return z
 
 def mul(Number x, Number y)
     if is_different(x,y)
-        fixed::fail()
+        compiler::skipdef()
     {type(x) z=x*y;}
     return z
 
 def div(Number x, Number y)
     if is_different(x,y)
-        fixed::fail()
+        compiler::skipdef()
     {type(x) z=x/y;}
     return z
 
 def lt(Number x, Number y)
     if is_different(x,y)
-        fixed::fail()
+        compiler::skipdef()
     {builtins::bool z = x<y?1:0;}
     return z
 
 def gt(Number x, Number y)
     if is_different(x,y)
-        fixed::fail()
+        compiler::skipdef()
     {builtins::bool z = x>y?1:0;}
     return z
 
 def le(Number x, Number y)
     if is_different(x,y)
-        fixed::fail()
+        compiler::skipdef()
     {builtins::bool z = x<=y?1:0;}
     return z
 
 def ge(Number x, Number y)
     if is_different(x,y)
-        fixed::fail()
+        compiler::skipdef()
     {builtins::bool z = x>=y?1:0;}
     return z
 
 def eq(Number x, Number y)
     if is_different(x,y)
-        fixed::fail()
+        compiler::skipdef()
     {builtins::bool z = x==y?1:0;}
     return z
 
 def neq(Number x, Number y)
     if is_different(x,y)
-        fixed::fail()
+        compiler::skipdef()
     {builtins::bool z = x!=y?1:0;}
     return z
     
 def sub(Number x, Number y)
-    if is_different(x,y)
-        fixed::fail()
-    if x is id and x<y 
-        fixed::fail()
+    if is_different(x,y) 
+        compiler::skipdef()
+    if x is id and(x<y)
+        print("message")
     {type(x) z=x-y;}
     return z

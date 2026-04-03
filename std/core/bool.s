@@ -12,41 +12,41 @@ def not(bool value)
     {builtins::bool z = value?0:1;}
     return z
 
-def eq(fixed::true, fixed::true) 
-    return fixed::true()
+def eq(compiler::true, compiler::true) 
+    return compiler::true()
 
-def eq(fixed::false, fixed::false) 
-    return fixed::true()
+def eq(compiler::false, compiler::false) 
+    return compiler::true()
 
-def eq(fixed::true, fixed::false) 
-    return fixed::false()
+def eq(compiler::true, compiler::false) 
+    return compiler::false()
 
-def eq(fixed::false, fixed::true) 
-    return fixed::false()
+def eq(compiler::false, compiler::true) 
+    return compiler::false()
 
-def not(fixed::true)
-    return fixed::false()
+def not(compiler::true)
+    return compiler::false()
 
-def not(fixed::false)
-    return fixed::true()
+def not(compiler::false)
+    return compiler::true()
 
-def neq(fixed::true|fixed::false x, fixed::true|fixed::false y)
+def neq(compiler::true|compiler::false x, compiler::true|compiler::false y)
     return not x==y
 
-def eq(fixed::true, bool value)
+def eq(compiler::true, bool value)
     return value
 
-def eq(bool value, fixed::true)
+def eq(bool value, compiler::true)
     return value
 
-def eq(fixed::false, bool value)
+def eq(compiler::false, bool value)
     return not value
 
-def eq(bool value, fixed::false)
+def eq(bool value, compiler::false)
     return not value
 
-def neq(fixed::true|fixed::false x, bool y)
+def neq(compiler::true|compiler::false x, bool y)
     return not eq(x, y)
 
-def neq(bool x, fixed::true|fixed::false y)
+def neq(bool x, compiler::true|compiler::false y)
     return not eq(x, y)

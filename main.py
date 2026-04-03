@@ -18,7 +18,7 @@ class CompfailException(Exception): pass
 
 temps: list[str]= list()
 def create_temp():
-    temp = "__temp"+str(len(temps))
+    temp = "__temp"+str(len(temps))+"v"
     temps.append(temp)
     return temp
 
@@ -278,7 +278,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.needs_failure_mode = True
     impl.implementation.append(CodeWord(";"))
     impl.dependent_implementations.append(callee)
-    if callee==FAIL_TYPE: raise CompfailException()
+    if callee==FAIL_TYPE: 
+        if impl.nesting: error_token.error("safety", "cannot create a compilation-time failure inside a 'while' or an 'if' whose condition does not evaluate to compile-time known boolean")
+        raise CompfailException()
     return rets
 
 
@@ -308,12 +310,31 @@ def process_linear_type(file: File, tokens: list[Token], pos: int) -> tuple[int,
         type = ret
     return pos, type
 
+def skip_statement(file: File, tokens: list[Token], pos: int):
+    depth = 0
+    budget = 1
+    while pos<len(tokens):
+        tok = peek_text(tokens, pos)
+        if tok==START_TOKEN and depth==0: break
+        if tok == "(": depth += 1
+        elif tok == ")": 
+            depth -= 1
+            budget = 0
+            if depth<0: break
+        elif tok[0] in symbols or tok=="is" or tok=="and" or tok=="or": budget = 1
+        elif depth==0:
+            budget -= 1
+            if budget<0: break
+        pos += 1
+    return pos
 
 def process_statement_operator(file: File, tokens: list[Token], impl: ImplementedType, pos: int, rets: list[Variable], current_operator_priority:int) -> tuple[int, list[Variable]]:
     # apply this when returning from process_statement
     while True:
         op = peek_text(tokens, pos)
         op_name, op_priority = {
+            "and": ("and", 10),
+            "or": ("or", 9),
             "is": ("is", 8),
             "<": ("lt",7),
             ">": ("gt",7),
@@ -330,12 +351,61 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             "->": ("access",-1),
         }.get(op, (None, 0))
         if op_name is None: return pos, rets
+        if current_operator_priority==9 and op_priority==10: 
+            tokens[pos].error("safety", "there is no clear priority order between 'and' and 'or'; be explicit with parentheses")
+        if current_operator_priority==10 and op_priority==9: 
+            tokens[pos].error("safety", "there is no clear priority order between 'and' and 'or'; be explicit with parentheses")
         if current_operator_priority and current_operator_priority<op_priority:
             return pos, rets
         op_token = tokens[pos]
         if current_operator_priority==7 and op_priority==7: 
             op_token.error("safety", "there is no clear priority order between multiple equalities and inequalities; be explicit with parentheses")
         
+        if op_name=="and":
+            if len(rets)!=1: op_token.error("type", "the left hand side must always be true/false for 'and'")
+            if rets[0].type==TRUE_TYPE:
+                pos, rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority) 
+                continue
+            if rets[0].type==FALSE_TYPE:
+                pos = skip_statement(file, tokens, pos+1) 
+                continue
+            if rets[0].type!=BOOL_TYPE: op_token.error("type", "the left hand side must always be true/false for 'and'")
+            impl.implementation.extend([
+                CodeWord("if"),
+                CodeWord("("),
+                rets[0],
+                CodeWord(")"),
+                CodeWord("{")
+            ])
+            pos, rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority)
+            pack_name = create_temp()
+            impl.assign(pack_name, create_temp(), op_token)
+            rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
+            impl.implementation.append(CodeWord("}"))
+
+        if op_name=="or":
+            if len(rets)!=1: op_token.error("type", "the left hand side must always be true/false for 'or'")
+            if rets[0].type==TRUE_TYPE:
+                pos = skip_statement(file, tokens, pos+1) 
+                continue
+            if rets[0].type==FALSE_TYPE:
+                pos, rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority) 
+                continue
+            if rets[0].type!=BOOL_TYPE: op_token.error("type", "the left hand side must always be true/false for 'or'")
+            impl.implementation.extend([
+                CodeWord("if"),
+                CodeWord("("),
+                CodeWord("!"),
+                rets[0],
+                CodeWord(")"),
+                CodeWord("{")
+            ])
+            pos, rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority) 
+            pack_name = create_temp()
+            impl.assign(pack_name, create_temp(), op_token)
+            rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
+            impl.implementation.append(CodeWord("}"))
+
         if op_name=="is":
             is_pos = pos
             pos += 1
@@ -482,6 +552,9 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
     return process_statement_operator(file, tokens, impl, pos+1, [var], current_operator_priority)
 
 def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedType, one_line: bool=False):
+    def skip_statement(file: File, tokens: list[Token], pos: int):
+        get(tokens, pos).error("safety", "this statement needs to start in a new line because it could be skipped (for now, skipping relies on code block indentation to properly end)")
+
     if peek_text(tokens, pos)!=START_TOKEN and not one_line: tokens[pos].error("syntax", "expecting indentation")
     pos += 1
     start_pos = pos
@@ -534,7 +607,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             else: impl.implementation.extend([CodeWord("goto"), CodeWord("__temp_return"), CodeWord(";")])
             continue
         if name.text=="continue" or name.text=="break":
-            if not impl.nesting: name.error("syntax", "need to be in a loop to '"+name.text+"'")
+            if not impl.nesting or impl.nesting[-1]!="while": name.error("syntax", "need to be in a loop to '"+name.text+"'")
             impl.implementation.extend([CodeWord(name.text), CodeWord(";")])
             continue
         if name.text=="while":
@@ -547,17 +620,18 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
             if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool'")
             if ret[0].type==TRUE_TYPE:
-                if peek_text(tokens, pos)!=START_TOKEN: get(tokens, pos).error("safety", "a constantly true/false expression must have its body start in a new line")
-                pos = process_body(file, tokens, pos, impl)
+                if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
+                else: pos = process_body(file, tokens, pos-1, impl, one_line=True)    
             elif ret[0].type==FALSE_TYPE:
-                if peek_text(tokens, pos)!=START_TOKEN: get(tokens, pos).error("safety", "a constantly true/false expression must have its body start indented in a new line")
-                depth = 1
-                pos += 1
-                while depth:
-                    next_token = get_skip(tokens, pos).text
-                    if next_token==START_TOKEN: depth += 1
-                    elif next_token==END_TOKEN: depth -= 1
+                if peek_text(tokens, pos)!=START_TOKEN: pos = skip_statement(file, tokens, pos)
+                else:
+                    depth = 1
                     pos += 1
+                    while depth:
+                        next_token = get_skip(tokens, pos).text
+                        if next_token==START_TOKEN: depth += 1
+                        elif next_token==END_TOKEN: depth -= 1
+                        pos += 1
             else:
                 if ret[0].type!=BOOL_TYPE: name.error("type", "conditions can only evaluate to 'bool' or be constantly true/false")
                 impl.implementation.extend([
@@ -579,11 +653,23 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
             if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool'")
             if ret[0].type==TRUE_TYPE:
-                if peek_text(tokens, pos)!=START_TOKEN: get(tokens, pos).error("safety", "a constantly true/false expression must have its body start in a new line")
-                pos = process_body(file, tokens, pos, impl)
+                if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
+                else: pos = process_body(file, tokens, pos-1, impl, one_line=True)
                 if peek_text(tokens, pos)=="else":
                     pos += 1
-                    if get(tokens, pos).text!=START_TOKEN: get(tokens, pos).error("safety", "a constantly true/false expression must have its body start indented in a new line")
+                    if get(tokens, pos).text!=START_TOKEN: pos = skip_statement(file, tokens, pos)
+                    else:
+                        depth = 1
+                        pos += 1
+                        while depth:
+                            next_token = get_skip(tokens, pos).text
+                            if next_token==START_TOKEN: depth += 1
+                            elif next_token==END_TOKEN: depth -= 1
+                            pos += 1
+                continue
+            if ret[0].type==FALSE_TYPE:
+                if peek_text(tokens,pos)!=START_TOKEN: pos = skip_statement(file, tokens, pos)
+                else:
                     depth = 1
                     pos += 1
                     while depth:
@@ -591,19 +677,9 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                         if next_token==START_TOKEN: depth += 1
                         elif next_token==END_TOKEN: depth -= 1
                         pos += 1
-                continue
-            if ret[0].type==FALSE_TYPE:
-                if peek_text(tokens, pos)!=START_TOKEN: get(tokens, pos).error("safety", "a constantly true/false expression must have its body start in a new line")
-                depth = 1
-                pos += 1
-                while depth:
-                    next_token = get_skip(tokens, pos).text
-                    if next_token==START_TOKEN: depth += 1
-                    elif next_token==END_TOKEN: depth -= 1
-                    pos += 1
                 if peek_text(tokens, pos)=="else":
-                    if peek_text(tokens, pos)!=START_TOKEN: get(tokens, pos).error("safety", "a constantly true/false expression must have its body start indented in a new line")
-                    pos = process_body(file, tokens, pos, impl)
+                    if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
+                    else: pos = process_body(file, tokens, pos-1, impl, one_line=True)
                 continue
             if ret[0].type!=BOOL_TYPE: name.error("type", "conditions can only evaluate to 'bool'")
             impl.implementation.extend([
@@ -614,8 +690,10 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 CodeWord("{")
             ])
             previous_vars = {k: v for k, v in impl.vars.items()}
+            impl.nesting.append("if")
             if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
             else: pos = process_body(file, tokens, pos-1, impl, one_line=True)
+            impl.nesting.pop()
             impl.implementation.append(CodeWord("}"))
             if peek_text(tokens, pos)=="else":
                 diff_vars_if = {k: v for k, v in impl.vars.items() if k not in previous_vars}
@@ -623,8 +701,10 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 previous_vars = {k: v for k, v in impl.vars.items()}
                 impl.implementation.extend([CodeWord("else"), CodeWord("{")])
                 pos += 1
+                impl.nesting.append("if")
                 if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
                 else: pos = process_body(file, tokens, pos-1, impl, one_line=True)
+                impl.nesting.pop()
                 impl.implementation.append(CodeWord("}"))
                 for k, v in impl.vars.items():
                     var = diff_vars_if.get(k, None)
@@ -854,7 +934,7 @@ FLOAT_TYPE = ImplementedType("float", "double")
 UINT_TYPE = ImplementedType("id", "unsigned long long")
 FALSE_TYPE = ImplementedType("false", "int")
 TRUE_TYPE = ImplementedType("true", "int")
-FAIL_TYPE = ImplementedType("fail")
+FAIL_TYPE = ImplementedType("skipdef")
 # FAIL_TYPE.vars["message"] = CSTR_TYPE
 # FAIL_TYPE.args.append("message") 
 smol_namespace = File("builtins")
@@ -866,12 +946,11 @@ smol_namespace.types["bool"] = UnionType("bool").append(BOOL_TYPE)
 smol_namespace.types["err"] = UnionType("err").append(ImplementedType("err", "int"))
 smol_namespace.types["empty"] = UnionType("empty").append(ImplementedType("void"))
 
-fixed_namespace = File("comptime")
-fixed_namespace.types["fail"] = UnionType("fail").append(FAIL_TYPE)
+fixed_namespace = File("compiler")
+fixed_namespace.types["skipdef"] = UnionType("skipdef").append(FAIL_TYPE)
 fixed_namespace.types["true"] = UnionType("true").append(TRUE_TYPE)
 fixed_namespace.types["false"] = UnionType("false").append(FALSE_TYPE)
-smol_namespace.namespaces["fixed"] = fixed_namespace
-
+smol_namespace.namespaces["compiler"] = fixed_namespace
 
 file_cache["builtins"] = smol_namespace
 

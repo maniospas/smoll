@@ -1,9 +1,11 @@
-import "std/system.sm"
+import "std/system.sm" as system
+import system::print
+import system::ge
 
 def main()
     i = &0
     while true
-        i = i+1
         print(i)
-        if i>10 break
+        i = i->system::add(1)
+        if i>=10 break
     

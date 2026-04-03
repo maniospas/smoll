@@ -304,7 +304,8 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             "*": ("mul",2),
             "**":("pow",1),
             "/": ("div",3),
-            "%": ("mod",4)
+            "%": ("mod",4),
+            "->": ("access",-1),
         }.get(op, (None, 0))
         if op_name is None: return pos, rets
         if current_operator_priority and current_operator_priority<op_priority:
@@ -312,8 +313,14 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
         op_token = tokens[pos]
         if current_operator_priority==7 and op_priority==7: 
             op_token.error("safety", "there is no clear priority order between multiple equalities and inequalities; be explicit with parentheses")
-        type: UnionType = file.types.get(op_name, None)
-        if type is None: op_token.error("type", "unknown type '"+op_name+"'")
+        
+        if op_priority==-1: 
+            pos, type = process_type(file, tokens, pos+1)
+            if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
+            pos -= 1
+        else: 
+            type: UnionType = file.types.get(op_name, None)
+            if type is None: op_token.error("type", "unknown type '"+op_name+"'")
         pos, additional_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority)
         rets = resolve_call(file, impl, type, rets+additional_rets, op_token)
     return pos, rets
@@ -395,8 +402,6 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         found = [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
         return process_statement_operator(file, tokens, impl, pos, found, current_operator_priority)
 
-    #if peek_text(tokens, pos+1) == ".": # if we still have dot, assume universal calling notation
-    #    raise Exception("universal calling notation not yet implemented")
     if var is None:
         # first try to see if this is a group of values
         current_prefix = current+"__"
@@ -546,11 +551,16 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
 def process_import(file: File, tokens: list[Token], pos: int):
     pos += 1
     name_token = get(tokens, pos)
-    if not name_token.is_string(): tokens[pos].error("syntax", "expecting a cstr filename to import")
-    name = name_token.text
-    name = name[1:len(name)-1]
-    if not os.path.exists(name) and name not in file_cache: name_token.error("import", "cannot import file '"+name+"'")
-    imported: File = load(name)
+    if not name_token.is_string(): 
+        namespace = file.namespaces.get(name_token.text, None)
+        if namespace is None: tokens[pos].error("syntax", "import expects a cstr filename or a known namespace but got '"+name_token.text+"'")
+        assert isinstance(namespace, File)
+        imported = namespace
+    else: 
+        name = name_token.text
+        name = name[1:len(name)-1]
+        if not os.path.exists(name) and name not in file_cache: name_token.error("import", "cannot import file '"+name+"'")
+        imported: File = load(name)
     pos += 1
     if peek_text(tokens, pos)=="::":
         pos, imported = process_type(imported, tokens, pos + 1)

@@ -89,13 +89,13 @@ class ImplementedType:
             ret += self.vars[arg].tostring()
         return self.name+"("+ret+")"
 
-    def assign(self, varname: str, value: list[Variable], error_token: "Token"):
+    def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True):
         if len(value)==0: error_token.error("type", "no expression value to assign to variable '"+varname+"'")
         if len(value)>1:
             common_prefix = longest_common_prefix([var.name for var in value])
             len_common_prefix = len(common_prefix)
-            for var in value: self.assign(varname+"__"+var.name[len_common_prefix:], [var], error_token)
-            return
+            for var in value: self.assign(varname+"__"+var.name[len_common_prefix:], [var], error_token, perform_immutability_checks)
+            return None
             error_token.error("type", "cannot assign more than one values to variable '"+varname+"'")
         existing = self.vars.get(varname, None)
         if not existing:
@@ -103,10 +103,10 @@ class ImplementedType:
             found = [val for varname, val in self.vars.items() if varname.startswith(current_prefix)]
             if found:
                 if len(found)!=len(value): error_token.error("type", "cannot overwrite tuple with one of different length")
-                for i in range(len(value)): assign(found[i], [value[i]], error_token)
-                return
+                for i in range(len(value)): assign(found[i], [value[i]], error_token, perform_immutability_checks)
+                return None
         if existing is not None and existing.type!=value[0].type: error_token.error("type", "mismatching types")
-        if existing and existing.immutable: error_token.error("type", "cannot overwrite immutable variable '"+varname+"'")
+        if perform_immutability_checks and existing and existing.immutable: error_token.error("type", "cannot overwrite immutable variable '"+varname+"'")
         #if existing is None: # force the following two lines so that we can revoke mutability
         existing = value[0].renamed_copy(varname)
         self.vars[varname] = existing
@@ -116,7 +116,7 @@ class ImplementedType:
         for pos, arg in enumerate(value):
             if not arg.name.startswith("__temp"): self.return_names[arg.name] = pos
             if self.has_returned_once: 
-                self.assign(self.rets[pos], [arg], error_token) # TODO: do not use assign but a manual setting to allow overwriting (or make mutable)
+                self.assign(self.rets[pos], [arg], error_token, perform_immutability_checks=False) # TODO: do not use assign but a manual setting to allow overwriting (or make mutable)
             else: 
                 self.rets.append(arg.name)
                 self.vars[arg.name] = arg # needed to reflect changes in const permissions
@@ -528,15 +528,27 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         ])
         impl.needs_failure_mode = True
         return process_statement_operator(file, tokens, impl, pos+1, [], current_operator_priority)
-    if current=="true": # does not have an implementation
+    if current=="true":
         tmp = create_temp()
-        variable = Variable(tmp, TRUE_TYPE) 
+        variable = Variable(tmp, BOOL_TYPE) 
         impl.vars[tmp] = variable
+        impl.implementation.extend([
+            variable,
+            CodeWord("="),
+            CodeWord("1"),
+            CodeWord(";")
+        ])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
-    if current=="false": # does not have an implementation
+    if current=="false":
         tmp = create_temp()
-        variable = Variable(tmp, FALSE_TYPE)
+        variable = Variable(tmp, BOOL_TYPE)
         impl.vars[tmp] = variable
+        impl.implementation.extend([
+            variable,
+            CodeWord("="),
+            CodeWord("0"),
+            CodeWord(";")
+        ])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current_token.is_string():
         tmp = create_temp()
@@ -562,7 +574,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.vars[tmp] = variable
         impl.implementation.extend([variable, CodeWord("="), CodeWord(current), CodeWord(";")])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
-    if current == "&":
+    if current == "&" or current=="mut":
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy() for r in ret], current_operator_priority)
     if current == "class":
@@ -863,7 +875,7 @@ def process_def(file: File, tokens: list[Token], pos: int):
     pos += 1
     while peek_text(tokens, pos)!=")":
         arg_immutability = True
-        if get(tokens, pos).text=="&":
+        if get(tokens, pos).text=="&" or get(tokens, pos).text=="mut":
             pos += 1
             arg_immutability = False
         pos, arg_type = process_linear_type(file, tokens, pos)

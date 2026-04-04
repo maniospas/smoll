@@ -53,6 +53,12 @@ class Variable(CodeSegment):
     def renamed_copy(self, new_name: str): return Variable(new_name, self.type, self.immutable, self.isprivate)
     def mutable_copy(self): return Variable(self.name, self.type, False, self.isprivate)
     def private_copy(self): return Variable(self.name, self.type, self.immutable, True)
+    def is_same(self, other: "Variable"):
+        if self.type!=other.type: return False
+        if self.immutable!=other.immutable: return False
+        if self.isprivate!=other.isprivate: return False
+        if self.name!=other.name: return False
+        return True
 
 class ImplementedType:
     def __init__(self, name: str, builtin:str|None=None, at:"Token"=None):
@@ -117,15 +123,22 @@ class ImplementedType:
         self.has_returned_once = True
 
     def transpile(self) -> str:
+        ret_body_start = ""
+        ret_body_end = ""
         arg_code = ""
         for arg in self.args:
             if self.vars[arg].type.builtin: 
                 if arg_code: arg_code += ", "
-                arg_code += self.vars[arg].type.builtin+" "+arg
+                if self.vars[arg].immutable: arg_code += self.vars[arg].type.builtin+" "+arg
+                else: 
+                    tmp = create_temp()
+                    arg_code += self.vars[arg].type.builtin+"* "+tmp
+                    ret_body_start += self.vars[arg].type.builtin+" "+arg+"=*"+tmp+";\n  "
+                    ret_body_end += "*"+tmp+"="+arg+";\n  "
+
             # other args are just class alignment
             # else: raise Exception("cannot handle non-builtin arguments: '"+arg+"'")
         ret_code = ""
-        ret_body_end = ""
         for arg in self.rets:
             if self.vars[arg].type.builtin:
                 tmp = create_temp()
@@ -138,6 +151,7 @@ class ImplementedType:
         arg_code += ret_code
 
         ret = ("static inline int " if self.needs_failure_mode else "static inline void ")+self.monomorphic_name+"("+arg_code+") {\n  "
+        ret += ret_body_start
         for var, val in self.vars.items():
             if var in self.args: continue
             if val.type.builtin: ret += val.type.builtin+" "+var+"=0;\n  "
@@ -246,7 +260,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         error_token.error("type", "could not resolve any call for '"+method.name+"("+','.join(var.type.name for var in vars)+")'")
     if len(available_types)>1:
         error_token.error("type", "more than one conflicting call '"+method.name+"("+','.join(var.type.name for var in vars)+")'")
-    # TODO: we will now call the method but we can also inline it
+    # TODO: we will now call the method, but we can also do so inline in the future maybe
     callee: ImplementedType = available_types[0]
     tmp = create_temp()
     rets = list()
@@ -262,8 +276,15 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             CodeWord(callee.monomorphic_name),
             CodeWord("("),
         ])
-    for var in vars:
-        if var.type.builtin: impl.implementation.extend([var, CodeWord(",")])
+    for varpos, var in enumerate(vars):
+        if var.type.builtin: 
+            if callee.vars[callee.args[varpos]].immutable:
+                impl.implementation.extend([var, CodeWord(",")])
+                continue
+            if var.isprivate: tokens[pos].error("type", "a mutable argument modify a immutable class field: '"+current+"'")
+            if var.immutable: error_token.error("safety", "a mutable argument cannot modify an immutable variable '"+var.name+"'")
+            impl.implementation.extend([CodeWord("&"), var, CodeWord(",")])
+
     for ret in callee.rets:
         varname = tmp+"__"+ret
         original = callee.vars[ret]
@@ -841,13 +862,17 @@ def process_def(file: File, tokens: list[Token], pos: int):
     if get(tokens, pos).text!="(": tokens[pos].error("syntax", "expecting opening parenthesis")
     pos += 1
     while peek_text(tokens, pos)!=")":
+        arg_immutability = True
+        if get(tokens, pos).text=="&":
+            pos += 1
+            arg_immutability = False
         pos, arg_type = process_linear_type(file, tokens, pos)
         arg_name = peek_text(tokens, pos)
-        if arg_name==")" or arg_name==",": arg_name = create_temp()
+        if arg_name==")" or arg_name==",": arg_name = "__temp_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
         else: pos += 1
         abstract_arg_types.append(arg_type.variations)
         abstract_arg_names.append(arg_name)
-        abstract_arg_immutability.append(True)
+        abstract_arg_immutability.append(arg_immutability)
         next_symbol = peek_text(tokens, pos)
         if next_symbol==")": break
         if next_symbol!=",": tokens[pos].error("syntax", "expecting comma between arguments")
@@ -867,11 +892,26 @@ def process_def(file: File, tokens: list[Token], pos: int):
                 for ret in arg_type.rets:
                     ret_name = arg_name+"__"+ret
                     impl.vars[ret_name] = arg_type.vars[ret].renamed_copy(ret_name)
+                    if immutable: impl.vars[ret_name] = impl.vars[ret_name].private_copy()
                     impl.args.append(ret_name)
+            found_type: UnionType = file.types.get(impl.name)
+            if found_type is not None:
+                # there may be some duplicate argument schemes - skip those
+                # the duplicate schemes arise, e.g., when we overload constructors for the same type
+                already_parsed = False
+                for variation in found_type.variations:
+                    is_same = len(variation.args)==len(impl.args)
+                    if is_same:
+                        for variation_arg, impl_arg in zip(variation.args, impl.args):
+                            if not variation.vars[variation_arg].is_same(impl.vars[impl_arg]):
+                                is_same = False
+                    if is_same:
+                        already_parsed = True
+                        break
+                if already_parsed: continue
             pos = process_body(file, tokens, pos, impl)
-            #print(impl.transpile())
-            found_type = file.types.get(impl.name)
-            if not found_type:
+            #make a union type to store the implementation if one does not already exist
+            if found_type is None:
                 found_type = UnionType(impl.name)
                 file.types[impl.name] = found_type
             found_type.variations.append(impl)

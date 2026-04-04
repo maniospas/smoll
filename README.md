@@ -40,7 +40,7 @@ def count(mut reader f, str line_prefix)
         print(line)
         lines = lines+1
         characters = characters+len(line)
-    return lines, characters
+    return (lines, characters)
 
 def main()
     f = &reader("README.md")

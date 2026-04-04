@@ -1,12 +1,18 @@
 import "std/core.s"
 
-def range(id start, id to)
+def range(id|empty start, id to)
+    if start is empty
+        start = 0
     pos = &start
-    return (pos, to)
+    return class(pos, to)
 
-def next(range r)
+def next(&range r, &id value)
+    value = r.pos
     r.pos = &r.pos+1
-    return r
+    return r.pos<=r.to
 
 def main()
-    print(1-2)
+    r = range(10)
+    value = &0
+    while r->next(value)
+        print value

@@ -89,7 +89,7 @@ def neq(Number x, Number y)
 def sub(Number x, Number y)
     if is_different(x,y) 
         compiler::skipdef()
-    if x is id and(x<y)
-        print("message")
+    if x is id and x<y
+        fail "id subtraction would yield a negative"
     {type(x) z=x-y;}
     return z

@@ -13,6 +13,9 @@ RESET = "\033[0m"
 symbols = "=\\/+-*@<>!%&#!(){}[]:.',;|"
 END_TOKEN = "...]" # impossible for something else to be tokenized as this
 START_TOKEN = "[..." # impossible for something else to be tokenized as this
+err_code_table: dict[str,int] = dict()
+err_code_table["success"] = 0
+debug_mode = True
 
 class CompfailException(Exception): pass
 
@@ -139,6 +142,7 @@ class ImplementedType:
             if var in self.args: continue
             if val.type.builtin: ret += val.type.builtin+" "+var+"=0;\n  "
             # non-built-ins are theoretical constructs only
+        if self.needs_failure_mode: ret += "int __temp_errcode=0;\n  "
         prev = ";"
         for token in self.implementation:
             tok = token.tostring()
@@ -148,9 +152,10 @@ class ImplementedType:
             elif tok=="{": ret += "{\n  "
             elif tok=="}": ret += "}\n  "
             else: ret += tok
-        if ret_body_end: ret += "__temp_return:\n  ";
+        if ret_body_end: ret += "__temp_return:\n  "
         ret += ret_body_end
-        if self.needs_failure_mode: ret += "return 0;\n  __temp_failure:\n  return 1;\n}"
+        if self.needs_failure_mode:
+            ret += "return 0;\n  __temp_failure:\n  return __temp_errcode;\n}"
         else: ret = ret[:-2]+"}"
         return ret
 
@@ -247,9 +252,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     rets = list()
     if callee.needs_failure_mode:
         impl.implementation.extend([
-            CodeWord("if"),
-            CodeWord("("),
-            CodeWord("!"),
+            CodeWord("__temp_errcode"),
+            CodeWord("="),
             CodeWord(callee.monomorphic_name),
             CodeWord("("),
         ])
@@ -269,14 +273,32 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if variable.type.builtin: impl.implementation.extend([CodeWord("&"), variable, CodeWord(",")])
     if callee.rets or vars:
         impl.implementation[-1] = CodeWord(")") # replace last comma with closing parenthesis
+    impl.implementation.append(CodeWord(";"))
     if callee.needs_failure_mode:
         impl.implementation.extend([
+            CodeWord("if"),
+            CodeWord("("),
+            CodeWord("__temp_errcode"),
             CodeWord(")"),
+            CodeWord("{"),
+        ])
+        if debug_mode:
+            text = "\\033[31mat\\033[0m "+error_token.file.path.replace('"','\\"')+" line "+str(error_token.row)+" column "+str(error_token.col)+"\\n"
+            text +="   unhandled error from "+callee.signature()+"\\n"
+            impl.implementation.extend([
+                CodeWord("printf"),
+                CodeWord("("),
+                CodeWord('"%s", "'+text+'"'),
+                CodeWord(")"),
+                CodeWord(";"),
+            ])
+        impl.implementation.extend([
             CodeWord("goto"),
             CodeWord("__temp_failure"),
+            CodeWord(";"),
+            CodeWord("}")
         ])
         impl.needs_failure_mode = True
-    impl.implementation.append(CodeWord(";"))
     impl.dependent_implementations.append(callee)
     if callee==FAIL_TYPE: 
         if impl.nesting: error_token.error("safety", "cannot create a compilation-time failure inside a 'while' or an 'if' whose condition does not evaluate to compile-time known boolean")
@@ -454,6 +476,37 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
 def process_statement(file: File, tokens: list[Token], pos: int, impl: ImplementedType, current_operator_priority: int) -> tuple[int, list[Variable]]:
     current_token = get(tokens, pos)
     current = current_token.text
+    if current=="fail":
+        pos += 1
+        message = get(tokens, pos)
+        if not message.is_string(): message.error("syntax", "a string literal must contain an error message after 'fail'")
+        text = message.text
+        text = text[1:(len(text)-1)] # remove string limits
+        err_code = err_code_table.get(text, None)
+        if err_code is None:
+            err_code = len(err_code_table)
+            err_code_table[text] = err_code
+        if debug_mode:
+            text = "\\033[31mfail\\033[0m "+text
+            text += "\\n\\033[31mat\\033[0m "+message.file.path.replace('"','\\"')+" line "+str(message.row)+" column "+str(message.col)+"\\n"
+            impl.implementation.extend([
+                CodeWord("printf"),
+                CodeWord("("),
+                CodeWord('"%s", "'+text+'"'),
+                CodeWord(")"),
+                CodeWord(";"),
+            ])
+        impl.implementation.extend([
+            CodeWord("__temp_errcode"),
+            CodeWord("="),
+            CodeWord(str(err_code)),
+            CodeWord(";"),
+            CodeWord("goto"),
+            CodeWord("__temp_failure"),
+            CodeWord(";")
+        ])
+        impl.needs_failure_mode = True
+        return process_statement_operator(file, tokens, impl, pos+1, [], current_operator_priority)
     if current=="true": # does not have an implementation
         tmp = create_temp()
         variable = Variable(tmp, TRUE_TYPE) 
@@ -995,7 +1048,9 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
 parser = argparse.ArgumentParser(description="Compile a .s file and optionally run the result.")
 parser.add_argument("source", metavar="SOURCE", help="Path to the .s source file to compile.",)
 parser.add_argument("--build", action="store_true", help="Build without running.",)
+parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
 args = parser.parse_args()
+debug_mode = args.debug
 src_path = Path(args.source)
 if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); sys.exit(1)
 

@@ -673,7 +673,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                     impl.implementation.append(variable)
                 elif tok.text=="builtins" and peek_text(tokens, pos+1)=="::":
                     pos += 2
-                    pos, type = process_type(file, tokens, pos)
+                    pos, type = process_type(file_cache["builtins"], tokens, pos)
                     if len(type.variations)!=1: get(tokens, pos).error("type", "more than one types in union '"+type.name+"'")
                     if type.variations[0].builtin is None: get(tokens, pos).error("type", "only builtin types can be unpacked here '"+type.name+"'")
                     #impl.implementation.append(CodeWord(type.variations[0].builtin))
@@ -1021,14 +1021,32 @@ def _load(path: str) -> File:
                     token_start = col
                 else: col += 1
             if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start +1 + count_spaces))
-    return process(file, tokens, 0)
+
+    processed_tokens = list()
+    len_tokens = len(tokens)
+    i = 0
+    while i<len_tokens:
+        token = tokens[i]
+        if token.is_int() and i<len_tokens-2 and tokens[i+1].text=="." and tokens[i+2].is_int():
+            try:
+                float_token = Token(token.text+"."+tokens[i+2].text, token.file, token.row, token.col)
+                float(float_token.text)
+                processed_tokens.append(float_token)
+                i += 3
+                continue
+            except: pass
+        processed_tokens.append(token)
+        i += 1
+    return file, processed_tokens
 
 file_cache: dict[str, File] = dict()
 def load(path: str) -> File:
     file = file_cache.get(path, None)
     if file is None:
-        file = _load(path)
+        # this weird sequencing here is so that we can import partially imported modules without circular overflow
+        file, processed_tokens = _load(path)
         file_cache[path] = file
+        process(file, processed_tokens, 0)
     return file
 
 
@@ -1112,10 +1130,9 @@ main_type: UnionType = file.types.get("main", None)
 if not main_type: print(f"{RED}error{RESET}: missing main type"); sys.exit(1)
 if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); sys.exit(1)
 
-exe_name = src_path.stem
-write_and_compile(exe_name, {main_type.variations[0]}, main_type.variations[0].monomorphic_name)
+exe_path = src_path.with_suffix("")
+write_and_compile(exe_path, {main_type.variations[0]}, main_type.variations[0].monomorphic_name)
 if not args.build:
-    exe_path = Path(exe_name)
     if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); sys.exit(1)
     print(f"[{YELLOW}+{RESET}] run          ./{exe_path}")
     result = subprocess.run("./"+str(exe_path), text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)

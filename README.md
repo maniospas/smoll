@@ -23,9 +23,8 @@ manuals to onboard.
 An example that shows several language features follows.
 Cheat sheet:
 - `import` brings functions from other files
-- `def` defines functions
-- `&` denotes mutable values that can keep being
-modified in later code
+- `def` defines functions (functions also define types)
+- `mut` denotes mutable values that can be overwritten in code; mutable fields can still be edited
 - `->` pipes a value at the beginning of a function's arguments.
 
 ```python
@@ -33,9 +32,10 @@ import "std/core.s"
 import "std/file.s"
 
 def count(mut reader f, str line_prefix)
-    lines = &0
-    characters = &0
-    while f->next(line=str)
+    lines = mut 0
+    characters = mut 0
+    line = mut str ""
+    while (f,line)->next()
         print(line_prefix, "")
         print(line)
         lines = lines+1
@@ -43,9 +43,9 @@ def count(mut reader f, str line_prefix)
     return (lines, characters)
 
 def main()
-    f = &reader("README.md")
+    f = mut reader("README.md")
     counted = f->count("|")
-    print("lines"")
+    print("lines")
     print(counted.lines)
     print("lines")
     print(counted.lines)

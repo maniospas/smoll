@@ -1,124 +1,88 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static inline void range__temp353v(unsigned long long to, unsigned long long* __temp372v, unsigned long long* __temp373v) {
-  int __temp354v=0;
-  unsigned long long __temp355v=0;
-  unsigned long long pos=0;
-  __temp355v=0;
-  pos=__temp355v;
+static inline void float__temp359v(unsigned long long x, double* __temp389v) {
+  double z=0;
+  z=x;
   goto __temp_return;
   __temp_return:
-  *__temp372v=pos;
-  *__temp373v=to;
+  *__temp389v=z;
 }
 
-static inline void false__temp5v(int* __temp374v) {
+static inline void false__temp5v(int* __temp390v) {
   int value=0;
   __temp_return:
-  *__temp374v=value;
+  *__temp390v=value;
 }
 
-static inline void not__temp21v(int __temp_anon0, int* __temp375v) {
+static inline void not__temp21v(int __temp_anon0, int* __temp391v) {
   int __temp22v__value=0;
   false__temp5v(&__temp22v__value);
   goto __temp_return;
   __temp_return:
-  *__temp375v=__temp22v__value;
+  *__temp391v=__temp22v__value;
 }
 
-static inline void is_different__temp79v(unsigned long long x, unsigned long long y, int* __temp376v) {
-  int __temp80v=0;
-  int __temp81v____temp22v__value=0;
-  not__temp21v(__temp80v,&__temp81v____temp22v__value);
+static inline void is_different__temp55v(double x, double y, int* __temp392v) {
+  int __temp56v=0;
+  int __temp57v____temp22v__value=0;
+  not__temp21v(__temp56v,&__temp57v____temp22v__value);
   goto __temp_return;
   __temp_return:
-  *__temp376v=__temp81v____temp22v__value;
+  *__temp392v=__temp57v____temp22v__value;
 }
 
-static inline void add__temp129v(unsigned long long x, unsigned long long y, unsigned long long* __temp377v) {
-  int __temp130v____temp81v____temp22v__value=0;
-  unsigned long long z=0;
-  is_different__temp79v(x,y,&__temp130v____temp81v____temp22v__value);
+static inline void mul__temp106v(double x, double y, double* __temp393v) {
+  int __temp107v____temp57v____temp22v__value=0;
+  double z=0;
+  is_different__temp55v(x,y,&__temp107v____temp57v____temp22v__value);
+  z=x*y;
+  goto __temp_return;
+  __temp_return:
+  *__temp393v=z;
+}
+
+static inline void add__temp82v(double x, double y, double* __temp394v) {
+  int __temp83v____temp57v____temp22v__value=0;
+  double z=0;
+  is_different__temp55v(x,y,&__temp83v____temp57v____temp22v__value);
   z=x+y;
   goto __temp_return;
   __temp_return:
-  *__temp377v=z;
+  *__temp394v=z;
 }
 
-static inline void eq__temp297v(unsigned long long x, unsigned long long y, int* __temp378v) {
-  int __temp298v____temp81v____temp22v__value=0;
-  int z=0;
-  is_different__temp79v(x,y,&__temp298v____temp81v____temp22v__value);
-  z=x==y?1:0;
-  goto __temp_return;
-  __temp_return:
-  *__temp378v=z;
-}
-
-static inline void next__temp356v(unsigned long long* __temp379v, unsigned long long r__to, unsigned long long* __temp380v, int* __temp381v) {
-  unsigned long long r__pos=*__temp379v;
-  unsigned long long value=*__temp380v;
-  unsigned long long __temp357v=0;
-  unsigned long long __temp358v__z=0;
-  unsigned long long next_pos=0;
-  int __temp359v__z=0;
-  int __temp360v=0;
-  int __temp361v=0;
-  __temp357v=1;
-  add__temp129v(r__pos,__temp357v,&__temp358v__z);
-  next_pos=__temp358v__z;
-  eq__temp297v(next_pos,r__to,&__temp359v__z);
-  if(__temp359v__z){
-  __temp360v=0;
-  goto __temp_return;
-  }
-  value=r__pos;
-  r__pos=next_pos;
-  __temp361v=1;
-  __temp360v=__temp361v;
-  goto __temp_return;
-  __temp_return:
-  *__temp379v=r__pos;
-  *__temp380v=value;
-  *__temp381v=__temp360v;
-}
-
-static inline void print__temp97v(unsigned long long value) {
-  int __temp98v=0;
-  const char* __temp99v=0;
+static inline void print__temp333v(double value) {
+  int __temp334v=0;
+  const char* __temp335v=0;
   const char* endl=0;
-  __temp99v="\n";
-  endl=__temp99v;
-  printf("%llu%s",value,endl);
+  __temp335v="\n";
+  endl=__temp335v;
+  printf("%.6f%s",value,endl);
 }
 
-static inline void main__temp363v() {
-  unsigned long long __temp364v=0;
-  unsigned long long __temp365v__pos=0;
-  unsigned long long __temp365v__to=0;
-  unsigned long long r__pos=0;
-  unsigned long long r__to=0;
-  unsigned long long __temp366v=0;
-  unsigned long long value=0;
-  int __temp367v____temp360v=0;
-  unsigned long long __temp369v=0;
-  unsigned long long __temp370v__z=0;
-  __temp364v=10;
-  range__temp353v(__temp364v,&__temp365v__pos,&__temp365v__to);
-  r__pos=__temp365v__pos;
-  r__to=__temp365v__to;
-  __temp366v=0;
-  value=__temp366v;
-  while(1){
-  next__temp356v(&r__pos,r__to,&value,&__temp367v____temp360v);
-  if(!__temp367v____temp360v)break;
-  print__temp97v(value);
-  }
-  __temp369v=1;
-  add__temp129v(value,__temp369v,&__temp370v__z);
-  value=__temp370v__z;
-  print__temp97v(value);
+static inline void main__temp378v() {
+  double __temp379v=0;
+  double x=0;
+  unsigned long long __temp380v=0;
+  double __temp381v__z=0;
+  unsigned long long __temp382v=0;
+  double __temp383v__z=0;
+  double __temp384v=0;
+  double __temp385v__z=0;
+  double __temp386v__z=0;
+  double __temp387v__z=0;
+  __temp379v=1.0;
+  x=__temp379v;
+  __temp380v=1;
+  float__temp359v(__temp380v,&__temp381v__z);
+  __temp382v=2;
+  float__temp359v(__temp382v,&__temp383v__z);
+  __temp384v=2.0;
+  mul__temp106v(__temp383v__z,__temp384v,&__temp385v__z);
+  add__temp82v(__temp381v__z,__temp385v__z,&__temp386v__z);
+  add__temp82v(x,__temp386v__z,&__temp387v__z);
+  print__temp333v(__temp387v__z);
 }
 
-int main() {main__temp363v();return 0;}
+int main() {main__temp378v();return 0;}

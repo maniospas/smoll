@@ -74,7 +74,7 @@ def main()
 ## mutability
 
 Values cannot normally be overwritten. However, you can declare
-mutable ones that can be overwritten **once** by placing `&`
+mutable ones that can be overwritten **once** by placing `mut`
 before an expression (so it makes the result of everything 
 that follows mutable). You can keep overwriting the value if
 you substitute it with a mutable one.
@@ -90,8 +90,8 @@ others of the same type.
 import "std/core.s"
 
 def main()
-    x = &1   // mutable - we want to mutate it further
-    x = &x+2 // mutable - we still want to keep mutating
+    x = mut 1   // mutable - we want to mutate it further
+    x = mut x+2 // mutable - we still want to keep mutating
     x = x+3  // immutable - stop mutating
     print x
     print "\n"
@@ -110,15 +110,15 @@ are `bool`, `int`, `float`, and `cstr` for string literals.
 import "std/core.s"
 
 def range(id start, id end)
-    pos = &start
+    pos = mut start
     return (pos, end)
 
-def next(range r)
-    r.pos = &r.pos+1
+def next(mut range r)
+    r.pos = mut r.pos+1
     return r
 
 def main()
-    r = &range(0,10)
+    r = mut range(0,10)
     r = r->next() // see proper loops below (parenthesis needed to designate empty tuple)
     print r.pos
     print "\n"

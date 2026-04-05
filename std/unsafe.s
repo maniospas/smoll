@@ -6,4 +6,7 @@ def alloc(id bytes)
 
 def realloc(mut compiler::ptr allocated, id bytes)
     {allocated = realloc(allocated, bytes);}
-    return allocated
+
+def zero(compiler::ptr allocated, id from, id to)
+    {memset(((char*)allocated)+from, 0, to);}
+    

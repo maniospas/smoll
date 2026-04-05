@@ -19,6 +19,9 @@ debug_mode = True
 
 class CompfailException(Exception): pass
 
+def pretty_name(name: str):
+    return name.replace("__", ".")
+
 temps: list[str]= list()
 def create_temp():
     temp = "__temp"+str(len(temps))+"v"
@@ -57,11 +60,34 @@ class Variable(CodeSegment):
         if self.type!=other.type: return False
         if self.immutable!=other.immutable: return False
         if self.isprivate!=other.isprivate: return False
-        if self.name!=other.name: return False
+        if self.type.builtin and self.name!=other.name: return False # skip name matching
         return True
 
+def signature_like(vars: list[Variable]):
+    ret = ""
+    i = 0
+    while i<len(vars):
+        if ret: ret += ", "
+        type = vars[i].type
+        arg_name = vars[i].name
+        if arg_name.startswith("__temp") or "____" in arg_name: arg_name = ""
+        else: arg_name = " "+arg_name.replace("__", ".")
+        if not vars[i].immutable: ret += "mut "
+        if type.builtin: 
+            ret += type.name+arg_name
+            i += 1
+        elif type.is_buffer_of: 
+            ret += type.is_buffer_of.name+"[]"+arg_name
+            i += len(type.rets)
+        else:
+            ret += type.name+arg_name
+            i += len(type.rets)
+        assert len(type.rets)
+    return ret
+    
+
 class ImplementedType:
-    def __init__(self, name: str, builtin:str|None=None, at:"Token"=None):
+    def __init__(self, name: str, builtin:str|None=None, at:"Token"=None, memory_size=0):
         self.name = name
         self.monomorphic_name = name+create_temp()
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
@@ -82,13 +108,19 @@ class ImplementedType:
         if self.builtin is not None:
             self.vars["value"] = Variable("value", self)
             self.rets.append("value")
+            self._memory_size = memory_size
+        else: self._memory_size = 0
+
+    def memory_size(self):
+        if self.builtin: return self._memory_size
+        ret = self._memory_size
+        for arg in self.args: ret += self.vars[arg].type.memory_size()
+        return ret
 
     def signature(self):
-        ret = ""
-        for arg in self.args:
-            if ret: ret += ", "
-            ret += self.vars[arg].tostring()
-        return self.name+"("+ret+")"
+        args = signature_like([self.vars[arg] for arg in self.args])
+        rets = signature_like([self.vars[arg] for arg in self.rets])
+        return self.name+"("+args+") -> ("+rets+")"
 
     def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True):
         if len(value)==0: error_token.error("type", "no expression value to assign to variable '"+varname+"'")
@@ -259,9 +291,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 break
         if is_available: available_types.append(variation)
     if len(available_types)==0:
-        error_token.error("type", "could not resolve any call for '"+method.name+"("+','.join(var.type.name for var in vars)+")'")
+        error_token.error("type", "could not resolve any call for '"+method.name+"("+signature_like(vars)+")' candidates:\n    "+"\n    ".join([t.signature() for t in method.variations]))
     if len(available_types)>1:
-        error_token.error("type", "more than one conflicting call '"+method.name+"("+','.join(var.type.name for var in vars)+")'")
+        error_token.error("type", "more than one conflicting call '"+method.name+"("+signature_like(vars)+")' candidates:\n    "+"\n    ".join([t.signature() for t in available_types]))
     # TODO: we will now call the method, but we can also do so inline in the future maybe
     callee: ImplementedType = available_types[0]
     tmp = create_temp()
@@ -283,8 +315,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             if callee.vars[callee.args[varpos]].immutable:
                 impl.implementation.extend([var, CodeWord(",")])
                 continue
-            if var.isprivate: error_token.error("type", "a mutable argument cannot modify an immutable class field: '"+var.name+"'")
-            if var.immutable: error_token.error("type", "a mutable argument cannot modify an immutable variable '"+var.name+"'")
+            #if var.isprivate: error_token.error("type", "a mutable argument cannot modify an immutable class field: '"+pretty_name(var.name)+"'")
+            #if var.immutable: error_token.error("type", "a mutable argument cannot modify an immutable variable '"+pretty_name(var.name)+"'")
             impl.implementation.extend([CodeWord("&"), var, CodeWord(",")])
 
     for ret in callee.rets:
@@ -294,8 +326,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.vars[varname] = variable
         rets.append(variable)
         if variable.type.builtin: impl.implementation.extend([CodeWord("&"), variable, CodeWord(",")])
-    if callee.rets or vars:
-        impl.implementation[-1] = CodeWord(")") # replace last comma with closing parenthesis
+    if callee.rets or vars: impl.implementation[-1] = CodeWord(")") # replace last comma with closing parenthesis
+    else: impl.implementation.append(CodeWord(")"))
     impl.implementation.append(CodeWord(";"))
     if callee.needs_failure_mode:
         impl.implementation.extend([
@@ -367,7 +399,13 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
                         actual_variation.vars[type_arg] = Variable(type_arg, actual_variation)
                         actual_variation.vars["ptr"] = Variable("ptr", POINTER_TYPE, immutable=False, isprivate=False)
                         actual_variation.vars["size"] = Variable("size", UINT_TYPE, immutable=False, isprivate=False)
-                        actual_variation.vars["align"] = Variable("align", UINT_TYPE, immutable=False, isprivate=False)
+                        actual_variation.vars["align"] = Variable("align", UINT_TYPE, immutable=True, isprivate=False)
+                        actual_variation.implementation.extend([
+                            actual_variation.vars["align"],
+                            CodeWord("="),
+                            CodeWord(str(variation.memory_size())),
+                            CodeWord(";")
+                        ])
                         actual_variation.rets.append(type_arg)
                         actual_variation.rets.append("ptr")
                         actual_variation.rets.append("size")
@@ -721,11 +759,12 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 elif tok.text=="builtins" and peek_text(tokens, pos+1)=="::":
                     pos += 2
                     pos, type = process_type(file_cache["builtins"], tokens, pos)
-                    if len(type.variations)!=1: get(tokens, pos).error("type", "more than one types in union '"+type.name+"'")
-                    if type.variations[0].builtin is None: get(tokens, pos).error("type", "only builtin types can be unpacked here '"+type.name+"'")
+                    if len(type.variations)!=1: get(tokens, pos).error("type", "more than one types in union '"+pretty_name(type.name)+"'")
+                    if type.variations[0].builtin is None: get(tokens, pos).error("type", "only builtin types can be unpacked here '"+pretty_name(type.name)+"'")
                     #impl.implementation.append(CodeWord(type.variations[0].builtin))
                     varname = get(tokens, pos).text
                     variable = Variable(varname, type.variations[0])
+                    if varname in impl.vars: get(tokens, pos).error("type", "variable already exists '"+pretty_name(varname)+"'")
                     impl.vars[varname] = variable
                     impl.implementation.append(variable)
                 else: impl.implementation.append(CodeWord(tok.text))
@@ -1097,12 +1136,13 @@ def load(path: str) -> File:
     return file
 
 
-POINTER_TYPE = ImplementedType("ptr", "void*")
-CSTR_TYPE = ImplementedType("cstr", "const char*")
-BOOL_TYPE = ImplementedType("bool", "int")
-INT_TYPE = ImplementedType("int", "long long int")
-FLOAT_TYPE = ImplementedType("float", "double")
-UINT_TYPE = ImplementedType("id", "unsigned long long")
+POINTER_TYPE = ImplementedType("ptr", "void*", memory_size=8)
+CSTR_TYPE = ImplementedType("cstr", "const char*", memory_size=8)
+BOOL_TYPE = ImplementedType("bool", "int", memory_size=8)
+INT_TYPE = ImplementedType("int", "long long int", memory_size=8)
+FLOAT_TYPE = ImplementedType("float", "double", memory_size=8)
+UINT_TYPE = ImplementedType("id", "unsigned long long", memory_size=8)
+CHAR_TYPE = ImplementedType("char", "char", memory_size=1)
 FALSE_TYPE = ImplementedType("false", "int")
 TRUE_TYPE = ImplementedType("true", "int")
 FAIL_TYPE = ImplementedType("skipdef")
@@ -1117,6 +1157,7 @@ smol_namespace.types["float"] = UnionType("float").append(FLOAT_TYPE)
 smol_namespace.types["bool"] = UnionType("bool").append(BOOL_TYPE)
 smol_namespace.types["err"] = UnionType("err").append(ImplementedType("err", "int"))
 smol_namespace.types["empty"] = UnionType("empty").append(ImplementedType("void"))
+smol_namespace.types["char"] = UnionType("char").append(CHAR_TYPE)
 smol_namespace.types["any"] = UnionType("any").append(ANY_TYPE)
 
 fixed_namespace = File("compiler")
@@ -1134,6 +1175,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     header = (
         "#include <stdio.h>\n"
         "#include <stdlib.h>\n"
+        "#include <string.h>\n"
         "\n"
     )
 

@@ -1,14 +1,17 @@
-import "std/core.s"
-import "std/unsafe.s" as unsafe
+import "std/array.s"
 
-def expect(mut any[] buffer, id elements)
-    buffer.ptr = unsafe::alloc(buffer.align)
+def print(any[] buffer)
+    print("buffer: ", "")
+    print(buffer.size, " elements, ")
+    print(buffer.align*buffer.size, " bytes\n")
 
-def print(mut any[] buffer)
-    print("buffer size", " ")
-    print(buffer.size)
+def anonymize(any[] buffer)
+    return buffer
+
+def test(float[] buffer)
+    print "float[] compatible" 
 
 def main()
     x = mut float[]()
     expect(x, 10)
-    print("hi")
+    print(x)

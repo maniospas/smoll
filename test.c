@@ -1,88 +1,61 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static inline void float__temp359v(unsigned long long x, double* __temp389v) {
-  double z=0;
-  z=x;
+static inline void float__temp_buffer__buffer__temp404v(void** __temp411v, unsigned long long* __temp412v, unsigned long long* __temp413v) {
+  void* ptr=0;
+  unsigned long long size=0;
+  unsigned long long align=0;
+  __temp_return:
+  *__temp411v=ptr;
+  *__temp412v=size;
+  *__temp413v=align;
+}
+
+static inline void alloc__temp382v(unsigned long long bytes, void** __temp414v) {
+  void* allocated=0;
+  allocated=malloc(bytes);
   goto __temp_return;
   __temp_return:
-  *__temp389v=z;
+  *__temp414v=allocated;
 }
 
-static inline void false__temp5v(int* __temp390v) {
-  int value=0;
+static inline void expect__temp394v(void* buffer__ptr, unsigned long long* __temp415v, unsigned long long* __temp416v, unsigned long long elements) {
+  unsigned long long buffer__size=*__temp415v;
+  unsigned long long buffer__align=*__temp416v;
+  void* __temp395v__allocated=0;
+  alloc__temp382v(buffer__align,&__temp395v__allocated);
+  buffer__ptr=__temp395v__allocated;
   __temp_return:
-  *__temp390v=value;
+  *__temp415v=buffer__size;
+  *__temp416v=buffer__align;
 }
 
-static inline void not__temp21v(int __temp_anon0, int* __temp391v) {
-  int __temp22v__value=0;
-  false__temp5v(&__temp22v__value);
-  goto __temp_return;
-  __temp_return:
-  *__temp391v=__temp22v__value;
-}
-
-static inline void is_different__temp55v(double x, double y, int* __temp392v) {
-  int __temp56v=0;
-  int __temp57v____temp22v__value=0;
-  not__temp21v(__temp56v,&__temp57v____temp22v__value);
-  goto __temp_return;
-  __temp_return:
-  *__temp392v=__temp57v____temp22v__value;
-}
-
-static inline void mul__temp106v(double x, double y, double* __temp393v) {
-  int __temp107v____temp57v____temp22v__value=0;
-  double z=0;
-  is_different__temp55v(x,y,&__temp107v____temp57v____temp22v__value);
-  z=x*y;
-  goto __temp_return;
-  __temp_return:
-  *__temp393v=z;
-}
-
-static inline void add__temp82v(double x, double y, double* __temp394v) {
-  int __temp83v____temp57v____temp22v__value=0;
-  double z=0;
-  is_different__temp55v(x,y,&__temp83v____temp57v____temp22v__value);
-  z=x+y;
-  goto __temp_return;
-  __temp_return:
-  *__temp394v=z;
-}
-
-static inline void print__temp333v(double value) {
-  int __temp334v=0;
-  const char* __temp335v=0;
+static inline void print__temp330v(const char* value) {
+  int __temp331v=0;
+  const char* __temp332v=0;
   const char* endl=0;
-  __temp335v="\n";
-  endl=__temp335v;
-  printf("%.6f%s",value,endl);
+  __temp332v="\n";
+  endl=__temp332v;
+  printf("%s%s",value,endl);
 }
 
-static inline void main__temp378v() {
-  double __temp379v=0;
-  double x=0;
-  unsigned long long __temp380v=0;
-  double __temp381v__z=0;
-  unsigned long long __temp382v=0;
-  double __temp383v__z=0;
-  double __temp384v=0;
-  double __temp385v__z=0;
-  double __temp386v__z=0;
-  double __temp387v__z=0;
-  __temp379v=1.0;
-  x=__temp379v;
-  __temp380v=1;
-  float__temp359v(__temp380v,&__temp381v__z);
-  __temp382v=2;
-  float__temp359v(__temp382v,&__temp383v__z);
-  __temp384v=2.0;
-  mul__temp106v(__temp383v__z,__temp384v,&__temp385v__z);
-  add__temp82v(__temp381v__z,__temp385v__z,&__temp386v__z);
-  add__temp82v(x,__temp386v__z,&__temp387v__z);
-  print__temp333v(__temp387v__z);
+static inline void main__temp403v() {
+  void* __temp406v__ptr=0;
+  unsigned long long __temp406v__size=0;
+  unsigned long long __temp406v__align=0;
+  void* x__ptr=0;
+  unsigned long long x__size=0;
+  unsigned long long x__align=0;
+  unsigned long long __temp407v=0;
+  const char* __temp409v=0;
+  float__temp_buffer__buffer__temp404v(&__temp406v__ptr,&__temp406v__size,&__temp406v__align);
+  x__ptr=__temp406v__ptr;
+  x__size=__temp406v__size;
+  x__align=__temp406v__align;
+  __temp407v=10;
+  expect__temp394v(x__ptr,&x__size,&x__align,__temp407v);
+  __temp409v="hi";
+  print__temp330v(__temp409v);
 }
 
-int main() {main__temp378v();return 0;}
+int main() {main__temp403v();return 0;}

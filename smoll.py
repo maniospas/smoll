@@ -77,6 +77,7 @@ class ImplementedType:
         self.nesting: str = list()
         self.has_returned_once = False
         self.needs_failure_mode = False
+        self.is_buffer_of: ImplementedType|None = None
         self.dependent_implementations: list[ImplementedType] = list()
         if self.builtin is not None:
             self.vars["value"] = Variable("value", self)
@@ -252,7 +253,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if len(variation.args)!=len(vars): continue
         is_available = True
         for i in range(len(vars)):
-            if vars[i].type!= variation.vars[variation.args[i]].type:
+            # we can allow lowering buffers to generic any
+            if vars[i].type!= variation.vars[variation.args[i]].type and variation.vars[variation.args[i]].type.is_buffer_of!=ANY_TYPE:
                 is_available = False
                 break
         if is_available: available_types.append(variation)
@@ -281,8 +283,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             if callee.vars[callee.args[varpos]].immutable:
                 impl.implementation.extend([var, CodeWord(",")])
                 continue
-            if var.isprivate: tokens[pos].error("type", "a mutable argument modify a immutable class field: '"+current+"'")
-            if var.immutable: error_token.error("safety", "a mutable argument cannot modify an immutable variable '"+var.name+"'")
+            if var.isprivate: error_token.error("type", "a mutable argument cannot modify an immutable class field: '"+var.name+"'")
+            if var.immutable: error_token.error("type", "a mutable argument cannot modify an immutable variable '"+var.name+"'")
             impl.implementation.extend([CodeWord("&"), var, CodeWord(",")])
 
     for ret in callee.rets:
@@ -326,6 +328,23 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         raise CompfailException()
     return rets
 
+buffer_types: dict[ImplementedType, UnionType] = dict()
+
+def find_unique_variations(variations: list[ImplementedType]):
+    all_found: list[ImplementedType] = list()
+    for impl in variations:
+        already_parsed = False
+        for variation in all_found:
+            is_same = len(variation.rets)==len(impl.rets)
+            if is_same:
+                for variation_arg, impl_arg in zip(variation.rets, impl.rets):
+                    if variation.vars[variation_arg].type!=impl.vars[impl_arg].type:
+                        is_same = False
+            if is_same:
+                already_parsed = True
+                break
+        if not already_parsed: all_found.append(impl)
+    return all_found
 
 def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|UnionType]:
     name = get(tokens, pos).text
@@ -334,6 +353,34 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
         if type is None: 
             #raise("unknown type '"+name+"'")
             tokens[pos].error("type", "unknown type '"+name+"'")
+        if peek_text(tokens, pos+1)=="[":
+            if get(tokens, pos+2).text!="]": get(tokens, pos+1).error("syntax", "to denote a buffer type use '[]'")
+            buffer_type = buffer_types.get(type, None)
+            if buffer_type is None:
+                buffer_type = UnionType(type.name+"__temp_buffer")
+                for variation in find_unique_variations(type.variations):
+                    variation_buffer_type = buffer_types.get(type, None)
+                    if variation_buffer_type is None:
+                        actual_variation = ImplementedType(buffer_type.name+"__buffer")
+                        actual_variation.is_buffer_of = variation
+                        type_arg = create_temp()+actual_variation.name
+                        actual_variation.vars[type_arg] = Variable(type_arg, actual_variation)
+                        actual_variation.vars["ptr"] = Variable("ptr", POINTER_TYPE, immutable=False, isprivate=False)
+                        actual_variation.vars["size"] = Variable("size", UINT_TYPE, immutable=False, isprivate=False)
+                        actual_variation.vars["align"] = Variable("align", UINT_TYPE, immutable=False, isprivate=False)
+                        actual_variation.rets.append(type_arg)
+                        actual_variation.rets.append("ptr")
+                        actual_variation.rets.append("size")
+                        actual_variation.rets.append("align")
+                        variation_buffer_type = UnionType(buffer_type.name+"__temp_buffer")
+                        variation_buffer_type.append(actual_variation)
+                        buffer_types[variation] = variation_buffer_type
+                    buffer_type.variations.extend(variation_buffer_type.variations)
+                buffer_types[type] = buffer_type
+            file.types[buffer_type.name] = buffer_type
+            return pos+3, buffer_type
+        for variation in type.variations: 
+            if variation==ANY_TYPE: tokens[pos].error("safety", "can only place on buffers the type 'any'")
         return pos+1, type
     namespace: File = file.namespaces.get(name, None)
     if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'")
@@ -1050,6 +1097,7 @@ def load(path: str) -> File:
     return file
 
 
+POINTER_TYPE = ImplementedType("ptr", "void*")
 CSTR_TYPE = ImplementedType("cstr", "const char*")
 BOOL_TYPE = ImplementedType("bool", "int")
 INT_TYPE = ImplementedType("int", "long long int")
@@ -1058,6 +1106,7 @@ UINT_TYPE = ImplementedType("id", "unsigned long long")
 FALSE_TYPE = ImplementedType("false", "int")
 TRUE_TYPE = ImplementedType("true", "int")
 FAIL_TYPE = ImplementedType("skipdef")
+ANY_TYPE = ImplementedType("any")
 # FAIL_TYPE.vars["message"] = CSTR_TYPE
 # FAIL_TYPE.args.append("message") 
 smol_namespace = File("builtins")
@@ -1068,11 +1117,13 @@ smol_namespace.types["float"] = UnionType("float").append(FLOAT_TYPE)
 smol_namespace.types["bool"] = UnionType("bool").append(BOOL_TYPE)
 smol_namespace.types["err"] = UnionType("err").append(ImplementedType("err", "int"))
 smol_namespace.types["empty"] = UnionType("empty").append(ImplementedType("void"))
+smol_namespace.types["any"] = UnionType("any").append(ANY_TYPE)
 
 fixed_namespace = File("compiler")
 fixed_namespace.types["skipdef"] = UnionType("skipdef").append(FAIL_TYPE)
 fixed_namespace.types["true"] = UnionType("true").append(TRUE_TYPE)
 fixed_namespace.types["false"] = UnionType("false").append(FALSE_TYPE)
+fixed_namespace.types["ptr"] = UnionType("ptr").append(POINTER_TYPE)
 smol_namespace.namespaces["compiler"] = fixed_namespace
 
 file_cache["builtins"] = smol_namespace
@@ -1082,7 +1133,8 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     exe_path = Path(output_name)
     header = (
         "#include <stdio.h>\n"
-        "#include <stdlib.h>\n\n"
+        "#include <stdlib.h>\n"
+        "\n"
     )
 
     generated_c_funcs = list()

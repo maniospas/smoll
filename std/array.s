@@ -1,6 +1,10 @@
 import "std/core.s"
 import "std/unsafe.s" as unsafe
 
+// a convention to make pointer operations safe outside the unsafe:: namespace
+// is that we GUARANTEE that non-zero pointers to a memory region contain
+// at least one element of the attached type (automatically inferred for any)
+
 def expect(mut any[] buffer, id elements)
     if elements==0 
         return empty()

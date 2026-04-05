@@ -14,4 +14,6 @@ def test(float[] buffer)
 def main()
     x = mut float[]()
     expect(x, 10)
+    x.ptr := float 10
+    value = deref x.ptr
     print(x)

@@ -174,7 +174,7 @@ class ImplementedType:
         if existing.type==POINTER_TYPE:
             existing_pointer_type = self.get_pointer_type(existing)
             other_pointer_type = self.get_pointer_type(value[0])
-            print(existing.name, existing_pointer_type.name if existing_pointer_type else None, value[0].name, other_pointer_type.name if other_pointer_type else None)
+            #print(existing.name, existing_pointer_type.name if existing_pointer_type else None, value[0].name, other_pointer_type.name if other_pointer_type else None)
             if existing_pointer_type is not None:
                 if existing_pointer_type!=other_pointer_type: error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+other_pointer_type.signature()+"'")
             else:
@@ -768,13 +768,14 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             impl.implementation.extend([
                 CodeWord("if"),
                 CodeWord("("),
-                var,
                 CodeWord("!"),
+                var,
                 CodeWord(")"),
                 CodeWord("{"),
             ])
             if debug_mode:
-                text = "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
+                text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
+                text += "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
                 impl.implementation.extend([
                     CodeWord("printf"),
                     CodeWord("("),

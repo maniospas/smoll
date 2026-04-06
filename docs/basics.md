@@ -268,3 +268,80 @@ def inc(int x, int|blank value)
         value = 1
     return x+value
 ```
+
+
+## buffers
+
+Buffers can be declared with the following syntax to hold any type's items:
+
+```python
+import "std/array.s"
+
+def print(any[] buffer)
+    print("buffer: ", "")
+    print(buffer.size, " elements, ")
+    print(buffer.align*buffer.size, " bytes\n")
+
+def main()
+    x = mut float[]()
+    print(x)
+```
+
+Most buffer features are implemented in `"std/array.s"`;
+we will see next how to work with abstract buffers.
+One of the most important features are the `grow` function to
+allocate and zero-initialize a specific number of 
+additional elements.
+
+A second important feature is the element access operator `[]`,
+which can be used to retrieve a pointer to a specific element. 
+This pointer is unstanble in that it can be set to via 
+`ptr := value` or dereferenced with `:ptr` into a correctly type
+object, but it may become invalid
+later in your code. Do not worry about safety, as any potential memory 
+corruption will make the compiler complain if you reuse pointers obtained
+before it. 
+
+All buffer indexes are of type `id`, which represents 
+unsigned integers.
+
+```python
+import "std/core.s"
+import "std/array.s"
+
+def main()
+    buf = mut float[]
+    buf->grow(10)
+    print(buf[0]) // prints 0, as x is zero-initialized
+    buf[1] := 1.0
+    print(:buf[1])
+```
+
+## pointers
+
+Use pointers to pass large chunks of data around or simply
+reference the memory address of buffer elements. *Smoλ* makes necessary
+checks on pointer safety; it would be too restrictive
+to impose those checks on the type system. 
+
+Mainly, the type of data stored on pointers
+is checked for consistency, and invalidated pointers (for example whose
+data have moved in memory by modifying a buffer) cannot be used.
+
+There is a particular contract for pointers: unless
+they create a runtime error by remaining uninitialized, it is always
+valid to move data to their memory address with the syntax `pointer := data`.
+Below is an example.
+
+```python
+import "std/core.s"
+import "std/array.s"
+
+def main()
+    buf = mut float[]->grow(1) // grow returns the buffer for convenience    
+    element = buf->get(0)
+    print(:element) // prints 0 as buffers are zero-initialized
+    element := 1.0  // setting to elements with [] uses this operation
+    print(:element) // prints 1
+    print(buf[0])   // prints 1 from the same memory ([] automatically derefs)
+```

@@ -253,9 +253,9 @@ def typed_print(int|float|cstr value)
 
 
 The same mechanism can be used to create optional arguments
-using the `empty` builtin type; that has no contents and therefore
+using the `blank` builtin type; that has no contents and therefore
 skips respective variable definition. Conversely, non-existing
-variables are considered `empty`, and checks like the one below 
+variables are considered `blank`, and checks like the one below 
 can be made. 
 
 There, the defined function implements either an increment
@@ -263,8 +263,8 @@ by one, or by a value provided as second argument. Use the
 same mechanism to have any number of optional arguments.
 
 ```python
-def inc(int x, int|empty value)
-    if value is empty
+def inc(int x, int|blank value)
+    if value is blank
         value = 1
     return x+value
 ```

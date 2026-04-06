@@ -718,6 +718,61 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
     if current == "&" or current=="mut":
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy() for r in ret], current_operator_priority)
+    if current == "deref":
+        pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
+        if len(ret)!=1: current_token.error("type", "can only deref a 'ptr'")
+        if ret[0].type!=POINTER_TYPE: current_token.error("type", "can only deref a 'ptr'")
+        pointer_type = impl.get_pointer_type(ret[0])
+        if pointer_type is None: current_token.error("type", "there is no known type attached to the pointer to deref at this point")
+        if pointer_type == ANY_TYPE: current_token.error("type", "cannot deref a pointer on 'any' data (this can be specialized)")
+        new_vars = list()
+        prefix = create_temp()+"__"
+        progress = 0
+        for ret_name in pointer_type.rets:
+            r_var = pointer_type.vars[ret_name].renamed_copy(prefix+ret_name)
+            new_vars.append(r_var)
+            mem_size = r_var.type.memory_size()
+            impl.vars[r_var.name] = r_var
+            if not mem_size: continue
+            # non-allocation check is mandatory unfortunately
+            impl.implementation.extend([
+                CodeWord("if"),
+                CodeWord("("),
+                CodeWord("!"),
+                ret[0],
+                CodeWord(")"),
+                CodeWord("{"),
+            ])
+            if debug_mode:
+                text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
+                text += "\\033[31mat\\033[0m "+current_token.file.path.replace('"','\\"')+" line "+str(current_token.row)+" column "+str(current_token.col)+"\\n"
+                impl.implementation.extend([
+                    CodeWord("printf"),
+                    CodeWord("("),
+                    CodeWord('"%s", "'+text+'"'),
+                    CodeWord(")"),
+                    CodeWord(";"),
+                ])
+            impl.implementation.extend([
+                CodeWord("goto"),
+                CodeWord("__temp_failure"),
+                CodeWord(";"),
+                CodeWord("}")
+            ])
+            impl.needs_failure_mode = True
+            impl.implementation.extend(
+                [CodeWord(w) for w in "memcpy (".split(" ")]
+                + [CodeWord("&")]
+                + [r_var]
+                + [CodeWord(",")]
+                + [CodeWord(w) for w in "( char * )".split(" ")]
+                + [ret[0]]
+                + ([CodeWord("+"), CodeWord(str(progress))] if progress else [])
+                + [CodeWord(","), CodeWord(str(mem_size))]
+                + [CodeWord(")"), CodeWord(";")]
+            )
+            progress += mem_size
+        return process_statement_operator(file, tokens, impl, pos, new_vars, current_operator_priority)
     if current == "class":
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         tmp = create_temp()
@@ -1267,7 +1322,7 @@ smol_namespace.types["id"] = UnionType("id").append(UINT_TYPE)
 smol_namespace.types["float"] = UnionType("float").append(FLOAT_TYPE)
 smol_namespace.types["bool"] = UnionType("bool").append(BOOL_TYPE)
 smol_namespace.types["err"] = UnionType("err").append(ImplementedType("err", "int"))
-smol_namespace.types["empty"] = UnionType("empty").append(ImplementedType("void"))
+smol_namespace.types["blank"] = UnionType("blank").append(ImplementedType("void"))
 smol_namespace.types["char"] = UnionType("char").append(CHAR_TYPE)
 smol_namespace.types["any"] = UnionType("any").append(ANY_TYPE)
 

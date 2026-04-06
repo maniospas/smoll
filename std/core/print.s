@@ -1,27 +1,27 @@
 import "builtins"
 
-def print(cstr value, cstr|empty endl)
-    if endl is empty 
+def print(cstr value, cstr|blank endl)
+    if endl is blank 
         endl = "\n"
     {printf("%s%s", value, endl);}
 
-def print(float value, cstr|empty endl)
-    if endl is empty 
+def print(float value, cstr|blank endl)
+    if endl is blank 
         endl = "\n"
     {printf("%.6f%s", value, endl);}
 
-def print(int value, cstr|empty endl)
-    if endl is empty 
+def print(int value, cstr|blank endl)
+    if endl is blank 
         endl = "\n"
     {printf("%lld%s", value, endl);}
 
-def print(id value, cstr|empty endl)
-    if endl is empty 
+def print(id value, cstr|blank endl)
+    if endl is blank 
         endl = "\n"
     {printf("%llu%s", value, endl);}
 
-def print(bool value, cstr|empty endl)
-    if endl is empty
+def print(bool value, cstr|blank endl)
+    if endl is blank
         endl = "\n"
     {printf("%s%s", value?"true":"false", endl);}
 

@@ -9,7 +9,7 @@ def anonymize(any[] buffer)
     return buffer
 
 def test(float[] buffer)
-    print "float[] compatible" 
+    print "float[] compatible"
 
 def main()
     x = mut float[]()
@@ -17,3 +17,4 @@ def main()
     x.ptr := float 10
     value = deref x.ptr
     print(x)
+    print(value)

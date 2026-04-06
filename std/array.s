@@ -7,7 +7,7 @@ import "std/unsafe.s" as unsafe
 
 def expect(mut any[] buffer, id elements)
     if elements==0 
-        return empty()
+        return blank()
     buffer.size = mut buffer.size+elements
     bytes = buffer.align*buffer.size
     buffer.ptr = mut unsafe::alloc(bytes)

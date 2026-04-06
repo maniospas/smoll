@@ -60,7 +60,7 @@ class Variable(CodeSegment):
         if self.type!=other.type: return False
         if self.immutable!=other.immutable: return False
         if self.isprivate!=other.isprivate: return False
-        if self.type.builtin and self.name!=other.name: return False # skip name matching
+        #if self.type.builtin and self.name!=other.name: return False # skip name matching
         return True
 
 def signature_like(vars: list[Variable]):
@@ -123,8 +123,8 @@ class ImplementedType:
         varname = var.name
         if varname not in self._pointer_type_dependencies: return None
         while varname in self._pointer_type_dependencies:
-            varname = self._pointer_type_dependencies
-        return args[varname]
+            varname = self._pointer_type_dependencies.get(varname, "")
+        return self.vars[varname]
 
     def get_pointer_type(self, var: Variable):
         ret = self._pointer_types.get(var.name, None)
@@ -136,7 +136,7 @@ class ImplementedType:
     def set_pointer_depedency(self, var: Variable, depends_on: Variable):
         assert var not in self._pointer_type_dependencies
         assert not self.get_pointer_type(var)
-        assert self.get_pointer_type(depends_on)
+        #assert self.get_pointer_type(depends_on), "Need to have pointer type for "+depends_on.name+" in "+self.name
         self._pointer_type_dependencies[var.name] = depends_on.name
 
     def memory_size(self):
@@ -339,6 +339,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         other_pointer_type = callee.get_pointer_type(callee.vars[callee.args[varpos]])
         if var_pointer_type is not None and other_pointer_type is not None and var_pointer_type!=ANY_TYPE and other_pointer_type!=ANY_TYPE and var_pointer_type!=other_pointer_type:
             error_token.error("safety", "two incompatible pointers are used '"+other_pointer_type.signature()+"' vs '"+var_pointer_type.signature()+"'")
+        if (var_pointer_type is None or var_pointer_type==ANY_TYPE) and other_pointer_type is not None and other_pointer_type!=ANY_TYPE:
+            impl._pointer_types[var.name] = other_pointer_type
     # TODO: we will now call the method, but we can also inline it in the future maybe
     tmp = create_temp()
     rets = list()
@@ -373,10 +375,15 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if original.type!=POINTER_TYPE: continue
         original_pointer_type = callee.get_pointer_type(original)
         if original_pointer_type is None or original_pointer_type==ANY_TYPE:
+            # print("-------------", impl.name, callee.name)
+            # print(callee._pointer_type_dependencies)
+            # print(callee.vars.keys())
+            # print("$$$$", variable.name, original.name)
             original_pointer_dependency = callee.follow_pointer_dependency(original)
             if original_pointer_dependency is not None:
-                for varpos, varname in enumerate(calee.vars):
+                for varpos, varname in enumerate(callee.args):
                     if varname!=original_pointer_dependency.name: continue
+                    print(impl.name, variable.name, vars[varpos].name)
                     impl.set_pointer_depedency(variable, vars[varpos])
                     break
         else: 
@@ -804,7 +811,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
     var = impl.vars.get(current, None)
     if peek_text(tokens, pos+1) == ":=":
         err_token = get(tokens, pos+1)
-        if var is None and var.isprivate: tokens[pos].error("type", "cannot set to immutable class field: '"+pretty_name(current)+"'")
+        if var is not None and var.isprivate: tokens[pos].error("type", "cannot set to immutable class field: '"+pretty_name(current)+"'")
         if var is None: tokens[pos].error("type", "can only set a value to an existing ptr with ':='")
         if var.type!=POINTER_TYPE: tokens[pos].error("type", "can only set a value to an existing ptr with ':='")
         pos, ret = process_statement(file, tokens, pos+2, impl, current_operator_priority=0)
@@ -1152,6 +1159,7 @@ def process_def(file: File, tokens: list[Token], pos: int):
                 if arg_type.builtin:
                     impl.vars[arg_name] = Variable(arg_name, arg_type, immutable)
                     impl.args.append(arg_name)
+                    if arg_type==POINTER_TYPE: impl.set_pointer_type(impl.vars[arg_name], ANY_TYPE)
                     continue
                 for ret in arg_type.rets:
                     ret_name = arg_name+"__"+ret
@@ -1315,6 +1323,14 @@ FAIL_TYPE = ImplementedType("skipdef")
 ANY_TYPE = ImplementedType("any")
 # FAIL_TYPE.vars["message"] = CSTR_TYPE
 # FAIL_TYPE.args.append("message") 
+SAME_CONTENTS_TYPE = ImplementedType("same_contents")
+SAME_CONTENTS_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
+SAME_CONTENTS_TYPE.vars["from"] = Variable("from", POINTER_TYPE)
+SAME_CONTENTS_TYPE.rets.append("to")
+SAME_CONTENTS_TYPE.args.extend(["to", "from"])
+SAME_CONTENTS_TYPE.set_pointer_type(SAME_CONTENTS_TYPE.vars["from"], ANY_TYPE)
+SAME_CONTENTS_TYPE.set_pointer_depedency(SAME_CONTENTS_TYPE.vars["to"], SAME_CONTENTS_TYPE.vars["from"])
+
 smol_namespace = File("builtins")
 smol_namespace.types["cstr"] = UnionType("cstr").append(CSTR_TYPE)
 smol_namespace.types["int"] = UnionType("int").append(INT_TYPE)
@@ -1331,6 +1347,7 @@ fixed_namespace.types["skipdef"] = UnionType("skipdef").append(FAIL_TYPE)
 fixed_namespace.types["true"] = UnionType("true").append(TRUE_TYPE)
 fixed_namespace.types["false"] = UnionType("false").append(FALSE_TYPE)
 fixed_namespace.types["ptr"] = UnionType("ptr").append(POINTER_TYPE)
+fixed_namespace.types["same_contents"] = UnionType("ptr").append(SAME_CONTENTS_TYPE)
 smol_namespace.namespaces["compiler"] = fixed_namespace
 
 file_cache["builtins"] = smol_namespace

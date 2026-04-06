@@ -13,10 +13,7 @@ def expect(mut any[] buffer, id elements)
     buffer.ptr = mut unsafe::alloc(bytes)
     unsafe::zero(buffer.ptr, 0, bytes)
 
-def get(any[] buffer, id element)
-    if element>=buffer.size
+def get(any[] buffer, id i)
+    if i>=buffer.size
         fail "out of bounds"
-    offset = element*buffer.align
-    buffer_ptr = buffer.ptr
-    {builtins::compiler::ptr el = ((char*)buffer_ptr)+offset;}
-    return el
+    return buffer.ptr->unsafe::add(i*buffer.align)

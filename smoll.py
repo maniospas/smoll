@@ -716,9 +716,10 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             ])
             pos, rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority)
             pack_name = create_temp()
-            impl.assign(pack_name, create_temp(), op_token)
+            impl.assign(pack_name, rets, op_token)
             rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
             impl.implementation.append(CodeWord("}"))
+            continue
 
         if op_name=="or":
             if len(rets)!=1: op_token.error("type", "the left hand side must always be true/false for 'or'")
@@ -739,9 +740,10 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             ])
             pos, rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority) 
             pack_name = create_temp()
-            impl.assign(pack_name, create_temp(), op_token)
+            impl.assign(pack_name, rets, op_token)
             rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
             impl.implementation.append(CodeWord("}"))
+            continue
 
         if op_name=="is":
             is_pos = pos
@@ -1076,7 +1078,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
         if name.text=="if":
             if_pos = pos-1
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
-            if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool'")
+            if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool' but found '"+signature_like(ret)+"'")
             if ret[0].type==TRUE_TYPE:
                 if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
                 else: pos = process_body(file, tokens, pos-1, impl, one_line=True)

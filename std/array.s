@@ -6,10 +6,10 @@ import "std/unsafe.s" as unsafe
 // at least one element of the attached type (automatically inferred for any)
 
 def alloc(mut any[] buffer, id size)
-    if buffer.unsafe_size!=0
-        fail "call resize for non-empty buffers; alloc promises no data reallocation"
-    if size==0
+    if buffer.unsafe_size==size
         return buffer
+    if buffer.unsafe_size!=0
+        fail "cannot resize buffers with alloc; it promises no data reallocation"
     buffer.unsafe_size = size
     bytes = buffer.align*size
     buffer.unsafe_ptr = unsafe::alloc(bytes)

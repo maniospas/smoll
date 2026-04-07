@@ -608,7 +608,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
     while True:
         op = peek_text(tokens, pos)
         op_name, op_priority = {
-            ":=": (":=", 11),
+            ":": (":", 11),
             "and": ("and", 10),
             "or": ("or", 9),
             "is": ("is", 8),
@@ -639,7 +639,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
         if current_operator_priority==7 and op_priority==7: 
             op_token.error("safety", "there is no clear priority order between multiple equalities and inequalities; be explicit with parentheses")
 
-        if op_name==":=":
+        if op_name==":":
             err_token = op_token
             if len(rets)!=1: err_token.error("type", "can not apply ':=' to non-pointer '"+signature_like(rets)+"'")
             var = rets[0]
@@ -933,7 +933,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                 continue
             get(tokens, pos).error("syntax", "expecting comma or closing parenthesis")
         pos += 1 # skip closing parenthesis
-        if peek_text(tokens, pos)=="->": return pos, ret  # manual left-to-right piping
+        if peek_text(tokens, pos)=="->" or peek_text(tokens, pos)=="[": return pos, ret  # manual left-to-right piping
         return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
     is_field = False
     while peek_text(tokens, pos+1) == ".":

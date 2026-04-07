@@ -38,3 +38,6 @@ def get(any[] buffer, id i)
 
 def len(any[] buffer)
     return buffer.unsafe_size
+
+def new(any[] buffer)
+    return buffer->alloc(1)[0]

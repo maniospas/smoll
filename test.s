@@ -14,9 +14,13 @@ def print(Field ptr f)
 
 def main()
     f = float[]->alloc(1)  // preffer alloc than resizing empty buffers (no pointer invalidation)
-    f[0] := 1.0 // move data to pointer
+    f[0]: 1.0   // move data to pointer
     print f[0]. // dot after a pointer derefs it
 
     p = Field[]->alloc(1)
-    p[0] := (1.0,2.0,3.0,4.0)
-    print(p[0])
+    p[0]: (1.0,2.0,3.0,4.0)
+    print p[0]
+    
+    n = (new float[]): 1.0
+    print(n.)
+

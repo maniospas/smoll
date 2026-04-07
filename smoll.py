@@ -5,6 +5,8 @@ import sys
 import argparse
 import itertools
 import subprocess
+import platform
+import urllib.request
 from pathlib import Path
 from collections import deque
 
@@ -18,6 +20,7 @@ START_TOKEN = "[..." # impossible for something else to be tokenized as this
 err_code_table: dict[str,int] = dict()
 err_code_table["success"] = 0
 debug_mode = True
+repositories: dict[str, str] = dict()
 
 class CompfailException(Exception): pass
 
@@ -65,7 +68,7 @@ class Variable(CodeSegment):
         #if self.type.builtin and self.name!=other.name: return False # skip name matching
         return True
 
-def signature_like(vars: list[Variable]):
+def signature_like(vars: list[Variable], impl=None):
     ret = ""
     i = 0
     while i<len(vars):
@@ -76,6 +79,10 @@ def signature_like(vars: list[Variable]):
         else: arg_name = " "+arg_name.replace("__", ".")
         if not vars[i].immutable: ret += "mut "
         if type.builtin: 
+            if type==POINTER_TYPE and impl: 
+                pointer_type = impl.get_pointer_type(vars[i])
+                if pointer_type is None: ret += "any "
+                else: ret += pointer_type.name+" "
             ret += type.name+arg_name
             i += 1
         elif type.is_buffer_of: 
@@ -150,8 +157,8 @@ class ImplementedType:
         return ret
 
     def signature(self):
-        args = signature_like([self.vars[arg] for arg in self.args])
-        rets = signature_like([self.vars[arg] for arg in self.rets])
+        args = signature_like([self.vars[arg] for arg in self.args], impl=self)
+        rets = signature_like([self.vars[arg] for arg in self.rets], impl=self)
         return self.name+"("+args+") -> ("+rets+")"
 
     def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True):
@@ -272,6 +279,7 @@ class File:
         self.path = path
         self.types: dict[str, UnionType] = dict()
         self.namespaces: dict[str, File] = dict()
+        self.is_main_file = None
 
 class Token:
     def __init__(self, text, file: File, row, col):
@@ -341,11 +349,23 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             if vars[i].type!= variation.vars[variation.args[i]].type and variation.vars[variation.args[i]].type.is_buffer_of!=ANY_TYPE:
                 is_available = False
                 break
+        # first check for pointer mismatches (this is a safety error)
+        for varpos, var in enumerate(vars):
+            if var.type!=POINTER_TYPE: continue
+            var_pointer_type = impl.get_pointer_type(var)
+            other_pointer_type = variation.get_pointer_type(variation.vars[variation.args[varpos]])
+            if var_pointer_type is not None and other_pointer_type is not None and var_pointer_type!=ANY_TYPE and other_pointer_type!=ANY_TYPE and var_pointer_type!=other_pointer_type:
+                is_available = False
+                # TODO: make a proper is_available check, that also accounts for internal pointer types but allows structural equivalence
+                # is_available = len(var_pointer_type.args)==len(other_pointer_type.args)
+                # for arg1, arg2 in zip(var_pointer_type.args, other_pointer_type.args):
+                #     if var_pointer_type
+                if not is_available: break
         if is_available: available_types.append(variation)
     if len(available_types)==0:
-        error_token.error("type", "could not resolve any call for '"+method.name+"("+signature_like(vars)+")' candidates:\n    "+"\n    ".join([t.signature() for t in method.variations]))
+        error_token.error("type", "could not resolve any call for '"+method.name+"("+signature_like(vars, impl)+")' candidates:\n    "+"\n    ".join([t.signature() for t in method.variations]))
     if len(available_types)>1:
-        error_token.error("type", "more than one conflicting call '"+method.name+"("+signature_like(vars)+")' candidates:\n    "+"\n    ".join([t.signature() for t in available_types]))
+        error_token.error("type", "more than one conflicting call '"+method.name+"("+signature_like(vars, impl)+")' candidates:\n    "+"\n    ".join([t.signature() for t in available_types]))
 
     callee: ImplementedType = available_types[0]
     # first check for pointer mismatches (this is a safety error)
@@ -353,11 +373,10 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if var.type!=POINTER_TYPE: continue # so we know for a fact that
         var_pointer_type = impl.get_pointer_type(var)
         other_pointer_type = callee.get_pointer_type(callee.vars[callee.args[varpos]])
-        if var_pointer_type is not None and other_pointer_type is not None and var_pointer_type!=ANY_TYPE and other_pointer_type!=ANY_TYPE and var_pointer_type!=other_pointer_type:
-            error_token.error("safety", "two incompatible pointers are used '"+other_pointer_type.signature()+"' vs '"+var_pointer_type.signature()+"'")
         if (var_pointer_type is None or var_pointer_type==ANY_TYPE) and other_pointer_type is not None and other_pointer_type!=ANY_TYPE:
             impl._pointer_types[var.name] = other_pointer_type
-    # TODO: we will now call the method, but we can also inline it in the future maybe
+
+    # TODO: we will now call the method, but we could also inline it in the future maybe
     tmp = create_temp()
     rets = list()
     if callee.needs_failure_mode:
@@ -1159,6 +1178,28 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
         pos, _ = process_statement(file, tokens, pos-1, impl, 0)
     return pos
 
+def process_repo(file: File, tokens: list[Token], pos: int):
+    pos += 1
+    url_token = get(tokens, pos)
+    if not url_token.is_string(): url_token.error("syntax", "repo expects a cstr repo path or url but got '"+name_token.text+"'")
+    pos += 1
+    if get(tokens, pos).text!="as": tokens[pos].error("syntax", "repo declaration expects 'as' here")
+    pos += 1
+    local_token = get(tokens, pos)
+    if not local_token.is_string(): url_token.error("syntax", "repo expects a cstr repo alias after 'as' but got '"+name_token.text+"'")
+    pos += 1
+    symbol = local_token.text[1:len(local_token.text)-1]
+    path = url_token.text[1:len(url_token.text)-1]
+    for repo in repositories:
+        if repo.startswith(symbol) or symbol.startswith(repo): local_token.error("syntax", "cannot have specialization between new and old repos '"+symbol+"' and '"+repo+"'")
+    if not file.is_main_file:
+        if symbol not in repositories:
+            tokens[pos-4].error("safety", "for safety, repos can only be defined for the first time in the main file\nFile '"+file.path+"' requires that you add this repo declaration to your main file")
+        elif path!= repositories[symbol]:
+            tokens[pos-4].error("safety",  "repo '"+symbol+"' has a declaration here that conflicts with a previous one '"+path+"' and '"+repositories[symbol]+"'")
+    repositories[symbol] = path
+    return pos
+
 def process_import(file: File, tokens: list[Token], pos: int):
     pos += 1
     name_token = get(tokens, pos)
@@ -1170,6 +1211,7 @@ def process_import(file: File, tokens: list[Token], pos: int):
     else: 
         name = name_token.text
         name = name[1:len(name)-1]
+        name = resolve_name(name, name_token)
         if not os.path.exists(name) and name not in file_cache: name_token.error("import", "cannot import file '"+name+"'")
         imported: File = load(name)
     pos += 1
@@ -1318,11 +1360,40 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
             if peek_text(tokens, i+2)=="=": i = process_union(file, tokens, i)
             else: i = process_def(file, tokens, i)
         elif tok.text=="import": i = process_import(file, tokens, i)
+        elif tok.text=="repo": i = process_repo(file, tokens, i)
         else: tok.error("syntax", "expecting  'def' or 'import but found '"+str(tok.text)+"'")
     return file
 
-def _load(path: str) -> File:
+def resolve_name(path: str, at_token: Token|None) -> str:
+    symbol = path
+    for repo, url in repositories.items():
+        if path.startswith(repo):
+            path = url+path[len(repo):]
+            symbol = path # TODO: decide between this and the commented implementation (this one is a tad slower but more flexible)
+            break
+    # if not os.path.exists(path) and not path.startswith("https://") and not path.startswith("http://"):
+    #     for repo, url in repositories.items():
+    #         if path.startswith(repo):
+    #             path = url+path[len(repo):]
+    #             break
+    if path.startswith("https://") or path.startswith("http://"):
+        if symbol==path: 
+            symbol = "./.cache"+urllib.parse.urlsplit(path).path
+            if os.path.exists(symbol): return symbol
+        try: 
+            os.makedirs(os.path.dirname(symbol), exist_ok=True)
+            download_with_progress(path, symbol, "download     "+os.path.basename(symbol).ljust(40))
+        except Exception as e: 
+            if at_token: at_token.error("download", str(e))
+            print("[✗] failed:")
+            print(str(e))
+            sys.exit(1)
+    else: symbol = path
+    return symbol
+
+def _load(path: str, is_main_file: bool=False) -> File:
     file = File(path)
+    file.is_main_file = is_main_file
     tokens = list()
     nesting_levels = [0]
     row = 0
@@ -1399,16 +1470,40 @@ def _load(path: str) -> File:
         i += 1
     return file, processed_tokens
 
+def download_with_progress(url: str, filepath: str, message: str):
+    filename = os.path.basename(filepath)
+    try:
+        response = urllib.request.urlopen(url)
+        total_size = int(response.getheader('Content-Length').strip())
+    except Exception as e:
+        print(f"\r[{YELLOW}+{RESET}] {message} ... (unknown size)")
+        urllib.request.urlretrieve(url, filepath)
+        return
+    chunk_size = 8192
+    downloaded = 0
+    with open(filepath, 'wb') as f:
+        while True:
+            chunk = response.read(chunk_size)
+            if not chunk: break
+            f.write(chunk)
+            downloaded += len(chunk)
+            percent = downloaded / total_size * 100
+            bar_len = 30
+            filled_len = int(bar_len * downloaded // total_size)
+            bar = '█' * filled_len + '-' * (bar_len - filled_len)
+            sys.stdout.write(f"\r[{YELLOW}+{RESET}] {message} {GREEN}[{bar}]{RESET} {percent:.1f}% | {YELLOW}{downloaded // 1024 // 1024}MB{RESET} / {total_size // 1024 // 1024}MB")
+            sys.stdout.flush()
+    print()
+
 file_cache: dict[str, File] = dict()
-def load(path: str) -> File:
+def load(path: str, is_main_file: bool=False) -> File:
     file = file_cache.get(path, None)
     if file is None:
         # this weird sequencing here is so that we can import partially imported modules without circular overflow
-        file, processed_tokens = _load(path)
+        file, processed_tokens = _load(path, is_main_file)
         file_cache[path] = file
         process(file, processed_tokens, 0)
     return file
-
 
 POINTER_TYPE = ImplementedType("ptr", "void*", memory_size=8)
 CSTR_TYPE = ImplementedType("cstr", "const char*", memory_size=8)
@@ -1502,7 +1597,7 @@ src_path = Path(args.source)
 if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); sys.exit(1)
 
 print(f"[{YELLOW}+{RESET}] process      {src_path}")
-file: File = load(str(src_path))
+file: File = load(resolve_name(str(src_path), None), is_main_file=True)
 main_type: UnionType = file.types.get("main", None)
 if not main_type: print(f"{RED}error{RESET}: missing main type"); sys.exit(1)
 if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); sys.exit(1)

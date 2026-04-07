@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: smoll-${{ matrix.os }}${{ matrix.exe_ext }}
+          path: smoll${{ matrix.exe_ext }}
           retention-days: 30
 
   release:
@@ -95,5 +95,5 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./release-assets/smoll-ubuntu-latest
-            ./release-assets/smoll-windows-latest.exe
+            ./release-assets/smoll
+            ./release-assets/smoll.exe

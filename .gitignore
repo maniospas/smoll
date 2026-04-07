@@ -3,3 +3,6 @@ __pycache__/
 smoll.build/
 smoll.dist/
 smoll.onefile-build/
+std/clang
+.cache
+.vscode

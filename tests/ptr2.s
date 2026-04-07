@@ -1,4 +1,3 @@
-repo "https://github.com/maniospas/smoll/raw/refs/heads/main/std/" as "std/"
 import "std/array.s"
 
 def Point(float x, float y)

@@ -565,7 +565,7 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
             file.types[buffer_type.name] = buffer_type
             return pos+3, buffer_type
         for variation in type.variations: 
-            if variation==ANY_TYPE: tokens[pos].error("safety", "can only place on buffers the type 'any'")
+            if variation==ANY_TYPE: tokens[pos].error("safety", "can only place on buffers or ponters the type 'any'")
         return pos+1, type
     namespace: File = file.namespaces.get(name, None)
     if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'")
@@ -937,10 +937,10 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
     is_field = False
     while peek_text(tokens, pos+1) == ".":
+        if current in impl.vars: break
         pos += 2
         current += "__"+get(tokens, pos).text
         is_field = True
-        if current in impl.vars: break
     var = impl.vars.get(current, None)
 
     if peek_text(tokens, pos+1) == "=":
@@ -1209,6 +1209,7 @@ def process_def(file: File, tokens: list[Token], pos: int):
     abstract_arg_types = list()
     abstract_arg_names = list()
     abstract_arg_immutability = list()
+    abstract_arg_convert_to_ptr = list()
     pos += 1
     if get(tokens, pos).text!="(": tokens[pos].error("syntax", "expecting opening parenthesis")
     pos += 1
@@ -1217,11 +1218,21 @@ def process_def(file: File, tokens: list[Token], pos: int):
         if get(tokens, pos).text=="&" or get(tokens, pos).text=="mut":
             pos += 1
             arg_immutability = False
-        pos, arg_type = process_linear_type(file, tokens, pos)
+        if peek_text(tokens, pos)=="ptr":
+            tokens[pos].error("syntax", "pointers should follow their attached data type. Perhaps you meant 'any ptr'?")
+        if peek_text(tokens, pos)=="any" and peek_text(tokens, pos+1)=="ptr":
+            pos += 1
+            arg_type = smol_namespace.types["any"]
+        else: pos, arg_type = process_linear_type(file, tokens, pos)
+        if peek_text(tokens, pos)=="ptr":
+            pos += 1
+            abstract_arg_convert_to_ptr.append(True)
+        else: abstract_arg_convert_to_ptr.append(False)
         arg_name = peek_text(tokens, pos)
         if arg_name==")" or arg_name==",": arg_name = "__temp_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
         else: pos += 1
         abstract_arg_types.append(arg_type.variations)
+        if POINTER_TYPE in arg_type.variations: tokens[pos].error("syntax", "pointers should follow their attached data type. Perhaps you meant 'any ptr'?")
         abstract_arg_names.append(arg_name)
         abstract_arg_immutability.append(arg_immutability)
         next_symbol = peek_text(tokens, pos)
@@ -1235,8 +1246,13 @@ def process_def(file: File, tokens: list[Token], pos: int):
         pos = starting_pos
         impl = ImplementedType(name, at=start_token)
         try:
-            for arg_name, arg_type, immutable in zip(abstract_arg_names, arg_types, abstract_arg_immutability):
-                if arg_type.builtin:
+            for arg_name, arg_type, immutable, convert_to_ptr in zip(abstract_arg_names, arg_types, abstract_arg_immutability, abstract_arg_convert_to_ptr):
+                if convert_to_ptr:
+                    impl.vars[arg_name] = Variable(arg_name, POINTER_TYPE, immutable)
+                    impl.args.append(arg_name)
+                    impl.set_pointer_type(impl.vars[arg_name], arg_type)
+                    continue
+                elif arg_type.builtin:
                     impl.vars[arg_name] = Variable(arg_name, arg_type, immutable)
                     impl.args.append(arg_name)
                     if arg_type==POINTER_TYPE: impl.set_pointer_type(impl.vars[arg_name], ANY_TYPE)

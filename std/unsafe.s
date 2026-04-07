@@ -4,18 +4,18 @@ def alloc(id bytes)
     {builtins::compiler::ptr allocated = malloc(bytes);}
     return allocated
 
-def realloc(compiler::ptr allocated, id bytes)
+def realloc(any ptr allocated, id bytes)
     {builtins::compiler::ptr new_allocated = allocated?realloc(allocated, bytes):malloc(bytes);}
     INVALIDATE compiler::ptr
     return new_allocated->compiler::attach_type(allocated)
 
-def free(compiler::ptr allocated)
+def free(any ptr allocated)
     {if(allocated)free(allocated);allocated=0;}
     INVALIDATE compiler::ptr
 
-def zero(compiler::ptr allocated, id from, id to)
+def zero(any ptr allocated, id from, id to)
     {memset(((char*)allocated)+from, 0, to);}
 
-def add(compiler::ptr allocated, id offset)
+def add(any ptr allocated, id offset)
     {builtins::compiler::ptr element = ((char*)allocated)+offset;}
     return element->compiler::attach_type(allocated)

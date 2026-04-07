@@ -13,9 +13,6 @@ jobs:
           - os: ubuntu-latest
             exe_ext: ''
             artifact_name: smoll-linux
-          - os: windows-latest
-            exe_ext: '.exe'
-            artifact_name: smoll-windows
 
     defaults:
       run:
@@ -39,9 +36,7 @@ jobs:
           python -m pip install nuitka[onefile] ordered-set tqdm
       - name: Compile with Nuitka
         run: |
-          yes | python -m nuitka --standalone --onefile \
-                 --output-filename=smoll \
-                 smoll.py
+          python -m nuitka --standalone --onefile --output-filename=smoll smoll.py
           mv "smoll${{ matrix.exe_ext }}" "smoll-${{ matrix.os }}${{ matrix.exe_ext }}"
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4

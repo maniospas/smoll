@@ -12,9 +12,11 @@ jobs:
         include:
           - os: ubuntu-latest
             exe_ext: ''
+            options: ''
             artifact_name: smoll-linux
           - os: windows-latest
             exe_ext: '.exe'
+            options: '--noask'
             artifact_name: smoll-windows
 
     defaults:
@@ -47,7 +49,7 @@ jobs:
           python -m pip install nuitka[onefile] ordered-set tqdm
       - name: Compile with Nuitka
         run: |
-          python -m nuitka --noask --standalone --onefile \
+          python -m nuitka ${{ matrix.options }} --standalone --onefile \
                  --output-filename=smoll \
                  smoll.py
           mv "smoll${{ matrix.exe_ext }}" "smoll-${{ matrix.os }}${{ matrix.exe_ext }}"

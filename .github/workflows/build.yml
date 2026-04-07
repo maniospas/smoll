@@ -1,110 +1,186 @@
-name: Build Nuitka Binaries
+name: Build & Release Nuitka Binaries
 
+# -------------------------------------------------
+# Run on a version tag (vX.Y.Z) or manual trigger
+# -------------------------------------------------
 on:
   push:
-  workflow_dispatch:
+  workflow_dispatch:     # manual button in the UI
+
+env:
+  RELEASE_NAME: ${{ github.ref_name }}
 
 jobs:
+  # =================================================
+  # 1️⃣ Build matrix – Linux and Windows
+  # =================================================
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
-            exe_ext: ''
+            exe_ext: ''               # Linux binary has no extension
             artifact_name: smoll-linux
           - os: windows-latest
-            exe_ext: '.exe'
+            exe_ext: '.exe'           # Windows binary
             artifact_name: smoll-windows
 
-    defaults:
-      run:
-        shell: bash
-
     steps:
+      # -------------------------------------------------
+      # Checkout source
+      # -------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Install Linux system packages
+
+      # -------------------------------------------------
+      # Linux only – install patchelf (required by Nuitka)
+      # -------------------------------------------------
+      - name: Install Linux packages
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y patchelf   # needed by Nuitka to rewrite RPATH
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+          sudo apt-get install -y patchelf
+
+      # -------------------------------------------------
+      # Windows only – fetch Dependency Walker
+      # -------------------------------------------------
       - name: Install Dependency Walker (Windows only)
         if: runner.os == 'Windows'
         run: |
+          # 1️⃣ Create a folder for the binary
           mkdir -p $HOME/dependency-walker
+
+          # 2️⃣ Download the tiny portable 64‑bit build (≈150 KB)
           curl -L -o $HOME/dependency-walker/depends.exe \
-            https://github.com/lukasjapan/dependency-walker/releases/download/2.2/depends.exe
+                https://github.com/lukasjapan/dependency-walker/releases/download/2.2/depends.exe
+
+          # 3️⃣ Add the folder to the runner's PATH for the rest of the job
           echo "$HOME/dependency-walker" >> $GITHUB_PATH
+
+          # 4️⃣ (Optional) Explicitly tell Nuitka where it is.
+          #    This is helpful if the PATH trick ever fails.
+          echo "NUITKA_DEPENDS_EXE=$HOME/dependency-walker/depends.exe" >> $GITHUB_ENV
+
+      # -------------------------------------------------
+      # Set up Python (no pip cache – we have no requirements.txt)
+      # -------------------------------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'   # change if you need a different version
+
+      # -------------------------------------------------
+      # Install Nuitka and the optional “one‑file” extras
+      # -------------------------------------------------
       - name: Install build requirements
         run: |
           python -m pip install --upgrade pip
-          # Nuitka + a few libraries it often needs
-          python -m pip install nuitka[onefile] ordered-set tqdm
+
+          # Pull Nuitka together with the onefile extras (brings in zstandard)
+          python -m pip install "Nuitka[onefile]" ordered-set tqdm
+
+          # If you prefer to install them piece‑by‑piece:
+          # python -m pip install nuitka zstandard ordered-set tqdm
+
+      # -------------------------------------------------
+      # Compile with Nuitka (same command works on both OSes)
+      # -------------------------------------------------
       - name: Compile with Nuitka
         run: |
-          python -m nuitka --standalone --onefile \
-                 --output-filename=smoll \
-                 smoll.py
-          mv "smoll${{ matrix.exe_ext }}" "smoll-${{ matrix.os }}${{ matrix.exe_ext }}"
-      - name: Quick sanity check
+          # The `--noask` flag forces Nuitka to take the default (yes) for any
+          # interactive question – crucial for CI.
+          python -m nuitka \
+                --standalone \
+                --onefile \
+                --output-filename=smoll \
+                --noask \
+                smoll.py
+
+          # Rename so we know which runner produced the file
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            mv "smoll" "smoll-${{ matrix.os }}"
+          else
+            mv "smoll.exe" "smoll-${{ matrix.os }}${{ matrix.exe_ext }}"
+          fi
+        shell: bash   # Git‑for‑Windows provides Bash on the Windows runner
+
+      # -------------------------------------------------
+      # (Optional) quick sanity‑check that the binary launches
+      # -------------------------------------------------
+      - name: Sanity check
         run: |
           chmod +x "smoll-${{ matrix.os }}${{ matrix.exe_ext }}" || true
           "./smoll-${{ matrix.os }}${{ matrix.exe_ext }}" --help || true
-      - name: Upload binary artifact
+
+      # -------------------------------------------------
+      # Upload the binary as a temporary artifact for the release job
+      # -------------------------------------------------
+      - name: Upload binary for release job
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: smoll-${{ matrix.os }}${{ matrix.exe_ext }}
           retention-days: 30
+
+  # =================================================
+  # 2️⃣ Release job – runs once after *all* builds succeed
+  # =================================================
   release:
     name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      packages: write
-      id-token: write
+      contents: write          # needed to create a release + upload assets
 
     steps:
-      - name: Checkout repo (for changelog, etc.)
+      # -------------------------------------------------
+      # Checkout (only needed if you want to generate a changelog)
+      # -------------------------------------------------
+      - name: Checkout (for changelog)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Download Linux binary
+
+      # -------------------------------------------------
+      # Download the Linux and Windows artifacts produced above
+      # -------------------------------------------------
+      - name: Download Linux artifact
         uses: actions/download-artifact@v4
         with:
           name: smoll-linux
           path: ./release-assets
-      - name: Download Windows binary
+
+      - name: Download Windows artifact
         uses: actions/download-artifact@v4
         with:
           name: smoll-windows
           path: ./release-assets
-      - name: Generate release notes (auto‑changelog)
+
+      # -------------------------------------------------
+      # (Optional) generate simple release notes automatically
+      # -------------------------------------------------
+      - name: Generate release notes
         id: notes
         run: |
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -z "$PREV_TAG" ]; then
-            echo "notes<<EOF" >> $GITHUB_OUTPUT
-            echo "First release – no previous tag." >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
+            echo "notes=First release" >> $GITHUB_OUTPUT
           else
             echo "notes<<EOF" >> $GITHUB_OUTPUT
             git log --pretty=format:"- %s (%h)" "$PREV_TAG"..HEAD >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
           fi
-      - name: Create GitHub Release & upload assets
+
+      # -------------------------------------------------
+      # Create (or update) the GitHub Release and attach the binaries
+      # -------------------------------------------------
+      - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ env.RELEASE_NAME }}
           body: ${{ steps.notes.outputs.notes }}
-          generate_release_notes: false
           draft: false
           prerelease: false
           files: |

@@ -33,20 +33,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install Dependency Walker (Windows only)
-        if: runner.os == 'Windows'
-        run: |
-          mkdir -p $HOME/dependency-walker
-          curl -L -o $HOME/dependency-walker/depends.exe \
-            https://github.com/lukasjapan/dependency-walker/releases/download/2.2/depends.exe
-          echo "$HOME/dependency-walker" >> $GITHUB_PATH
       - name: Install build requirements
         run: |
           python -m pip install --upgrade pip
           python -m pip install nuitka[onefile] ordered-set tqdm
       - name: Compile with Nuitka
         run: |
-          python -m nuitka --standalone --onefile \
+          yes | python -m nuitka --standalone --onefile \
                  --output-filename=smoll \
                  smoll.py
           mv "smoll${{ matrix.exe_ext }}" "smoll-${{ matrix.os }}${{ matrix.exe_ext }}"

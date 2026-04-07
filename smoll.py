@@ -174,7 +174,7 @@ class ImplementedType:
                 if len(found)!=len(value): error_token.error("type", "cannot overwrite tuple with one of different length")
                 for i in range(len(value)): assign(found[i], [value[i]], error_token, perform_immutability_checks, top_entry=False)
                 return None
-        if existing is not None and existing.type!=value[0].type: error_token.error("type", "mismatching types\n    "+existing.type.signature()+"\n    "+value[0].type.signature())
+        if existing is not None and existing.type!=value[0].type: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'")
         if perform_immutability_checks and existing and existing.immutable: error_token.error("type", "cannot overwrite immutable variable '"+varname+"'")
         if existing and not existing.immutable and value[0].immutable: 
             value[0] = value[0].mutable_copy()
@@ -401,21 +401,18 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if variable.type.builtin: impl.implementation.extend([CodeWord("&"), variable, CodeWord(",")])
         if original.type!=POINTER_TYPE: continue
         original_pointer_type = callee.get_pointer_type(original)
-        #print(impl.name, callee.name, ret)
         if original_pointer_type is None or original_pointer_type==ANY_TYPE:
-            #print(" any pointer type in", callee.name)
-            #print(" ",original.name)
             original_pointer_dependency: Variable = callee.follow_pointer_dependency(original)
+            if original_pointer_dependency is None: original_pointer_dependency = original
             if original_pointer_dependency is not None:
                 for varpos, varname in enumerate(callee.args):
                     if varname!=original_pointer_dependency.name: continue
-                    #print(varname)
-                    #print(impl.name, variable.name, vars[varpos].name)
                     impl.set_pointer_depedency(variable, vars[varpos])
-                    pointer_type = impl.get_pointer_type(vars[varpos])
+                    pointer_type: ImplementedType = impl.get_pointer_type(vars[varpos])
                     if pointer_type and pointer_type!=ANY_TYPE and ret_pos and rets[ret_pos-1].type.is_buffer_of==ANY_TYPE:
-                        rets[ret_pos-1].type = buffer_types[vars[varpos].type]
+                        rets[ret_pos-1].type = buffer_types[pointer_type].variations[0]
                     break
+        
         else: 
             impl.set_pointer_type(variable, original_pointer_type)
             # overwrite known pointer types here for the pointer (it's fine to change the type because rets are copies)

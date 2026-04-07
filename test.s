@@ -7,12 +7,10 @@ def Field(Point a, Point b)
     return (a,b)
 
 def main()
-    f = float[]
-    f = f->alloc 1  // preffer alloc to resize (it avoids pointer invalidation)
+    f = float[]->alloc(1)  // preffer alloc to resize for empty buffers (no pointer invalidation)
     f[0] := 1.0 // move data to pointer
     print f[0]. // dot after a pointer derefs it
 
-    p = Field[]
-    p->alloc 1
+    p = Field[]->alloc(1)
     p[0] := (1.0,2.0,3.0,4.0)
     print p[0]..a.y

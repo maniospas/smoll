@@ -2,85 +2,85 @@
 #include <stdlib.h>
 #include <string.h>
 
-static inline void float__temp_buffer__buffer__temp435v(void** __temp462v, unsigned long long* __temp463v, unsigned long long* __temp464v) {
+static inline void float__temp_buffer__buffer__temp434v(void** __temp461v, unsigned long long* __temp462v, unsigned long long* __temp463v) {
   void* unsafe_ptr=0;
   unsigned long long unsafe_size=0;
   unsigned long long align=0;
   align=8;
   __temp_return:
-  *__temp462v=unsafe_ptr;
-  *__temp463v=unsafe_size;
-  *__temp464v=align;
+  *__temp461v=unsafe_ptr;
+  *__temp462v=unsafe_size;
+  *__temp463v=align;
 }
 
-static inline void false__temp7v(int* __temp465v) {
+static inline void false__temp7v(int* __temp464v) {
   int value=0;
   __temp_return:
-  *__temp465v=value;
+  *__temp464v=value;
 }
 
-static inline void not__temp25v(int __temp_anon0, int* __temp466v) {
+static inline void not__temp25v(int __temp_anon0, int* __temp465v) {
   int __temp26v__value=0;
   false__temp7v(&__temp26v__value);
   goto __temp_return;
   __temp_return:
-  *__temp466v=__temp26v__value;
+  *__temp465v=__temp26v__value;
 }
 
-static inline void is_different__temp83v(unsigned long long x, unsigned long long y, int* __temp467v) {
+static inline void is_different__temp83v(unsigned long long x, unsigned long long y, int* __temp466v) {
   int __temp84v=0;
   int __temp85v____temp26v__value=0;
   not__temp25v(__temp84v,&__temp85v____temp26v__value);
   goto __temp_return;
   __temp_return:
-  *__temp467v=__temp85v____temp26v__value;
+  *__temp466v=__temp85v____temp26v__value;
 }
 
-static inline void neq__temp300v(unsigned long long x, unsigned long long y, int* __temp468v) {
+static inline void neq__temp300v(unsigned long long x, unsigned long long y, int* __temp467v) {
   int __temp301v____temp85v____temp26v__value=0;
   int z=0;
   is_different__temp83v(x,y,&__temp301v____temp85v____temp26v__value);
   z=x!=y?1:0;
   goto __temp_return;
   __temp_return:
-  *__temp468v=z;
+  *__temp467v=z;
 }
 
-static inline void eq__temp276v(unsigned long long x, unsigned long long y, int* __temp469v) {
+static inline void eq__temp276v(unsigned long long x, unsigned long long y, int* __temp468v) {
   int __temp277v____temp85v____temp26v__value=0;
   int z=0;
   is_different__temp83v(x,y,&__temp277v____temp85v____temp26v__value);
   z=x==y?1:0;
   goto __temp_return;
   __temp_return:
-  *__temp469v=z;
+  *__temp468v=z;
 }
 
-static inline void mul__temp132v(unsigned long long x, unsigned long long y, unsigned long long* __temp470v) {
+static inline void mul__temp132v(unsigned long long x, unsigned long long y, unsigned long long* __temp469v) {
   int __temp133v____temp85v____temp26v__value=0;
   unsigned long long z=0;
   is_different__temp83v(x,y,&__temp133v____temp85v____temp26v__value);
   z=x*y;
   goto __temp_return;
   __temp_return:
-  *__temp470v=z;
+  *__temp469v=z;
 }
 
-static inline void alloc__temp367v(unsigned long long bytes, void** __temp471v) {
+static inline void alloc__temp367v(unsigned long long bytes, void** __temp470v) {
   void* allocated=0;
   allocated=malloc(bytes);
   goto __temp_return;
   __temp_return:
-  *__temp471v=allocated;
+  *__temp470v=allocated;
 }
 
 static inline void zero__temp371v(void* allocated, unsigned long long from, unsigned long long to) {
   memset(((char*)allocated)+from,0,to);
 }
 
-static inline int alloc__temp376v(void** __temp472v, unsigned long long* __temp473v, unsigned long long buffer__align, unsigned long long size, void** __temp474v, unsigned long long* __temp475v, unsigned long long* __temp476v) {
-  void* buffer__unsafe_ptr=*__temp472v;
-  unsigned long long buffer__unsafe_size=*__temp473v;
+static inline int alloc__temp376v(void** __temp471v, unsigned long long* __temp472v, unsigned long long buffer__align, unsigned long long size, void** __temp473v, unsigned long long* __temp474v, unsigned long long* __temp475v) {
+  void* buffer__unsafe_ptr=*__temp471v;
+  unsigned long long buffer__unsafe_size=*__temp472v;
   unsigned long long __temp377v=0;
   int __temp378v__z=0;
   unsigned long long __temp379v=0;
@@ -114,61 +114,61 @@ static inline int alloc__temp376v(void** __temp472v, unsigned long long* __temp4
   buffer__align=buffer__align;
   goto __temp_return;
   __temp_return:
-  *__temp472v=buffer__unsafe_ptr;
-  *__temp473v=buffer__unsafe_size;
-  *__temp474v=buffer__unsafe_ptr;
-  *__temp475v=buffer__unsafe_size;
-  *__temp476v=buffer__align;
+  *__temp471v=buffer__unsafe_ptr;
+  *__temp472v=buffer__unsafe_size;
+  *__temp473v=buffer__unsafe_ptr;
+  *__temp474v=buffer__unsafe_size;
+  *__temp475v=buffer__align;
   return 0;
   __temp_failure:
   return __temp_errcode;
 }
 
-static inline void ge__temp252v(unsigned long long x, unsigned long long y, int* __temp477v) {
+static inline void ge__temp252v(unsigned long long x, unsigned long long y, int* __temp476v) {
   int __temp253v____temp85v____temp26v__value=0;
   int z=0;
   is_different__temp83v(x,y,&__temp253v____temp85v____temp26v__value);
   z=x>=y?1:0;
   goto __temp_return;
   __temp_return:
-  *__temp477v=z;
+  *__temp476v=z;
 }
 
-static inline void attach_type__temp11v(void* to, void* from, void** __temp478v) {
+static inline void attach_type__temp11v(void* to, void* from, void** __temp477v) {
   __temp_return:
-  *__temp478v=to;
+  *__temp477v=to;
 }
 
-static inline void add__temp372v(void* allocated, unsigned long long offset, void** __temp479v) {
+static inline void add__temp372v(void* allocated, unsigned long long offset, void** __temp478v) {
   void* element=0;
   void* __temp373v__to=0;
   element=((char*)allocated)+offset;
   attach_type__temp11v(element,allocated,&__temp373v__to);
   goto __temp_return;
   __temp_return:
-  *__temp479v=__temp373v__to;
+  *__temp478v=__temp373v__to;
 }
 
-static inline int get__temp397v(void** __temp480v, unsigned long long* __temp481v, unsigned long long buffer__align, unsigned long long i, void** __temp482v) {
-  void* buffer__unsafe_ptr=*__temp480v;
-  unsigned long long buffer__unsafe_size=*__temp481v;
-  int __temp398v__z=0;
-  unsigned long long __temp399v__z=0;
-  void* __temp400v____temp373v__to=0;
+static inline int get__temp396v(void** __temp479v, unsigned long long* __temp480v, unsigned long long buffer__align, unsigned long long i, void** __temp481v) {
+  void* buffer__unsafe_ptr=*__temp479v;
+  unsigned long long buffer__unsafe_size=*__temp480v;
+  int __temp397v__z=0;
+  unsigned long long __temp398v__z=0;
+  void* __temp399v____temp373v__to=0;
   int __temp_errcode=0;
-  ge__temp252v(i,buffer__unsafe_size,&__temp398v__z);
-  if(__temp398v__z){
+  ge__temp252v(i,buffer__unsafe_size,&__temp397v__z);
+  if(__temp397v__z){
   printf("%s", "\033[31mfail\033[0m out of bounds\n\033[31mat\033[0m std/array.s line 36 column 14\n");
   __temp_errcode=3;
   goto __temp_failure;
   }
-  mul__temp132v(i,buffer__align,&__temp399v__z);
-  add__temp372v(buffer__unsafe_ptr,__temp399v__z,&__temp400v____temp373v__to);
+  mul__temp132v(i,buffer__align,&__temp398v__z);
+  add__temp372v(buffer__unsafe_ptr,__temp398v__z,&__temp399v____temp373v__to);
   goto __temp_return;
   __temp_return:
-  *__temp480v=buffer__unsafe_ptr;
-  *__temp481v=buffer__unsafe_size;
-  *__temp482v=__temp400v____temp373v__to;
+  *__temp479v=buffer__unsafe_ptr;
+  *__temp480v=buffer__unsafe_size;
+  *__temp481v=__temp399v____temp373v__to;
   return 0;
   __temp_failure:
   return __temp_errcode;
@@ -183,161 +183,161 @@ static inline void print__temp335v(double value) {
   printf("%.6f%s",value,endl);
 }
 
-static inline void Field__temp_buffer__buffer__temp447v(void** __temp483v, unsigned long long* __temp484v, unsigned long long* __temp485v) {
+static inline void Field__temp_buffer__buffer__temp446v(void** __temp482v, unsigned long long* __temp483v, unsigned long long* __temp484v) {
   void* unsafe_ptr=0;
   unsigned long long unsafe_size=0;
   unsigned long long align=0;
   align=32;
   __temp_return:
-  *__temp483v=unsafe_ptr;
-  *__temp484v=unsafe_size;
-  *__temp485v=align;
+  *__temp482v=unsafe_ptr;
+  *__temp483v=unsafe_size;
+  *__temp484v=align;
 }
 
-static inline int main__temp434v() {
-  void* __temp437v__unsafe_ptr=0;
-  unsigned long long __temp437v__unsafe_size=0;
-  unsigned long long __temp437v__align=0;
+static inline int main__temp433v() {
+  void* __temp436v__unsafe_ptr=0;
+  unsigned long long __temp436v__unsafe_size=0;
+  unsigned long long __temp436v__align=0;
+  unsigned long long __temp437v=0;
+  void* __temp438v__buffer__unsafe_ptr=0;
+  unsigned long long __temp438v__buffer__unsafe_size=0;
+  unsigned long long __temp438v__buffer__align=0;
   void* f__unsafe_ptr=0;
   unsigned long long f__unsafe_size=0;
   unsigned long long f__align=0;
-  unsigned long long __temp438v=0;
-  void* __temp439v__buffer__unsafe_ptr=0;
-  unsigned long long __temp439v__buffer__unsafe_size=0;
-  unsigned long long __temp439v__buffer__align=0;
-  unsigned long long __temp440v=0;
-  void* __temp441v____temp400v____temp373v__to=0;
-  double __temp442v=0;
-  unsigned long long __temp443v=0;
-  void* __temp444v____temp400v____temp373v__to=0;
-  double __temp445v__z=0;
-  void* __temp449v__unsafe_ptr=0;
-  unsigned long long __temp449v__unsafe_size=0;
-  unsigned long long __temp449v__align=0;
+  unsigned long long __temp439v=0;
+  void* __temp440v____temp399v____temp373v__to=0;
+  double __temp441v=0;
+  unsigned long long __temp442v=0;
+  void* __temp443v____temp399v____temp373v__to=0;
+  double __temp444v__z=0;
+  void* __temp448v__unsafe_ptr=0;
+  unsigned long long __temp448v__unsafe_size=0;
+  unsigned long long __temp448v__align=0;
+  unsigned long long __temp449v=0;
+  void* __temp450v__buffer__unsafe_ptr=0;
+  unsigned long long __temp450v__buffer__unsafe_size=0;
+  unsigned long long __temp450v__buffer__align=0;
   void* p__unsafe_ptr=0;
   unsigned long long p__unsafe_size=0;
   unsigned long long p__align=0;
-  unsigned long long __temp450v=0;
-  void* __temp451v__buffer__unsafe_ptr=0;
-  unsigned long long __temp451v__buffer__unsafe_size=0;
-  unsigned long long __temp451v__buffer__align=0;
-  unsigned long long __temp452v=0;
-  void* __temp453v____temp400v____temp373v__to=0;
+  unsigned long long __temp451v=0;
+  void* __temp452v____temp399v____temp373v__to=0;
+  double __temp453v=0;
   double __temp454v=0;
   double __temp455v=0;
   double __temp456v=0;
-  double __temp457v=0;
-  unsigned long long __temp458v=0;
-  void* __temp459v____temp400v____temp373v__to=0;
-  double __temp460v__a__x__z=0;
-  double __temp460v__a__y__z=0;
-  double __temp460v__b__x__z=0;
-  double __temp460v__b__y__z=0;
+  unsigned long long __temp457v=0;
+  void* __temp458v____temp399v____temp373v__to=0;
+  double __temp459v__a__x__z=0;
+  double __temp459v__a__y__z=0;
+  double __temp459v__b__x__z=0;
+  double __temp459v__b__y__z=0;
   int __temp_errcode=0;
-  float__temp_buffer__buffer__temp435v(&__temp437v__unsafe_ptr,&__temp437v__unsafe_size,&__temp437v__align);
-  f__unsafe_ptr=__temp437v__unsafe_ptr;
-  f__unsafe_size=__temp437v__unsafe_size;
-  f__align=__temp437v__align;
-  __temp438v=1;
-  __temp_errcode=alloc__temp376v(&f__unsafe_ptr,&f__unsafe_size,f__align,__temp438v,&__temp439v__buffer__unsafe_ptr,&__temp439v__buffer__unsafe_size,&__temp439v__buffer__align);
+  float__temp_buffer__buffer__temp434v(&__temp436v__unsafe_ptr,&__temp436v__unsafe_size,&__temp436v__align);
+  __temp437v=1;
+  __temp_errcode=alloc__temp376v(&__temp436v__unsafe_ptr,&__temp436v__unsafe_size,__temp436v__align,__temp437v,&__temp438v__buffer__unsafe_ptr,&__temp438v__buffer__unsafe_size,&__temp438v__buffer__align);
   if(__temp_errcode){
-  printf("%s", "\033[31mat\033[0m test.s line 11 column 6\n   unhandled error from alloc(any[], id size) -> (any[])\n");
+  printf("%s", "\033[31mat\033[0m test.s line 10 column 16\n   unhandled error from alloc(any[], id size) -> (any[])\n");
   goto __temp_failure;
   }
-  __temp440v=0;
-  __temp_errcode=get__temp397v(&f__unsafe_ptr,&f__unsafe_size,f__align,__temp440v,&__temp441v____temp400v____temp373v__to);
+  f__unsafe_ptr=__temp438v__buffer__unsafe_ptr;
+  f__unsafe_size=__temp438v__buffer__unsafe_size;
+  f__align=__temp438v__buffer__align;
+  __temp439v=0;
+  __temp_errcode=get__temp396v(&f__unsafe_ptr,&f__unsafe_size,f__align,__temp439v,&__temp440v____temp399v____temp373v__to);
   if(__temp_errcode){
-  printf("%s", "\033[31mat\033[0m test.s line 12 column 6\n   unhandled error from get(any[], id i) -> (ptr)\n");
+  printf("%s", "\033[31mat\033[0m test.s line 11 column 6\n   unhandled error from get(any[], id i) -> (ptr)\n");
   goto __temp_failure;
   }
-  __temp442v=1.0;
-  if(!__temp441v____temp400v____temp373v__to){
-  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 12 column 10\n");
+  __temp441v=1.0;
+  if(!__temp440v____temp399v____temp373v__to){
+  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 11 column 10\n");
   goto __temp_failure;
   }
-  memcpy((char*)__temp441v____temp400v____temp373v__to,&__temp442v,8);
-  __temp443v=0;
-  __temp_errcode=get__temp397v(&f__unsafe_ptr,&f__unsafe_size,f__align,__temp443v,&__temp444v____temp400v____temp373v__to);
+  memcpy((char*)__temp440v____temp399v____temp373v__to,&__temp441v,8);
+  __temp442v=0;
+  __temp_errcode=get__temp396v(&f__unsafe_ptr,&f__unsafe_size,f__align,__temp442v,&__temp443v____temp399v____temp373v__to);
   if(__temp_errcode){
-  printf("%s", "\033[31mat\033[0m test.s line 13 column 12\n   unhandled error from get(any[], id i) -> (ptr)\n");
+  printf("%s", "\033[31mat\033[0m test.s line 12 column 12\n   unhandled error from get(any[], id i) -> (ptr)\n");
   goto __temp_failure;
   }
-  if(!__temp444v____temp400v____temp373v__to){
-  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 13 column 15\n");
+  if(!__temp443v____temp399v____temp373v__to){
+  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 12 column 15\n");
   goto __temp_failure;
   }
-  memcpy(&__temp445v__z,(char*)__temp444v____temp400v____temp373v__to,8);
-  print__temp335v(__temp445v__z);
-  Field__temp_buffer__buffer__temp447v(&__temp449v__unsafe_ptr,&__temp449v__unsafe_size,&__temp449v__align);
-  p__unsafe_ptr=__temp449v__unsafe_ptr;
-  p__unsafe_size=__temp449v__unsafe_size;
-  p__align=__temp449v__align;
-  __temp450v=1;
-  __temp_errcode=alloc__temp376v(&p__unsafe_ptr,&p__unsafe_size,p__align,__temp450v,&__temp451v__buffer__unsafe_ptr,&__temp451v__buffer__unsafe_size,&__temp451v__buffer__align);
+  memcpy(&__temp444v__z,(char*)__temp443v____temp399v____temp373v__to,8);
+  print__temp335v(__temp444v__z);
+  Field__temp_buffer__buffer__temp446v(&__temp448v__unsafe_ptr,&__temp448v__unsafe_size,&__temp448v__align);
+  __temp449v=1;
+  __temp_errcode=alloc__temp376v(&__temp448v__unsafe_ptr,&__temp448v__unsafe_size,__temp448v__align,__temp449v,&__temp450v__buffer__unsafe_ptr,&__temp450v__buffer__unsafe_size,&__temp450v__buffer__align);
   if(__temp_errcode){
-  printf("%s", "\033[31mat\033[0m test.s line 16 column 6\n   unhandled error from alloc(any[], id size) -> (any[])\n");
+  printf("%s", "\033[31mat\033[0m test.s line 14 column 16\n   unhandled error from alloc(any[], id size) -> (any[])\n");
   goto __temp_failure;
   }
-  __temp452v=0;
-  __temp_errcode=get__temp397v(&p__unsafe_ptr,&p__unsafe_size,p__align,__temp452v,&__temp453v____temp400v____temp373v__to);
+  p__unsafe_ptr=__temp450v__buffer__unsafe_ptr;
+  p__unsafe_size=__temp450v__buffer__unsafe_size;
+  p__align=__temp450v__buffer__align;
+  __temp451v=0;
+  __temp_errcode=get__temp396v(&p__unsafe_ptr,&p__unsafe_size,p__align,__temp451v,&__temp452v____temp399v____temp373v__to);
   if(__temp_errcode){
-  printf("%s", "\033[31mat\033[0m test.s line 17 column 6\n   unhandled error from get(any[], id i) -> (ptr)\n");
+  printf("%s", "\033[31mat\033[0m test.s line 15 column 6\n   unhandled error from get(any[], id i) -> (ptr)\n");
   goto __temp_failure;
   }
-  __temp454v=1.0;
-  __temp455v=2.0;
-  __temp456v=3.0;
-  __temp457v=4.0;
-  if(!__temp453v____temp400v____temp373v__to){
-  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 17 column 10\n");
+  __temp453v=1.0;
+  __temp454v=2.0;
+  __temp455v=3.0;
+  __temp456v=4.0;
+  if(!__temp452v____temp399v____temp373v__to){
+  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 15 column 10\n");
   goto __temp_failure;
   }
-  memcpy((char*)__temp453v____temp400v____temp373v__to,&__temp454v,8);
-  if(!__temp453v____temp400v____temp373v__to){
-  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 17 column 10\n");
+  memcpy((char*)__temp452v____temp399v____temp373v__to,&__temp453v,8);
+  if(!__temp452v____temp399v____temp373v__to){
+  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 15 column 10\n");
   goto __temp_failure;
   }
-  memcpy((char*)__temp453v____temp400v____temp373v__to+8,&__temp455v,8);
-  if(!__temp453v____temp400v____temp373v__to){
-  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 17 column 10\n");
+  memcpy((char*)__temp452v____temp399v____temp373v__to+8,&__temp454v,8);
+  if(!__temp452v____temp399v____temp373v__to){
+  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 15 column 10\n");
   goto __temp_failure;
   }
-  memcpy((char*)__temp453v____temp400v____temp373v__to+16,&__temp456v,8);
-  if(!__temp453v____temp400v____temp373v__to){
-  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 17 column 10\n");
+  memcpy((char*)__temp452v____temp399v____temp373v__to+16,&__temp455v,8);
+  if(!__temp452v____temp399v____temp373v__to){
+  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 15 column 10\n");
   goto __temp_failure;
   }
-  memcpy((char*)__temp453v____temp400v____temp373v__to+24,&__temp457v,8);
-  __temp458v=0;
-  __temp_errcode=get__temp397v(&p__unsafe_ptr,&p__unsafe_size,p__align,__temp458v,&__temp459v____temp400v____temp373v__to);
+  memcpy((char*)__temp452v____temp399v____temp373v__to+24,&__temp456v,8);
+  __temp457v=0;
+  __temp_errcode=get__temp396v(&p__unsafe_ptr,&p__unsafe_size,p__align,__temp457v,&__temp458v____temp399v____temp373v__to);
   if(__temp_errcode){
-  printf("%s", "\033[31mat\033[0m test.s line 18 column 12\n   unhandled error from get(any[], id i) -> (ptr)\n");
+  printf("%s", "\033[31mat\033[0m test.s line 16 column 12\n   unhandled error from get(any[], id i) -> (ptr)\n");
   goto __temp_failure;
   }
-  if(!__temp459v____temp400v____temp373v__to){
-  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 18 column 15\n");
+  if(!__temp458v____temp399v____temp373v__to){
+  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 16 column 15\n");
   goto __temp_failure;
   }
-  memcpy(&__temp460v__a__x__z,(char*)__temp459v____temp400v____temp373v__to,8);
-  if(!__temp459v____temp400v____temp373v__to){
-  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 18 column 15\n");
+  memcpy(&__temp459v__a__x__z,(char*)__temp458v____temp399v____temp373v__to,8);
+  if(!__temp458v____temp399v____temp373v__to){
+  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 16 column 15\n");
   goto __temp_failure;
   }
-  memcpy(&__temp460v__a__y__z,(char*)__temp459v____temp400v____temp373v__to+8,8);
-  if(!__temp459v____temp400v____temp373v__to){
-  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 18 column 15\n");
+  memcpy(&__temp459v__a__y__z,(char*)__temp458v____temp399v____temp373v__to+8,8);
+  if(!__temp458v____temp399v____temp373v__to){
+  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 16 column 15\n");
   goto __temp_failure;
   }
-  memcpy(&__temp460v__b__x__z,(char*)__temp459v____temp400v____temp373v__to+16,8);
-  if(!__temp459v____temp400v____temp373v__to){
-  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 18 column 15\n");
+  memcpy(&__temp459v__b__x__z,(char*)__temp458v____temp399v____temp373v__to+16,8);
+  if(!__temp458v____temp399v____temp373v__to){
+  printf("%s", "\033[31mmemory error\033[0m unallocated pointer\n\033[31mat\033[0m test.s line 16 column 15\n");
   goto __temp_failure;
   }
-  memcpy(&__temp460v__b__y__z,(char*)__temp459v____temp400v____temp373v__to+24,8);
-  print__temp335v(__temp460v__a__y__z);
+  memcpy(&__temp459v__b__y__z,(char*)__temp458v____temp399v____temp373v__to+24,8);
+  print__temp335v(__temp459v__a__y__z);
   return 0;
   __temp_failure:
   return __temp_errcode;
 }
 
-int main() {main__temp434v();return 0;}
+int main() {main__temp433v();return 0;}

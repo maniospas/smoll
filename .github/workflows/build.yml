@@ -40,7 +40,7 @@ jobs:
           python -m pip install nuitka ordered-set tqdm
       - name: Compile with Nuitka
         run: |
-          nuitka --standalone --onefile \
+          python -m nuitka --standalone --onefile \
                  --output-filename=smoll \
                  smoll.py
           mv "smoll${{ matrix.exe_ext }}" "smoll-${{ matrix.os }}${{ matrix.exe_ext }}"

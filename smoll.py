@@ -1,3 +1,5 @@
+# nuitka --standalone --onefile --output-filename=smoll smoll.py
+
 import os
 import sys
 import argparse

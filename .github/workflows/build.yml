@@ -16,7 +16,7 @@ jobs:
             artifact_name: smoll-linux
           - os: windows-latest
             exe_ext: '.exe'
-            options: '--noask'
+            options: '--no-prompt'
             artifact_name: smoll-windows
 
     defaults:

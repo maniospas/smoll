@@ -5,14 +5,31 @@ import "std/unsafe.s" as unsafe
 // is that we GUARANTEE that non-zero pointers to a memory region contain
 // at least one element of the attached type (automatically inferred for any)
 
-def grow(mut any[] buffer, id elements)
-    if elements==0 
+def alloc(mut any[] buffer, id size)
+    if buffer.unsafe_size!=0
+        fail "call resize for non-empty buffers; alloc promises no data reallocation"
+    if size==0
+        return buffer
+    buffer.unsafe_size = size
+    bytes = buffer.align*size
+    buffer.unsafe_ptr = unsafe::alloc(bytes)
+    unsafe::zero(buffer.unsafe_ptr, 0, bytes)
+    return buffer
+
+def resize(mut any[] buffer, id size)
+    if buffer.unsafe_size==size 
+        return buffer
+    if size==0
+        unsafe::free(buffer.unsafe_ptr)
+        buffer.unsafe_size = 0
         return buffer
     prev_bytes = buffer.unsafe_size*buffer.align
-    buffer.unsafe_size = buffer.unsafe_size+elements
-    bytes = buffer.align*buffer.unsafe_size
+    buffer.unsafe_size = size
+    bytes = buffer.align*size
     buffer.unsafe_ptr = unsafe::realloc(buffer.unsafe_ptr, bytes)
-    unsafe::zero(buffer.unsafe_ptr, prev_bytes, bytes)
+    if prev_bytes<bytes
+        unsafe::zero(buffer.unsafe_ptr, prev_bytes, bytes)
+    return buffer
 
 def get(any[] buffer, id i)
     if i>=buffer.unsafe_size

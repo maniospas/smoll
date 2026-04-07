@@ -385,7 +385,14 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 impl.invalidated[var] = error_token
     impl.invalidate_types_when_called.extend(callee.invalidate_types_when_called)
 
-    for ret in callee.rets:
+    # this is a critical point for ... pointers ;-) actually for buffers
+    # we are next going to go through all the actual pointer compliance checks
+    # so it is correct (actually, mandatory) to promote the return result to the 
+    # corresponding input buffer type - we will do so by detecting pointers attached to buffers,
+    # which have a known structure, with the pointers as the first argument.
+
+
+    for ret_pos, ret in enumerate(callee.rets):
         varname = tmp+"__"+ret
         original = callee.vars[ret]
         variable = original.renamed_copy(varname)
@@ -394,20 +401,24 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if variable.type.builtin: impl.implementation.extend([CodeWord("&"), variable, CodeWord(",")])
         if original.type!=POINTER_TYPE: continue
         original_pointer_type = callee.get_pointer_type(original)
+        #print(impl.name, callee.name, ret)
         if original_pointer_type is None or original_pointer_type==ANY_TYPE:
-            # print("-------------", impl.name, callee.name)
-            # print(callee._pointer_type_dependencies)
-            # print(callee.vars.keys())
-            # print("$$$$", variable.name, original.name)
-            original_pointer_dependency = callee.follow_pointer_dependency(original)
+            #print(" any pointer type in", callee.name)
+            #print(" ",original.name)
+            original_pointer_dependency: Variable = callee.follow_pointer_dependency(original)
             if original_pointer_dependency is not None:
                 for varpos, varname in enumerate(callee.args):
                     if varname!=original_pointer_dependency.name: continue
+                    #print(varname)
                     #print(impl.name, variable.name, vars[varpos].name)
                     impl.set_pointer_depedency(variable, vars[varpos])
+                    pointer_type = impl.get_pointer_type(vars[varpos])
+                    if pointer_type and pointer_type!=ANY_TYPE and ret_pos and rets[ret_pos-1].type.is_buffer_of==ANY_TYPE:
+                        rets[ret_pos-1].type = buffer_types[vars[varpos].type]
                     break
         else: 
             impl.set_pointer_type(variable, original_pointer_type)
+            # overwrite known pointer types here for the pointer (it's fine to change the type because rets are copies)
     if callee.rets or vars: impl.implementation[-1] = CodeWord(")") # replace last comma with closing parenthesis
     else: impl.implementation.append(CodeWord(")"))
     impl.implementation.append(CodeWord(";"))
@@ -441,6 +452,62 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if impl.nesting: error_token.error("safety", "cannot create a compilation-time failure inside a 'while' or an 'if' whose condition does not evaluate to compile-time known boolean")
         raise CompfailException()
     return rets
+
+def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token):
+    if len(ret)!=1: current_token.error("type", "can only deref a 'ptr' but got '"+signature_like(ret)+"'")
+    if ret[0].type!=POINTER_TYPE: current_token.error("type", "can only deref a 'ptr' but got '"+signature_like(ret)+"'")
+    if ret[0].name in impl.invalidated: current_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer")
+    pointer_type = impl.get_pointer_type(ret[0])
+    if pointer_type is None: current_token.error("type", "there is no known type attached to the pointer to deref at this point")
+    if pointer_type == ANY_TYPE: current_token.error("type", "cannot deref a pointer on 'any' data (this can be specialized)")
+    new_vars = list()
+    prefix = create_temp()+"__"
+    progress = 0
+    for ret_name in pointer_type.rets:
+        r_var = pointer_type.vars[ret_name].renamed_copy(prefix+ret_name)
+        new_vars.append(r_var)
+        mem_size = r_var.type.memory_size()
+        impl.vars[r_var.name] = r_var
+        if not mem_size: continue
+        # non-allocation check is mandatory unfortunately
+        impl.implementation.extend([
+            CodeWord("if"),
+            CodeWord("("),
+            CodeWord("!"),
+            ret[0],
+            CodeWord(")"),
+            CodeWord("{"),
+        ])
+        if debug_mode:
+            text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
+            text += "\\033[31mat\\033[0m "+current_token.file.path.replace('"','\\"')+" line "+str(current_token.row)+" column "+str(current_token.col)+"\\n"
+            impl.implementation.extend([
+                CodeWord("printf"),
+                CodeWord("("),
+                CodeWord('"%s", "'+text+'"'),
+                CodeWord(")"),
+                CodeWord(";"),
+            ])
+        impl.implementation.extend([
+            CodeWord("goto"),
+            CodeWord("__temp_failure"),
+            CodeWord(";"),
+            CodeWord("}")
+        ])
+        impl.needs_failure_mode = True
+        impl.implementation.extend(
+            [CodeWord(w) for w in "memcpy (".split(" ")]
+            + [CodeWord("&")]
+            + [r_var]
+            + [CodeWord(",")]
+            + [CodeWord(w) for w in "( char * )".split(" ")]
+            + [ret[0]]
+            + ([CodeWord("+"), CodeWord(str(progress))] if progress else [])
+            + [CodeWord(","), CodeWord(str(mem_size))]
+            + [CodeWord(")"), CodeWord(";")]
+        )
+        progress += mem_size
+    return pos, new_vars
 
 buffer_types: dict[ImplementedType, UnionType] = dict()
 
@@ -561,6 +628,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             "/": ("div",3),
             "%": ("mod",4),
             "[": ("get", 0.5),
+            ".": ("dot", 0.5),
             "->": ("access",-1),
         }.get(op, (None, 0))
         if op_name is None: return pos, rets
@@ -586,7 +654,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
             pointer_type: ImplementedType = impl.get_pointer_type(var)
             if pointer_type is None: err_token.error("type", "cannot := a value onto a pointer with unknown associated type")
-            if len(pointer_type.rets)!=len(ret): err_token.error("type", "this is a pointer to data of different type")
+            if len(pointer_type.rets)!=len(ret): err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")
             for pr, r in zip(pointer_type.rets, ret):
                 if pointer_type.vars[pr].type != r.type: err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")
             # we now have a contract that we can place our data on the pointer
@@ -710,7 +778,28 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             rets = [Variable(tmp, TRUE_TYPE) if found else Variable(tmp, FALSE_TYPE)]
             impl.vars[tmp] = rets[0]
             continue
-        if op=="[":
+        if op==".":
+            current_token = tokens[pos]
+            if len(rets)==1 and rets[0].type==POINTER_TYPE:
+                pos, rets = process_deref(file, pos, rets, impl, current_token)
+                pos += 1
+                continue
+            current = longest_common_prefix([r.name for r in rets])
+            if current.endswith("__"): current=current[:-2]
+            pos -= 1
+            while peek_text(tokens, pos+1) == ".":
+                pos += 2
+                current += "__"+get(tokens, pos).text
+                is_field = True
+                if current in impl.vars: break
+            pos += 1
+            var = impl.vars.get(current, None)
+            if var is None:
+                current_prefix = current+"__"
+                rets = [r for r in rets if r.name.startswith(current_prefix)]
+                if rets or peek_text(tokens, pos+1)=="is": continue
+                current_token.error("type", "not found field '"+pretty_name(current)+"'") 
+        elif op=="[":
             err_token = tokens[pos]
             type = file.types.get("get", None)
             if type is None: err_token.error("type", "missing implementation for 'get'")
@@ -719,7 +808,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             if peek_text(tokens, pos)!="]": err_token.error("syntax", "missing closing ']'")
             pos += 1
             continue
-        elif op_priority==-1: 
+        elif op_priority==-1:
             pos, type = process_type(file, tokens, pos+1)
             if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
             pos -= 1
@@ -822,62 +911,10 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                 impl.invalidated[var] = current_token
         impl.invalidate_types_when_called.extend(type.variations)
         return pos, []
-    if current == "deref" or current==":":
-        pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
-        if len(ret)!=1: current_token.error("type", "can only deref a 'ptr'")
-        if ret[0].type!=POINTER_TYPE: current_token.error("type", "can only deref a 'ptr'")
-        if ret[0].name in impl.invalidated: current_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer")
-        pointer_type = impl.get_pointer_type(ret[0])
-        if pointer_type is None: current_token.error("type", "there is no known type attached to the pointer to deref at this point")
-        if pointer_type == ANY_TYPE: current_token.error("type", "cannot deref a pointer on 'any' data (this can be specialized)")
-        new_vars = list()
-        prefix = create_temp()+"__"
-        progress = 0
-        for ret_name in pointer_type.rets:
-            r_var = pointer_type.vars[ret_name].renamed_copy(prefix+ret_name)
-            new_vars.append(r_var)
-            mem_size = r_var.type.memory_size()
-            impl.vars[r_var.name] = r_var
-            if not mem_size: continue
-            # non-allocation check is mandatory unfortunately
-            impl.implementation.extend([
-                CodeWord("if"),
-                CodeWord("("),
-                CodeWord("!"),
-                ret[0],
-                CodeWord(")"),
-                CodeWord("{"),
-            ])
-            if debug_mode:
-                text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
-                text += "\\033[31mat\\033[0m "+current_token.file.path.replace('"','\\"')+" line "+str(current_token.row)+" column "+str(current_token.col)+"\\n"
-                impl.implementation.extend([
-                    CodeWord("printf"),
-                    CodeWord("("),
-                    CodeWord('"%s", "'+text+'"'),
-                    CodeWord(")"),
-                    CodeWord(";"),
-                ])
-            impl.implementation.extend([
-                CodeWord("goto"),
-                CodeWord("__temp_failure"),
-                CodeWord(";"),
-                CodeWord("}")
-            ])
-            impl.needs_failure_mode = True
-            impl.implementation.extend(
-                [CodeWord(w) for w in "memcpy (".split(" ")]
-                + [CodeWord("&")]
-                + [r_var]
-                + [CodeWord(",")]
-                + [CodeWord(w) for w in "( char * )".split(" ")]
-                + [ret[0]]
-                + ([CodeWord("+"), CodeWord(str(progress))] if progress else [])
-                + [CodeWord(","), CodeWord(str(mem_size))]
-                + [CodeWord(")"), CodeWord(";")]
-            )
-            progress += mem_size
-        return process_statement_operator(file, tokens, impl, pos, new_vars, current_operator_priority)
+    # if current == "deref" or current==":":
+    #     pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
+    #     pos, ret = process_deref(file, pos, ret, impl, current_token)
+    #     return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
     if current == "class":
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         tmp = create_temp()
@@ -891,7 +928,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             pos += 1
             if peek_text(tokens, pos)==")": break
             pos, segment = process_statement(file, tokens, pos, impl, current_operator_priority=0)
-            pos, segment = process_statement_operator(file, tokens, impl, pos, segment, current_operator_priority=-0.5)
+            pos, segment = process_statement_operator(file, tokens, impl, pos, segment, current_operator_priority=0)
             ret.extend(segment)
             peek = peek_text(tokens, pos)
             if peek==")": break
@@ -899,7 +936,8 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                 continue
             get(tokens, pos).error("syntax", "expecting comma or closing parenthesis")
         pos += 1 # skip closing parenthesis
-        return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=-0.5)
+        if peek_text(tokens, pos)=="->": return pos, ret  # manual left-to-right piping
+        return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
     is_field = False
     while peek_text(tokens, pos+1) == ".":
         pos += 2
@@ -1319,7 +1357,7 @@ def _load(path: str) -> File:
                     while True:
                         col += 1
                         if col==len(line): break
-                        if c in "(){}[];&|": break
+                        if c in "(){}[];&|.": break
                         c = line[col]
                         if c not in symbols or c in "(){}[];&|": break
                     if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))

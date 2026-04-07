@@ -9,6 +9,10 @@ def realloc(compiler::ptr allocated, id bytes)
     INVALIDATE compiler::ptr
     return new_allocated->compiler::attach_type(allocated)
 
+def free(compiler::ptr allocated)
+    {if(allocated)free(allocated);allocated=0;}
+    INVALIDATE compiler::ptr
+
 def zero(compiler::ptr allocated, id from, id to)
     {memset(((char*)allocated)+from, 0, to);}
 

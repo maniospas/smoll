@@ -38,6 +38,13 @@ jobs:
           python -m pip install --upgrade pip
           # Nuitka + a few libraries it often needs
           python -m pip install nuitka ordered-set tqdm
+      - name: Install Dependency Walker (Windows only)
+        if: runner.os == 'Windows'
+        run: |
+          mkdir -p $HOME/dependency-walker
+          curl -L -o $HOME/dependency-walker/depends.exe \
+            https://github.com/lukasjapan/dependency-walker/releases/download/2.2/depends.exe
+          echo "$HOME/dependency-walker" >> $GITHUB_PATH
       - name: Compile with Nuitka
         run: |
           python -m nuitka --standalone --onefile \

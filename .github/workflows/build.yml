@@ -12,11 +12,9 @@ jobs:
         include:
           - os: ubuntu-latest
             exe_ext: ''
-            options: ''
             artifact_name: smoll-linux
           - os: windows-latest
             exe_ext: '.exe'
-            options: '--no-prompt'
             artifact_name: smoll-windows
 
     defaults:
@@ -45,18 +43,13 @@ jobs:
       - name: Install build requirements
         run: |
           python -m pip install --upgrade pip
-          # Nuitka + a few libraries it often needs
           python -m pip install nuitka[onefile] ordered-set tqdm
       - name: Compile with Nuitka
         run: |
-          python -m nuitka ${{ matrix.options }} --standalone --onefile \
+          python -m nuitka --no_asserts --static_hashes --no_docstrings --standalone --onefile \
                  --output-filename=smoll \
                  smoll.py
           mv "smoll${{ matrix.exe_ext }}" "smoll-${{ matrix.os }}${{ matrix.exe_ext }}"
-      - name: Quick sanity check
-        run: |
-          chmod +x "smoll-${{ matrix.os }}${{ matrix.exe_ext }}" || true
-          "./smoll-${{ matrix.os }}${{ matrix.exe_ext }}" --help || true
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:

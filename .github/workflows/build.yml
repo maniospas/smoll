@@ -74,16 +74,17 @@ jobs:
       - name: Generate release notes (auto‑changelog)
         id: notes
         run: |
+          set -euo pipefail
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          if [ -z "$PREV_TAG" ]; then
-            echo "notes<<EOF" >> $GITHUB_OUTPUT
-            echo "First release – no previous tag." >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-          else
-            echo "notes<<EOF" >> $GITHUB_OUTPUT
-            git log --pretty=format:"- %s (%h)" "$PREV_TAG"..HEAD >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-          fi
+          {
+            echo "notes<<EOF"
+            if [ -z "$PREV_TAG" ]; then
+              echo "First release – no previous tag."
+            else
+              git log --pretty=format:"- %s (%h)" "$PREV_TAG"..HEAD
+            fi
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
       - name: Create GitHub Release & upload assets
         uses: softprops/action-gh-release@v2
         with:

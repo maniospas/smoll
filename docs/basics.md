@@ -317,23 +317,25 @@ In those cases, use `resize` to change buffer size, that is, its
 number of elements. You can also set the size to zero.
 
 A second important feature is the element access operator `[]`,
-which can be used to retrieve a pointer to a specific element. In general, this operator is implemented by overloading the `get` 
-function.
-
-Pointers can only be retrieved from buffers and are
+which can be used to retrieve a pointer to a specific element. 
+In general, this operator is implemented by overloading the `get` 
+function. Pointers can only be retrieved from buffers and are
 unstanble in that they become invalid later in the code. 
 Being invalid means that they can not be read from or copy data
 to them. Still, invalidation ensures safety.
 
-Use`ptr: value` to copy same data on the pointer's memory,
-and `ptr.` dereferences the pointers into a local object.
+Use `ptr << value` to copy same data on the pointer's memory,
+where this operator can also be written as `value >> ptr` if
+you want to compute the value first and pointer next (we will 
+see a good reason later). On the other hand,
+`ptr.` dereferences the pointers into a local object.
 For example, `ptr..field` gets a field from an object stored 
 in a pointer.
 
 
-Lastly, all buffer indexes -yes, we are still talking about buffers-
-are of type `id`, which represents unsigned integers. Below is an
-example of buffer usage
+Lastly, all buffer indexes -yes, still talking about buffers-
+are of type `id`, which represents unsigned integers. Here is an
+example of buffer usage.
 
 ```python
 import "std/core.s"
@@ -343,7 +345,7 @@ def main()
     buf = mut float[]
     buf->resize(10)
     print buf[0]. // prints 0, as x is zero-initialized
-    buf[1]: 1.0
+    buf[1] << 1.0
     print buf[1].
 ```
 
@@ -383,3 +385,27 @@ last two prints, `element` would become invalidated and would
 need to be re-obtained from the buffer.
 In general, try to work with buffers and only use pointers
 for rapidly moving temporary data around.
+
+As we now know about pointer invalidation, it becomes apparent
+why the syntax `data >> ptr` is necessary when moving data
+within a buffer while resizing it, as it lets us put dereferencing
+on the left-hand-side to evaluate it before moving data. 
+
+
+Below is how one could do
+this without intermediate variables
+by leveraging the fact that `resize` returns the buffer
+while a function `last` can retrieve a pointer to the last
+element (or fail for an empty buffer).
+If we used `<<` we would not have access to `buf[2]` after resizing.
+
+```python
+import "std/core.s"
+import "std/array.s"
+
+def main()
+    buf = mut id[]->alloc(3)
+    buf[2] << 1
+    buf[2].>> last buf->resize(2)
+    print buf[1]. // prints 1
+```

@@ -624,32 +624,35 @@ def skip_statement(file: File, tokens: list[Token], pos: int):
         pos += 1
     return pos
 
+operators = {
+    ">>": (">>", 11),
+    "<<": ("<<", 11),
+    "and": ("and", 10),
+    "or": ("or", 9),
+    "is": ("is", 8),
+    "<": ("lt",7),
+    ">": ("gt",7),
+    "<=":("le",7),
+    ">=":("ge",7),
+    "==":("eq",7),
+    "!=":("neq",7),
+    "+": ("add",5),
+    "-": ("sub",6),
+    "*": ("mul",2),
+    "**":("pow",1),
+    "/": ("div",3),
+    "%": ("mod",4),
+    "[": ("get", 0.5),
+    ".": ("dot", 0.5),
+    "->": ("access",-1),
+}
+
+
 def process_statement_operator(file: File, tokens: list[Token], impl: ImplementedType, pos: int, rets: list[Variable], current_operator_priority:int) -> tuple[int, list[Variable]]:
     # apply this when returning from process_statement
     while True:
         op = peek_text(tokens, pos)
-        op_name, op_priority = {
-            ">>": (">>", 11),
-            "<<": ("<<", 11),
-            "and": ("and", 10),
-            "or": ("or", 9),
-            "is": ("is", 8),
-            "<": ("lt",7),
-            ">": ("gt",7),
-            "<=":("le",7),
-            ">=":("ge",7),
-            "==":("eq",7),
-            "!=":("neq",7),
-            "+": ("add",5),
-            "-": ("sub",6),
-            "*": ("mul",2),
-            "**":("pow",1),
-            "/": ("div",3),
-            "%": ("mod",4),
-            "[": ("get", 0.5),
-            ".": ("dot", 0.5),
-            "->": ("access",-1),
-        }.get(op, (None, 0))
+        op_name, op_priority = operators.get(op, (None, 0))
         if op_name is None: return pos, rets
         if current_operator_priority==9 and op_priority==10: 
             tokens[pos].error("safety", "there is no clear priority order between 'and' and 'or'; be explicit with parentheses")
@@ -669,8 +672,8 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             if len(rets)!=1: err_token.error("type", "can not apply '"+op_name+"' to non-pointer '"+signature_like(rets)+"'")
             var = rets[0]
             if var is not None and var.isprivate: err_token.error("type", "cannot set to immutable class field: '"+pretty_name(current)+"'")
-            if var is None: err_token.error("type", "can only set a value to an existing ptr with ':='")
-            if var.type!=POINTER_TYPE: err_token.error("type", "can only set a value to an existing ptr with ':='")
+            if var is None: err_token.error("type", "can only set a value to an existing ptr with '"+op_name+"'")
+            if var.type!=POINTER_TYPE: err_token.error("type", "can only set a value to an existing ptr with '"+op_name+"'")
             if var.name in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer")
             pointer_type: ImplementedType = impl.get_pointer_type(var)
             if pointer_type is None: err_token.error("type", "cannot := a value onto a pointer with unknown associated type")
@@ -960,7 +963,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                 continue
             get(tokens, pos).error("syntax", "expecting comma or closing parenthesis")
         pos += 1 # skip closing parenthesis
-        if peek_text(tokens, pos)=="->" or peek_text(tokens, pos)=="[": return pos, ret  # manual left-to-right piping
+        if peek_text(tokens, pos)=="->" or peek_text(tokens, pos)=="[" or peek_text(tokens, pos) in operators: return pos, ret  # manual left-to-right piping
         return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
     is_field = False
     while peek_text(tokens, pos+1) == ".":

@@ -40,7 +40,6 @@ jobs:
       - name: Compile with Nuitka
         run: |
           python -m nuitka --standalone --onefile --assume-yes-for-downloads --output-filename=smoll smoll.py
-          mv "smoll${{ matrix.exe_ext }}" "smoll-${{ matrix.os }}${{ matrix.exe_ext }}"
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:

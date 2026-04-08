@@ -71,20 +71,6 @@ jobs:
         with:
           name: smoll-windows
           path: ./release-assets
-      - name: Generate release notes (auto‑changelog)
-        id: notes
-        run: |
-          set -euo pipefail
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          {
-            echo "notes<<EOF"
-            if [ -z "$PREV_TAG" ]; then
-              echo "First release – no previous tag."
-            else
-              git log --pretty=format:"- %s (%h)" "$PREV_TAG"..HEAD
-            fi
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
       - name: Create GitHub Release & upload assets
         uses: softprops/action-gh-release@v2
         with:

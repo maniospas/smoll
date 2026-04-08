@@ -126,7 +126,7 @@ class ImplementedType:
 
     def set_pointer_type(self, var: Variable, type: "ImplementedType"):
         assert var.type == POINTER_TYPE
-        assert var not in self._pointer_type_dependencies
+        assert var.name not in self._pointer_type_dependencies
         assert not self.get_pointer_type(var)
         self._pointer_types[var.name] = type
 
@@ -629,7 +629,8 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
     while True:
         op = peek_text(tokens, pos)
         op_name, op_priority = {
-            ":": (":", 11),
+            ">>": (">>", 11),
+            "<<": ("<<", 11),
             "and": ("and", 10),
             "or": ("or", 9),
             "is": ("is", 8),
@@ -660,16 +661,17 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
         if current_operator_priority==7 and op_priority==7: 
             op_token.error("safety", "there is no clear priority order between multiple equalities and inequalities; be explicit with parentheses")
 
-        if op_name==":":
+        if op_name==">>" or op_name=="<<":
             err_token = op_token
-            if len(rets)!=1: err_token.error("type", "can not apply ':=' to non-pointer '"+signature_like(rets)+"'")
+            pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority=0) # don't touch rets
+            pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+            if op_name ==">>": ret, rets = rets, ret
+            if len(rets)!=1: err_token.error("type", "can not apply '"+op_name+"' to non-pointer '"+signature_like(rets)+"'")
             var = rets[0]
             if var is not None and var.isprivate: err_token.error("type", "cannot set to immutable class field: '"+pretty_name(current)+"'")
             if var is None: err_token.error("type", "can only set a value to an existing ptr with ':='")
             if var.type!=POINTER_TYPE: err_token.error("type", "can only set a value to an existing ptr with ':='")
             if var.name in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer")
-            pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority=0) # don't touch rets
-            pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
             pointer_type: ImplementedType = impl.get_pointer_type(var)
             if pointer_type is None: err_token.error("type", "cannot := a value onto a pointer with unknown associated type")
             if len(pointer_type.rets)!=len(ret): err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")
@@ -819,6 +821,8 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 rets = [r for r in rets if r.name.startswith(current_prefix)]
                 if rets or peek_text(tokens, pos+1)=="is": continue
                 current_token.error("type", "not found field '"+pretty_name(current)+"'") 
+            rets = [var]
+            continue
         elif op=="[":
             err_token = tokens[pos]
             type = file.types.get("get", None)

@@ -7,6 +7,7 @@ import "std/unsafe.s" as unsafe
 
 def alloc(mut any[] buffer, id size)
     if buffer.unsafe_size==size
+        unsafe::zero(buffer.unsafe_ptr, 0, buffer.align*size)
         return buffer
     if buffer.unsafe_size!=0
         fail "cannot resize buffers with alloc; it promises no data reallocation"
@@ -31,6 +32,11 @@ def resize(mut any[] buffer, id size)
         unsafe::zero(buffer.unsafe_ptr, prev_bytes, bytes)
     return buffer
 
+def last(any[] buffer)
+    if 0==buffer.unsafe_size
+        fail "out of bounds"
+    return buffer.unsafe_ptr->unsafe::add((buffer.unsafe_size-1)*buffer.align)
+
 def get(any[] buffer, id i)
     if i>=buffer.unsafe_size
         fail "out of bounds"
@@ -38,6 +44,3 @@ def get(any[] buffer, id i)
 
 def len(any[] buffer)
     return buffer.unsafe_size
-
-def new(any[] buffer)
-    return buffer->alloc(1)[0]

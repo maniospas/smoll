@@ -123,6 +123,8 @@ class ImplementedType:
             self.rets.append("value")
             self._memory_size = memory_size
         else: self._memory_size = 0
+        self.complexity = 0
+        self.num_calls = 0
 
     def set_pointer_type(self, var: Variable, type: "ImplementedType"):
         assert var.type == POINTER_TYPE
@@ -241,8 +243,9 @@ class ImplementedType:
             # else: raise Exception("cannot handle non-builtin returns: '"+arg+"'") # we d
         if arg_code and ret_code: arg_code += ", "
         arg_code += ret_code
+        doinline = self.complexity<500 or self.num_calls<=1
 
-        ret = ("static inline int " if self.needs_failure_mode else "static inline void ")+self.monomorphic_name+"("+arg_code+") {\n  "
+        ret = ("static inline " if doinline else "")+("int " if self.needs_failure_mode else "void ")+self.monomorphic_name+"("+arg_code+") {\n  "
         ret += ret_body_start
         for var, val in self.vars.items():
             if var in self.args: continue
@@ -466,6 +469,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         ])
         impl.needs_failure_mode = True
     impl.dependent_implementations.append(callee)
+    impl.complexity += callee.complexity+len(callee.implementation)
+    callee.num_calls += 1
     if callee==FAIL_TYPE: 
         if impl.nesting: error_token.error("safety", "cannot create a compilation-time failure inside a 'while' or an 'if' whose condition does not evaluate to compile-time known boolean")
         raise CompfailException()
@@ -548,6 +553,7 @@ def find_unique_variations(variations: list[ImplementedType]):
 def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|UnionType]:
     name = get(tokens, pos).text
     if peek_text(tokens, pos+1)!="::":
+        if name in operators: tokens[pos].error("syntax", "the previous expression has ended")
         type: UnionType = file.types.get(name, None)
         if type is None: 
             #raise("unknown type '"+name+"'")
@@ -672,8 +678,8 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             if len(rets)!=1: err_token.error("type", "can not apply '"+op_name+"' to non-pointer '"+signature_like(rets)+"'")
             var = rets[0]
             if var is not None and var.isprivate: err_token.error("type", "cannot set to immutable class field: '"+pretty_name(current)+"'")
-            if var is None: err_token.error("type", "can only set a value to an existing ptr with '"+op_name+"'")
-            if var.type!=POINTER_TYPE: err_token.error("type", "can only set a value to an existing ptr with '"+op_name+"'")
+            if var is None: err_token.error("type", "can only set a value to an existing ptr with '"+op_name+"' but found '"+signature_like(rets)+"'")
+            if var.type!=POINTER_TYPE: err_token.error("type", "can only set a value to an existing ptr with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.name in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer")
             pointer_type: ImplementedType = impl.get_pointer_type(var)
             if pointer_type is None: err_token.error("type", "cannot := a value onto a pointer with unknown associated type")
@@ -843,12 +849,12 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
         else: 
             type: UnionType = file.types.get(op_name, None)
             if type is None: op_token.error("type", "missing implementation for '"+op_name+"'")
-        pos, additional_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority)
+        pos, additional_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority, for_call=True)
         rets = resolve_call(file, impl, type, rets+additional_rets, op_token)
     return pos, rets
 
 
-def process_statement(file: File, tokens: list[Token], pos: int, impl: ImplementedType, current_operator_priority: int) -> tuple[int, list[Variable]]:
+def process_statement(file: File, tokens: list[Token], pos: int, impl: ImplementedType, current_operator_priority: int, for_call: bool=False) -> tuple[int, list[Variable]]:
     current_token = get(tokens, pos)
     current = current_token.text
     if current=="fail":
@@ -963,7 +969,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                 continue
             get(tokens, pos).error("syntax", "expecting comma or closing parenthesis")
         pos += 1 # skip closing parenthesis
-        if peek_text(tokens, pos)=="->" or peek_text(tokens, pos)=="[" or peek_text(tokens, pos) in operators: return pos, ret  # manual left-to-right piping
+        if peek_text(tokens, pos)=="->" or peek_text(tokens, pos)=="[" or (peek_text(tokens, pos) in operators and for_call): return pos, ret  # manual left-to-right piping
         return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
     is_field = False
     while peek_text(tokens, pos+1) == ".":
@@ -1000,7 +1006,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         pos, method = process_linear_type(file, tokens, pos)
         #if isinstance(method, File): tokens[pos].error("type", "did not resolve completely to a type")
         if peek_text(tokens, pos-1)=="]": vars = list()
-        else: pos, vars = process_statement(file, tokens, pos, impl, current_operator_priority)
+        else: pos, vars = process_statement(file, tokens, pos, impl, current_operator_priority, for_call=True)
         varsret = resolve_call(file, impl, method, vars, current_token)
         return process_statement_operator(file, tokens, impl, pos, varsret, current_operator_priority)
     return process_statement_operator(file, tokens, impl, pos+1, [var], current_operator_priority)
@@ -1494,7 +1500,7 @@ def download_with_progress(url: str, filepath: str, message: str):
             if not chunk: break
             f.write(chunk)
             downloaded += len(chunk)
-            percent = downloaded / total_size * 100
+            percent = downloaded / total_size * 50
             bar_len = 30
             filled_len = int(bar_len * downloaded // total_size)
             bar = '█' * filled_len + '-' * (bar_len - filled_len)
@@ -1578,18 +1584,30 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     body = "\n\n".join(generated_c_funcs)
     src_path.write_text(header + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")
-    gcc_cmd = [
-        "gcc",
-        "-O3",
-        "-std=c99",
-        str(src_path),
-        "-o",
-        str(exe_path),
-    ]
+    gcc_cmd = {
+        "gcc": [
+            "gcc",
+            "-O3",
+            "-std=c99",
+            str(src_path),
+            "-o",
+            str(exe_path),
+        ],
+        "antcc": [
+            "./antcc",
+            "-O2",
+            str(src_path),
+            "-o",
+            str(exe_path),
+        ]
+    }.get(chosen_compiler, None)
+    if gcc_cmd is None:
+        print("[✗] "+chosen_compiler+" not found")
+        sys.exit(1)
     print(f"[{YELLOW}+{RESET}] compile     ", " ".join(gcc_cmd))
     result = subprocess.run(gcc_cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        print("[✗] gcc failed:")
+        print("[✗] "+chosen_compiler+" failed:")
         print(result.stderr)
         sys.exit(1)
 
@@ -1598,8 +1616,14 @@ parser = argparse.ArgumentParser(description="Compile a .s file and optionally r
 parser.add_argument("source", metavar="SOURCE", help="Path to the .s source file to compile.",)
 parser.add_argument("--build", action="store_true", help="Build without running.",)
 parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
+parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang.",)
 args = parser.parse_args()
 debug_mode = args.debug
+chosen_compiler = args.back or "auto"
+if chosen_compiler == "auto":
+    #if os.path.exists("antcc"): chosen_compiler = "antcc"
+    #else: 
+    chosen_compiler = "gcc"
 src_path = Path(args.source)
 if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); sys.exit(1)
 

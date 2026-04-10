@@ -23,6 +23,7 @@ debug_mode = True
 repositories: dict[str, str] = dict()
 
 class CompfailException(Exception): pass
+class FastReturnException(Exception): pass
 
 def pretty_name(name: str):
     return name.replace("__", ".")
@@ -123,8 +124,13 @@ class ImplementedType:
             self.rets.append("value")
             self._memory_size = memory_size
         else: self._memory_size = 0
+        # these parameters help decide whether we should declare static inline
         self.complexity = 0
         self.num_calls = 0
+        self.force_not_inline = False 
+        # this is used to throw a FastReturnException the first time the function returns
+        self.fast_return_exception = False
+        self.has_been_completed = False
 
     def set_pointer_type(self, var: Variable, type: "ImplementedType"):
         assert var.type == POINTER_TYPE
@@ -215,6 +221,10 @@ class ImplementedType:
                 self.rets.append(arg.name)
                 self.vars[arg.name] = arg # needed to reflect changes in const permissions
         self.has_returned_once = True
+        if self.fast_return_exception: 
+            self.force_not_inline = True
+            self.has_returned_once = True
+            raise FastReturnException
 
     def transpile(self) -> str:
         ret_body_start = ""
@@ -243,7 +253,7 @@ class ImplementedType:
             # else: raise Exception("cannot handle non-builtin returns: '"+arg+"'") # we d
         if arg_code and ret_code: arg_code += ", "
         arg_code += ret_code
-        doinline = self.complexity<500 or self.num_calls<=1
+        doinline = (self.complexity<500 or self.num_calls<=1) and not self.force_not_inline
 
         ret = ("static inline " if doinline else "")+("int " if self.needs_failure_mode else "void ")+self.monomorphic_name+"("+arg_code+") {\n  "
         ret += ret_body_start
@@ -366,6 +376,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 if not is_available: break
         if is_available: available_types.append(variation)
     if len(available_types)==0:
+        # has_defs = False
+        # for i, tok in enumerate(file.tokens):
+        #     if tok.text=="def" and peek_text(tokens, i+1)==method.name
         error_token.error("type", "could not resolve any call for '"+method.name+"("+signature_like(vars, impl)+")' candidates:\n    "+"\n    ".join([t.signature() for t in method.variations]))
     if len(available_types)>1:
         error_token.error("type", "more than one conflicting call '"+method.name+"("+signature_like(vars, impl)+")' candidates:\n    "+"\n    ".join([t.signature() for t in available_types]))
@@ -557,6 +570,13 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
         type: UnionType = file.types.get(name, None)
         if type is None: 
             #raise("unknown type '"+name+"'")
+            found = False
+            for tokpos, tok in enumerate(tokens):
+                if tok.text=="def" and peek_text(tokens, tokpos+1)==name:
+                    if peek_text(tokens, tokpos+2)=="=": tokens[pos].error("type", "type union is declared later per 'def "+name+"'")
+                    else: tokens[pos].error("type", "usage of 'def "+name+"' before its definition; perhaps declare it as 'rec fib'")
+                elif tok.text=="rec" and peek_text(tokens, tokpos+1)==name:
+                    tokens[pos].error("type", "usage of 'rec "+name+"' before its definition") 
             tokens[pos].error("type", "unknown type '"+name+"'")
         if peek_text(tokens, pos+1)=="[":
             if get(tokens, pos+2).text!="]": get(tokens, pos+1).error("syntax", "to denote a buffer type use '[]'")
@@ -1062,6 +1082,8 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             pos += 1
             continue
         if name.text=="return":
+            #if impl.fast_return_exception and not impl.nesting and not impl.has_returned_once: 
+            #    name.error("safety", "the first return must occur conditionally in recursive functions: 'rec "+impl.name+"'")
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
             impl.returns(ret, name)
             if not ret: impl.implementation.extend([CodeWord("return"), CodeWord(";")])
@@ -1261,7 +1283,7 @@ def process_import(file: File, tokens: list[Token], pos: int):
         file.namespaces[namespace_name] = namespace_value
     return pos
 
-def process_def(file: File, tokens: list[Token], pos: int):
+def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception: bool):
     start_token = get(tokens, pos)
     pos += 1
     name = get(tokens, pos).text
@@ -1301,9 +1323,11 @@ def process_def(file: File, tokens: list[Token], pos: int):
     if get(tokens, pos).text!=")": tokens[pos].error("syntax", "expecting closing parenthesis")
     pos += 1
     starting_pos = pos
+    greatest_pos = None
     for arg_types in itertools.product(*abstract_arg_types):
         pos = starting_pos
         impl = ImplementedType(name, at=start_token)
+        impl.fast_return_exception = fast_return_exception
         try:
             for arg_name, arg_type, immutable, convert_to_ptr in zip(abstract_arg_names, arg_types, abstract_arg_immutability, abstract_arg_convert_to_ptr):
                 if convert_to_ptr:
@@ -1322,29 +1346,39 @@ def process_def(file: File, tokens: list[Token], pos: int):
                     if immutable: impl.vars[ret_name] = impl.vars[ret_name].private_copy()
                     impl.args.append(ret_name)
             found_type: UnionType = file.types.get(impl.name)
+            already_parsed = None
             if found_type is not None:
                 # there may be some duplicate argument schemes - skip those
                 # the duplicate schemes arise, e.g., when we overload constructors for the same type
-                already_parsed = False
-                for variation in found_type.variations:
+                for variation_position, variation in enumerate(found_type.variations):
                     is_same = len(variation.args)==len(impl.args)
                     if is_same:
                         for variation_arg, impl_arg in zip(variation.args, impl.args):
                             if not variation.vars[variation_arg].is_same(impl.vars[impl_arg]):
                                 is_same = False
                     if is_same:
-                        already_parsed = True
+                        already_parsed = variation_position
                         break
-                if already_parsed: continue
-            pos = process_body(file, tokens, pos, impl)
+                if already_parsed is not None: 
+                    if found_type.variations[already_parsed].at!=impl.at: continue
+            try:
+                pos = process_body(file, tokens, pos, impl)
+            except FastReturnException: 
+                assert fast_return_exception
+            #if not impl.force_not_inline and fast_return_exception: continue # register only forcefully RECURSIVE variations
             #make a union type to store the implementation if one does not already exist
             if found_type is None:
                 found_type = UnionType(impl.name)
                 file.types[impl.name] = found_type
-            found_type.variations.append(impl)
+            if already_parsed is not None:
+                for a in impl.__dict__:
+                    if a not in ["monomorphic_name", "force_not_inline"]:
+                        setattr(found_type.variations[already_parsed], a, getattr(impl, a))
+            else: found_type.variations.append(impl)
             greatest_pos = pos
         except CompfailException: pass
-    if name not in file.types: start_token.error("safety", "no valid variations of '"+name+"'")
+    if name not in file.types: start_token.error("safety", "no valid variations of '"+name+"'; either due to compiler::fail everywhere or becuase you are trying to overload a function that exists.")
+    if greatest_pos is None: start_token.error("safety", "no valid variations of '"+name+"'; either due to compiler::fail everywhere or because you are trying to overload a function that exists.")
     pos = greatest_pos
     return pos  # all parsing should end at the same position
 
@@ -1366,15 +1400,43 @@ def process_union(file: File, tokens: list[Token], pos: int):
     return pos
 
 def process(file: File, tokens: list[Token], pos: int) -> File:
+    # this schema assumes that imports and repos happen before defs
+    # first pass: process functions only up to their first return
+    has_made_def = False
     i = 0
     while i<len(tokens):
         tok = tokens[i]
-        if tok.text=="def": 
-            if peek_text(tokens, i+2)=="=": i = process_union(file, tokens, i)
-            else: i = process_def(file, tokens, i)
-        elif tok.text=="import": i = process_import(file, tokens, i)
-        elif tok.text=="repo": i = process_repo(file, tokens, i)
-        else: tok.error("syntax", "expecting  'def' or 'import but found '"+str(tok.text)+"'")
+        if tok.text=="def" or tok.text=="rec": 
+            has_made_def = True
+            if peek_text(tokens, i+2)=="=": 
+                if tok.text=="rec": tok.error("cannot define a type union with 'rec'")
+                i = process_union(file, tokens, i)
+            else: 
+                pos_end = i
+                depth = 0
+                while pos_end<len(tokens):
+                    txt = get_skip(tokens, pos_end).text
+                    if txt==START_TOKEN: depth += 1
+                    if txt==END_TOKEN: 
+                        depth -= 1
+                        if depth==0: break
+                    pos_end += 1
+                i = process_def(file, tokens, i, fast_return_exception=tok.text=="rec")
+                i = pos_end+1
+        elif tok.text=="import": 
+            if has_made_def: tok.error("syntax", "can only import before the file's first 'def'")
+            i = process_import(file, tokens, i)
+        elif tok.text=="repo": 
+            if has_made_def: tok.error("syntax", "can declare repos before the file's first 'def'")
+            i = process_repo(file, tokens, i)
+        else: tok.error("syntax", "expecting  'def', 'repo', or 'import' but found '"+str(tok.text)+"'")
+    # second pass: process the rest of functions (skip other syntax stuff)
+    i = 0
+    while i<len(tokens):
+        tok = tokens[i]
+        if tok.text=="rec":
+            i = process_def(file, tokens, i, fast_return_exception=False)
+        else: i += 1
     return file
 
 def resolve_name(path: str, at_token: Token|None) -> str:
@@ -1571,24 +1633,26 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     )
 
     generated_c_funcs = list()
+    c_decls = list()
     already_generated = set()
     def add_implementation(next_def: ImplementedType):
         for candidate_def in next_def.dependent_implementations:
             if candidate_def not in already_generated:
                 already_generated.add(candidate_def)
                 add_implementation(candidate_def)
-        generated_c_funcs.append(next_def.transpile())
+        transpiled = next_def.transpile()
+        if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
+        generated_c_funcs.append(transpiled)
     for main_def in main_defs: add_implementation(main_def)
     if entry_point: generated_c_funcs.append(f"""int main() {{{entry_point}();return 0;}}""")
 
-    body = "\n\n".join(generated_c_funcs)
+    body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
     src_path.write_text(header + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")
     gcc_cmd = {
         "gcc": [
             "gcc",
             "-O3",
-            "-std=c99",
             str(src_path),
             "-o",
             str(exe_path),
@@ -1632,6 +1696,7 @@ file: File = load(resolve_name(str(src_path), None), is_main_file=True)
 main_type: UnionType = file.types.get("main", None)
 if not main_type: print(f"{RED}error{RESET}: missing main type"); sys.exit(1)
 if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); sys.exit(1)
+if main_type.variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); sys.exit(1)
 
 exe_path = src_path.with_suffix("")
 write_and_compile(exe_path, {main_type.variations[0]}, main_type.variations[0].monomorphic_name)

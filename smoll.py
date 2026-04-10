@@ -61,6 +61,7 @@ class Variable(CodeSegment):
     def copy(self, prefix: str): return Variable(prefix+"__"+self.name, self.type, self.immutable, self.isprivate)
     def renamed_copy(self, new_name: str): return Variable(new_name, self.type, self.immutable, self.isprivate)
     def mutable_copy(self): return Variable(self.name, self.type, False, self.isprivate)
+    def immutable_copy(self): return Variable(self.name, self.type, True, self.isprivate)
     def private_copy(self): return Variable(self.name, self.type, self.immutable, True)
     def is_same(self, other: "Variable"):
         if self.type!=other.type: return False
@@ -78,8 +79,8 @@ def signature_like(vars: list[Variable], impl=None):
         arg_name = vars[i].name
         if arg_name.startswith("__temp") or "____" in arg_name: arg_name = ""
         else: arg_name = " "+arg_name.replace("__", ".")
-        if not vars[i].immutable: ret += "mut "
         if type.builtin: 
+            if not vars[i].immutable: ret += "mut "
             if type==POINTER_TYPE and impl: 
                 pointer_type = impl.get_pointer_type(vars[i])
                 if pointer_type is None: ret += "any "
@@ -87,9 +88,11 @@ def signature_like(vars: list[Variable], impl=None):
             ret += type.name+arg_name
             i += 1
         elif type.is_buffer_of: 
+            if any(not vars[k].immutable for k in range(i, i+len(type.rets))): ret += "mut "
             ret += type.is_buffer_of.name+"[]"+arg_name
             i += len(type.rets)
         else:
+            if any(not vars[k].immutable for k in range(i, i+len(type.rets))): ret += "mut "
             ret += type.name+arg_name
             i += len(type.rets)
         assert len(type.rets)
@@ -380,6 +383,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             if vars[i].type!= variation.vars[variation.args[i]].type and variation.vars[variation.args[i]].type.is_buffer_of!=ANY_TYPE:
                 is_available = False
                 break
+            if not variation.vars[variation.args[i]].immutable and vars[i].immutable:
+                is_available = False
+                break
         # first check for pointer mismatches (this is a safety error)
         for varpos, var in enumerate(vars):
             if var.type!=POINTER_TYPE: continue
@@ -427,11 +433,12 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         ])
     for varpos, var in enumerate(vars):
         if var.type.builtin: 
-            if callee.vars[callee.args[varpos]].immutable:
+            callee_arg = callee.vars[callee.args[varpos]]
+            if callee_arg.immutable:
                 impl.implementation.extend([var, CodeWord(",")])
                 continue
-            #if var.isprivate: error_token.error("type", "a mutable argument cannot modify an immutable class field: '"+pretty_name(var.name)+"'")
-            #if var.immutable: error_token.error("type", "a mutable argument cannot modify an immutable variable '"+pretty_name(var.name)+"'")
+            if var.isprivate: error_token.error("type", "an immutable class field '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
+            #elif not var.immutable: error_token.error("type", "an immutable variable '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
             impl.implementation.extend([CodeWord("&"), var, CodeWord(",")])
 
     for invalid_type in callee.invalidate_types_when_called:
@@ -1364,11 +1371,14 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
                 for ret in arg_type.rets:
                     ret_name = arg_name+"__"+ret
                     impl.vars[ret_name] = arg_type.vars[ret].renamed_copy(ret_name)
-                    if immutable: impl.vars[ret_name] = impl.vars[ret_name].private_copy()
+                    if immutable: impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
                     impl.args.append(ret_name)
                     if impl.vars[ret_name].type==POINTER_TYPE:
                         found_ptr_type = arg_type.get_pointer_type(arg_type.vars[ret])
                         if found_ptr_type is not None and found_ptr_type!=ANY_TYPE: impl.set_pointer_type(impl.vars[ret_name], found_ptr_type)
+                        else:
+                            dep = arg_type.follow_pointer_dependency(arg_type.vars[ret])
+                            if dep is not None: impl.set_pointer_depedency(dep.renamed_copy(arg_name+"__"+dep.name))
             found_type: UnionType = file.types.get(impl.name)
             already_parsed = None
             if found_type is not None:

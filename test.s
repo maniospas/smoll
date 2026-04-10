@@ -7,12 +7,11 @@ def test1()
     y = float[]
     return x
 
-def test2(float[] x)
+def test2(mut float[] x)
     x->resize(2)
     x[1] << 2.0
-
 
 def main()
     x = test1()
     test2(x)
-    print x[0].+x[1].+x[3].
+    print x[0].+x[1].

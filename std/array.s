@@ -5,7 +5,7 @@ import "std/unsafe.s" as unsafe
 // is that we GUARANTEE that non-zero pointers to a memory region contain
 // at least one element of the attached type (automatically inferred for any)
 
-def alloc(mut any[] buffer, id size)
+def alloc(mut any[] buffer, nat size)
     if buffer.unsafe_size==size
         unsafe::zero(buffer.unsafe_ptr, 0, buffer.align*size)
         return buffer
@@ -17,7 +17,7 @@ def alloc(mut any[] buffer, id size)
     unsafe::zero(buffer.unsafe_ptr, 0, bytes)
     return buffer
 
-def resize(mut any[] buffer, id size)
+def resize(mut any[] buffer, nat size)
     if buffer.unsafe_size==size 
         return buffer
     if size==0
@@ -37,7 +37,7 @@ def last(any[] buffer)
         fail "out of bounds"
     return buffer.unsafe_ptr->unsafe::add((buffer.unsafe_size-1)*buffer.align)
 
-def get(any[] buffer, id i)
+def get(any[] buffer, nat i)
     if i>=buffer.unsafe_size
         fail "out of bounds"
     return buffer.unsafe_ptr->unsafe::add(i*buffer.align)

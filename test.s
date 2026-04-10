@@ -1,13 +1,32 @@
 import "std/core.s"
+import "std/array.s"
 
-rec fib(nat n)
-    if n<=1
-        return 1
-    return call_fib(n-1)+call_fib(n-2)
+def test1()
+    x = float[]->resize(1)
+    x[0] << 1.0
+    y = float[]
+    return x
 
-def call_fib(nat n)
-    return fib(n)
+//def test2(float[] x)
+//    x->resize(2)
+//    x[1] << 2.0
+
+def test3()
+    x = test1()
+    return x
+
+def ff()
+    return float[]
+
+def test4()
+    x = ff[]
+    x->resize(1)
+    print len(x)
+    r = x[0].
+    r->resize(1)
+    r[0] << 1.0
 
 def main()
-    print fib(42)
-
+    //x = test3()
+    //print x[0].
+    test4()

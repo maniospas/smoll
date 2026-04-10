@@ -589,6 +589,9 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
                         actual_variation = ImplementedType(buffer_type.name+"__buffer")
                         actual_variation.is_buffer_of = variation
                         type_arg = create_temp()+actual_variation.name
+                        for varg in variation.rets:
+                            if variation.vars[varg].type == POINTER_TYPE:
+                                tokens[pos].error("safety", "cannot place pointers or buffers onto buffers")
                         actual_variation.vars[type_arg] = Variable(type_arg, actual_variation)
                         actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
                         actual_variation.vars["unsafe_size"] = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
@@ -702,7 +705,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             if var.type!=POINTER_TYPE: err_token.error("type", "can only set a value to an existing ptr with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.name in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer")
             pointer_type: ImplementedType = impl.get_pointer_type(var)
-            if pointer_type is None: err_token.error("type", "cannot := a value onto a pointer with unknown associated type")
+            if pointer_type is None: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type")
             if len(pointer_type.rets)!=len(ret): err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")
             for pr, r in zip(pointer_type.rets, ret):
                 if pointer_type.vars[pr].type != r.type: err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")

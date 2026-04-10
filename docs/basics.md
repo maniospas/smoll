@@ -118,13 +118,13 @@ def main()
 All functions declare corresponding types via their returned values.
 That is, you can use the function's name to refer to data with
 equivalent structure. Below is an example, where the
-`id` type represents to non-negative integers. Other builtin types
+`nat` type represents to natural numbers (non-negative integers). Other builtin types
 are `bool`, `int`, `float`, and `cstr` for string literals.
 
 ```python
 import "std/core.s"
 
-def range(id start, id end)
+def range(nat start, nat end)
     pos = mut start
     return (pos, end)
 
@@ -235,12 +235,12 @@ as recursive.
 ```python
 import "std/core.s"
 
-rec fib(id n)
+rec fib(nat n)
     if n<=1
         return 1
     return call_fib(n-1)+call_fib(n-2)
 
-def call_fib(id n)
+def call_fib(nat n)
     return fib(n)
 
 def main()
@@ -370,8 +370,8 @@ in a pointer.
 
 
 Lastly, all buffer indexes -yes, still talking about buffers-
-are of type `id`, which represents unsigned integers. Here is an
-example of buffer usage.
+are of type `nat`, which represents natural numbers (non-negative integers). 
+Here is an example of buffer usage.
 
 ```python
 import "std/core.s"

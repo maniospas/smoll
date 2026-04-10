@@ -15,7 +15,7 @@ def print(int value, cstr|blank endl)
         endl = "\n"
     {printf("%lld%s", value, endl);}
 
-def print(id value, cstr|blank endl)
+def print(nat value, cstr|blank endl)
     if endl is blank 
         endl = "\n"
     {printf("%llu%s", value, endl);}

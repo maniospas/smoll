@@ -11,14 +11,8 @@ def test2(float[] x)
     x->resize(2)
     x[1] << 2.0
 
-def test3()
-    x = test1()
-    return x
-
-def ff()
-    return float[]
 
 def main()
-    //x = test3()
-    //print x[0].
-    test4()
+    x = test1()
+    test2(x)
+    print x[0].+x[1].+x[3].

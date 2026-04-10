@@ -205,7 +205,7 @@ class ImplementedType:
             other_pointer_type = self.get_pointer_type(value[0])
             #print(existing.name, existing_pointer_type.name if existing_pointer_type else None, value[0].name, other_pointer_type.name if other_pointer_type else None)
             if existing_pointer_type is not None:
-                if existing_pointer_type!=other_pointer_type: error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+other_pointer_type.signature()+"'")
+                if existing_pointer_type!=other_pointer_type: error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
             else:
                 if self.get_pointer_type(value[0]): self.set_pointer_depedency(existing, value[0])
         if existing.type.builtin: self.implementation.extend([existing, CodeWord("="), value[0], CodeWord(";")])
@@ -1334,7 +1334,7 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
         if arg_name==")" or arg_name==",": arg_name = "__temp_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
         else: pos += 1
         abstract_arg_types.append(find_unique_variations(arg_type.variations))
-        if POINTER_TYPE in arg_type.variations: tokens[pos].error("syntax", "pointers should follow their attached data type. Perhaps you meant 'any ptr'?")
+        if POINTER_TYPE in arg_type.variations: tokens[pos].error("syntax", "'ptr' should follow after its attached data type. Perhaps you meant 'any ptr'?")
         abstract_arg_names.append(arg_name)
         abstract_arg_immutability.append(arg_immutability)
         next_symbol = peek_text(tokens, pos)
@@ -1366,6 +1366,9 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
                     impl.vars[ret_name] = arg_type.vars[ret].renamed_copy(ret_name)
                     if immutable: impl.vars[ret_name] = impl.vars[ret_name].private_copy()
                     impl.args.append(ret_name)
+                    if impl.vars[ret_name].type==POINTER_TYPE:
+                        found_ptr_type = arg_type.get_pointer_type(arg_type.vars[ret])
+                        if found_ptr_type is not None and found_ptr_type!=ANY_TYPE: impl.set_pointer_type(impl.vars[ret_name], found_ptr_type)
             found_type: UnionType = file.types.get(impl.name)
             already_parsed = None
             if found_type is not None:

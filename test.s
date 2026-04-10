@@ -7,9 +7,9 @@ def test1()
     y = float[]
     return x
 
-//def test2(float[] x)
-//    x->resize(2)
-//    x[1] << 2.0
+def test2(float[] x)
+    x->resize(2)
+    x[1] << 2.0
 
 def test3()
     x = test1()
@@ -17,14 +17,6 @@ def test3()
 
 def ff()
     return float[]
-
-def test4()
-    x = ff[]
-    x->resize(1)
-    print len(x)
-    r = x[0].
-    r->resize(1)
-    r[0] << 1.0
 
 def main()
     //x = test3()

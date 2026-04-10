@@ -317,7 +317,8 @@ class Token:
             float(self.text)
             return True
         except: return False
-    def error(self, errtype: str, message: str):
+    def error(self, errtype: str, message: str, reason: "Token"=None, raason_message:str="defined in"):
+        print(f"{RED}{errtype} error:{RESET} {message}")
         try:
             with open(self.file.path, "r", encoding="utf-8") as f:
                 for i, line in enumerate(f, start=1):
@@ -326,16 +327,33 @@ class Token:
                         break
                 else: source_line = ""
         except OSError as exc:
-            print(f"{RED}{errtype} error:{RESET} {message}")
-            print(f"   (could not open source file {self.file.path!r}: {exc})")
             sys.exit(1)
         token_len = max(len(self.text), 1)
-        pointer = " " * (self.col - 1) + "^" * token_len
         location = f"{self.file.path} line {self.row} column {self.col}"
-        print(f"{RED}{errtype} error{RESET}: {message}")
         print(f"{RED}at{RESET} {location}")
         print(source_line)
-        print(f"{RED}{pointer}{RESET}")
+        if not reason: print(RED+" "*(self.col - 1)+"^"*token_len+RESET)
+        if reason:
+            orignal_token_len = token_len
+            try:
+                with open(reason.file.path, "r", encoding="utf-8") as f:
+                    for i, line in enumerate(f, start=1):
+                        if i == reason.row:
+                            source_line = line.rstrip("\n")
+                            break
+                    else: source_line = ""
+            except OSError as exc:
+                sys.exit(1)
+            token_len = max(len(reason.text), 1)
+            pointer = " " * (reason.col - 1) + "^" * token_len
+            location = f"{reason.file.path} line {reason.row} column {reason.col}"
+            prefix = " "*(self.col-1)
+            print(prefix+RED+"^"*orignal_token_len+"|"+RESET)
+            print(prefix+RED+" "*orignal_token_len+"|"+raason_message+RESET+" "+location)
+            prefix += " "*orignal_token_len+" "
+            print(prefix+source_line)
+            print(prefix+f"{RED}{pointer}{RESET}")
+
         sys.exit(1)
 
 def get(tokens: list[Token], pos: int) -> Token:
@@ -591,7 +609,7 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
                         type_arg = create_temp()+actual_variation.name
                         for varg in variation.rets:
                             if variation.vars[varg].type == POINTER_TYPE:
-                                tokens[pos].error("safety", "cannot place pointers or buffers onto buffers")
+                                tokens[pos].error("safety", "cannot place pointer field '"+pretty_name(varg)+"' onto a buffer", reason=variation.at)
                         actual_variation.vars[type_arg] = Variable(type_arg, actual_variation)
                         actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
                         actual_variation.vars["unsafe_size"] = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
@@ -615,7 +633,7 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
             file.types[buffer_type.name] = buffer_type
             return pos+3, buffer_type
         for variation in type.variations: 
-            if variation==ANY_TYPE: tokens[pos].error("safety", "can only place on buffers or ponters the type 'any'")
+            if variation==ANY_TYPE: tokens[pos].error("safety", "can only use 'any' type within pointers or buffers")
         return pos+1, type
     namespace: File = file.namespaces.get(name, None)
     if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'")
@@ -705,7 +723,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             if var.type!=POINTER_TYPE: err_token.error("type", "can only set a value to an existing ptr with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.name in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer")
             pointer_type: ImplementedType = impl.get_pointer_type(var)
-            if pointer_type is None: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type")
+            if pointer_type is None or pointer_type==ANY_TYPE: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type")
             if len(pointer_type.rets)!=len(ret): err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")
             for pr, r in zip(pointer_type.rets, ret):
                 if pointer_type.vars[pr].type != r.type: err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")
@@ -1167,7 +1185,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                     if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
                     else: pos = process_body(file, tokens, pos-1, impl, one_line=True)
                 continue
-            if ret[0].type!=BOOL_TYPE: name.error("type", "conditions can only evaluate to 'bool'")
+            if ret[0].type!=BOOL_TYPE: name.error("type", "conditions can only evaluate to 'true', 'false', or 'bool' (the first two refer to compile-time known literals)")
             impl.implementation.extend([
                 CodeWord("if"), 
                 CodeWord("("),
@@ -1406,11 +1424,13 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
     # this schema assumes that imports and repos happen before defs
     # first pass: process functions only up to their first return
     has_made_def = False
+    first_def_tok = None
     i = 0
     while i<len(tokens):
         tok = tokens[i]
         if tok.text=="def" or tok.text=="rec": 
             has_made_def = True
+            first_def_tok = tok
             if peek_text(tokens, i+2)=="=": 
                 if tok.text=="rec": tok.error("cannot define a type union with 'rec'")
                 i = process_union(file, tokens, i)
@@ -1427,10 +1447,10 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
                 i = process_def(file, tokens, i, fast_return_exception=tok.text=="rec")
                 i = pos_end+1
         elif tok.text=="import": 
-            if has_made_def: tok.error("syntax", "can only import before the file's first 'def'")
+            if has_made_def: tok.error("safety", "can only import before the file's first definition", reason=first_def_tok, raason_message="first definition at")
             i = process_import(file, tokens, i)
         elif tok.text=="repo": 
-            if has_made_def: tok.error("syntax", "can declare repos before the file's first 'def'")
+            if has_made_def: tok.error("safety", "can declare repos before the file's first definition", reason=first_def_tok, raason_message="first definition at")
             i = process_repo(file, tokens, i)
         else: tok.error("syntax", "expecting  'def', 'repo', or 'import' but found '"+str(tok.text)+"'")
     # second pass: process the rest of functions (skip other syntax stuff)

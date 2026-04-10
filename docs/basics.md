@@ -43,8 +43,8 @@ def main()
 
 If you want to import something specific, use `::` within
 the import statement. You can use the path instead of the
-namespace name too, for example to bring a function from
-a file and be done with it.
+namespace name too, for example to bring a single function 
+from a file.
 
 ```python
 import "std/core.s" as core
@@ -115,10 +115,10 @@ def main()
 
 ## types
 
-All functions declare homonymous types via their returned values.
+All functions declare corresponding types via their returned values.
 That is, you can use the function's name to refer to data with
-equivalent structure. Below is an example, where we use the
-`id` type referring to non-negative integers. Other builtin types
+equivalent structure. Below is an example, where the
+`id` type represents to non-negative integers. Other builtin types
 are `bool`, `int`, `float`, and `cstr` for string literals.
 
 ```python
@@ -148,10 +148,8 @@ by the returned value's name.
 
 Types like the above are structurally matched, as we did
 when applying `add` to the range construct. If you
-want to set a type by name, use the following `class`
-notation to wrap the returned value so that it is never
-structurally matched.
-
+want to prevent implicit structural metches, 
+use the following `class` notation to wrap the returned value.
 
 
 ```python
@@ -167,6 +165,7 @@ def main()
     p = Point(1.0, 2.0)
     print sum p 
 ```
+
 
 ## conditions
 
@@ -209,6 +208,43 @@ def main()
     print "sign is: "
     print sgn
     print "\n"
+```
+
+## recursion
+
+Sometimes, it is convenient for functions to call each 
+other. Normally, functions can see only previous ones,
+but you can use `rec` instead of `def` to allow recursion
+within the current file. 
+
+A file with recursive functions works like this:
+- **Step 1.** All functions are parsed, where recursive ones stop at their first return statement. Up to that point, everything
+can only see previous functions, which means that you need
+to encode the recursion stoping conditions.
+- **Step 2.** The rest of the recursive definitions
+are parsed. These now have access to the whole file's types.
+
+Below is an overengineered and
+slow FIbonacci number calculator that demonstrates recursion
+concepts. Reminder that recursive functions can call both
+themselves and others that appear *later*. But normal functions
+can still only see previous declarations. Do note that only
+one function in a chain of multiple ones needs to be declared
+as recursive.
+
+```python
+import "std/core.s"
+
+rec fib(id n)
+    if n<=1
+        return 1
+    return call_fib(n-1)+call_fib(n-2)
+
+def call_fib(id n)
+    return fib(n)
+
+def main()
+    print fib(42)
 ```
 
 ## unions

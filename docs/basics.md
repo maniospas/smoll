@@ -145,7 +145,6 @@ The example above uses the `.` notation to obtain
 a value packed in a type by name. This name is determined
 by the returned value's name.
 
-
 Types like the above are structurally matched, as we did
 when applying `add` to the range construct. If you
 want to prevent implicit structural metches, 
@@ -164,6 +163,69 @@ def sum(Point p)
 def main()
     p = Point(1.0, 2.0)
     print sum p 
+```
+
+## type mutability
+
+Normal mutability rules apply when overwriting whole objects. For example,
+`t` below needs to be made mutable so that it can be overwritten. This
+does not mean that field immutability can be violated. 
+That is, even if `t` is mutable, we would not
+be able to overwrite the immutable `t.y` field by itself.
+
+```python
+import "std/core.s"
+
+def Test()
+    x = 1
+    y = 2
+    return class(mut x, y)
+
+def main()
+    t = mut Test()
+    t = Test()
+    print(t.x) 
+```
+
+You can normally overwrite mutable fields even if you cannot overwrite 
+whole type's instance at once. This is the default mutability mode, but
+one can also use `const` instead of `mut` to strip away any mutation
+capability.
+
+```python
+import "std/core.s"
+
+def Test()
+    x = 1
+    y = 2
+    return class(mut x, y)
+
+def main()
+    t = Test()
+    print(t.x) // prints 1
+    t.x = 0
+    print(t.x) // prints 0
+    print(t.y) // prints 2
+```
+
+The same rules hold for function arguments. Below is an example.
+
+```python
+import "std/core.s"
+
+def Test()
+    x = 1
+    y = 2
+    return class(mut x, y)
+
+def test(const Test t)
+    // t.x = 10 // disallowed
+    print(t.x)
+
+def main()
+    t = Test()
+    t.x = 5
+    test(t)
 ```
 
 

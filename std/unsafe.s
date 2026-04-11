@@ -4,7 +4,7 @@ def alloc(nat bytes)
     {builtins::compiler::ptr allocated = malloc(bytes__value);builtins::bool failed=allocated==0;}
     if failed
         fail "allocation failed"
-    return allocated
+    return allocated // allow content modifications afterwrds
 
 def realloc(any ptr allocated, nat bytes)
     {builtins::compiler::ptr new_allocated = allocated?realloc(allocated, bytes__value):malloc(bytes__value);builtins::bool failed=new_allocated==0;}

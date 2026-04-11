@@ -60,7 +60,10 @@ class Variable(CodeSegment):
     def tostring(self): return self.name
     def copy(self, prefix: str): return Variable(prefix+"__"+self.name, self.type, self.immutable, self.isprivate)
     def renamed_copy(self, new_name: str): return Variable(new_name, self.type, self.immutable, self.isprivate)
-    def mutable_copy(self): return Variable(self.name, self.type, False, self.isprivate)
+    def mutable_copy(self, error_token): 
+        if error_token and self.type==POINTER_TYPE and self.immutable: 
+            error_token.error("safety", "cannot make mutable an immutable pointer '"+pretty_name(self.name)+"'")
+        return Variable(self.name, self.type, False, self.isprivate)
     def immutable_copy(self): return Variable(self.name, self.type, True, self.isprivate)
     def private_copy(self): return Variable(self.name, self.type, self.immutable, True)
     def is_same(self, other: "Variable"):
@@ -194,12 +197,14 @@ class ImplementedType:
                 if len(found)!=len(value): error_token.error("type", "cannot overwrite tuple with one of different length")
                 for i in range(len(value)): assign(found[i], [value[i]], error_token, perform_immutability_checks, top_entry=False)
                 return None
-        if existing is not None and existing.type!=value[0].type: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'")
+        if existing is not None and existing.type!=value[0].type: 
+            if existing.type == POINTER_TYPE: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'\nPerhaps you meant to place a value on a pointer with the pattern '"+existing.name+"&& = ...'")
+            error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'")
         if perform_immutability_checks and existing and existing.immutable: 
-            if not existing.type.builtin and "____" in varname: error_token.error("type", "cannot overwrite immutable class instance '"+varname.split("____")[0]+"'")
-            error_token.error("type", "cannot overwrite immutable variable '"+varname+"'")
+            if not existing.type.builtin and "____" in varname: error_token.error("type", "cannot overwrite immutable class instance '"+pretty_name(varname.split("____")[0])+"'")
+            error_token.error("type", "cannot overwrite immutable variable '"+pretty_name(varname)+"'")
         if existing and not existing.immutable and value[0].immutable: 
-            value[0] = value[0].mutable_copy()
+            value[0] = value[0].mutable_copy(error_token)
             #error_token.error("type", "cannot overwrite mutable variable with immutable one '"+varname+"'")
         #if existing is None: # force the following two lines so that we can revoke mutability
         existing = value[0].renamed_copy(varname)
@@ -728,9 +733,10 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             if len(rets)!=1: err_token.error("type", "can not apply '"+op_name+"' to non-pointer '"+signature_like(rets)+"'")
             var = rets[0]
             if var is not None and var.isprivate: err_token.error("type", "cannot set to immutable class field: '"+pretty_name(current)+"'")
-            if var is None: err_token.error("type", "can only set a value to an existing ptr with '"+op_name+"' but found '"+signature_like(rets)+"'")
-            if var.type!=POINTER_TYPE: err_token.error("type", "can only set a value to an existing ptr with '"+op_name+"' but found '"+signature_like(rets)+"'")
+            if var is None: err_token.error("type", "can only set a value to an existing pointer with '"+op_name+"' but found '"+signature_like(rets)+"'")
+            if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.name in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer")
+            if var.immutable: err_token.error("type", "cannot move data to an immutable pointer (it may not be 'mut', obtained with '&&' from a buffer, it may have been declared as 'const')")
             pointer_type: ImplementedType = impl.get_pointer_type(var)
             if pointer_type is None or pointer_type==ANY_TYPE: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type")
             if len(pointer_type.rets)!=len(ret): err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")
@@ -884,12 +890,26 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             continue
         elif op=="[":
             err_token = tokens[pos]
-            type = file.types.get("get", None)
-            if type is None: err_token.error("type", "missing implementation for 'get'")
             pos, additional_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
-            rets = resolve_call(file, impl, type, rets+additional_rets, err_token)
             if peek_text(tokens, pos)!="]": err_token.error("syntax", "missing closing ']'")
             pos += 1
+            get_func_name = "get" 
+            deref = True
+            if peek_text(tokens, pos)=="&" and peek_text(tokens, pos+1)=="&":
+                get_func_name = "mutget"
+                deref = False
+                pos += 2
+            elif peek_text(tokens, pos)=="&":
+                deref = False
+                pos += 1
+            elif peek_text(tokens, pos)=="<<":
+                get_func_name = "mutget"
+                deref = False
+            type = file.types.get(get_func_name, None)
+            if type is None: err_token.error("type", "missing implementation for '"+get_func_name+"'")
+            rets = resolve_call(file, impl, type, rets+additional_rets, err_token)
+            if deref:
+                pos, rets = process_deref(file, pos, rets, impl, err_token)
             continue
         elif op_priority==-1:
             pos, type = process_type(file, tokens, pos+1)
@@ -984,9 +1004,17 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.vars[tmp] = variable
         impl.implementation.extend([variable, CodeWord("="), CodeWord(current), CodeWord(";")])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
-    if current == "&" or current=="mut":
+    if current=="mut":
+        prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
-        return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy() for r in ret], current_operator_priority)
+        return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(tokens[prev_pos]) for r in ret], current_operator_priority)
+    if current=="unsafe_mut":
+        prev_pos = pos
+        pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
+        return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(None) for r in ret], current_operator_priority)
+    if current=="const":
+        pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
+        return process_statement_operator(file, tokens, impl, pos, [r.immutable_copy() for r in ret], current_operator_priority)
     if current == "INVALIDATE":
         pos, type = process_linear_type(file, tokens, pos+1)
         for var, val in impl.vars.items():
@@ -1325,10 +1353,13 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
     if get(tokens, pos).text!="(": tokens[pos].error("syntax", "expecting opening parenthesis")
     pos += 1
     while peek_text(tokens, pos)!=")":
-        arg_immutability = True
-        if get(tokens, pos).text=="&" or get(tokens, pos).text=="mut":
+        arg_immutability = 1
+        if get(tokens, pos).text=="mut":
             pos += 1
-            arg_immutability = False
+            arg_immutability = 0
+        elif get(tokens, pos).text=="const":
+            pos += 1
+            arg_immutability = -1
         if peek_text(tokens, pos)=="ptr":
             tokens[pos].error("syntax", "pointers should follow their attached data type. Perhaps you meant 'any ptr'?")
         if peek_text(tokens, pos)=="any" and peek_text(tokens, pos+1)=="ptr":
@@ -1343,6 +1374,8 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
         if arg_name==")" or arg_name==",": arg_name = "__temp_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
         else: pos += 1
         abstract_arg_types.append(find_unique_variations(arg_type.variations))
+        #if arg_immutability==-1 and all(variation.builtin for variation in arg_type.variations):
+        #    tokens[pos].error("type", "all argument parameters are builtin types, so 'const' is redundant")
         if POINTER_TYPE in arg_type.variations: tokens[pos].error("syntax", "'ptr' should follow after its attached data type. Perhaps you meant 'any ptr'?")
         abstract_arg_names.append(arg_name)
         abstract_arg_immutability.append(arg_immutability)
@@ -1361,19 +1394,20 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
         try:
             for arg_name, arg_type, immutable, convert_to_ptr in zip(abstract_arg_names, arg_types, abstract_arg_immutability, abstract_arg_convert_to_ptr):
                 if convert_to_ptr:
-                    impl.vars[arg_name] = Variable(arg_name, POINTER_TYPE, immutable)
+                    impl.vars[arg_name] = Variable(arg_name, POINTER_TYPE, immutable!=0)
                     impl.args.append(arg_name)
                     impl.set_pointer_type(impl.vars[arg_name], arg_type)
                     continue
                 elif arg_type.builtin:
-                    impl.vars[arg_name] = Variable(arg_name, arg_type, immutable)
+                    impl.vars[arg_name] = Variable(arg_name, arg_type, immutable!=0)
                     impl.args.append(arg_name)
                     if arg_type==POINTER_TYPE: impl.set_pointer_type(impl.vars[arg_name], ANY_TYPE)
                     continue
                 for ret in arg_type.rets:
                     ret_name = arg_name+"__"+ret
                     impl.vars[ret_name] = arg_type.vars[ret].renamed_copy(ret_name)
-                    if immutable: impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
+                    if immutable==0: impl.vars[ret_name] = impl.vars[ret_name].mutable_copy(tokens[pos])
+                    elif immutable==-1: impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
                     impl.args.append(ret_name)
                     if impl.vars[ret_name].type==POINTER_TYPE:
                         found_ptr_type = arg_type.get_pointer_type(arg_type.vars[ret])
@@ -1619,6 +1653,7 @@ def load(path: str, is_main_file: bool=False) -> File:
     return file
 
 POINTER_TYPE = ImplementedType("ptr", "void*", memory_size=8)
+POINTER_TYPE.vars[POINTER_TYPE.rets[0]].immutable = False
 CSTR_TYPE = ImplementedType("cstr", "const char*", memory_size=8)
 BOOL_TYPE = ImplementedType("bool", "int", memory_size=8)
 INT_TYPE = ImplementedType("int", "long long int", memory_size=8)

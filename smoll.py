@@ -195,7 +195,9 @@ class ImplementedType:
                 for i in range(len(value)): assign(found[i], [value[i]], error_token, perform_immutability_checks, top_entry=False)
                 return None
         if existing is not None and existing.type!=value[0].type: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'")
-        if perform_immutability_checks and existing and existing.immutable: error_token.error("type", "cannot overwrite immutable variable '"+varname+"'")
+        if perform_immutability_checks and existing and existing.immutable: 
+            if not existing.type.builtin and "____" in varname: error_token.error("type", "cannot overwrite immutable class instance '"+varname.split("____")[0]+"'")
+            error_token.error("type", "cannot overwrite immutable variable '"+varname+"'")
         if existing and not existing.immutable and value[0].immutable: 
             value[0] = value[0].mutable_copy()
             #error_token.error("type", "cannot overwrite mutable variable with immutable one '"+varname+"'")

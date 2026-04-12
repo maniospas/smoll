@@ -393,9 +393,7 @@ any type's items:
 import "std/array.s"
 
 def print(any[] buffer)
-    print("buffer: ", "")
-    print(buffer.size, " elements, ")
-    print(buffer.align*buffer.size, " bytes\n")
+    print(buffer->len(), " elements in buffer\n")
 
 def main()
     x = mut float[]
@@ -406,33 +404,23 @@ Most buffer features are implemented in `"std/array.s"`;
 we will see next how to work with abstract buffers.
 One of the most important features is the `alloc` function to
 allocate and zero-initialize a specific number of elements. This
-function returns the buffer itself to enable initialization like
-`buf = mut float[]->alloc(10)`.
+function returns the buffer itself to enable initialization per
+`buf = (mut float[])->alloc(10)`.
 
 Allocation will create an error if it tries to change the number of
 elements from a non-zero number to something else.
 In those cases, use `resize` to change buffer size, that is, its
 number of elements. You can also set the size to zero.
 
-A second important feature is the element access operator `[]`,
-which can be used to retrieve a pointer to a specific element. 
+A second important feature is the element access operator `buffer[pos]`,
+which can be used to extract an object stored at a specific position. 
 In general, this operator is implemented by overloading the `get` 
-function. Pointers can only be retrieved from buffers and are
-unstanble in that they become invalid later in the code. 
-Being invalid means that they can not be read from or copy data
-to them. Still, invalidation ensures safety.
+function and `mutget` functions. Use `element << value` to copy same data 
+on a buffer's element, where this operator can also be written as `value >> element` 
+if you want to compute the value first and pointer next (we will 
+see a good reason later). 
 
-Use `ptr << value` to copy same data on the pointer's memory,
-where this operator can also be written as `value >> ptr` if
-you want to compute the value first and pointer next (we will 
-see a good reason later). On the other hand,
-`ptr.` dereferences the pointers into a local object.
-For example, `ptr..field` gets a field from an object stored 
-in a pointer.
-
-
-Lastly, all buffer indexes -yes, still talking about buffers-
-are of type `nat`, which represents natural numbers (non-negative integers). 
+All buffer indexes are of type `nat`, which represents natural numbers (non-negative integers). 
 Here is an example of buffer usage.
 
 ```python
@@ -442,17 +430,37 @@ import "std/array.s"
 def main()
     buf = mut float[]
     buf->resize(10)
-    print buf[0]. // prints 0, as x is zero-initialized
+    print buf[0]  // prints 0, as buffers are zero-initialized
     buf[1] << 1.0
-    print buf[1].
+    print buf[1]
 ```
+
+Declare a buffer as `const` to disallow any modifications to its
+contents. Normally, buffers merely prevent resizing or allocation
+(unless they are `mut`), but "locking" them underneath a constant
+safeguard can improve performance and bring code safety.
 
 ## pointers
 
-We already saw that pointers exist. In general,
-use them to pass large chunks of data around or simply
-reference the memory address of buffer elements. *Smoλ* makes necessary
-checks on pointer safety; it would be too restrictive
+Pointers reference specific memory regions in buffers, which 
+you can use to safely move data around while sharing only
+one memory address. 
+
+Pointers are unstanble in that they become invalid later in the code. 
+Being invalid means that they can not be read from or copy data
+to them. Still, invalidation ensures safety.
+
+Obtain a `const` pointer from a buffer whose
+pointed memory location cannot be modified per `ptr = buf[element]&`, and
+a `mut` pointer per `ptr = buf[element]&&`. 
+
+
+`ptr.` dereferences the pointers into a local object. 
+For example, `ptr..field` gets a field from an object stored 
+in a pointer. On the other hand, move values onto pointed locations
+of mutable pointers per `ptr << value`.
+
+*Smoλ* makes necessary checks on pointer safety; it would be too restrictive
 to impose those checks on the type system. 
 
 Mainly, the type of data stored on pointers
@@ -470,15 +478,16 @@ import "std/core.s"
 import "std/array.s"
 
 def main()
-    buf = mut float[]->alloc(1)
-    element = buf[0]
+    buf = (mut float[])->alloc(1)
+    element = buf[0]&&
     print element.  // prints 0 as buffers are zero-initialized
     element << 1.0
-    print element.  // prints 1
-    print buf[0].   // prints 1 from the same memory 
+    print element.  // prints 1 by dereferencing
+    print buf[0]    // prints 1 from the same memory 
 ```
 
-If, in he above example, `buf->rize(2)` was applied before the
+If, in he above example, a new line 
+`buf->rize(2)` was applied before the
 last two prints, `element` would become invalidated and would
 need to be re-obtained from the buffer.
 In general, try to work with buffers and only use pointers
@@ -502,8 +511,8 @@ import "std/core.s"
 import "std/array.s"
 
 def main()
-    buf = mut id[]->alloc(3)
+    buf = mut nat[]->alloc(3)
     buf[2] << 1
-    buf[2].>> last buf->resize(2)
-    print buf[1]. // prints 1
+    buf[2] >> last buf->resize(2)
+    print buf[1]  // prints 1
 ```

@@ -7,12 +7,12 @@ import "std/unsafe.s" as unsafe
 
 def alloc(mut any[] buffer, nat size)
     if buffer.unsafe_size==size
-        unsafe::zero(buffer.unsafe_ptr, 0, buffer.align*size)
+        unsafe::zero(buffer.unsafe_ptr, 0, buffer.unsafe_align*size)
         return buffer
     if buffer.unsafe_size!=0
         fail "cannot resize buffers with alloc; it promises no data reallocation"
+    bytes = buffer.unsafe_align*size
     buffer.unsafe_size = size
-    bytes = buffer.align*size
     buffer.unsafe_ptr = unsafe_mut unsafe::alloc(bytes)
     unsafe::zero(buffer.unsafe_ptr, 0, bytes)
     return buffer
@@ -24,9 +24,9 @@ def resize(mut any[] buffer, nat size)
         unsafe::free(buffer.unsafe_ptr)
         buffer.unsafe_size = 0
         return buffer
-    prev_bytes = buffer.unsafe_size*buffer.align
+    prev_bytes = buffer.unsafe_size*buffer.unsafe_align
     buffer.unsafe_size = size
-    bytes = buffer.align*size
+    bytes = buffer.unsafe_align*size
     buffer.unsafe_ptr = unsafe_mut unsafe::realloc(buffer.unsafe_ptr, bytes)
     if prev_bytes<bytes
         unsafe::zero(buffer.unsafe_ptr, prev_bytes, bytes)
@@ -35,17 +35,17 @@ def resize(mut any[] buffer, nat size)
 def last(any[] buffer)
     if 0==buffer.unsafe_size
         fail "out of bounds"
-    return unsafe_mut buffer.unsafe_ptr->unsafe::add((buffer.unsafe_size-1)*buffer.align)
+    return unsafe_mut buffer.unsafe_ptr->unsafe::add((buffer.unsafe_size-1)*buffer.unsafe_align)
     
 def mutget(any[] buffer, nat i)
     if i>=buffer.unsafe_size
         fail "out of bounds"
-    return unsafe_mut buffer.unsafe_ptr->unsafe::add(i*buffer.align)
+    return unsafe_mut buffer.unsafe_ptr->unsafe::add(i*buffer.unsafe_align)
     
 def get(const any[] buffer, nat i)
     if i>=buffer.unsafe_size
         fail "out of bounds"
-    return buffer.unsafe_ptr->unsafe::add(i*buffer.align)
+    return buffer.unsafe_ptr->unsafe::add(i*buffer.unsafe_align)
 
 def len(any[] buffer)
     return buffer.unsafe_size

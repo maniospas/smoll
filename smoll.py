@@ -624,13 +624,13 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
                         for varg in variation.rets:
                             if variation.vars[varg].type == POINTER_TYPE:
                                 tokens[pos].error("safety", "cannot place pointer field '"+pretty_name(varg)+"' onto a buffer", reason=variation.at)
-                        actual_variation.vars[type_arg] = Variable(type_arg, actual_variation)
+                        actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=False, isprivate=False)
                         actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
                         actual_variation.vars["unsafe_size"] = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
-                        actual_variation.vars["align"] = Variable("align", UINT_TYPE, immutable=True, isprivate=False)
+                        actual_variation.vars["unsafe_align"] = Variable("unsafe_align", UINT_TYPE, immutable=False, isprivate=False)
                         actual_variation.set_pointer_type(actual_variation.vars["unsafe_ptr"], variation)
                         actual_variation.implementation.extend([
-                            actual_variation.vars["align"],
+                            actual_variation.vars["unsafe_align"],
                             CodeWord("="),
                             CodeWord(str(variation.memory_size())),
                             CodeWord(";")
@@ -638,7 +638,7 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
                         actual_variation.rets.append(type_arg)
                         actual_variation.rets.append("unsafe_ptr")
                         actual_variation.rets.append("unsafe_size")
-                        actual_variation.rets.append("align")
+                        actual_variation.rets.append("unsafe_align")
                         variation_buffer_type = UnionType(buffer_type.name+"__temp_buffer")
                         variation_buffer_type.append(actual_variation)
                         buffer_types[variation] = variation_buffer_type

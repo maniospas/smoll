@@ -91,11 +91,11 @@ def signature_like(vars: list[Variable], impl=None):
             ret += type.name+arg_name
             i += 1
         elif type.is_buffer_of: 
-            if any(not vars[k].immutable for k in range(i, i+len(type.rets))): ret += "mut "
+            if any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
             ret += type.is_buffer_of.name+"[]"+arg_name
             i += len(type.rets)
         else:
-            if any(not vars[k].immutable for k in range(i, i+len(type.rets))): ret += "mut "
+            if any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
             ret += type.name+arg_name
             i += len(type.rets)
         assert len(type.rets)
@@ -166,9 +166,10 @@ class ImplementedType:
 
     def memory_size(self):
         if self.builtin: return self._memory_size
-        ret = self._memory_size
-        for arg in self.args: ret += self.vars[arg].type.memory_size()
-        return ret
+        return 0
+        #ret = self._memory_size
+        #for arg in self.args: ret += self.vars[arg].type.memory_size()
+        #return ret
 
     def signature(self):
         args = signature_like([self.vars[arg] for arg in self.args], impl=self)
@@ -570,6 +571,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
             + [CodeWord(",")]
             + [CodeWord(w) for w in "( char * )".split(" ")]
             + [ret[0]]
+          
             + ([CodeWord("+"), CodeWord(str(progress))] if progress else [])
             + [CodeWord(","), CodeWord(str(mem_size))]
             + [CodeWord(")"), CodeWord(";")]
@@ -606,7 +608,7 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
             for tokpos, tok in enumerate(tokens):
                 if tok.text=="def" and peek_text(tokens, tokpos+1)==name:
                     if peek_text(tokens, tokpos+2)=="=": tokens[pos].error("type", "type union is declared later per 'def "+name+"'")
-                    else: tokens[pos].error("type", "usage of 'def "+name+"' before its definition; perhaps declare it as 'rec fib'")
+                    else: tokens[pos].error("type", "usage of 'def "+name+"' before its definition; perhaps declare it as 'rec'")
                 elif tok.text=="rec" and peek_text(tokens, tokpos+1)==name:
                     tokens[pos].error("type", "usage of 'rec "+name+"' before its definition") 
             tokens[pos].error("type", "unknown type '"+name+"'")

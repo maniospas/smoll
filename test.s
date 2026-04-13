@@ -1,16 +1,16 @@
 import "std/core.s"
 import "std/array.s"
 
-def Point2D(float x, float y)
-    return class(x,y)
+def test1()
+    x = mut(float[])->alloc(1)
+    x[0] << 1.0
+    y = float[]
+    return x
 
-def Point3D(float x, float y, float z)
-    plane = Point2D(x,y)
-    return (plane,class(z))
-
+def test2(mut float[] x)
+    x->resize(2)->last() << 2.0
 
 def main()
-    points = (mut Point3D[])->alloc(10)
-    points[0] << Point3D(1.0,2.0,3.0)
-
-    print points[0].plane.x
+    x = test1()
+    test2(x)
+    print x[0]+x[1]

@@ -13,6 +13,7 @@ from collections import deque
 RED   = "\033[31m"
 GREEN = "\033[32m"
 YELLOW= "\033[33m"
+PURPLE= "\033[35m"
 RESET = "\033[0m"
 symbols = "=\\/+-*@<>!%&#!(){}[]:.',;|"
 END_TOKEN = "...]" # impossible for something else to be tokenized as this
@@ -166,10 +167,10 @@ class ImplementedType:
 
     def memory_size(self):
         if self.builtin: return self._memory_size
-        return 0
-        #ret = self._memory_size
-        #for arg in self.args: ret += self.vars[arg].type.memory_size()
-        #return ret
+        ret = self._memory_size
+        for arg in self.args: 
+            if self.vars[arg].type.builtin: ret += self.vars[arg].type.memory_size()
+        return ret
 
     def signature(self):
         args = signature_like([self.vars[arg] for arg in self.args], impl=self)
@@ -228,7 +229,7 @@ class ImplementedType:
             if not arg.name.startswith("__temp"): self.return_names[arg.name] = pos
             if self.has_returned_once: 
                 self.assign(self.rets[pos], [arg], error_token, perform_immutability_checks=False, top_entry=False) # TODO: do not use assign but a manual setting to allow overwriting (or make mutable)
-            else: 
+            else:
                 self.rets.append(arg.name)
                 self.vars[arg.name] = arg # needed to reflect changes in const permissions
         self.has_returned_once = True
@@ -328,8 +329,11 @@ class Token:
             float(self.text)
             return True
         except: return False
-    def error(self, errtype: str, message: str, reason: "Token"=None, raason_message:str="defined in"):
-        print(f"{RED}{errtype} error:{RESET} {message}")
+    def error(self, errtype: str, message: str, reason: "Token"=None, raason_message:str="defined in", suggestions=None):
+        print(f"{PURPLE}{errtype} error: {message}{RESET}")
+        if suggestions:
+            for suggestion in suggestions:
+                print(suggestion)
         try:
             with open(self.file.path, "r", encoding="utf-8") as f:
                 for i, line in enumerate(f, start=1):
@@ -1038,6 +1042,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
     if current == "(":
         ret = list()
         while True:
+            prev_pos = pos
             pos += 1
             if peek_text(tokens, pos)==")": break
             pos, segment = process_statement(file, tokens, pos, impl, current_operator_priority=0)
@@ -1047,7 +1052,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             if peek==")": break
             if peek==",":
                 continue
-            get(tokens, pos).error("syntax", "expecting comma or closing parenthesis")
+            get(tokens, prev_pos).error("syntax", "no matching comma or closing parenthesis")
         pos += 1 # skip closing parenthesis
         if peek_text(tokens, pos)=="->" or peek_text(tokens, pos)=="[" or (peek_text(tokens, pos) in operators and for_call): return pos, ret  # manual left-to-right piping
         return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
@@ -1406,7 +1411,7 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
                     if arg_type==POINTER_TYPE: impl.set_pointer_type(impl.vars[arg_name], ANY_TYPE)
                     continue
                 for ret in arg_type.rets:
-                    ret_name = arg_name+"__"+ret
+                    ret_name = arg_name+"__"+ret  if len(arg_type.rets)>1 else arg_name
                     impl.vars[ret_name] = arg_type.vars[ret].renamed_copy(ret_name)
                     if immutable==0: impl.vars[ret_name] = impl.vars[ret_name].mutable_copy(tokens[pos])
                     elif immutable==-1: impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
@@ -1546,61 +1551,67 @@ def _load(path: str, is_main_file: bool=False) -> File:
     tokens = list()
     nesting_levels = [0]
     row = 0
-    with open(path, "r") as f:
-        for line in f:
-            row += 1
-            count_spaces = len(line)
-            line = line.strip(" \t")
-            count_spaces -= len(line)
-            if not len(line) or line.startswith("//") or line=="\n": continue
-            prev_nesting_level = nesting_levels[len(nesting_levels)-1]
-            while count_spaces < prev_nesting_level:
-                tokens.append(Token(END_TOKEN, file, row, prev_nesting_level+1))
-                nesting_levels.pop() # pop from back
+    try:
+        with open(path, "r") as f:
+            for line in f:
+                row += 1
+                count_spaces = len(line)
+                line = line.strip(" \t")
+                count_spaces -= len(line)
+                if not len(line) or line.startswith("//") or line=="\n": continue
                 prev_nesting_level = nesting_levels[len(nesting_levels)-1]
-                if count_spaces > prev_nesting_level: Token(" "*count_spaces, file, row, 1).error("syntax", "misaligned indentation")
-            if count_spaces > prev_nesting_level:
-                tokens.append(Token(START_TOKEN, file, row, count_spaces+1))
-                nesting_levels.append(count_spaces)
-            col = 0
-            token_start = 0
-            while col < len(line):
-                c = line[col] # c is a character
-                if c in " \t\n\r":
-                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                    while True:
+                while count_spaces < prev_nesting_level:
+                    tokens.append(Token(END_TOKEN, file, row, prev_nesting_level+1))
+                    nesting_levels.pop() # pop from back
+                    prev_nesting_level = nesting_levels[len(nesting_levels)-1]
+                    if count_spaces > prev_nesting_level: Token(" "*count_spaces, file, row, 1).error("syntax", "misaligned indentation")
+                if count_spaces > prev_nesting_level:
+                    tokens.append(Token(START_TOKEN, file, row, count_spaces+1))
+                    nesting_levels.append(count_spaces)
+                col = 0
+                token_start = 0
+                while col < len(line):
+                    c = line[col] # c is a character
+                    if c in " \t\n\r":
+                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                        while True:
+                            col += 1
+                            if col==len(line): break
+                            c = line[col]
+                            if c not in " \t\n\r": break
+                        token_start = col
+                    elif c=="\"":
+                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                        token_start = col
+                        while True:
+                            col += 1
+                            if col==len(line): Token(line[token_start:col], file, row, token_start + 1 + count_spaces).error("syntax", "string never closed (strings cannot continue across multiple lines) - "+line[token_start:col])
+                            if line[col]=="\"" and (line[col-1]!="\\" or col<2 or line[col-2]=="\\"): break
                         col += 1
-                        if col==len(line): break
-                        c = line[col]
-                        if c not in " \t\n\r": break
-                    token_start = col
-                elif c=="\"":
-                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                    token_start = col
-                    while True:
-                        col += 1
-                        if col==len(line): Token(line[token_start:col], file, row, token_start + 1 + count_spaces).error("syntax", "string never closed (strings cannot continue across multiple lines) - "+line[token_start:col])
-                        if line[col]=="\"" and (line[col-1]!="\\" or col<2 or line[col-2]=="\\"): break
-                    col += 1
-                    tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                    token_start = col
-                elif c=="/" and col<len(line)-1 and line[col+1]=="/":
-                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                    token_start = col # comment out stuff
-                    break
-                elif c in symbols:
-                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                    token_start = col
-                    while True:
-                        col += 1
-                        if col==len(line): break
-                        if c in "(){}[];&|.": break
-                        c = line[col]
-                        if c not in symbols or c in "(){}[];&|": break
-                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                    token_start = col
-                else: col += 1
-            if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start +1 + count_spaces))
+                        tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                        token_start = col
+                    elif c=="/" and col<len(line)-1 and line[col+1]=="/":
+                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                        token_start = col # comment out stuff
+                        break
+                    elif c in symbols:
+                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                        token_start = col
+                        while True:
+                            col += 1
+                            if col==len(line): break
+                            if c in "(){}[];&|.": break
+                            c = line[col]
+                            if c not in symbols or c in "(){}[];&|": break
+                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                        token_start = col
+                    else: col += 1
+                if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start +1 + count_spaces))
+    except UnicodeDecodeError as err: 
+        print(f"[{RED}✗{RESET}] {PURPLE}file read error{RESET} {err}")
+        location = f"{path} line {row+1}"
+        print(f"{RED}at{RESET} {location}")
+        sys.exit(1)
 
     processed_tokens = list()
     len_tokens = len(tokens)
@@ -1663,7 +1674,9 @@ FLOAT_TYPE = ImplementedType("float", "double", memory_size=8)
 UINT_TYPE = ImplementedType("nat", "unsigned long long", memory_size=8)
 CHAR_TYPE = ImplementedType("char", "char", memory_size=1)
 FALSE_TYPE = ImplementedType("false", "int")
+FALSE_TYPE._memory_size = 0
 TRUE_TYPE = ImplementedType("true", "int")
+TRUE_TYPE._memory_size = 0
 FAIL_TYPE = ImplementedType("skipdef")
 ANY_TYPE = ImplementedType("any")
 # FAIL_TYPE.vars["message"] = CSTR_TYPE

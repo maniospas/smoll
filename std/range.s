@@ -1,11 +1,11 @@
 import "std/core.s"
 
-def range(id|empty pos, id to)
-    if pos is empty
+def range(nat|blank pos, nat to)
+    if pos is blank
         pos = 0
     return (mut pos, to)
 
-def next(mut range r, mut id value)
+def next(range r, mut nat value)
     next_pos = r.pos+1
     if next_pos==r.to
         return false

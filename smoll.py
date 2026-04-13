@@ -539,7 +539,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     for ret_name in pointer_type.rets:
         r_var = pointer_type.vars[ret_name].renamed_copy(prefix+ret_name)
         new_vars.append(r_var)
-        mem_size = r_var.type.memory_size()
+        mem_size = r_var.type.memory_size() if r_var.type.builtin else 0
         impl.vars[r_var.name] = r_var
         if not mem_size: continue
         # non-allocation check is mandatory unfortunately
@@ -751,7 +751,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             # we now have a contract that we can place our data on the pointer
             progress = 0
             for r in ret:
-                mem_size = r.type.memory_size()
+                mem_size = r.type.memory_size() if r.type.builtin else 0
                 if not mem_size: continue
                 # non-allocation check is mandatory unfortunately
                 impl.implementation.extend([
@@ -1166,7 +1166,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 CodeWord("{"),
             ])
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
-            if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool'")
+            if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool' but found '"+signature_like(ret)+"'")
             if ret[0].type==TRUE_TYPE:
                 if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
                 else: pos = process_body(file, tokens, pos-1, impl, one_line=True)    

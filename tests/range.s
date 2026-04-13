@@ -4,7 +4,7 @@ import "std/range.s" as range
 def main()
     r = range::range(10)
     value = mut 0
-    while (r,value)->range::next()
+    while range::next(r,value)
         print value
     value = value+1
     print(value)

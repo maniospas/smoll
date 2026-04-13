@@ -332,8 +332,9 @@ class Token:
     def error(self, errtype: str, message: str, reason: "Token"=None, raason_message:str="defined in", suggestions=None):
         print(f"{PURPLE}{errtype} error: {message}{RESET}")
         if suggestions:
+            print("    alternatives")
             for suggestion in suggestions:
-                print(suggestion)
+                print("    -", suggestion)
         try:
             with open(self.file.path, "r", encoding="utf-8") as f:
                 for i, line in enumerate(f, start=1):
@@ -415,9 +416,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         # has_defs = False
         # for i, tok in enumerate(file.tokens):
         #     if tok.text=="def" and peek_text(tokens, i+1)==method.name
-        error_token.error("type", "could not resolve any call for '"+method.name+"("+signature_like(vars, impl)+")' candidates:\n    "+"\n    ".join([t.signature() for t in method.variations]))
+        error_token.error("type", "could not resolve any call for '"+method.name+"("+signature_like(vars, impl)+")'", suggestions=[t.signature() for t in method.variations])
     if len(available_types)>1:
-        error_token.error("type", "more than one conflicting call '"+method.name+"("+signature_like(vars, impl)+")' candidates:\n    "+"\n    ".join([t.signature() for t in available_types]))
+        error_token.error("type", "more than one conflicting call '"+method.name+"("+signature_like(vars, impl)+")'", suggestions=[t.signature() for t in available_types])
 
     callee: ImplementedType = available_types[0]
     # first check for pointer mismatches (this is a safety error)
@@ -615,7 +616,20 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
                     else: tokens[pos].error("type", "usage of 'def "+name+"' before its definition; perhaps declare it as 'rec'")
                 elif tok.text=="rec" and peek_text(tokens, tokpos+1)==name:
                     tokens[pos].error("type", "usage of 'rec "+name+"' before its definition") 
-            tokens[pos].error("type", "unknown type '"+name+"'")
+
+            if name in symbols: tokens[pos].error("syntax", "previous expression ended before operator '"+name+"'")
+            candidates = list()
+            max_candidate_common_length = 0
+            for type in file.types.values():
+                for variation in type.variations:
+                    if "__temp" in variation.name: continue
+                    common_length = len(longest_common_prefix([variation.name, name]))
+                    if common_length>max_candidate_common_length: 
+                        candidates = list()
+                        max_candidate_common_length = common_length
+                    if common_length==max_candidate_common_length: 
+                        candidates.append(variation.signature())
+            tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=candidates)
         if peek_text(tokens, pos+1)=="[":
             if get(tokens, pos+2).text!="]": get(tokens, pos+1).error("syntax", "to denote a buffer type use '[]'")
             buffer_type = buffer_types.get(type, None)
@@ -694,6 +708,7 @@ def skip_statement(file: File, tokens: list[Token], pos: int):
 operators = {
     ">>": (">>", 11),
     "<<": ("<<", 11),
+    "=": ("=", 11),
     "and": ("and", 10),
     "or": ("or", 9),
     "is": ("is", 8),
@@ -731,7 +746,8 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
         if current_operator_priority==7 and op_priority==7: 
             op_token.error("safety", "there is no clear priority order between multiple equalities and inequalities; be explicit with parentheses")
 
-        if op_name==">>" or op_name=="<<":
+        if op_name==">>" or op_name=="<<" or op_name=="=":
+            if op_name=="=" and peek_text(tokens, pos-1)!="]": tokens[pos].error("safety", "unexpected '=' in the middle of expression", suggestions=["use 'buffer[item] = value' when supported by 'mutget' (for buffers, this is equivalent to buffer[item]&&<<value)", "use '<<' to move data to a mutable pointer", "fix syntax to assign to a variable or variable item instead"])
             err_token = op_token
             pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority=0) # don't touch rets
             pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
@@ -891,6 +907,17 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 current_prefix = current+"__"
                 rets = [r for r in rets if r.name.startswith(current_prefix)]
                 if rets or peek_text(tokens, pos+1)=="is": continue
+                candidates = list()
+                max_candidate_common_length = 0
+                for var in impl.vars:
+                    if var.startswith("__temp") or "____temp" in var: continue
+                    common_length = len(longest_common_prefix([var, current]))
+                    if common_length>max_candidate_common_length: 
+                        candidates = list()
+                        max_candidate_common_length = common_length
+                    if common_length==max_candidate_common_length: 
+                        var = pretty_name(var)
+                        candidates.append(var)
                 current_token.error("type", "not found field '"+pretty_name(current)+"'") 
             rets = [var]
             continue
@@ -901,6 +928,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             pos += 1
             get_func_name = "get" 
             deref = True
+            also_assign = False
             if peek_text(tokens, pos)=="&" and peek_text(tokens, pos+1)=="&":
                 get_func_name = "mutget"
                 deref = False
@@ -908,7 +936,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             elif peek_text(tokens, pos)=="&":
                 deref = False
                 pos += 1
-            elif peek_text(tokens, pos)=="<<":
+            elif peek_text(tokens, pos)=="=":
                 get_func_name = "mutget"
                 deref = False
             type = file.types.get(get_func_name, None)
@@ -916,6 +944,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             rets = resolve_call(file, impl, type, rets+additional_rets, err_token)
             if deref:
                 pos, rets = process_deref(file, pos, rets, impl, err_token)
+
             continue
         elif op_priority==-1:
             pos, type = process_type(file, tokens, pos+1)
@@ -1085,7 +1114,19 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         if found or peek_text(tokens, pos+1)=="is": return process_statement_operator(file, tokens, impl, pos+1, found, current_operator_priority) 
 
         # if it was a field, don't try type resolution but immediately fail now
-        if is_field: current_token.error("type", "not found field '"+current+"'") 
+        if is_field: 
+            candidates = list()
+            max_candidate_common_length = 0
+            for var in impl.vars:
+                if var.startswith("__temp") or "____temp" in var: continue
+                common_length = len(longest_common_prefix([var, current]))
+                if common_length>max_candidate_common_length: 
+                    candidates = list()
+                    max_candidate_common_length = common_length
+                if common_length==max_candidate_common_length: 
+                    var = pretty_name(var)
+                    candidates.append(var)
+            current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=candidates) 
 
         # then resolve to a call based on type
         pos, method = process_linear_type(file, tokens, pos)

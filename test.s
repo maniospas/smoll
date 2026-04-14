@@ -16,6 +16,9 @@ def sum(Point2D[] v)
 
 def Point3D(float x, float y, float z)
     plane = Point2D(x,y)
+    defer 
+        print("point created")
+    print "starting point creation"
     return (plane,class(z))
 
 def main()

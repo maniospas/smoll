@@ -121,11 +121,14 @@ class ImplementedType:
         self.has_returned_once = False
         self.needs_failure_mode = False
         self.is_buffer_of: ImplementedType|None = None
-        self.dependent_implementations: list[ImplementedType] = list()
+        self.dependent_implementations: list[ImplementedType] = list() # deoendent pointer TYPES
+        self.dependent_assignments: dict[str, str] = dict() # e.g., dependent memory regions
+        self.defers: list[CodeSegment] = list() # release code for specific variables
         self._pointer_types: dict[str, ImplementedType] = dict() # only place pointer variables here
         self._pointer_type_dependencies: dict[str, str] = dict() # only place pointer variables here
         self.invalidated: dict[str, Token] = dict() # invalidated variables and the place where the invalidation occurred
         self.invalidate_types_when_called: list[ImplementedType] = list()
+        self.is_parsing_a_defer = False
         if self.builtin is not None:
             self.vars["value"] = Variable("value", self)
             self.rets.append("value")
@@ -223,6 +226,7 @@ class ImplementedType:
                     error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
             else:
                 if self.get_pointer_type(value[0]): self.set_pointer_depedency(existing, value[0])
+        self.dependent_assignments[existing.name] = value[0].name
         if existing.type.builtin: self.implementation.extend([existing, CodeWord("="), value[0], CodeWord(";")])
 
     def returns(self, value: list[Variable], error_token: "Token"):
@@ -287,10 +291,32 @@ class ImplementedType:
             elif tok=="}": ret += "}\n  "
             else: ret += tok
         if ret_body_end: ret += "__temp_return:\n  "
+        # apply defers that are applied on success mode
+        defer_ret = ""
+        for defer in self.defers:
+            prev = ";"
+            for token in defer:
+                tok = token.tostring()
+                if prev[0] not in symbols and tok[0] not in symbols and prev!=";": defer_ret += " "
+                prev = tok
+                if tok==";": defer_ret += ";\n  "
+                elif tok=="{": defer_ret += "{\n  "
+                elif tok=="}": defer_ret += "}\n  "
+                else: defer_ret += tok
+        # set return values if needed
         ret += ret_body_end
         if self.needs_failure_mode:
-            ret += "return 0;\n  __temp_failure:\n  return __temp_errcode;\n}"
-        else: ret = ret[:-2]+"}"
+            ret += "\n  goto __temp_final;" # skip failure handling
+            ret += "\n  __temp_failure:"
+            # TODO: here we place all the defers that are applied only when there is a need to invalidate returns
+            # TODO: may such defers will never be needed
+            # then we move to the last defers
+            ret += "\n  __temp_final:"
+            ret += defer_ret
+            ret += "\n  return __temp_errcode;\n}"
+        else: 
+            ret += defer_ret
+            ret = ret[:-2]+"}"
         return ret
 
 class UnionType:
@@ -510,6 +536,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     else: impl.implementation.append(CodeWord(")"))
     impl.implementation.append(CodeWord(";"))
     if callee.needs_failure_mode:
+        if impl.is_parsing_a_defer: error_token.error("safety", "cannot call a function with unhandled failure within 'defer'", reason=callee.at)
         impl.implementation.extend([
             CodeWord("if"),
             CodeWord("("),
@@ -669,7 +696,7 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
                         max_candidate_common_length = common_length
                     if common_length==max_candidate_common_length: 
                         candidates.append(variation.signature())
-            tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=candidates)
+            tokens[pos].error("type", "unknown type '\""+file.path+"\"::"+pretty_name(name)+"'", suggestions=candidates)
         if peek_text(tokens, pos+1)=="[":
             if get(tokens, pos+2).text!="]": get(tokens, pos+1).error("syntax", "to denote a buffer type use '[]'")
             buffer_type = buffer_types.get(type, None)
@@ -961,6 +988,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 temp_type.vars[new_name] = associated_type.vars[associated_type.rets[j]].renamed_copy(new_name)
             temp_buffer_type = create_buffer_type(temp_type.name+"@"+field_name, "0", temp_type)
             for var in rets:
+                prev_name = var.name
                 new_name = varname+"__"+var.name[len_common_prefix:]
                 if var.type.is_buffer_of==associated_type: 
                     var = var.renamed_copy(new_name)
@@ -987,6 +1015,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                     impl.assign(new_name, [var], field_token, False, False)
                     new_var = impl.vars[new_name]
                 new_rets.append(new_var)
+                impl.dependent_assignments[new_name] = prev_name
             rets = new_rets
             continue
         elif op==".":
@@ -1065,6 +1094,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
     current_token = get(tokens, pos)
     current = current_token.text
     if current=="fail":
+        if impl.is_parsing_a_defer: current_token.error("safety", "cannot fail within a 'defer' statement")
         pos += 1
         message = get(tokens, pos)
         if not message.is_string(): message.error("syntax", "a string literal must contain an error message after 'fail'")
@@ -1290,12 +1320,24 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             pos += 1
             continue
         if name.text=="return":
+            if impl.is_parsing_a_defer: name.error("safety", "cannot return within a 'defer'")
             #if impl.fast_return_exception and not impl.nesting and not impl.has_returned_once: 
             #    name.error("safety", "the first return must occur conditionally in recursive functions: 'rec "+impl.name+"'")
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
             impl.returns(ret, name)
             if not ret: impl.implementation.extend([CodeWord("return"), CodeWord(";")])
             else: impl.implementation.extend([CodeWord("goto"), CodeWord("__temp_return"), CodeWord(";")])
+            continue
+        if name.text=="defer":
+            if impl.is_parsing_a_defer: name.error("safety", "cannot declare a 'defer' within another")
+            if impl.nesting: name.error("safety", "cannot 'defer' within conditions or loops")
+            impl.is_parsing_a_defer = True
+            prev_implementation = impl.implementation
+            impl.implementation = list()
+            pos = process_body(file, tokens, pos, impl, one_line=False)
+            impl.defers.append(impl.implementation)
+            impl.implementation = prev_implementation
+            impl.is_parsing_a_defer = False
             continue
         if name.text=="continue" or name.text=="break":
             if not impl.nesting or impl.nesting[-1]!="while": name.error("syntax", "need to be in a loop to '"+name.text+"'")
@@ -1862,7 +1904,6 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         "#include <string.h>\n"
         "\n"
     )
-
     generated_c_funcs = list()
     c_decls = list()
     already_generated = set()

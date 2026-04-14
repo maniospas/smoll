@@ -410,18 +410,20 @@ function returns the buffer itself to enable initialization per
 Allocation will create an error if it tries to change the number of
 elements from a non-zero number to something else.
 In those cases, use `resize` to change buffer size, that is, its
-number of elements. You can also set the size to zero.
+number of elements. You can also set the size to zero. If the
+allocation is the same in size as before, the buffer's elements
+are still zero-initialized. This is helpful when reusing the same
+buffers within loops. 
 
 A second important feature is the element access operator `buffer[pos]`,
 which can be used to extract an object stored at a specific position. 
 In general, this operator is implemented by overloading the `get` 
-function and `mutget` functions. Use `element << value` to copy same data 
-on a buffer's element, where this operator can also be written as `value >> element` 
-if you want to compute the value first and pointer next (we will 
-see a good reason later). 
+function and `mutget` functions. Use `buffer[pos] = value` to copy same data 
+on a buffer's element. This is equiavalent to the pointer notations
+`buffer[pos]&&<<value`, but more on pointers later.
 
-All buffer indexes are of type `nat`, which represents natural numbers (non-negative integers). 
-Here is an example of buffer usage.
+All buffer indexes are of type `nat`, which represents natural numbers 
+(non-negative integers). Here is an example of buffer usage.
 
 ```python
 import "std/core.s"
@@ -431,7 +433,7 @@ def main()
     buf = mut float[]
     buf->resize(10)
     print buf[0]  // prints 0, as buffers are zero-initialized
-    buf[1] << 1.0
+    buf[1] = 1.0
     print buf[1]
 ```
 
@@ -442,7 +444,7 @@ safeguard can improve performance and bring code safety.
 
 ## pointers
 
-Pointers reference specific memory regions in buffers, which 
+Pointers reference specific memory locations in buffers, which 
 you can use to safely move data around while sharing only
 one memory address. 
 
@@ -455,7 +457,7 @@ pointed memory location cannot be modified per `ptr = buf[element]&`, and
 a `mut` pointer per `ptr = buf[element]&&`. 
 
 
-`ptr.` dereferences the pointers into a local object. 
+`ptr.` dereferences the pointers onto a local object. 
 For example, `ptr..field` gets a field from an object stored 
 in a pointer. On the other hand, move values onto pointed locations
 of mutable pointers per `ptr << value`.
@@ -470,8 +472,7 @@ Functions declare pointer arguments per `any ptr`, `float ptr`, etc.
 
 There is a particular contract for pointers: unless
 they create a runtime error by remaining uninitialized, it is always
-valid to move data to their memory address with the already mentioned
-syntax `pointer: data`. Below is an example.
+valid to move data to their memory address. Below is an example.
 
 ```python
 import "std/core.s"
@@ -495,15 +496,14 @@ for rapidly moving temporary data around.
 
 As we now know about pointer invalidation, it becomes apparent
 why the syntax `data >> ptr` is necessary when moving data
-within a buffer while resizing it, as it lets us put dereferencing
+within a buffer while resizing it; it lets us put dereferencing
 on the left-hand-side to evaluate it before moving data. 
-
 
 Below is how one could do
 this without intermediate variables
 by leveraging the fact that `resize` returns the buffer
-while a function `last` can retrieve a pointer to the last
-element (or fail for an empty buffer).
+while a helper function `mutlast` is provided to retrieve a 
+mutable pointer to the last element (or fail for an empty buffer).
 If we used `<<` we would not have access to `buf[2]` after resizing.
 
 ```python
@@ -511,8 +511,40 @@ import "std/core.s"
 import "std/array.s"
 
 def main()
-    buf = mut nat[]->alloc(3)
-    buf[2] << 1
-    buf[2] >> last buf->resize(2)
+    buf = (mut nat[])->alloc(3)
+    buf[2] = 1
+    buf[2] >> buf->resize(2)
     print buf[1]  // prints 1
+```
+
+## substructures
+
+You can work with "horizontal" data from buffers and pointers by
+obtaining or setting to specific items. However, you can also
+work with "vertical" data by being able to obtain sub-buffers
+or sub-pointers for their fields.
+
+The method to do so is by using the `buf@field` or `ptr@field` notation, 
+where the field refers to a known field of the attached stucture. This
+operator helps write very safe yet fast and memory-efficient code by
+obtaining necessary offsets within allocated memory. Below is
+an example:
+
+
+```python
+import "std/core.s"
+import "std/array.s"
+
+def Point2D(float x, float y)
+    return class(x,y)
+
+def Point3D(float x, float y, float z)
+    plane = Point2D(x,y)
+    return (plane,class(z))
+
+def main()
+    points = (mut Point3D[])->alloc(10)
+    points[0] = Point3D(1.0,2.0,3.0)
+    print points@plane@x[0]
+    print points[0].plane.x // equivalent
 ```

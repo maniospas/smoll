@@ -201,7 +201,9 @@ class ImplementedType:
                 return None
         if existing is not None and existing.type!=value[0].type: 
             if existing.type == POINTER_TYPE: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'\nPerhaps you meant to place a value on a pointer with the pattern '"+existing.name+"&& = ...'")
-            error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'")
+            if existing.type.is_buffer_of and value[0].type.is_buffer_of and match_structure_with(existing.type.is_buffer_of, value[0].type.is_buffer_of): 
+                pass
+            else: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'")
         if perform_immutability_checks and existing and existing.immutable: 
             if not existing.type.builtin and "____" in varname: error_token.error("type", "cannot overwrite immutable class instance '"+pretty_name(varname.split("____")[0])+"'")
             error_token.error("type", "cannot overwrite immutable variable '"+pretty_name(varname)+"'")
@@ -217,7 +219,8 @@ class ImplementedType:
             other_pointer_type = self.get_pointer_type(value[0])
             #print(existing.name, existing_pointer_type.name if existing_pointer_type else None, value[0].name, other_pointer_type.name if other_pointer_type else None)
             if existing_pointer_type is not None:
-                if existing_pointer_type!=other_pointer_type: error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
+                if existing_pointer_type!=other_pointer_type and not match_structure_with(existing_pointer_type, other_pointer_type):
+                    error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
             else:
                 if self.get_pointer_type(value[0]): self.set_pointer_depedency(existing, value[0])
         if existing.type.builtin: self.implementation.extend([existing, CodeWord("="), value[0], CodeWord(";")])
@@ -386,6 +389,16 @@ def peek_text(tokens: list[Token], pos: int) -> str:
     if pos >= len(tokens): return ""
     return tokens[pos].text
 
+def match_structure_with(x: ImplementedType, y: ImplementedType):
+    assert isinstance(x, ImplementedType)
+    assert isinstance(y, ImplementedType)
+    if len(x.rets)!=len(y.rets): return False
+    for rx,ry in zip(x.rets, y.rets):
+        if x.vars[rx].type!=y.vars[ry].type: return False
+        if x.vars[rx].immutable and not y.vars[ry].immutable: return False
+        #if x.vars[rx].isprivate!=y.vars[ry].isprivate: return False
+    return True
+
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
     available_types: list[ImplementedType] = list()
     for variation in method.variations:
@@ -393,9 +406,11 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         is_available = True
         for i in range(len(vars)):
             # we can allow lowering buffers to generic any
-            if vars[i].type!= variation.vars[variation.args[i]].type and variation.vars[variation.args[i]].type.is_buffer_of!=ANY_TYPE:
+            if vars[i].type!=variation.vars[variation.args[i]].type and variation.vars[variation.args[i]].type.is_buffer_of!=ANY_TYPE:
                 is_available = False
-                break
+                if vars[i].type.is_buffer_of and variation.vars[variation.args[i]].type.is_buffer_of and match_structure_with(vars[i].type.is_buffer_of, variation.vars[variation.args[i]].type.is_buffer_of):
+                    is_available = True
+                if not is_available: break
             if not variation.vars[variation.args[i]].immutable and vars[i].immutable:
                 is_available = False
                 break
@@ -404,7 +419,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             if var.type!=POINTER_TYPE: continue
             var_pointer_type = impl.get_pointer_type(var)
             other_pointer_type = variation.get_pointer_type(variation.vars[variation.args[varpos]])
-            if var_pointer_type is not None and other_pointer_type is not None and var_pointer_type!=ANY_TYPE and other_pointer_type!=ANY_TYPE and var_pointer_type!=other_pointer_type:
+            if var_pointer_type is not None and other_pointer_type is not None and var_pointer_type!=ANY_TYPE and other_pointer_type!=ANY_TYPE and not match_structure_with(var_pointer_type, other_pointer_type):
                 is_available = False
                 # TODO: make a proper is_available check, that also accounts for internal pointer types but allows structural equivalence
                 # is_available = len(var_pointer_type.args)==len(other_pointer_type.args)
@@ -602,6 +617,31 @@ def find_unique_variations(variations: list[ImplementedType]):
         if not already_parsed: all_found.append(impl)
     return all_found
 
+
+def create_buffer_type(name, memory_size, variation):
+    actual_variation = ImplementedType(name)
+    actual_variation.is_buffer_of = variation
+    type_arg = create_temp()+actual_variation.name
+    for varg in variation.rets:
+        if variation.vars[varg].type == POINTER_TYPE:
+            tokens[pos].error("safety", "cannot place pointer field '"+pretty_name(varg)+"' onto a buffer", reason=variation.at)
+    actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=False, isprivate=False)
+    actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
+    actual_variation.vars["unsafe_size"] = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
+    actual_variation.vars["unsafe_align"] = Variable("unsafe_align", UINT_TYPE, immutable=False, isprivate=False)
+    actual_variation.set_pointer_type(actual_variation.vars["unsafe_ptr"], variation)
+    actual_variation.implementation.extend([
+        actual_variation.vars["unsafe_align"],
+        CodeWord("="),
+        CodeWord(memory_size),
+        CodeWord(";")
+    ])
+    actual_variation.rets.append(type_arg)
+    actual_variation.rets.append("unsafe_ptr")
+    actual_variation.rets.append("unsafe_size")
+    actual_variation.rets.append("unsafe_align")
+    return actual_variation
+
 def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|UnionType]:
     name = get(tokens, pos).text
     if peek_text(tokens, pos+1)!="::":
@@ -638,27 +678,7 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
                 for variation in find_unique_variations(type.variations):
                     variation_buffer_type = buffer_types.get(type, None)
                     if variation_buffer_type is None:
-                        actual_variation = ImplementedType(buffer_type.name+"__buffer")
-                        actual_variation.is_buffer_of = variation
-                        type_arg = create_temp()+actual_variation.name
-                        for varg in variation.rets:
-                            if variation.vars[varg].type == POINTER_TYPE:
-                                tokens[pos].error("safety", "cannot place pointer field '"+pretty_name(varg)+"' onto a buffer", reason=variation.at)
-                        actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=False, isprivate=False)
-                        actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
-                        actual_variation.vars["unsafe_size"] = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
-                        actual_variation.vars["unsafe_align"] = Variable("unsafe_align", UINT_TYPE, immutable=False, isprivate=False)
-                        actual_variation.set_pointer_type(actual_variation.vars["unsafe_ptr"], variation)
-                        actual_variation.implementation.extend([
-                            actual_variation.vars["unsafe_align"],
-                            CodeWord("="),
-                            CodeWord(str(variation.memory_size())),
-                            CodeWord(";")
-                        ])
-                        actual_variation.rets.append(type_arg)
-                        actual_variation.rets.append("unsafe_ptr")
-                        actual_variation.rets.append("unsafe_size")
-                        actual_variation.rets.append("unsafe_align")
+                        actual_variation = create_buffer_type(buffer_type.name+"__buffer", str(variation.memory_size()), variation)
                         variation_buffer_type = UnionType(buffer_type.name+"__temp_buffer")
                         variation_buffer_type.append(actual_variation)
                         buffer_types[variation] = variation_buffer_type
@@ -726,6 +746,7 @@ operators = {
     "%": ("mod",4),
     "[": ("get", 0.5),
     ".": ("dot", 0.5),
+    "@": ("@", 0.5),
     "->": ("access",-1),
 }
 
@@ -887,7 +908,88 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             rets = [Variable(tmp, TRUE_TYPE) if found else Variable(tmp, FALSE_TYPE)]
             impl.vars[tmp] = rets[0]
             continue
-        if op==".":
+        if op=="@":
+            associated_type = None
+            count = 0
+            for ret in rets:
+                if ret.type.is_buffer_of:
+                    next_associated_type = ret.type.is_buffer_of
+                    if next_associated_type==associated_type: continue
+                    associated_type = next_associated_type
+                    count += 1
+                # if ret.type==POINTER_TYPE:
+                #     next_associated_type = impl.get_pointer_type(ret)
+                #     if next_associated_type==associated_type: continue
+                #     associated_type = next_associated_type
+                #     count += 1
+            if count!=1 or associated_type is None: tokens[pos].error("type", "can only apply '@' on a buffer, not '"+signature_like(rets)+"'")
+            if associated_type==ANY_TYPE: tokens[pos].error("type", "cannot apply the @ notation on 'any[]'")
+            pos += 1
+            field_token = get(tokens, pos)
+            pos += 1
+            field_name = field_token.text
+            min_pos = len(associated_type.rets)
+            max_pos_plus_one = 0 # non-inclusive
+            count = 0
+            prefix = field_name+"__"
+            for i, r in enumerate(associated_type.rets):
+                if field_name==r:
+                    min_pos = i
+                    max_pos_plus_one = i+1
+                    count = 1
+                    break
+                if r.startswith(prefix):
+                    min_pos = min(min_pos, i)
+                    max_pos_plus_one = max(max_pos_plus_one, i+1)
+                    count += 1
+            if count==0: field_token.error("type", "field '"+pretty_name(field_name)+"' not found in '"+associated_type.signature()+"' with returns "+','.join(associated_type.rets))
+            if count!=max_pos_plus_one-min_pos: field_token.error("type", "field '"+pretty_name(field_name)+"' is not packed contiguousy in '"+associated_type.signature()+"' with returns "+','.join(associated_type.rets))
+            offset = 0
+            for i in range(min_pos):
+                var = associated_type.vars[associated_type.rets[i]]
+                mem_size = var.type.memory_size() if var.type.builtin else 0
+                offset += mem_size
+            varname = create_temp()
+            common_prefix = longest_common_prefix([var.name for var in rets])
+            len_common_prefix = len(common_prefix)
+            new_rets = list()
+            temp_type = ImplementedType(associated_type.name+"."+field_name)
+            associated_len_common_prefix = len(longest_common_prefix([var for var in associated_type.rets[min_pos:max_pos_plus_one]]))
+            for j in range(min_pos, max_pos_plus_one):
+                new_name = associated_type.rets[j][associated_len_common_prefix:]
+                temp_type.rets.append(new_name)
+                temp_type.vars[new_name] = associated_type.vars[associated_type.rets[j]].renamed_copy(new_name)
+            temp_buffer_type = create_buffer_type(temp_type.name+"@"+field_name, "0", temp_type)
+            for var in rets:
+                new_name = varname+"__"+var.name[len_common_prefix:]
+                if var.type.is_buffer_of==associated_type: 
+                    var = var.renamed_copy(new_name)
+                    var.type = temp_buffer_type
+                if var.type==POINTER_TYPE:
+                    new_var = var.renamed_copy(new_name)
+                    impl.vars[new_var.name] = new_var
+                    impl.set_pointer_type(new_var, temp_type)
+                    impl.implementation.extend([
+                        new_var,
+                        CodeWord("="),
+                        CodeWord("("),
+                        CodeWord("("),
+                        CodeWord("char"),
+                        CodeWord("*"),
+                        CodeWord(")"),
+                        var,
+                        CodeWord(")"),
+                        CodeWord("+"),
+                        CodeWord(str(offset)),
+                        CodeWord(";")
+                    ])
+                else:
+                    impl.assign(new_name, [var], field_token, False, False)
+                    new_var = impl.vars[new_name]
+                new_rets.append(new_var)
+            rets = new_rets
+            continue
+        elif op==".":
             current_token = tokens[pos]
             if len(rets)==1 and rets[0].type==POINTER_TYPE:
                 pos, rets = process_deref(file, pos, rets, impl, current_token)

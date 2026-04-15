@@ -129,6 +129,7 @@ class ImplementedType:
         self.invalidated: dict[str, Token] = dict() # invalidated variables and the place where the invalidation occurred
         self.invalidate_types_when_called: list[ImplementedType] = list()
         self.is_parsing_a_defer = False
+        self.is_parsing_a_try: list[Variable] = list() # list of variables that hold try results
         if self.builtin is not None:
             self.vars["value"] = Variable("value", self)
             self.rets.append("value")
@@ -474,12 +475,24 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     tmp = create_temp()
     rets = list()
     if callee.needs_failure_mode:
-        impl.implementation.extend([
-            CodeWord("__temp_errcode"),
-            CodeWord("="),
-            CodeWord(callee.monomorphic_name),
-            CodeWord("("),
-        ])
+        if impl.is_parsing_a_try:
+            impl.implementation.extend([
+                impl.is_parsing_a_try[-1],
+                CodeWord("="),
+                impl.is_parsing_a_try[-1],
+                CodeWord("?"),
+                impl.is_parsing_a_try[-1],
+                CodeWord(":"),
+                CodeWord(callee.monomorphic_name),
+                CodeWord("("),
+            ])
+        else:
+            impl.implementation.extend([
+                CodeWord("__temp_errcode"),
+                CodeWord("="),
+                CodeWord(callee.monomorphic_name),
+                CodeWord("("),
+            ])
     else:
         impl.implementation.extend([
             CodeWord(callee.monomorphic_name),
@@ -535,7 +548,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if callee.rets or vars: impl.implementation[-1] = CodeWord(")") # replace last comma with closing parenthesis
     else: impl.implementation.append(CodeWord(")"))
     impl.implementation.append(CodeWord(";"))
-    if callee.needs_failure_mode:
+    if callee.needs_failure_mode and not impl.is_parsing_a_try:
         if impl.is_parsing_a_defer: error_token.error("safety", "cannot call a function with unhandled failure within 'defer'", reason=callee.at)
         impl.implementation.extend([
             CodeWord("if"),
@@ -1175,6 +1188,23 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(tokens[prev_pos]) for r in ret], current_operator_priority)
+    if current=="try":
+        tmp = create_temp()
+        var = Variable(tmp, BOOL_TYPE)
+        impl.vars[tmp] = var
+        impl.is_parsing_a_try.append(var)
+        pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
+        pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
+        impl.is_parsing_a_try.pop()
+        impl.implementation.extend([
+            var,
+            CodeWord("="),
+            var,
+            CodeWord("=="),
+            CodeWord("0"),
+            CodeWord(";")
+        ])
+        return pos, [var]
     if current=="unsafe_mut":
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
@@ -1324,6 +1354,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             #if impl.fast_return_exception and not impl.nesting and not impl.has_returned_once: 
             #    name.error("safety", "the first return must occur conditionally in recursive functions: 'rec "+impl.name+"'")
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
+            pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
             impl.returns(ret, name)
             if not ret: impl.implementation.extend([CodeWord("return"), CodeWord(";")])
             else: impl.implementation.extend([CodeWord("goto"), CodeWord("__temp_return"), CodeWord(";")])

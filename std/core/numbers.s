@@ -67,3 +67,11 @@ def sub(Number x, Number y)
         fail "id subtraction would yield a negative"
     {type(x) z=x-y;}
     return z
+
+def pow(nat x, nat y) 
+    i = mut 0
+    ret = mut 1
+    while i<y
+        ret = ret*x
+        i = i+1
+    return ret

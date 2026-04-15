@@ -18,6 +18,13 @@ def alloc(mut any[] buffer, nat size)
     buffer.unsafe_ptr -> unsafe::zero(0, bytes)
     return buffer
 
+def free(mut any[] buffer)
+    if buffer.unsafe_size==0
+        return buffer
+    buffer.unsafe_size = 0
+    buffer.unsafe_ptr -> unsafe::free()
+    return buffer
+
 def resize(mut any[] buffer, nat size)
     if buffer.unsafe_size==size 
         return buffer

@@ -548,3 +548,55 @@ def main()
     print points@plane@x[0]
     print points[0].plane.x // equivalent
 ```
+
+## try and fail
+
+Functions in *smoλ* can fail freely when unforeseen conditions are encountered,
+for example when running out of memory. When failing functions are called by
+others, the failure cascades until the whole program terminates. You can encode
+failure tracking in your programs by passing the `--debug` flag to the compiler.
+
+Failure means that all resources are released and return values become zero. 
+Mutable arguments are left unaffected. You can manually `fail` like so:
+
+```python
+import "std/core.s"
+
+def always_fail()
+    print "we are failing"
+    fail "we failed!"
+
+def main()
+    always_fail()
+    print "this line is never printed"
+```
+
+There are certain places in code where you can recover from call failures,
+for example by calling the same code again for improved user input, or by
+falling back to some secondary functionality. This is achieved with the
+`try` keyword.
+
+The latter parses an expression and stops at the first failing
+function, if any. Then, failures are converted into boolean values.
+Below is an example where we safeguard against failing allocaition.
+
+```python
+import "std/core.s"
+import "std/array.s"
+
+def vector(nat size)
+    return (mut float[]) -> alloc(size)
+
+def main()
+    if not try v = vector pow(1024,6)
+        print "failed to allocate"
+    print(v->len(), " numbers allocated\n")
+```
+
+
+
+
+## defer
+
+You can defer code blocks to run at the end of current function.
+Those blocks cann

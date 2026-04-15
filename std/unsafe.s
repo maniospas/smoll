@@ -15,10 +15,10 @@ def realloc(any ptr allocated, nat bytes)
 
 def free(any ptr allocated)
     {if(allocated)free(allocated);allocated=0;}
-    INVALIDATE compiler::ptr
+    //INVALIDATE compiler::ptr
 
 def zero(any ptr allocated, nat from, nat to)
-    {memset(((char*)allocated)+from, 0, to);}
+    {memset(((char*)allocated)+from, 0, to-from);}
 
 def add(any ptr allocated, nat offset)
     {builtins::compiler::ptr element = ((char*)allocated)+offset;}

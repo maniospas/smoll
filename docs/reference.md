@@ -625,11 +625,7 @@ def main()
 There are certain places in code where you can recover from call failures,
 for example by calling the same code again for improved user input, or by
 falling back to some secondary functionality. This is achieved with the
-`try` keyword.
-
-The latter parses an expression and stops at the first failing
-function, if any. Then, failures are converted into boolean values.
-Below is an example where we safeguard against failing allocaition.
+`try` keyword, which parses an expression without stopping at failing functions, if any (their returns are just zero-initialized). Then, failures are converted into boolean values. Below is an example where we safeguard against failing allocation.
 
 ```python
 import "std/core.s"
@@ -651,14 +647,11 @@ You can defer code blocks to run later. The "later" part is
 ideally the end of the current function, but *smoλ* may
 postpone it further to accomodate resources (e.g., buffers) 
 that are still in use.
-
 Defer blocks cannot have any return statements or unhandled
 errors; explicitly wrap all potentially erroneous function calls 
 in `try`. Conversely, their eventual execution is guaranteed,
 even if errors are created in the interim.
-
-
-Below is a simple defer example.
+Below is a simple example.
 
 ```python
 import "std/core.s"

@@ -12,11 +12,16 @@ manuals to onboard.
 ## 🚀 Features
 
 - Functions returns as type declarations
-- Linear tuple-based type system
+- Simple tuple-based type system
 - Function and type overloading
-- Permissive safety checking
+- Safe yet permissive
 - Immutability by default (can still define mutables)
 - C integration
+- Zero-cost abstractions everywhere
+
+## 🔗 Material
+
+[Reference guide](docs/reference.md)
 
 ## ⚡ Quickstart
 
@@ -52,10 +57,6 @@ def main()
 
 ```
 
-
-## 🔗 Material
-
-[Basic syntax](docs/basics.md)
 
 ## 🏷️ License
 

@@ -1,4 +1,25 @@
-# smoλ: Basic syntax
+# smoλ reference
+
+**Section 1. Basic syntax**<br>
+_1.1.1._ [import](#import) <br>
+_1.2._ [calling notation](#calling-notation) <br>
+_1.3._ [mutability](#mutability) <br>
+_1.4._ [types](#types) <br>
+_1.5._ [type mutability](#type-mutability) <br>
+_1.6._ [conditions](#conditions)<br>
+_1.7._ [recursion](#recursion) <br>
+_1.8._ [unions](#unions) <br>
+_1.9._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)<br>
+_1.10._ [local definitions](#local-definitions)
+
+**Section 2. Safe resorces**<br>
+_2.1._ [buffers](#buffers)<br>
+_2.2._ [pointers](#pointers)<br>
+_2.3._ [substructures](#substructures)<br>
+_2.4._ [try and fail](#try-and-fail)<br>
+_2.5._ [defer](#defer)<br>
+
+# Section 1. Basic syntax
 
 ## import
 
@@ -77,6 +98,8 @@ methods. In general, do try to avoid needless parentheses,
 as the snippet below does (`f1 f2 ... args` is a chain of 
 function calls). You can always refer to functions
 within namespaces.
+
+*Prefer this syntax only when differentiating between same-named definitions is important.*
 
 ```python
 import "std/core.s" as core
@@ -371,11 +394,9 @@ The same mechanism can be used to create optional arguments
 using the `blank` builtin type; that has no contents and therefore
 skips respective variable definition. Conversely, non-existing
 variables are considered `blank`, and checks like the one below 
-can be made. 
-
-There, the defined function implements either an increment
-by one, or by a value provided as second argument. Use the
-same mechanism to have any number of optional arguments.
+can be made to check for the presence of **optional arguments**. 
+In the next example, the defined function implements either an increment
+by one, or by a value provided as second argument. 
 
 ```python
 def inc(int x, int|blank value)
@@ -389,8 +410,7 @@ def inc(int x, int|blank value)
 This is perhaps a good point to mention that you can have imports
 or function definitions be preceded by `local` to avoid exposing
 unecessary contents.
-
-For example, the range module from the standard library imports
+For example, the *range* module from the standard library imports
 the latter's core locally but never exposes it, for example to
 cover cases where different arithmetic operations need to be defined 
 in your part of the code (e.g., handling of overflows).
@@ -412,6 +432,7 @@ def next(range r, mut nat value)
     return true
 ```
 
+# Section 2. Safe resources
 
 ## buffers
 

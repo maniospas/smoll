@@ -1,4 +1,4 @@
-import "std/core.s"
+local import "std/core.s" 
 
 def alloc(nat bytes)
     {builtins::compiler::ptr allocated = malloc(bytes);builtins::bool failed=allocated==0;}
@@ -15,7 +15,7 @@ def realloc(any ptr allocated, nat bytes)
 
 def free(any ptr allocated)
     {if(allocated)free(allocated);allocated=0;}
-    //INVALIDATE compiler::ptr
+    INVALIDATE compiler::ptr
 
 def zero(any ptr allocated, nat from, nat to)
     {memset(((char*)allocated)+from, 0, to-from);}

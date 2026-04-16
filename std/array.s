@@ -1,5 +1,5 @@
-import "std/core.s"
-import "std/unsafe.s" as unsafe
+local import "std/core.s"
+local import "std/unsafe.s" as unsafe
 
 // a convention to make pointer operations safe outside the unsafe:: namespace
 // is that we GUARANTEE that non-zero pointers to a memory region contain

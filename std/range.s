@@ -1,4 +1,4 @@
-import "std/core.s"
+local import "std/core.s"
 
 def range(nat|blank pos, nat to)
     if pos is blank

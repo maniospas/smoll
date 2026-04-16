@@ -335,6 +335,7 @@ class File:
         self.types: dict[str, UnionType] = dict()
         self.namespaces: dict[str, File] = dict()
         self.is_main_file = None
+        self.localdefs = set() # a set of references to local types and namespaces
 
 class Token:
     def __init__(self, text, file: File, row, col):
@@ -709,6 +710,7 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
                         max_candidate_common_length = common_length
                     if common_length==max_candidate_common_length: 
                         candidates.append(variation.signature())
+            if file==tokens[pos].file: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=candidates)
             tokens[pos].error("type", "unknown type '\""+file.path+"\"::"+pretty_name(name)+"'", suggestions=candidates)
         if peek_text(tokens, pos+1)=="[":
             if get(tokens, pos+2).text!="]": get(tokens, pos+1).error("syntax", "to denote a buffer type use '[]'")
@@ -1516,7 +1518,7 @@ def process_repo(file: File, tokens: list[Token], pos: int):
     repositories[symbol] = path
     return pos
 
-def process_import(file: File, tokens: list[Token], pos: int):
+def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
     pos += 1
     name_token = get(tokens, pos)
     if not name_token.is_string(): 
@@ -1543,11 +1545,14 @@ def process_import(file: File, tokens: list[Token], pos: int):
         if not as_mode: name = imported.name
         if name in file.types: name_token.error("import", "cannot overwrite type '"+name+"'")
         file.types[name] = imported
+        if is_local: 
+            for variation in importer.varitations: file.localdefs.add(variation)
         return pos
     assert isinstance(imported, File)
     if as_mode:
         if name in file.namespaces: name_token.error("import", "cannot overwrite existing namespace '"+name+"'")
         file.namespaces[name] = imported
+        if is_local: file.localdefs.add(imported)
         return pos
     for type_name, type_value in imported.types.items():
         existing = file.types.get(type_name, None)
@@ -1557,14 +1562,17 @@ def process_import(file: File, tokens: list[Token], pos: int):
             new_type.variations.extend(type_value.variations)
             new_type.variations = list(set(new_type.variations))
             type_value = new_type
+        if is_local:
+            for variation in type_value.variations: file.localdefs.add(variation)
         file.types[type_name] = type_value
     for namespace_name, namespace_value in imported.namespaces.items():
         existing = file.namespaces.get(namespace_name, None)
         if existing is not None and existing!=namespace_value: name_token.error("import", "cannot overwrite existing type '"+name+"'")
+        if is_local: file.localdefs.add(namespace_value)
         file.namespaces[namespace_name] = namespace_value
     return pos
 
-def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception: bool):
+def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception: bool, is_local: bool):
     start_token = get(tokens, pos)
     pos += 1
     name = get(tokens, pos).text
@@ -1613,6 +1621,7 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
     for arg_types in itertools.product(*abstract_arg_types):
         pos = starting_pos
         impl = ImplementedType(name, at=start_token)
+        if is_local: file.localdefs.add(impl)
         impl.fast_return_exception = fast_return_exception
         try:
             for arg_name, arg_type, immutable, convert_to_ptr in zip(abstract_arg_names, arg_types, abstract_arg_immutability, abstract_arg_convert_to_ptr):
@@ -1700,6 +1709,10 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
     i = 0
     while i<len(tokens):
         tok = tokens[i]
+        is_local = tok.text=="local"
+        if is_local:
+            i += 1
+            tok = get(tokens, i)
         if tok.text=="def" or tok.text=="rec": 
             has_made_def = True
             first_def_tok = tok
@@ -1716,12 +1729,13 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
                         depth -= 1
                         if depth==0: break
                     pos_end += 1
-                i = process_def(file, tokens, i, fast_return_exception=tok.text=="rec")
+                i = process_def(file, tokens, i, fast_return_exception=tok.text=="rec", is_local=is_local)
                 i = pos_end+1
         elif tok.text=="import": 
             if has_made_def: tok.error("safety", "can only import before the file's first definition", reason=first_def_tok, raason_message="first definition at")
-            i = process_import(file, tokens, i)
-        elif tok.text=="repo": 
+            i = process_import(file, tokens, i, is_local=is_local)
+        elif tok.text=="repo":
+            if is_local: tok.error("syntax", "cannot declare a repo as 'local'")
             if has_made_def: tok.error("safety", "can declare repos before the file's first definition", reason=first_def_tok, raason_message="first definition at")
             i = process_repo(file, tokens, i)
         else: tok.error("syntax", "expecting  'def', 'repo', or 'import' but found '"+str(tok.text)+"'")
@@ -1730,8 +1744,19 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
     while i<len(tokens):
         tok = tokens[i]
         if tok.text=="rec":
-            i = process_def(file, tokens, i, fast_return_exception=False)
+            i = process_def(file, tokens, i, fast_return_exception=False, is_local=False) # it will copy data into the existing type, so no local declaration detection is needed
         else: i += 1
+
+    # now that we have processed everything, remove all localdefs
+    file.namespaces = {k:v for k,v in file.namespaces.items() if v not in file.localdefs}
+    new_types = dict()
+    for k,v in file.types.items():
+        u = UnionType(v.name)
+        for variation in v.variations:
+            if variation not in file.localdefs:
+                u.variations.append(variation)
+        if u.variations: new_types[k] = u
+    file.types = new_types
     return file
 
 def resolve_name(path: str, at_token: Token|None) -> str:

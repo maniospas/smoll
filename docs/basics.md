@@ -15,7 +15,7 @@ def main()
 
 If you are new to the language, now is a good point to mention
 that you need only the executable to start working with it. You can
-then rference local or **online** directory. Below is an example,
+then reference local or **online** directory. Below is an example,
 where the theoretical *std/* location is grabbed from the development repository. For safety, imported files other than the one you run can only make suggestions about repos, and fail to compile if these are not present.
 
 ```python
@@ -286,9 +286,11 @@ to encode the recursion stoping conditions.
 - **Step 2.** The rest of the recursive definitions
 are parsed. These now have access to the whole file's types.
 
-Below is an overengineered and
-slow FIbonacci number calculator that demonstrates recursion
-concepts. Reminder that recursive functions can call both
+Below is an overengineered and thus algorithmically
+slow Fibonacci number calculator that demonstrates recursion
+concepts. The function `call_fib` is completely useless too. :-)
+
+Reminder that recursive functions can call both
 themselves and others that appear *later*. But normal functions
 can still only see previous declarations. Do note that only
 one function in a chain of multiple ones needs to be declared
@@ -380,6 +382,34 @@ def inc(int x, int|blank value)
     if value is blank
         value = 1
     return x+value
+```
+
+## local definitions
+
+This is perhaps a good point to mention that you can have imports
+or function definitions be preceded by `local` to avoid exposing
+unecessary contents.
+
+For example, the range module from the standard library imports
+the latter's core locally but never exposes it, for example to
+cover cases where different arithmetic operations need to be defined 
+in your part of the code (e.g., handling of overflows).
+
+```python
+local import "std/core.s"
+
+def range(nat|blank pos, nat to)
+    if pos is blank
+        pos = 0
+    return (mut pos, to)
+
+def next(range r, mut nat value)
+    next_pos = r.pos+1
+    if next_pos==r.to
+        return false
+    value = r.pos
+    r.pos = mut next_pos
+    return true
 ```
 
 
@@ -594,9 +624,27 @@ def main()
 ```
 
 
-
-
 ## defer
 
-You can defer code blocks to run at the end of current function.
-Those blocks cann
+You can defer code blocks to run later. The "later" part is
+ideally the end of the current function, but *smoλ* may
+postpone it further to accomodate resources (e.g., buffers) 
+that are still in use.
+
+Defer blocks cannot have any return statements or unhandled
+errors; explicitly wrap all potentially erroneous function calls 
+in `try`. Conversely, their eventual execution is guaranteed,
+even if errors are created in the interim.
+
+
+Below is a simple defer example.
+
+```python
+import "std/core.s"
+
+def main()
+    defer
+        print "third"
+    print "first"
+    print "second"
+```

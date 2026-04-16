@@ -1,7 +1,7 @@
 # smoλ reference
 
 **Section 1. Basic syntax**<br>
-_1.1.1._ [import](#import) <br>
+_1.1._ [import](#import) <br>
 _1.2._ [calling notation](#calling-notation) <br>
 _1.3._ [mutability](#mutability) <br>
 _1.4._ [types](#types) <br>
@@ -12,7 +12,7 @@ _1.8._ [unions](#unions) <br>
 _1.9._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)<br>
 _1.10._ [local definitions](#local-definitions)
 
-**Section 2. Safe resorces**<br>
+**Section 2. Safe resources**<br>
 _2.1._ [buffers](#buffers)<br>
 _2.2._ [pointers](#pointers)<br>
 _2.3._ [substructures](#substructures)<br>

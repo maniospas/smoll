@@ -1,28 +1,22 @@
 import "std/core.s"
 import "std/array.s"
 
-def Point2D(float x, float y)
-    return (x,y)
+def test1()
+    x = alloc(mut float[], 2)
+    x[0] = 1.0
+    x[1] = 2.0
+    print x[1]
+    defer
+        print("going to deallocate of size: ", "")
+        print len x
+    return x
 
-def sum(Point2D[] v)
-    x = mut 0.0
-    y = mut 0.0
-    i = mut 0 
-    while i<v->len()
-        x = x+v[i].x
-        y = y+v[i].y
-        i = i+1
-    return (x,y)
-
-def Point3D(float x, float y, float z)
-    plane = Point2D(x,y)
-    print "starting point creation"
-    return (plane,class(z))
+def test2() 
+    t = test1()
+    j = t
+    k = alloc(mut float[], 3)
+    return (t,j,k)
 
 def main()
-    points = (mut Point3D[])->alloc(10)
-    points[0] = Point3D(1.0,2.0,3.0)
-    points[1] = Point3D(1.0,2.0,3.0)
-    sums = sum points@plane
-    print sums.x
-    print sums.y
+    t = test2()
+    print(t.t[1])

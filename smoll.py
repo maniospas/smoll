@@ -46,6 +46,7 @@ def longest_common_prefix(strings: list[str]) -> str:
 class CodeSegment:
     def tostring(self): return ""
     def copy(self, prefix: str): return self
+    def is_temp(self): return False
 
 class CodeWord(CodeSegment):
     def __init__(self, name: str): self.name = name
@@ -73,6 +74,7 @@ class Variable(CodeSegment):
         if self.isprivate!=other.isprivate: return False
         #if self.type.builtin and self.name!=other.name: return False # skip name matching
         return True
+    def is_temp(self): return self.name.startswith("__temp")
 
 def signature_like(vars: list[Variable], impl=None):
     ret = ""
@@ -124,6 +126,7 @@ class ImplementedType:
         self.dependent_implementations: list[ImplementedType] = list() # deoendent pointer TYPES
         self.dependent_assignments: dict[str, str] = dict() # e.g., dependent memory regions
         self.defers: list[CodeSegment] = list() # release code for specific variables
+        self.returned_defers: list[CodeSegment] = list()
         self._pointer_types: dict[str, ImplementedType] = dict() # only place pointer variables here
         self._pointer_type_dependencies: dict[str, str] = dict() # only place pointer variables here
         self.invalidated: dict[str, Token] = dict() # invalidated variables and the place where the invalidation occurred
@@ -230,6 +233,27 @@ class ImplementedType:
         self.dependent_assignments[existing.name] = value[0].name
         if existing.type.builtin: self.implementation.extend([existing, CodeWord("="), value[0], CodeWord(";")])
 
+    def get_assignment(self, from_name: str, to_name: list[str]):
+        to_name = set(to_name)
+        if from_name in to_name: return from_name
+        graph = dict()
+        for k, v in self.dependent_assignments.items():
+            if v not in graph: graph[v] = list()
+            graph[v].append(k)
+            if k not in graph: graph[k] = list()
+            graph[k].append(v)
+        
+        visited = set()
+        pending = set()
+        pending.add(from_name)
+        while pending:
+            next_value = pending.pop()
+            if next_value in to_name: return next_value
+            visited.add(next_value)
+            for candidate in graph.get(next_value, list()):
+                if candidate not in visited: pending.add(candidate)
+        return None
+
     def returns(self, value: list[Variable], error_token: "Token"):
         if self.has_returned_once and len(self.rets)!=len(value):
             error_token.error("type", "this value returned here is a different type than previous returns '"+signature_like([self.vars[ret] for ret in self.rets])+"' vs '"+signature_like(value)+"'")
@@ -240,11 +264,43 @@ class ImplementedType:
             else:
                 self.rets.append(arg.name)
                 self.vars[arg.name] = arg # needed to reflect changes in const permissions
+        for i in range(len(self.rets)):
+            for j in range(i+1,len(self.rets)):
+                if self.rets[i]==self.rets[j]: error_token.error("safety", "cannot return the same variable multiple times; conflict for '"+pretty_name(self.rets[i])+"'")
+        if not self.has_returned_once:
+            # it is invariant that matching types match what is being returned
+            to_remove = list()
+            for defer in self.defers:
+                orignal_defer = defer
+                normalized_defer = list()
+                for v in defer:
+                    if isinstance(v, Variable):
+                        ret = self.get_assignment(v.tostring(), self.rets) # we have computed these now (DO NOT MOVE EARLIER)
+                        normalized_defer.append(self.vars[ret] if ret else v)
+                        #print(self.name, ret, "Returned as", v.tostring())
+                    else: normalized_defer.append(v)
+                defer = normalized_defer
+                has_any_returned_value = any(v in defer for v in value)
+                if not has_any_returned_value: continue
+                if any(not v.immutable and v.tostring() in self.args and not v.tostring() in self.rets for v in value):
+                    error_token.error("safety", "cannot have a 'defer' that mixes non-returned mutable argument and returns")
+                has_assigned = set()
+                has_not_assigned = set()
+                for pos, v in enumerate(defer):
+                    if pos<len(defer)-1 and defer[pos+1].tostring()=="=" and not v in has_not_assigned: has_assigned.add(v)
+                    has_not_assigned.add(v)
+                    if isinstance(v, Variable) and not v.is_temp() and v not in value and not v in has_assigned:
+                        if not v in value: error_token.error("safety", "cannot return a partial 'defer'\nThis return statement does not to return '"+pretty_name(v.tostring())+"'. However, a value from that is used within a 'defer' that also contains returned values; the latter would be delegated for later calling without knowing the missing return value.", suggestions=["return '"+pretty_name(v.tostring())+"' too, or any structure it resides in", "do not return variables within the same 'defer'"])
+                self.returned_defers.append(defer)
+                to_remove.append(orignal_defer)
+            for defer in to_remove: self.defers.remove(defer)
         self.has_returned_once = True
         if self.fast_return_exception: 
             self.force_not_inline = True
             self.has_returned_once = True
             raise FastReturnException
+            
+            
 
     def transpile(self) -> str:
         ret_body_start = ""
@@ -294,7 +350,7 @@ class ImplementedType:
         if ret_body_end: ret += "__temp_return:\n  "
         # apply defers that are applied on success mode
         defer_ret = ""
-        for defer in self.defers:
+        for defer in reversed(self.defers):
             prev = ";"
             for token in defer:
                 tok = token.tostring()
@@ -480,10 +536,6 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             impl.implementation.extend([
                 impl.is_parsing_a_try[-1],
                 CodeWord("="),
-                impl.is_parsing_a_try[-1],
-                CodeWord("?"),
-                impl.is_parsing_a_try[-1],
-                CodeWord(":"),
                 CodeWord(callee.monomorphic_name),
                 CodeWord("("),
             ])
@@ -543,12 +595,16 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                         rets[ret_pos-1].type = buffer_types[pointer_type].variations[0]
                     break
         
-        else: 
+        else:
             impl.set_pointer_type(variable, original_pointer_type)
             # overwrite known pointer types here for the pointer (it's fine to change the type because rets are copies)
     if callee.rets or vars: impl.implementation[-1] = CodeWord(")") # replace last comma with closing parenthesis
     else: impl.implementation.append(CodeWord(")"))
+
     impl.implementation.append(CodeWord(";"))
+    if callee.needs_failure_mode and impl.is_parsing_a_try:
+        if impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the 'try' mechanism has already matched one function call")
+        impl.is_parsing_a_try[-1] = None
     if callee.needs_failure_mode and not impl.is_parsing_a_try:
         if impl.is_parsing_a_defer: error_token.error("safety", "cannot call a function with unhandled failure within 'defer'", reason=callee.at)
         impl.implementation.extend([
@@ -581,6 +637,27 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if callee==FAIL_TYPE: 
         if impl.nesting: error_token.error("safety", "cannot create a compilation-time failure inside a 'while' or an 'if' whose condition does not evaluate to compile-time known boolean")
         raise CompfailException()
+
+    # and after all the above we need to transfer all defers
+    # remember that defers cannot fail so we're ok with them
+    # however, we need to move all variables declared inside too
+    # tmp is retained for before as the return variable prefix
+    if callee.returned_defers:
+        secondary_tmp = create_temp()  # need new prefix to avoid packing stuff into the tmp object
+    for defer in callee.returned_defers:
+        new_defer = list()
+        for v in defer:
+            if not isinstance(v, Variable):
+                new_defer.append(v)
+                continue
+            v_name = v.tostring()
+            if v_name in callee.rets:
+                new_defer.append(impl.vars[tmp+"__"+v_name]) # we have already created this
+                continue
+            new_v = v.renamed_copy(secondary_tmp+"__"+v_name)
+            new_defer.append(new_v)
+            impl.vars[new_v.name] = new_v
+        impl.defers.append(new_defer)
     return rets
 
 def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token):
@@ -1197,6 +1274,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.is_parsing_a_try.append(var)
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
+        if impl.is_parsing_a_try[-1] is not None: current_token.error("safety", "this 'try' statement does not guard against anything")
         impl.is_parsing_a_try.pop()
         impl.implementation.extend([
             var,
@@ -1361,7 +1439,18 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             if not ret: impl.implementation.extend([CodeWord("return"), CodeWord(";")])
             else: impl.implementation.extend([CodeWord("goto"), CodeWord("__temp_return"), CodeWord(";")])
             continue
+        if name.text=="debug_msg":
+            message = get(tokens, pos)
+            pos += 1
+            print(impl.name+":", message.text)
+            continue
+        if name.text=="debug_type":
+            pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
+            pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+            print(impl.name+":", signature_like(ret, impl))
+            continue
         if name.text=="defer":
+            if impl.has_returned_once: name.error("safety", "cannot declare a 'defer' after the first return")
             if impl.is_parsing_a_defer: name.error("safety", "cannot declare a 'defer' within another")
             if impl.nesting: name.error("safety", "cannot 'defer' within conditions or loops")
             impl.is_parsing_a_defer = True

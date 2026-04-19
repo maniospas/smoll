@@ -5,7 +5,16 @@ local import "std/unsafe.s" as unsafe
 // is that we GUARANTEE that non-zero pointers to a memory region contain
 // at least one element of the attached type (automatically inferred for any)
 
+def free(mut any[] buffer)
+    if buffer.unsafe_size==0
+        return buffer
+    buffer.unsafe_size = 0
+    buffer.unsafe_ptr -> unsafe::free()
+    return buffer
+
 def alloc(mut any[] buffer, nat size)
+    defer
+        buffer->free()
     if buffer.unsafe_size==size
         if size!=0
             buffer.unsafe_ptr -> unsafe::zero(0, buffer.unsafe_align*size)
@@ -18,19 +27,13 @@ def alloc(mut any[] buffer, nat size)
     buffer.unsafe_ptr -> unsafe::zero(0, bytes)
     return buffer
 
-def free(mut any[] buffer)
-    if buffer.unsafe_size==0
-        return buffer
-    buffer.unsafe_size = 0
-    buffer.unsafe_ptr -> unsafe::free()
-    return buffer
-
 def resize(mut any[] buffer, nat size)
     if buffer.unsafe_size==size 
         return buffer
     if size==0
-        unsafe::free(buffer.unsafe_ptr)
-        buffer.unsafe_size = 0
+        return buffer -> free()
+    if buffer.unsafe_size==0
+        buffer = buffer -> alloc(size)
         return buffer
     prev_bytes = buffer.unsafe_size*buffer.unsafe_align
     buffer.unsafe_size = size

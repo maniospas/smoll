@@ -665,7 +665,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
 def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token):
     if len(ret)!=1: current_token.error("type", "can only deref a 'ptr' but got '"+signature_like(ret)+"'")
     if ret[0].type!=POINTER_TYPE: current_token.error("type", "can only deref a 'ptr' but got '"+signature_like(ret)+"'")
-    if ret[0].name in impl.invalidated: current_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer")
+    if ret[0].name in impl.invalidated: current_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[ret[0].name])
     pointer_type = impl.get_pointer_type(ret[0])
     if pointer_type is None: current_token.error("type", "there is no known type attached to the pointer to deref at this point")
     if pointer_type == ANY_TYPE: current_token.error("type", "cannot deref a pointer on 'any' data (this can be specialized)")
@@ -1126,6 +1126,8 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 current += "__"+get(tokens, pos).text
                 is_field = True
                 if current in impl.vars: break
+            for r in rets:
+                if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' has been invalidated", reason=impl.invalidated[r.name], raason_message="due to")
             pos += 1
             var = impl.vars.get(current, None)
             if var is None:
@@ -1299,6 +1301,13 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         for var, val in impl.vars.items():
             if val.type in type.variations and not var.endswith("__unsafe_ptr"):
                 impl.invalidated[var] = current_token
+                if var in impl.args and not val.immutable:
+                    impl.implementation.extend([
+                        val, 
+                        CodeWord("="),
+                        CodeWord("0"),
+                        CodeWord(";")
+                    ])
         impl.invalidate_types_when_called.extend(type.variations)
         return pos, []
     # if current == "deref" or current==":":
@@ -1336,7 +1345,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         current += "__"+get(tokens, pos).text
         is_field = True
     var = impl.vars.get(current, None)
-
+    
     if peek_text(tokens, pos+1) == "=":
         if var is not None and var.isprivate: tokens[pos].error("type", "cannot set to immutable class field: '"+pretty_name(current)+"'")
         current_prefix = current+"__"
@@ -1350,11 +1359,18 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         found = [] # [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
         return pos, found
 
+    if var:
+        r = var
+        if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' has been invalidated", reason=impl.invalidated[r.name])
+
     if var is None:
         # first try to see if this is a group of values
         # if not found but followed by 'is' consider it of type void
         current_prefix = current+"__"
         found = [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
+        for r in found:
+            if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' has been invalidated", reason=impl.invalidated[r.name], raason_message="due to")
+
         if found or peek_text(tokens, pos+1)=="is": return process_statement_operator(file, tokens, impl, pos+1, found, current_operator_priority) 
 
         # if it was a field, don't try type resolution but immediately fail now
@@ -1450,6 +1466,33 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
             pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
             print(impl.name+":", signature_like(ret, impl))
+            continue
+        if name.text=="del":
+            # if impl.has_returned_once: name.error("safety", "cannot 'del' if you have already returned")
+            # if impl.nesting: name.error("safety", "cannot 'del' within conditions or loops")
+            pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
+            pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+            rets = [r.name for r in ret]
+            invalidated = set()
+            for var, val in impl.vars.items():
+                if impl.get_assignment(var, rets):
+                    impl.invalidated[var] = name
+                    invalidated.add(val)
+            to_remove = list()
+            for defer in impl.defers:
+                if not any(v in defer for v in invalidated): continue
+                impl.implementation.extend(defer)
+                to_remove.append(defer)
+            for v in invalidated:
+                if v.name in impl.args and not v.immutable:
+                    impl.implementation.extend([
+                        v, 
+                        CodeWord("="),
+                        CodeWord("0"),
+                        CodeWord(";")
+                    ])
+            for defer in to_remove: impl.defers.remove(defer)
+            ret = []
             continue
         if name.text=="defer":
             if impl.has_returned_once: name.error("safety", "cannot declare a 'defer' after the first return")

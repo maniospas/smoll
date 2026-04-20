@@ -4,14 +4,14 @@ def alloc(nat bytes)
     {builtins::compiler::ptr allocated = malloc(bytes);builtins::bool failed=allocated==0;}
     if failed
         fail "allocation failed"
-    return allocated // allow content modifications afterwrds
+    return allocated # allow content modifications afterwrds
 
-def realloc(any ptr allocated, nat bytes)
+def realloc(any ptr allocated__unsafe_ptr, nat bytes) # the __unsafe_ptr suffix is needed to skip invalidation internally
+    INVALIDATE compiler::ptr
     {builtins::compiler::ptr new_allocated = allocated?realloc(allocated, bytes):malloc(bytes);builtins::bool failed=new_allocated==0;}
     if failed
         fail "reallocation failed"
-    INVALIDATE compiler::ptr
-    return new_allocated -> compiler::attach_type(allocated)
+    return new_allocated -> compiler::attach_type(allocated__unsafe_ptr)
 
 def free(any ptr allocated)
     {if(allocated)free(allocated);allocated=0;}

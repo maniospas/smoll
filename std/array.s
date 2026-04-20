@@ -1,9 +1,9 @@
 local import "std/core.s"
 local import "std/unsafe.s" as unsafe
 
-// a convention to make pointer operations safe outside the unsafe:: namespace
-// is that we GUARANTEE that non-zero pointers to a memory region contain
-// at least one element of the attached type (automatically inferred for any)
+# a convention to make pointer operations safe outside the unsafe:: namespace
+# is that we GUARANTEE that non-zero pointers to a memory region contain
+# at least one element of the attached type (automatically inferred for any)
 
 def free(mut any[] buffer)
     if buffer.unsafe_size==0

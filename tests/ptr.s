@@ -1,4 +1,4 @@
-import "std/array.s"
+import "std/core.s"
 
 def Point(float x, float y)
     return (x,y)

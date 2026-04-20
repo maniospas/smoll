@@ -1,5 +1,4 @@
 import "std/core.s"
-import "std/array.s"
 
 def test1()
     x = alloc(mut float[], 2)

@@ -5,3 +5,6 @@ import "std/core/print.s"
 import "std/core/convert.s"
 import "std/core/range.s"
 import "std/core/units.s"
+
+import "std/core/string.s"
+import "std/core/array.s"

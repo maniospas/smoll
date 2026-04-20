@@ -19,6 +19,9 @@ _2.3._ [substructures](#substructures)<br>
 _2.4._ [try and fail](#try-and-fail)<br>
 _2.5._ [defer](#defer)<br>
 
+**Section 3. Standard library**<br>
+_3.1._ [strings](#strings)<br>
+
 # Section 1. Basic syntax
 
 ## import
@@ -441,7 +444,7 @@ They can be declared with the following syntax to hold
 any type's items:
 
 ```python
-import "std/array.s"
+import "std/core.s"
 
 def print(any[] buffer)
     print(buffer->len(), " elements in buffer\n")
@@ -451,17 +454,19 @@ def main()
     print(x)
 ```
 
-Most buffer features are implemented in `"std/array.s"`;
+Most buffer features are implemented in the standard library's core
 we will see next how to work with abstract buffers.
 One of the most important features is the `alloc` function to
 allocate and zero-initialize a specific number of elements. This
 function returns the buffer itself to enable initialization per
-`buf = (mut float[])->alloc(10)`.
+`buf = (mut float[])->alloc 4`. You can allocate a buffer of chars
+by not providing the mutable buffer decleration per `buf = alloc 4`.
+Make use of the `KB`, `MB`, `GB` functions to quickly size allocations.
 
 Allocation will create an error if it tries to change the number of
-elements from a non-zero number to something else.
-In those cases, use `resize` to change buffer size, that is, its
-number of elements. You can also set the size to zero. If the
+elements from a non-zero number to something different.
+In those cases, use `resize` instead. 
+You can also set the size to zero. If the
 allocation is the same in size as before, the buffer's elements
 are still zero-initialized. This is helpful when reusing the same
 buffers within loops. 
@@ -478,7 +483,6 @@ All buffer indexes are of type `nat`, which represents natural numbers
 
 ```python
 import "std/core.s"
-import "std/array.s"
 
 def main()
     buf = mut float[]
@@ -527,7 +531,6 @@ valid to move data to their memory address. Below is an example.
 
 ```python
 import "std/core.s"
-import "std/array.s"
 
 def main()
     buf = (mut float[])->alloc(1)
@@ -661,4 +664,48 @@ def main()
         print "third"
     print "first"
     print "second"
+```
+
+
+
+# Section 3. Standard library
+
+## strings
+
+The standard library provides the `str` structural type for representing
+strings by combining character buffers, an offset within the buffer
+where the string starts (more stable than using a pointer), its length,
+and its first character for quicker comparison; that is `\0` for empty
+strings.
+
+`cstr` data are trivially castable to strings if their length is not
+needed. Below is na example, where printing is also implemented for
+strings.
+
+```python
+import "std/core.s"
+
+def main()
+    print str "hello world!"
+```
+
+## lists
+
+You can manage buffers by adding push and pop operations, as well
+as a capacity-based growth stratetegy. This is done by caling the 
+`list` function on a mutable buffer. List elements are accessed like 
+buffers. An example follows.
+
+```python
+import "std/core.s"
+
+def main()
+    li = list mut float[]
+    0.1 >> push li
+    0.1 >> push li
+    0.1 >> push li
+
+    li[1] = 0.2
+    print li[0]
+    print li[1]
 ```

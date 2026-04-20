@@ -14,7 +14,9 @@ def free(mut any[] buffer)
 
 def alloc(mut any[] buffer, nat size)
     defer
-        buffer->free()
+        if buffer.unsafe_size!=0
+            buffer.unsafe_size = 0
+            buffer.unsafe_ptr -> unsafe::free()
     if buffer.unsafe_size==size
         if size!=0
             buffer.unsafe_ptr -> unsafe::zero(0, buffer.unsafe_align*size)
@@ -63,7 +65,7 @@ def get(const any[] buffer, nat i)
         fail "out of bounds"
     return buffer.unsafe_ptr -> unsafe::add(i*buffer.unsafe_align)
 
-def len(any[] buffer)
+def len(const any[] buffer)
     return buffer.unsafe_size
 
 def alloc(nat size)

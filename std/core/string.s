@@ -1,5 +1,5 @@
 local import "std/core.s"
-local import "std/array.s"
+local import "std/core/array.s"
 
 def str(const char[] buf, nat pos, nat length, char first)
     return (buf, pos, length, first)

@@ -527,6 +527,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 # for arg1, arg2 in zip(var_pointer_type.args, other_pointer_type.args):
                 #     if var_pointer_type
                 if not is_available: break
+
         if is_available: available_types.append(variation)
     if len(available_types)==0:
         # has_defs = False
@@ -544,6 +545,12 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         other_pointer_type = callee.get_pointer_type(callee.vars[callee.args[varpos]])
         if (var_pointer_type is None or var_pointer_type==ANY_TYPE) and other_pointer_type is not None and other_pointer_type!=ANY_TYPE:
             impl._pointer_types[var.name] = other_pointer_type
+
+        # invalidate everything assigned to the same mutable pointer if the function actually requires it as mutable
+        if not callee.vars[callee.args[varpos]].immutable:
+            for v, val in impl.vars.items():
+                if impl.get_assignment(v, [var.name]):
+                    impl.invalidated[v] = error_token
 
     # TODO: we will now call the method, but we could also inline it in the future maybe
     tmp = create_temp()

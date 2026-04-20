@@ -1,5 +1,4 @@
 import "std/core.s"
-import "std/array.s"
 
 def Point2D(float x, float y)
     return (x,y)

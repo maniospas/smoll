@@ -1,5 +1,4 @@
-import "std/std.s"
-import "std/array.s"
+import "std/core.s"
 
 def main()
     f = io::read "README.md"

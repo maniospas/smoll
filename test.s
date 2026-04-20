@@ -1,14 +1,13 @@
-import "std/std.s"
-import "std/array.s"
+import "std/core.s"
 
 def main()
-    li = list mut float[]
-    0.1 >> push li
-    0.1 >> push li
-    0.1 >> push li
-    print(len li.buffer, " buffer capacity\n")
+    buf1 = mut float[]
+    buf1 = buf1->resize(10)
 
-    li[1] = 0.2
-    print li[0]
-    print li[1]
+    buf2 = buf1
+    buf2 = buf2->resize(10000)
+
+    print len buf1
+    print len buf2
+    print buf1[5]
 

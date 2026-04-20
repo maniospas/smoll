@@ -32,10 +32,9 @@ def chunk(char[] buf, mut nat|blank pos, read f)
     {builtins::nat bytes_read = f__unsafe_ptr?fread((char*)contents, 1, size, (FILE*)f__unsafe_ptr):0;}
     if bytes_read==0
         fail "end of file"
-    {builtins::char first = ((char*)contents)[0];}
     prev_pos = const pos
     pos = pos+bytes_read
-    return str(buf, prev_pos, bytes_read, first)
+    return str(buf, prev_pos, bytes_read)
 
 def line(char[] buf, mut nat|blank pos, read f)
     if pos is blank
@@ -46,7 +45,6 @@ def line(char[] buf, mut nat|blank pos, read f)
     if not success
         fail "end of file"
     {builtins::nat bytes_read = strlen((char*)contents);}
-    {builtins::char first = bytes_read?((char*)contents)[0]:0;}
     prev_pos = const pos
     pos = pos+bytes_read
-    return str(buf, prev_pos, bytes_read, first)
+    return str(buf, prev_pos, bytes_read)

@@ -1361,7 +1361,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
 
     if var:
         r = var
-        if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' has been invalidated", reason=impl.invalidated[r.name])
+        if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' has been invalidated", reason=impl.invalidated[r.name], raason_message="due to")
 
     if var is None:
         # first try to see if this is a group of values

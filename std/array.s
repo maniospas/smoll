@@ -68,3 +68,24 @@ def len(any[] buffer)
 
 def alloc(nat size)
     return alloc(mut char[], size)
+
+def list(mut any[] buffer)
+    length = mut len buffer
+    return class(buffer, length)
+
+def get(list l, nat pos)
+    if pos>=l.length
+        fail "out of bounds"
+    return get(l.buffer,pos)
+
+def mutget(list l, nat pos)
+    if pos>=l.length
+        fail "out of bounds"
+    return mutget(l.buffer,pos)
+
+def push(list l)
+    prev_length = l.length
+    if prev_length >= len l.buffer
+        l.buffer = l.buffer->resize(prev_length+prev_length/2+1)
+    l.length = prev_length + 1
+    return mutget(l.buffer,prev_length)

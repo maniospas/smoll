@@ -1,11 +1,18 @@
 import "std/std.s"
+import "std/array.s"
 
 def main()
-    f = io::read "README.md"
-    mem = array::alloc KB 4  # read in at most 4 KB chunks (mut char[] is assumed as the buffer type) 
-    while try line = io::line(mem,f)
-        print("|", "")
-        print(line, "")
-    print ""
-    del f
-    print "THE END"
+    li = list mut float[]
+    li->push() << 0.1
+    li->push() << 0.1
+    li->push() << 0.1
+    print(len li.buffer, " buffer capacity\n")
+
+    print li[0]
+    print li[1]
+
+    li[1] = 0.2
+    print li[1]
+
+    print li[2]
+

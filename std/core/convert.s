@@ -16,3 +16,7 @@ def nat(Number x)
         fail "cannot convert negative float to id"
     {builtins::nat value=x;}
     return value
+
+def exists(const any ptr x)
+    {builtins::bool z = x!=0;}
+    return z

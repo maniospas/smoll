@@ -27,34 +27,32 @@ manuals to onboard.
 
 An example that shows several language features follows.
 Cheat sheet:
-- `import` brings functions from other files
+- `import` brings functions from other files, and potentially organizes them in namespaces
 - `def` defines functions (functions also define types)
-- `mut` denotes mutable values that can be overwritten in code; mutable fields can still be edited
-- `->` pipes a value at the beginning of a function's arguments.
+- `mut` denotes mutable values that can be overwritten in code
+- `->` pipes a value at the beginning of a function's arguments
+- `try` evaluates to boolean, depending on whether an expression failed (failures are safe)
 
 ```python
+// test.s
+repo "https://github.com/maniospas/smoll/raw/refs/heads/main/std/" as "std/"
 import "std/core.s"
-import "std/file.s"
-
-def count(mut reader f, str line_prefix)
-    lines = mut 0
-    characters = mut 0
-    line = mut str ""
-    while (f,line)->next()
-        print(line_prefix, "")
-        print(line)
-        lines = lines+1
-        characters = characters+len(line)
-    return (lines, characters)
+import "std/io.s" as io
+import "std/array.s" as array
 
 def main()
-    f = mut reader("README.md")
-    counted = f->count("|")
-    print("lines")
-    print(counted.lines)
-    print("lines")
-    print(counted.lines)
+    f = io::read "README.md"
+    mem = array::alloc(mut char[], 1024) // 1024-byte chunks
+    while try line = io::line(mem, f)
+        print("|", "")
+        print(line, "")
+    print ""
+```
 
+Download the executable from the latest release and run:
+
+```bash
+./smoll test.s
 ```
 
 

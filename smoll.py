@@ -94,7 +94,8 @@ def signature_like(vars: list[Variable], impl=None):
             ret += type.name+arg_name
             i += 1
         elif type.is_buffer_of: 
-            if any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
+            if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
+            elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "const "
             ret += type.is_buffer_of.name+"[]"+arg_name
             i += len(type.rets)
         else:
@@ -743,7 +744,7 @@ def create_buffer_type(name, memory_size, variation):
     for varg in variation.rets:
         if variation.vars[varg].type == POINTER_TYPE:
             tokens[pos].error("safety", "cannot place pointer field '"+pretty_name(varg)+"' onto a buffer", reason=variation.at)
-    actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=False, isprivate=False)
+    actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=True, isprivate=False)
     actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
     actual_variation.vars["unsafe_size"] = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
     actual_variation.vars["unsafe_align"] = Variable("unsafe_align", UINT_TYPE, immutable=False, isprivate=False)

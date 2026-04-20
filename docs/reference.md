@@ -30,7 +30,7 @@ file; the `print` function is imported from the core.
 import "std/core.s"
 
 def main()
-    // this is a line comment, by the way
+    # this is a line comment, by the way
     print "hello world!"
 ```
 
@@ -44,7 +44,7 @@ repo "https://github.com/maniospas/smoll/raw/refs/heads/main/std/" as "std/"
 import "std/core.s"
 
 def main()
-    // this is a line comment, by the way
+    # this is a line comment, by the way
     print "hello world!"
 ```
 
@@ -128,7 +128,7 @@ others of the same type.
 import "std/core.s"
 
 def main()
-    x = mut 1   // mutable - we want to mutate it further
+    x = mut 1  # mutable - we want to mutate it further
     x = x+2
     x = x+3
     print x
@@ -157,10 +157,10 @@ def next(mut range r)
 
 def main()
     r = mut range(0,10)
-    r = r->next() // see proper loops below (parenthesis needed to designate empty tuple)
+    r = r->next()  # see proper loops below (parenthesis needed to designate empty tuple)
     print r.pos
     print "\n"
-    print add r   // pos+end
+    print add r # pos+end
     print "\n"
 ```
 
@@ -225,10 +225,10 @@ def Test()
 
 def main()
     t = Test()
-    print(t.x) // prints 1
+    print t.x # prints 1
     t.x = 0
-    print(t.x) // prints 0
-    print(t.y) // prints 2
+    print t.x # prints 0
+    print t.y # prints 2
 ```
 
 The same rules hold for function arguments. Below is an example.
@@ -242,13 +242,13 @@ def Test()
     return class(mut x, y)
 
 def test(const Test t)
-    // t.x = 10 // disallowed
-    print(t.x)
+    # t.x = 10 # disallowed
+    print t.x
 
 def main()
     t = Test()
     t.x = 5
-    test(t)
+    test t
 ```
 
 
@@ -483,7 +483,7 @@ import "std/array.s"
 def main()
     buf = mut float[]
     buf->resize(10)
-    print buf[0]  // prints 0, as buffers are zero-initialized
+    print buf[0]  # prints 0, as buffers are zero-initialized
     buf[1] = 1.0
     print buf[1]
 ```
@@ -532,10 +532,10 @@ import "std/array.s"
 def main()
     buf = (mut float[])->alloc(1)
     element = buf[0]&&
-    print element.  // prints 0 as buffers are zero-initialized
+    print element.  # prints 0 as buffers are zero-initialized
     element << 1.0
-    print element.  // prints 1 by dereferencing
-    print buf[0]    // prints 1 from the same memory 
+    print element.  # prints 1 by dereferencing
+    print buf[0]    # prints 1 from the same memory 
 ```
 
 If, in he above example, a new line 
@@ -565,7 +565,7 @@ def main()
     buf = (mut nat[])->alloc(3)
     buf[2] = 1
     buf[2] >> buf->resize(2)
-    print buf[1]  // prints 1
+    print buf[1]  # prints 1
 ```
 
 ## substructures
@@ -597,7 +597,7 @@ def main()
     points = (mut Point3D[])->alloc(10)
     points[0] = Point3D(1.0,2.0,3.0)
     print points@plane@x[0]
-    print points[0].plane.x // equivalent
+    print points[0].plane.x  # equivalent
 ```
 
 ## try and fail

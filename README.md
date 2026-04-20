@@ -9,6 +9,8 @@ are resolved, and so on. In short: reading a program
 explains the program and you don't need to read lengthy
 manuals to onboard.
 
+**If you don't use the smoll lsp, Python keyword and comment highlighting works pretty well.**
+
 ## 🚀 Features
 
 - Functions returns as type declarations
@@ -34,7 +36,7 @@ Cheat sheet:
 - `try` evaluates to boolean, depending on whether an expression failed (failures are safe)
 
 ```python
-// test.s
+# test.s
 repo "https://github.com/maniospas/smoll/raw/refs/heads/main/std/" as "std/"
 import "std/core.s"
 import "std/io.s" as io
@@ -42,7 +44,7 @@ import "std/array.s" as array
 
 def main()
     f = io::read "README.md"
-    mem = array::alloc(mut char[], 1024) // 1024-byte chunks
+    mem = array::alloc KB 4 # 4 KB chunk size, on char[] by default
     while try line = io::line(mem, f)
         print("|", "")
         print(line, "")

@@ -65,3 +65,6 @@ def get(const any[] buffer, nat i)
 
 def len(any[] buffer)
     return buffer.unsafe_size
+
+def alloc(nat size)
+    return alloc(mut char[], size)

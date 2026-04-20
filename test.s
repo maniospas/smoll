@@ -2,8 +2,8 @@ import "std/std.s"
 
 def main()
     f = io::read "README.md"
-    mem = array::alloc(mut char[], 1024) // 1024-byte chunks
-    while try line = io::line(mem, f)
+    mem = array::alloc KB 4
+    while try line = mem->io::line f
         print("|", "")
         print(line, "")
-    print ""
+    print "\nTHE END"

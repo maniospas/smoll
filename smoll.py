@@ -99,7 +99,8 @@ def signature_like(vars: list[Variable], impl=None):
             ret += type.is_buffer_of.name+"[]"+arg_name
             i += len(type.rets)
         else:
-            if any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
+            if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
+            elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "const "
             ret += type.name+arg_name
             i += len(type.rets)
         assert len(type.rets)
@@ -1889,7 +1890,7 @@ def _load(path: str, is_main_file: bool=False) -> File:
                 count_spaces = len(line)
                 line = line.strip(" \t")
                 count_spaces -= len(line)
-                if not len(line) or line.startswith("//") or line=="\n": continue
+                if not len(line) or line.startswith("//") or line.startswith("#") or line=="\n": continue
                 prev_nesting_level = nesting_levels[len(nesting_levels)-1]
                 while count_spaces < prev_nesting_level:
                     tokens.append(Token(END_TOKEN, file, row, prev_nesting_level+1))
@@ -1921,7 +1922,7 @@ def _load(path: str, is_main_file: bool=False) -> File:
                         col += 1
                         tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
                         token_start = col
-                    elif c=="/" and col<len(line)-1 and line[col+1]=="/":
+                    elif c=="#" or (c=="/" and col<len(line)-1 and line[col+1]=="/"):
                         if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
                         token_start = col # comment out stuff
                         break

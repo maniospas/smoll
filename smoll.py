@@ -546,10 +546,11 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if (var_pointer_type is None or var_pointer_type==ANY_TYPE) and other_pointer_type is not None and other_pointer_type!=ANY_TYPE:
             impl._pointer_types[var.name] = other_pointer_type
 
-        # invalidate everything assigned to the same mutable pointer if the function actually requires it as mutable
-        if not callee.vars[callee.args[varpos]].immutable:
+        # invalidate everything assigned to the same mutable pointer if the function actually requires it as mutable and the function
+        # creates invalidations
+        if (not callee.vars[callee.args[varpos]].immutable) and POINTER_TYPE in callee.invalidate_types_when_called:
             for v, val in impl.vars.items():
-                if impl.get_assignment(v, [var.name]):
+                if val not in vars and impl.get_assignment(v, [var.name]): # don't invalidate mutable args that are reset
                     impl.invalidated[v] = error_token
 
     # TODO: we will now call the method, but we could also inline it in the future maybe
@@ -589,7 +590,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         for var, val in impl.vars.items():
             if val.type == invalid_type and not var.endswith("__unsafe_ptr"):
                 impl.invalidated[var] = error_token
-    impl.invalidate_types_when_called.extend(callee.invalidate_types_when_called)
+    for p in callee.invalidate_types_when_called:
+        if p not in impl.invalidate_types_when_called:
+            impl.invalidate_types_when_called.append(p)
 
     # this is a critical point for ... pointers ;-) actually for buffers
     # we are next going to go through all the actual pointer compliance checks
@@ -922,7 +925,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             if var is None: err_token.error("type", "can only set a value to an existing pointer with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.name in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer")
-            if var.immutable: err_token.error("type", "cannot move data to an immutable pointer (it may not be 'mut', obtained with '&&' from a buffer, it may have been declared as 'const')")
+            if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&&' from a buffer (or mutget) if you are working with std", "remove 'const' qualitifier"])
             pointer_type: ImplementedType = impl.get_pointer_type(var)
             if pointer_type is None or pointer_type==ANY_TYPE: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type")
             if len(pointer_type.rets)!=len(ret): err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")
@@ -1149,7 +1152,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 is_field = True
                 if current in impl.vars: break
             for r in rets:
-                if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' has been invalidated", reason=impl.invalidated[r.name], raason_message="due to")
+                if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' could have been invalidated", reason=impl.invalidated[r.name], raason_message="due to")
             pos += 1
             var = impl.vars.get(current, None)
             if var is None:
@@ -1383,7 +1386,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
 
     if var:
         r = var
-        if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' has been invalidated", reason=impl.invalidated[r.name], raason_message="due to")
+        if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' could have been invalidated", reason=impl.invalidated[r.name], raason_message="due to")
 
     if var is None:
         # first try to see if this is a group of values
@@ -1391,7 +1394,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         current_prefix = current+"__"
         found = [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
         for r in found:
-            if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' has been invalidated", reason=impl.invalidated[r.name], raason_message="due to")
+            if r.name in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.name)+"' could have been invalidated", reason=impl.invalidated[r.name], raason_message="due to")
 
         if found or peek_text(tokens, pos+1)=="is": return process_statement_operator(file, tokens, impl, pos+1, found, current_operator_priority) 
 

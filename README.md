@@ -40,11 +40,10 @@ Cheat sheet:
 repo "https://github.com/maniospas/smoll/raw/refs/heads/main/std/" as "std/"
 import "std/core.s"
 import "std/io.s" as io
-import "std/array.s" as array
 
 def main()
     f = io::read "README.md"
-    mem = array::alloc KB 4 # 4 KB chunk size, on char[] by default
+    mem = alloc KB 4 # max 4 KB chunk size, on char[] by default
     while try line = io::line(mem, f)
         print("|", "")
         print(line, "")

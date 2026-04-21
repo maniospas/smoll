@@ -11,7 +11,7 @@ def realloc(any ptr allocated__unsafe_ptr, nat bytes) # the __unsafe_ptr suffix 
     {builtins::compiler::ptr new_allocated = allocated__unsafe_ptr?realloc(allocated__unsafe_ptr, bytes):malloc(bytes);builtins::bool failed=new_allocated==0;}
     if failed
         fail "reallocation failed"
-    return new_allocated -> compiler::attach_type(allocated__unsafe_ptr)
+    return new_allocated.compiler::attach_type(allocated__unsafe_ptr)
 
 def free(any ptr allocated)
     {if(allocated)free(allocated);allocated=0;}
@@ -22,4 +22,4 @@ def zero(any ptr allocated, nat from, nat to)
 
 def add(any ptr allocated, nat offset)
     {builtins::compiler::ptr element = ((char*)allocated)+offset;}
-    return element -> compiler::attach_type(allocated)
+    return element.compiler::attach_type(allocated)

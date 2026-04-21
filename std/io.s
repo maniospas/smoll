@@ -1,6 +1,4 @@
 local import "std/core.s"
-local import "std/string.s"
-local import "std/array.s"
 local import "std/unsafe.s" as unsafe
 
 def read(cstr path)

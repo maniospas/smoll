@@ -1139,16 +1139,22 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             continue
         elif op==".":
             current_token = tokens[pos]
-            if len(rets)==1 and rets[0].type==POINTER_TYPE:
+            if len(rets)==1 and rets[0].type==POINTER_TYPE and peek_text(tokens, pos+1)==".":
                 pos, rets = process_deref(file, pos, rets, impl, current_token)
-                pos += 1
+                pos += 2
                 continue
             current = longest_common_prefix([r.name for r in rets])
             if current.endswith("__"): current=current[:-2]
             pos -= 1
+            call_continuation = False
             while peek_text(tokens, pos+1) == ".":
                 pos += 2
-                current += "__"+get(tokens, pos).text
+                peek = current+"__"+get(tokens, pos).text
+                if not any(v.startswith(peek) for v in impl.vars) and peek_text(tokens, pos+1)!="is":
+                    pos -= 2
+                    call_continuation = True
+                    break
+                current = peek
                 is_field = True
                 if current in impl.vars: break
             for r in rets:
@@ -1158,6 +1164,14 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             if var is None:
                 current_prefix = current+"__"
                 rets = [r for r in rets if r.name.startswith(current_prefix)]
+                if rets and call_continuation:
+                    pos, type = process_type(file, tokens, pos+1)
+                    if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
+                    pos -= 1
+                    op_priority = -0.5
+                    pos, additional_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority, for_call=True)
+                    rets = resolve_call(file, impl, type, rets+additional_rets, op_token)
+                    continue
                 if rets or peek_text(tokens, pos+1)=="is": continue
                 candidates = list()
                 max_candidate_common_length = 0
@@ -1172,6 +1186,13 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                         candidates.append(var)
                 current_token.error("type", "not found field '"+pretty_name(current)+"'") 
             rets = [var]
+            if call_continuation:
+                pos, type = process_type(file, tokens, pos+1)
+                if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
+                pos -= 1
+                op_priority = -0.5
+                pos, additional_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority, for_call=True)
+                rets = resolve_call(file, impl, type, rets+additional_rets, op_token)
             continue
         elif op=="[":
             err_token = tokens[pos]
@@ -1199,6 +1220,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
 
             continue
         elif op_priority==-1:
+            op_token.error("syntax", "'->' has been deprecated")
             pos, type = process_type(file, tokens, pos+1)
             if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
             pos -= 1
@@ -1361,13 +1383,17 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                 continue
             get(tokens, prev_pos).error("syntax", "no matching comma or closing parenthesis")
         pos += 1 # skip closing parenthesis
-        if peek_text(tokens, pos)=="->" or peek_text(tokens, pos)=="[" or (peek_text(tokens, pos) in operators and for_call): return pos, ret  # manual left-to-right piping
+        if peek_text(tokens, pos)=="->" or peek_text(tokens, pos)=="." or peek_text(tokens, pos)=="[" or (peek_text(tokens, pos) in operators and for_call): return pos, ret  # manual left-to-right piping
         return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
     is_field = False
     while peek_text(tokens, pos+1) == ".":
         if current in impl.vars: break
         pos += 2
-        current += "__"+get(tokens, pos).text
+        peek = current+"__"+get(tokens, pos).text
+        if not any(v.startswith(peek) for v in impl.vars) and peek_text(tokens, pos+1)!="=":
+            pos -= 2
+            break
+        current = peek
         is_field = True
     var = impl.vars.get(current, None)
     

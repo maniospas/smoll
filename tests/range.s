@@ -1,10 +1,9 @@
 import "std/core.s"
-import "std/range.s" as range
+import "std/core/range.s" as range
 
 def main()
     r = range::range(10)
-    value = mut 0
-    while r->range::next(value)
+    while try value = mut r.range::next()
         print(value)
     value = value+1
     print(value)

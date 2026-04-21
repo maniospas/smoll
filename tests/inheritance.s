@@ -7,7 +7,7 @@ def sum(Point2D[] v)
     x = mut 0.0
     y = mut 0.0
     i = mut 0 
-    while i<v->len()
+    while i<v.len()
         x = x+v[i].x
         y = y+v[i].y
         i = i+1
@@ -18,7 +18,7 @@ def Point3D(float x, float y, float z)
     return (plane,class(z))
 
 def main()
-    points = (mut Point3D[])->alloc(10)
+    points = (mut Point3D[]).alloc 10
     points[0] = Point3D(1.0,2.0,3.0)
     points[1] = Point3D(1.0,2.0,3.0)
     sums = sum points@plane

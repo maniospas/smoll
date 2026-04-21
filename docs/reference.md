@@ -80,9 +80,11 @@ def main()
 
 ## calling notation
 
-Functions do not require parentheses and have only one
-argument. That argument can be a tuple of values, like below.
-Tuples are denoted by parentheses, inside which values are comma-separated.
+Functions are followed by their arguments in parantheses,
+although you can also omit the latter if they would end 
+at the end of the line. Arguments are comma-separated,
+like below. In general, commas within parentheses designate
+tuples.
 
 
 ```python
@@ -94,7 +96,7 @@ def main()
     print add(1,2)
 ```
 
-You can also use the `->` operator to pipe some data
+You can also use the `.` operator to pipe some data
 into the beginning of a function like below. This also
 works as a notation for calling functions like class 
 methods. In general, do try to avoid needless parentheses,
@@ -102,16 +104,14 @@ as the snippet below does (`f1 f2 ... args` is a chain of
 function calls). You can always refer to functions
 within namespaces.
 
-*Prefer this syntax only when differentiating between same-named definitions is important.*
-
 ```python
 import "std/core.s" as core
-import core::print
+import core::print  # import print symbol
 
 def main()
     x1 = 1
-    x2 = x1->core::add 1
-    print x2->core::add 2
+    x2 = x1.core::add 1
+    print x2.core::add 2
 ```
 
 ## mutability
@@ -160,7 +160,7 @@ def next(mut range r)
 
 def main()
     r = mut range(0,10)
-    r = r->next()  # see proper loops below (parenthesis needed to designate empty tuple)
+    r = r.next()  # see proper loops below (parenthesis needed to designate empty tuple)
     print r.pos
     print "\n"
     print add r # pos+end
@@ -447,7 +447,7 @@ any type's items:
 import "std/core.s"
 
 def print(any[] buffer)
-    print(buffer->len(), " elements in buffer\n")
+    print(len buffer, " elements in buffer\n")
 
 def main()
     x = mut float[]
@@ -459,7 +459,7 @@ we will see next how to work with abstract buffers.
 One of the most important features is the `alloc` function to
 allocate and zero-initialize a specific number of elements. This
 function returns the buffer itself to enable initialization per
-`buf = (mut float[])->alloc 4`. You can allocate a buffer of chars
+`buf = (mut float[]).alloc 4`. You can allocate a buffer of chars
 by not providing the mutable buffer decleration per `buf = alloc 4`.
 Make use of the `KB`, `MB`, `GB` functions to quickly size allocations.
 
@@ -486,7 +486,7 @@ import "std/core.s"
 
 def main()
     buf = mut float[]
-    buf->resize(10)
+    buf.resize(10)
     print buf[0]  # prints 0, as buffers are zero-initialized
     buf[1] = 1.0
     print buf[1]
@@ -512,8 +512,8 @@ pointed memory location cannot be modified per `ptr = buf[element]&`, and
 a `mut` pointer per `ptr = buf[element]&&`. 
 
 
-`ptr.` dereferences the pointers onto a local object. 
-For example, `ptr..field` gets a field from an object stored 
+`ptr..` dereferences pointers onto local objects. 
+For example, `ptr...field` gets a field from an object stored 
 in a pointer. On the other hand, move values onto pointed locations
 of mutable pointers per `ptr << value`.
 
@@ -533,16 +533,16 @@ valid to move data to their memory address. Below is an example.
 import "std/core.s"
 
 def main()
-    buf = (mut float[])->alloc(1)
+    buf = (mut float[]).alloc 1
     element = buf[0]&&
-    print element.  # prints 0 as buffers are zero-initialized
+    print element.. # prints 0 as buffers are zero-initialized
     element << 1.0
-    print element.  # prints 1 by dereferencing
+    print element.. # prints 1 by dereferencing
     print buf[0]    # prints 1 from the same memory 
 ```
 
 If, in he above example, a new line 
-`buf->rize(2)` was applied before the
+`buf.resize 2` was applied before the
 last two prints, `element` would become invalidated and would
 need to be re-obtained from the buffer.
 In general, try to work with buffers and only use pointers
@@ -565,9 +565,9 @@ import "std/core.s"
 import "std/array.s"
 
 def main()
-    buf = (mut nat[])->alloc(3)
+    buf = (mut nat[]).alloc 3
     buf[2] = 1
-    buf[2] >> buf->resize(2)
+    buf[2] >> mutlast buf.resize 2
     print buf[1]  # prints 1
 ```
 
@@ -635,7 +635,7 @@ import "std/core.s"
 import "std/array.s"
 
 def vector(nat size)
-    return (mut float[]) -> alloc(size)
+    return (mut float[]).alloc size
 
 def main()
     if not try v = vector pow(1024,6)

@@ -10,7 +10,6 @@ on any copyright. But derivative works and redistribution of the smoll
 transpiler should retain attribution and this license, as should
 redistributions of antcc for the relevant segments.
 
-
 smoll.py and executable
 =======================
 
@@ -32,6 +31,13 @@ std/ and test/ contents
 =======================
 
 CC0. This work has been marked as dedicated to the public domain.
+
+./antcc
+=======
+The included antcc compiler is a custom variation of the original,
+distibuted under the original's license below. Modifications focus on 
+adding several passes at -O2 optimization that better optimize C 
+transiplation by smoll.
 
 ./antcc
 =======

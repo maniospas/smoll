@@ -21,6 +21,7 @@ _2.5._ [defer](#defer)<br>
 
 **Section 3. Standard library**<br>
 _3.1._ [strings](#strings)<br>
+_3.2._ [lists](#lists)<br>
 
 # Section 1. Basic syntax
 

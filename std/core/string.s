@@ -44,6 +44,7 @@ def copy(charlist li, str other)
     prev_length = li.length + len other
     if prev_length >= len li.buffer
         li.buffer = li.buffer.resize(prev_length+prev_length/2+1)
+    li.length = prev_length
     return copy(li.buffer, prev_prev_length, other)
 
 

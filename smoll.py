@@ -331,6 +331,8 @@ class ImplementedType:
         if existing.type.builtin: self.implementation.extend([existing, CodeWord("="), value[0], CodeWord(";")])
 
     def get_assignment(self, from_name: str, to_name: list[str]):
+        assert isinstance(from_name, str)
+        assert isinstance(to_name, list)
         to_name = set(to_name)
         if from_name in to_name: return from_name
         graph = dict()
@@ -352,6 +354,9 @@ class ImplementedType:
         return None
 
     def returns(self, value: list[Variable], error_token: "Token"):
+        for v in value: 
+            if v.name in self.invalidated:
+                error_token.error("safety", "some returns have been invalidated", reason=self.invalidated[v.name])
         if self.has_returned_once and len(self.rets)!=len(value):
             error_token.error("type", "this value returned here is a different type than previous returns '"+signature_like([self.vars[ret] for ret in self.rets])+"' vs '"+signature_like(value)+"'")
         for pos, arg in enumerate(value):
@@ -398,6 +403,9 @@ class ImplementedType:
             raise FastReturnException
             
     def transpile(self) -> str:
+        #print(self.signature())
+        #for k,v in self.dependent_assignments.items():
+        #    print("  ", v, "->", k)
         self.simplify()
         ret_body_start = ""
         ret_body_end = ""
@@ -687,6 +695,11 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     prefix = longest_common_prefix(callee.rets)
     prefix_length = len(prefix)
     #print(impl.name, callee.name, prefix, callee.rets)
+    
+    for ret in callee.rets+callee.args:
+        for argpos, arg in enumerate(callee.args):
+            if callee.get_assignment(ret, [arg]):
+                impl.dependent_assignments[tmp+"__"+ret[prefix_length:]] = vars[argpos].name
 
     for ret_pos, ret in enumerate(callee.rets):
         varname = tmp+"__"+ret[prefix_length:]
@@ -1924,9 +1937,9 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
                     if impl.vars[ret_name].type==POINTER_TYPE:
                         found_ptr_type = arg_type.get_pointer_type(arg_type.vars[ret])
                         if found_ptr_type is not None and found_ptr_type!=ANY_TYPE: impl.set_pointer_type(impl.vars[ret_name], found_ptr_type)
-                        else:
-                            dep = arg_type.follow_pointer_dependency(arg_type.vars[ret])
-                            if dep is not None: impl.set_pointer_depedency(dep.renamed_copy(arg_name+"__"+dep.name))
+                        #else:
+                        #    dep = arg_type.follow_pointer_dependency(arg_type.vars[ret])
+                        #    if dep is not None: impl.set_pointer_depedency(dep.renamed_copy(arg_name+"__"+dep.name[prefix_len:]))
             found_type: UnionType = file.types.get(impl.name)
             already_parsed = None
             if found_type is not None:

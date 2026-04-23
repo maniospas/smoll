@@ -24,49 +24,8 @@ import platform
 import urllib.request
 from pathlib import Path
 from collections import deque
+from utils import *
 
-RED   = "\033[31m"
-GREEN = "\033[32m"
-YELLOW= "\033[33m"
-PURPLE= "\033[35m"
-RESET = "\033[0m"
-symbols = "=\\/+-*@<>!%&#!(){}[]:.',;|"
-END_TOKEN = "...]" # impossible for something else to be tokenized as this
-START_TOKEN = "[..." # impossible for something else to be tokenized as this
-err_code_table: dict[str,int] = dict()
-err_code_table["success"] = 0
-debug_mode = True
-repositories: dict[str, str] = dict()
-
-class CompfailException(Exception): pass
-class FastReturnException(Exception): pass
-
-def pretty_name(name: str):
-    return name.replace("__", ".")
-
-temps: list[str]= list()
-def create_temp():
-    temp = "__temp"+str(len(temps))+"v"
-    temps.append(temp)
-    return temp
-
-def longest_common_prefix(strings: list[str]) -> str:
-    if not strings: return ""
-    strings.sort()
-    first, last = strings[0], strings[-1]
-    i = 0
-    while i < len(first) and first[i] == last[i]: i += 1
-    return first[:i]
-
-class CodeSegment:
-    def tostring(self): return ""
-    def copy(self, prefix: str): return self
-    def is_temp(self): return False
-
-class CodeWord(CodeSegment):
-    def __init__(self, name: str): self.name = name
-    def tostring(self): return self.name
-    def copy(self, prefix: str): return self
 
 class Variable(CodeSegment):
     def __init__(self, name: str, type: "ImplementedType", immutable: bool=True, isprivate: bool=False):
@@ -163,6 +122,121 @@ class ImplementedType:
         self.fast_return_exception = False
         self.has_been_completed = False
 
+    def simplify(self):
+        label_usage: dict[str, int] = dict()
+        variable_sets: dict[str, int] = dict()
+
+        # remove final return goto
+        if len(self.implementation)>=3 and self.implementation[-3].tostring()=="goto" and self.implementation[-2].tostring()=="__temp_return":
+            assert self.implementation[-1].tostring()==";"
+            self.implementation = self.implementation[:-3]
+
+        # remove goto next label, otherwise count label usage, and count variable modifications
+        new_implementation = list()
+        pos = -1
+        while pos<len(self.implementation)-1:
+            pos += 1
+            v = self.implementation[pos]
+            text = v.tostring()
+            if text in ["=", "&"] and pos:
+                var = self.implementation[pos-1].tostring()
+                variable_sets[var] = variable_sets.get(var, 0)+1
+            if text=="goto" and pos<len(self.implementation)-2:
+                label = self.implementation[pos+1].tostring()
+                assert self.implementation[pos+2].tostring()==";"
+                if pos<len(self.implementation)-4 and self.implementation[pos+3].tostring()==label:
+                    assert self.implementation[pos+4].tostring()==":"
+                    pos += 1 # skip the goto statement
+                    continue
+                label_usage[label] = label_usage.get(label,0)+1
+            new_implementation.append(v)
+        self.implementation = new_implementation
+
+        # remove variables that are set only once, unless those are args or returned
+        for var in self.rets: variable_sets[var] = variable_sets.get(var, 0)+2
+        for var in self.args: variable_sets[var] = variable_sets.get(var, 0)+2
+        for var in self.returned_defers:
+            if isinstance(var, Variable): variable_sets[var.name] = variable_sets.get(var.name, 0)+2
+        substitute: dict[str,Variable] = dict()
+
+        for var, val in list(self.vars.items()):
+            if var.startswith("__temp") and "____" in var and var not in substitute and var not in self.args and var not in self.rets:
+                val = val.renamed_copy(create_temp())
+                substitute[var] = val
+                self.vars[val.name] = val
+
+        def count(impl):
+            pos = -1
+            while pos<len(impl)-1:
+                pos += 1
+                v = impl[pos]
+                text = v.tostring() 
+                if text=="=" and pos and pos<len(self.implementation)-2 and impl[pos+2]==";":
+                    var = impl[-1].tostring()
+                    rhs = impl[1].tostring()
+                    if veriable_sets.get(var,0)==1 and rhs in self.vars:
+                        substitute[var] = substitute.get(rhs, impl[1])
+        count(self.implementation)
+        
+        def rename(impl):
+            new_implementation = list()
+            pos = -1
+            while pos<len(impl)-1:
+                pos += 1
+                v = impl[pos]
+                text = v.tostring() 
+                new_implementation.append(substitute.get(text, v))
+            return new_implementation
+
+        self.implementation = rename(self.implementation)
+        self.defers = [rename(defer) for defer in self.defers]
+        self.returned_defers = [rename(defer) for defer in self.returned_defers]
+
+        def remove_noop(impl):
+            new_implementation = list()
+            pos = -1
+            while pos<len(impl)-1:
+                pos += 1
+                if pos<len(impl)-3 and impl[pos+1].tostring()=="=" and impl[pos].tostring()==impl[pos+2].tostring() and impl[pos+3].tostring()==";":
+                    pos += 3
+                    continue
+                new_implementation.append(impl[pos])
+            return new_implementation
+
+        self.implementation = remove_noop(self.implementation)
+        self.defers = [remove_noop(defer) for defer in self.defers]
+        self.returned_defers = [remove_noop(defer) for defer in self.returned_defers]
+
+
+        # pos = -1
+        # while pos<len(self.implementation)-1:
+        #     pos += 1
+        #     v = self.implementation[pos]
+        #     text = str(v)
+        #     if text=="goto":
+        #         label = str(self.implementation[pos+1])
+        #         label_usage[label] = label_usage.get(label,0)+1
+        #     if isinstance()
+
+        # pos = -1
+        # while pos<len(self.implementation)-1:
+        #     if text==":" and pos>=2 and str(self.implementation[pos-2] in "{};"):
+        #     pos += 1
+
+        varset: set[str] = set()
+        for v in self.args: varset.add(v)
+        for v in self.rets: varset.add(v)
+        for v in self.implementation:
+            if isinstance(v, Variable): varset.add(v.name)
+        for defer in self.defers:
+            for v in defer:
+                if isinstance(v, Variable): varset.add(v.name)
+        for defer in self.returned_defers:
+            for v in defer:
+                if isinstance(v, Variable): varset.add(v.name)
+        self.vars = {k:v for k,v in self.vars.items() if k in varset}
+
+
     def set_pointer_type(self, var: Variable, type: "ImplementedType"):
         assert var.type == POINTER_TYPE
         assert var.name not in self._pointer_type_dependencies
@@ -192,8 +266,14 @@ class ImplementedType:
     def memory_size(self):
         if self.builtin: return self._memory_size
         ret = self._memory_size
-        for arg in self.args: 
+        i = 0
+        while i<len(self.args):
+            arg = self.args[i]
+            # if self.vars[arg].type.is_buffer_of: 
+            #     i += 4
+            #     continue
             if self.vars[arg].type.builtin: ret += self.vars[arg].type.memory_size()
+            i += 1
         return ret
 
     def signature(self):
@@ -204,11 +284,11 @@ class ImplementedType:
     def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True):
         if len(value)==0: error_token.error("type", "no expression value to assign to variable '"+varname+"'")
         if len(value)>1:
+            common_prefix = longest_common_prefix([var.name for var in value])
+            len_common_prefix = len(common_prefix)
             if top_entry and "__" in varname and not varname.startswith("__temp"):
                 if not any(v.startswith(varname) for v in self.vars.keys()):
                     error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'")
-            common_prefix = longest_common_prefix([var.name for var in value])
-            len_common_prefix = len(common_prefix)
             for var in value: self.assign(varname+"__"+var.name[len_common_prefix:], [var], error_token, perform_immutability_checks, False)
             return None
             error_token.error("type", "cannot assign more than one values to variable '"+varname+"'")
@@ -317,9 +397,8 @@ class ImplementedType:
             self.has_returned_once = True
             raise FastReturnException
             
-            
-
     def transpile(self) -> str:
+        self.simplify()
         ret_body_start = ""
         ret_body_end = ""
         arg_code = ""
@@ -364,7 +443,8 @@ class ImplementedType:
             elif tok=="{": ret += "{\n  "
             elif tok=="}": ret += "}\n  "
             else: ret += tok
-        if ret_body_end: ret += "__temp_return:\n  "
+        if any(token.tostring()=="__temp_return" for token in self.implementation):
+            if ret_body_end: ret += "__temp_return:\n  "
         # apply defers that are applied on success mode
         defer_ret = ""
         for defer in reversed(self.defers):
@@ -380,12 +460,12 @@ class ImplementedType:
         # set return values if needed
         ret += ret_body_end
         if self.needs_failure_mode:
-            ret += "\n  goto __temp_final;" # skip failure handling
+            #ret += "\n  goto __temp_final;" # skip failure handling
             ret += "\n  __temp_failure:"
             # TODO: here we place all the defers that are applied only when there is a need to invalidate returns
             # TODO: may such defers will never be needed
             # then we move to the last defers
-            ret += "\n  __temp_final:"
+            #ret += "\n  __temp_final:"
             ret += defer_ret
             ret += "\n  return __temp_errcode;\n}"
         else: 
@@ -500,7 +580,7 @@ def match_structure_with(x: ImplementedType, y: ImplementedType):
         #if x.vars[rx].isprivate!=y.vars[ry].isprivate: return False
     return True
 
-def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
+def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
     available_types: list[ImplementedType] = list()
     for variation in method.variations:
         if len(variation.args)!=len(vars): continue
@@ -538,6 +618,10 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         error_token.error("type", "more than one conflicting call '"+method.name+"("+signature_like(vars, impl)+")'", suggestions=[t.signature() for t in available_types])
 
     callee: ImplementedType = available_types[0]
+    return callee
+
+def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
+    callee = _select_call(file, impl, method, vars, error_token)
     # first check for pointer mismatches (this is a safety error)
     for varpos, var in enumerate(vars):
         if var.type!=POINTER_TYPE: continue # so we know for a fact that
@@ -600,9 +684,12 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     # corresponding input buffer type - we will do so by detecting pointers attached to buffers,
     # which have a known structure, with the pointers as the first argument.
 
+    prefix = longest_common_prefix(callee.rets)
+    prefix_length = len(prefix)
+    #print(impl.name, callee.name, prefix, callee.rets)
 
     for ret_pos, ret in enumerate(callee.rets):
-        varname = tmp+"__"+ret
+        varname = tmp+"__"+ret[prefix_length:]
         original = callee.vars[ret]
         variable = original.renamed_copy(varname)
         impl.vars[varname] = variable
@@ -679,7 +766,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 continue
             v_name = v.tostring()
             if v_name in callee.rets:
-                new_defer.append(impl.vars[tmp+"__"+v_name]) # we have already created this
+                new_defer.append(impl.vars[tmp+"__"+v_name[prefix_length:]]) # we have already created this
                 continue
             new_v = v.renamed_copy(secondary_tmp+"__"+v_name)
             new_defer.append(new_v)
@@ -697,6 +784,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     new_vars = list()
     prefix = create_temp()+"__"
     progress = 0
+    skip = 0
     for ret_name in pointer_type.rets:
         r_var = pointer_type.vars[ret_name].renamed_copy(prefix+ret_name)
         new_vars.append(r_var)
@@ -763,13 +851,19 @@ def find_unique_variations(variations: list[ImplementedType]):
     return all_found
 
 
-def create_buffer_type(name, memory_size, variation):
+def create_buffer_type(name, memory_size, variation, error_token):
     actual_variation = ImplementedType(name)
     actual_variation.is_buffer_of = variation
     type_arg = create_temp()+actual_variation.name
-    for varg in variation.rets:
+    i = 0
+    while i<len(variation.rets):
+        varg = variation.rets[i]
+        # if variation.vars[varg].type.is_buffer_of:
+        #     i += 4
+        #     continue
         if variation.vars[varg].type == POINTER_TYPE:
-            tokens[pos].error("safety", "cannot place pointer field '"+pretty_name(varg)+"' onto a buffer", reason=variation.at)
+            error_token.error("safety", "cannot place a pointer '"+pretty_name(varg)+"' onto a buffer", reason=variation.at)
+        i += 1
     actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=True, isprivate=False)
     actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
     actual_variation.vars["unsafe_size"] = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
@@ -824,7 +918,7 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
                 for variation in find_unique_variations(type.variations):
                     variation_buffer_type = buffer_types.get(type, None)
                     if variation_buffer_type is None:
-                        actual_variation = create_buffer_type(buffer_type.name+"__buffer", str(variation.memory_size()), variation)
+                        actual_variation = create_buffer_type(buffer_type.name+"__buffer", str(variation.memory_size()), variation, get(tokens, pos))
                         variation_buffer_type = UnionType(buffer_type.name+"__temp_buffer")
                         variation_buffer_type.append(actual_variation)
                         buffer_types[variation] = variation_buffer_type
@@ -919,7 +1013,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority=0) # don't touch rets
             pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
             if op_name ==">>": ret, rets = rets, ret
-            if len(rets)!=1: err_token.error("type", "can not apply '"+op_name+"' to non-pointer '"+signature_like(rets)+"'")
+            if len(rets)!=1: err_token.error("type", "cannot apply '"+op_name+"' to non-pointer '"+signature_like(rets)+"'")
             var = rets[0]
             if var is not None and var.isprivate: err_token.error("type", "cannot set to immutable class field: '"+pretty_name(current)+"'")
             if var is None: err_token.error("type", "can only set a value to an existing pointer with '"+op_name+"' but found '"+signature_like(rets)+"'")
@@ -1105,7 +1199,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 new_name = associated_type.rets[j][associated_len_common_prefix:]
                 temp_type.rets.append(new_name)
                 temp_type.vars[new_name] = associated_type.vars[associated_type.rets[j]].renamed_copy(new_name)
-            temp_buffer_type = create_buffer_type(temp_type.name+"@"+field_name, "0", temp_type)
+            temp_buffer_type = create_buffer_type(temp_type.name+"@"+field_name, "0", temp_type, field_token)
             for var in rets:
                 prev_name = var.name
                 new_name = varname+"__"+var.name[len_common_prefix:]
@@ -1820,8 +1914,9 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
                     impl.args.append(arg_name)
                     if arg_type==POINTER_TYPE: impl.set_pointer_type(impl.vars[arg_name], ANY_TYPE)
                     continue
+                prefix_len = len(longest_common_prefix(arg_type.rets))
                 for ret in arg_type.rets:
-                    ret_name = arg_name+"__"+ret  if len(arg_type.rets)>1 else arg_name
+                    ret_name = arg_name+"__"+ret[prefix_len:]  if len(arg_type.rets)>1 else arg_name
                     impl.vars[ret_name] = arg_type.vars[ret].renamed_copy(ret_name)
                     if immutable==0: impl.vars[ret_name] = impl.vars[ret_name].mutable_copy(tokens[pos])
                     elif immutable==-1: impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()

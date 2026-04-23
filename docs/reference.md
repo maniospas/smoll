@@ -458,9 +458,9 @@ def main()
 Most buffer features are implemented in the standard library's core
 we will see next how to work with abstract buffers.
 One of the most important features is the `alloc` function to
-allocate and zero-initialize a specific number of elements. This
-function returns the buffer itself to enable initialization per
-`buf = (mut float[]).alloc 4`. You can allocate a buffer of chars
+allocate and zero-initialize a specific number of elements. 
+This returns the buffer itself to enable initialization per patterns like
+`buf = (mut float[]).alloc 4`. Allocate a buffer of chars
 by not providing the mutable buffer decleration per `buf = alloc 4`.
 Make use of the `KB`, `MB`, `GB` functions to quickly size allocations.
 

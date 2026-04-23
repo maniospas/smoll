@@ -29,6 +29,20 @@ def alloc(mut any[] buffer, nat size)
     buffer.unsafe_ptr.unsafe::zero(0, bytes)
     return buffer
 
+# def new(const any[] buffer, nat size)
+#     ret = any[]
+#     ret.unsafe_align = buffer.unsafe_align
+#     bytes = ret.unsafe_align*size
+#     ret.unsafe_size = size
+#     ret.unsafe_ptr = unsafe_mut unsafe::alloc(bytes)
+#     ret.unsafe_ptr.unsafe::zero(0, bytes)
+#     ret.unsafe_ptr = unsafe_mut ret.unsafe_ptr.compiler::attach_type(buffer.unsafe_ptr)
+#     defer
+#         if ret.unsafe_size!=0
+#             ret.unsafe_size = 0
+#             ret.unsafe_ptr.unsafe::free()
+#     return ret
+
 def resize(mut any[] buffer, nat size)
     if buffer.unsafe_size==size 
         return buffer

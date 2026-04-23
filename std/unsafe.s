@@ -13,8 +13,8 @@ def realloc(any ptr allocated__unsafe_ptr, nat bytes) # the __unsafe_ptr suffix 
         fail "reallocation failed"
     return new_allocated.compiler::attach_type(allocated__unsafe_ptr)
 
-def free(any ptr allocated)
-    {if(allocated)free(allocated);allocated=0;}
+def free(mut any ptr allocated)
+    {if(allocated)free(allocated);} # automatically set to zero because it's a returned invalidated variable
     INVALIDATE compiler::ptr
 
 def zero(any ptr allocated, nat from, nat to)

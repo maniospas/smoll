@@ -1,8 +1,11 @@
 local import "std/core.s"
 local import "std/core/array.s"
 
-def str(const char[] buf, nat pos, nat length, char first)
-    return (buf, pos, length, first)
+def strdat(nat pos, nat length, char first)
+    return (pos, length, first)
+
+def str(const char[] buf, strdat dat)
+    return (buf, dat)
 
 def str(const char[] buf, nat pos, nat length)
     if length!=0
@@ -17,16 +20,16 @@ def str(cstr c)
     return str(buf,0,length)
 
 def len(str s)
-    return s.length
+    return s.dat.length
 
 def copy(char[] buf, mut nat pos, str other)
     next_pos = pos+len other
     if next_pos>= len buf
         fail "string buffer out of memory"
-    {memcpy(((char*)buf__unsafe_ptr)+pos, ((char*)other__buf__unsafe_ptr)+other__pos, other__length*sizeof(char));}
+    {memcpy(((char*)buf__unsafe_ptr)+pos, ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
     prev_pos = const pos
     pos = next_pos
-    return str(buf, prev_pos, other.length, other.first)
+    return str(buf, prev_pos, other.dat.length, other.dat.first)
 
 def copy(char[] buf, mut nat pos, cstr other)
     return copy(buf, pos, str other)
@@ -34,7 +37,7 @@ def copy(char[] buf, mut nat pos, cstr other)
 def print(str s, cstr|blank endl)
     if endl is blank
         endl = "\n"
-    {printf("%.*s%s", (int)s__length, s__pos+(const char*)s__buf__unsafe_ptr, endl);}
+    {printf("%.*s%s", (int)s__dat__length, s__dat__pos+(const char*)s__buf__unsafe_ptr, endl);}
 
 local def charlist()
     return list mut char[]

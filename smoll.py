@@ -369,8 +369,7 @@ class ImplementedType:
         for i in range(len(self.rets)):
             for j in range(i+1,len(self.rets)):
                 if self.rets[i]==self.rets[j]: error_token.error("safety", "cannot return the same variable multiple times; conflict for '"+pretty_name(self.rets[i])+"'")
-        if not self.has_returned_once:
-            # it is invariant that matching types match what is being returned
+        if True:
             to_remove = list()
             for defer in self.defers:
                 orignal_defer = defer
@@ -406,6 +405,8 @@ class ImplementedType:
         #print(self.signature())
         #for k,v in self.dependent_assignments.items():
         #    print("  ", v, "->", k)
+        #print(len(self.defers))
+        #print(len(self.returned_defers))
         self.simplify()
         ret_body_start = ""
         ret_body_end = ""

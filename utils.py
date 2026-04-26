@@ -27,6 +27,7 @@ repositories: dict[str, str] = dict()
 
 class CompfailException(Exception): pass
 class FastReturnException(Exception): pass
+class FatalException(Exception): pass
 
 def pretty_name(name: str):
     return name.replace("__", ".")

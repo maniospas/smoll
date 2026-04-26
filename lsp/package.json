@@ -1,0 +1,30 @@
+{
+  "name": "smoll-lsp",
+  "displayName": "smoll",
+  "version": "0.0.1",
+  "engines": { "vscode": "^1.75.0" },
+  "categories": ["Programming Languages"],
+  "activationEvents": ["onLanguage:smoll"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [{
+      "id": "smoll",
+      "extensions": [".s"],
+      "configuration": "./language-configuration.json"
+    }]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.0.0"
+  }
+}

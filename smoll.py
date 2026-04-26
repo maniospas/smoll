@@ -26,6 +26,17 @@ from pathlib import Path
 from collections import deque
 from utils import *
 
+def print_lsp_keyword(tok, description: str):
+    print("---")
+    print("keyword")
+    print(os.path.abspath(tok.file.path))
+    print(tok.row)
+    print(tok.col)
+    print(len(tok.text))
+    print(os.path.abspath(tok.file.path))
+    print(tok.row)
+    print(tok.col)
+    print(description)
 
 class Variable(CodeSegment):
     def __init__(self, name: str, type: "ImplementedType", immutable: bool=True, isprivate: bool=False):
@@ -483,9 +494,10 @@ class ImplementedType:
         return ret
 
 class UnionType:
-    def __init__(self, name):
+    def __init__(self, name, at:"Token"=None):
         self.name = name
         self.variations: list[ImplementedType] = list()
+        self.at = at
 
     def append(self, variation: ImplementedType):
         self.variations.append(variation)
@@ -627,6 +639,23 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         error_token.error("type", "more than one conflicting call '"+method.name+"("+signature_like(vars, impl)+")'", suggestions=[t.signature() for t in available_types])
 
     callee: ImplementedType = available_types[0]
+
+    if is_lsp and error_token.file.is_main_file:
+        at = callee.at if callee.at else error_token
+        print("---")
+        # position in processed file
+        print("function")
+        print(os.path.abspath(error_token.file.path))
+        print(error_token.row)
+        print(error_token.col)
+        print(len(error_token.text))
+        # defined at
+        print(os.path.abspath(at.file.path))
+        print(at.row)
+        print(at.col)
+        # message (may span multiple lines))
+        print(callee.signature()+"\n"+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+
     return callee
 
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
@@ -925,15 +954,16 @@ def process_type(file: File, tokens: list[Token], pos: int) -> tuple[int, File|U
             if file==tokens[pos].file: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=candidates)
             tokens[pos].error("type", "unknown type '\""+file.path+"\"::"+pretty_name(name)+"'", suggestions=candidates)
         if peek_text(tokens, pos+1)=="[":
-            if get(tokens, pos+2).text!="]": get(tokens, pos+1).error("syntax", "to denote a buffer type use '[]'")
+            at_pos = get(tokens, pos+1)
+            if get(tokens, pos+2).text!="]": at_pos.error("syntax", "to denote a buffer type use '[]'")
             buffer_type = buffer_types.get(type, None)
             if buffer_type is None:
-                buffer_type = UnionType(type.name+"__temp_buffer")
+                buffer_type = UnionType(type.name+"__temp_buffer", at=get(tokens, pos+1))
                 for variation in find_unique_variations(type.variations):
                     variation_buffer_type = buffer_types.get(type, None)
                     if variation_buffer_type is None:
                         actual_variation = create_buffer_type(buffer_type.name+"__buffer", str(variation.memory_size()), variation, get(tokens, pos))
-                        variation_buffer_type = UnionType(buffer_type.name+"__temp_buffer")
+                        variation_buffer_type = UnionType(buffer_type.name+"__temp_buffer", at=at_pos)
                         variation_buffer_type.append(actual_variation)
                         buffer_types[variation] = variation_buffer_type
                     buffer_type.variations.extend(variation_buffer_type.variations)
@@ -954,7 +984,7 @@ def process_linear_type(file: File, tokens: list[Token], pos: int) -> tuple[int,
     if peek_text(tokens, pos) == "|":
         prev_pos = pos
         pos, alternatives = process_linear_type(file, tokens, pos+1)
-        ret = UnionType(type.name+"|"+alternatives.name)
+        ret = UnionType(type.name+"|"+alternatives.name, at=get(tokens, prev_pos))
         ret.variations.extend(type.variations)
         ret.variations.extend(alternatives.variations)
         ret.variations = list(set(ret.variations))
@@ -1273,12 +1303,13 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 current_prefix = current+"__"
                 rets = [r for r in rets if r.name.startswith(current_prefix)]
                 if rets and call_continuation:
+                    call_token = get(tokens,pos+1)
                     pos, type = process_type(file, tokens, pos+1)
                     if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
                     pos -= 1
                     op_priority = -0.5
                     pos, additional_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority, for_call=True)
-                    rets = resolve_call(file, impl, type, rets+additional_rets, op_token)
+                    rets = resolve_call(file, impl, type, rets+additional_rets, call_token)
                     continue
                 if rets or peek_text(tokens, pos+1)=="is": continue
                 candidates = list()
@@ -1423,10 +1454,12 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.implementation.extend([variable, CodeWord("="), CodeWord(current), CodeWord(";")])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current=="mut":
+        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "declares that the following value will be treated as mutable (fields and pointer contents may modified) - creates an error if the conversion to mutable is unsafe")
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(tokens[prev_pos]) for r in ret], current_operator_priority)
     if current=="try":
+        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "tries to execute the rest of the statement without failing this function too on errors; the result is a true or false boolean value, depending on whether an error occurred or not")
         tmp = create_temp()
         var = Variable(tmp, BOOL_TYPE)
         impl.vars[tmp] = var
@@ -1445,10 +1478,12 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         ])
         return pos, [var]
     if current=="unsafe_mut":
+        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "declares that the following value will be treated as mutable, even if that is unsafe (fields and pointer contents may modified) - does NOT create an error if the conversion to mutable is unsafe")
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(None) for r in ret], current_operator_priority)
     if current=="const":
+        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "declares that the following value will be treated as fully immatuble (it cannot be the reason why fields and pointer contents are modified)")
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.immutable_copy() for r in ret], current_operator_priority)
     if current == "INVALIDATE":
@@ -1607,6 +1642,8 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             pos += 1
             continue
         if name.text=="return":
+            if is_lsp and name.file.is_main_file: 
+                print_lsp_keyword(name, "returns from the current function immediately - function returns form a type")
             if impl.is_parsing_a_defer: name.error("safety", "cannot return within a 'defer'")
             #if impl.fast_return_exception and not impl.nesting and not impl.has_returned_once: 
             #    name.error("safety", "the first return must occur conditionally in recursive functions: 'rec "+impl.name+"'")
@@ -1620,11 +1657,15 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             message = get(tokens, pos)
             pos += 1
             print(impl.name+":", message.text)
+            if is_lsp and name.file.is_main_file: 
+                print_lsp_keyword(name, "prints a debug message once this position is reached during compilation:\n"+message.text)
             continue
         if name.text=="debug_type":
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
             pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
             print(impl.name+":", signature_like(ret, impl))
+            if is_lsp and name.file.is_main_file: 
+                print_lsp_keyword(name, "prints this inferred type when this position is reached during compilation:\n"+signature_like(ret, impl))
             continue
         if name.text=="del":
             # if impl.has_returned_once: name.error("safety", "cannot 'del' if you have already returned")
@@ -1840,17 +1881,17 @@ def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
         file.types[name] = imported
         if is_local: 
             for variation in importer.varitations: file.localdefs.add(variation)
-        return pos
+        return pos, imported
     assert isinstance(imported, File)
     if as_mode:
         if name in file.namespaces: name_token.error("import", "cannot overwrite existing namespace '"+name+"'")
         file.namespaces[name] = imported
         if is_local: file.localdefs.add(imported)
-        return pos
+        return pos, imported
     for type_name, type_value in imported.types.items():
         existing = file.types.get(type_name, None)
         if existing is not None:
-            new_type = UnionType(type_name)
+            new_type = UnionType(type_name, at=name_token)
             new_type.variations.extend(existing.variations)
             new_type.variations.extend(type_value.variations)
             new_type.variations = list(set(new_type.variations))
@@ -1863,7 +1904,7 @@ def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
         if existing is not None and existing!=namespace_value: name_token.error("import", "cannot overwrite existing type '"+name+"'")
         if is_local: file.localdefs.add(namespace_value)
         file.namespaces[namespace_name] = namespace_value
-    return pos
+    return pos, imported
 
 def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception: bool, is_local: bool):
     start_token = get(tokens, pos)
@@ -1964,7 +2005,7 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
             #if not impl.force_not_inline and fast_return_exception: continue # register only forcefully RECURSIVE variations
             #make a union type to store the implementation if one does not already exist
             if found_type is None:
-                found_type = UnionType(impl.name)
+                found_type = UnionType(impl.name, at=start_token)
                 file.types[impl.name] = found_type
             if already_parsed is not None:
                 for a in impl.__dict__:
@@ -1986,7 +2027,7 @@ def process_union(file: File, tokens: list[Token], pos: int):
     pos += 1
     if get(tokens,pos).text!="=": tokens[pos].error("syntax", "expecting '='")
     pos += 1
-    union_type = UnionType(union_name)
+    union_type = UnionType(union_name, at=start_token)
     while True:
         pos, variation = process_type(file, tokens, pos)
         union_type.variations.extend(variation.variations)
@@ -2005,9 +2046,15 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
         tok = tokens[i]
         is_local = tok.text=="local"
         if is_local:
+            if is_lsp and tok.file.is_main_file: 
+                print_lsp_keyword(tok, "the next import or definition has local visibility (does not affect files importing this file)")
             i += 1
             tok = get(tokens, i)
         if tok.text=="def" or tok.text=="rec": 
+            if is_lsp and tok.file.is_main_file: 
+                if tok.text=="def": print_lsp_keyword(tok, "defines a function that takes into account all previous definitions - its return forms a type")
+                if tok.text=="rec": print_lsp_keyword(tok, "defines a recursive function that can take into account later definitions in this file")
+            
             has_made_def = True
             first_def_tok = tok
             if peek_text(tokens, i+2)=="=": 
@@ -2027,11 +2074,36 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
                 i = pos_end+1
         elif tok.text=="import": 
             if has_made_def: tok.error("safety", "can only import before the file's first definition", reason=first_def_tok, raason_message="first definition at")
-            i = process_import(file, tokens, i, is_local=is_local)
+            defname = get(tokens, i+1)
+            i, imported = process_import(file, tokens, i, is_local=is_local)
+            if is_lsp and tok.file.is_main_file:
+                print_lsp_keyword(tok, "imports a namespace or function")
+                print("---")
+                # position in processed file
+                print("namespace") # type of token: namespace, string, keyword, function, variable
+                print(os.path.abspath(defname.file.path))
+                print(defname.row)
+                print(defname.col)
+                endtok = get(tokens,i-1)
+                assert endtok.row==defname.row
+                print(endtok.col-defname.col+len(endtok.text)) # token length
+                # defined at
+                if isinstance(imported, File):
+                    print(os.path.abspath(imported.path))
+                    print(1)
+                    print(1)
+                else:
+                    print(os.path.abspath(imported.at.file.path))
+                    print(imported.at.row)
+                    print(imported.at.col)
+                # message (may span multiple lines))
+                print("imported - ctrl+click to go to activation")
         elif tok.text=="repo":
             if is_local: tok.error("syntax", "cannot declare a repo as 'local'")
             if has_made_def: tok.error("safety", "can declare repos before the file's first definition", reason=first_def_tok, raason_message="first definition at")
             i = process_repo(file, tokens, i)
+            if is_lsp and tok.file.is_main_file:
+                print_lsp_keyword(tok, "defines an online resource to be accessed as if it were a local path prefix")
         else: tok.error("syntax", "expecting  'def', 'repo', or 'import' but found '"+str(tok.text)+"'")
     # second pass: process the rest of functions (skip other syntax stuff)
     i = 0
@@ -2045,7 +2117,7 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
     file.namespaces = {k:v for k,v in file.namespaces.items() if v not in file.localdefs}
     new_types = dict()
     for k,v in file.types.items():
-        u = UnionType(v.name)
+        u = UnionType(v.name, at=v.at)
         for variation in v.variations:
             if variation not in file.localdefs:
                 u.variations.append(variation)
@@ -2225,22 +2297,24 @@ SAME_CONTENTS_TYPE.set_pointer_type(SAME_CONTENTS_TYPE.vars["from"], ANY_TYPE)
 SAME_CONTENTS_TYPE.set_pointer_depedency(SAME_CONTENTS_TYPE.vars["to"], SAME_CONTENTS_TYPE.vars["from"])
 
 smol_namespace = File("builtins")
-smol_namespace.types["cstr"] = UnionType("cstr").append(CSTR_TYPE)
-smol_namespace.types["int"] = UnionType("int").append(INT_TYPE)
-smol_namespace.types["nat"] = UnionType("nat").append(UINT_TYPE)
-smol_namespace.types["float"] = UnionType("float").append(FLOAT_TYPE)
-smol_namespace.types["bool"] = UnionType("bool").append(BOOL_TYPE)
-smol_namespace.types["err"] = UnionType("err").append(ImplementedType("err", "int"))
-smol_namespace.types["blank"] = UnionType("blank").append(ImplementedType("void"))
-smol_namespace.types["char"] = UnionType("char").append(CHAR_TYPE)
-smol_namespace.types["any"] = UnionType("any").append(ANY_TYPE)
+builtin_token = Token("builtina", smol_namespace, 1, 1)
+smol_namespace.types["cstr"] = UnionType("cstr", at=builtin_token).append(CSTR_TYPE)
+smol_namespace.types["int"] = UnionType("int", at=builtin_token).append(INT_TYPE)
+smol_namespace.types["nat"] = UnionType("nat", at=builtin_token).append(UINT_TYPE)
+smol_namespace.types["float"] = UnionType("float", at=builtin_token).append(FLOAT_TYPE)
+smol_namespace.types["bool"] = UnionType("bool", at=builtin_token).append(BOOL_TYPE)
+smol_namespace.types["err"] = UnionType("err", at=builtin_token).append(ImplementedType("err", "int"))
+smol_namespace.types["blank"] = UnionType("blank", at=builtin_token).append(ImplementedType("void"))
+smol_namespace.types["char"] = UnionType("char", at=builtin_token).append(CHAR_TYPE)
+smol_namespace.types["any"] = UnionType("any", at=builtin_token).append(ANY_TYPE)
 
 fixed_namespace = File("compiler")
-fixed_namespace.types["skipdef"] = UnionType("skipdef").append(FAIL_TYPE)
-fixed_namespace.types["true"] = UnionType("true").append(TRUE_TYPE)
-fixed_namespace.types["false"] = UnionType("false").append(FALSE_TYPE)
-fixed_namespace.types["ptr"] = UnionType("ptr").append(POINTER_TYPE)
-fixed_namespace.types["attach_type"] = UnionType("attach_type").append(SAME_CONTENTS_TYPE)
+compiler_token = Token("compiler", fixed_namespace, 1, 1)
+fixed_namespace.types["skipdef"] = UnionType("skipdef", at=compiler_token).append(FAIL_TYPE)
+fixed_namespace.types["true"] = UnionType("true", at=compiler_token).append(TRUE_TYPE)
+fixed_namespace.types["false"] = UnionType("false", at=compiler_token).append(FALSE_TYPE)
+fixed_namespace.types["ptr"] = UnionType("ptr", at=compiler_token).append(POINTER_TYPE)
+fixed_namespace.types["attach_type"] = UnionType("attach_type", at=compiler_token).append(SAME_CONTENTS_TYPE)
 smol_namespace.namespaces["compiler"] = fixed_namespace
 
 file_cache["builtins"] = smol_namespace
@@ -2300,12 +2374,14 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
 # ---- MAIN
 parser = argparse.ArgumentParser(description="Compile a .s file and optionally run the result.")
 parser.add_argument("source", metavar="SOURCE", help="Path to the .s source file to compile.",)
+parser.add_argument("--lsp", action="store_true", help="No compilation, and output is meant for the lsp to read.",)
 parser.add_argument("--build", action="store_true", help="Build without running.",)
 parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
 parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang.",)
 args = parser.parse_args()
 debug_mode = args.debug
 chosen_compiler = args.back or "auto"
+is_lsp = args.lsp
 if chosen_compiler == "auto":
     #if os.path.exists("antcc"): chosen_compiler = "antcc"
     #else: 
@@ -2313,17 +2389,17 @@ if chosen_compiler == "auto":
 src_path = Path(args.source)
 if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); sys.exit(1)
 
-print(f"[{YELLOW}+{RESET}] process      {src_path}")
+if not is_lsp: print(f"[{YELLOW}+{RESET}] process      {src_path}")
 file: File = load(resolve_name(str(src_path), None), is_main_file=True)
-main_type: UnionType = file.types.get("main", None)
-if not main_type: print(f"{RED}error{RESET}: missing main type"); sys.exit(1)
-if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); sys.exit(1)
-if main_type.variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); sys.exit(1)
-
-exe_path = src_path.with_suffix("")
-write_and_compile(exe_path, {main_type.variations[0]}, main_type.variations[0].monomorphic_name)
-if not args.build:
-    if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); sys.exit(1)
-    print(f"[{YELLOW}+{RESET}] run          ./{exe_path}")
-    result = subprocess.run("./"+str(exe_path), text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
-    if result.returncode != 0: sys.exit(result.returncode)
+if not is_lsp:
+    main_type: UnionType = file.types.get("main", None)
+    if not main_type: print(f"{RED}error{RESET}: missing main type"); sys.exit(1)
+    if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); sys.exit(1)
+    if main_type.variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); sys.exit(1)
+    exe_path = src_path.with_suffix("")
+    write_and_compile(exe_path, {main_type.variations[0]}, main_type.variations[0].monomorphic_name)
+    if not args.build:
+        if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); sys.exit(1)
+        print(f"[{YELLOW}+{RESET}] run          ./{exe_path}")
+        result = subprocess.run("./"+str(exe_path), text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+        if result.returncode != 0: sys.exit(result.returncode)

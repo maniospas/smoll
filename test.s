@@ -1,21 +1,9 @@
-import "std/core.s"
+local import "std/core.s"
 
-def foo1()
-    mem = list mut char[]
-    x = copy(mem, "hello world!").dat
-    y = copy(mem, "how are you?").dat
-    return(mem.buffer, x,y)
-
-def foo2()
-    mem = (alloc KB 4, mut 0)
-    x = copy(mem, "hello world!")
-    y = copy(mem, "how are you?")
-    return (x,y)
+def test(int[]|float[] arr)
+    return arr[0]<arr[1]
 
 def main()
-    f = foo1()
-    print (f.mem, f.x)
-    print (f.mem, f.y)
-    # f = foo2()
-    # print f.x
-    # print f.y
+    x = mut float[]
+    x = x.resize(10)
+    print test x

@@ -671,25 +671,6 @@ def main()
 
 # Section 3. Standard library
 
-## strings
-
-The standard library provides the `str` structural type for representing
-strings by combining character buffers, an offset within the buffer
-where the string starts (more stable than using a pointer), its length,
-and its first character for quicker comparison; that is `\0` for empty
-strings.
-
-`cstr` data are trivially castable to strings if their length is not
-needed. Below is na example, where printing is also implemented for
-strings.
-
-```python
-import "std/core.s"
-
-def main()
-    print str "hello world!"
-```
-
 ## lists
 
 You can manage buffers by adding push and pop operations, as well
@@ -709,4 +690,23 @@ def main()
     li[1] = 0.2
     print li[0]
     print li[1]
+```
+
+## strings
+
+The standard library provides the `str` structural type for representing
+strings by combining character buffers, an offset within the buffer
+where the string starts (more stable than using a pointer), its length,
+and its first character for quicker comparison; that is `\0` for empty
+strings.
+
+`cstr` data are trivially castable to strings if their length is not
+needed. Below is na example, where printing is also implemented for
+strings.
+
+```python
+import "std/core.s"
+
+def main()
+    print str "hello world!"
 ```

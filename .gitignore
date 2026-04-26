@@ -6,3 +6,5 @@ smoll.onefile-build/
 std/clang
 .cache
 .vscode
+lsp/node_modules/
+lsp/out/

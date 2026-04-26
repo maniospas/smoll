@@ -17,6 +17,9 @@ import {
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { execFile } from 'child_process';
 import { pathToFileURL, fileURLToPath } from 'url';
+import { writeFile, unlink } from 'fs/promises';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 // ── Logging ───────────────────────────────────
 const LOGGING = false;
@@ -49,7 +52,31 @@ const connection = createConnection(ProposedFeatures.all);
 const documents  = new TextDocuments(TextDocument);
 const cache      = new Map<string, CompilerToken[]>();
 const debounces  = new Map<string, ReturnType<typeof setTimeout>>();
+const generations = new Map<string, number>();
 const DEBOUNCE_MS = 300;
+
+// ── Temp file helpers ─────────────────────────
+async function writeTempFile(content: string, realPath: string): Promise<string> {
+  const ext = realPath.slice(realPath.lastIndexOf('.'));
+  const tmp = join(tmpdir(), `smoll-lsp-${process.pid}-${Date.now()}${ext}`);
+  await writeFile(tmp, content, 'utf8');
+  return tmp;
+}
+
+async function deleteTempFile(tmp: string) {
+  try { await unlink(tmp); } catch {}
+}
+
+function remapTokenPaths(tokens: CompilerToken[], tmpPath: string, realPath: string): CompilerToken[] {
+  return tokens.map(t => ({
+    ...t,
+    file: t.file === tmpPath ? realPath : t.file,
+    definition: t.definition ? {
+      ...t.definition,
+      file: t.definition.file === tmpPath ? realPath : t.definition.file,
+    } : undefined,
+  }));
+}
 
 // ── Parser ────────────────────────────────────
 function parseCompilerOutput(stdout: string): CompilerToken[] {
@@ -72,7 +99,7 @@ function parseCompilerOutput(stdout: string): CompilerToken[] {
     const defLine   = parseInt(lines[6].trim(), 10);
     const defCol    = parseInt(lines[7].trim(), 10);
     const message   = lines.slice(8).join('\n').trim();
-    const kind: 'error' | 'annotation' = message.startsWith('error') ? 'error' : 'annotation';
+    const kind: 'error' | 'annotation' = message.includes('error:') ? 'error' : 'annotation';
 
     log(`parser: [${tokenType}] ${file}:${line}:${col} len=${length} | def=${defFile}:${defLine}:${defCol} | msg="${message}"`);
 
@@ -86,14 +113,14 @@ function parseCompilerOutput(stdout: string): CompilerToken[] {
 }
 
 // ── Compiler ──────────────────────────────────
-function runCompiler(filePath: string): Promise<CompilerToken[]> {
+function runCompiler(tmpPath: string): Promise<CompilerToken[]> {
   return new Promise((resolve) => {
-    log(`compiler: spawning ./smoll ${filePath} --lsp`);
+    log(`compiler: spawning ./smoll ${tmpPath} --lsp`);
     log(`─────────────────────────────────────────`);
 
-    execFile('./smoll', [filePath, '--lsp'], { timeout: 10_000 }, (err, stdout, stderr) => {
+    execFile('./smoll', [tmpPath, '--lsp'], { timeout: 10_000 }, (err, stdout, stderr) => {
       log(`compiler: exited | stdout=${stdout.length}b stderr=${stderr.length}b`);
-      if (stderr.length > 0) log(`compiler: stderr → ${stderr.slice(0, 300)}`);
+      if (stderr.length > 0) log(`compiler: stderr → ${stderr.slice(0, 200)}`);
 
       if (stdout.length === 0) {
         log(`compiler: WARNING stdout is empty — no tokens will be produced`);
@@ -122,14 +149,35 @@ function scheduleAnalysis(uri: string, filePath: string) {
     log(`debounce: reset for ${filePath}`);
   }
 
+  // Snapshot content now, while the document version is current
+  const doc     = documents.get(uri);
+  const content = doc?.getText() ?? '';
+
   const handle = setTimeout(async () => {
     debounces.delete(uri);
-    log(`debounce: fired for ${filePath}`);
-    const tokens = await runCompiler(filePath);
-    cache.set(filePath, tokens);
-    publishDiagnostics(uri, filePath, tokens);
-    connection.languages.semanticTokens.refresh();
-    log(`debounce: analysis complete — ${tokens.length} tokens cached`);
+
+    const gen = (generations.get(filePath) ?? 0) + 1;
+    generations.set(filePath, gen);
+
+    log(`debounce: fired for ${filePath} (gen ${gen})`);
+
+    const tmpPath = await writeTempFile(content, filePath);
+    try {
+      const raw    = await runCompiler(tmpPath);
+      const tokens = remapTokenPaths(raw, tmpPath, filePath);
+
+      if (generations.get(filePath) !== gen) {
+        log(`debounce: stale result discarded (gen ${gen} vs ${generations.get(filePath)})`);
+        return;
+      }
+
+      cache.set(filePath, tokens);
+      publishDiagnostics(uri, filePath, tokens);
+      connection.languages.semanticTokens.refresh();
+      log(`debounce: analysis complete — ${tokens.length} tokens cached`);
+    } finally {
+      await deleteTempFile(tmpPath);
+    }
   }, DEBOUNCE_MS);
 
   debounces.set(uri, handle);
@@ -137,10 +185,10 @@ function scheduleAnalysis(uri: string, filePath: string) {
 
 // ── Diagnostics ───────────────────────────────
 function publishDiagnostics(uri: string, filePath: string, tokens: CompilerToken[]) {
-  const mine = tokens.filter(t => t.file === filePath);
+  const mine        = tokens.filter(t => t.file === filePath);
   const errors      = mine.filter(t => t.kind === 'error');
   const annotations = mine.filter(t => t.kind === 'annotation');
-  log(`diagnostics: ${mine.length} for this file (${errors} errors.length, ${annotations} annotations.length)`);
+  log(`diagnostics: ${mine.length} for this file (${errors.length} errors, ${annotations.length} annotations)`);
 
   const diagnostics: Diagnostic[] = errors.map(t => ({
     severity: t.kind === 'error' ? DiagnosticSeverity.Error : DiagnosticSeverity.Hint,
@@ -252,6 +300,7 @@ documents.onDidClose(event => {
   const filePath = fileURLToPath(event.document.uri);
   log(`event: closed — ${filePath}`);
   cache.delete(filePath);
+  generations.delete(filePath);
   connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
 });
 

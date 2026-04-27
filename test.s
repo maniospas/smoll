@@ -5,7 +5,7 @@ def point()
     y = mut 0
     return (x,y)
 
-def test(mut point [] ps)
+def test(mut point[] ps)
     return len ps
 
 def test(int[]|float[] arr)
@@ -14,5 +14,6 @@ def test(int[]|float[] arr)
 def main()
     x = mut float[]
     x = x.resize 10
+    print(10==10)
     print test x
     print test resize(mut point[], 2)

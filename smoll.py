@@ -537,6 +537,7 @@ class Token:
     def error(self, errtype: str, message: str, reason: "Token"=None, raason_message:str="defined in", suggestions=None):
         if is_lsp:
             if self.file.is_main_file:
+                at = reason if reason else self
                 print("---")
                 # position in processed file
                 print("function")
@@ -545,11 +546,16 @@ class Token:
                 print(self.col)
                 print(len(self.text))
                 # defined at
-                print(os.path.abspath(self.file.path))
-                print(self.row)
-                print(self.col)
+                print(os.path.abspath(at.file.path))
+                print(at.row)
+                print(at.col)
                 # message (may span multiple lines))
-                print(errtype+" error: "+message)
+                print(errtype+" error: "+message+" "+(reason_message+" "+reason.file.path if reason else ""))
+                if suggestions:
+                    print("    with alternatives:\n")
+                for suggestion in suggestions:
+                    if "->" in suggestion: print("```rust\n"+suggestion+"\n```")
+                    else: print("    -", suggestion)
             raise FatalException
 
 
@@ -672,7 +678,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         print(at.row)
         print(at.col)
         # message (may span multiple lines))
-        print(callee.signature()+"\n"+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+        print("```rust\n"+callee.signature()+(" defined in "+at.file.path if callee.at else " from compiler definitions")+"\n```")
 
     return callee
 
@@ -1006,7 +1012,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                     print(at.row)
                     print(at.col)
                     # message (may span multiple lines))
-                    print(variation.signature()+"\n"+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
+                    print("```rust\n"+variation.signature()+(" defined in "+at.file.path if variation.at else " from compiler definitions")+"\n```")
 
             return pos+3, buffer_type
         for variation in type.variations: 
@@ -1029,7 +1035,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                 print(at.row)
                 print(at.col)
                 # message (may span multiple lines))
-                print(variation.signature()+"\n"+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
+                print(variation.signature()+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
 
         return pos+1, type
     namespace: File = file.namespaces.get(name, None)
@@ -1943,8 +1949,9 @@ def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
         name = name_token.text
         name = name[1:len(name)-1]
         name = resolve_name(name, name_token)
-        if not os.path.exists(name) and name not in file_cache: name_token.error("import", "cannot import file '"+name+"'")
-        imported: File = load(name)
+        if not os.path.exists(name) and name not in file_cache: name_token.error("import", "non-existent file '"+name+"'")
+        if os.path.isdir(name) and name not in file_cache: name_token.error("import", "expecting file but got directory '"+name+"'")
+        imported: File = load(name, name_token)
     pos += 1
     if peek_text(tokens, pos)=="::":
         pos, imported = process_type(imported, tokens, pos + 1)
@@ -2263,7 +2270,7 @@ def resolve_name(path: str, at_token: Token|None) -> str:
     else: symbol = path
     return symbol
 
-def _load(path: str, is_main_file: bool=False) -> File:
+def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> File:
     file = File(path)
     file.is_main_file = is_main_file
     tokens = list()
@@ -2325,7 +2332,24 @@ def _load(path: str, is_main_file: bool=False) -> File:
                         token_start = col
                     else: col += 1
                 if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start +1 + count_spaces))
-    except UnicodeDecodeError as err: 
+    except Exception as err: 
+        if is_lsp:
+            if err_token: err_token.error(str(err))
+            if file.is_main_file:
+                print("---")
+                # position in processed file
+                print("function")
+                print(os.path.abspath(file.path))
+                print(row+1)
+                print(1)
+                print(3)
+                # defined at
+                print(os.path.abspath(file.path))
+                print(row+1)
+                print(1)
+                # message (may span multiple lines))
+                print(str(err))
+            raise FatalException
         print(f"[{RED}✗{RESET}] {PURPLE}file read error{RESET} {err}")
         location = f"{path} line {row+1}"
         print(f"{RED}at{RESET} {location}")
@@ -2374,11 +2398,11 @@ def download_with_progress(url: str, filepath: str, message: str):
     print()
 
 file_cache: dict[str, File] = dict()
-def load(path: str, is_main_file: bool=False) -> File:
+def load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> File:
     file = file_cache.get(path, None)
     if file is None:
         # this weird sequencing here is so that we can import partially imported modules without circular overflow
-        file, processed_tokens = _load(path, is_main_file)
+        file, processed_tokens = _load(path, is_main_file, err_token)
         file_cache[path] = file
         process(file, processed_tokens, 0)
     return file

@@ -20,6 +20,7 @@ import { pathToFileURL, fileURLToPath } from 'url';
 import { writeFile, unlink } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import { platform } from 'os';
 
 // ── Logging ───────────────────────────────────
 const LOGGING = false;
@@ -115,10 +116,11 @@ function parseCompilerOutput(stdout: string): CompilerToken[] {
 // ── Compiler ──────────────────────────────────
 function runCompiler(tmpPath: string): Promise<CompilerToken[]> {
   return new Promise((resolve) => {
-    log(`compiler: spawning ./smoll ${tmpPath} --lsp`);
+    const BINARY = platform() === 'win32' ? 'smoll.exe' : './smoll';
+    log(`compiler: spawning ${BINARY} ${tmpPath} --lsp`);
     log(`─────────────────────────────────────────`);
 
-    execFile('./smoll', [tmpPath, '--lsp'], { timeout: 10_000 }, (err, stdout, stderr) => {
+    execFile(BINARY, [tmpPath, '--lsp'], { timeout: 10_000 }, (err, stdout, stderr) => {
       log(`compiler: exited | stdout=${stdout.length}b stderr=${stderr.length}b`);
       if (stderr.length > 0) log(`compiler: stderr → ${stderr.slice(0, 200)}`);
 
@@ -190,15 +192,18 @@ function publishDiagnostics(uri: string, filePath: string, tokens: CompilerToken
   const annotations = mine.filter(t => t.kind === 'annotation');
   log(`diagnostics: ${mine.length} for this file (${errors.length} errors, ${annotations.length} annotations)`);
 
-  const diagnostics: Diagnostic[] = errors.map(t => ({
-    severity: t.kind === 'error' ? DiagnosticSeverity.Error : DiagnosticSeverity.Hint,
-    range: Range.create(
-      Position.create(t.line - 1, t.col - 1),
-      Position.create(t.line - 1, t.col - 1 + t.length)
-    ),
-    message: t.message,
-    source: 'smoll',
-  }));
+  const diagnostics: Diagnostic[] = errors.map(t => {
+    const firstLine = t.message.split(':')[0];
+    return {
+      severity: t.kind === 'error' ? DiagnosticSeverity.Error : DiagnosticSeverity.Hint,
+      range: Range.create(
+        Position.create(t.line - 1, t.col - 1),
+        Position.create(t.line - 1, t.col - 1 + t.length)
+      ),
+      message: firstLine,
+      source: 'smoll',
+    };
+  });
 
   connection.sendDiagnostics({ uri, diagnostics });
 }
@@ -208,23 +213,26 @@ connection.onHover((params: TextDocumentPositionParams): Hover | null => {
   const filePath = fileURLToPath(params.textDocument.uri);
   const tokens   = cache.get(filePath) ?? [];
   const cursor   = params.position;
-  log(`hover: cursor=${cursor.line}:${cursor.character} file=${filePath} cache=${tokens.length} tokens`);
 
-  const hit = tokens.find(t =>
+  const hits = tokens.filter(t =>
     t.file === filePath &&
     t.line - 1 === cursor.line &&
     cursor.character >= t.col - 1 &&
     cursor.character <  t.col - 1 + t.length
   );
 
-  if (!hit) { log(`hover: no hit`); return null; }
-  log(`hover: hit [${hit.tokenType}] "${hit.message}" at ${hit.line}:${hit.col}`);
+  if (hits.length === 0) return null;
+
+  const sections = [...new Set(hits.map(hit => hit.message))];
 
   return {
-    contents: { kind: 'markdown', value: `\`${hit.message}\`` },
+    contents: {
+      kind: 'markdown',
+      value: sections.join('\n\n---\n\n'),
+    },
     range: Range.create(
-      Position.create(hit.line - 1, hit.col - 1),
-      Position.create(hit.line - 1, hit.col - 1 + hit.length)
+      Position.create(hits[0].line - 1, hits[0].col - 1),
+      Position.create(hits[0].line - 1, hits[0].col - 1 + hits[0].length)
     ),
   };
 });
@@ -250,37 +258,40 @@ connection.languages.semanticTokens.on((params) => {
 });
 
 // ── Go-to-definition ──────────────────────────
-connection.onDefinition((params: DefinitionParams): Location | null => {
+connection.onDefinition((params: DefinitionParams): Location[] => {
   const filePath = fileURLToPath(params.textDocument.uri);
   const tokens   = cache.get(filePath) ?? [];
   const cursor   = params.position;
   log(`definition: cursor=${cursor.line}:${cursor.character} file=${filePath}`);
 
-  const hit = tokens.find(t =>
-    t.definition &&
-    t.file === filePath &&
-    t.line - 1 === cursor.line &&
-    cursor.character >= t.col - 1 &&
-    cursor.character <  t.col - 1 + t.length
-  );
-
-  if (!hit?.definition) { log(`definition: no hit`); return null; }
-  const sameLocation =
-    hit.definition.file === hit.file &&
-    hit.definition.line === hit.line &&
-    hit.definition.col  === hit.col;
-
-  if (sameLocation) { log(`definition: same location — skipping`); return null; }
-
-  log(`definition: hit → ${hit.definition.file}:${hit.definition.line}:${hit.definition.col}`);
-
-  return Location.create(
-    pathToFileURL(hit.definition.file).toString(),
-    Range.create(
-      Position.create(hit.definition.line - 1, hit.definition.col - 1),
-      Position.create(hit.definition.line - 1, hit.definition.col)
+  const locations = tokens
+    .filter(t =>
+      t.definition &&
+      t.file === filePath &&
+      t.line - 1 === cursor.line &&
+      cursor.character >= t.col - 1 &&
+      cursor.character <  t.col - 1 + t.length &&
+      !(t.definition.file === t.file &&
+        t.definition.line === t.line &&
+        t.definition.col  === t.col)
     )
-  );
+    .map(t => Location.create(
+      pathToFileURL(t.definition!.file).toString(),
+      Range.create(
+        Position.create(t.definition!.line - 1, t.definition!.col - 1),
+        Position.create(t.definition!.line - 1, t.definition!.col)
+      )
+    ));
+
+  // Deduplicate by uri+position
+  const seen = new Set<string>();
+  const unique = locations.filter(loc => {
+    const key = `${loc.uri}:${loc.range.start.line}:${loc.range.start.character}`;
+    return seen.has(key) ? false : (seen.add(key), true);
+  });
+
+  log(`definition: ${unique.length} location(s)`);
+  return unique;
 });
 
 // ── Document lifecycle ────────────────────────

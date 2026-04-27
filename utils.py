@@ -28,6 +28,9 @@ repositories: dict[str, str] = dict()
 class CompfailException(Exception): pass
 class FastReturnException(Exception): pass
 class FatalException(Exception): pass
+class ImportError(Exception): 
+    def __init__(text):
+        super().__init__(text)
 
 def pretty_name(name: str):
     return name.replace("__", ".")

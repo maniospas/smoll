@@ -6,6 +6,7 @@
   "categories": ["Programming Languages"],
   "activationEvents": ["onLanguage:smoll"],
   "main": "./out/extension.js",
+  "publisher": "maniospas",
   "contributes": {
     "languages": [{
       "id": "smoll",

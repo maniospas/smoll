@@ -1,0 +1,6 @@
+import "builtins"
+import "std/core/bool.s"
+import "std/core/numbers.s"
+import "std/core/print.s"
+import "std/core/convert.s"
+import "std/core/range.s"

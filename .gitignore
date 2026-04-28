@@ -8,3 +8,5 @@ std/clang
 .vscode
 lsp/node_modules/
 lsp/out/
+build/
+.mypy_cache/

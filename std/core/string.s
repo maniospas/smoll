@@ -1,4 +1,20 @@
-local import "std/core.s"
+# Written in 2026 by Emmanouil Krasanakis (maniospas@hotmail.com)
+# To the extent possible under law, the author has dedicated all copyright
+# and related and neighboring rights to this software to the public domain
+# worldwide.
+# 
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+# IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+
+local import "std/core/builtinsext.s"
 local import "std/core/array.s"
 
 def strdat(nat pos, nat length, char first)
@@ -53,3 +69,17 @@ def copy(charlist li, str other)
 
 def copy(charlist li, cstr other)
     return li.copy str other
+
+def get(str s, nat i)
+    return s.buf[s.dat.pos+i]&
+
+def char(str s)
+    return s.dat.first
+
+def char(cstr s)
+    {builtins::char c = s[0];}
+    return c
+
+def eq(char x, char y)
+    {builtins::bool z = (x==y);}
+    return z

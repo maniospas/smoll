@@ -32,10 +32,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
       - name: Install build requirements
         run: |
           python -m pip install --upgrade pip
+          python -m pip install mypy
           python -m pip install nuitka[onefile] ordered-set tqdm
       - name: Compile with Nuitka
         run: |

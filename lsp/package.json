@@ -10,7 +10,8 @@
   "contributes": {
     "languages": [{
       "id": "smoll",
-      "extensions": [".s"],
+      "aliases": ["Smoll", "smoll"],
+      "extensions": [".s", ".smoll"],
       "configuration": "./language-configuration.json"
     }]
   },

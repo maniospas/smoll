@@ -123,7 +123,6 @@ function runCompiler(tmpPath: string): Promise<CompilerToken[]> {
     execFile(BINARY, [tmpPath, '--lsp'], { timeout: 10_000 }, (err, stdout, stderr) => {
       log(`compiler: exited | stdout=${stdout.length}b stderr=${stderr.length}b`);
       if (stderr.length > 0) log(`compiler: stderr → ${stderr.slice(0, 200)}`);
-
       if (stdout.length === 0) {
         log(`compiler: WARNING stdout is empty — no tokens will be produced`);
         log(`─────────────────────────────────────────`);

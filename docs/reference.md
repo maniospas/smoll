@@ -710,3 +710,25 @@ import "std/core.s"
 def main()
     print str "hello world!"
 ```
+
+You can convert string contents to numeric types. This creates
+errors on failure.
+
+```python
+import "std/core.s"
+
+def main()
+    print float "123"
+```
+
+Strings can be copied both on `char[], mut nat` buffers and on
+lists defined on character arrays like below.
+
+```python
+import "std/core.s"
+
+def main()
+    buf = list mut char[] # or buf = (alloc(mut char[], KB 4), mut 0)
+    s = buf.copy "hello world!"
+    print s
+```

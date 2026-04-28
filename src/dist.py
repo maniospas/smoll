@@ -158,6 +158,7 @@ class Variable(CodeSegment):
 def signature_like(vars: list[Variable], impl=None):
     ret = ""
     i = 0
+    where: list[str] = list()
     while i<len(vars):
         if ret: ret += ", "
         type = vars[i].type
@@ -175,7 +176,7 @@ def signature_like(vars: list[Variable], impl=None):
         elif type.is_buffer_of: 
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
             elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "const "
-            ret += type.is_buffer_of.name+"[]"+arg_name
+            ret += type.is_buffer_of.name+"[]"+arg_name+" size "+str(type.is_buffer_of.memory_size())
             i += len(type.rets)
         else:
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
@@ -382,6 +383,7 @@ class ImplementedType:
         return ret
 
     def signature(self):
+        if self.is_buffer_of: return "buffer of "+self.is_buffer_of.signature()
         args = signature_like([self.vars[arg] for arg in self.args], impl=self)
         rets = signature_like([self.vars[arg] for arg in self.rets], impl=self)
         return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"
@@ -649,7 +651,7 @@ class Token:
                 # message (may span multiple lines))
                 print(errtype+" error: "+message+" "+(raason_message+" "+reason.file.path if reason else ""))
                 if suggestions:
-                    print("    with alternatives:\n")
+                    print("    with alternatives:")
                     for suggestion in suggestions:
                         if "->" in suggestion: print("```rust\n"+suggestion+"\n```")
                         else: print("    -", suggestion)
@@ -758,9 +760,9 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         # has_defs = False
         # for i, tok in enumerate(file.tokens):
         #     if tok.text=="def" and peek_text(tokens, i+1)==method.name
-        error_token.error("type", "could not resolve any call for '"+method.name+"("+signature_like(vars, impl)+")'", suggestions=[t.signature() for t in method.variations])
+        error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature() for t in method.variations])
     if len(available_types)>1:
-        error_token.error("type", "more than one conflicting call '"+method.name+"("+signature_like(vars, impl)+")'", suggestions=[t.signature() for t in available_types])
+        error_token.error("type", "more than one conflicting call '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature()+(" defined in "+t.at.file.path if t.at else " from compiler definitions") for t in available_types])
 
     callee: ImplementedType = available_types[0]
 
@@ -2230,6 +2232,7 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
     pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr = _gather_def(file, tokens, pos, fast_return_exception, is_local)
     starting_pos = pos
     greatest_pos = None
+    candidates: list[ImplementedType] = list()
     for arg_types in itertools.product(*abstract_arg_types):
         pos = starting_pos
         impl = ImplementedType(name, at=start_token)
@@ -2275,7 +2278,9 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
                         already_parsed = variation_position
                         break
                 if already_parsed is not None: 
-                    if found_type.variations[already_parsed].at!=impl.at: continue
+                    if found_type.variations[already_parsed].at!=impl.at: 
+                        candidates.append(found_type.variations[already_parsed])
+                        continue
             try:
                 pos = process_body(file, tokens, pos, impl)
             except FastReturnException: 
@@ -2292,10 +2297,8 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
             else: found_type.variations.append(impl)
             greatest_pos = pos
         except CompfailException: pass
-    if name not in file.types: start_token.error("safety", "no valid variations of '"+name+"'; either due to compiler::skip everywhere or becuase you are trying to overload a function that exists.")
-    if greatest_pos is None and not is_lsp: start_token.error("safety", "no valid variations of '"+name+"'; either due to compiler::skip everywhere or because you are trying to overload a function that exists.")
-    else: 
-        assert greatest_pos is not None
+    if name not in file.types or greatest_pos is None: start_token.error("safety", "no valid variations of '"+name+"'"+(" given the same name and arguments" if candidates else ""), suggestions=[candidate.signature()+(" defined in "+candidate.at.file.path if candidate.at else " from compiler definitions") for candidate in candidates])
+    if greatest_pos is not None:
         pos = greatest_pos
     return pos  # all parsing should end at the same position
 

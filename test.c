@@ -189,11 +189,11 @@ static inline void nat__temp386v(unsigned long long x, unsigned long long* __tem
   *__temp667v=value;
 }
 
-static inline void range__temp392v(unsigned long long to, unsigned long long* __temp668v, unsigned long long* __temp669v) {
-  unsigned long long __temp394v=0;
+static inline void range__temp390v(unsigned long long to, unsigned long long* __temp668v, unsigned long long* __temp669v) {
+  unsigned long long __temp392v=0;
   unsigned long long from=0;
-  __temp394v=0;
-  from=__temp394v;
+  __temp392v=0;
+  from=__temp392v;
   *__temp668v=from;
   *__temp669v=to;
 }
@@ -286,7 +286,7 @@ static inline int nat__temp608v(void* s__buf__unsafe_ptr, unsigned long long s__
   nat__temp386v(__temp612v,&__temp613v__);
   number=__temp613v__;
   len__temp521v(s__buf__unsafe_ptr,s__buf__unsafe_size,s__buf__unsafe_align,s__dat__pos,s__dat__length,s__dat__first,&__temp614v__);
-  range__temp392v(__temp614v__,&__temp615v__from,&__temp615v__to);
+  range__temp390v(__temp614v__,&__temp615v__from,&__temp615v__to);
   it__from=__temp615v__from;
   it__to=__temp615v__to;
   while(1){

@@ -30,7 +30,7 @@ function log(msg: string) {
 }
 
 // ── Semantic token legend ─────────────────────
-const TOKEN_TYPES = ['namespace', 'string', 'keyword', 'function', 'variable'];
+const TOKEN_TYPES = ['namespace', 'string', 'keyword', 'function', 'variable', 'comment'];
 const TOKEN_MODIFIERS: string[] = [];
 const semanticTokensLegend = { tokenTypes: TOKEN_TYPES, tokenModifiers: TOKEN_MODIFIERS };
 
@@ -46,6 +46,21 @@ interface CompilerToken {
   message: string;
   kind: 'error' | 'annotation';
   definition?: { file: string; line: number; col: number; };
+}
+
+const LINE_COMMENT = /#.*/g;
+
+function getCommentTokens(document: TextDocument): { line: number; col: number; length: number }[] {
+  const results: { line: number; col: number; length: number }[] = [];
+  const lines = document.getText().split(/\r?\n/);
+  for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+    LINE_COMMENT.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = LINE_COMMENT.exec(lines[lineIdx])) !== null) {
+      results.push({ line: lineIdx, col: match.index, length: match[0].length });
+    }
+  }
+  return results;
 }
 
 // ── Connection ────────────────────────────────
@@ -240,18 +255,25 @@ connection.onHover((params: TextDocumentPositionParams): Hover | null => {
 connection.languages.semanticTokens.on((params) => {
   const filePath = fileURLToPath(params.textDocument.uri);
   const tokens   = cache.get(filePath) ?? [];
+  const document = documents.get(params.textDocument.uri);
   const builder  = new SemanticTokensBuilder();
 
-  const sorted = [...tokens]
+  type FlatToken = { line: number; col: number; length: number; typeIndex: number };
+
+  const compilerTokens: FlatToken[] = tokens
     .filter(t => t.file === filePath)
+    .map(t => ({ line: t.line - 1, col: t.col - 1, length: t.length, typeIndex: TOKEN_TYPES.indexOf(t.tokenType) }));
+
+  const commentTokens: FlatToken[] = document
+    ? getCommentTokens(document).map(c => ({ ...c, typeIndex: TOKEN_TYPES.indexOf('comment') }))
+    : [];
+
+  const all = [...compilerTokens, ...commentTokens]
+    .filter(t => t.typeIndex !== -1)
     .sort((a, b) => a.line !== b.line ? a.line - b.line : a.col - b.col);
 
-  log(`semantic tokens: building ${sorted.length} tokens for ${filePath}`);
-  for (const t of sorted) {
-    const typeIndex = TOKEN_TYPES.indexOf(t.tokenType);
-    if (typeIndex === -1) { log(`semantic tokens: unknown type "${t.tokenType}" — skipping`); continue; }
-    builder.push(t.line - 1, t.col - 1, t.length, typeIndex, 0);
-  }
+  log(`semantic tokens: ${compilerTokens.length} compiler + ${commentTokens.length} comments`);
+  for (const t of all) builder.push(t.line, t.col, t.length, t.typeIndex, 0);
 
   return builder.build();
 });

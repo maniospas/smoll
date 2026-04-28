@@ -19,6 +19,6 @@
 # mypyc src/dist.py
 #
 # Compile with:
-# nuitka --standalone --onefile --lto=yes --output-filename=smoll smoll.py
+# nuitka --standalone --onefile --lto=yes --output-filename=smoll --python-flag=no_asserts --python-flag=no_site --python-flag=static_hashes smoll.py
 
 import src.dist

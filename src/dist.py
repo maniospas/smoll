@@ -372,8 +372,8 @@ class ImplementedType:
         if self.builtin: return self._memory_size
         ret = self._memory_size
         i = 0
-        while i<len(self.args):
-            arg = self.args[i]
+        while i<len(self.rets):
+            arg = self.rets[i]
             # if self.vars[arg].type.is_buffer_of: 
             #     i += 4
             #     continue
@@ -653,6 +653,7 @@ class Token:
                     for suggestion in suggestions:
                         if "->" in suggestion: print("```rust\n"+suggestion+"\n```")
                         else: print("    -", suggestion)
+            if is_lsp and reason and reason.file.is_main_file and errtype=="safety": return
             raise FatalException
 
 
@@ -918,7 +919,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if callee==FAIL_TYPE: 
         if impl.nesting: error_token.error("safety", "cannot create a compilation-time failure inside a 'while' or an 'if' whose condition does not evaluate to compile-time known boolean")
         raise CompfailException()
-
+    if callee==SUCCESS_TYPE: 
+        if impl.nesting: error_token.error("safety", "we are inside a 'while' or an 'if' whose condition cannot be inferred to a compile-time known boolean", reason=error_token)
+        
     # and after all the above we need to transfer all defers
     # remember that defers cannot fail so we're ok with them
     # however, we need to move all variables declared inside too
@@ -1076,7 +1079,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                         candidates = list()
                         max_candidate_common_length = common_length
                     if common_length==max_candidate_common_length: 
-                        candidates.append(variation.signature())
+                        candidates.append(variation)
             if file==tokens[pos].file: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates])
             tokens[pos].error("type", "unknown type '\""+file.path+"\"::"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates])
         assert type is not None
@@ -1086,7 +1089,10 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
             buffer_type: UnionType|None = buffer_types[type] if type in buffer_types else None
             if buffer_type is None:
                 buffer_type = UnionType(type.name+"__temp_buffer", at=type.at)
-                for variation in find_unique_variations(type.variations):
+                unique_variations = find_unique_variations(type.variations)
+                #unique_variations = type.variations
+                #if len(unique_variations)!=1: at_pos.error("safety", "it is not clear which version should be used for '"+type.name+"[]'", suggestions=[candidate.signature() for candidate in unique_variations])
+                for variation in unique_variations:
                     variation_buffer_type = buffer_types.get(type, None)
                     if variation_buffer_type is None:
                         actual_variation = create_buffer_type(buffer_type.name+"__buffer", str(variation.memory_size()), variation, get(tokens, pos))
@@ -1288,6 +1294,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             continue
         
         if op_name=="and":
+            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "logical 'and' between two boolean or compile-time boolean values; the right hand side evaluates only if the left is 'true'")
             if len(rets)!=1: op_token.error("type", "the left hand side must always be true/false for 'and'")
             if rets[0].type==TRUE_TYPE:
                 pos, rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority) 
@@ -1311,6 +1318,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             continue
 
         if op_name=="or":
+            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "logical 'or' between two boolean or compile-time boolean values; the right hand side evaluates only if the left is 'false'")
             if len(rets)!=1: op_token.error("type", "the left hand side must always be true/false for 'or'")
             if rets[0].type==TRUE_TYPE:
                 pos = skip_statement(file, tokens, pos+1) 
@@ -1335,6 +1343,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
             continue
 
         if op_name=="is":
+            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "compile time boolean check of whether a value is of a given type; 'value is blank' checks if the value exists")
             def process_is(pos: int, rets: list[Variable]):
                 is_pos = pos
                 pos += 1
@@ -1890,7 +1899,8 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 print_lsp_keyword(name, "prints this inferred type when this position is reached during compilation:\n"+signature_like(ret, impl))
             continue
         if name.text=="del":
-            def process_del():
+            if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "invalidates the subsequent value, potentially calling deferred destructors")
+            def process_del(pos: int):
                 # if impl.has_returned_once: name.error("safety", "cannot 'del' if you have already returned")
                 # if impl.nesting: name.error("safety", "cannot 'del' within conditions or loops")
                 pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
@@ -1917,7 +1927,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 for defer in to_remove: impl.defers.remove(defer)
                 ret = []
                 return pos, ret
-            pos, ret = process_del()
+            pos, ret = process_del(pos)
             continue
         if name.text=="defer":
             def process_defer(pos: int):
@@ -1935,7 +1945,10 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             pos = process_defer(pos)
             continue
         if name.text=="continue" or name.text=="break":
-            if not impl.nesting or impl.nesting[-1]!="while": name.error("syntax", "need to be in a loop to '"+name.text+"'")
+            if not impl.nesting or not any(nest=="while" for nest in impl.nesting): name.error("syntax", "need to be in a loop to '"+name.text+"'")
+            if is_lsp and name.file.is_main_file:
+                if name.text=="continue": print_lsp_keyword(name, "continues immediately from the next loop iteration by skipping the rest of the current iteration")
+                else: print_lsp_keyword(name, "stops the current loop immediately")
             impl.implementation.extend([CodeWord(name.text), CODEWORD_SEMICOLON])
             continue
         if name.text=="while":
@@ -2279,8 +2292,8 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
             else: found_type.variations.append(impl)
             greatest_pos = pos
         except CompfailException: pass
-    if name not in file.types: start_token.error("safety", "no valid variations of '"+name+"'; either due to compiler::fail everywhere or becuase you are trying to overload a function that exists.")
-    if greatest_pos is None and not is_lsp: start_token.error("safety", "no valid variations of '"+name+"'; either due to compiler::fail everywhere or because you are trying to overload a function that exists.")
+    if name not in file.types: start_token.error("safety", "no valid variations of '"+name+"'; either due to compiler::skip everywhere or becuase you are trying to overload a function that exists.")
+    if greatest_pos is None and not is_lsp: start_token.error("safety", "no valid variations of '"+name+"'; either due to compiler::skip everywhere or because you are trying to overload a function that exists.")
     else: 
         assert greatest_pos is not None
         pos = greatest_pos
@@ -2373,7 +2386,8 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
                 i = process_repo(file, tokens, i)
                 if is_lsp and tok.file.is_main_file:
                     print_lsp_keyword(tok, "defines an online resource to be accessed as if it were a local path prefix")
-            else: tok.error("syntax", "expecting  'def', 'repo', or 'import' but found '"+str(tok.text)+"'")
+            else:
+                tok.error("syntax", "expecting 'def', 'repo', or 'import' but found '"+str(tok.text)+"'")
         except FatalException:
             i += 1
             while True:
@@ -2583,7 +2597,8 @@ FALSE_TYPE = ImplementedType("false", "int")
 FALSE_TYPE._memory_size = 0
 TRUE_TYPE = ImplementedType("true", "int")
 TRUE_TYPE._memory_size = 0
-FAIL_TYPE = ImplementedType("skipdef")
+FAIL_TYPE = ImplementedType("skip")
+SUCCESS_TYPE = ImplementedType("branchless")
 ANY_TYPE = ImplementedType("any")
 # FAIL_TYPE.vars["message"] = CSTR_TYPE
 # FAIL_TYPE.args.append("message") 
@@ -2609,7 +2624,8 @@ smol_namespace.types["any"] = UnionType("any", at=builtin_token).append(ANY_TYPE
 
 fixed_namespace = File("compiler")
 compiler_token = Token("compiler", fixed_namespace, 1, 1)
-fixed_namespace.types["skipdef"] = UnionType("skipdef", at=compiler_token).append(FAIL_TYPE)
+fixed_namespace.types["skip"] = UnionType("skip", at=compiler_token).append(FAIL_TYPE)
+fixed_namespace.types["branchless"] = UnionType("branchless", at=compiler_token).append(SUCCESS_TYPE)
 fixed_namespace.types["true"] = UnionType("true", at=compiler_token).append(TRUE_TYPE)
 fixed_namespace.types["false"] = UnionType("false", at=compiler_token).append(FALSE_TYPE)
 fixed_namespace.types["ptr"] = UnionType("ptr", at=compiler_token).append(POINTER_TYPE)

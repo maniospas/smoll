@@ -1,4 +1,7 @@
 import "std/core.s"
+import "builtins" as builtins
+
 
 def main()
-    print nat "123"
+    mem = list mut char[]
+    print float mem.copy "123"

@@ -14,7 +14,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
-local import "std/core/numbers.s"
+local import "std/core/builtinsext.s"
 local import "std/core/convert.s"
 local import "std/core/range.s"
 local import "std/core/string.s"
@@ -47,7 +47,8 @@ def float(console)
         fail "user input was not a float"
     return number
 
-def int(str s)
+def int(cstr|str _s)
+    s = str _s
     if 0==len s
         fail "invalid int conversion from empty string"
     number = mut int 0
@@ -72,7 +73,8 @@ def int(str s)
         number = int(0)-number
     return const number
 
-def nat(str s)
+def nat(cstr|str _s)
+    s = str _s
     if 0==len s
         fail "invalid nat conversion from empty string"
     number = mut nat 0
@@ -85,71 +87,47 @@ def nat(str s)
         number = number*10+digit
     return const number
 
-def int(cstr s)
-    return int str s
-
-def nat(cstr s)
-    return nat str s
-
-# def convert(@access f64, String _s)
-#     s = _s.str()
-#     @c_body{
-#         f64 number = 0.0;
-#         bool success = true;
-#         bool negative = false;
-
-#         if(s__length == 0) 
-#             success = false;
-#         else {
-#             char *chars = (char*)s__contents;
-#             u64 i = 0;
-#             if(chars[0] == '-') {
-#                 negative = true;
-#                 i++;
-#                 if(i == s__length) success = false;
-#             } else if(chars[0] == '+') {
-#                 i++;
-#                 if(i == s__length) success = false;
-#             }
-#             for(; i < s__length && success; i++) {
-#                 char c = chars[i];
-#                 if(c >= '0' && c <= '9') {number = number * 10.0 + (c - '0');} 
-#                 else if(c == '.') {i++;break;} 
-#                 else {success = false;}
-#             }
-#             if(success && i < s__length) {
-#                 f64 frac = 0.0;
-#                 f64 base = 0.1;
-#                 for(; i < s__length && success; i++) {
-#                     char c = chars[i];
-#                     if(c >= '0' && c <= '9') {
-#                         frac += (c - '0') * base;
-#                         base *= 0.1;
-#                     } else if(c == 'e' || c == 'E') {
-#                         i++;
-#                         break;
-#                     } else { success = false; }
-#                 }
-#                 number += frac;
-#             }
-#             if(success && i < s__length) {
-#                 bool expNeg = false;
-#                 if(chars[i] == '-') {expNeg = true; i++;} 
-#                 else if(chars[i] == '+') {i++;}
-#                 if(i == s__length) success = false;
-#                 i64 expVal = 0;
-#                 for(; i < s__length && success; i++) {
-#                     char c = chars[i];
-#                     if(c >= '0' && c <= '9') {expVal = expVal * 10 + (c - '0');} 
-#                     else { success = false; }
-#                 }
-#                 if(expNeg) expVal = -expVal;
-#                 number *= pow(10.0, expVal);
-#             }
-#             if(negative) 
-#                 number = -number;
-#         }
-#     }
-#     if success.not() 
-#         @c_fail{printf("Error: invalid floating-point conversion from string\n");}
-#     return number
+def float(cstr|str _s)
+    s = str _s
+    if 0==len s
+        fail "invalid float conversion from empty string"
+    number = mut 0.0
+    i = mut 0
+    if 0==len s
+        fail "invalid float conversion from empty string"
+    i = mut 0
+    negative = s[0]==char "-"
+    if negative
+        i = i+1
+        if i==len s
+            fail "invalid float conversion from string with only a sign"
+    else if s[i]==char "+"
+        i = i+1
+        if i==len s
+            fail "invalid float conversion from string with only a sign"
+    while i<len s
+        c = s[i]
+        {builtins::bool is_digit=c>='0' && c<='9'; builtins::float digit=c-'0';}
+        is_dot = c==char "." 
+        if is_dot
+            i = i+1
+            break
+        if not is_digit
+            fail "invalid float conversion from non-number string"
+        number = number*10.0+digit
+        i = i+1
+    if is_dot
+        if i==len s
+            fail "invalid float conversion from string without a value after the dot"
+        base = mut 0.1
+        while i<len s
+            d = s[i]
+            {builtins::bool is_decimal_digit=d>='0' && d<='9'; builtins::float decimal_digit=d-'0';}
+            if not is_decimal_digit
+                fail "invalid float conversion from non-number string"
+            number = number+decimal_digit*base
+            base = base*0.1
+            i = i+1
+    if negative
+        number = 0.0-number
+    return number

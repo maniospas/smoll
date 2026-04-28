@@ -31,7 +31,7 @@ def str(const char[] buf, nat pos, nat length)
 def str(cstr c)
     buf = const char[]  # const because we do not allow resizing operations
     {buf__unsafe_ptr = c;}
-    {builtins::nat length = strlen(c);}
+    {builtins::nat length = c?strlen(c):0;}
     {buf__unsafe_size = length+1;}  # account for null termination
     return str(buf,0,length)
 
@@ -40,7 +40,7 @@ def len(str s)
 
 def copy(char[] buf, mut nat pos, str other)
     next_pos = pos+len other
-    if next_pos>= len buf
+    if next_pos>=len buf
         fail "string buffer out of memory"
     {memcpy(((char*)buf__unsafe_ptr)+pos, ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
     prev_pos = const pos
@@ -58,17 +58,14 @@ def print(str s, cstr|blank endl)
 local def charlist()
     return list mut char[]
 
-def copy(charlist li, str other)
+def copy(charlist li, str|cstr _other)
+    other = str _other
     prev_prev_length = mut li.length
     prev_length = li.length + len other
     if prev_length >= len li.buffer
         li.buffer = li.buffer.resize(prev_length+prev_length/2+1)
     li.length = prev_length
     return copy(li.buffer, prev_prev_length, other)
-
-
-def copy(charlist li, cstr other)
-    return li.copy str other
 
 def get(str s, nat i)
     return s.buf[s.dat.pos+i]&
@@ -77,9 +74,14 @@ def char(str s)
     return s.dat.first
 
 def char(cstr s)
-    {builtins::char c = s[0];}
+    {builtins::char c = s?s[0]:0;}
     return c
 
 def eq(char x, char y)
     {builtins::bool z = (x==y);}
     return z
+
+def print(char c, cstr|blank endl)
+    if endl is blank
+        endl = "\n"
+    {printf("%c%s", c, endl);}

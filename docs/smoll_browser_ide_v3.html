@@ -1,0 +1,384 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+#ide {
+  font-family: var(--font-mono);
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border-radius: var(--border-radius-lg);
+  border: 0.5px solid #333;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 620px;
+}
+#titlebar {
+  background: #323233;
+  border-bottom: 1px solid #111;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  height: 36px;
+  flex-shrink: 0;
+}
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+#tabs { display: flex; margin-left: 8px; }
+.tab {
+  color: #888;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-top: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+}
+.tab.active { background: #1e1e1e; color: #ccc; border-top-color: #007acc; }
+#toolbar {
+  background: #2d2d2d;
+  border-bottom: 1px solid #111;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+}
+.tbtn {
+  background: #0e639c; color: #fff;
+  border: none; border-radius: 3px;
+  font-size: 11px; font-family: var(--font-mono);
+  padding: 3px 10px; cursor: pointer;
+}
+.tbtn:hover { background: #1177bb; }
+.tbtn.sec { background: #3a3a3a; color: #ccc; }
+.tbtn.sec:hover { background: #484848; }
+#py-status { margin-left: auto; font-size: 11px; color: #888; display: flex; align-items: center; gap: 5px; }
+.sdot { width: 7px; height: 7px; border-radius: 50%; background: #888; flex-shrink: 0; }
+.sdot.loading { background: #e5c07b; animation: pulse 1s infinite; }
+.sdot.ready   { background: #98c379; }
+.sdot.error   { background: #f44747; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+#panels { display: flex; flex: 1; overflow: hidden; }
+.pane { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.pane + .pane { border-left: 1px solid #111; }
+.pane-hdr {
+  background: #252526;
+  border-bottom: 1px solid #111;
+  font-size: 11px; color: #888;
+  padding: 4px 10px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.editor-inner { position: relative; flex: 1; overflow: hidden; }
+#lnums {
+  position: absolute; top: 0; left: 0;
+  padding: 10px 0 10px 8px;
+  color: #555; font-size: 13px; line-height: 1.6;
+  user-select: none; pointer-events: none;
+  min-width: 34px; text-align: right;
+}
+#editor {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: transparent; color: #d4d4d4;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.6;
+  border: none; outline: none; resize: none;
+  padding: 10px 10px 10px 44px;
+  tab-size: 2; white-space: pre; overflow: auto;
+  caret-color: #fff;
+}
+#c-out {
+  flex: 1; overflow: auto;
+  padding: 10px 14px;
+  font-size: 12.5px; line-height: 1.65;
+  white-space: pre;
+}
+#console {
+  flex: 1; overflow-y: auto;
+  padding: 10px; font-size: 12px; line-height: 1.7;
+  white-space: pre-wrap; word-break: break-all;
+}
+.con-info { color: #4ec9b0; }
+.con-ok   { color: #98c379; }
+.con-err  { color: #f44747; }
+.con-warn { color: #e5c07b; }
+.con-out  { color: #d4d4d4; }
+#loader-bar {
+  border-top: 1px solid #111;
+  padding: 5px 10px;
+  background: #252526;
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+#loader-bar label { font-size: 11px; color: #888; white-space: nowrap; }
+#smoll-in { font-size: 11px; color: #ccc; background: transparent; border: none; cursor: pointer; flex: 1; }
+#smoll-in::file-selector-button {
+  background: #3a3a3a; color: #ccc; border: 0.5px solid #555;
+  border-radius: 3px; padding: 2px 8px; font-size: 11px; cursor: pointer; margin-right: 6px;
+}
+#smoll-badge { font-size: 10px; padding: 2px 7px; border-radius: 3px; background: #2a3a2a; color: #98c379; border: 0.5px solid #3a5a3a; display: none; white-space: nowrap; }
+#statusbar { background: #007acc; color: #fff; font-size: 11px; padding: 2px 12px; display: flex; gap: 12px; flex-shrink: 0; }
+#cursor-pos { margin-left: auto; }
+/* C syntax highlight */
+.kw  { color: #569cd6; }
+.ty  { color: #4ec9b0; }
+.str { color: #ce9178; }
+.cmt { color: #6a9955; font-style: italic; }
+.pp  { color: #c586c0; }
+.num { color: #b5cea8; }
+.fn  { color: #dcdcaa; }
+</style>
+
+<div id="ide">
+  <div id="titlebar">
+    <div class="dot" style="background:#ff5f56"></div>
+    <div class="dot" style="background:#ffbd2e"></div>
+    <div class="dot" style="background:#27c93f"></div>
+    <div id="tabs">
+      <div class="tab active" data-tab="editor">program.s</div>
+      <div class="tab" data-tab="c">output.c</div>
+      <div class="tab" data-tab="console">console</div>
+    </div>
+  </div>
+  <div id="toolbar">
+    <button class="tbtn" id="btn-run">&#9654; Transpile</button>
+    <button class="tbtn sec" id="btn-clear-c">Clear C</button>
+    <div id="py-status">
+      <div class="sdot loading" id="sdot"></div>
+      <span id="stxt">Loading Pyodide...</span>
+    </div>
+  </div>
+
+  <div id="panels">
+    <!-- Editor pane -->
+    <div class="pane" id="pane-editor">
+      <div class="editor-inner">
+        <div id="lnums"></div>
+        <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+      </div>
+      <div id="loader-bar">
+        <label>smoll.py</label>
+        <input type="file" id="smoll-in" accept=".py">
+        <span id="smoll-badge">loaded</span>
+      </div>
+    </div>
+
+    <!-- C output pane -->
+    <div class="pane" id="pane-c" style="display:none">
+      <div class="pane-hdr">
+        <span id="c-filename">output.c</span>
+        <span id="c-lines"></span>
+      </div>
+      <div id="c-out"><span style="color:#555">Run transpilation to see C output.</span></div>
+    </div>
+
+    <!-- Console pane -->
+    <div class="pane" id="pane-console" style="display:none">
+      <div class="pane-hdr"><span>CONSOLE</span><span id="run-time"></span></div>
+      <div id="console"></div>
+    </div>
+  </div>
+
+  <div id="statusbar">
+    <span>smoll IDE — <span id="mode-label">--back none</span></span>
+    <span id="cursor-pos">Ln 1, Col 1</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const editor   = document.getElementById('editor');
+  const cOut     = document.getElementById('c-out');
+  const consoleEl= document.getElementById('console');
+  const sdot     = document.getElementById('sdot');
+  const stxt     = document.getElementById('stxt');
+  const btnRun   = document.getElementById('btn-run');
+  const btnClearC= document.getElementById('btn-clear-c');
+  const lnums    = document.getElementById('lnums');
+  const fileIn   = document.getElementById('smoll-in');
+  const badge    = document.getElementById('smoll-badge');
+  const cursorPos= document.getElementById('cursor-pos');
+  const runTime  = document.getElementById('run-time');
+  const cFilename= document.getElementById('c-filename');
+  const cLines   = document.getElementById('c-lines');
+
+  let pyodide = null, smollSource = null;
+
+  const DEMO = `type main() =
+  printf("Hello from smoll!\\n")
+`;
+  editor.value = DEMO;
+  updateLnums();
+
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(t => {
+    t.onclick = () => {
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      ['editor','c','console'].forEach(id => {
+        const p = document.getElementById('pane-'+id);
+        if(p) p.style.display = t.dataset.tab===id ? 'flex' : 'none';
+      });
+    };
+  });
+
+  function updateLnums(){
+    lnums.innerHTML = editor.value.split('\n').map((_,i)=>`<div>${i+1}</div>`).join('');
+  }
+  editor.addEventListener('input', updateLnums);
+  editor.addEventListener('scroll', ()=>{ lnums.style.marginTop=(-editor.scrollTop)+'px'; });
+  editor.addEventListener('keydown', e=>{
+    if(e.key==='Tab'){ e.preventDefault(); const s=editor.selectionStart; editor.value=editor.value.substring(0,s)+'  '+editor.value.substring(editor.selectionEnd); editor.selectionStart=editor.selectionEnd=s+2; updateLnums(); }
+    if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); runCode(); }
+  });
+  editor.addEventListener('keyup', updateCursor);
+  editor.addEventListener('click', updateCursor);
+  function updateCursor(){ const v=editor.value.substring(0,editor.selectionStart).split('\n'); cursorPos.textContent=`Ln ${v.length}, Col ${v[v.length-1].length+1}`; }
+
+  function clog(msg, cls='con-out'){
+    const d=document.createElement('div'); d.className=cls; d.textContent=msg;
+    consoleEl.appendChild(d); consoleEl.scrollTop=consoleEl.scrollHeight;
+  }
+
+  function highlightC(code) {
+    const keywords = /\b(if|else|for|while|do|return|break|continue|switch|case|default|struct|typedef|sizeof|void|static|const|extern|inline|goto|enum|union)\b/g;
+    const types    = /\b(int|char|float|double|long|short|unsigned|signed|size_t|FILE|NULL|bool)\b/g;
+    const preproc  = /^(#\s*\w+.*)/gm;
+    const comments = /(\/\/[^\n]*)|(\/\*[\s\S]*?\*\/)/g;
+    const strings  = /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g;
+    const numbers  = /\b(\d+\.?\d*)\b/g;
+    const funcs    = /\b([a-zA-Z_]\w*)\s*(?=\()/g;
+
+    // Escape HTML first
+    let s = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    // Order matters: comments and strings first (protect contents)
+    const segments = [];
+    let last = 0;
+    const combined = new RegExp(`(${comments.source})|(${strings.source})`, 'g');
+    let m;
+    while((m=combined.exec(s))!==null){
+      if(m.index>last) segments.push({t:'code',v:s.slice(last,m.index)});
+      const cls = (m[0].startsWith('"')||m[0].startsWith("'")) ? 'str' : 'cmt';
+      segments.push({t:'lit',cls,v:m[0]});
+      last=m.index+m[0].length;
+    }
+    if(last<s.length) segments.push({t:'code',v:s.slice(last)});
+
+    return segments.map(seg=>{
+      if(seg.t==='lit') return `<span class="${seg.cls}">${seg.v}</span>`;
+      let v=seg.v;
+      v=v.replace(preproc,  '<span class="pp">$1</span>');
+      v=v.replace(funcs,    '<span class="fn">$1</span>');
+      v=v.replace(keywords, '<span class="kw">$1</span>');
+      v=v.replace(types,    '<span class="ty">$1</span>');
+      v=v.replace(numbers,  '<span class="num">$1</span>');
+      return v;
+    }).join('');
+  }
+
+  fileIn.onchange = async e => {
+    const file=e.target.files[0]; if(!file) return;
+    smollSource=await file.text();
+    badge.style.display='inline';
+    clog(`smoll.py loaded — ${smollSource.length} bytes`, 'con-ok');
+  };
+
+  async function initPyodide(){
+    try{
+      pyodide=await loadPyodide();
+      sdot.className='sdot ready'; stxt.textContent='Pyodide ready';
+      clog('Pyodide ready. Load smoll.py, write a program, hit Transpile.','con-info');
+    }catch(err){
+      sdot.className='sdot error'; stxt.textContent='Pyodide failed';
+      clog('Pyodide error: '+err.message,'con-err');
+    }
+  }
+
+  async function runCode(){
+    if(!pyodide){ clog('Pyodide not ready.','con-warn'); return; }
+    if(!smollSource){ clog('Load smoll.py first.','con-warn'); switchTab('console'); return; }
+
+    consoleEl.innerHTML=''; runTime.textContent='';
+    const src = editor.value;
+    const t0 = performance.now();
+
+    const captured=[];
+    pyodide.setStdout({batched:s=>captured.push({t:'out',s})});
+    pyodide.setStderr({batched:s=>captured.push({t:'err',s})});
+
+    let cCode = null;
+    try{
+      pyodide.FS.writeFile('/program.s', src);
+      pyodide.FS.writeFile('/smoll_src.py', smollSource);
+
+      await pyodide.runPythonAsync(`
+import sys, types, importlib, os
+
+sys.argv = ['smoll', '/program.s', '--back', 'none']
+
+_mod = types.ModuleType('smoll')
+_mod.__file__ = '/smoll_src.py'
+sys.modules['smoll'] = _mod
+_mod.__name__ = '__main__'
+
+exec(compile(open('/smoll_src.py').read(), '/smoll_src.py', 'exec'), _mod.__dict__)
+`);
+
+      // Read the generated .c file (smoll writes /program.c)
+      try {
+        const raw = pyodide.FS.readFile('/program.c', {encoding:'utf8'});
+        cCode = raw;
+      } catch(_) {
+        // try without leading slash prefix
+        try {
+          const raw = pyodide.FS.readFile('program.c', {encoding:'utf8'});
+          cCode = raw;
+        } catch(e2) {
+          clog('Could not read output .c file: '+e2.message, 'con-warn');
+        }
+      }
+
+    } catch(err){
+      const msg = err.message||String(err);
+      if(!msg.includes('SystemExit: 0')) captured.push({t:'err',s:msg});
+    }
+
+    const elapsed=((performance.now()-t0)/1000).toFixed(3);
+    runTime.textContent=`${elapsed}s`;
+
+    for(const {t,s} of captured){
+      s.split('\n').forEach(line=>{ if(line) clog(line, t==='err'?'con-err':'con-out'); });
+    }
+    clog(`── done in ${elapsed}s ──`, 'con-info');
+
+    if(cCode){
+      const lineCount = cCode.split('\n').length;
+      cOut.innerHTML = highlightC(cCode);
+      cFilename.textContent = 'program.c';
+      cLines.textContent = `${lineCount} lines`;
+      switchTab('c');
+      clog(`C output ready — ${lineCount} lines`, 'con-ok');
+    } else {
+      switchTab('console');
+    }
+  }
+
+  function switchTab(name){
+    document.querySelectorAll('.tab').forEach(t=>{
+      t.classList.toggle('active', t.dataset.tab===name);
+    });
+    ['editor','c','console'].forEach(id=>{
+      const p=document.getElementById('pane-'+id);
+      if(p) p.style.display=(id===name?'flex':'none');
+    });
+  }
+
+  btnRun.onclick = runCode;
+  btnClearC.onclick = ()=>{ cOut.innerHTML='<span style="color:#555">Run transpilation to see C output.</span>'; cLines.textContent=''; };
+
+  const s=document.createElement('script');
+  s.src='https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js';
+  s.onload=initPyodide;
+  s.onerror=()=>{ sdot.className='sdot error'; stxt.textContent='CDN error'; };
+  document.head.appendChild(s);
+})();
+</script>

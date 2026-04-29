@@ -30,12 +30,27 @@ function log(msg: string) {
 }
 
 // ── Semantic token legend ─────────────────────
-const TOKEN_TYPES = ['namespace', 'string', 'keyword', 'function', 'variable', 'comment'];
-const TOKEN_MODIFIERS: string[] = [];
+const TOKEN_TYPES = [
+  'namespace', 'type', 'class', 'enum', 'interface',
+  'struct', 'typeParameter', 'parameter', 'variable',
+  'property', 'enumMember', 'event', 'function', 'method',
+  'macro', 'keyword', 'modifier', 'comment', 'string',
+  'number', 'regexp', 'operator', 'decorator'
+];
+const TOKEN_MODIFIERS = [
+  'declaration', 'definition', 'readonly', 'static',
+  'deprecated', 'abstract', 'async', 'modification',
+  'documentation', 'defaultLibrary'
+];
 const semanticTokensLegend = { tokenTypes: TOKEN_TYPES, tokenModifiers: TOKEN_MODIFIERS };
 
 // ── Types ─────────────────────────────────────
-type TokenType = 'namespace' | 'string' | 'keyword' | 'function' | 'variable';
+type TokenType =
+  | 'namespace' | 'type' | 'class' | 'enum' | 'interface'
+  | 'struct' | 'typeParameter' | 'parameter' | 'variable'
+  | 'property' | 'enumMember' | 'event' | 'function' | 'method'
+  | 'macro' | 'keyword' | 'modifier' | 'comment' | 'string'
+  | 'number' | 'regexp' | 'operator' | 'decorator';
 
 interface CompilerToken {
   tokenType: TokenType;
@@ -87,6 +102,7 @@ function remapTokenPaths(tokens: CompilerToken[], tmpPath: string, realPath: str
   return tokens.map(t => ({
     ...t,
     file: t.file === tmpPath ? realPath : t.file,
+    message: t.message.replace(new RegExp(tmpPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), realPath),
     definition: t.definition ? {
       ...t.definition,
       file: t.definition.file === tmpPath ? realPath : t.definition.file,

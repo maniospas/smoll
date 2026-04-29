@@ -41,6 +41,10 @@ err_code_table["success"] = 0
 debug_mode = True
 repositories: dict[str, str] = dict()
 
+def strip_quotes(text: str) -> str:
+    if len(text)>=2 and text[0]=="\"" and text[-1]=="\"": return text[1:-1]
+    return text
+
 class CompfailException(Exception): pass
 class FastReturnException(Exception): pass
 class FatalException(Exception): pass
@@ -107,7 +111,7 @@ def print_lsp_string(tok):
     print(tok.col)
     print("a string literal")
 
-def print_lsp_literal(tok, name: str):
+def print_lsp_literal(tok: "Token", name: str):
     print("---")
     print("number")
     print(os.path.abspath(tok.file.path))
@@ -119,9 +123,21 @@ def print_lsp_literal(tok, name: str):
     print(tok.col)
     print("a "+name+" literal")
 
-def print_lsp_keyword(tok, description: str):
+def print_lsp_keyword(tok: "Token", description: str):
     print("---")
     print("keyword")
+    print(os.path.abspath(tok.file.path))
+    print(tok.row)
+    print(tok.col)
+    print(len(tok.text))
+    print(os.path.abspath(tok.file.path))
+    print(tok.row)
+    print(tok.col)
+    print(description)
+
+def print_lsp_decorator(tok: "Token", description: str):
+    print("---")
+    print("decorator")
     print(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
@@ -417,8 +433,8 @@ class ImplementedType:
                 pass
             else: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'")
         if perform_immutability_checks and existing and existing.immutable: 
-            if not existing.type.builtin and "____" in varname: error_token.error("type", "cannot overwrite immutable class instance '"+pretty_name(varname.split("____")[0])+"'")
-            error_token.error("type", "cannot overwrite immutable variable '"+pretty_name(varname)+"'")
+            if not existing.type.builtin and "____" in varname: error_token.error("safety", "cannot overwrite immutable class instance '"+pretty_name(varname.split("____")[0])+"'")
+            else: error_token.error("safety", "cannot overwrite immutable variable '"+pretty_name(varname)+"'")
         if existing and not existing.immutable and value[0].immutable: 
             value[0] = value[0].mutable_copy(error_token)
             #error_token.error("type", "cannot overwrite mutable variable with immutable one '"+varname+"'")
@@ -656,7 +672,7 @@ class Token:
                     for suggestion in suggestions:
                         if "->" in suggestion: print("```rust\n"+suggestion+"\n```")
                         else: print("    -", suggestion)
-            if is_lsp and reason and reason.file.is_main_file and errtype=="safety": return
+            if is_lsp and self.file.is_main_file and errtype=="safety": return
             raise FatalException
 
 
@@ -781,8 +797,8 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         print(at.row)
         print(at.col)
         # message (may span multiple lines))
-        if callee.doc: print("**"+callee.doc[0][1:-1]+"**")
-        if len(callee.doc)>1: print("\n"+"\n".join(doc[1:-1] for doc in callee.doc[1:]))
+        if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
+        if len(callee.doc)>1: print("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:]))
         print("```rust\n"+callee.signature()+(" defined in "+at.file.path if callee.at else " from compiler definitions")+"\n```")
 
     return callee
@@ -1117,7 +1133,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                     at = variation.at if variation.at else type_start
                     print("---")
                     # position in processed file
-                    print("function")
+                    print("struct")
                     print(os.path.abspath(type_start.file.path))
                     print(type_start.row)
                     print(type_start.col)
@@ -1136,11 +1152,12 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
         if is_lsp and type_start.file.is_main_file and show_lsp:
             type_end = get(tokens, pos)
             if type_start.row != type_end.row: type_end = type_start
-            for variation in type.variations:
+            unique_variations = find_unique_variations(type.variations)
+            for variation in unique_variations:
                 at = variation.at if variation.at else type_start
                 print("---")
                 # position in processed file
-                print("function")
+                print("struct")
                 print(os.path.abspath(type_start.file.path))
                 print(type_start.row)
                 print(type_start.col)
@@ -1664,7 +1681,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(current), CODEWORD_SEMICOLON])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current=="doc":
-        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "adds the next cstr predicate to the function's documentation and returns it")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "adds the next cstr predicate to the function's documentation and returns it")
         next_token = get(tokens, pos+1)
         if not next_token.is_string(): next_token.error("type", "expecting 'cstr' documentation")
         pos += 1
@@ -1676,7 +1693,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.doc.append(next_token.text)
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current=="mut":
-        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "declares that the following value will be treated as mutable (fields and pointer contents may modified) - creates an error if the conversion to mutable is unsafe")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "declares that the following value will be treated as mutable (fields and pointer contents may modified) - creates an error if the conversion to mutable is unsafe")
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(tokens[prev_pos]) for r in ret], current_operator_priority)
@@ -1702,12 +1719,12 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             return pos, [var]
         return process_try(pos)
     if current=="unsafe_mut":
-        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "declares that the following value will be treated as mutable, even if that is unsafe (fields and pointer contents may modified) - does NOT create an error if the conversion to mutable is unsafe")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "declares that the following value will be treated as mutable, even if that is unsafe (fields and pointer contents may modified) - does NOT create an error if the conversion to mutable is unsafe")
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(None) for r in ret], current_operator_priority)
     if current=="const":
-        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "declares that the following value will be treated as fully immatuble (it cannot be the reason why fields and pointer contents are modified)")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "declares that the following value will be treated as fully immatuble (it cannot be the reason why fields and pointer contents are modified)")
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.immutable_copy() for r in ret], current_operator_priority)
     if current == "INVALIDATE":
@@ -1730,6 +1747,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
     #     pos, ret = process_deref(file, pos, ret, impl, current_token)
     #     return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
     if current == "class":
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "packs into a uniquely type class")
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         tmp = create_temp()
         var_class = Variable(tmp, impl)
@@ -1829,7 +1847,9 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         pos, method = process_linear_type(file, tokens, pos)
         #if isinstance(method, File): tokens[pos].error("type", "did not resolve completely to a type")
         if peek_text(tokens, pos-1)=="]": vars: list[Variable] = list()
-        else: pos, vars = process_statement(file, tokens, pos, impl, current_operator_priority, for_call=True)
+        else: 
+            current_token = get(tokens, pos-1)
+            pos, vars = process_statement(file, tokens, pos, impl, current_operator_priority, for_call=True)
         varsret = resolve_call(file, impl, method, vars, current_token)
         return process_statement_operator(file, tokens, impl, pos, varsret, current_operator_priority)
     return process_statement_operator(file, tokens, impl, pos+1, [var], current_operator_priority)
@@ -2191,11 +2211,11 @@ def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception
     while peek_text(tokens, pos)!=")":
         arg_immutability = 1
         if get(tokens, pos).text=="mut":
-            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "mutable argument - changes to it overwrite values at the calling site (overwritten values must also be mutable)")
+            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "mutable argument - changes to it overwrite values at the calling site (overwritten values must also be mutable)")
             pos += 1
             arg_immutability = 0
         elif get(tokens, pos).text=="const":
-            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "const argument - not only is it immutable, but also guarantees that it will allow no attached memory or other resource modifications")
+            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "const argument - not only is it immutable, but also guarantees that it will allow no attached memory or other resource modifications")
             pos += 1
             arg_immutability = -1
         if peek_text(tokens, pos)=="ptr":
@@ -2436,6 +2456,10 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
                 u.variations.append(variation)
         if u.variations: new_types[k] = u
     file.types = new_types
+    if debug_mode:
+        for k,v in file.types.items():
+            for variation in v.variations:
+                print(variation.signature())
     return file
 
 def resolve_name(path: str, at_token: Token|None) -> str:

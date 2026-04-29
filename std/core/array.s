@@ -117,8 +117,8 @@ def alloc(nat size)
     return alloc(mut char[], size)
 
 def list(mut any[] buffer)
-    doc "automatically growing list"
-    doc "Defined over a buffer that is automatically managed and resized."
+    doc "list of buffer"
+    doc "List defined over a mutable buffer that is automatically managed and resized."
     doc "A capacity is maintained so that resizes are not performed too frequently."
     length = mut len buffer
     return class(buffer, length)

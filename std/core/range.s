@@ -16,10 +16,13 @@
 
 local import "std/core/numbers.s"
 
-def range(nat|blank from, nat to)
-    if from is blank
-        from = 0
-    return (mut from, to)
+def range(nat|blank _from, nat to)
+    doc "constructs a range given its unsigned integer endpoints"
+    if _from is blank
+        doc "the range's start is assumed to be zero"
+        _from = 0
+    from = mut _from
+    return (from, to)
 
 def next(range r)
     if r.from>=r.to

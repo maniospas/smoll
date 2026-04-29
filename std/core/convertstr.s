@@ -20,9 +20,11 @@ local import "std/core/range.s"
 local import "std/core/string.s"
 
 def console()
+    doc "references the system console"
     return class()
 
 def int(console)
+    doc "reads an integer from the console"
     {builtins::int number=0;builtins::char ch=0;}
     {builtins::int result=scanf("%lld%c", &number, &ch);}
     {builtins::bool success = (result == 2 && (ch == 13 || ch == 10));}
@@ -31,6 +33,7 @@ def int(console)
     return number
 
 def nat(console)
+    doc "reads an unsigned integer from the console"
     {builtins::nat number = 0; builtins::char ch = 0;}
     {builtins::bool success = 0;}
     {builtins::char first = getchar();}
@@ -40,6 +43,7 @@ def nat(console)
     return number
 
 def float(console)
+    doc "reads a float from the console"
     {builtins::float number = 0; builtins::char ch = 0;}
     {builtins::int result = scanf("%lf%c", &number, &ch);}
     {builtins::bool success = (result == 2 && (ch == 13 || ch == 10));}
@@ -48,6 +52,7 @@ def float(console)
     return number
 
 def int(cstr|str _s)
+    doc "converts a string to an integer"
     s = str _s
     if 0==len s
         fail "invalid int conversion from empty string"
@@ -74,6 +79,7 @@ def int(cstr|str _s)
     return const number
 
 def nat(cstr|str _s)
+    doc "converts a string to an unsigned integer"
     s = str _s
     if 0==len s
         fail "invalid nat conversion from empty string"
@@ -88,6 +94,7 @@ def nat(cstr|str _s)
     return const number
 
 def float(cstr|str _s)
+    doc "converts a string to a float"
     s = str _s
     if 0==len s
         fail "invalid float conversion from empty string"

@@ -18,14 +18,17 @@ import "builtins"
 import "std/core/numbers.s"
 
 def float(Number x)
+    doc "cast a number to float - may lose information"
     {builtins::float z=x;}
     return z
 
 def int(Number x)
+    doc "cast a number to float - may lose information"
     {builtins::int z=x;}
     return z
 
 def nat(Number x)
+    doc "cast a number to natural - may lose information and creats an error on negative input"
     if x is int and x<int(0)
         fail "cannot convert negative int to id"
     if x is float and x<float(0)
@@ -34,5 +37,6 @@ def nat(Number x)
     return value
 
 def exists(const any ptr x)
+    doc "checks that a pointer exists"
     {builtins::bool z = x!=0;}
     return z

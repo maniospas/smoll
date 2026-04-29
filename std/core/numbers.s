@@ -23,68 +23,81 @@ def is_different(Number x, Number y)
     return not x is type(y)
 
 def add(Number x, Number y)
+    doc "add"
     if is_different(x,y)
         compiler::skip()
     {type(x) z=x+y;}
     return z
 
 def mul(Number x, Number y)
+    doc "multiply with"
     if is_different(x,y)
         compiler::skip()
     {type(x) z=x*y;}
     return z
 
 def div(Number x, Number y)
+    doc "divide by"
     if is_different(x,y)
         compiler::skip()
     {type(x) z=x/y;}
     return z
 
 def lt(Number x, Number y)
+    doc "less than"
     if is_different(x,y)
         compiler::skip()
     {builtins::bool z = x<y?1:0;}
     return z
 
 def gt(Number x, Number y)
+    doc "greater than"
     if is_different(x,y)
         compiler::skip()
     {builtins::bool z = x>y?1:0;}
     return z
 
 def le(Number x, Number y)
+    doc "less than or equal to"
     if is_different(x,y)
         compiler::skip()
     {builtins::bool z = x<=y?1:0;}
     return z
 
 def ge(Number x, Number y)
+    doc "greater than or equal to"
     if is_different(x,y)
         compiler::skip()
     {builtins::bool z = x>=y?1:0;}
     return z
 
 def eq(Number x, Number y)
+    doc "equal to"
     if is_different(x,y)
         compiler::skip()
     {builtins::bool z = x==y?1:0;}
     return z
 
 def neq(Number x, Number y)
+    doc "unequal to"
     if is_different(x,y)
         compiler::skip()
     {builtins::bool z = x!=y?1:0;}
     return z
     
 def sub(Number x, Number y)
+    doc "substract by"
     if is_different(x,y) 
         compiler::skip()
+    if x is nat
+        doc ""
     if x is nat and x<y
         fail "id subtraction would yield a negative"
     {type(x) z=x-y;}
     return z
 
 def pow(nat x, nat y) 
+    doc "exponentiate by"
     i = mut 0
     ret = mut 1
     while i<y

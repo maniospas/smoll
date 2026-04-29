@@ -97,7 +97,7 @@ CODEWORD_GOTO = CodeWord("goto")
 
 def print_lsp_string(tok):
     print("---")
-    print("namespace")
+    print("string")
     print(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
@@ -192,6 +192,7 @@ class ImplementedType:
         self.name = name
         self.monomorphic_name = name+create_temp()
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
+        self.doc: list[str] = list()
         self.args: list[str] = list()
         self.rets: list[str] = list()
         self.vars: dict[str, Variable] = dict()
@@ -780,6 +781,8 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         print(at.row)
         print(at.col)
         # message (may span multiple lines))
+        if callee.doc: print("**"+callee.doc[0][1:-1]+"**")
+        if len(callee.doc)>1: print("\n"+"\n".join(doc[1:-1] for doc in callee.doc[1:]))
         print("```rust\n"+callee.signature()+(" defined in "+at.file.path if callee.at else " from compiler definitions")+"\n```")
 
     return callee
@@ -1660,6 +1663,18 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.vars[tmp] = variable
         impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(current), CODEWORD_SEMICOLON])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
+    if current=="doc":
+        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "adds the next cstr predicate to the function's documentation and returns it")
+        next_token = get(tokens, pos+1)
+        if not next_token.is_string(): next_token.error("type", "expecting 'cstr' documentation")
+        pos += 1
+        tmp = create_temp()
+        variable = Variable(tmp, CSTR_TYPE)
+        impl.vars[tmp] = variable
+        if is_lsp and next_token.file.is_main_file: print_lsp_string(next_token)
+        impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(next_token.text), CODEWORD_SEMICOLON])
+        impl.doc.append(next_token.text)
+        return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current=="mut":
         if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "declares that the following value will be treated as mutable (fields and pointer contents may modified) - creates an error if the conversion to mutable is unsafe")
         prev_pos = pos
@@ -1797,18 +1812,18 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
 
         # if it was a field, don't try type resolution but immediately fail now
         if is_field: 
-            candidates: list[ImplementedType] = list()
+            field_candidates: list[str] = list()
             max_candidate_common_length = 0
             for varname in impl.vars:
                 if varname.startswith("__temp") or "____temp" in varname: continue
                 common_length = len(longest_common_prefix([varname, current]))
                 if common_length>max_candidate_common_length: 
-                    candidates = list()
+                    field_candidates = list()
                     max_candidate_common_length = common_length
                 if common_length==max_candidate_common_length: 
                     varname = pretty_name(varname)
-                    candidates.append(varname)
-            current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=[candidate.signature() for candidate in candidates]) 
+                    field_candidates.append(varname)
+            current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=[candidate for candidate in field_candidates]) 
 
         # then resolve to a call based on type
         pos, method = process_linear_type(file, tokens, pos)
@@ -2591,18 +2606,33 @@ def load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> File
 POINTER_TYPE = ImplementedType("ptr", "void*", memory_size=8)
 POINTER_TYPE.vars[POINTER_TYPE.rets[0]].immutable = False
 CSTR_TYPE = ImplementedType("cstr", "const char*", memory_size=8)
+CSTR_TYPE.doc.append("constant string")
 BOOL_TYPE = ImplementedType("bool", "int", memory_size=8)
+BOOL_TYPE.doc.append("boolean value")
+BOOL_TYPE.doc.append("Can only be `true` or `false`.")
 INT_TYPE = ImplementedType("int", "long long int", memory_size=8)
+INT_TYPE.doc.append("a signed integer value")
+INT_TYPE.doc.append("Represents values in the range `2^-63 to 2^63-1`.")
 FLOAT_TYPE = ImplementedType("float", "double", memory_size=8)
 UINT_TYPE = ImplementedType("nat", "unsigned long long", memory_size=8)
+UINT_TYPE.doc.append("an unsigned integer value")
+UINT_TYPE.doc.append("Represents values in the range `0 to 2^65-1`.")
 CHAR_TYPE = ImplementedType("char", "char", memory_size=1)
+CHAR_TYPE.doc.append("a character")
+CHAR_TYPE.doc.append("Represents characters in the numeric range `-128 to 127`.")
 FALSE_TYPE = ImplementedType("false", "int")
 FALSE_TYPE._memory_size = 0
 TRUE_TYPE = ImplementedType("true", "int")
 TRUE_TYPE._memory_size = 0
 FAIL_TYPE = ImplementedType("skip")
+FAIL_TYPE.doc.append("skip definition and verify branchless code")
+FAIL_TYPE.doc.append("Branchless code refers loops or conditions that are eliminated during compilation as either always true or always false, based on type analysis and data analysis. This is meaningful for compiling different versions of functions based on specific conditions occuring. This function is hard-wired to create an error if it is called withing a condition or loop that has not been eliminated this way. Otherwise, it skips the current function definition.")
 SUCCESS_TYPE = ImplementedType("branchless")
+SUCCESS_TYPE.doc.append("verify branchless code")
+SUCCESS_TYPE.doc.append("Branchless code refers loops or conditions that are eliminated during compilation as either always true or always false, based on type analysis and data analysis. This is meaningful for compiling different versions of functions based on specific conditions occuring. This function is hard-wired to create an error if it is called withing a condition or loop that has not been eliminated this way.")
 ANY_TYPE = ImplementedType("any")
+ANY_TYPE.doc.append("any type")
+ANY_TYPE.doc.append("Represents a generic for buffers and pointers for type-independent code that can be matched to a concrete type later.")
 # FAIL_TYPE.vars["message"] = CSTR_TYPE
 # FAIL_TYPE.args.append("message") 
 SAME_CONTENTS_TYPE = ImplementedType("attach_type")
@@ -2612,6 +2642,8 @@ SAME_CONTENTS_TYPE.rets.append("to")
 SAME_CONTENTS_TYPE.args.extend(["to", "from"])
 SAME_CONTENTS_TYPE.set_pointer_type(SAME_CONTENTS_TYPE.vars["from"], ANY_TYPE)
 SAME_CONTENTS_TYPE.set_pointer_depedency(SAME_CONTENTS_TYPE.vars["to"], SAME_CONTENTS_TYPE.vars["from"])
+SAME_CONTENTS_TYPE.doc.append("pointer references the same type as another")
+SAME_CONTENTS_TYPE.doc.append("Forces the first pointer to reference the same type of object as another. The function returns the first one to enable chain notation.")
 
 smol_namespace = File("builtins")
 builtin_token = Token("builtina", smol_namespace, 1, 1)

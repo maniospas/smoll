@@ -18,17 +18,22 @@ local import "std/core/builtinsext.s"
 local import "std/core/array.s"
 
 def strdat(nat pos, nat length, char first)
+    doc "string data without the buffer storage"
     return (pos, length, first)
 
 def str(const char[] buf, strdat dat)
+    doc "a string residing on a buffer"
     return (buf, dat)
 
 def str(const char[] buf, nat pos, nat length)
+    doc "a string residing on a buffer that automatically detects the first character"
     if length!=0
         first = buf[pos]  # properly zero-initialized otherwise
     return str(buf, pos, length, first)
 
 def str(cstr c)
+    doc "convert to string"
+    doc "Defines an implicit constant buffer using the cstr's memory data."
     buf = const char[]  # const because we do not allow resizing operations
     {buf__unsafe_ptr = c;}
     {builtins::nat length = c?strlen(c):0;}
@@ -36,9 +41,14 @@ def str(cstr c)
     return str(buf,0,length)
 
 def len(str s)
+    doc "string length"
     return s.dat.length
 
 def copy(char[] buf, mut nat pos, str other)
+    doc "copy a string"
+    doc "Constructs the copy on the buffer at a given position and returns it."
+    doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
+    doc "This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead."
     next_pos = pos+len other
     if next_pos>=len buf
         fail "string buffer out of memory"
@@ -48,10 +58,16 @@ def copy(char[] buf, mut nat pos, str other)
     return str(buf, prev_pos, other.dat.length, other.dat.first)
 
 def copy(char[] buf, mut nat pos, cstr other)
+    doc "copy a cstr"
+    doc "Constructs the copy on the buffer at a given position and returns it as a string."
+    doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
+    doc "This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead."
     return copy(buf, pos, str other)
 
 def print(str s, cstr|blank endl)
+    doc "print a string"
     if endl is blank
+        doc "Ends the line too."
         endl = "\n"
     {printf("%.*s%s", (int)s__dat__length, s__dat__pos+(const char*)s__buf__unsafe_ptr, endl);}
 
@@ -59,6 +75,10 @@ local def charlist()
     return list mut char[]
 
 def copy(charlist li, str|cstr _other)
+    doc "copy a string"
+    doc "Constructs the copy on a buffer managed by a list."
+    doc "The list may automatically resize its managed buffer to fit the new string."
+    doc "This operation therefore destabilizes memory, and the `.dat` segment of strings should be obtained."
     other = str _other
     prev_prev_length = mut li.length
     prev_length = li.length + len other
@@ -68,20 +88,28 @@ def copy(charlist li, str|cstr _other)
     return copy(li.buffer, prev_prev_length, other)
 
 def get(str s, nat i)
+    doc "a character in a string"
     return s.buf[s.dat.pos+i]&
 
 def char(str s)
+    doc "treat as character"
+    doc "The first character of a string is extracted, for example to write `c = char str \"C\"`."
     return s.dat.first
 
 def char(cstr s)
+    doc "treat as character"
+    doc "The first character of a string is extracted, for example to write `c = char \"C\"`."
     {builtins::char c = s?s[0]:0;}
     return c
 
 def eq(char x, char y)
+    doc "equals"
     {builtins::bool z = (x==y);}
     return z
 
 def print(char c, cstr|blank endl)
+    doc "print a character"
     if endl is blank
+        doc "Ends the line too."
         endl = "\n"
     {printf("%c%s", c, endl);}

@@ -1,0 +1,388 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+#ide {
+  font-family: var(--font-mono);
+  background: #1e1e1e; color: #d4d4d4;
+  border-radius: var(--border-radius-lg);
+  border: 0.5px solid #333;
+  overflow: hidden; display: flex; flex-direction: column; height: 620px;
+}
+#titlebar {
+  background: #323233; border-bottom: 1px solid #111;
+  display: flex; align-items: center; gap: 10px; padding: 0 12px; height: 36px; flex-shrink: 0;
+}
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+#tabs { display: flex; margin-left: 8px; }
+.tab { color: #888; font-size: 12px; padding: 6px 14px; border-top: 1px solid transparent; cursor: pointer; user-select: none; }
+.tab.active { background: #1e1e1e; color: #ccc; border-top-color: #007acc; }
+#toolbar {
+  background: #2d2d2d; border-bottom: 1px solid #111;
+  display: flex; align-items: center; gap: 6px; padding: 4px 10px; flex-shrink: 0;
+}
+.tbtn { background: #0e639c; color: #fff; border: none; border-radius: 3px; font-size: 11px; font-family: var(--font-mono); padding: 3px 10px; cursor: pointer; }
+.tbtn:hover { background: #1177bb; }
+.tbtn:active { background: #094c78; }
+.tbtn.sec { background: #3a3a3a; color: #ccc; }
+.tbtn.sec:hover { background: #484848; }
+#py-status { margin-left: auto; font-size: 11px; color: #888; display: flex; align-items: center; gap: 5px; }
+.sdot { width: 7px; height: 7px; border-radius: 50%; background: #888; flex-shrink: 0; }
+.sdot.loading { background: #e5c07b; animation: pulse 1s infinite; }
+.sdot.ready   { background: #98c379; }
+.sdot.error   { background: #f44747; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+#panels { display: flex; flex: 1; overflow: hidden; }
+.pane { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.pane + .pane { border-left: 1px solid #111; }
+.pane-hdr { background: #252526; border-bottom: 1px solid #111; font-size: 11px; color: #888; padding: 4px 10px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.editor-inner { position: relative; flex: 1; overflow: hidden; }
+#lnums { position: absolute; top: 0; left: 0; padding: 10px 0 10px 8px; color: #555; font-size: 13px; line-height: 1.6; user-select: none; pointer-events: none; min-width: 34px; text-align: right; }
+#editor { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: transparent; color: #d4d4d4; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; border: none; outline: none; resize: none; padding: 10px 10px 10px 44px; tab-size: 2; white-space: pre; overflow: auto; caret-color: #fff; }
+#c-out { flex: 1; overflow: auto; padding: 10px 14px; font-size: 12.5px; line-height: 1.65; white-space: pre; }
+#console-out {
+  flex: 1; overflow-y: auto;
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px; line-height: 1.7;
+  white-space: pre;
+}
+#statusbar { background: #007acc; color: #fff; font-size: 11px; padding: 2px 12px; display: flex; gap: 12px; flex-shrink: 0; }
+#cursor-pos { margin-left: auto; }
+.kw{color:#569cd6}.ty{color:#4ec9b0}.str{color:#ce9178}.cmt{color:#6a9955;font-style:italic}.pp{color:#c586c0}.num{color:#b5cea8}.fn{color:#dcdcaa}
+</style>
+
+<div id="ide">
+  <div id="titlebar">
+    <div class="dot" style="background:#ff5f56"></div>
+    <div class="dot" style="background:#ffbd2e"></div>
+    <div class="dot" style="background:#27c93f"></div>
+    <div id="tabs">
+      <div class="tab active" data-tab="editor">program.s</div>
+      <div class="tab" data-tab="c">output.c</div>
+      <div class="tab" data-tab="console">console</div>
+    </div>
+  </div>
+  <div id="toolbar">
+    <button class="tbtn" id="btn-run">&#9654; Transpile</button>
+    <button class="tbtn sec" id="btn-clear">Clear</button>
+    <div id="py-status">
+      <div class="sdot loading" id="sdot"></div>
+      <span id="stxt">Loading...</span>
+    </div>
+  </div>
+  <div id="panels">
+    <div class="pane" id="pane-editor">
+      <div class="editor-inner">
+        <div id="lnums"></div>
+        <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+      </div>
+    </div>
+    <div class="pane" id="pane-c" style="display:none">
+      <div class="pane-hdr"><span id="c-filename">output.c</span><span id="c-lines"></span></div>
+      <div id="c-out"><span style="color:#555">Transpile a program to see C output here.</span></div>
+    </div>
+    <div class="pane" id="pane-console" style="display:none">
+      <div class="pane-hdr"><span>CONSOLE</span><span id="run-time"></span></div>
+      <div id="console-out"></div>
+    </div>
+  </div>
+  <div id="statusbar">
+    <span id="status-label">smoll IDE</span>
+    <span id="cursor-pos">Ln 1, Col 1</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const editor     = document.getElementById('editor');
+  const cOut       = document.getElementById('c-out');
+  const conOut     = document.getElementById('console-out');
+  const sdot       = document.getElementById('sdot');
+  const stxt       = document.getElementById('stxt');
+  const btnRun     = document.getElementById('btn-run');
+  const btnClear   = document.getElementById('btn-clear');
+  const lnums      = document.getElementById('lnums');
+  const cursorPos  = document.getElementById('cursor-pos');
+  const runTime    = document.getElementById('run-time');
+  const cFilename  = document.getElementById('c-filename');
+  const cLines     = document.getElementById('c-lines');
+  const statusLabel= document.getElementById('status-label');
+
+  let pyodide = null, smollSource = null, pyodideReady = false;
+
+  editor.value = 'repo "https://github.com/maniospas/smoll/raw/refs/heads/main/std/" as "std/"\nimport "std/core.s"\ndef main()\n    print "Hello world!"\n';
+  updateLnums();
+
+  document.querySelectorAll('.tab').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    ['editor','c','console'].forEach(id => {
+      const p = document.getElementById('pane-' + id);
+      if (p) p.style.display = id === name ? 'flex' : 'none';
+    });
+  }
+
+  function updateLnums() {
+    lnums.innerHTML = editor.value.split('\n').map((_,i) => `<div>${i+1}</div>`).join('');
+  }
+  editor.addEventListener('input', updateLnums);
+  editor.addEventListener('scroll', () => { lnums.style.marginTop = (-editor.scrollTop) + 'px'; });
+  editor.addEventListener('keydown', e => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const s = editor.selectionStart;
+      editor.value = editor.value.substring(0,s) + '  ' + editor.value.substring(editor.selectionEnd);
+      editor.selectionStart = editor.selectionEnd = s + 2;
+      updateLnums();
+    }
+    if ((e.ctrlKey||e.metaKey) && e.key === 'Enter') { e.preventDefault(); runCode(); }
+  });
+  editor.addEventListener('keyup', updateCursor);
+  editor.addEventListener('click', updateCursor);
+  function updateCursor() {
+    const v = editor.value.substring(0, editor.selectionStart).split('\n');
+    cursorPos.textContent = `Ln ${v.length}, Col ${v[v.length-1].length+1}`;
+  }
+
+  // ── ANSI renderer ──────────────────────────────────────────
+  const ANSI_FG = {
+    30:'#1e1e1e', 31:'#f44747', 32:'#98c379', 33:'#e5c07b',
+    34:'#569cd6', 35:'#c586c0', 36:'#4ec9b0', 37:'#d4d4d4',
+    90:'#555555', 91:'#ff6b6b', 92:'#b5f0a0', 93:'#ffd080',
+    94:'#82baff', 95:'#e0a0ff', 96:'#80ffe0', 97:'#ffffff'
+  };
+  const ANSI_BG = {
+    40:'#1e1e1e', 41:'#5a1a1a', 42:'#1a3a1a', 43:'#3a3a1a',
+    44:'#1a1a5a', 45:'#3a1a3a', 46:'#1a3a3a', 47:'#3a3a3a',
+    100:'#333',  101:'#7a2a2a',102:'#2a5a2a',103:'#5a5a2a',
+    104:'#2a2a7a',105:'#5a2a5a',106:'#2a5a5a',107:'#5a5a5a'
+  };
+
+  function ansiToHtml(raw) {
+    let s = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    let result = '', openSpan = false;
+    let state = { bold:false, dim:false, fg:null, bg:null };
+    const close = () => { if (openSpan) { result += '</span>'; openSpan = false; } };
+    const open  = () => {
+      const styles = [];
+      if (state.fg)   styles.push(`color:${state.fg}`);
+      if (state.bg)   styles.push(`background:${state.bg}`);
+      if (state.bold) styles.push('font-weight:500');
+      if (state.dim)  styles.push('opacity:0.6');
+      if (styles.length) { result += `<span style="${styles.join(';')}">`, openSpan = true; }
+    };
+    const parts = s.split(/\x1b\[([0-9;]*)m/);
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2 === 0) { result += parts[i]; }
+      else {
+        close();
+        const codes = parts[i] === '' ? [0] : parts[i].split(';').map(Number);
+        for (const c of codes) {
+          if      (c === 0)              state = {bold:false,dim:false,fg:null,bg:null};
+          else if (c === 1)              state.bold = true;
+          else if (c === 2)              state.dim  = true;
+          else if (c === 22)             { state.bold = false; state.dim = false; }
+          else if (c>=30 && c<=37)       state.fg = ANSI_FG[c];
+          else if (c>=90 && c<=97)       state.fg = ANSI_FG[c];
+          else if (c === 39)             state.fg = null;
+          else if (c>=40 && c<=47)       state.bg = ANSI_BG[c];
+          else if (c>=100 && c<=107)     state.bg = ANSI_BG[c];
+          else if (c === 49)             state.bg = null;
+        }
+        open();
+      }
+    }
+    close();
+    return result;
+  }
+
+  // Each line gets its own div so flex layout stays correct;
+  // color arg only used when there are no ANSI codes at all.
+  function clog(raw, color) {
+    const d = document.createElement('div');
+    if (color && !raw.includes('\x1b[')) {
+      const esc = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      d.innerHTML = `<span style="color:${color}">${esc}</span>`;
+    } else {
+      d.innerHTML = ansiToHtml(raw);
+    }
+    conOut.appendChild(d);
+    conOut.scrollTop = conOut.scrollHeight;
+  }
+
+  // ── Filter smoll's internal Python traceback ───────────────
+  // Keep only lines that came from smoll itself (user-visible errors),
+  // drop the Python traceback that wraps the _SmollExit / os._exit path.
+  function filterTraceback(lines) {
+    // Detect the start of an internal traceback we want to hide:
+    // "Traceback (most recent call last):" followed by smoll internals
+    // We want to suppress everything from that line through the final
+    // "RuntimeError: smoll exited with code N" line (which we also drop,
+    // since smoll already printed its own error message above it).
+    const result = [];
+    let inTraceback = false;
+    for (const line of lines) {
+      // const stripped = line.replace(/\x1b\[[0-9;]*m/g, '');
+      // if (stripped.startsWith('Traceback (most recent call last):')) {
+      //   inTraceback = true;
+      //   continue;
+      // }
+      // if (inTraceback) {
+      //   // End markers: RuntimeError line or _SmollExit line
+      //   if (stripped.startsWith('RuntimeError:') ||
+      //       stripped.startsWith('_SmollExit') ||
+      //       stripped.startsWith('smoll exited')) {
+      //     inTraceback = false;
+      //   }
+      //   continue;
+      // }
+      result.push(line);
+    }
+    return result;
+  }
+
+  // ── C syntax highlight ─────────────────────────────────────
+  function highlightC(code) {
+    let s = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const segs = []; let last = 0;
+    const re = /(\/\/[^\n]*)|(\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g;
+    let m;
+    while ((m = re.exec(s)) !== null) {
+      if (m.index > last) segs.push({t:'code', v: s.slice(last, m.index)});
+      segs.push({t:'lit', cls: (m[0][0]==='"'||m[0][0]==="'") ? 'str':'cmt', v: m[0]});
+      last = m.index + m[0].length;
+    }
+    if (last < s.length) segs.push({t:'code', v: s.slice(last)});
+    return segs.map(seg => {
+      if (seg.t === 'lit') return `<span class="${seg.cls}">${seg.v}</span>`;
+      let v = seg.v;
+      v = v.replace(/^(#\s*\w+.*)/gm, '<span class="pp">$1</span>');
+      v = v.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, '<span class="fn">$1</span>');
+      v = v.replace(/\b(if|else|for|while|do|return|break|continue|switch|case|default|struct|typedef|sizeof|void|static|const|extern|inline|goto|enum|union)\b/g, '<span class="kw">$1</span>');
+      v = v.replace(/\b(int|char|float|double|long|short|unsigned|signed|size_t|FILE|NULL|bool)\b/g, '<span class="ty">$1</span>');
+      v = v.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+      return v;
+    }).join('');
+  }
+
+  // ── Fetch smoll.py ─────────────────────────────────────────
+  async function fetchSmoll() {
+    try {
+      const resp = await fetch('https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/smoll.py');
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      smollSource = await resp.text();
+      clog(`smoll.py fetched (${smollSource.length} bytes)`, '#98c379');
+      statusLabel.textContent = 'smoll IDE — ready';
+      return true;
+    } catch(err) {
+      clog('Failed to fetch smoll.py: ' + err.message, '#f44747');
+      statusLabel.textContent = 'smoll IDE — fetch failed';
+      return false;
+    }
+  }
+
+  // ── Pyodide ────────────────────────────────────────────────
+  async function initPyodide() {
+    try {
+      pyodide = await loadPyodide();
+      pyodideReady = true;
+      sdot.className = 'sdot ready';
+      stxt.textContent = 'Ready';
+      clog('Pyodide loaded.', '#4ec9b0');
+    } catch(err) {
+      sdot.className = 'sdot error';
+      stxt.textContent = 'Pyodide failed';
+      clog('Pyodide error: ' + err.message, '#f44747');
+    }
+  }
+
+  // ── Run ────────────────────────────────────────────────────
+  async function runCode() {
+    if (!pyodideReady) { clog('Pyodide not ready yet.', '#e5c07b'); switchTab('console'); return; }
+    if (!smollSource)  { clog('smoll.py not loaded yet.', '#e5c07b'); switchTab('console'); return; }
+
+    conOut.innerHTML = ''; runTime.textContent = '';
+    const t0 = performance.now();
+    const captured = [];
+    pyodide.setStdout({ batched: s => captured.push({t:'out', s}) });
+    pyodide.setStderr({ batched: s => captured.push({t:'err', s}) });
+
+    let cCode = null;
+    try {
+      pyodide.FS.writeFile('/program.s', editor.value);
+      pyodide.FS.writeFile('/smoll_src.py', smollSource);
+
+      await pyodide.runPythonAsync(`
+import sys, types, os
+
+class _SmollExit(Exception):
+    def __init__(self, code): self.code = code
+os._exit = lambda code: (_ for _ in ()).throw(_SmollExit(code))
+
+sys.argv = ['smoll', '/program.s', '--back', 'none']
+
+_mod = types.ModuleType('smoll')
+_mod.__file__ = '/smoll_src.py'
+sys.modules['smoll'] = _mod
+_mod.__name__ = '__main__'
+
+try:
+    exec(compile(open('/smoll_src.py').read(), '/smoll_src.py', 'exec'), _mod.__dict__)
+except _SmollExit as e:
+    if e.code != 0:
+        raise RuntimeError(f"smoll exited with code {e.code}")
+except SystemExit as e:
+    if str(e) not in ('0', 'None'):
+        raise RuntimeError(f"smoll exited: {e}")
+`);
+      for (const path of ['/program.c', 'program.c']) {
+        try { cCode = pyodide.FS.readFile(path, {encoding:'utf8'}); break; } catch(_) {}
+      }
+    } catch(err) {
+      const msg = err.message || String(err);
+      if (!msg.includes('SystemExit: 0')) captured.push({t:'err', s: msg});
+    }
+
+    const elapsed = ((performance.now() - t0) / 1000).toFixed(3);
+    runTime.textContent = `${elapsed}s`;
+
+    // Collect all lines from stdout+stderr, filter traceback, then render
+    const allLines = [];
+    for (const {s} of captured) s.split('\n').forEach(l => allLines.push(l));
+    const filtered = filterTraceback(allLines);
+    filtered.forEach(line => { if (line.trim() || line === '') clog(line); });
+    clog(`── done in ${elapsed}s ──`, '#4ec9b0');
+
+    if (cCode) {
+      const lineCount = cCode.split('\n').length;
+      cOut.innerHTML = highlightC(cCode);
+      cFilename.textContent = 'program.c';
+      cLines.textContent = `${lineCount} lines`;
+      switchTab('c');
+      clog(`C output: ${lineCount} lines`, '#98c379');
+    } else {
+      switchTab('console');
+    }
+  }
+
+  btnRun.onclick = runCode;
+  btnClear.onclick = () => {
+    cOut.innerHTML = '<span style="color:#555">Transpile a program to see C output here.</span>';
+    cLines.textContent = ''; conOut.innerHTML = '';
+  };
+
+  switchTab('console');
+  const pyScript = document.createElement('script');
+  pyScript.src = 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js';
+  pyScript.onload = () => {
+    Promise.all([initPyodide(), fetchSmoll()]).then(() => {
+      if (pyodideReady && smollSource) {
+        clog('Ready — write a smoll program and hit Transpile (Ctrl+Enter).', '#4ec9b0');
+        switchTab('editor');
+      }
+    });
+  };
+  pyScript.onerror = () => { sdot.className='sdot error'; stxt.textContent='CDN error'; };
+  document.head.appendChild(pyScript);
+})();
+</script>

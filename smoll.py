@@ -2598,10 +2598,14 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
 
 def download_with_progress(url: str, filepath: str, message: str):
     filename = os.path.basename(filepath)
+    fallback: bool = False
+    print(url)
     try:
         response = urllib.request.urlopen(url)
         total_size = int(response.getheader('Content-Length').strip())
     except Exception as e:
+        fallback = True
+    if fallback:
         print(f"\r[{YELLOW}+{RESET}] {message} ... (unknown size)")
         urllib.request.urlretrieve(url, filepath)
         return

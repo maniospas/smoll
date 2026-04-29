@@ -2,7 +2,7 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 #ide {
-  font-family: var(--font-mono);
+  font-family: monospace;
   background: #1e1e1e; color: #d4d4d4;
   border-radius: var(--border-radius-lg);
   border: 0.5px solid #333;
@@ -20,7 +20,7 @@
   background: #2d2d2d; border-bottom: 1px solid #111;
   display: flex; align-items: center; gap: 6px; padding: 4px 10px; flex-shrink: 0;
 }
-.tbtn { background: #0e639c; color: #fff; border: none; border-radius: 3px; font-size: 11px; font-family: var(--font-mono); padding: 3px 10px; cursor: pointer; }
+.tbtn { background: #0e639c; color: #fff; border: none; border-radius: 3px; font-size: 11px; font-family: monospace; padding: 3px 10px; cursor: pointer; }
 .tbtn:hover { background: #1177bb; }
 .tbtn:active { background: #094c78; }
 .tbtn.sec { background: #3a3a3a; color: #ccc; }
@@ -37,12 +37,12 @@
 .pane-hdr { background: #252526; border-bottom: 1px solid #111; font-size: 11px; color: #888; padding: 4px 10px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
 .editor-inner { position: relative; flex: 1; overflow: hidden; }
 #lnums { position: absolute; top: 0; left: 0; padding: 10px 0 10px 8px; color: #555; font-size: 13px; line-height: 1.6; user-select: none; pointer-events: none; min-width: 34px; text-align: right; }
-#editor { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: transparent; color: #d4d4d4; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; border: none; outline: none; resize: none; padding: 10px 10px 10px 44px; tab-size: 2; white-space: pre; overflow: auto; caret-color: #fff; }
+#editor { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: transparent; color: #d4d4d4; font-family: monospace; font-size: 13px; line-height: 1.6; border: none; outline: none; resize: none; padding: 10px 10px 10px 44px; tab-size: 2; white-space: pre; overflow: auto; caret-color: #fff; }
 #c-out { flex: 1; overflow: auto; padding: 10px 14px; font-size: 12.5px; line-height: 1.65; white-space: pre; }
 #console-out {
   flex: 1; overflow-y: auto;
   padding: 10px;
-  font-family: var(--font-mono);
+  font-family: monospace;
   font-size: 12px; line-height: 1.7;
   white-space: pre;
 }
@@ -110,7 +110,7 @@
 
   let pyodide = null, smollSource = null, pyodideReady = false;
 
-  editor.value = 'repo "https://github.com/maniospas/smoll/raw/refs/heads/main/std/" as "std/"\nimport "std/core.s"\ndef main()\n    print "Hello world!"\n';
+  editor.value = 'repo "https://github.com/maniospas/smoll/raw/refs/heads/main/std/" as "std/"\nimport "std/core.s"\n\ndef main()\n    print "Hello world!"\n';
   updateLnums();
 
   document.querySelectorAll('.tab').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
@@ -222,20 +222,20 @@
     const result = [];
     let inTraceback = false;
     for (const line of lines) {
-      // const stripped = line.replace(/\x1b\[[0-9;]*m/g, '');
-      // if (stripped.startsWith('Traceback (most recent call last):')) {
-      //   inTraceback = true;
-      //   continue;
-      // }
-      // if (inTraceback) {
-      //   // End markers: RuntimeError line or _SmollExit line
-      //   if (stripped.startsWith('RuntimeError:') ||
-      //       stripped.startsWith('_SmollExit') ||
-      //       stripped.startsWith('smoll exited')) {
-      //     inTraceback = false;
-      //   }
-      //   continue;
-      // }
+      const stripped = line.replace(/\x1b\[[0-9;]*m/g, '');
+      if (stripped.startsWith('Traceback (most recent call last):')) {
+        inTraceback = true;
+        continue;
+      }
+      if (inTraceback) {
+        // End markers: RuntimeError line or _SmollExit line
+        if (stripped.startsWith('RuntimeError:') ||
+            stripped.startsWith('_SmollExit') ||
+            stripped.startsWith('smoll exited')) {
+          inTraceback = false;
+        }
+        continue;
+      }
       result.push(line);
     }
     return result;

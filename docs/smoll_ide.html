@@ -308,8 +308,13 @@ async def download_with_progress(url: str, filepath: str, message: str):
   async function runCode() {
     if (!pyodideReady) { clog('Pyodide not ready yet.', '#e5c07b'); switchTab('console'); return; }
     if (!smollSource)  { clog('smoll.py not loaded yet.', '#e5c07b'); switchTab('console'); return; }
+    setRunning(true);
+    switchTab('c');
 
-    conOut.innerHTML = ''; runTime.textContent = '';
+    runTime.textContent = '';
+    cOut.innerHTML = `<span style="color:#e5c07b">
+      <span class="sdot loading" style="display:inline-block;margin-right:6px"></span>
+    </span>`;
     const t0 = performance.now();
     const captured = [];
     pyodide.setStdout({ batched: s => captured.push({t:'out', s}) });
@@ -358,6 +363,7 @@ except SystemExit as e:
     for (const {s} of captured) s.split('\n').forEach(l => allLines.push(l));
     filterTraceback(allLines).forEach(line => { if(line.trim()||line==='') clog(line); });
     clog(`── done in ${elapsed}s ──`, '#4ec9b0');
+    setRunning(false);
 
     if (cCode) {
       const lineCount = cCode.split('\n').length;
@@ -378,6 +384,25 @@ except SystemExit as e:
   };
 
   switchTab('console');
+
+  let isRunning = false;
+
+  function setRunning(state) {
+    isRunning = state;
+    btnRun.disabled = state;
+
+    if (state) {
+      sdot.className = 'sdot loading';
+      stxt.textContent = 'Transpiling...';
+
+      cOut.innerHTML = '<span style="color:#888">⏳ Running transpilation...</span>';
+      cFilename.textContent = 'program.c';
+      cLines.textContent = '';
+    } else {
+      sdot.className = 'sdot ready';
+      stxt.textContent = 'Ready';
+    }
+  }
 
   const pyScript = document.createElement('script');
   pyScript.src = 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js';

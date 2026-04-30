@@ -2785,10 +2785,10 @@ if chosen_compiler == "auto":
     #if os.path.exists("antcc"): chosen_compiler = "antcc"
     #else: 
     chosen_compiler = "gcc"
-src_path = Path(args.source)
-if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); os._exit(1)
 
 async def main():
+    src_path = Path(args.source)
+    if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); os._exit(1)
     if not is_lsp: print(f"[{YELLOW}+{RESET}] process      {src_path}")
     file: File = await load(await resolve_name(str(src_path), None), is_main_file=True)
     if not is_lsp:
@@ -2806,4 +2806,14 @@ async def main():
         
         os._exit(0) # not in lsp case, as it inteferes with the stdout pipe
 
-asyncio.run(main())
+
+# compatibility with pyodine
+def is_event_loop_running():
+    try:
+        asyncio.get_running_loop()
+        return True
+    except RuntimeError: return False
+if is_event_loop_running():
+    asyncio.create_task(main())
+else:
+    asyncio.run(main())

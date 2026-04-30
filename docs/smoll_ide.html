@@ -247,9 +247,6 @@ html,body{height:100%;background:#1e1e1e}
    * ────────────────────────────────────────────────────────────────────── */
   const PATCH_MARKER = 'async def download_with_progress(';
   const PATCH_CODE = `
-import asyncio as _asyncio
-import os as _os
-
 async def download_with_progress(url: str, filepath: str, message: str):
     from pyodide.http import pyfetch
     print(f"[{YELLOW}+{RESET}] {message} ...")
@@ -257,9 +254,9 @@ async def download_with_progress(url: str, filepath: str, message: str):
     if response.status != 200:
         raise RuntimeError(f"Failed to fetch {url}: HTTP {response.status}")
     data = await response.bytes()
-    _os.makedirs(_os.path.dirname(filepath), exist_ok=True)
-    with open(filepath, "wb") as _f:
-        _f.write(data)
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, "wb") as f:
+        f.write(data)
 `;
 
   function patchSmoll(src) {

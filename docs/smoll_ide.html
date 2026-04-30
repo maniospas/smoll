@@ -316,8 +316,14 @@ async def download_with_progress(url: str, filepath: str, message: str):
     </span>`;
     const t0 = performance.now();
     const captured = [];
-    pyodide.setStdout({ batched: s => captured.push({t:'out', s}) });
-    pyodide.setStderr({ batched: s => captured.push({t:'err', s}) });
+    pyodide.setStdout({
+      write: (s) => {
+        clog(s); // immediate streaming to UI
+      }
+    });
+    pyodide.setStderr({
+      write: (s) => clog(s, '#f44747')
+    });
 
     let cCode = null;
     try {

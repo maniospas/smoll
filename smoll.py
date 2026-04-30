@@ -2813,7 +2813,7 @@ def is_event_loop_running():
         return True
     except RuntimeError: return False
 if is_event_loop_running():
-    task = asyncio.create_task(main())
+    asyncio.create_task(main())
 else:
     asyncio.run(main())
-    if not is_lsp: os._exit(0) # not in lsp case, as it inteferes with the stdout pipe
+    #if not is_lsp: os._exit(0) # not in lsp case, as it inteferes with the stdout pipe

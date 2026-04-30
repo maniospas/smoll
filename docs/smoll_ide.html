@@ -34,25 +34,22 @@ html,body{height:100%;background:#1e1e1e}
 #cursor-pos{margin-left:auto}
 .kw{color:#569cd6}.ty{color:#4ec9b0}.str{color:#ce9178}.cmt{color:#6a9955;font-style:italic}.pp{color:#c586c0}.num{color:#b5cea8}.fn{color:#dcdcaa}
 </style>
+
+
 </head>
 <body>
 <div id="ide">
   <div id="titlebar">
-    <div class="dot" style="background:#ff5f56"></div>
-    <div class="dot" style="background:#ffbd2e"></div>
-    <div class="dot" style="background:#27c93f"></div>
     <div id="tabs">
+      <div id="py-status">
+        <div class="sdot loading" id="sdot"></div>
+        <span id="stxt">Loading...</span>
+      </div>&nbsp;
+      <button class="tbtn" id="btn-run">&#9654; Transpile</button>
+      <button class="tbtn sec" id="btn-clear" hidden>Clear</button>
       <div class="tab active" data-tab="editor">program.s</div>
-      <div class="tab" data-tab="c">output.c</div>
+      <div class="tab" data-tab="c">program.c</div>
       <div class="tab" data-tab="console">console</div>
-    </div>
-  </div>
-  <div id="toolbar">
-    <button class="tbtn" id="btn-run">&#9654; Transpile</button>
-    <button class="tbtn sec" id="btn-clear">Clear</button>
-    <div id="py-status">
-      <div class="sdot loading" id="sdot"></div>
-      <span id="stxt">Loading...</span>
     </div>
   </div>
   <div id="panels">
@@ -63,7 +60,7 @@ html,body{height:100%;background:#1e1e1e}
       </div>
     </div>
     <div class="pane" id="pane-c" style="display:none">
-      <div class="pane-hdr"><span id="c-filename">output.c</span><span id="c-lines"></span></div>
+      <div class="pane-hdr"><span id="c-filename">program.c</span><span id="c-lines"></span></div>
       <div id="c-out"><span style="color:#555">Transpile a program to see C output here.</span></div>
     </div>
     <div class="pane" id="pane-console" style="display:none">
@@ -289,6 +286,7 @@ async def download_with_progress(url: str, filepath: str, message: str):
     }
   }
 
+  btnRun.style.display = 'none';
   /* ── Pyodide init ── */
   async function initPyodide() {
     try {
@@ -296,6 +294,9 @@ async def download_with_progress(url: str, filepath: str, message: str):
       pyodideReady = true;
       sdot.className = 'sdot ready';
       stxt.textContent = 'Ready';
+      sdot.style.display = 'none';
+      stxt.style.display = 'none';
+      btnRun.style.display = '';
       clog('Pyodide loaded.', '#4ec9b0');
     } catch(err) {
       sdot.className = 'sdot error';
@@ -304,32 +305,42 @@ async def download_with_progress(url: str, filepath: str, message: str):
     }
   }
 
+  async function waitForNewFile(path, timeout = 5000) {
+    const start = performance.now();
+    while (performance.now() - start < timeout) {
+      try {
+        pyodide.FS.stat(path);
+        const content = pyodide.FS.readFile(path, { encoding: "utf8" });
+        if (content && content.length > 0) 
+          return content;
+      } 
+      catch (_) {}
+      await new Promise(r => setTimeout(r, 20));
+    }
+    return null; // or throw new Error("Timeout waiting for non-empty file");
+  }
+
   /* ── Run / transpile ── */
   async function runCode() {
     if (!pyodideReady) { clog('Pyodide not ready yet.', '#e5c07b'); switchTab('console'); return; }
     if (!smollSource)  { clog('smoll.py not loaded yet.', '#e5c07b'); switchTab('console'); return; }
-    switchTab('c');
 
-    runTime.textContent = '';
-    cOut.innerHTML = `<span style="color:#e5c07b">
+    conOut.innerHTML = ''; runTime.textContent = '';
+    switchTab('console');
+    cOut.innerHTML = `
+    <span style="color:#e5c07b">
       <span class="sdot loading" style="display:inline-block;margin-right:6px"></span> Transpiling to C...
     </span>`;
     const t0 = performance.now();
     const captured = [];
-    pyodide.setStdout({
-      write: (s) => {
-        clog(s); // immediate streaming to UI
-      }
-    });
-    pyodide.setStderr({
-      write: (s) => clog(s, '#f44747')
-    });
+    pyodide.setStdout({ batched: s => captured.push({t:'out', s}) });
+    pyodide.setStderr({ batched: s => captured.push({t:'err', s}) });
 
     let cCode = null;
     try {
-      pyodide.FS.writeFile('/program.s', editor.value);
-      pyodide.FS.writeFile('/smoll_src.py', smollSource);
-
+      await pyodide.FS.writeFile('/program.s', editor.value);
+      await pyodide.FS.writeFile('/smoll_src.py', smollSource);
+      await pyodide.FS.writeFile('/program.c', '');
       await pyodide.runPythonAsync(`
 import sys, types, os
 
@@ -353,9 +364,8 @@ except SystemExit as e:
     if str(e) not in ('0', 'None'):
         raise RuntimeError(f"smoll exited: {e}")
 `);
-      for (const path of ['/program.c', 'program.c']) {
-        try { cCode = pyodide.FS.readFile(path, {encoding:'utf8'}); break; } catch(_) {}
-      }
+      const ok = await waitForNewFile('/program.c', 8000);
+      if (ok) cCode = pyodide.FS.readFile('/program.c', { encoding: 'utf8' });
     } catch(err) {
       const msg = err.message || String(err);
       if (!msg.includes('SystemExit: 0')) captured.push({t:'err', s: msg});
@@ -374,7 +384,7 @@ except SystemExit as e:
       cOut.innerHTML = highlightC(cCode);
       cFilename.textContent = 'program.c';
       cLines.textContent = `${lineCount} lines`;
-      switchTab('c');
+      switchTab('console');
       clog(`C output: ${lineCount} lines`, '#98c379');
     } else {
       switchTab('console');
@@ -388,8 +398,6 @@ except SystemExit as e:
   };
 
   switchTab('console');
-
-  let isRunning = false;
 
   const pyScript = document.createElement('script');
   pyScript.src = 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js';

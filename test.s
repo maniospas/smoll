@@ -1,17 +1,8 @@
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import "std/core.s"
-import "builtins" as builtins
-
-def test(char t)
-    print t
 
 def main()
-    print 1
-    mem = list mut char[]
-    s1 = mem.copy "123.12"
-    s2 = mem.copy "123.12"
-
-    #print float s1
-    print float s2
-    print len mem.buffer
-    
+    while not try x = float console print "Please give a number:"
+        print "invalid number"
+    print "this is its square"
+    print x*x

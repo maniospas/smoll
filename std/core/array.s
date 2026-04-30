@@ -113,7 +113,7 @@ def len(const any[] buffer)
     return buffer.unsafe_size
 
 def alloc(nat size)
-    doc "allocates a character buffer of given size"
+    doc "allocates a `char[]` buffer of given size"
     return alloc(mut char[], size)
 
 def list(mut any[] buffer)

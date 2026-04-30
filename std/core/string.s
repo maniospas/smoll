@@ -44,6 +44,33 @@ def len(str s)
     doc "string length"
     return s.dat.length
 
+def copy(str other)
+    doc "copy a string to a new buffer"
+    buf = alloc len other
+    {memcpy(((char*)buf__unsafe_ptr), ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
+    return str(buf, 0, other.dat.length, other.dat.first)
+
+def copy(cstr other)
+    doc "copy a cstr to a new buffer"
+    return copy str other
+
+def copy_null_terminated(str other)
+    doc "copy a string to a new buffer while ensuring null termination"
+    buf = alloc 1+len other
+    {memcpy(((char*)buf__unsafe_ptr), ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
+    {((char*)buf__unsafe_ptr)[other__dat__length] = 0;}
+    return str(buf, 0, other.dat.length, other.dat.first)
+
+def unsafe_temporary_cstr(str other) 
+    doc "convert a string to a temporary cstr"
+    doc "This function's return is meant to be passed to operating system calls,"
+    doc "and will become invalid once the calling site ends."
+    doc "It also does not admit proper cstr equality comparisons via pointer values"
+    doc "that reflect contents; it will compare equal only to itself."
+    c = copy_null_terminated(other)
+    {builtins::cstr ret = other__buf__unsafe_ptr;}
+    return ret
+
 def copy(char[] buf, mut nat pos, str other)
     doc "copy a string"
     doc "Constructs the copy on the buffer at a given position and returns it."

@@ -13,11 +13,12 @@ manuals to onboard.
 
 ## 🚀 Features
 
-- Functions returns as type declarations
+- Function returns as type declarations
 - Simple tuple-based type system
 - Function and type overloading
 - Safe yet permissive
 - Immutability by default (can still define mutables)
+- Can opt in to constness for memory contents
 - C integration
 - Zero-cost abstractions everywhere
 
@@ -37,7 +38,7 @@ Cheat sheet:
 
 ```python
 # test.s
-repo "https://github.com/maniospas/smoll/raw/refs/heads/main/std/" as "std/"
+repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import "std/core.s"
 import "std/io.s" as io
 

@@ -18,6 +18,7 @@ local import "std/core.s"
 local import "std/unsafe.s" as unsafe
 
 def read(cstr path)
+    doc "loads a cstr path as a readable object"
     {builtins::compiler::ptr unsafe_ptr = fopen(path, "r");}
     defer
         {if(unsafe_ptr) fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}
@@ -26,6 +27,10 @@ def read(cstr path)
         print path
         fail "failed to open file"
     return class(unsafe_mut unsafe_ptr)
+
+def read(str path)
+    doc "loads a string path as a readable object"
+    return read unsafe_temporary_cstr path
 
 def to_start(read f)
     contents = f.unsafe_ptr

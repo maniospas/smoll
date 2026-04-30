@@ -349,20 +349,7 @@ class ImplementedType:
         self.returned_defers = [remove_noop(defer) for defer in self.returned_defers]
 
 
-        # pos = -1
-        # while pos<len(self.implementation)-1:
-        #     pos += 1
-        #     v = self.implementation[pos]
-        #     text = str(v)
-        #     if text=="goto":
-        #         label = str(self.implementation[pos+1])
-        #         label_usage[label] = label_usage.get(label,0)+1
-        #     if isinstance()
-
-        # pos = -1
-        # while pos<len(self.implementation)-1:
-        #     if text==":" and pos>=2 and str(self.implementation[pos-2] in "{};"):
-        #     pos += 1
+        # clean up the set of used variables
 
         varset: set[str] = set()
         for vs in self.args: varset.add(vs)
@@ -424,6 +411,11 @@ class ImplementedType:
         return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"
 
     def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True):
+        # for segment in varname.split("--"):
+        #     if segment in ["def", "repo", "import", "return", "mut", "unsafe_mut", "const"]:
+        #         error_token.error("safety", "keyword '"+segment+"' cannot be assigned to")
+        #     if segment in operators:
+        #         error_token.error("safety", "operator '"+segment+"' cannot be assigned to")
         if len(value)==0: error_token.error("type", "no expression value to assign to variable '"+varname+"'")
         if len(value)>1:
             common_prefix = longest_common_prefix([var.name for var in value])
@@ -1988,6 +1980,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             pos, ret = process_del(pos)
             continue
         if name.text=="defer":
+            if is_lsp and name.file.is_main_file: print_lsp_definition(name, "defines code to run when all its content variables would no longer be used afterwards")
             def process_defer(pos: int):
                 if impl.has_returned_once: name.error("safety", "cannot declare a 'defer' after the first return")
                 if impl.is_parsing_a_defer: name.error("safety", "cannot declare a 'defer' within another")

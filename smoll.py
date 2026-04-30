@@ -19,6 +19,7 @@
 # nuitka --standalone --onefile --lto=yes --output-filename=smoll --python-flag=no_asserts --python-flag=no_site --python-flag=static_hashes smoll.py
 
 
+import asyncio
 import os
 import sys
 import argparse
@@ -126,9 +127,21 @@ def print_lsp_literal(tok: "Token", name: str):
     print(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
-    print("a "+name+" literal")
+    print(name)
 
 def print_lsp_keyword(tok: "Token", description: str):
+    print("---")
+    print("keyword")
+    print(os.path.abspath(tok.file.path))
+    print(tok.row)
+    print(tok.col)
+    print(len(tok.text))
+    print(os.path.abspath(tok.file.path))
+    print(tok.row)
+    print(tok.col)
+    print(description)
+
+def print_lsp_definition(tok: "Token", description: str):
     print("---")
     print("keyword")
     print(os.path.abspath(tok.file.path))
@@ -1668,18 +1681,21 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(current), CODEWORD_SEMICOLON])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current_token.is_uint():
+        if is_lsp and current_token.file.is_main_file: print_lsp_literal(current_token, "an unsigned integer")
         tmp = create_temp()
         variable = Variable(tmp, UINT_TYPE)
         impl.vars[tmp] = variable
         impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(current), CODEWORD_SEMICOLON])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current_token.is_int():
+        if is_lsp and current_token.file.is_main_file: print_lsp_literal(current_token, "an integer")
         tmp = create_temp()
         variable = Variable(tmp, INT_TYPE)
         impl.vars[tmp] = variable
         impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(current), CODEWORD_SEMICOLON])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current_token.is_float():
+        if is_lsp and current_token.file.is_main_file: print_lsp_literal(current_token, "a float value")
         tmp = create_temp()
         variable = Variable(tmp, FLOAT_TYPE)
         impl.vars[tmp] = variable
@@ -2143,7 +2159,7 @@ def process_repo(file: File, tokens: list[Token], pos: int):
     repositories[symbol] = path
     return pos
 
-def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
+async def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
     pos += 1
     name_token = get(tokens, pos)
     if not name_token.is_string(): 
@@ -2155,10 +2171,10 @@ def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
         if is_lsp and name_token.file.is_main_file: print_lsp_string(name_token)
         name = name_token.text
         name = name[1:len(name)-1]
-        name = resolve_name(name, name_token)
+        name = await resolve_name(name, name_token)
         if not os.path.exists(name) and name not in file_cache: name_token.error("import", "non-existent file '"+name+"'")
         if os.path.isdir(name) and name not in file_cache: name_token.error("import", "expecting file but got directory '"+name+"'")
-        imported = load(name, err_token=name_token)
+        imported = await load(name, err_token=name_token)
     pos += 1
     if peek_text(tokens, pos)=="::":
         if not isinstance(imported, File): get(tokens, pos).error("import", "expecting file before '::' but got type '"+name+"'")
@@ -2360,7 +2376,7 @@ def process_union(file: File, tokens: list[Token], pos: int):
     file.types[union_name] = union_type
     return pos
 
-def process(file: File, tokens: list[Token], pos: int) -> File:
+async def process(file: File, tokens: list[Token], pos: int) -> File:
     # this schema assumes that imports and repos happen before defs
     # first pass: process functions only up to their first return
     has_made_def = False
@@ -2372,13 +2388,13 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
             is_local = tok.text=="local"
             if is_local:
                 if is_lsp and tok.file.is_main_file: 
-                    print_lsp_keyword(tok, "the next import or definition has local visibility (does not affect files importing this file)")
+                    print_lsp_definition(tok, "the next import or definition has local visibility (does not affect files importing this file)")
                 i += 1
                 tok = get(tokens, i)
             if tok.text=="def" or tok.text=="rec":
                 if is_lsp and tok.file.is_main_file: 
-                    if tok.text=="def": print_lsp_keyword(tok, "defines a function that takes into account all previous definitions - its return forms a type")
-                    if tok.text=="rec": print_lsp_keyword(tok, "defines a recursive function that can take into account later definitions in this file")
+                    if tok.text=="def": print_lsp_definition(tok, "defines a function that takes into account all previous definitions - its return forms a type")
+                    if tok.text=="rec": print_lsp_definition(tok, "defines a recursive function that can take into account later definitions in this file")
                 
                 has_made_def = True
                 first_def_tok = tok
@@ -2400,7 +2416,7 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
             elif tok.text=="import": 
                 if has_made_def: tok.error("safety", "can only import before the file's first definition", reason=first_def_tok, raason_message="first definition at")
                 defname = get(tokens, i+1)
-                i, imported = process_import(file, tokens, i, is_local=is_local)
+                i, imported = await process_import(file, tokens, i, is_local=is_local)
                 if is_lsp and tok.file.is_main_file:
                     print_lsp_keyword(tok, "imports a namespace or function")
                     print("---")
@@ -2467,7 +2483,7 @@ def process(file: File, tokens: list[Token], pos: int) -> File:
                 print(variation.signature())
     return file
 
-def resolve_name(path: str, at_token: Token|None) -> str:
+async def resolve_name(path: str, at_token: Token|None) -> str:
     symbol = path
     for repo, url in repositories.items():
         if path.startswith(repo):
@@ -2485,7 +2501,7 @@ def resolve_name(path: str, at_token: Token|None) -> str:
             if os.path.exists(symbol): return symbol
         try: 
             os.makedirs(os.path.dirname(symbol), exist_ok=True)
-            download_with_progress(path, symbol, "download     "+os.path.basename(symbol).ljust(40))
+            await download_with_progress(path, symbol, "download     "+os.path.basename(symbol).ljust(40))
         except Exception as e: 
             if at_token: at_token.error("download", str(e))
             print("[✗] failed:")
@@ -2596,7 +2612,7 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
         i += 1
     return file, processed_tokens
 
-def download_with_progress(url: str, filepath: str, message: str):
+async def download_with_progress(url: str, filepath: str, message: str):
     filename = os.path.basename(filepath)
     fallback: bool = False
     try:
@@ -2625,13 +2641,13 @@ def download_with_progress(url: str, filepath: str, message: str):
     print()
 
 file_cache: dict[str, File] = dict()
-def load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> File:
+async def load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> File:
     file = file_cache.get(path, None)
     if file is None:
         # this weird sequencing here is so that we can import partially imported modules without circular overflow
         file, processed_tokens = _load(path, is_main_file, err_token)
         file_cache[path] = file
-        process(file, processed_tokens, 0)
+        await process(file, processed_tokens, 0)
     assert file is not None
     return file
 
@@ -2772,19 +2788,22 @@ if chosen_compiler == "auto":
 src_path = Path(args.source)
 if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); os._exit(1)
 
-if not is_lsp: print(f"[{YELLOW}+{RESET}] process      {src_path}")
-file: File = load(resolve_name(str(src_path), None), is_main_file=True)
-if not is_lsp:
-    main_type: UnionType|None = file.types.get("main", None)
-    if not main_type: print(f"{RED}error{RESET}: missing main type"); os._exit(1)
-    if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); os._exit(1)
-    if main_type.variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); os._exit(1)
-    exe_path = src_path.with_suffix("")
-    write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
-    if not args.build and chosen_compiler!="none":
-        if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); os._exit(1)
-        print(f"[{YELLOW}+{RESET}] run          ./{exe_path}")
-        result = subprocess.run("./"+str(exe_path), text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
-        if result.returncode != 0: os._exit(result.returncode)
-    
-    os._exit(0) # not in lsp case, as it inteferes with the stdout pipe
+async def main():
+    if not is_lsp: print(f"[{YELLOW}+{RESET}] process      {src_path}")
+    file: File = await load(await resolve_name(str(src_path), None), is_main_file=True)
+    if not is_lsp:
+        main_type: UnionType|None = file.types.get("main", None)
+        if not main_type: print(f"{RED}error{RESET}: missing main type"); os._exit(1)
+        if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); os._exit(1)
+        if main_type.variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); os._exit(1)
+        exe_path = src_path.with_suffix("")
+        write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
+        if not args.build and chosen_compiler!="none":
+            if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); os._exit(1)
+            print(f"[{YELLOW}+{RESET}] run          ./{exe_path}")
+            result = subprocess.run("./"+str(exe_path), text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+            if result.returncode != 0: os._exit(result.returncode)
+        
+        os._exit(0) # not in lsp case, as it inteferes with the stdout pipe
+
+asyncio.run(main())

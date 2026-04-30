@@ -44,7 +44,7 @@ then reference local or **online** directory. Below is an example,
 where the theoretical *std/* location is grabbed from the development repository. For safety, imported files other than the one you run can only make suggestions about repos, and fail to compile if these are not present.
 
 ```python
-repo "https://github.com/maniospas/smoll/raw/refs/heads/main/std/" as "std/"
+repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import "std/core.s"
 
 def main()

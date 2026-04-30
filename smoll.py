@@ -2786,9 +2786,9 @@ if chosen_compiler == "auto":
     #else: 
     chosen_compiler = "gcc"
 
+src_path = Path(args.source)
+if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); os._exit(1)
 async def main():
-    src_path = Path(args.source)
-    if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); os._exit(1)
     if not is_lsp: print(f"[{YELLOW}+{RESET}] process      {src_path}")
     file: File = await load(await resolve_name(str(src_path), None), is_main_file=True)
     if not is_lsp:

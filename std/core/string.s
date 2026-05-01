@@ -134,6 +134,42 @@ def eq(char x, char y)
     {builtins::bool z = (x==y);}
     return z
 
+def neq(char x, char y)
+    doc "not equals"
+    {builtins::bool z = (x!=y);}
+    return z
+
+def eq(cstr x, cstr y)
+    doc "equals"
+    {builtins::bool z = (x==y);}
+    return z
+
+def eq(str x, str y)
+    doc "equals"
+    n = len x
+    if n!=len y
+        return false
+    if x.dat.first!=y.dat.first
+        return false
+    {builtins::bool z = !memcmp(((char*)x__buf__unsafe_ptr)+x__dat__pos, ((char*)y__buf__unsafe_ptr)+y__dat__pos, n);}
+    return z
+
+def eq(str x, cstr y)
+    doc "equals"
+    if x.dat.first != char y
+        return false
+    return x==str y
+
+def eq(cstr x, str y)
+    doc "equals"
+    if y.dat.first != char x
+        return false
+    return y==str x
+
+def neq(str|cstr x, str|cstr y)
+    doc "not equals"
+    return not x==y
+
 def print(char c, cstr|blank endl)
     doc "print a character"
     if endl is blank

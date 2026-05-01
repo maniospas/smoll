@@ -219,7 +219,9 @@ def signature_like(vars: list[Variable], impl=None):
             i += len(type.rets)
         assert len(type.rets)
     return ret
-    
+
+global_cstr2var: dict[str,str] = dict() # from literal to variable name
+global_var2cstr: dict[str,str] = dict() # from variable name to literal
 
 class ImplementedType:
     def __init__(self, name: str, builtin:str|None=None, at:Optional["Token"]=None, memory_size=0):
@@ -240,6 +242,7 @@ class ImplementedType:
         self.has_returned_once = False
         self.needs_failure_mode = False
         self.is_buffer_of: ImplementedType|None = None
+        self.used_globals: set[str] = set()
         self.dependent_implementations: list[ImplementedType] = list() # deoendent pointer TYPES
         self.dependent_assignments: dict[str, str] = dict() # e.g., dependent memory regions
         self.defers: list[list[CodeSegment]] = list() # release code for specific variables
@@ -573,11 +576,11 @@ class ImplementedType:
         arg_code += ret_code
         doinline = (self.complexity<500 or self.num_calls<=1) and not self.force_not_inline
 
-        ret = ("static inline " if doinline else "")+("int " if self.needs_failure_mode else "void ")+self.monomorphic_name+"("+arg_code+") {\n  "
+        ret = ("static inline __attribute__((always_inline)) " if doinline else "")+("int " if self.needs_failure_mode else "void ")+self.monomorphic_name+"("+arg_code+") {\n  "
         ret += ret_body_start
         for var, val in self.vars.items():
             if var in self.args: continue
-            if val.type.builtin: ret += val.type.builtin+" "+var+"=0;\n  "
+            if val.type.builtin and not val.name in self.used_globals: ret += val.type.builtin+" "+var+"=0;\n  "
             # non-built-ins are theoretical constructs only
         if self.needs_failure_mode: ret += "int __temp_errcode=0;\n  "
         prev = ";"
@@ -810,7 +813,6 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
         if len(callee.doc)>1: print("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:]))
         print("```rust\n"+callee.signature()+(" defined in "+at.file.path if callee.at else " from compiler definitions")+"\n```")
-
     return callee
 
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
@@ -945,6 +947,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         ])
         impl.needs_failure_mode = True
     impl.dependent_implementations.append(callee)
+    for global_var in callee.used_globals:
+        impl.used_globals.add(global_var)
     impl.complexity += callee.complexity+len(callee.implementation)
     callee.num_calls += 1
     if callee==FAIL_TYPE: 
@@ -1667,10 +1671,14 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current_token.is_string():
         if is_lsp and current_token.file.is_main_file: print_lsp_string(current_token)
-        tmp = create_temp()
-        variable = Variable(tmp, CSTR_TYPE)
-        impl.vars[tmp] = variable
-        impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(current), CODEWORD_SEMICOLON])
+        tmp: str|None = global_cstr2var.get(current, None)
+        variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE)
+        if tmp is None: 
+            global_cstr2var[current] = variable.name
+            global_var2cstr[variable.name] = current
+        impl.vars[variable.name] = variable
+        impl.used_globals.add(variable.name)
+        #impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(current), CODEWORD_SEMICOLON])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current_token.is_uint():
         if is_lsp and current_token.file.is_main_file: print_lsp_literal(current_token, "an unsigned integer")
@@ -1694,17 +1702,17 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(current), CODEWORD_SEMICOLON])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current=="doc":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "adds the next cstr predicate to the function's documentation and returns it")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "adds the next cstr predicate to the function's documentation")
         next_token = get(tokens, pos+1)
         if not next_token.is_string(): next_token.error("type", "expecting 'cstr' documentation")
         pos += 1
-        tmp = create_temp()
-        variable = Variable(tmp, CSTR_TYPE)
-        impl.vars[tmp] = variable
+        #tmp = create_temp()
+        #variable = Variable(tmp, CSTR_TYPE)
+        #impl.vars[tmp] = variable
         if is_lsp and next_token.file.is_main_file: print_lsp_string(next_token)
-        impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(next_token.text), CODEWORD_SEMICOLON])
+        #impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(next_token.text), CODEWORD_SEMICOLON])
         impl.doc.append(next_token.text)
-        return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
+        return pos+1,[] #process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current=="mut":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "declares that the following value will be treated as mutable (fields and pointer contents may modified) - creates an error if the conversion to mutable is unsafe")
         prev_pos = pos
@@ -2719,6 +2727,8 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         "#include <string.h>\n"
         "\n"
     )
+    globs = "\n".join("const char* const "+k+"="+global_var2cstr[k]+";" for main_def in main_defs for k in main_def.used_globals)+"\n"
+
     generated_c_funcs = list()
     c_decls = list()
     already_generated = set()
@@ -2734,7 +2744,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     if entry_point: generated_c_funcs.append(f"""int main() {{{entry_point}();return 0;}}""")
 
     body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
-    src_path.write_text(header + body, encoding="utf-8")
+    src_path.write_text(header + globs + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")
     if chosen_compiler=="none": return
     gcc_cmd = {

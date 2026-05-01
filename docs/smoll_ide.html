@@ -383,7 +383,7 @@ except SystemExit as e:
       const lineCount = cCode.split('\n').length;
       cOut.innerHTML = highlightC(cCode);
       cFilename.textContent = 'program.c';
-      cLines.textContent = `${lineCount} lines`;
+      cLines.innerHTML = `${lineCount} lines - consider running on <a href="https://www.online-cpp.com/online_c_compiler">https://www.online-cpp.com/online_c_compiler</a>`;
       switchTab('console');
       clog(`C output: ${lineCount} lines`, '#98c379');
     } else {

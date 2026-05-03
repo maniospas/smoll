@@ -1,13 +1,20 @@
 import "std/core.s"
 
-def test()
-    mem = list ref mut char[]
-    s1 = mem.copy "123"
-    s2 = mem.copy "456"
-    return (s1,s2)
-    
+def test1()
+    return singleton()
 
+def test2()
+    print "test2"
+    test1()
+
+def test3()
+    print "test3"
+    test1()
+
+def test4()
+    test3()
+    
 def main()
-    s = test()
-    print s.s1
-    print s.s2
+    test2()
+    test4()
+    

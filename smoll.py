@@ -241,6 +241,8 @@ class ImplementedType:
     def __init__(self, name: str, builtin:str|None=None, at:Optional["Token"]=None, memory_size=0):
         self.name = name
         self.monomorphic_name = name+create_temp()
+        self.has_retrieved_class: Optional["Token"] = None
+        self.has_retrieved_singleton: Optional["Token"] = None
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
         self.doc: list[str] = list()
         self.args: list[str] = list()
@@ -989,7 +991,17 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     #     if vars[argpos].name in impl.invalidated:
     #         print(vars[argpos].name)
 
-    impl.dependent_implementations.append(callee)
+    if callee in impl.dependent_implementations:
+        if callee.has_retrieved_singleton:
+            error_token.error("safety", "already contains a call to singleton '"+callee.signature()+"'", reason=callee.has_retrieved_singleton, raason_message="due to")
+    else: 
+        impl.dependent_implementations.append(callee)
+    for dependency in callee.dependent_implementations:
+        if dependency.has_retrieved_singleton:
+            if dependency in impl.dependent_implementations:
+                error_token.error("safety", "both the current function and '"+callee.signature()+"' already contain a call to singleton '"+dependency.signature()+"'", reason=dependency.has_retrieved_singleton, raason_message="due to")
+            else:
+                impl.dependent_implementations.append(dependency)
     for global_var in callee.used_globals:
         impl.used_globals.add(global_var)
     impl.complexity += callee.complexity+len(callee.implementation)
@@ -1830,12 +1842,25 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
     #     pos, ret = process_deref(file, pos, ret, impl, current_token)
     #     return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
     if current == "class":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "packs into a uniquely type class")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "packs into a type class unique to this function")
+        if impl.has_retrieved_singleton: current_token.error("safety", "cannot create both a singleton and a class for the same function", reason=impl.has_retrieved_singleton, raason_message="due to")
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         tmp = create_temp()
         var_class = Variable(tmp, impl)
         impl.vars[tmp] = var_class
+        impl.has_retrieved_class = current_token
         return process_statement_operator(file, tokens, impl, pos, [var_class]+[r.private_copy() if r.immutable else r for r in ret], current_operator_priority)
+
+    if current == "singleton":
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "packs into a type class unique to this function, while further setting this function as a singleton resource")
+        if impl.has_retrieved_class: current_token.error("safety", "cannot create both a singleton (class with a single instance) and a class for the same function", reason=impl.has_retrieved_class, raason_message="due to")
+        pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
+        tmp = create_temp()
+        var_class = Variable(tmp, impl)
+        impl.has_retrieved_singleton = current_token
+        impl.vars[tmp] = var_class
+        return process_statement_operator(file, tokens, impl, pos, [var_class]+[r.private_copy() if r.immutable else r for r in ret], current_operator_priority)
+
 
     if current == "(":
         ret = list()

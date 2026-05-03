@@ -1,20 +1,8 @@
 import "std/core.s"
+import "std/io.s" as io
 
-def test1()
-    return singleton()
-
-def test2()
-    print "test2"
-    test1()
-
-def test3()
-    print "test3"
-    test1()
-
-def test4()
-    test3()
-    
 def main()
-    test2()
-    test4()
-    
+    buf = mut alloc 2 # exactly the limit, which prevents unsafe_temporary_cstr from trying for the zero-copy approach
+    s = copy(buf, mut 0, str "ls")
+    print s
+    io::system s

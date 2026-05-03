@@ -993,13 +993,13 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
 
     if callee in impl.dependent_implementations:
         if callee.has_retrieved_singleton:
-            error_token.error("safety", "already contains a call to singleton '"+callee.signature()+"'", reason=callee.has_retrieved_singleton, raason_message="due to")
+            error_token.error("safety", "already contains a call to singleton '"+callee.signature()+"'", reason=callee.has_retrieved_singleton, raason_message="declared at")
     else: 
         impl.dependent_implementations.append(callee)
     for dependency in callee.dependent_implementations:
         if dependency.has_retrieved_singleton:
             if dependency in impl.dependent_implementations:
-                error_token.error("safety", "both the current function and '"+callee.signature()+"' already contain a call to singleton '"+dependency.signature()+"'", reason=dependency.has_retrieved_singleton, raason_message="due to")
+                error_token.error("safety", "both the current function and '"+callee.signature()+"' already contain a call to singleton '"+dependency.signature()+"'", reason=dependency.has_retrieved_singleton, raason_message="declared at")
             else:
                 impl.dependent_implementations.append(dependency)
     for global_var in callee.used_globals:
@@ -2815,9 +2815,11 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     src_path = Path(f"{output_name}.c")
     exe_path = Path(output_name)
     header = (
+        "#include \"std/common.h\"\n"
         "#include <stdio.h>\n"
         "#include <stdlib.h>\n"
         "#include <string.h>\n"
+        "#include <time.h>\n"
         "\n"
     )
     globs = "\n".join("const char* const "+k+"="+global_var2cstr[k]+";" for main_def in main_defs for k in main_def.used_globals)+"\n"

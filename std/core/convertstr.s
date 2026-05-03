@@ -21,7 +21,7 @@ local import "std/core/string.s"
 
 def console()
     doc "references the system console"
-    return class()
+    return singleton()
 
 def int(console)
     doc "reads an integer from the console"

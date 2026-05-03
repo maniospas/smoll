@@ -15,9 +15,10 @@ _1.10._ [local definitions](#local-definitions)
 **Section 2. Safe resources**<br>
 _2.1._ [buffers](#buffers)<br>
 _2.2._ [pointers](#pointers)<br>
-_2.3._ [substructures](#substructures)<br>
-_2.4._ [try and fail](#try-and-fail)<br>
-_2.5._ [defer](#defer)<br>
+_2.2._ [stable references](#stable-references)<br>
+_2.4._ [substructures](#substructures)<br>
+_2.5._ [try and fail](#try-and-fail)<br>
+_2.6._ [defer](#defer)<br>
 
 **Section 3. Standard library**<br>
 _3.1._ [strings](#strings)<br>
@@ -504,7 +505,7 @@ Pointers reference specific memory locations in buffers, which
 you can use to safely move data around while sharing only
 one memory address. 
 
-Pointers are unstanble in that they become invalid later in the code. 
+Pointers are unstable in that they become invalid later in the code. 
 Being invalid means that they can not be read from or copy data
 to them. Still, invalidation ensures safety.
 
@@ -570,6 +571,61 @@ def main()
     buf[2] = 1
     buf[2] >> mutlast buf.resize 2
     print buf[1]  # prints 1
+```
+
+## stable references
+
+You can work with data that reference other data
+in that they are updated together. This is similar
+than pointers, but comes under some scarce safety 
+restrictions that let compile ensure safety.
+
+To convert some data to a reference use the `ref value`
+syntax like below.
+
+```python
+import "std/core.s"
+
+def main()
+    x = mut 0
+    y = ref x
+    z = ref x
+    x = 2
+    print y+z # prints 4
+```
+
+References are **automatically propagated**
+by analyzing direct input-output equalities. This
+allows the compiler to re-attach valid references to
+invalidated data structures, for example that would
+have been validated by memore movements.
+
+Notably, references are not types but just some
+property you attach to local variables to indicate
+safe usage. Below is an example, where a list is used
+to dynamically manage a buffer and resize it as needed.
+
+Without `ref`, the compiler would complain that the 
+potential resizing of the second copy could 
+(in this case: would) invalidate the buffer version
+that the string `s1` know about. However, thanks to 
+the stable reference, the buffer is automatically updated
+for strings copied onto it.
+
+
+```python
+import "std/core.s"
+
+def test()
+    mem = list ref mut char[]
+    s1 = mem.copy "123"
+    s2 = mem.copy "456"
+    return (s1,s2)
+
+def main()
+    s = test()
+    print s.s1
+    print s.s2
 ```
 
 ## substructures

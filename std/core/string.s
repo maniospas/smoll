@@ -17,13 +17,17 @@
 local import "std/core/builtinsext.s"
 local import "std/core/array.s"
 
-def strdat(nat pos, nat length, char first)
+local def strdat(nat pos, nat length, char first)
     doc "string data without the buffer storage"
     return (pos, length, first)
 
 def str(const char[] buf, strdat dat)
     doc "a string residing on a buffer"
-    return (buf, dat)
+    return class(buf, dat)
+
+def str(str other)
+    doc "tautology function for strings"
+    return other
 
 def str(const char[] buf, nat pos, nat length)
     doc "a string residing on a buffer that automatically detects the first character"
@@ -54,8 +58,9 @@ def copy(cstr other)
     doc "copy a cstr to a new buffer"
     return copy str other
 
-def copy_null_terminated(str other)
+local def copy_null_terminated(str other)
     doc "copy a string to a new buffer while ensuring null termination"
+    doc "This is useful only for supporting unsafe_temporary_cstr."
     buf = alloc 1+len other
     {memcpy(((char*)buf__unsafe_ptr), ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
     {((char*)buf__unsafe_ptr)[other__dat__length] = 0;}
@@ -80,7 +85,7 @@ def copy(char[] buf, mut nat pos, str other)
     if next_pos>=len buf
         fail "string buffer out of memory"
     {memcpy(((char*)buf__unsafe_ptr)+pos, ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
-    prev_pos = const pos
+    prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)
 
@@ -96,6 +101,8 @@ def print(str s, cstr|blank endl)
     if endl is blank
         doc "Ends the line too."
         endl = "\n"
+    if s.dat.length+s.dat.pos>s.buf.unsafe_size
+        fail "string out of bounds"
     {printf("%.*s%s", (int)s__dat__length, s__dat__pos+(const char*)s__buf__unsafe_ptr, endl);}
 
 local def charlist()

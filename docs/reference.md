@@ -23,6 +23,8 @@ _2.6._ [defer](#defer)<br>
 **Section 3. Standard library**<br>
 _3.1._ [strings](#strings)<br>
 _3.2._ [lists](#lists)<br>
+_3.3._ [io](#io)<br>
+_3.4._ [processes](#processes)<br>
 
 # Section 1. Basic syntax
 
@@ -787,4 +789,89 @@ def main()
     buf = list mut char[] # or buf = (alloc(mut char[], KB 4), mut 0)
     s = buf.copy "hello world!"
     print s
+```
+
+## io
+
+There are several means for textual input and output through the console
+and the file system. Examples below mostly use `cstr` arguments, but `str`
+arguments are fine too. In the last case, if strings are not null-terminated
+and the buffer holding them does not have a trailing null character to
+pretend that they are null-terminated, a copy may be made.
+
+Read a file by opening it and iterating line by
+line, like below. This needs a `char[]` buffer on which to store (temporary) lines,
+although you can save yourself a `copy` and pass a mutable position as a second 
+argument to directly read on the buffer and progress the position.
+
+```python
+import "std/core.s"
+import "std/io.s"::file as file
+
+def main()
+    f = file::read "README.md"
+    mem = alloc KB 4 # max 4 KB chunk size, on char[] by default
+    while try line = file::line(mem, f)
+        print("|", "")
+        print(line, "")
+    print ""
+```
+
+Similarly, create a file for writing like below. Can also delete it.
+
+```python
+import "std/core.s"
+import "std/io.s" as io
+
+def main()
+    f = io::file::write "tmp.txt"
+    f.print "hello world"
+    defer 
+        io::dir::remove "tmp.txt"
+```
+
+Above was a first introduction to a the `dir` namespace for directory 
+operations. Below is how to iterate through directory contents.
+
+```python
+import "std/core.s"
+import "std/io.s"::dir as dir
+
+def main()
+    dir = mut dir::read "."
+    buf = alloc 128
+    while try entry=buf.dir::entry dir
+        print(entry, " ")
+        if dir::is_file entry
+            print "file"
+        else
+            print "dir"
+```
+
+## processes
+
+Processes can also be read similarly to files. To begin with, a blocking system process
+that fails on non-zero error code can be evoked like below.
+
+```python
+import "std/core.s"
+import "std/io.s"::process
+
+def main()
+    success = try system "echo \"hello world!\""
+    print success
+```
+
+One can also open and communicate with running processes.
+
+```python
+
+import "std/core.s"
+import "std/io.s"::process as proc
+
+def main()
+    process = proc::process "ls"
+    buffer = (alloc KB 4, mut 0) # example with growing position
+    while try line=buffer.proc::line process
+        print line
 ```

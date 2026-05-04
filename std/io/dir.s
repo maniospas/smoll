@@ -36,7 +36,7 @@ def is_file(str|cstr _path)
     {builtins::bool exists = __smo_is_file(path);}
     return exists
 
-def remove_file(str|cstr _path)
+def remove(str|cstr _path)
     doc "removes a file at a cstr path, fails if it cannot be removed"
     path = unsafe_temporary_cstr _path
     {builtins::bool result = __smo_remove_file(path);}

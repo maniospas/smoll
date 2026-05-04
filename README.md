@@ -40,12 +40,12 @@ Cheat sheet:
 # test.s
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import "std/core.s"
-import "std/io.s" as io
+import "std/io.s"::file as file
 
 def main()
-    f = io::read "README.md"
+    f = file::read "README.md"
     mem = alloc KB 4 # max 4 KB chunk size, on char[] by default
-    while try line = io::line(mem, f)
+    while try line = file::line(mem, f)
         print("|", "")
         print(line, "")
     print ""

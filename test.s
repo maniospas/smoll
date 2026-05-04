@@ -1,11 +1,9 @@
 import "std/core.s"
-import "std/io.s" as io
-import "std/io.s"::dir::core as core
+import "std/io.s"::dir as dir
 
 def main()
-    core::print "TEEEEE"
-    dir = mut io::dir::read("./std")
+    dir = mut dir::read("./std")
     buf = alloc 128
-    while try entry=buf.io::dir::entry dir
+    while try entry=buf.dir::entry dir
         print entry
     

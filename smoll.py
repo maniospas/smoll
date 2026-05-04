@@ -1171,8 +1171,16 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                         max_candidate_common_length = common_length
                     if common_length==max_candidate_common_length: 
                         candidates.append(variation)
-            if file==tokens[pos].file: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates])
-            tokens[pos].error("type", "unknown type '\""+file.path+"\"::"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates])
+            if file==tokens[pos].file: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\"::"+k for k in file.namespaces])
+            
+            namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
+            if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\"::"+k for k in file.namespaces])
+            assert namespace is not None
+            if peek_text(tokens, pos+3)=="::":
+                return process_type(namespace, tokens, pos+2)
+            return pos+1, namespace
+            
+            #tokens[pos].error("type", "unknown type '\""+file.path+"\"::"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\"::"+k for k in file.namespaces])
         assert type is not None
         if peek_text(tokens, pos+1)=="[":
             at_pos = get(tokens, pos+1)
@@ -1240,8 +1248,8 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                 print(variation.signature()+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
 
         return pos+1, type
-    namespace: File|None = file.namespaces.get(name, None)
-    if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'")
+    namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
+    if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\"::"+k for k in file.namespaces])
     assert namespace is not None
     return process_type(namespace, tokens, pos+2)
 
@@ -2273,7 +2281,7 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
     if peek_text(tokens, pos)=="::":
         if not isinstance(imported, File): get(tokens, pos).error("import", "expecting file before '::' but got type '"+name+"'")
         assert isinstance(imported, File)
-        pos, imported = process_type(imported, tokens, pos + 1)
+        pos, imported = process_type(imported, tokens, pos - 1) # go back and process properly
     as_mode = peek_text(tokens, pos)=="as"
     if as_mode:
         if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_keyword(get(tokens, pos), "declares a name")

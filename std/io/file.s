@@ -19,7 +19,7 @@ local import "std/unsafe.s" as unsafe
 
 def read(str|cstr _path)
     path = unsafe_temporary_cstr _path
-    doc "loads a cstr path as a readable object"
+    doc "loads a cstr path as a readable file"
     {builtins::compiler::ptr unsafe_ptr = fopen(path, "r");}
     defer
         {if(unsafe_ptr) fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}

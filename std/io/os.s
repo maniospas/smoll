@@ -41,3 +41,23 @@ def remove_file(str|cstr _path)
     path = unsafe_temporary_cstr _path
     {builtins::bool result = __smo_remove_file(path);}
     if not result fail "failed to remove file"
+
+def dir(str|cstr _path)
+    path = unsafe_temporary_cstr _path
+    doc "loads a cstr path as a readable directory"
+    {builtins::compiler::ptr unsafe_ptr = opendir(path);}
+    defer
+        {if(unsafe_ptr) closedir((DIR*)unsafe_ptr); unsafe_ptr=0;}
+    if not exists unsafe_ptr fail "failed to open file"
+    return class(unsafe_mut unsafe_ptr)
+
+def entry(char[] buf, mut nat|blank pos, dir f)
+    if pos is blank
+        pos = mut 0
+    if not exists f.unsafe_ptr
+        fail "not open dir"
+    {builtins::compiler::ptr de = readdir((DIR*)f__unsafe_ptr);}
+    if not exists de
+        fail "end of dir"
+    {builtins::cstr dirname=((struct dirent*)de)->d_name;}
+    return copy(buf, pos, dirname)

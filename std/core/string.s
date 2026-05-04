@@ -25,6 +25,10 @@ def str(const char[] buf, strdat dat)
     doc "a string residing on a buffer"
     return class(buf, dat)
 
+def str(const char[] buf)
+    doc "a string residing on the full breadth of a buffer"
+    return str(buf, 0, len buf, buf[0])
+
 def str(str other)
     doc "tautology function for strings"
     return other
@@ -139,6 +143,10 @@ def print(str s, cstr|blank endl)
 
 local def charlist()
     return list mut char[]
+
+def str(charlist li)
+    doc "declare a string on a list's char[] buffer"
+    return str li.buffer
 
 def copy(charlist li, str|cstr _other)
     doc "copy a string"

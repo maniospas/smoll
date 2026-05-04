@@ -13,6 +13,8 @@ import {
   TextDocumentPositionParams,
   DefinitionParams,
   SemanticTokensBuilder,
+  CompletionItem,
+  CompletionItemKind,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { execFile } from 'child_process';
@@ -86,6 +88,23 @@ const debounces  = new Map<string, ReturnType<typeof setTimeout>>();
 const generations = new Map<string, number>();
 const DEBOUNCE_MS = 300;
 
+// ── Cache ready ───────────────────────────────
+const cacheReady = new Map<string, Array<() => void>>();
+
+function waitForCache(filePath: string): Promise<void> {
+  return new Promise(resolve => {
+    const listeners = cacheReady.get(filePath) ?? [];
+    listeners.push(resolve);
+    cacheReady.set(filePath, listeners);
+  });
+}
+
+function notifyCacheReady(filePath: string) {
+  const listeners = cacheReady.get(filePath) ?? [];
+  cacheReady.delete(filePath);
+  for (const resolve of listeners) resolve();
+}
+
 // ── Temp file helpers ─────────────────────────
 async function writeTempFile(content: string, realPath: string): Promise<string> {
   const ext = realPath.slice(realPath.lastIndexOf('.'));
@@ -102,7 +121,7 @@ function remapTokenPaths(tokens: CompilerToken[], tmpPath: string, realPath: str
   return tokens.map(t => ({
     ...t,
     file: t.file === tmpPath ? realPath : t.file,
-    message: t.message.replace(new RegExp(tmpPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), realPath),
+    message: t.message.replace(tmpPath, realPath),
     definition: t.definition ? {
       ...t.definition,
       file: t.definition.file === tmpPath ? realPath : t.definition.file,
@@ -181,7 +200,6 @@ function scheduleAnalysis(uri: string, filePath: string) {
     log(`debounce: reset for ${filePath}`);
   }
 
-  // Snapshot content now, while the document version is current
   const doc     = documents.get(uri);
   const content = doc?.getText() ?? '';
 
@@ -206,6 +224,7 @@ function scheduleAnalysis(uri: string, filePath: string) {
       cache.set(filePath, tokens);
       publishDiagnostics(uri, filePath, tokens);
       connection.languages.semanticTokens.refresh();
+      notifyCacheReady(filePath);
       log(`debounce: analysis complete — ${tokens.length} tokens cached`);
     } finally {
       await deleteTempFile(tmpPath);
@@ -320,7 +339,6 @@ connection.onDefinition((params: DefinitionParams): Location[] => {
       )
     ));
 
-  // Deduplicate by uri+position
   const seen = new Set<string>();
   const unique = locations.filter(loc => {
     const key = `${loc.uri}:${loc.range.start.line}:${loc.range.start.character}`;
@@ -330,6 +348,54 @@ connection.onDefinition((params: DefinitionParams): Location[] => {
   log(`definition: ${unique.length} location(s)`);
   return unique;
 });
+
+// ── Completion ────────────────────────────────
+connection.onCompletion(async (params): Promise<CompletionItem[]> => {
+  const uri      = params.textDocument.uri;
+  const filePath = fileURLToPath(uri);
+  const cursor   = params.position;
+
+  if (debounces.has(uri)) {
+    await waitForCache(filePath);
+  }
+
+  const tokens = cache.get(filePath) ?? [];
+
+  const hits = tokens.filter(t =>
+    t.line - 1 === cursor.line &&
+    cursor.character >= t.col &&
+    cursor.character <=  t.col + t.length
+  );
+
+  const items: CompletionItem[] = [];
+  for (const t of hits) {
+    items.push(...extractCodeBlockLineStarts(t.message));
+  }
+
+  const seen = new Set<string>();
+  return items.filter(i => seen.has(i.label) ? false : (seen.add(i.label), true));
+});
+
+function extractCodeBlockLineStarts(message: string): CompletionItem[] {
+  const lines = message.split('\n');
+  const items: CompletionItem[] = [];
+  let inCodeBlock = false;
+
+  for (const line of lines) {
+    if (line.trimStart().startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock && line.trim().length > 0) {
+      items.push({
+        label: line.trim().split('(')[0].trim(),
+        kind: CompletionItemKind.Function,
+      });
+    }
+  }
+
+  return items;
+}
 
 // ── Document lifecycle ────────────────────────
 documents.onDidChangeContent(change => {
@@ -360,6 +426,9 @@ connection.onInitialize((_params: InitializeParams) => {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       hoverProvider: true,
       definitionProvider: true,
+      completionProvider: {
+        triggerCharacters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_:.()[]<>+-*/^%=! '.split(''),
+      },
       semanticTokensProvider: { legend: semanticTokensLegend, full: true },
     },
   };

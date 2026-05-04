@@ -38,8 +38,7 @@ def nat(console)
     {builtins::bool success = 0;}
     {builtins::char first = getchar();}
     {if(first != "-"[0] && first != EOF) {ungetc(first, stdin);builtins::int result = scanf("%lu%c", &number, &ch);success = (result == 2 && (ch == 13 || ch == 10));}}
-    if not success
-        fail "user input was not a nat"
+    if not success fail "user input was not a nat"
     return number
 
 def float(console)
@@ -47,31 +46,26 @@ def float(console)
     {builtins::float number = 0; builtins::char ch = 0;}
     {builtins::int result = scanf("%lf%c", &number, &ch);}
     {builtins::bool success = (result == 2 && (ch == 13 || ch == 10));}
-    if not success
-        fail "user input was not a float"
+    if not success fail "user input was not a float"
     return number
 
 def int(cstr|str _s)
     doc "converts a string to an integer"
     s = str _s
-    if 0==len s
-        fail "invalid int conversion from empty string"
+    if 0==len s fail "invalid int conversion from empty string"
     number = mut int 0
     i = mut 0
     negative = s[0]==char "-"
     if negative
         i = i+1
-        if i==len s
-            fail "invalid int conversion from string with only a sign"
+        if i==len s fail "invalid int conversion from string with only a sign"
     else if s[i]==char "+"
         i = i+1
-        if i==len s
-            fail "invalid int conversion from string with only a sign"
+        if i==len s fail "invalid int conversion from string with only a sign"
     while i<len s
         c = s[i]
         {builtins::bool is_digit=c>='0' && c<='9'; builtins::int digit=c-'0';}
-        if not is_digit
-            fail "invalid integer int from non-number string"
+        if not is_digit fail "invalid integer int from non-number string"
         number = number*int(10)+digit
         i = i+1
     if negative 
@@ -81,23 +75,20 @@ def int(cstr|str _s)
 def nat(cstr|str _s)
     doc "converts a string to an unsigned integer"
     s = str _s
-    if 0==len s
-        fail "invalid nat conversion from empty string"
+    if 0==len s fail "invalid nat conversion from empty string"
     number = mut nat 0
     it = range len s
     while try i=next it
         c = s[i]
         {builtins::bool is_digit=c>='0' && c<='9'; builtins::nat digit=c-'0';}
-        if not is_digit
-            fail "invalid nat conversion from non-number string"
+        if not is_digit fail "invalid nat conversion from non-number string"
         number = number*10+digit
     return const number
 
 def float(cstr|str _s)
     doc "converts a string to a float"
     s = str _s
-    if 0==len s
-        fail "invalid float conversion from empty string"
+    if 0==len s fail "invalid float conversion from empty string"
     number = mut 0.0
     i = mut 0
     if 0==len s
@@ -106,12 +97,10 @@ def float(cstr|str _s)
     negative = s[0]==char "-"
     if negative
         i = i+1
-        if i==len s
-            fail "invalid float conversion from string with only a sign"
+        if i==len s fail "invalid float conversion from string with only a sign"
     else if s[i]==char "+"
         i = i+1
-        if i==len s
-            fail "invalid float conversion from string with only a sign"
+        if i==len s fail "invalid float conversion from string with only a sign"
     while i<len s
         c = s[i]
         {builtins::bool is_digit=c>='0' && c<='9'; builtins::float digit=c-'0';}
@@ -119,19 +108,16 @@ def float(cstr|str _s)
         if is_dot
             i = i+1
             break
-        if not is_digit
-            fail "invalid float conversion from non-number string"
+        if not is_digit fail "invalid float conversion from non-number string"
         number = number*10.0+digit
         i = i+1
     if is_dot
-        if i==len s
-            fail "invalid float conversion from string without a value after the dot"
+        if i==len s fail "invalid float conversion from string without a value after the dot"
         base = mut 0.1
         while i<len s
             d = s[i]
             {builtins::bool is_decimal_digit=d>='0' && d<='9'; builtins::float decimal_digit=d-'0';}
-            if not is_decimal_digit
-                fail "invalid float conversion from non-number string"
+            if not is_decimal_digit fail "invalid float conversion from non-number string"
             number = number+decimal_digit*base
             base = base*0.1
             i = i+1

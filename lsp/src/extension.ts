@@ -22,6 +22,7 @@ export function activate(context: ExtensionContext) {
   };
 
   client = new LanguageClient('smoll', 'smoll', serverOptions, clientOptions);
+
   client.start().then(() => {
     window.showInformationMessage('smoll language server started');
     const statusBar = window.createStatusBarItem();

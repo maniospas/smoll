@@ -23,10 +23,7 @@ def read(str|cstr _path)
     {builtins::compiler::ptr unsafe_ptr = fopen(path, "r");}
     defer
         {if(unsafe_ptr) fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}
-    if not exists unsafe_ptr
-        print("Failed to open file:", " ")
-        print path
-        fail "failed to open file"
+    if not exists unsafe_ptr fail "failed to open file"
     return class(unsafe_mut unsafe_ptr)
 
 def write(str|cstr _path)
@@ -35,45 +32,37 @@ def write(str|cstr _path)
     {builtins::compiler::ptr unsafe_ptr = fopen(path, "wx+");}
     defer
         {if(unsafe_ptr) fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}
-    if not exists unsafe_ptr
-        print("Failed to create file:", " ")
-        print path
-        fail "failed to create file"
+    if not exists unsafe_ptr fail "failed to create file"
     return class(unsafe_mut unsafe_ptr)
 
 def terminal()
     doc "opens a new system writable interactive terminal, fails if no display is available"
     {builtins::bool has_gui = __smo_has_display();}
-    if not has_gui
-        fail "cannot open a new terminal in the current environment"
+    if not has_gui fail "cannot open a new terminal in the current environment"
     {builtins::compiler::ptr unsafe_ptr = __smo_open_console();}
     defer
         {__smo_close_console((FILE*)unsafe_ptr); unsafe_ptr=0;}
-    if not exists unsafe_ptr
-        fail "failed to open new terminal"
+    if not exists unsafe_ptr fail "failed to open new terminal"
     return class(unsafe_mut unsafe_ptr)
 
 def File = read|write|terminal
 
 def to_start(File f)
-    if not exists f.unsafe_ptr
-        fail "failed to move to start of closed file"
+    if not exists f.unsafe_ptr fail "failed to move to start of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_SET);}
+
 def to_end(File f)
-    if not exists f.unsafe_ptr
-        fail "failed to move to end of closed file"
+    if not exists f.unsafe_ptr fail "failed to move to end of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_END);}
 
 def chunk(char[] buf, mut nat|blank pos, File f)
     if pos is blank
         pos = mut 0
-    if not exists buf.unsafe_ptr
-        fail "not open file"
+    if not exists buf.unsafe_ptr fail "not open file"
     contents = unsafe::add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos
     {builtins::nat bytes_read = f__unsafe_ptr?fread((char*)contents, 1, size, (FILE*)f__unsafe_ptr):0;}
-    if bytes_read==0
-        fail "end of file"
+    if bytes_read==0 fail "end of file"
     prev_pos = const pos
     pos = pos+bytes_read
     return str(buf, prev_pos, bytes_read)
@@ -95,13 +84,11 @@ def line(char[] buf, mut nat|blank pos, File f)
 
 def print(terminal|write f, str text)
     doc "writes a string to a write file"
-    if not exists f.unsafe_ptr
-        fail "failed to write to closed file"
+    if not exists f.unsafe_ptr fail "failed to write to closed file"
     {builtins::nat bytes_written = fwrite((char*)text__unsafe_ptr, 1, text__unsafe_size, (FILE*)f__unsafe_ptr);}
-    if bytes_written!=len text
-        fail "failed to write to file"
+    if bytes_written!=len text fail "failed to write to file"
+
 def print(terminal|write f, cstr text)
     doc "writes a cstr to a write file"
-    if not exists f.unsafe_ptr
-        fail "failed to write to closed file"
+    if not exists f.unsafe_ptr fail "failed to write to closed file"
     {fwrite(text, 1, strlen(text), (FILE*)f__unsafe_ptr);}

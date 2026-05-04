@@ -18,36 +18,26 @@ local import "std/core.s"
 local import "std/unsafe.s" as unsafe
 local import "std/io/file.s"
 
-def is_dir(cstr path)
+def is_dir(str|cstr _path)
     doc "checks whether a cstr path points to an existing directory"
+    path = unsafe_temporary_cstr _path
     {builtins::bool exists = __smo_is_dir(path);}
     return exists
-def is_dir(str path)
-    doc "checks whether a string path points to an existing directory"
-    return is_dir unsafe_temporary_cstr path
 
-def create_dir(cstr path)
+def create_dir(str|cstr _path)
+    path = unsafe_temporary_cstr _path
     doc "creates a directory at a cstr path, fails if it already exists or cannot be created"
     {builtins::bool result = __smo_create_dir(path);}
-    if not result
-        fail "failed to create directory"
-def create_dir(str path)
-    doc "creates a directory at a string path"
-    return create_dir unsafe_temporary_cstr path
+    if not result fail "failed to create directory"
 
-def is_file(cstr path)
+def is_file(str|cstr _path)
     doc "checks whether a cstr path points to an existing file"
+    path = unsafe_temporary_cstr _path
     {builtins::bool exists = __smo_is_file(path);}
     return exists
-def is_file(str path)
-    doc "checks whether a string path points to an existing file"
-    return is_file unsafe_temporary_cstr path
 
-def remove_file(cstr path)
+def remove_file(str|cstr _path)
     doc "removes a file at a cstr path, fails if it cannot be removed"
+    path = unsafe_temporary_cstr _path
     {builtins::bool result = __smo_remove_file(path);}
-    if not result
-        fail "failed to remove file"
-def remove_file(str path)
-    doc "removes a file at a string path"
-    return remove_file unsafe_temporary_cstr path
+    if not result fail "failed to remove file"

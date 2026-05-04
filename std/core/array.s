@@ -86,26 +86,22 @@ def resize(mut any[] buffer, nat size)
 
 def last(const any[] buffer)
     doc "get a pointer to the last buffer element"
-    if 0==buffer.unsafe_size
-        fail "out of bounds"
+    if 0==buffer.unsafe_size fail "out of bounds"
     return buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1)*buffer.unsafe_align)
 
 def mutlast(any[] buffer)
     doc "get a mutable pointer to the last buffer element"
-    if 0==buffer.unsafe_size
-        fail "out of bounds"
+    if 0==buffer.unsafe_size fail "out of bounds"
     return unsafe_mut buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1)*buffer.unsafe_align)
     
 def mutget(any[] buffer, nat i)
     doc "get a mutable pointer to a buffer element"
-    if i>=buffer.unsafe_size
-        fail "out of bounds"
+    if i>=buffer.unsafe_size fail "out of bounds"
     return unsafe_mut buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align)
     
 def get(const any[] buffer, nat i)
     doc "get a pointer to a buffer element"
-    if i>=buffer.unsafe_size
-        fail "out of bounds"
+    if i>=buffer.unsafe_size fail "out of bounds"
     return buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align)
 
 def len(const any[] buffer)
@@ -125,14 +121,12 @@ def list(mut any[] buffer)
 
 def get(list l, nat pos)
     doc "get a list element pointer"
-    if pos>=l.length
-        fail "out of bounds"
+    if pos>=l.length fail "out of bounds"
     return get(l.buffer,pos)
 
 def mutget(list l, nat pos)
     doc "get a mutable list element pointer"
-    if pos>=l.length
-        fail "out of bounds"
+    if pos>=l.length fail "out of bounds"
     return l.buffer.mutget pos
 
 def push(list l)

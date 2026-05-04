@@ -15,7 +15,7 @@ _1.10._ [local definitions](#local-definitions)
 **Section 2. Safe resources**<br>
 _2.1._ [buffers](#buffers)<br>
 _2.2._ [pointers](#pointers)<br>
-_2.2._ [stable references](#stable-references)<br>
+_2.3._ [stable references](#stable-references)<br>
 _2.4._ [substructures](#substructures)<br>
 _2.5._ [try and fail](#try-and-fail)<br>
 _2.6._ [defer](#defer)<br>
@@ -84,7 +84,7 @@ def main()
 
 ## calling notation
 
-Functions are followed by their arguments in parantheses,
+Functions are followed by their arguments in parentheses,
 although you can also omit the latter if they would end 
 at the end of the line. Arguments are comma-separated,
 like below. In general, commas within parentheses designate
@@ -177,8 +177,12 @@ by the returned value's name.
 
 Types like the above are structurally matched, as we did
 when applying `add` to the range construct. If you
-want to prevent implicit structural metches, 
+want to prevent implicit structural matches, 
 use the following `class` notation to wrap the returned value.
+
+Default for class definitions when declaring types with some
+contract of how they are constructed; such contracts should
+not be violated by matching with arbitrary data.
 
 
 ```python
@@ -194,6 +198,9 @@ def main()
     p = Point(1.0, 2.0)
     print sum p 
 ```
+
+Can also use `singleton` instead of `class` to further
+ensure that the function runs at most one time in your program.
 
 ## type mutability
 
@@ -310,11 +317,15 @@ but you can use `rec` instead of `def` to allow recursion
 within the current file. 
 
 A file with recursive functions works like this:
-- **Step 1.** All functions are parsed, where recursive ones stop at their first return statement. Up to that point, everything
+- **Step 1.** All functions are parsed, where recursive ones stop at their 
+first return statement. Up to that point, everything
 can only see previous functions, which means that you need
-to encode the recursion stoping conditions.
+to encode the recursion stopping conditions.
 - **Step 2.** The rest of the recursive definitions
 are parsed. These now have access to the whole file's types.
+
+Importantly, the recursive function's escape hatch should occur
+first, otherwise Step 1 would result in failure.
 
 Below is an overengineered and thus algorithmically
 slow Fibonacci number calculator that demonstrates recursion
@@ -343,7 +354,7 @@ def main()
 
 ## unions
 
-Declare alteratives between types (unions) by separating them
+Declare alternatives between types (unions) by separating them
 with `|`. Below is an example that defines a function for
 adding either a float or an integer to a float. The brackets
 are used to add some C code, inside which `builtins::float` is
@@ -377,7 +388,7 @@ def unsafe_add(Number x, Number y)
 ## conditional compilation and default arguments
 
 You can use the `[value] is [type]` operator to check that a value/tuple
-adheres to a at least one variation of a union. The result is not
+adheres to at least one variation of a union. The result is not
 merely a boolean, but in fact of type `compile::true` or `compile::false`;
 these values are significant because they let *smoλ* actually identify 
 whether conditions will always be true or false and **eliminate code without parsing it**.
@@ -416,7 +427,7 @@ def inc(int x, int|blank value)
 
 This is perhaps a good point to mention that you can have imports
 or function definitions be preceded by `local` to avoid exposing
-unecessary contents.
+unnecessary contents.
 For example, the *range* module from the standard library imports
 the latter's core locally but never exposes it, for example to
 cover cases where different arithmetic operations need to be defined 
@@ -464,7 +475,7 @@ One of the most important features is the `alloc` function to
 allocate and zero-initialize a specific number of elements. 
 This returns the buffer itself to enable initialization per patterns like
 `buf = (mut float[]).alloc 4`. Allocate a buffer of chars
-by not providing the mutable buffer decleration per `buf = alloc 4`.
+by not providing the mutable buffer declaration per `buf = alloc 4`.
 Make use of the `KB`, `MB`, `GB` functions to quickly size allocations.
 
 Allocation will create an error if it tries to change the number of
@@ -479,7 +490,7 @@ A second important feature is the element access operator `buffer[pos]`,
 which can be used to extract an object stored at a specific position. 
 In general, this operator is implemented by overloading the `get` 
 function and `mutget` functions. Use `buffer[pos] = value` to copy same data 
-on a buffer's element. This is equiavalent to the pointer notations
+on a buffer's element. This is equivalent to the pointer notations
 `buffer[pos]&&<<value`, but more on pointers later.
 
 All buffer indexes are of type `nat`, which represents natural numbers 
@@ -518,7 +529,8 @@ a `mut` pointer per `ptr = buf[element]&&`.
 
 `ptr..` dereferences pointers onto local objects. 
 For example, `ptr...field` gets a field from an object stored 
-in a pointer. On the other hand, move values onto pointed locations
+in a pointer by following up the dereferenced data with field
+access notation. Move values onto pointed locations
 of mutable pointers per `ptr << value`.
 
 *Smoλ* makes necessary checks on pointer safety; it would be too restrictive
@@ -545,7 +557,7 @@ def main()
     print buf[0]    # prints 1 from the same memory 
 ```
 
-If, in he above example, a new line 
+If, in the above example, a new line 
 `buf.resize 2` was applied before the
 last two prints, `element` would become invalidated and would
 need to be re-obtained from the buffer.
@@ -579,8 +591,12 @@ def main()
 
 You can work with data that reference other data
 in that they are updated together. This is similar
-than pointers, but comes under some scarce safety 
-restrictions that let compile ensure safety.
+to pointers, but comes under some scarce safety 
+restrictions that let the compiler ensure safety.
+At the same time, references are dissolved during
+returns into actual values that are not automatically
+updated together anymore - though safety checks are
+still performed.
 
 To convert some data to a reference use the `ref value`
 syntax like below.
@@ -600,7 +616,7 @@ References are **automatically propagated**
 by analyzing direct input-output equalities. This
 allows the compiler to re-attach valid references to
 invalidated data structures, for example that would
-have been validated by memore movements.
+have been validated by memory movements.
 
 Notably, references are not types but just some
 property you attach to local variables to indicate
@@ -638,7 +654,7 @@ work with "vertical" data by being able to obtain sub-buffers
 or sub-pointers for their fields.
 
 The method to do so is by using the `buf@field` or `ptr@field` notation, 
-where the field refers to a known field of the attached stucture. This
+where the field refers to a known field of the attached structure. This
 operator helps write very safe yet fast and memory-efficient code by
 obtaining necessary offsets within allocated memory. Below is
 an example:
@@ -656,7 +672,7 @@ def Point3D(float x, float y, float z)
     return (plane,class(z))
 
 def main()
-    points = (mut Point3D[])->alloc(10)
+    points = (mut Point3D[]).alloc(10)
     points[0] = Point3D(1.0,2.0,3.0)
     print points@plane@x[0]
     print points[0].plane.x  # equivalent
@@ -699,7 +715,7 @@ def vector(nat size)
 def main()
     if not try v = vector pow(1024,6)
         print "failed to allocate"
-    print(v->len(), " numbers allocated\n")
+    print(len v, " numbers allocated\n")
 ```
 
 
@@ -707,7 +723,7 @@ def main()
 
 You can defer code blocks to run later. The "later" part is
 ideally the end of the current function, but *smoλ* may
-postpone it further to accomodate resources (e.g., buffers) 
+postpone it further to accommodate resources (e.g., buffers) 
 that are still in use.
 Defer blocks cannot have any return statements or unhandled
 errors; explicitly wrap all potentially erroneous function calls 
@@ -732,7 +748,7 @@ def main()
 ## lists
 
 You can manage buffers by adding push and pop operations, as well
-as a capacity-based growth stratetegy. This is done by caling the 
+as a capacity-based growth strategy. This is done by calling the 
 `list` function on a mutable buffer. List elements are accessed like 
 buffers. An example follows.
 
@@ -759,7 +775,7 @@ and its first character for quicker comparison; that is `\0` for empty
 strings.
 
 `cstr` data are trivially castable to strings if their length is not
-needed. Below is na example, where printing is also implemented for
+needed. Below is an example, where printing is also implemented for
 strings.
 
 ```python
@@ -830,7 +846,7 @@ def main()
         io::dir::remove "tmp.txt"
 ```
 
-Above was a first introduction to a the `dir` namespace for directory 
+Above was a first introduction to the `dir` namespace for directory 
 operations. Below is how to iterate through directory contents.
 
 ```python

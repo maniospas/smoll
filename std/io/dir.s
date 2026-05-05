@@ -16,7 +16,6 @@
 
 local import "std/core.s"
 local import "std/unsafe.s" as unsafe
-import "std/core.s" as core
 
 def is_dir(str|cstr _path)
     doc "checks whether a cstr path points to an existing directory"
@@ -51,13 +50,16 @@ def read(str|cstr _path)
     if not exists unsafe_ptr fail "failed to open file"
     return class(unsafe_mut unsafe_ptr)
 
-def entry(char[] buf, mut nat|blank pos, read f)
-    if pos is blank
-        pos = mut 0
+def unsafe_entry(read f)
     if not exists f.unsafe_ptr
         fail "not open dir"
     {builtins::compiler::ptr de = readdir((DIR*)f__unsafe_ptr);}
     if not exists de
         fail "end of dir"
     {builtins::cstr dirname=((struct dirent*)de)->d_name;}
-    return copy(buf, pos, dirname)
+    return dirname
+
+def entry(char[] buf, mut nat|blank pos, read f)
+    if pos is blank
+        pos = mut 0
+    return copy_null_terminated(buf, pos, unsafe_entry f)  # optimized for joining with prefix

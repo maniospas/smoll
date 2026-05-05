@@ -23,6 +23,10 @@ def console()
     doc "references the system console"
     return singleton()
 
+def flush_console()
+    doc "flushes the print buffer on the console"
+    {fflush(stdout);}
+
 def int(console)
     doc "reads an integer from the console"
     {builtins::int number=0;builtins::char ch=0;}

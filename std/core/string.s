@@ -17,6 +17,11 @@
 local import "std/core/builtinsext.s"
 local import "std/core/array.s"
 
+def exists(cstr c)
+    doc "checks whether a cstr is not zero-initialized"
+    {builtins::bool z = c!=0;}
+    return z
+
 local def strdat(nat pos, nat length, char first)
     doc "string data without the buffer storage"
     return (pos, length, first)
@@ -73,15 +78,12 @@ def neq(char x, char y)
     {builtins::bool z = (x!=y);}
     return z
 
-def copy(str other)
+def copy(str|cstr _other)
     doc "copy a string to a new buffer"
+    other = str _other
     buf = alloc len other
     {memcpy(((char*)buf__unsafe_ptr), ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
     return str(buf, 0, other.dat.length, other.dat.first)
-
-def copy(cstr other)
-    doc "copy a cstr to a new buffer"
-    return copy str other
 
 local def copy_null_terminated(str other)
     doc "copy a string to a new buffer while ensuring null termination"
@@ -105,18 +107,43 @@ def unsafe_temporary_cstr(str other)
         c = other
     else
         c = copy_null_terminated(other)
-    {builtins::cstr ret = other__buf__unsafe_ptr;}
+    {builtins::cstr ret = c__buf__unsafe_ptr+c__dat__pos;}
+    defer
+        # will do nothing but ties ret and c together
+        if not exists ret 
+            del c
     return ret
 
 def unsafe_temporary_cstr(cstr other)
     doc "tautology function for cstr, simplified pattern of converting str|cstr to cstr"
     return other
 
-def copy(char[] buf, mut nat pos, str other)
+def bufpos(any[] buf)
+    pos = mut 0
+    return (buf, pos)
+
+def bufpos(bufpos other)
+    pos = mut other.pos
+    return (other.buf, pos)
+
+def extend_right_by(str s, nat by)
+    new_length = s.dat.length+by
+    if new_length+s.dat.pos>len s.buf fail "string does not fit on buffer"
+    return str(s.buf, s.dat.pos, new_length, s.dat.first)
+
+def extend_left(str s, nat|blank pos)
+    if pos is blank
+        pos = 0
+    if pos==s.dat.pos return s
+    if pos>s.dat.pos+s.dat.length fail "cannot extend the string's left side outside the its right range"
+    return str(s.buf, pos, (s.dat.pos+s.dat.length)-pos)
+
+def copy(char[] buf, mut nat pos, str|cstr _other)
     doc "copy a string"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
     doc "This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead."
+    other = str _other
     next_pos = pos+len other
     if next_pos>len buf
         fail "string buffer out of memory"
@@ -125,12 +152,21 @@ def copy(char[] buf, mut nat pos, str other)
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)
 
-def copy(char[] buf, mut nat pos, cstr other)
-    doc "copy a cstr"
-    doc "Constructs the copy on the buffer at a given position and returns it as a string."
+def copy_null_terminated(char[] buf, mut nat pos, str|cstr _other)
+    doc "copy a string while adding null termination"
+    doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
     doc "This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead."
-    return copy(buf, pos, str other)
+    other = str _other
+    null_pos = pos+len other
+    next_pos = null_pos + 1
+    if next_pos>len buf
+        fail "string buffer out of memory"
+    {memcpy(((char*)buf__unsafe_ptr)+pos, ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
+    {((char*)buf__unsafe_ptr)[null_pos]=0;}
+    prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
+    pos = next_pos
+    return str(buf, prev_pos, other.dat.length, other.dat.first)
 
 def print(str s, cstr|blank endl)
     doc "print a string"
@@ -202,3 +238,28 @@ def print(char c, cstr|blank endl)
         doc "Ends the line too."
         endl = "\n"
     {printf("%c%s", c, endl);}
+
+def slice(str _s, nat from, nat to)
+    s = str _s
+    if from==to return str ""
+    if from<to or to>s.dat.length fail "slice out of string bounds"
+    new_length = to-from
+    new_pos = s.dat.pos+from
+    if from!=0 new_first = s.buf[new_pos]
+    else new_first = const s.dat.first
+    return str(s.buf, new_pos, new_length, new_first)
+
+def starts_with(cstr|str _stack, cstr|str _needle)
+    stack = str _stack
+    needle = str _needle
+    if stack.dat.first!=needle.dat.first return false
+    if stack.dat.length<needle.dat.length return false
+    return stack.slice(0,len needle)==needle
+
+def ends_with(cstr|str _stack, cstr|str _needle)
+    stack = str _stack
+    needle = str _needle
+    if stack.dat.length<needle.dat.length return false
+    n = len stack
+    ret = stack.slice(n-len needle, n)
+    return ret==needle

@@ -53,10 +53,9 @@ static inline uint64_t __smo_file_size(FILE* fp) {
 
 /* ── filesystem ── */
 static inline int __smo_is_file(const char* path) {
-    FILE* f = fopen(path, "r");
-    if (!f) return 0;
-    fclose(f);
-    return 1;
+    struct stat st;
+    if (stat(path, &st) != 0) return 0;
+    return S_ISREG(st.st_mode);
 }
 
 static inline int __smo_is_dir(const char* path) {

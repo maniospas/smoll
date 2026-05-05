@@ -188,7 +188,7 @@ class Variable(CodeSegment):
         if error_token and self._references:
             error_token.error("safety", "cannot make a reference mutable '"+pretty_name(self.name)+"' (perhaps try 'ref mut' instead of 'mut ret')")
         return Variable(self.name, self.type, False, self.isprivate, self._references)
-    def immutable_copy(self): return Variable(self.name, self.type, True, self.isprivate, self._references)
+    def immutable_copy(self): return Variable(self.name, self.type, True, False, self._references)
     def private_copy(self): return Variable(self.name, self.type, self.immutable, True, self._references)
     def is_same(self, other: "Variable"):
         if self.type!=other.type: return False
@@ -1782,6 +1782,11 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "declares that the following value will be treated as mutable (fields and pointer contents may modified) - creates an error if the conversion to mutable is unsafe")
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
+        if len(ret)==0:
+            current_token.error("safety", "next value is blank")
+        tmp = create_temp()
+        impl.assign(tmp, ret, current_token)
+        ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(tokens[prev_pos]) for r in ret], current_operator_priority)
     if current=="try":
         def process_try(pos: int):
@@ -1805,10 +1810,10 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             return pos, [var]
         return process_try(pos)
     if current=="local":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "creates an anonymized version of the next variable that prevents safe access")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "creates an anonymized version of the next variable that prevents mutable access to it")
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
-        if len(ret)==0 or all(r.name.startswith("__temp") or "____temp" in r.name for r in ret):
-            current_token.error("safety", "next value is already temporary or blank")
+        if len(ret)==0:# or all(r.name.startswith("__temp") or "____temp" in r.name for r in ret):
+            current_token.error("safety", "next value is blank")
         tmp = create_temp()
         impl.assign(tmp, ret, current_token)
         ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
@@ -1817,6 +1822,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "tracks changes to the referenced value, such as buffer modifications, and makes all subsequent usage of the value (even implicit usage) use the referenced value")
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
+        ret = impl.stabilize(ret)
         # tmp = create_temp()
         # impl.assign(tmp, [r.stable_copy() for r in ret], current_token)
         # ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
@@ -1827,7 +1833,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(None) for r in ret], current_operator_priority)
     if current=="const":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "declares that the following value will be treated as fully immatuble (it cannot be the reason why fields and pointer contents are modified)")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "declares that the following value will be treated as fully immatuble (it cannot be the reason why fields and pointer contents are modified) - strips away any class membership information")
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.immutable_copy() for r in ret], current_operator_priority)
     if current == "INVALIDATE":
@@ -2216,11 +2222,11 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                     var = diff_vars_if.get(k, None)
                     if var is None: continue
                     if var.type!=v.type:
-                        tokens[if_pos].error("safety", "the conditional blocks starting here have a variable with different types '"+k+"'")
+                        tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable with different types '"+k+"'")
                     if var.isprivate!=v.isprivate:
-                        tokens[if_pos].error("safety", "the conditional blocks starting here have a variable that changes on whether it is packed in a class '"+k+"'")
+                        tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable but assume differently whether it is packed in a class '"+k+"' - perhaps try to 'const' it first")
                     if var.immutable!=v.immutable:
-                        tokens[if_pos].error("safety", "the conditional blocks starting here have a variable that changes on whether it is immutable '"+k+"'") 
+                        tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable but assume differently whether it is immutable '"+k+"'") 
                 for k, v in diff_vars_if.items():
                     var = impl.vars.get(k, None)
                     if var is None:
@@ -2229,9 +2235,9 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                     if var.type!=v.type:
                         tokens[if_pos].error("safety", "the conditional blocks starting here have a variable with different types '"+k+"'")
                     if var.isprivate!=v.isprivate:
-                        tokens[if_pos].error("safety", "the conditional blocks starting here have a variable that changes on whether it is packed in a class '"+k+"'")
+                        tokens[if_pos].error("safety", "the conditional blocks starting here have a variable but assume differently whether it is packed in a class '"+k+"' - perhaps try to 'const' it first")
                     if var.immutable!=v.immutable:
-                        tokens[if_pos].error("safety", "the conditional blocks starting here have a variable that changes on whether it is immutable '"+k+"'") 
+                        tokens[if_pos].error("safety", "the conditional blocks starting here have a variable but assume differently whether it is immutable '"+k+"'") 
             continue
         pos, _ = process_statement(file, tokens, pos-1, impl, 0)
     return pos
@@ -2823,7 +2829,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     src_path = Path(f"{output_name}.c")
     exe_path = Path(output_name)
     header = (
-        "#include \"std/common.h\"\n"
+        "#include <std/common.h>\n"
         "#include <stdio.h>\n"
         "#include <stdlib.h>\n"
         "#include <string.h>\n"
@@ -2857,6 +2863,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
             str(src_path),
             "-o",
             str(exe_path),
+            "-I."
         ],
         "antcc": [
             "./antcc",
@@ -2864,6 +2871,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
             str(src_path),
             "-o",
             str(exe_path),
+            "-I."
         ]
     }.get(chosen_compiler, None)
     if gcc_cmd is None:

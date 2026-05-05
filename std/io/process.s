@@ -6,8 +6,11 @@ def process(str|cstr _cmd)
     {builtins::compiler::ptr contents = popen((const char*)cmd, "r");}
     if not exists contents fail "failed to start process"
     defer 
-        if exists contents {builtins::int status = pclose((FILE*)contents); contents = 0;}
-        if status!=int 0 print "process terminated with unhandled non-zero exit code"
+        if exists contents 
+            {char buf[1024]; while(fread(buf, 1, sizeof(buf), (FILE*)contents)) {}}
+            {builtins::int status = pclose((FILE*)contents); contents = 0;}
+        if status!=int 0
+            print "process terminated with unhandled non-zero exit code"
     return class(unsafe_mut contents)
 
 def to_end(process p)

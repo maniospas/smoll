@@ -1,14 +1,22 @@
 import "std/core.s"
-import "std/io.s" as io
+import "std/io.s"::dir as dir
+import "std/io.s"::process as process
 
 def main()
     path = "./tests/passing/"
-    bp = bufpos alloc KB 4
+    max_command_length = 50
+    bp = bufpos alloc max_command_length # buffer and mutable position pair
     bp.copy "./smoll "
     bp.copy path
-    test_dir = io::dir::read path
-    while try entry = bp.bufpos().io::dir::entry test_dir
-        if not entry.ends_with ".s" continue
-        command = extend_left entry
-        print command
-        del mut io::process::process command # spawn and forcefully end
+    test_dir = dir::read path
+    proc_buf = alloc KB 4
+    while try entry = (local bp).dir::entry test_dir # do not move the position
+        if not entry.ends_with ".s" 
+            continue
+        command = lextend entry
+        command.rextend(max_command_length-len command, char " ").print " "
+        proc = mut process::read command.rextend char "" # null-terminate to avoid copying in cstr conversion
+        while try line=proc_buf.process::line proc
+            print("*", "")
+        print ""
+        del proc

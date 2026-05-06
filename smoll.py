@@ -267,6 +267,7 @@ class ImplementedType:
         self._pointer_type_dependencies: dict[str, str] = dict() # only place pointer variables here
         self.invalidated: dict[str, Token] = dict() # invalidated variables and the place where the invalidation occurred
         self.invalidate_types_when_called: list[ImplementedType] = list()
+        self.accumulating_defers: list[dict[str, Token]] = [dict()] # for the top level we defer at the end of file
         self.is_parsing_a_defer = False
         self.is_parsing_a_try: list[Variable|None] = list() # list of variables that hold try results
         if self.builtin is not None:
@@ -485,6 +486,16 @@ class ImplementedType:
                     error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
             else:
                 if self.get_pointer_type(value[0]): self.set_pointer_depedency(existing, value[0])
+
+        accumulated_defer = self.accumulating_defers[-1].get(existing.name, None)
+        if accumulated_defer is not None: # important to do this before setting dependent_assignments
+            if not self.get_assignment(existing.name, [value[0].name]):
+                error_token.error("safety", "this creates a leaking resource '"+pretty_name(value[0].name)+"'", reason=accumulated_defer, raason_message="due to overwriting", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
+        accumulated_defer = self.accumulating_defers[-1].get(value[0].stabilized_name(), None)
+        if accumulated_defer is not None:
+            self.accumulating_defers[-1][existing.name] = accumulated_defer
+           
+
         self.dependent_assignments[existing.name] = value[0].stabilized_name()
         if existing.type.builtin and (existing._references is None or not perform_immutability_checks): self.implementation.extend([existing, CODEWORD_EQUALS, value[0], CODEWORD_SEMICOLON])
 
@@ -1026,7 +1037,10 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 continue
             v_name = segment.tostring()
             if v_name in callee.rets:
-                new_defer.append(impl.vars[tmp+"__"+v_name[prefix_length:]]) # we have already created this
+                v_name_tmp = tmp+"__"+v_name[prefix_length:]
+                new_defer.append(impl.vars[v_name_tmp]) # we have already created this
+                #if impl.vars[v_name_tmp].type==POINTER_TYPE:
+                impl.accumulating_defers[-1][v_name_tmp] = error_token
                 continue
             new_v = segment.renamed_copy(secondary_tmp+"__"+v_name)
             new_defer.append(new_v)
@@ -2126,6 +2140,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 CODEWORD_LBRACKET,
             ])
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
+            impl.accumulating_defers.append(dict())
             if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool' but found '"+signature_like(ret)+"'")
             if ret[0].type==TRUE_TYPE:
                 if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
@@ -2153,8 +2168,14 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 ])
                 if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
                 else: pos = process_body(file, tokens, pos-1, impl, one_line=True)
+            
+            for should_invalid in impl.accumulating_defers[-1]:
+                if impl.invalidated.get(should_invalid) is None:
+                    impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
+
             impl.implementation.append(CODEWORD_RBRACKET)
             impl.nesting.pop()
+            impl.accumulating_defers.pop()
             continue
         if name.text=="if":
             if_pos = pos-1

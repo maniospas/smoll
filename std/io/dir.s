@@ -62,4 +62,4 @@ def unsafe_entry(read f)
 def entry(char[] buf, mut nat|blank pos, read f)
     if pos is blank
         pos = mut 0
-    return copy_null_terminated(buf, pos, unsafe_entry f)  # optimized for joining with prefix
+    return copy(buf, pos, unsafe_entry f)  # optimized for joining with prefix

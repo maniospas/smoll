@@ -1,7 +1,7 @@
 local import "std/core.s"
 local import "std/unsafe.s" as unsafe
 
-def process(str|cstr _cmd)
+def read(str|cstr _cmd)
     cmd = unsafe_temporary_cstr _cmd
     {builtins::compiler::ptr contents = popen((const char*)cmd, "r");}
     if not exists contents fail "failed to start process"
@@ -13,11 +13,11 @@ def process(str|cstr _cmd)
             print "process terminated with unhandled non-zero exit code"
     return class(unsafe_mut contents)
 
-def to_end(process p)
+def to_end(read p)
     if not exists p.contents
         {{char buf[1024]; while(fread(buf, 1, sizeof(buf), (FILE*)p__contents)) {}}}
 
-def chunk(char[] buf, mut nat|blank pos, process f)
+def chunk(char[] buf, mut nat|blank pos, read f)
     if pos is blank
         pos = mut 0
     contents = unsafe::add(buf.unsafe_ptr, pos)
@@ -28,7 +28,7 @@ def chunk(char[] buf, mut nat|blank pos, process f)
     pos = pos+bytes_read
     return str(buf, prev_pos, bytes_read)
 
-def line(char[] buf, mut nat|blank pos, process f)
+def line(char[] buf, mut nat|blank pos, read f)
     if pos is blank
         pos = mut 0
     contents = unsafe::add(buf.unsafe_ptr, pos)

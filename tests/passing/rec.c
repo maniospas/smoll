@@ -5,42 +5,42 @@
 #include <time.h>
 
 const char* const __temp345v="\n";
-int fib__temp1090v(unsigned long long n, unsigned long long* __temp1119v) ;
-static inline __attribute__((always_inline)) void false__temp7v(int* __temp1111v) {
+int fib__temp1121v(unsigned long long n, unsigned long long* __temp1150v) ;
+static inline __attribute__((always_inline)) void false__temp7v(int* __temp1142v) {
   int value=0;
-  *__temp1111v=value;
+  *__temp1142v=value;
 }
 
-static inline __attribute__((always_inline)) void not__temp26v(int __temp_anon0, int* __temp1112v) {
+static inline __attribute__((always_inline)) void not__temp26v(int __temp_anon0, int* __temp1143v) {
   int __temp27v__=0;
   false__temp7v(&__temp27v__);
-  *__temp1112v=__temp27v__;
+  *__temp1143v=__temp27v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp84v(unsigned long long x, unsigned long long y, int* __temp1113v) {
+static inline __attribute__((always_inline)) void is_different__temp84v(unsigned long long x, unsigned long long y, int* __temp1144v) {
   int __temp85v=0;
   int __temp86v__=0;
   not__temp26v(__temp85v,&__temp86v__);
-  *__temp1113v=__temp86v__;
+  *__temp1144v=__temp86v__;
 }
 
-static inline __attribute__((always_inline)) void le__temp229v(unsigned long long x, unsigned long long y, int* __temp1114v) {
+static inline __attribute__((always_inline)) void le__temp229v(unsigned long long x, unsigned long long y, int* __temp1145v) {
   int __temp230v__=0;
   int z=0;
   is_different__temp84v(x,y,&__temp230v__);
   z=x<=y?1:0;
-  *__temp1114v=z;
+  *__temp1145v=z;
 }
 
-static inline __attribute__((always_inline)) void lt__temp181v(unsigned long long x, unsigned long long y, int* __temp1115v) {
+static inline __attribute__((always_inline)) void lt__temp181v(unsigned long long x, unsigned long long y, int* __temp1146v) {
   int __temp182v__=0;
   int z=0;
   is_different__temp84v(x,y,&__temp182v__);
   z=x<y?1:0;
-  *__temp1115v=z;
+  *__temp1146v=z;
 }
 
-static inline __attribute__((always_inline)) int sub__temp329v(unsigned long long x, unsigned long long y, unsigned long long* __temp1116v) {
+static inline __attribute__((always_inline)) int sub__temp329v(unsigned long long x, unsigned long long y, unsigned long long* __temp1147v) {
   int __temp330v__=0;
   int __temp333v__=0;
   unsigned long long z=0;
@@ -52,60 +52,60 @@ static inline __attribute__((always_inline)) int sub__temp329v(unsigned long lon
   goto __temp_failure;
   }
   z=x-y;
-  *__temp1116v=z;
+  *__temp1147v=z;
   
   __temp_failure:
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) void call_fib__temp1094v(unsigned long long n, unsigned long long* __temp1117v) {
-  unsigned long long __temp1095v__=0;
-  fib__temp1090v(n,&__temp1095v__);
-  *__temp1117v=__temp1095v__;
+static inline __attribute__((always_inline)) void call_fib__temp1125v(unsigned long long n, unsigned long long* __temp1148v) {
+  unsigned long long __temp1126v__=0;
+  fib__temp1121v(n,&__temp1126v__);
+  *__temp1148v=__temp1126v__;
 }
 
-static inline __attribute__((always_inline)) void add__temp109v(unsigned long long x, unsigned long long y, unsigned long long* __temp1118v) {
+static inline __attribute__((always_inline)) void add__temp109v(unsigned long long x, unsigned long long y, unsigned long long* __temp1149v) {
   int __temp110v__=0;
   unsigned long long z=0;
   is_different__temp84v(x,y,&__temp110v__);
   z=x+y;
-  *__temp1118v=z;
+  *__temp1149v=z;
 }
 
-int fib__temp1090v(unsigned long long n, unsigned long long* __temp1119v) {
-  unsigned long long __temp1101v=0;
-  int __temp1102v__=0;
-  unsigned long long __temp1103v=0;
-  unsigned long long __temp1104v=0;
-  unsigned long long __temp1105v__=0;
-  unsigned long long __temp1106v__=0;
-  unsigned long long __temp1107v=0;
-  unsigned long long __temp1108v__=0;
-  unsigned long long __temp1109v__=0;
-  unsigned long long __temp1110v__=0;
+int fib__temp1121v(unsigned long long n, unsigned long long* __temp1150v) {
+  unsigned long long __temp1132v=0;
+  int __temp1133v__=0;
+  unsigned long long __temp1134v=0;
+  unsigned long long __temp1135v=0;
+  unsigned long long __temp1136v__=0;
+  unsigned long long __temp1137v__=0;
+  unsigned long long __temp1138v=0;
+  unsigned long long __temp1139v__=0;
+  unsigned long long __temp1140v__=0;
+  unsigned long long __temp1141v__=0;
   int __temp_errcode=0;
-  __temp1101v=1;
-  le__temp229v(n,__temp1101v,&__temp1102v__);
-  if(__temp1102v__){
-  __temp1103v=1;
+  __temp1132v=1;
+  le__temp229v(n,__temp1132v,&__temp1133v__);
+  if(__temp1133v__){
+  __temp1134v=1;
   goto __temp_return;
   }
-  __temp1104v=1;
-  __temp_errcode=sub__temp329v(n,__temp1104v,&__temp1105v__);
+  __temp1135v=1;
+  __temp_errcode=sub__temp329v(n,__temp1135v,&__temp1136v__);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  call_fib__temp1094v(__temp1105v__,&__temp1106v__);
-  __temp1107v=2;
-  __temp_errcode=sub__temp329v(n,__temp1107v,&__temp1108v__);
+  call_fib__temp1125v(__temp1136v__,&__temp1137v__);
+  __temp1138v=2;
+  __temp_errcode=sub__temp329v(n,__temp1138v,&__temp1139v__);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  call_fib__temp1094v(__temp1108v__,&__temp1109v__);
-  add__temp109v(__temp1106v__,__temp1109v__,&__temp1110v__);
-  __temp1103v=__temp1110v__;
+  call_fib__temp1125v(__temp1139v__,&__temp1140v__);
+  add__temp109v(__temp1137v__,__temp1140v__,&__temp1141v__);
+  __temp1134v=__temp1141v__;
   __temp_return:
-  *__temp1119v=__temp1103v;
+  *__temp1150v=__temp1134v;
   
   __temp_failure:
   return __temp_errcode;
@@ -117,12 +117,12 @@ static inline __attribute__((always_inline)) void print__temp356v(unsigned long 
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__temp1096v() {
-  unsigned long long __temp1097v=0;
-  unsigned long long __temp1098v__=0;
-  __temp1097v=42;
-  fib__temp1090v(__temp1097v,&__temp1098v__);
-  print__temp356v(__temp1098v__);
+static inline __attribute__((always_inline)) void main__temp1127v() {
+  unsigned long long __temp1128v=0;
+  unsigned long long __temp1129v__=0;
+  __temp1128v=42;
+  fib__temp1121v(__temp1128v,&__temp1129v__);
+  print__temp356v(__temp1129v__);
 }
 
-int main() {main__temp1096v();return 0;}
+int main() {main__temp1127v();return 0;}

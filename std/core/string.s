@@ -99,15 +99,20 @@ def unsafe_temporary_cstr(str other)
     doc "and will become invalid once the calling site ends."
     doc "It also does not admit proper cstr equality comparisons via pointer values"
     doc "that reflect contents; it will always compare equal only to itself."
-    doc "An optimization that safely checks beyond the buffer's contents for null"
-    doc "termination is also employed. Modifying the string buffer in any capacity"
-    doc "invalidates the null termination property, so in general do not make string"
-    doc "copies or additions while this is used in code."
-    if len(other)+other.dat.pos<len(other.buf) and other.buf[len other]==char ""
+    doc "An optimization that safely checks the last element and one position beyond"
+    doc "the buffer's contents for null termination is also employed. Modifying the"
+    doc "string buffer in any capacity"
+    doc "invalidates the null termination property, so in general do not manipulate" 
+    doc "strings while this is used in code; it should only be used for operating"
+    doc "system calls."
+    end_pos = other.dat.pos+other.dat.length
+    if end_pos!=0 and end_pos<=len(other.buf) and other.buf[end_pos-1]==char ""
+        c = other
+    else if end_pos<len(other.buf) and other.buf[end_pos]==char ""
         c = other
     else
         c = copy_null_terminated(other)
-    {builtins::cstr ret = c__buf__unsafe_ptr+c__dat__pos;}
+    {builtins::cstr ret = ((char*)c__buf__unsafe_ptr)+c__dat__pos;}
     defer
         # will do nothing but ties ret and c together
         if not exists ret 
@@ -122,17 +127,25 @@ def bufpos(any[] buf)
     pos = mut 0
     return (buf, pos)
 
-def bufpos(bufpos other)
-    pos = mut other.pos
-    return (other.buf, pos)
-
-def extend_right_by(str s, nat by)
+def rextend(str s, nat|blank by, char|blank character)
+    doc "extend a string right on its enclosing buffer"
+    if by is blank
+        doc "The extension extends by one character."
+        by = 1
     new_length = s.dat.length+by
     if new_length+s.dat.pos>len s.buf fail "string does not fit on buffer"
+    if not character is blank
+        doc "The extension sets a specified character to all new positions."
+        {memset(((char*)s__buf__unsafe_ptr)+s__dat__pos+s__dat__length, character, by);}
     return str(s.buf, s.dat.pos, new_length, s.dat.first)
 
-def extend_left(str s, nat|blank pos)
+def lextend(const str s, nat|blank pos)
+    doc "extend a string left on its enclosing buffer"
+    doc "The extension reached a position left of the string's end. No memory is allocated"
+    doc "and the result of the extension is returned. This counts as concatenating the string"
+    doc "with its previous data."
     if pos is blank
+        doc "The extension reaches the buffer's start."
         pos = 0
     if pos==s.dat.pos return s
     if pos>s.dat.pos+s.dat.length fail "cannot extend the string's left side outside the its right range"

@@ -85,94 +85,95 @@ static inline int __smo_remove_file(const char* path) {
  * - no polling, no greeting drain, no struct wrapper needed
  */
 static inline FILE* __smo_open_console(void) {
-    int pty_fd = posix_openpt(O_RDWR | O_NOCTTY);
-    if (pty_fd < 0 || grantpt(pty_fd) != 0 || unlockpt(pty_fd) != 0)
-        return NULL;
+    // int pty_fd = posix_openpt(O_RDWR | O_NOCTTY);
+    // if (pty_fd < 0 || grantpt(pty_fd) != 0 || unlockpt(pty_fd) != 0)
+    //     return NULL;
 
-    char pts_name[128];
-    if (ptsname_r(pty_fd, pts_name, sizeof(pts_name)) != 0) {
-        close(pty_fd);
-        return NULL;
-    }
+    // char pts_name[128];
+    // if (ptsname_r(pty_fd, pts_name, sizeof(pts_name)) != 0) {
+    //     close(pty_fd);
+    //     return NULL;
+    // }
 
-    struct termios tio;
-    if (tcgetattr(pty_fd, &tio) == 0) {
-        tio.c_lflag &= ~(ECHO | ICANON);
-        tcsetattr(pty_fd, TCSANOW, &tio);
-    }
+    // struct termios tio;
+    // if (tcgetattr(pty_fd, &tio) == 0) {
+    //     tio.c_lflag &= ~(ECHO | ICANON);
+    //     tcsetattr(pty_fd, TCSANOW, &tio);
+    // }
 
-    /* find a terminal emulator */
-    const char* found = NULL;
-    {
-        const char* terms[] = {"xterm", "konsole"};
-        for (int i = 0; i < 2 && !found; i++) {
-            char cmd[64];
-            snprintf(cmd, sizeof(cmd), "command -v %s >/dev/null 2>&1", terms[i]);
-            if (system(cmd) == 0) found = terms[i];
-        }
-    }
-    if (!found) {
-        close(pty_fd);
-        return NULL;
-    }
+    // /* find a terminal emulator */
+    // const char* found = NULL;
+    // {
+    //     const char* terms[] = {"xterm", "konsole"};
+    //     for (int i = 0; i < 2 && !found; i++) {
+    //         char cmd[64];
+    //         snprintf(cmd, sizeof(cmd), "command -v %s >/dev/null 2>&1", terms[i]);
+    //         if (system(cmd) == 0) found = terms[i];
+    //     }
+    // }
+    // if (!found) {
+    //     close(pty_fd);
+    //     return NULL;
+    // }
 
-    pid_t pid = fork();
-    if (pid < 0) {
-        close(pty_fd);
-        return NULL;
-    }
-    if (pid == 0) {
-        close(pty_fd); /* child does not need master */
-        /* Build a shell command that redirects its own stdio to the slave
-         * pts device, then execs a shell — this is what the terminal emulator
-         * will display.  xterm runs this via -e sh -c "..." */
-        char sh_cmd[256];
-        snprintf(sh_cmd, sizeof(sh_cmd),
-            "exec sh <%s >%s 2>&1", pts_name, pts_name);
-        if (strcmp(found, "xterm") == 0)
-            execlp("xterm", "xterm", "-e", "sh", "-c", sh_cmd, NULL);
-        else
-            execlp("konsole", "konsole", "-e", "sh", "-c", sh_cmd, NULL);
-        _exit(1);
-    }
+    // pid_t pid = fork();
+    // if (pid < 0) {
+    //     close(pty_fd);
+    //     return NULL;
+    // }
+    // if (pid == 0) {
+    //     close(pty_fd); /* child does not need master */
+    //     /* Build a shell command that redirects its own stdio to the slave
+    //      * pts device, then execs a shell — this is what the terminal emulator
+    //      * will display.  xterm runs this via -e sh -c "..." */
+    //     char sh_cmd[256];
+    //     snprintf(sh_cmd, sizeof(sh_cmd),
+    //         "exec sh <%s >%s 2>&1", pts_name, pts_name);
+    //     if (strcmp(found, "xterm") == 0)
+    //         execlp("xterm", "xterm", "-e", "sh", "-c", sh_cmd, NULL);
+    //     else
+    //         execlp("konsole", "konsole", "-e", "sh", "-c", sh_cmd, NULL);
+    //     _exit(1);
+    // }
 
-    /* parent: wait until xterm has opened the slave end.
-     * We do this by trying to open the slave ourselves with O_NONBLOCK — once
-     * xterm has set up its session the slave will have a controlling process
-     * and reads/writes on the master will work.  We also impose a short
-     * minimum delay so the window has time to appear before the caller writes. */
-    {
-        struct timespec ts = {0, 50000000L}; /* 50 ms per poll */
-        int ready = 0;
-        for (int i = 0; i < 60 && !ready; i++) { /* up to 3 s */
-            nanosleep(&ts, NULL);
-            int sfd = open(pts_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
-            if (sfd >= 0) {
-                close(sfd);
-                ready = 1;
-            }
-        }
-        if (!ready) {
-            kill(pid, SIGTERM);
-            waitpid(pid, NULL, 0);
-            close(pty_fd);
-            return NULL;
-        }
-        /* extra settle — xterm opened the slave but may not have drawn yet */
-        struct timespec settle = {0, 300000000L}; /* 300 ms */
-        nanosleep(&settle, NULL);
-    }
+    // /* parent: wait until xterm has opened the slave end.
+    //  * We do this by trying to open the slave ourselves with O_NONBLOCK — once
+    //  * xterm has set up its session the slave will have a controlling process
+    //  * and reads/writes on the master will work.  We also impose a short
+    //  * minimum delay so the window has time to appear before the caller writes. */
+    // {
+    //     struct timespec ts = {0, 50000000L}; /* 50 ms per poll */
+    //     int ready = 0;
+    //     for (int i = 0; i < 60 && !ready; i++) { /* up to 3 s */
+    //         nanosleep(&ts, NULL);
+    //         int sfd = open(pts_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    //         if (sfd >= 0) {
+    //             close(sfd);
+    //             ready = 1;
+    //         }
+    //     }
+    //     if (!ready) {
+    //         kill(pid, SIGTERM);
+    //         waitpid(pid, NULL, 0);
+    //         close(pty_fd);
+    //         return NULL;
+    //     }
+    //     /* extra settle — xterm opened the slave but may not have drawn yet */
+    //     struct timespec settle = {0, 300000000L}; /* 300 ms */
+    //     nanosleep(&settle, NULL);
+    // }
 
-    /* parent: wrap master fd as unbuffered FILE* and return */
-    FILE* f = fdopen(pty_fd, "r+");
-    if (!f) {
-        kill(pid, SIGTERM);
-        waitpid(pid, NULL, 0);
-        close(pty_fd);
-        return NULL;
-    }
-    setvbuf(f, NULL, _IONBF, 0);
-    return f;
+    // /* parent: wrap master fd as unbuffered FILE* and return */
+    // FILE* f = fdopen(pty_fd, "r+");
+    // if (!f) {
+    //     kill(pid, SIGTERM);
+    //     waitpid(pid, NULL, 0);
+    //     close(pty_fd);
+    //     return NULL;
+    // }
+    // setvbuf(f, NULL, _IONBF, 0);
+    // return f;
+    return NULL;
 }
 
 static inline void __smo_close_console(FILE* f) {

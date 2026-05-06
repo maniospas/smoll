@@ -4,3 +4,4 @@
 
 #include <stdio.h>
 #include <dirent.h>
+#include <alloca.h>

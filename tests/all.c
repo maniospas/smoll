@@ -4,15 +4,15 @@
 #include <string.h>
 #include <time.h>
 
-const char* const __temp1604v=".s";
-const char* const __temp1592v="./smoll ";
-const char* const __temp345v="\n";
-const char* const __temp406v="kilobytes to bytes";
-const char* const __temp1610v=" ";
-const char* const __temp1130v="process terminated with unhandled non-zero exit code";
 const char* const __temp573v="";
 const char* const __temp1621v="*";
+const char* const __temp1610v=" ";
+const char* const __temp1130v="process terminated with unhandled non-zero exit code";
+const char* const __temp1604v=".s";
+const char* const __temp345v="\n";
+const char* const __temp406v="kilobytes to bytes";
 const char* const __temp1587v="./tests/passing/";
+const char* const __temp1592v="./smoll ";
 
 static inline __attribute__((always_inline)) void char__temp_buffer__buffer__temp486v(void** __temp1624v, unsigned long long* __temp1625v, unsigned long long* __temp1626v) {
   void* unsafe_ptr=0;

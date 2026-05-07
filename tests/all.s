@@ -15,12 +15,9 @@ def main()
         if not entry.ends_with ".s" 
             continue
         command = lextend entry
-        command.rextend(max_command_length-len command, char " ").print " "
+        print command.rextend(max_command_length-len command, char " ")
         proc = mut process::read command.rextend char "" # null-terminate to avoid copying in cstr conversion
-        while try line=proc_buf.process::line proc
-            print("*", "")
-        print ""
-        
+    
         try noerr() # clear warnings
         del proc
         if exists compiler::catch()

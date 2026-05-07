@@ -9,4 +9,6 @@ std/clang
 lsp/node_modules/
 lsp/out/
 build/
+src/
 .mypy_cache/
+tmp.txt

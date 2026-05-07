@@ -625,7 +625,7 @@ class ImplementedType:
             if val.type.builtin and not val.name in self.used_globals: ret += val.type.builtin+" "+var+"=0;\n  "
             # non-built-ins are theoretical constructs only
         if self.needs_failure_mode: ret += "int __temp_errcode=0;\n  "
-        if self.has_any_complaint: ret += "int __temp_complain=0;\n  "
+        if self.has_any_complaint or self.needs_failure_mode: ret += "int __temp_complain=0;\n  "
         prev = ";"
         for token in self.implementation:
             tok = token.tostring()

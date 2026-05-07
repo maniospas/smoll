@@ -1,5 +1,7 @@
 # smoλ reference
 
+<div class="toc" markdown="1">
+
 **Section 1. Basic syntax**<br>
 _1.1._ [import](#import) <br>
 _1.2._ [calling notation](#calling-notation) <br>
@@ -25,6 +27,8 @@ _3.1._ [strings](#strings)<br>
 _3.2._ [lists](#lists)<br>
 _3.3._ [io](#io)<br>
 _3.4._ [processes](#processes)<br>
+
+</div>
 
 # Section 1. Basic syntax
 
@@ -317,10 +321,12 @@ but you can use `rec` instead of `def` to allow recursion
 within the current file. 
 
 A file with recursive functions works like this:
+
 - **Step 1.** All functions are parsed, where recursive ones stop at their 
 first return statement. Up to that point, everything
 can only see previous functions, which means that you need
 to encode the recursion stopping conditions.
+
 - **Step 2.** The rest of the recursive definitions
 are parsed. These now have access to the whole file's types.
 

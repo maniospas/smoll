@@ -28,7 +28,7 @@ def int(Number x)
     return z
 
 def nat(Number x)
-    doc "cast a number to natural - may lose information and creats an error on negative input"
+    doc "cast a number to natural - may lose information and creates an error on negative input"
     if x is int and x<int(0)
         fail "cannot convert negative int to id"
     if x is float and x<float(0)

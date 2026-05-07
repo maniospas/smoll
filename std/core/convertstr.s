@@ -23,7 +23,7 @@ def console()
     doc "references the system console"
     return singleton()
 
-def flush_console()
+def flush(console)
     doc "flushes the print buffer on the console"
     {fflush(stdout);}
 
@@ -127,4 +127,4 @@ def float(cstr|str _s)
             i = i+1
     if negative
         number = 0.0-number
-    return number
+    return const number

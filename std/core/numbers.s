@@ -104,3 +104,11 @@ def pow(nat x, nat y)
         ret = ret*x
         i = i+1
     return ret
+
+def eq(compiler::catch x, compiler::catch y)
+    {builtins::bool z=(x==y);}
+    return z
+
+def neq(compiler::catch x, compiler::catch y)
+    {builtins::bool z=(x!=y);}
+    return z

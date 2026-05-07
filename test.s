@@ -1,9 +1,12 @@
 import "std/core.s"
-import "std/io.s"::dir as dir
+
+def inc(float|int|nat x, float|int|nat|blank value)
+    if value is blank
+        value = type float|int|nat(x) 1
+    if not value is type(x)
+        compiler::skip() # skip invalid 'inc' definitions
+    return x+value
 
 def main()
-    dir = mut dir::read("./std")
-    buf = alloc 128
-    while try entry=buf.dir::entry dir
-        print entry
-    
+    print inc 2.0  # prints 3.0
+    print inc(2,2) # prints 4

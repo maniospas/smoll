@@ -2,6 +2,7 @@ import "std/core.s"
 import "std/io.s"::dir as dir
 import "std/io.s"::process as process
 
+
 def main()
     path = "./tests/passing/"
     max_command_length = 50
@@ -19,4 +20,9 @@ def main()
         while try line=proc_buf.process::line proc
             print("*", "")
         print ""
+        
+        try noerr() # clear warnings
         del proc
+        if exists compiler::catch()
+            print cstr compiler::catch()
+        

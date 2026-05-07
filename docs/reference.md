@@ -325,7 +325,9 @@ to encode the recursion stopping conditions.
 are parsed. These now have access to the whole file's types.
 
 Importantly, the recursive function's escape hatch should occur
-first, otherwise Step 1 would result in failure.
+first, otherwise Step 1 would result in failure; the compiler
+will point out that you are trying to perform a recursion with
+an incomplete type.
 
 Below is an overengineered and thus algorithmically
 slow Fibonacci number calculator that demonstrates recursion
@@ -417,10 +419,39 @@ In the next example, the defined function implements either an increment
 by one, or by a value provided as second argument. 
 
 ```python
-def inc(int x, int|blank value)
+import "std/core.s"
+
+def inc(nat x, nat|blank value)
     if value is blank
         value = 1
     return x+value
+
+def main()
+    print inc 2    # prints 3
+    print inc(2,2) # prints 4
+```
+
+Here is a much more complicated example, where `compiler::skip()` 
+is used to prevent certain versions of the function from being
+created (e.g. there is no `inc(flaot,int)`). Do note that you
+can also specialize a type `T` that could have produced
+`x` per `type T x`. In total, the compiler investigates 3*4=12
+variations and eventually keeps 6 of them. Both conditions
+are fully zero-cost abstractions.
+
+```python
+import "std/core.s"
+
+def inc(float|int|nat x, float|int|nat|blank value)
+    if value is blank
+        value = type float|int|nat x 1
+    if not value is type(x)
+        compiler::skip() # skip invalid 'inc' definitions
+    return x+value
+
+def main()
+    print inc 2.0  # prints 3.0
+    print inc(2,2) # prints 4
 ```
 
 ## local definitions
@@ -514,18 +545,15 @@ safeguard can improve performance and bring code safety.
 
 ## pointers
 
-Pointers reference specific memory locations in buffers, which 
-you can use to safely move data around while sharing only
-one memory address. 
-
-Pointers are unstable in that they become invalid later in the code. 
-Being invalid means that they can not be read from or copy data
-to them. Still, invalidation ensures safety.
+Pointers reference specific memory locations in buffers. Use them 
+to quickly move data around while sharing only one memory address. 
+Pointers are unstable in that, for safety, they become invalid whenever 
+any buffer is resized. Being invalid means that they can not be read 
+from or copy data to them.
 
 Obtain a `const` pointer from a buffer whose
 pointed memory location cannot be modified per `ptr = buf[element]&`, and
 a `mut` pointer per `ptr = buf[element]&&`. 
-
 
 `ptr..` dereferences pointers onto local objects. 
 For example, `ptr...field` gets a field from an object stored 
@@ -616,11 +644,18 @@ References are **automatically propagated**
 by analyzing direct input-output equalities. This
 allows the compiler to re-attach valid references to
 invalidated data structures, for example that would
-have been validated by memory movements.
+have been validated by memory movements. 
+
+There will always be proper inference for direct equalities as
+long as these are not deliberately invalidated (e.g.,
+by adding zero) and do not pass through unsafe C sections.
+The compiler also always creates error messages instead of 
+triggering unsafe behavior.
 
 Notably, references are not types but just some
-property you attach to local variables to indicate
-safe usage. Below is an example, where a list is used
+property attached to local variables to indicate
+that the compiler should enforce safe usage. 
+Below is an example, where a list is used
 to dynamically manage a buffer and resize it as needed.
 
 Without `ref`, the compiler would complain that the 
@@ -703,7 +738,9 @@ def main()
 There are certain places in code where you can recover from call failures,
 for example by calling the same code again for improved user input, or by
 falling back to some secondary functionality. This is achieved with the
-`try` keyword, which parses an expression without stopping at failing functions, if any (their returns are just zero-initialized). Then, failures are converted into boolean values. Below is an example where we safeguard against failing allocation.
+`try` keyword, which parses an expression without stopping at failing functions, 
+if any (their returns are just zero-initialized). Then, failures are converted into 
+boolean values. Below is an example where we safeguard against failing allocation.
 
 ```python
 import "std/core.s"
@@ -724,7 +761,11 @@ def main()
 You can defer code blocks to run later. The "later" part is
 ideally the end of the current function, but *smoλ* may
 postpone it further to accommodate resources (e.g., buffers) 
-that are still in use.
+that are still in use. That is, defers are returned alongside
+function data they are refer to, and are called at the calling
+site. The compiler complains if some but not all variables 
+involved in a defer block are returned.
+
 Defer blocks cannot have any return statements or unhandled
 errors; explicitly wrap all potentially erroneous function calls 
 in `try`. Conversely, their eventual execution is guaranteed,
@@ -741,6 +782,54 @@ def main()
     print "second"
 ```
 
+Defers can be forcefully executed while invalidating a
+structure. This is done with the `del` keyword. For
+example, this is typically used to close resources like
+open files and processes.
+
+```python
+import "std/core.s"
+import "std/io.s"::process as process
+
+def main()
+    proc = mut process::read "echo \"hello world!\""
+    del proc # runs the process's defer, which waits for completion
+    print "bye!"
+```
+
+
+## catching error type
+
+The `compiler::catch()` function provides the means of retrieving
+an error code intercepted by `try` statements.
+Error codes can be compared for equality and cleared
+with `try noerr()`; the latter is a shorthand for `try fail "noerr"`,
+where the message is a builtin message by the compiler to indicate
+the absense of errors.
+
+Importantly, error codes are not retrieved from called functions
+but *are* obtained from deferred statements triggered by `del`.
+The next snippet demonstrates how to clear errors, check that they
+are not *noerr* and convert them to `cstr` so that they can be
+manipulated.
+
+
+```python
+import "std/core.s"
+import "std/io.s"::process as process
+
+def bye_error()
+    fail "bye!" 
+
+def main()
+    try noerr()
+    proc = mut process::read "echo \"hello world!\""
+    try bye_error()
+    del proc
+
+    if exists compiler::catch()
+        print cstr compiler::catch() # prints 'bye!' if no process error
+```
 
 
 # Section 3. Standard library

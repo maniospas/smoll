@@ -5,10 +5,13 @@
 #include <time.h>
 
 const char* const __temp348v="\n";
-const char* const __temp413v="hello world";
-static const char* __temp_all_errcodes[3] = {0,
-0,
-"id subtraction would yield a negative"
+const char* const __temp412v="hello world";
+static const char* __temp_all_errcodes[6] = {"noerr",
+"error",
+"id subtraction would yield a negative",
+"cannot convert negative float to id",
+"cannot convert negative int to id",
+"iteration end"
 };
 
 static inline __attribute__((always_inline)) void print__temp346v(const char* value) {
@@ -84,28 +87,32 @@ static inline __attribute__((always_inline)) void cstr__temp408v(long long int v
   *__temp431v=ret;
 }
 
-static inline __attribute__((always_inline)) void main__temp412v() {
-  int __temp415v=0;
+static inline __attribute__((always_inline)) void main__temp411v() {
+  int __temp414v=0;
+  unsigned long long __temp415v=0;
   unsigned long long __temp416v=0;
-  unsigned long long __temp417v=0;
-  unsigned long long __temp418v__=0;
-  unsigned long long __temp419v=0;
-  unsigned long long __temp420v__=0;
+  unsigned long long __temp417v__=0;
+  unsigned long long __temp418v=0;
+  unsigned long long __temp419v__=0;
+  int __temp421v=0;
   long long int __temp422v=0;
   const char* __temp423v__=0;
   int __temp_complain=0;
-  print__temp346v(__temp413v);
-  __temp416v=2;
-  __temp417v=3;
-  mul__temp134v(__temp416v,__temp417v,&__temp418v__);
-  __temp419v=20;
-  __temp_complain=sub__temp330v(__temp418v__,__temp419v,&__temp420v__);
-  __temp415v=__temp_complain;
-  print__temp359v(__temp420v__);
-  __temp415v=__temp415v==0;
+  print__temp346v(__temp412v);
+  __temp415v=2;
+  __temp416v=3;
+  mul__temp134v(__temp415v,__temp416v,&__temp417v__);
+  __temp418v=20;
+  __temp_complain=sub__temp330v(__temp417v__,__temp418v,&__temp419v__);
+  __temp414v=__temp_complain;
+  print__temp359v(__temp419v__);
+  __temp414v=__temp414v==0;
   __temp422v=__temp_complain;
+  __temp421v=(__temp_complain==0);
+  __temp_complain=0;
   cstr__temp408v(__temp422v,&__temp423v__);
   print__temp346v(__temp423v__);
+  __temp421v=__temp421v==0;
 }
 
-int main() {main__temp412v();return 0;}
+int main() {main__temp411v();return 0;}

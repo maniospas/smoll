@@ -403,6 +403,13 @@ first, otherwise Step 1 would result in failure; the compiler
 will point out that you are trying to perform a recursion with
 an incomplete type.</p>
 
+<p>Before moving forward, it must be mentioned that
+smoλ&#8217;s type system is deliberately
+simplified so that programs <em>can be read sequentially</em>
+and <em>resolve types in finite time</em>. Recursion is too
+convenient to disallow fully, so this pattern is selected
+as a means of presenting the aforementioned properties.</p>
+
 <p>Below is an overengineered and thus algorithmically
 slow Fibonacci number calculator that demonstrates recursion
 concepts. The function <code>call_fib</code> is completely useless too. :-)</p>
@@ -897,7 +904,7 @@ open files and processes.</p>
 an error code intercepted by <code>try</code> statements. This function creates
 an error itself if it <em>fails</em> to find an error. To avoid confusion, the
 compiler just mandates that you should wrap the catch function inside a <code>try</code> 
-of its own. This ways, you can obtain the error and check that it exists
+of its own. This way, you can obtain the error and check that it exists
 simultaneously.</p>
 
 <div class="codehilite">
@@ -905,13 +912,13 @@ simultaneously.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span> <span class="k">as</span> <span class="n">io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="k">try</span> <span class="n">file</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">io</span><span class="p">::</span><span class="n">file</span><span class="p">::</span><span class="n">read</span> <span class="s2">&quot;non_existent_file&quot;</span>
+    <span class="k">try</span> <span class="nb">print</span> <span class="mi">2</span><span class="o">*</span><span class="mi">3</span><span class="o">-</span><span class="mi">20</span>
     <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
-        <span class="nb">print</span> <span class="s2">&quot;failed to open file&quot;</span>
+        <span class="nb">print</span> <span class="s2">&quot;cannot substract two nat numbers and obtain a negative result&quot;</span>
 </code></pre>
 </div>
 
-<p>The same function also clears the intercepted error code so that thee next call 
+<p>The same function also clears the intercepted error code so that the next call 
 captures only subsequent messages. Caught errors can be compared for equality and
 converted to strings per <code>cstr error</code>.</p>
 
@@ -927,13 +934,13 @@ But, importently, they <em>are</em> obtained from deferred statements triggered 
     <span class="n">fail</span> <span class="s2">&quot;bye!&quot;</span> 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="k">try</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
     <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">::</span><span class="n">read</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
     <span class="k">try</span> <span class="n">bye_error</span><span class="p">()</span>
     <span class="k">del</span> <span class="n">proc</span>
 
     <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span> <span class="c1"># prints &#39;bye!&#39; if no process error</span>
+        <span class="n">fail</span> <span class="n">error</span>       <span class="c1"># can fail with error codes too</span>
 </code></pre>
 </div>
 

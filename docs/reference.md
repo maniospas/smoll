@@ -824,7 +824,7 @@ The `compiler::catch()` function provides the means of retrieving
 an error code intercepted by `try` statements. This function creates
 an error itself if it *fails* to find an error. To avoid confusion, the
 compiler just mandates that you should wrap the catch function inside a `try` 
-of its own. This ways, you can obtain the error and check that it exists
+of its own. This way, you can obtain the error and check that it exists
 simultaneously.
 
 ```python
@@ -832,13 +832,13 @@ import "std/core.s"
 import "std/io.s" as io
 
 def main()
-    try file = mut io::file::read "non_existent_file"
+    try print 2*3-20
     if try error = compiler::catch()
-        print "failed to open file"
+        print "cannot substract two nat numbers and obtain a negative result"
 ```
 
 
-The same function also clears the intercepted error code so that thee next call 
+The same function also clears the intercepted error code so that the next call 
 captures only subsequent messages. Caught errors can be compared for equality and
 converted to strings per `cstr error`.
 
@@ -855,13 +855,13 @@ def bye_error()
     fail "bye!" 
 
 def main()
-    try compiler::catch()
     proc = mut process::read "echo \"hello world!\""
     try bye_error()
     del proc
 
     if try error = compiler::catch()
         print cstr error # prints 'bye!' if no process error
+        fail error       # can fail with error codes too
 ```
 
 

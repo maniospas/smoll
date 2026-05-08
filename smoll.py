@@ -891,10 +891,10 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         tmp = create_temp()
         var = Variable(tmp, CAUGHT_TYPE)
         impl.vars[tmp] = var
-        if not impl.used_error_codes: err_token.error("safety", "there is nothing to catch up to here")
+        if not impl.used_error_codes: error_token.error("safety", "there is nothing to catch up to here")
         impl.has_caught_used_error_codes = True
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
-        if try_var is None: err_token.error("safety", "you can only catch within a `try`, for example per `if exists error=compiler::catch() print cstr error`")
+        if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if exists error=compiler::catch() print cstr error`")
         else: impl.is_parsing_a_try[-1] = None
         impl.implementation.extend([
             var,

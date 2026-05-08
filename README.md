@@ -29,7 +29,7 @@ the compiler stops you from doing unsafe stuff.
 
 ## 🔗 Material
 
-[Reference guide](docs/reference.md)
+[Reference guide](https://maniospas.github.io/smoll/)
 
 *Use the smoll lsp, or Python keyword and comment highlighting works pretty well.*
 
@@ -73,4 +73,4 @@ CC0 for the standard library.
 
 *No AI was used in the development of the language's core.
 Some AI was used for boilerplate cross-platform implementations 
-in the standard library and validation.*
+in the standard library and lsp, as well as for validation.*

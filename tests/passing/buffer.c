@@ -4,34 +4,8 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[27] = {
-"noerr",
-"id subtraction would yield a negative",
-"cannot convert negative float to id",
-"cannot convert negative int to id",
-"iteration end",
-"allocation failed",
-"reallocation failed",
-"cannot resize buffers with alloc; it promises no data reallocation",
-"cannot resize an unallocated buffer",
-"out of bounds",
-"string does not fit on buffer",
-"cannot extend the string's left side outside the its right range",
-"string buffer out of memory",
-"string out of bounds",
-"slice out of string bounds",
-"user input was not an int",
-"user input was not a nat",
-"user input was not a float",
-"invalid int conversion from empty string",
-"invalid int conversion from string with only a sign",
-"invalid integer int from non-number string",
-"invalid nat conversion from empty string",
-"invalid nat conversion from non-number string",
-"invalid float conversion from empty string",
-"invalid float conversion from string with only a sign",
-"invalid float conversion from non-number string",
-"invalid float conversion from string without a value after the dot"
+static const char* __temp_all_errcodes[0] = {
+
 };
 const char* const __temp348v="\n";
 
@@ -106,7 +80,7 @@ static inline __attribute__((always_inline)) int alloc__temp426v(unsigned long l
   allocated=malloc(bytes);
   failed=allocated==0;
   if(failed){
-  __temp_errcode=5;
+  __temp_errcode=6;
   goto __temp_failure;
   }
   *__temp1240v=allocated;
@@ -148,7 +122,7 @@ static inline __attribute__((always_inline)) int alloc__temp435v(void** __temp12
   __temp446v=0;
   neq__temp302v(buffer__unsafe_size,__temp446v,&__temp447v__);
   if(__temp447v__){
-  __temp_errcode=7;
+  __temp_errcode=8;
   goto __temp_failure;
   }
   mul__temp134v(buffer__unsafe_align,size,&__temp448v__);
@@ -204,7 +178,7 @@ static inline __attribute__((always_inline)) int mutget__temp479v(void** __temp1
   int __temp_complain=0;
   ge__temp254v(i,buffer__unsafe_size,&__temp480v__);
   if(__temp480v__){
-  __temp_errcode=9;
+  __temp_errcode=10;
   goto __temp_failure;
   }
   mul__temp134v(i,buffer__unsafe_align,&__temp481v__);
@@ -288,7 +262,7 @@ static inline __attribute__((always_inline)) int realloc__temp427v(void* allocat
   new_allocated=allocated__unsafe_ptr?realloc(allocated__unsafe_ptr,bytes):malloc(bytes);
   failed=new_allocated==0;
   if(failed){
-  __temp_errcode=6;
+  __temp_errcode=7;
   goto __temp_failure;
   }
   attach_type__temp13v(new_allocated,allocated__unsafe_ptr,&__temp428v__);
@@ -339,7 +313,7 @@ static inline __attribute__((always_inline)) int resize__temp452v(void** __temp1
   __temp458v=0;
   eq__temp278v(buffer__unsafe_size,__temp458v,&__temp459v__);
   if(__temp459v__){
-  __temp_errcode=8;
+  __temp_errcode=9;
   goto __temp_failure;
   }
   mul__temp134v(buffer__unsafe_size,buffer__unsafe_align,&__temp460v__);
@@ -377,7 +351,7 @@ static inline __attribute__((always_inline)) int sub__temp330v(unsigned long lon
   is_different__temp85v(x,y,&__temp331v__);
   lt__temp182v(x,y,&__temp334v__);
   if(__temp334v__){
-  __temp_errcode=1;
+  __temp_errcode=2;
   goto __temp_failure;
   }
   z=x-y;
@@ -402,7 +376,7 @@ static inline __attribute__((always_inline)) int mutlast__temp472v(void** __temp
   __temp473v=0;
   eq__temp278v(__temp473v,buffer__unsafe_size,&__temp474v__);
   if(__temp474v__){
-  __temp_errcode=9;
+  __temp_errcode=10;
   goto __temp_failure;
   }
   __temp475v=1;
@@ -465,7 +439,7 @@ static inline __attribute__((always_inline)) int get__temp483v(void* buffer__uns
   int __temp_complain=0;
   ge__temp254v(i,buffer__unsafe_size,&__temp484v__);
   if(__temp484v__){
-  __temp_errcode=9;
+  __temp_errcode=10;
   goto __temp_failure;
   }
   mul__temp134v(i,buffer__unsafe_align,&__temp485v__);

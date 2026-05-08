@@ -4,51 +4,8 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[44] = {
-"noerr",
-"id subtraction would yield a negative",
-"cannot convert negative float to id",
-"cannot convert negative int to id",
-"iteration end",
-"allocation failed",
-"reallocation failed",
-"cannot resize buffers with alloc; it promises no data reallocation",
-"cannot resize an unallocated buffer",
-"out of bounds",
-"string does not fit on buffer",
-"cannot extend the string's left side outside the its right range",
-"string buffer out of memory",
-"string out of bounds",
-"slice out of string bounds",
-"user input was not an int",
-"user input was not a nat",
-"user input was not a float",
-"invalid int conversion from empty string",
-"invalid int conversion from string with only a sign",
-"invalid integer int from non-number string",
-"invalid nat conversion from empty string",
-"invalid nat conversion from non-number string",
-"invalid float conversion from empty string",
-"invalid float conversion from string with only a sign",
-"invalid float conversion from non-number string",
-"invalid float conversion from string without a value after the dot",
-"failed to start process",
-"process terminated with unhandled non-zero exit code",
-"end of file",
-"system call failed",
-"failed to open file",
-"failed to create file",
-"cannot open a new terminal in the current environment",
-"failed to open new terminal",
-"failed to move to start of closed file",
-"failed to move to end of closed file",
-"not open file",
-"failed to write to closed file",
-"failed to write to file",
-"failed to create directory",
-"failed to remove file",
-"not open dir",
-"end of dir"
+static const char* __temp_all_errcodes[0] = {
+
 };
 const char* const __temp576v="";
 const char* const __temp1659v="README.md";
@@ -127,7 +84,7 @@ static inline __attribute__((always_inline)) int get__temp483v(void* buffer__uns
   int __temp_complain=0;
   ge__temp254v(i,buffer__unsafe_size,&__temp484v__);
   if(__temp484v__){
-  __temp_errcode=9;
+  __temp_errcode=10;
   goto __temp_failure;
   }
   mul__temp134v(i,buffer__unsafe_align,&__temp485v__);
@@ -263,7 +220,7 @@ static inline __attribute__((always_inline)) int sub__temp330v(unsigned long lon
   is_different__temp85v(x,y,&__temp331v__);
   lt__temp182v(x,y,&__temp334v__);
   if(__temp334v__){
-  __temp_errcode=1;
+  __temp_errcode=2;
   goto __temp_failure;
   }
   z=x-y;
@@ -316,7 +273,7 @@ static inline __attribute__((always_inline)) int alloc__temp426v(unsigned long l
   allocated=malloc(bytes);
   failed=allocated==0;
   if(failed){
-  __temp_errcode=5;
+  __temp_errcode=6;
   goto __temp_failure;
   }
   *__temp1715v=allocated;
@@ -358,7 +315,7 @@ static inline __attribute__((always_inline)) int alloc__temp435v(void** __temp17
   __temp446v=0;
   neq__temp302v(buffer__unsafe_size,__temp446v,&__temp447v__);
   if(__temp447v__){
-  __temp_errcode=7;
+  __temp_errcode=8;
   goto __temp_failure;
   }
   mul__temp134v(buffer__unsafe_align,size,&__temp448v__);
@@ -620,7 +577,7 @@ static inline __attribute__((always_inline)) int read__temp1302v(void* _path__bu
   exists__temp396v(unsafe_ptr,&__temp1305v__);
   not__temp18v(__temp1305v__,&__temp1306v__);
   if(__temp1306v__){
-  __temp_errcode=31;
+  __temp_errcode=32;
   goto __temp_failure;
   }
   *__temp1752v=unsafe_ptr;
@@ -675,7 +632,7 @@ static inline __attribute__((always_inline)) int line__temp1469v(void** __temp17
   exists__temp396v(buf__unsafe_ptr,&__temp1471v__);
   not__temp18v(__temp1471v__,&__temp1472v__);
   if(__temp1472v__){
-  __temp_errcode=37;
+  __temp_errcode=38;
   goto __temp_failure;
   }
   add__temp431v(buf__unsafe_ptr,pos,&__temp1473v__);
@@ -688,7 +645,7 @@ static inline __attribute__((always_inline)) int line__temp1469v(void** __temp17
   success=f__unsafe_ptr?fgets((char*)contents,size,(FILE*)f__unsafe_ptr)!=0:0;
   not__temp18v(success,&__temp1475v__);
   if(__temp1475v__){
-  __temp_errcode=29;
+  __temp_errcode=30;
   goto __temp_failure;
   }
   bytes_read=strlen((char*)contents);
@@ -733,7 +690,7 @@ static inline __attribute__((always_inline)) int print__temp691v(void* s__buf__u
   add__temp110v(s__dat__length,s__dat__pos,&__temp693v__);
   gt__temp206v(__temp693v__,s__buf__unsafe_size,&__temp694v__);
   if(__temp694v__){
-  __temp_errcode=13;
+  __temp_errcode=14;
   goto __temp_failure;
   }
   printf("%.*s%s",(int)s__dat__length,s__dat__pos+(const char*)s__buf__unsafe_ptr,endl);

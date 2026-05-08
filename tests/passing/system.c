@@ -4,51 +4,8 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[44] = {
-"noerr",
-"id subtraction would yield a negative",
-"cannot convert negative float to id",
-"cannot convert negative int to id",
-"iteration end",
-"allocation failed",
-"reallocation failed",
-"cannot resize buffers with alloc; it promises no data reallocation",
-"cannot resize an unallocated buffer",
-"out of bounds",
-"string does not fit on buffer",
-"cannot extend the string's left side outside the its right range",
-"string buffer out of memory",
-"string out of bounds",
-"slice out of string bounds",
-"user input was not an int",
-"user input was not a nat",
-"user input was not a float",
-"invalid int conversion from empty string",
-"invalid int conversion from string with only a sign",
-"invalid integer int from non-number string",
-"invalid nat conversion from empty string",
-"invalid nat conversion from non-number string",
-"invalid float conversion from empty string",
-"invalid float conversion from string with only a sign",
-"invalid float conversion from non-number string",
-"invalid float conversion from string without a value after the dot",
-"failed to start process",
-"process terminated with unhandled non-zero exit code",
-"end of file",
-"system call failed",
-"failed to open file",
-"failed to create file",
-"cannot open a new terminal in the current environment",
-"failed to open new terminal",
-"failed to move to start of closed file",
-"failed to move to end of closed file",
-"not open file",
-"failed to write to closed file",
-"failed to write to file",
-"failed to create directory",
-"failed to remove file",
-"not open dir",
-"end of dir"
+static const char* __temp_all_errcodes[0] = {
+
 };
 const char* const __temp1665v="ls";
 const char* const __temp576v="";
@@ -124,7 +81,7 @@ static inline __attribute__((always_inline)) int alloc__temp426v(unsigned long l
   allocated=malloc(bytes);
   failed=allocated==0;
   if(failed){
-  __temp_errcode=5;
+  __temp_errcode=6;
   goto __temp_failure;
   }
   *__temp1679v=allocated;
@@ -166,7 +123,7 @@ static inline __attribute__((always_inline)) int alloc__temp435v(void** __temp16
   __temp446v=0;
   neq__temp302v(buffer__unsafe_size,__temp446v,&__temp447v__);
   if(__temp447v__){
-  __temp_errcode=7;
+  __temp_errcode=8;
   goto __temp_failure;
   }
   mul__temp134v(buffer__unsafe_align,size,&__temp448v__);
@@ -249,7 +206,7 @@ static inline __attribute__((always_inline)) int get__temp483v(void* buffer__uns
   int __temp_complain=0;
   ge__temp254v(i,buffer__unsafe_size,&__temp484v__);
   if(__temp484v__){
-  __temp_errcode=9;
+  __temp_errcode=10;
   goto __temp_failure;
   }
   mul__temp134v(i,buffer__unsafe_align,&__temp485v__);
@@ -427,7 +384,7 @@ static inline __attribute__((always_inline)) int copy__temp651v(void** __temp172
   len__temp487v(buf__unsafe_ptr,buf__unsafe_size,buf__unsafe_align,&__temp655v__);
   gt__temp206v(next_pos,__temp655v__,&__temp656v__);
   if(__temp656v__){
-  __temp_errcode=12;
+  __temp_errcode=13;
   goto __temp_failure;
   }
   memcpy(((char*)buf__unsafe_ptr)+pos,((char*)other__buf__unsafe_ptr)+other__dat__pos,other__dat__length*sizeof(char));
@@ -476,7 +433,7 @@ static inline __attribute__((always_inline)) int sub__temp330v(unsigned long lon
   is_different__temp85v(x,y,&__temp331v__);
   lt__temp182v(x,y,&__temp334v__);
   if(__temp334v__){
-  __temp_errcode=1;
+  __temp_errcode=2;
   goto __temp_failure;
   }
   z=x-y;
@@ -722,7 +679,7 @@ static inline __attribute__((always_inline)) int system__temp1291v(void* _cmd__b
   int__temp380v(__temp1294v,&__temp1295v__);
   neq__temp291v(result,__temp1295v__,&__temp1296v__);
   if(__temp1296v__){
-  __temp_errcode=30;
+  __temp_errcode=31;
   goto __temp_failure;
   }
   

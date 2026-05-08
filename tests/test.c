@@ -4,8 +4,9 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[5] = {
+static const char* __temp_all_errcodes[6] = {
 "noerr",
+"error",
 "id subtraction would yield a negative",
 "cannot convert negative float to id",
 "cannot convert negative int to id",
@@ -63,7 +64,7 @@ static inline __attribute__((always_inline)) int sub__temp330v(unsigned long lon
   is_different__temp85v(x,y,&__temp331v__);
   lt__temp182v(x,y,&__temp334v__);
   if(__temp334v__){
-  __temp_errcode=1;
+  __temp_errcode=2;
   goto __temp_failure;
   }
   z=x-y;

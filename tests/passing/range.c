@@ -4,34 +4,8 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[27] = {
-"noerr",
-"id subtraction would yield a negative",
-"cannot convert negative float to id",
-"cannot convert negative int to id",
-"iteration end",
-"allocation failed",
-"reallocation failed",
-"cannot resize buffers with alloc; it promises no data reallocation",
-"cannot resize an unallocated buffer",
-"out of bounds",
-"string does not fit on buffer",
-"cannot extend the string's left side outside the its right range",
-"string buffer out of memory",
-"string out of bounds",
-"slice out of string bounds",
-"user input was not an int",
-"user input was not a nat",
-"user input was not a float",
-"invalid int conversion from empty string",
-"invalid int conversion from string with only a sign",
-"invalid integer int from non-number string",
-"invalid nat conversion from empty string",
-"invalid nat conversion from non-number string",
-"invalid float conversion from empty string",
-"invalid float conversion from string with only a sign",
-"invalid float conversion from non-number string",
-"invalid float conversion from string without a value after the dot"
+static const char* __temp_all_errcodes[0] = {
+
 };
 const char* const __temp348v="\n";
 
@@ -92,7 +66,7 @@ static inline __attribute__((always_inline)) int next__temp404v(unsigned long lo
   int __temp_complain=0;
   ge__temp254v(r__from,r__to,&__temp405v__);
   if(__temp405v__){
-  __temp_errcode=4;
+  __temp_errcode=5;
   goto __temp_failure;
   }
   ret=r__from;

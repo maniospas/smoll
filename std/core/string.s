@@ -148,7 +148,7 @@ def lextend(const str s, nat|blank pos)
         doc "The extension reaches the buffer's start."
         pos = 0
     if pos==s.dat.pos return s
-    if pos>s.dat.pos+s.dat.length fail "cannot extend the string's left side outside the its right range"
+    if pos>s.dat.pos+s.dat.length fail "cannot extend the string's left side outside its right range"
     return str(s.buf, pos, (s.dat.pos+s.dat.length)-pos)
 
 def copy(char[] buf, mut nat pos, str|cstr _other)

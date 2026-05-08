@@ -43,8 +43,9 @@ symbols = "=\\/+-*@<>!%&#!(){}[]:.',;|"
 END_TOKEN = "...]" # impossible for something else to be tokenized as this
 START_TOKEN = "[..." # impossible for something else to be tokenized as this
 err_code_table: dict[str,int] = dict()
-err_code_list = ["\"noerr\""]
+err_code_list = ["\"noerr\"", "\"error\""]
 err_code_table["noerr"] = 0
+err_code_table["error"] = 1
 debug_mode = True
 repositories: dict[str, str] = dict()
 
@@ -252,6 +253,9 @@ class ImplementedType:
         self.implementation: list[CodeSegment] = list()
         self.preparation: list[CodeSegment] = list()
         self.deallocation: list[CodeSegment] = list()
+        self.used_error_codes: set[ImplementedType] = set() # called functions whose error codes we actually use
+        self.spawned_error_codes: set[int] = set() # called fails
+        self.has_caught_used_error_codes = False
         self.builtin = builtin
         self.nominal = True if builtin else False
         self.at = at
@@ -284,6 +288,15 @@ class ImplementedType:
         # this is used to throw a FastReturnException the first time the function returns
         self.fast_return_exception = False
         self.has_been_completed = False
+
+    def gather_spawned_error_codes(self, discovered: set["ImplementedType"]):
+        ret = set()
+        if self in discovered: return ret
+        discovered.add(self)
+        ret = ret.union(self.spawned_error_codes)
+        if not self.has_caught_used_error_codes: return ret
+        for other in self.used_error_codes: ret = ret.union(other.gather_spawned_error_codes(discovered))
+        return ret
 
     def stabilize(self, rets: list[str]):
         return [self.vars[ret._references] if ret._references else ret for ret in rets]
@@ -865,6 +878,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         tmp = create_temp()
         var = Variable(tmp, CAUGHT_TYPE)
         impl.vars[tmp] = var
+        if not impl.used_error_codes:
+            err_token.error("safety", "there is nothing to catch up to here")
+        impl.has_caught_used_error_codes = True
         impl.implementation.extend([
             var,
             CODEWORD_EQUALS,
@@ -918,6 +934,11 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             CodeWord(callee.monomorphic_name),
             CODEWORD_LPAR,
         ])
+    impl.used_error_codes.add(callee)
+    for defer in callee.returned_defers:
+        for i in range(len(defer)-3):
+            if defer[i].tostring()=="__temp_errcode" and defer[i+1].tostring()=="=" and defer[i+3].tostring()==";":
+                impl.spawned_error_codes.add(int(defer[i+2].tostring()))
     for varpos, var in enumerate(vars):
         if var.type.builtin: 
             callee_arg = callee.vars[callee.args[varpos]]
@@ -1736,6 +1757,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             err_code = len(err_code_table)
             err_code_table[text] = err_code
             err_code_list.append(message.text)
+        impl.spawned_error_codes.add(err_code)
         if debug_mode:
             text = "\\033[31mfail\\033[0m "+text
             text += "\\n\\033[31mat\\033[0m "+message.file.path.replace('"','\\"')+" line "+str(message.row)+" column "+str(message.col)+"\\n"
@@ -2923,25 +2945,38 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         "\n"
     )
 
-    header += "static const char* __temp_all_errcodes["+str(len(err_code_list))+"] = {\n"
-    header += ",\n".join(err_code_list)
-    header += "\n};\n"
-
     globs = "\n".join("const char* const "+k+"="+global_var2cstr[k]+";" for main_def in main_defs for k in main_def.used_globals)+"\n"
 
-    generated_c_funcs = list()
-    c_decls = list()
-    already_generated = set()
+    discovered_defs: list[ImplementedType] = list()
+    already_generated: set[ImplementedType] = set()
+    new_error_code_list: list[str] = list()
     def add_implementation(next_def: ImplementedType):
         for candidate_def in next_def.dependent_implementations:
             if candidate_def not in already_generated:
                 already_generated.add(candidate_def)
                 add_implementation(candidate_def)
+        discovered_defs.append(next_def)
+    for main_def in main_defs: add_implementation(main_def)
+    
+    visited_defs_for_error_codes: set[ImplementedType] = set()
+    found_error_codes: set[int] = set()
+    for main_def in main_defs: found_error_codes = found_error_codes.union(main_def.gather_spawned_error_codes(visited_defs_for_error_codes))
+    
+    c_decls = list()
+    generated_c_funcs = list()
+    for next_def in discovered_defs:
         transpiled = next_def.transpile()
         if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
         generated_c_funcs.append(transpiled)
-    for main_def in main_defs: add_implementation(main_def)
     if entry_point: generated_c_funcs.append(f"""int main() {{{entry_point}();return 0;}}""")
+
+    effective_err_code_list = [element if pos in found_error_codes else "0" for pos, element in enumerate(err_code_list)]
+    effective_err_code_list_size = len(effective_err_code_list)
+    while effective_err_code_list_size and effective_err_code_list[effective_err_code_list_size-1]=="0":
+        effective_err_code_list_size -= 1
+    header += "static const char* __temp_all_errcodes["+str(effective_err_code_list_size)+"] = {\n"
+    header += ",\n".join(effective_err_code_list[:effective_err_code_list_size])
+    header += "\n};\n"
 
     body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
     src_path.write_text(header + globs + body, encoding="utf-8")

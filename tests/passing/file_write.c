@@ -4,51 +4,8 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[44] = {
-"noerr",
-"id subtraction would yield a negative",
-"cannot convert negative float to id",
-"cannot convert negative int to id",
-"iteration end",
-"allocation failed",
-"reallocation failed",
-"cannot resize buffers with alloc; it promises no data reallocation",
-"cannot resize an unallocated buffer",
-"out of bounds",
-"string does not fit on buffer",
-"cannot extend the string's left side outside the its right range",
-"string buffer out of memory",
-"string out of bounds",
-"slice out of string bounds",
-"user input was not an int",
-"user input was not a nat",
-"user input was not a float",
-"invalid int conversion from empty string",
-"invalid int conversion from string with only a sign",
-"invalid integer int from non-number string",
-"invalid nat conversion from empty string",
-"invalid nat conversion from non-number string",
-"invalid float conversion from empty string",
-"invalid float conversion from string with only a sign",
-"invalid float conversion from non-number string",
-"invalid float conversion from string without a value after the dot",
-"failed to start process",
-"process terminated with unhandled non-zero exit code",
-"end of file",
-"system call failed",
-"failed to open file",
-"failed to create file",
-"cannot open a new terminal in the current environment",
-"failed to open new terminal",
-"failed to move to start of closed file",
-"failed to move to end of closed file",
-"not open file",
-"failed to write to closed file",
-"failed to write to file",
-"failed to create directory",
-"failed to remove file",
-"not open dir",
-"end of dir"
+static const char* __temp_all_errcodes[0] = {
+
 };
 const char* const __temp1662v="hello world";
 const char* const __temp1659v="tmp.txt";
@@ -83,7 +40,7 @@ static inline __attribute__((always_inline)) int write__temp1319v(const char* _p
   exists__temp396v(unsafe_ptr,&__temp1321v__);
   not__temp18v(__temp1321v__,&__temp1322v__);
   if(__temp1322v__){
-  __temp_errcode=32;
+  __temp_errcode=33;
   goto __temp_failure;
   }
   *__temp1667v=unsafe_ptr;
@@ -101,7 +58,7 @@ static inline __attribute__((always_inline)) int print__temp1587v(void** __temp1
   exists__temp396v(f__unsafe_ptr,&__temp1588v__);
   not__temp18v(__temp1588v__,&__temp1589v__);
   if(__temp1589v__){
-  __temp_errcode=38;
+  __temp_errcode=39;
   goto __temp_failure;
   }
   fwrite(text,1,strlen(text),(FILE*)f__unsafe_ptr);

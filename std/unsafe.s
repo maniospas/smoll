@@ -31,7 +31,7 @@ def realloc(any ptr allocated__unsafe_ptr, nat bytes)
 
 def free(mut any ptr allocated)
     {if(allocated)free(allocated);} 
-    # automatically set to zero because it's a returned invalidated variable
+    # automatically sets to zero address because it's a returned invalidated variable
     INVALIDATE compiler::ptr
 
 def zero(any ptr allocated, nat from, nat to)

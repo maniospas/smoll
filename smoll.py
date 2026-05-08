@@ -124,7 +124,7 @@ def print_lsp_var(tok, signature:str):
     print(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
-    print(signature)
+    print("```rust\n"+signature+"\n```")
 
 def print_lsp_string(tok):
     print("---")
@@ -1214,6 +1214,7 @@ def find_unique_variations(variations: list[ImplementedType]):
 def create_buffer_type(name, memory_size, variation, error_token):
     actual_variation = ImplementedType(name, at=variation.at)
     actual_variation.is_buffer_of = variation
+    #actual_variation.doc = variation.doc
     type_arg = create_temp()+actual_variation.name
     i = 0
     while i<len(variation.rets):
@@ -1694,8 +1695,11 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                     rets = [r for r in rets if r.name.startswith(current_prefix)]
                     if rets and is_lsp and get(tokens, pos-1).file.is_main_file: print_lsp_var(get(tokens, pos-1), signature_like(rets,impl))
                     if rets and call_continuation:
-                        call_token = get(tokens,pos+1)
+                        start_call = get(tokens,pos+1)
                         pos, type = process_type(file, tokens, pos+1)
+                        call_token = get(tokens,pos-1)
+                        if start_call.file==call_token.file and start_call.row==call_token.row: 
+                            call_token = Token(" "*(call_token.col-start_call.col+len(call_token.text)), start_call.file, start_call.row, start_call.col)
                         if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
                         assert isinstance(type, UnionType)
                         pos -= 1
@@ -1720,13 +1724,17 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 rets = [var]
                 if is_lsp and get(tokens, pos-1).file.is_main_file: print_lsp_var(get(tokens, pos-1), signature_like(rets,impl))
                 if call_continuation:
+                    start_call = get(tokens,pos+1)
                     pos, type = process_type(file, tokens, pos+1)
+                    call_token = get(tokens,pos-1)
+                    if start_call.file==call_token.file and start_call.row==call_token.row: 
+                        call_token = Token(" "*(call_token.col-start_call.col+len(call_token.text)), start_call.file, start_call.row, start_call.col)
                     if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
                     assert isinstance(type, UnionType)
                     pos -= 1
                     op_priority = -0.5
                     pos, additional_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority, for_call=True)
-                    rets = resolve_call(file, impl, type, rets+additional_rets, op_token)
+                    rets = resolve_call(file, impl, type, rets+additional_rets, call_token)
                 return pos, rets
             pos, rets = process_access(pos, rets)
             continue
@@ -1779,7 +1787,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
     current_token = get(tokens, pos)
     current = current_token.text
     if current=="fail":
-        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "immediately fail during execution with the corresponding debug message")
+        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**fail**\n\nImmediately fail during execution with the corresponding string literal message or error code retrieved with 'compiler::catch()' from some other failure statement. Failures cascade to callers and to the callers of callers until the program exits with a corresponding error code, or a 'try' statement intercepts them.")
         pos += 1
         impl.needs_failure_mode = True
         message = get(tokens, pos)
@@ -1916,7 +1924,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(current), CODEWORD_SEMICOLON])
         return process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current=="doc":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "adds the next cstr predicate to the function's documentation")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**documentation**\n\nAdds the next string literal to the function's documentation.")
         next_token = get(tokens, pos+1)
         if not next_token.is_string(): next_token.error("type", "expecting 'cstr' documentation")
         pos += 1
@@ -1928,7 +1936,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.doc.append(next_token.text)
         return pos+1,[] #process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
     if current=="mut":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "declares that the following value will be treated as mutable (fields and pointer contents may modified) - creates an error if the conversion to mutable is unsafe")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable. This means that variables, fields and pointer contents may modified. This creates an error if mutable treatment is unsafe.")
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         if len(ret)==0:
@@ -1939,7 +1947,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(tokens[prev_pos]) for r in ret], current_operator_priority)
     if current=="try":
         def process_try(pos: int):
-            if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "tries to execute the rest of the statement without failing this function too on errors; the result is a true or false boolean value, depending on whether an error occurred or not; the error's value is retrieved by the next 'compiler::caught()'")
+            if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**try**\n\nTries to execute the rest of the statement without failing. The result is a true or false boolean value, depending on whether an error occurred or not; the error's value is retrieved by the next 'compiler::caught()'. If more than one failing function calls are encountered in the expression, an error is created so that each is handled autonomously through assignment to intermediate variables.")
             tmp = create_temp()
             var = Variable(tmp, BOOL_TYPE)
             impl.vars[tmp] = var
@@ -1959,7 +1967,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             return pos, [var]
         return process_try(pos)
     if current=="local":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "creates an anonymized version of the next variable that prevents mutable access to it")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**local**\n\nCreates an anonymized version of the next variable. Anonymization prevents mutable modidications from affecting the original, although it does not safeguard memory contents.")
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         if len(ret)==0:# or all(r.name.startswith("__temp") or "____temp" in r.name for r in ret):
             current_token.error("safety", "next value is blank")
@@ -1968,7 +1976,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
         return process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
     if current=="ref":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "tracks changes to the referenced value, such as buffer modifications, and makes all subsequent usage of the value (even implicit usage) use the referenced value")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**reference**\n\nTracks changes to the referenced value, such as buffer modifications, and makes all subsequent usage of the value (even implicit usage) use the referenced value. References are unpacked into actual independent values during returns.")
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         ret = impl.stabilize(ret)
@@ -1977,16 +1985,16 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         # ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
         return process_statement_operator(file, tokens, impl, pos, [r.stable_copy() for r in ret], current_operator_priority)
     if current=="unsafe_mut":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "declares that the following value will be treated as mutable, even if that is unsafe (fields and pointer contents may modified) - does NOT create an error if the conversion to mutable is unsafe")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**unsafe mutability**\n\nDeclares that the following value will be treated as mutable, even if that is unsafe (fields and pointer contents may modified). This does NOT create an error if the conversion to mutable is unsafe. YOU HAVE BEEN WARNED.")
         prev_pos = pos
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(None) for r in ret], current_operator_priority)
     if current=="const":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "declares that the following value will be treated as fully immatuble (it cannot be the reason why fields and pointer contents are modified) - strips away any class membership information")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**constant value or memory**\n\nDeclares that the following value will be treated as fully immatuble (it cannot be the reason why fields and pointer contents are modified). This strips away any class membership information too. Do note that this does NOT mean that memory cannot be modified elsewhere - just that the yielded value cannot anymore be the source of modifications.")
         pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return process_statement_operator(file, tokens, impl, pos, [r.immutable_copy() for r in ret], current_operator_priority)
     if current == "INVALIDATE":
-        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "invalides all data of the subsequent type that are not __unsafe_ptr; DO NOT USE THIS KEYWORD unless you are trying to enforce some safety patterns on exceptionally unsafe code, such as pointer invalidation whenever memory is reallocated or freed")
+        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**INVALIDATE**\n\nInvalides all data of the subsequent type that are not __unsafe_ptr; DO NOT USE THIS KEYWORD unless you are trying to enforce some safety patterns on exceptionally unsafe code, such as pointer invalidation whenever memory is reallocated or freed.")
         pos, type = process_linear_type(file, tokens, pos+1)
         for varname, val in impl.vars.items():
             if val.type in type.variations and not varname.endswith("__unsafe_ptr"):
@@ -2106,6 +2114,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                     field_candidates.append(varname)
             current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=[candidate for candidate in field_candidates]) 
         is_type_resolution = peek_text(tokens, pos)=="type"
+        start_call = get(tokens,pos)
         if is_type_resolution:
             pos, all_variations = process_linear_type(file, tokens, pos+1, reduce_to_unique_variations=False, show_lsp=True)
             pos, typevars = process_statement(file, tokens, pos, impl, current_operator_priority, for_call=True)
@@ -2123,12 +2132,18 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         else:
             # then resolve to a call based on type
             pos, method = process_linear_type(file, tokens, pos)
+        call_token = get(tokens, pos-1)
         #if isinstance(method, File): tokens[pos].error("type", "did not resolve completely to a type")
-        if peek_text(tokens, pos-1)=="]": vars: list[Variable] = list()
+        if peek_text(tokens, pos-1)=="]": 
+            vars: list[Variable] = list()
         else: 
             if not is_type_resolution: current_token = get(tokens, pos-1)
             pos, vars = process_statement(file, tokens, pos, impl, current_operator_priority, for_call=True)
-        varsret = resolve_call(file, impl, method, vars, current_token)
+        
+        #call_token = current_token
+        if start_call.file==call_token.file and start_call.row==call_token.row: 
+            call_token = Token(" "*(call_token.col-start_call.col+len(call_token.text)), start_call.file, start_call.row, start_call.col)
+        varsret = resolve_call(file, impl, method, vars, call_token)
         return process_statement_operator(file, tokens, impl, pos, varsret, current_operator_priority)
     return process_statement_operator(file, tokens, impl, pos+1, [var], current_operator_priority)
 
@@ -2272,7 +2287,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             impl.implementation.extend([CodeWord(name.text), CODEWORD_SEMICOLON])
             continue
         if name.text=="while":
-            if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "loop that runs while the condition is true")
+            if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**while**\n\nLoop that runs while the condition is true.")
             impl.nesting.append("while")
             if_pos = pos-1
             impl.implementation.extend([
@@ -2319,14 +2334,14 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             continue
         if name.text=="if":
             if_pos = pos-1
-            if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "start conditional statement and run a code block if it is true")
+            if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**if**\n\nStart a conditional statement and run a code block if it is true.")
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
             if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool' but found '"+signature_like(ret)+"'")
             if ret[0].type==TRUE_TYPE:
                 if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
                 else: pos = process_body(file, tokens, pos-1, impl, one_line=True)
                 if peek_text(tokens, pos)=="else":
-                    if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "alternative to conditional statement")
+                    if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "**else**\n\nAlternative to conditional statement.")
                     pos += 1
                     if get(tokens, pos).text!=START_TOKEN: pos = skip_statement(file, tokens, pos)
                     else:
@@ -2349,7 +2364,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                         elif next_token==END_TOKEN: depth -= 1
                         pos += 1
                 if peek_text(tokens, pos)=="else":
-                    if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "alternative to conditional statement")
+                    if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "**else**\n\nAlternative to conditional statement.")
                     if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
                     else: pos = process_body(file, tokens, pos-1, impl, one_line=True)
                 continue
@@ -2368,7 +2383,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             impl.nesting.pop()
             impl.implementation.append(CODEWORD_RBRACKET)
             if peek_text(tokens, pos)=="else":
-                if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "alternative to conditional statement")
+                if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "**else**\n\nAlternative to conditional statement.")
                 diff_vars_if = {k: v for k, v in impl.vars.items() if k not in previous_vars}
                 impl.vars = previous_vars
                 previous_vars = {k: v for k, v in impl.vars.items()}

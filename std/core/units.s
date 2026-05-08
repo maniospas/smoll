@@ -17,13 +17,13 @@
 local import "std/core/numbers.s"
 
 def KB(nat x)
-    "kilobytes to bytes"
+    doc "kilobytes to bytes"
     return x*1024
 
 def MB(nat x)
-    "megabytes to bytes"
+    doc "megabytes to bytes"
     return x*1024*1024
 
 def GB(nat x)
-    "gigabytes to bytes"
+    doc "gigabytes to bytes"
     return x*1024*1024*1024

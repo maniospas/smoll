@@ -112,3 +112,11 @@ def eq(compiler::catch x, compiler::catch y)
 def neq(compiler::catch x, compiler::catch y)
     {builtins::bool z=(x!=y);}
     return z
+
+def eq(any ptr x, any ptr y)
+    {builtins::bool z=(x==y);}
+    return z
+
+def neq(any ptr x, any ptr y)
+    {builtins::bool z=(x!=y);}
+    return z

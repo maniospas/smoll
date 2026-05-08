@@ -2944,8 +2944,8 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         "#include <time.h>\n"
         "\n"
     )
+    used_globs = set(k for main_def in main_defs for k in main_def.used_globals)
 
-    globs = "\n".join("const char* const "+k+"="+global_var2cstr[k]+";" for main_def in main_defs for k in main_def.used_globals)+"\n"
 
     discovered_defs: list[ImplementedType] = list()
     already_generated: set[ImplementedType] = set()
@@ -2974,12 +2974,21 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     effective_err_code_list_size = len(effective_err_code_list)
     while effective_err_code_list_size and effective_err_code_list[effective_err_code_list_size-1]=="0":
         effective_err_code_list_size -= 1
-    header += "static const char* __temp_all_errcodes["+str(effective_err_code_list_size)+"] = {\n"
-    header += ",\n".join(effective_err_code_list[:effective_err_code_list_size])
-    header += "\n};\n"
-
+    define_errors = ""
+    set_errcodes = "static const char* __temp_all_errcodes["+str(effective_err_code_list_size)+"] = {"
+    for i, err_msg in enumerate(effective_err_code_list):
+        if i>=effective_err_code_list_size: break
+        if i: set_errcodes += ",\n"
+        if err_msg!="0":
+            err_var = global_cstr2var.get(err_msg, None)
+            if err_var is not None and err_var in used_globs:
+                used_globs.remove(err_var)
+                define_errors += "#define "+err_var+" (__temp_all_errcodes["+str(i)+"])\n"
+        set_errcodes += err_msg
+    set_errcodes += "\n};\n"
+    globs = "\n".join("const char* const "+k+"="+global_var2cstr[k]+";" for k in used_globs)+"\n"
     body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
-    src_path.write_text(header + globs + body, encoding="utf-8")
+    src_path.write_text(header + globs + set_errcodes + define_errors + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")
     if chosen_compiler=="none": return
     gcc_cmd = {

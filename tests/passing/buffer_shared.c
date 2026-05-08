@@ -257,7 +257,7 @@ static inline __attribute__((always_inline)) int main__temp1200v() {
   unsigned long long __temp1212v__=0;
   unsigned long long __temp1214v=0;
   void* __temp1215v__=0;
-  double __temp1216v__z=0;
+  double __temp1216v__value=0;
   int __temp_errcode=0;
   int __temp_complain=0;
   float__temp_buffer__buffer__temp1201v(&__temp1203v__unsafe_ptr,&__temp1203v__unsafe_size,&__temp1203v__unsafe_align);
@@ -297,8 +297,8 @@ static inline __attribute__((always_inline)) int main__temp1200v() {
   if(!__temp1215v__){
   goto __temp_failure;
   }
-  memcpy(&__temp1216v__z,(char*)__temp1215v__,8);
-  print__temp351v(__temp1216v__z);
+  memcpy(&__temp1216v__value,(char*)__temp1215v__,8);
+  print__temp351v(__temp1216v__value);
   
   __temp_failure:
   return __temp_errcode;

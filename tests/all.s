@@ -20,6 +20,7 @@ def main()
     
         try noerr() # clear warnings
         del proc
+        error = compiler::catch()
         if exists compiler::catch()
             print cstr compiler::catch()
-        
+    

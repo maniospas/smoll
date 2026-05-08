@@ -485,11 +485,11 @@ static inline __attribute__((always_inline)) int main__temp1212v() {
   double __temp1222v=0;
   unsigned long long __temp1223v=0;
   void* __temp1224v__=0;
-  double __temp1225v__value=0;
+  double __temp1225v__z=0;
   unsigned long long __temp1227v=0;
   void* __temp1228v__=0;
   void* f0=0;
-  double __temp1229v__value=0;
+  double __temp1229v__z=0;
   unsigned long long __temp1230v=0;
   void* __temp1231v__unsafe_ptr=0;
   unsigned long long __temp1231v__unsafe_size=0;
@@ -529,7 +529,7 @@ static inline __attribute__((always_inline)) int main__temp1212v() {
   unsigned long long __temp1253v__unsafe_align=0;
   void* __temp1255v__=0;
   void* n=0;
-  double __temp1256v__value=0;
+  double __temp1256v__z=0;
   unsigned long long __temp1302v=0;
   int __temp1303v=0;
   unsigned long long __temp1308v=0;
@@ -568,8 +568,8 @@ static inline __attribute__((always_inline)) int main__temp1212v() {
   if(!__temp1224v__){
   goto __temp_failure;
   }
-  memcpy(&__temp1225v__value,(char*)__temp1224v__,8);
-  print__temp351v(__temp1225v__value);
+  memcpy(&__temp1225v__z,(char*)__temp1224v__,8);
+  print__temp351v(__temp1225v__z);
   __temp1227v=0;
   __temp_errcode=mutget__temp479v(&f__unsafe_ptr,&f__unsafe_size,&f__unsafe_align,__temp1227v,&__temp1228v__);
   if(__temp_errcode){
@@ -579,7 +579,7 @@ static inline __attribute__((always_inline)) int main__temp1212v() {
   if(!f0){
   goto __temp_failure;
   }
-  memcpy(&__temp1229v__value,(char*)f0,8);
+  memcpy(&__temp1229v__z,(char*)f0,8);
   __temp1230v=2;
   __temp_errcode=resize__temp452v(&f__unsafe_ptr,&f__unsafe_size,&f__unsafe_align,__temp1230v,&__temp1231v__unsafe_ptr,&__temp1231v__unsafe_size,&__temp1231v__unsafe_align);
   if(__temp_errcode){
@@ -592,7 +592,7 @@ static inline __attribute__((always_inline)) int main__temp1212v() {
   if(!__temp1232v__){
   goto __temp_failure;
   }
-  memcpy((char*)__temp1232v__,&__temp1229v__value,8);
+  memcpy((char*)__temp1232v__,&__temp1229v__z,8);
   Field__temp_buffer__buffer__temp1233v(&__temp1235v__unsafe_ptr,&__temp1235v__unsafe_size,&__temp1235v__unsafe_align);
   __temp1236v__unsafe_ptr=__temp1235v__unsafe_ptr;
   __temp1236v__unsafe_size=__temp1235v__unsafe_size;
@@ -661,8 +661,8 @@ static inline __attribute__((always_inline)) int main__temp1212v() {
   if(!n){
   goto __temp_failure;
   }
-  memcpy(&__temp1256v__value,(char*)n,8);
-  print__temp351v(__temp1256v__value);
+  memcpy(&__temp1256v__z,(char*)n,8);
+  print__temp351v(__temp1256v__z);
   
   __temp_failure:__temp1313v=0;
   neq__temp302v(__temp1253v__unsafe_size,__temp1313v,&__temp1314v);

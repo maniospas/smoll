@@ -4,10 +4,9 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[0] = {
-
-};
 const char* const __temp348v="\n";
+static const char* __temp_all_errcodes[0] = {
+};
 
 static inline __attribute__((always_inline)) void float__temp_buffer__buffer__temp1201v(void** __temp1230v, unsigned long long* __temp1231v, unsigned long long* __temp1232v) {
   void* unsafe_ptr=0;
@@ -480,10 +479,10 @@ static inline __attribute__((always_inline)) int main__temp1218v() {
   unsigned long long x__unsafe_align=0;
   unsigned long long __temp1222v=0;
   void* __temp1223v__=0;
-  double __temp1224v__z=0;
+  double __temp1224v__value=0;
   unsigned long long __temp1225v=0;
   void* __temp1226v__=0;
-  double __temp1227v__z=0;
+  double __temp1227v__value=0;
   double __temp1228v__=0;
   unsigned long long __temp1284v=0;
   int __temp1285v=0;
@@ -508,7 +507,7 @@ static inline __attribute__((always_inline)) int main__temp1218v() {
   if(!__temp1223v__){
   goto __temp_failure;
   }
-  memcpy(&__temp1224v__z,(char*)__temp1223v__,8);
+  memcpy(&__temp1224v__value,(char*)__temp1223v__,8);
   __temp1225v=1;
   __temp_errcode=get__temp483v(x__unsafe_ptr,x__unsafe_size,x__unsafe_align,__temp1225v,&__temp1226v__);
   if(__temp_errcode){
@@ -517,8 +516,8 @@ static inline __attribute__((always_inline)) int main__temp1218v() {
   if(!__temp1226v__){
   goto __temp_failure;
   }
-  memcpy(&__temp1227v__z,(char*)__temp1226v__,8);
-  add__temp88v(__temp1224v__z,__temp1227v__z,&__temp1228v__);
+  memcpy(&__temp1227v__value,(char*)__temp1226v__,8);
+  add__temp88v(__temp1224v__value,__temp1227v__value,&__temp1228v__);
   print__temp351v(__temp1228v__);
   
   __temp_failure:__temp1284v=0;

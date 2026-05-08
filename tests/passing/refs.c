@@ -4,10 +4,9 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[0] = {
-
-};
 const char* const __temp348v="\n";
+static const char* __temp_all_errcodes[0] = {
+};
 
 static inline __attribute__((always_inline)) void false__temp7v(int* __temp1206v) {
   int value=0;

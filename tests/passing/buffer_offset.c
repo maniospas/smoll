@@ -4,11 +4,10 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[0] = {
-
-};
 const char* const __temp1220v="starting point creation";
 const char* const __temp348v="\n";
+static const char* __temp_all_errcodes[0] = {
+};
 
 static inline __attribute__((always_inline)) void Point3D__temp_buffer__buffer__temp1224v(void** __temp1250v, unsigned long long* __temp1251v, unsigned long long* __temp1252v) {
   void* unsafe_ptr=0;

@@ -4,10 +4,9 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[0] = {
-
-};
 const char* const __temp348v="\n";
+static const char* __temp_all_errcodes[0] = {
+};
 
 static inline __attribute__((always_inline)) void range__temp400v(unsigned long long to, unsigned long long* __temp1210v, unsigned long long* __temp1211v) {
   unsigned long long __temp402v=0;

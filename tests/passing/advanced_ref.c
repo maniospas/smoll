@@ -4,12 +4,11 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[0] = {
-
-};
 const char* const __temp1206v="123";
 const char* const __temp348v="\n";
 const char* const __temp1208v="456";
+static const char* __temp_all_errcodes[0] = {
+};
 
 static inline __attribute__((always_inline)) void char__temp_buffer__buffer__temp1201v(void** __temp1214v, unsigned long long* __temp1215v, unsigned long long* __temp1216v) {
   void* unsafe_ptr=0;

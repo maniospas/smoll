@@ -4,13 +4,12 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[3] = {
-0,
+const char* const __temp348v="\n";
+const char* const __temp413v="hello world";
+static const char* __temp_all_errcodes[3] = {0,
 0,
 "id subtraction would yield a negative"
 };
-const char* const __temp348v="\n";
-const char* const __temp413v="hello world";
 
 static inline __attribute__((always_inline)) void print__temp346v(const char* value) {
   const char* endl=0;

@@ -4,11 +4,10 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[0] = {
-
-};
 const char* const __temp1662v="hello world";
 const char* const __temp1659v="tmp.txt";
+static const char* __temp_all_errcodes[0] = {
+};
 
 static inline __attribute__((always_inline)) void unsafe_temporary_cstr__temp592v(const char* other, const char** __temp1664v) {
   *__temp1664v=other;

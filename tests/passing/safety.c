@@ -4,12 +4,11 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[0] = {
-
-};
 const char* const __temp576v="";
 const char* const __temp348v="\n";
 const char* const __temp1218v="going to deallocate of size: ";
+static const char* __temp_all_errcodes[0] = {
+};
 
 static inline __attribute__((always_inline)) void float__temp_buffer__buffer__temp1201v(void** __temp1237v, unsigned long long* __temp1238v, unsigned long long* __temp1239v) {
   void* unsafe_ptr=0;

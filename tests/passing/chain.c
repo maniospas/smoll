@@ -4,11 +4,10 @@
 #include <string.h>
 #include <time.h>
 
-static const char* __temp_all_errcodes[0] = {
-
-};
 const char* const __temp1201v="123";
 const char* const __temp348v="\n";
+static const char* __temp_all_errcodes[0] = {
+};
 
 static inline __attribute__((always_inline)) void eq__temp736v(const char* x, const char* y, int* __temp1204v) {
   int z=0;

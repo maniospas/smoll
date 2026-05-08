@@ -47,6 +47,7 @@ def str(const char[] buf, nat pos, nat length)
 def str(cstr c)
     doc "convert to string"
     doc "Defines an implicit constant buffer using the cstr's memory data."
+    doc "Subsequent comparisons no longer use the underlying pointer value."
     buf = const char[]  # const because we do not allow resizing operations
     {buf__unsafe_ptr = c;}
     {builtins::nat length = c?strlen(c):0;}

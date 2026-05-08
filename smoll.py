@@ -103,6 +103,7 @@ CODEWORD_EQUALS = CodeWord("=")
 CODEWORD_LPAR = CodeWord("(")
 CODEWORD_RPAR = CodeWord(")")
 CODEWORD_AMP = CodeWord("&")
+CODEWORD_NOT = CodeWord("!")
 CODEWORD_COMMA = CodeWord(",")
 CODEWORD_ADD = CodeWord("+")
 CODEWORD_MUL = CodeWord("*")
@@ -111,7 +112,19 @@ CODEWORD_RBRACKET = CodeWord("}")
 CODEWORD_SEMICOLON = CodeWord(";")
 CODEWORD_PRINTF = CodeWord("printf")
 CODEWORD_GOTO = CodeWord("goto")
+CODEWORD_IF = CodeWord("if")
 
+def print_lsp_var(tok, signature:str):
+    print("---")
+    print("variable")
+    print(os.path.abspath(tok.file.path))
+    print(tok.row)
+    print(tok.col)
+    print(len(tok.text))
+    print(os.path.abspath(tok.file.path))
+    print(tok.row)
+    print(tok.col)
+    print(signature)
 
 def print_lsp_string(tok):
     print("---")
@@ -878,13 +891,32 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         tmp = create_temp()
         var = Variable(tmp, CAUGHT_TYPE)
         impl.vars[tmp] = var
-        if not impl.used_error_codes:
-            err_token.error("safety", "there is nothing to catch up to here")
+        if not impl.used_error_codes: err_token.error("safety", "there is nothing to catch up to here")
         impl.has_caught_used_error_codes = True
+        try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
+        if try_var is None: err_token.error("safety", "you can only catch within a `try`, for example per `if exists error=compiler::catch() print cstr error`")
+        else: impl.is_parsing_a_try[-1] = None
         impl.implementation.extend([
             var,
             CODEWORD_EQUALS,
             CodeWord("__temp_complain"),
+            CODEWORD_SEMICOLON,
+        ])
+        impl.has_any_complaint = True
+        impl.implementation.extend([
+            try_var,
+            CODEWORD_EQUALS,
+            CODEWORD_LPAR,
+            CodeWord("__temp_complain"),
+            CodeWord("=="),
+            CodeWord("0"),
+            CODEWORD_RPAR,
+            CODEWORD_SEMICOLON,
+        ])
+        impl.implementation.extend([
+            CodeWord("__temp_complain"),
+            CODEWORD_EQUALS,
+            CodeWord("0"),
             CODEWORD_SEMICOLON,
         ])
         return [var]
@@ -1011,7 +1043,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if callee.needs_failure_mode and not impl.is_parsing_a_try:
         if impl.is_parsing_a_defer: error_token.error("safety", "cannot call a function with unhandled failure within 'defer'", reason=callee.at)
         impl.implementation.extend([
-            CodeWord("if"),
+            CODEWORD_IF,
             CODEWORD_LPAR,
             CodeWord("__temp_errcode"),
             CODEWORD_RPAR,
@@ -1121,7 +1153,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
         if not mem_size: continue
         # non-allocation check is mandatory unfortunately
         impl.implementation.extend([
-            CodeWord("if"),
+            CODEWORD_IF,
             CODEWORD_LPAR,
             CodeWord("!"),
             ret[0],
@@ -1225,7 +1257,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                 elif tok.text=="rec" and peek_text(tokens, tokpos+1)==name:
                     tokens[pos].error("type", "usage of 'rec "+name+"' before its definition") 
 
-            if name in symbols: tokens[pos].error("syntax", "previous expression ended before operator '"+name+"'")
+            if name[0] in symbols: tokens[pos].error("syntax", "previous expression ended before operator '"+name+"'")
             candidates: list[ImplementedType] = list()
             max_candidate_common_length = 0
             for type in file.types.values():
@@ -1423,7 +1455,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 if not mem_size: continue
                 # non-allocation check is mandatory unfortunately
                 impl.implementation.extend([
-                    CodeWord("if"),
+                    CODEWORD_IF,
                     CODEWORD_LPAR,
                     CodeWord("!"),
                     var,
@@ -1471,7 +1503,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 continue
             if rets[0].type!=BOOL_TYPE: op_token.error("type", "the left hand side must always be true/false for 'and'")
             impl.implementation.extend([
-                CodeWord("if"),
+                CODEWORD_IF,
                 CODEWORD_LPAR,
                 rets[0],
                 CODEWORD_RPAR,
@@ -1495,7 +1527,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 continue
             if rets[0].type!=BOOL_TYPE: op_token.error("type", "the left hand side must always be true/false for 'or'")
             impl.implementation.extend([
-                CodeWord("if"),
+                CODEWORD_IF,
                 CODEWORD_LPAR,
                 CodeWord("!"),
                 rets[0],
@@ -1660,6 +1692,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 if var is None:
                     current_prefix = current+"__"
                     rets = [r for r in rets if r.name.startswith(current_prefix)]
+                    if rets and is_lsp and get(tokens, pos-1).file.is_main_file: print_lsp_var(get(tokens, pos-1), signature_like(rets,impl))
                     if rets and call_continuation:
                         call_token = get(tokens,pos+1)
                         pos, type = process_type(file, tokens, pos+1)
@@ -1685,6 +1718,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                     current_token.error("type", "not found field '"+pretty_name(current)+"'") 
                 assert var is not None
                 rets = [var]
+                if is_lsp and get(tokens, pos-1).file.is_main_file: print_lsp_var(get(tokens, pos-1), signature_like(rets,impl))
                 if call_continuation:
                     pos, type = process_type(file, tokens, pos+1)
                     if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
@@ -1747,8 +1781,45 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
     if current=="fail":
         if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "immediately fail during execution with the corresponding debug message")
         pos += 1
+        impl.needs_failure_mode = True
         message = get(tokens, pos)
-        if not message.is_string(): message.error("syntax", "a string literal must contain an error message after 'fail'")
+        if not message.is_string(): 
+            pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
+            pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+            if len(ret)!=1 or ret[0].type!=CAUGHT_TYPE:
+                message.error("syntax", "must contain an error message after 'fail' or resolve to 'catch' type but found: "+signature_like(ret, impl))
+            if debug_mode:
+                text = "\\033[31mfail\\033[0m propagating error"
+                text += "\\n\\033[31mat\\033[0m "+message.file.path.replace('"','\\"')+" line "+str(message.row)+" column "+str(message.col)+"\\n"
+                impl.implementation.extend([
+                    CODEWORD_PRINTF,
+                    CODEWORD_LPAR,
+                    CodeWord('"%s", "'+text+'"'),
+                    CODEWORD_RPAR,
+                    CODEWORD_SEMICOLON,
+                ])
+            try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
+            if try_var is not None:
+                impl.has_any_complaint = True
+                impl.implementation.extend([
+                    CodeWord("__temp_complain"),
+                    CODEWORD_EQUALS,
+                    ret[0],
+                    CODEWORD_SEMICOLON
+                ])
+                impl.is_parsing_a_try[-1] = None
+            else:
+                if impl.is_parsing_a_defer: current_token.error("safety", "cannot fail within a 'defer' statement unless within a 'try'")
+                impl.implementation.extend([
+                    CodeWord("__temp_errcode"),
+                    CODEWORD_EQUALS,
+                    ret[0],
+                    CODEWORD_SEMICOLON,
+                    CODEWORD_GOTO,
+                    CodeWord("__temp_failure"),
+                    CODEWORD_SEMICOLON
+                ])
+            return process_statement_operator(file, tokens, impl, pos, [], current_operator_priority)
         if is_lsp and message.file.is_main_file: print_lsp_string(message)
         text = message.text
         text = text[1:(len(text)-1)] # remove string limits
@@ -1789,7 +1860,6 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                 CodeWord("__temp_failure"),
                 CODEWORD_SEMICOLON
             ])
-        impl.needs_failure_mode = True
         return process_statement_operator(file, tokens, impl, pos+1, [], current_operator_priority)
     if current=="true":
         tmp = create_temp()
@@ -1998,26 +2068,13 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             for p, r in zip(previous, ret): impl.assign(p.name, [r], current_token)
         else: impl.assign(current, ret, current_token)
 
-        if is_lsp and var_token.file.is_main_file:
-            tok = var_token
-            print("---")
-            # position in processed file
-            print("variable")
-            print(os.path.abspath(tok.file.path))
-            print(tok.row)
-            print(tok.col)
-            print(len(tok.text))
-            # defined at
-            print(os.path.abspath(tok.file.path))
-            print(tok.row)
-            print(tok.col)
-            # message (may span multiple lines))
-            print(signature_like(ret,impl))
+        if is_lsp and var_token.file.is_main_file: print_lsp_var(var_token, signature_like(ret,impl))
 
         found: list[Variable] = [] # [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
         return pos, found
 
     if var:
+        if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_var(get(tokens, pos), signature_like([var],impl))
         r = var
         if r.stabilized_name() in impl.invalidated: 
             current_token.error("safety", "the variable '"+pretty_name(r.stabilized_name())+"' could have been invalidated", reason=impl.invalidated[r.stabilized_name()], raason_message="due to")
@@ -2031,7 +2088,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         for r in found:
             if r.stabilized_name() in impl.invalidated:
                 current_token.error("safety", "the variable '"+pretty_name(r.stabilized_name())+"' could have been invalidated", reason=impl.invalidated[r.stabilized_name()], raason_message="due to")
-
+        if found and is_lsp and get(tokens, pos).file.is_main_file: print_lsp_var(get(tokens, pos), signature_like(found,impl))
         if found or peek_text(tokens, pos+1)=="is": return process_statement_operator(file, tokens, impl, pos+1, found, current_operator_priority) 
 
         # if it was a field, don't try type resolution but immediately fail now
@@ -2241,7 +2298,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             else:
                 if ret[0].type!=BOOL_TYPE: name.error("type", "conditions can only evaluate to 'bool' or be constantly true/false")
                 impl.implementation.extend([
-                    CodeWord("if"), 
+                    CODEWORD_IF, 
                     CODEWORD_LPAR,
                     CodeWord("!"),
                     ret[0],
@@ -2298,7 +2355,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 continue
             if ret[0].type!=BOOL_TYPE: name.error("type", "conditions can only evaluate to 'true', 'false', or 'bool' (the first two refer to compile-time known literals)")
             impl.implementation.extend([
-                CodeWord("if"), 
+                CODEWORD_IF, 
                 CODEWORD_LPAR,
                 ret[0],
                 CODEWORD_RPAR,
@@ -2961,16 +3018,9 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     visited_defs_for_error_codes: set[ImplementedType] = set()
     found_error_codes: set[int] = set()
     for main_def in main_defs: found_error_codes = found_error_codes.union(main_def.gather_spawned_error_codes(visited_defs_for_error_codes))
-    
-    c_decls = list()
-    generated_c_funcs = list()
-    for next_def in discovered_defs:
-        transpiled = next_def.transpile()
-        if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
-        generated_c_funcs.append(transpiled)
-    if entry_point: generated_c_funcs.append(f"""int main() {{{entry_point}();return 0;}}""")
 
-    effective_err_code_list = [element if pos in found_error_codes else "0" for pos, element in enumerate(err_code_list)]
+    # TODO: the following breaks due to compiler::catch() handling in _call(...)
+    effective_err_code_list = err_code_list#[element for element in enumerate(err_code_list)]# if pos in found_error_codes else "0" for pos, element in enumerate(err_code_list)]
     effective_err_code_list_size = len(effective_err_code_list)
     while effective_err_code_list_size and effective_err_code_list[effective_err_code_list_size-1]=="0":
         effective_err_code_list_size -= 1
@@ -2987,6 +3037,15 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         set_errcodes += err_msg
     set_errcodes += "\n};\n"
     globs = "\n".join("const char* const "+k+"="+global_var2cstr[k]+";" for k in used_globs)+"\n"
+
+    # declarations only after error codes because transpilation simplifications can affect error detection
+    c_decls = list()
+    generated_c_funcs = list()
+    for next_def in discovered_defs:
+        transpiled = next_def.transpile()
+        if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
+        generated_c_funcs.append(transpiled)
+    if entry_point: generated_c_funcs.append(f"""int main() {{{entry_point}();return 0;}}""")
     body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
     src_path.write_text(header + globs + set_errcodes + define_errors + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")

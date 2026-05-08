@@ -78,7 +78,8 @@
 <em>2.3.</em> <a href="#stable-references">stable references</a><br>
 <em>2.4.</em> <a href="#substructures">substructures</a><br>
 <em>2.5.</em> <a href="#try-and-fail">try and fail</a><br>
-<em>2.6.</em> <a href="#defer">defer</a><br></p>
+<em>2.6.</em> <a href="#defer">defer</a><br>
+<em>2.7.</em> <a href="#catching-errors">catching errors</a><br></p>
 
 <p><strong>Section 3. Standard library</strong><br>
 <em>3.1.</em> <a href="#strings">strings</a><br>
@@ -801,11 +802,13 @@ an example:</p>
 
 <p>Functions in <em>smoλ</em> can fail freely when unforeseen conditions are encountered,
 for example when running out of memory. When failing functions are called by
-others, the failure cascades until the whole program terminates. You can encode
-failure tracking in your programs by passing the <code>--debug</code> flag to the compiler.</p>
+others, the failure cascades until the whole program terminates.</p>
 
-<p>Failure means that all resources are released and return values become zero. 
-Mutable arguments are left unaffected. You can manually <code>fail</code> like so:</p>
+<p>Failure means that all resources are released and return values become zero.
+Often there will be no opportunity to do anything with those zero values,
+however, as failures cascade and cause the caller to fail and then the caller&#8217;s
+caller and so on. Mutable arguments are left unaffected on failure too. 
+You can manually <code>fail</code> like so:</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -820,12 +823,16 @@ Mutable arguments are left unaffected. You can manually <code>fail</code> like s
 </code></pre>
 </div>
 
-<p>There are certain places in code where you can recover from call failures,
+<p>There are certain places in code where you may want to recover from call failures,
 for example by calling the same code again for improved user input, or by
 falling back to some secondary functionality. This is achieved with the
-<code>try</code> keyword, which parses an expression without stopping at failing functions, 
-if any (their returns are just zero-initialized). Then, failures are converted into 
-boolean values. Below is an example where we safeguard against failing allocation.</p>
+<code>try</code> keyword. That parses an expression without stopping at the first failing functions, 
+if any (their returns are just zero-initialized). You can fail only once within a try
+and the compiler will complain for multiple failures - split those among multiple declaration
+to avoid ambiguity.</p>
+
+<p>Finally, the failure within tried expressions is converted into 
+boolean values. Below is an example that safeguards against failing allocation.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -884,20 +891,33 @@ open files and processes.</p>
 </code></pre>
 </div>
 
-<h2 id="catching-error-type">catching error type</h2>
+<h2 id="catching-errors">catching errors</h2>
 
 <p>The <code>compiler::catch()</code> function provides the means of retrieving
-an error code intercepted by <code>try</code> statements.
-Error codes can be compared for equality and cleared
-with <code>try noerr()</code>; the latter is a shorthand for <code>try fail "noerr"</code>,
-where the message is a builtin message by the compiler to indicate
-the absense of errors.</p>
+an error code intercepted by <code>try</code> statements. This function creates
+an error itself if it <em>fails</em> to find an error. To avoid confusion, the
+compiler just mandates that you should wrap the catch function inside a <code>try</code> 
+of its own. This ways, you can obtain the error and check that it exists
+simultaneously.</p>
 
-<p>Importantly, error codes are not retrieved from called functions
-but <em>are</em> obtained from deferred statements triggered by <code>del</code>.
-The next snippet demonstrates how to clear errors, check that they
-are not <em>noerr</em> and convert them to <code>cstr</code> so that they can be
-manipulated.</p>
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span> <span class="k">as</span> <span class="n">io</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="k">try</span> <span class="n">file</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">io</span><span class="p">::</span><span class="n">file</span><span class="p">::</span><span class="n">read</span> <span class="s2">&quot;non_existent_file&quot;</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="s2">&quot;failed to open file&quot;</span>
+</code></pre>
+</div>
+
+<p>The same function also clears the intercepted error code so that thee next call 
+captures only subsequent messages. Caught errors can be compared for equality and
+converted to strings per <code>cstr error</code>.</p>
+
+<p>Errors are not retrieved when intercepted within called functions.
+But, importently, they <em>are</em> obtained from deferred statements triggered by 
+<code>del</code>. The next snippet demonstrates how to clear errors and check on them.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -907,13 +927,13 @@ manipulated.</p>
     <span class="n">fail</span> <span class="s2">&quot;bye!&quot;</span> 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="k">try</span> <span class="n">noerr</span><span class="p">()</span>
+    <span class="k">try</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
     <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">::</span><span class="n">read</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
     <span class="k">try</span> <span class="n">bye_error</span><span class="p">()</span>
     <span class="k">del</span> <span class="n">proc</span>
 
-    <span class="k">if</span> <span class="n">exists</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
-        <span class="nb">print</span> <span class="n">cstr</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span> <span class="c1"># prints &#39;bye!&#39; if no process error</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span> <span class="c1"># prints &#39;bye!&#39; if no process error</span>
 </code></pre>
 </div>
 
@@ -1036,7 +1056,7 @@ operations. Below is how to iterate through directory contents.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="nb">dir</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">dir</span><span class="p">::</span><span class="n">read</span> <span class="s2">&quot;.&quot;</span>
     <span class="n">buf</span> <span class="o">=</span> <span class="n">alloc</span> <span class="mi">128</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">entry</span><span class="o">=</span><span class="n">buf</span><span class="o">.</span><span class="n">dir</span><span class="p">::</span><span class="n">entry</span> <span class="nb">dir</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">entry</span><span class="o">=</span><span class="nb">dir</span><span class="p">::</span><span class="n">entry</span> <span class="nb">dir</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">dir</span><span class="p">::</span><span class="n">is_file</span> <span class="n">entry</span>
             <span class="nb">print</span> <span class="s2">&quot;file&quot;</span>

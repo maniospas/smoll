@@ -11,6 +11,3 @@ def cstr(compiler::catch value)
 def exists(compiler::catch value)
     {builtins::bool ret = (value!=0);}
     return ret
-
-def noerr()
-    fail "noerr"

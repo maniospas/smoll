@@ -4,28 +4,28 @@
 #include <string.h>
 #include <time.h>
 
-const char* const __temp1662v="hello world";
-const char* const __temp1659v="tmp.txt";
+const char* const __temp1641v="tmp.txt";
+const char* const __temp1644v="hello world";
 static const char* __temp_all_errcodes[0] = {
 };
 
-static inline __attribute__((always_inline)) void unsafe_temporary_cstr__temp592v(const char* other, const char** __temp1664v) {
-  *__temp1664v=other;
+static inline __attribute__((always_inline)) void unsafe_temporary_cstr__temp592v(const char* other, const char** __temp1646v) {
+  *__temp1646v=other;
 }
 
-static inline __attribute__((always_inline)) void exists__temp396v(void* x, int* __temp1665v) {
+static inline __attribute__((always_inline)) void exists__temp396v(void* x, int* __temp1647v) {
   int z=0;
   z=x!=0;
-  *__temp1665v=z;
+  *__temp1647v=z;
 }
 
-static inline __attribute__((always_inline)) void not__temp18v(int value, int* __temp1666v) {
+static inline __attribute__((always_inline)) void not__temp18v(int value, int* __temp1648v) {
   int z=0;
   z=value?0:1;
-  *__temp1666v=z;
+  *__temp1648v=z;
 }
 
-static inline __attribute__((always_inline)) int write__temp1319v(const char* _path, void** __temp1667v) {
+static inline __attribute__((always_inline)) int write__temp1319v(const char* _path, void** __temp1649v) {
   const char* __temp1320v__=0;
   const char* path=0;
   void* unsafe_ptr=0;
@@ -42,14 +42,14 @@ static inline __attribute__((always_inline)) int write__temp1319v(const char* _p
   __temp_errcode=33;
   goto __temp_failure;
   }
-  *__temp1667v=unsafe_ptr;
+  *__temp1649v=unsafe_ptr;
   
   __temp_failure:
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int print__temp1587v(void** __temp1668v, const char* text) {
-  void* f__unsafe_ptr=*__temp1668v;
+static inline __attribute__((always_inline)) int print__temp1587v(void** __temp1650v, const char* text) {
+  void* f__unsafe_ptr=*__temp1650v;
   int __temp1588v__=0;
   int __temp1589v__=0;
   int __temp_errcode=0;
@@ -61,31 +61,31 @@ static inline __attribute__((always_inline)) int print__temp1587v(void** __temp1
   goto __temp_failure;
   }
   fwrite(text,1,strlen(text),(FILE*)f__unsafe_ptr);
-  *__temp1668v=f__unsafe_ptr;
+  *__temp1650v=f__unsafe_ptr;
   
   __temp_failure:
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int main__temp1658v() {
-  void* __temp1660v__unsafe_ptr=0;
+static inline __attribute__((always_inline)) int main__temp1640v() {
+  void* __temp1642v__unsafe_ptr=0;
   void* f__unsafe_ptr=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  __temp_errcode=write__temp1319v(__temp1659v,&__temp1660v__unsafe_ptr);
+  __temp_errcode=write__temp1319v(__temp1641v,&__temp1642v__unsafe_ptr);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  f__unsafe_ptr=__temp1660v__unsafe_ptr;
-  __temp_errcode=print__temp1587v(&f__unsafe_ptr,__temp1662v);
+  f__unsafe_ptr=__temp1642v__unsafe_ptr;
+  __temp_errcode=print__temp1587v(&f__unsafe_ptr,__temp1644v);
   if(__temp_errcode){
   goto __temp_failure;
   }
   
-  __temp_failure:if(__temp1660v__unsafe_ptr)fclose((FILE*)__temp1660v__unsafe_ptr);
-  __temp1660v__unsafe_ptr=0;
+  __temp_failure:if(__temp1642v__unsafe_ptr)fclose((FILE*)__temp1642v__unsafe_ptr);
+  __temp1642v__unsafe_ptr=0;
   
   return __temp_errcode;
 }
 
-int main() {main__temp1658v();return 0;}
+int main() {main__temp1640v();return 0;}

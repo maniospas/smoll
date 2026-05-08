@@ -50,16 +50,14 @@ def read(str|cstr _path)
     if not exists unsafe_ptr fail "failed to open file"
     return class(unsafe_mut unsafe_ptr)
 
-def unsafe_entry(read f)
+def entry(read f)
+    doc "the next entry of an open dictionary"
+    doc "This value is modified as you continue reading"
+    doc "from the same directory."
     if not exists f.unsafe_ptr
         fail "not open dir"
     {builtins::compiler::ptr de = readdir((DIR*)f__unsafe_ptr);}
     if not exists de
         fail "end of dir"
     {builtins::cstr dirname=((struct dirent*)de)->d_name;}
-    return dirname
-
-def entry(char[] buf, mut nat|blank pos, read f)
-    if pos is blank
-        pos = mut 0
-    return copy(buf, pos, unsafe_entry f)  # optimized for joining with prefix
+    return str dirname

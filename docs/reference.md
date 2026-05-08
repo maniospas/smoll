@@ -21,6 +21,7 @@ _2.3._ [stable references](#stable-references)<br>
 _2.4._ [substructures](#substructures)<br>
 _2.5._ [try and fail](#try-and-fail)<br>
 _2.6._ [defer](#defer)<br>
+_2.7._ [catching errors](#catching-errors)<br>
 
 **Section 3. Standard library**<br>
 _3.1._ [strings](#strings)<br>
@@ -334,6 +335,13 @@ Importantly, the recursive function's escape hatch should occur
 first, otherwise Step 1 would result in failure; the compiler
 will point out that you are trying to perform a recursion with
 an incomplete type.
+
+Before moving forward, it must be mentioned that
+smoλ's type system is deliberately
+simplified so that programs *can be read sequentially*
+and *resolve types in finite time*. Recursion is too
+convenient to disallow fully, so this pattern is selected
+as a means of presenting the aforementioned properties.
 
 Below is an overengineered and thus algorithmically
 slow Fibonacci number calculator that demonstrates recursion
@@ -723,11 +731,13 @@ def main()
 
 Functions in *smoλ* can fail freely when unforeseen conditions are encountered,
 for example when running out of memory. When failing functions are called by
-others, the failure cascades until the whole program terminates. You can encode
-failure tracking in your programs by passing the `--debug` flag to the compiler.
+others, the failure cascades until the whole program terminates.
 
-Failure means that all resources are released and return values become zero. 
-Mutable arguments are left unaffected. You can manually `fail` like so:
+Failure means that all resources are released and return values become zero.
+Often there will be no opportunity to do anything with those zero values,
+however, as failures cascade and cause the caller to fail and then the caller's
+caller and so on. Mutable arguments are left unaffected on failure too. 
+You can manually `fail` like so:
 
 ```python
 import "std/core.s"
@@ -741,12 +751,16 @@ def main()
     print "this line is never printed"
 ```
 
-There are certain places in code where you can recover from call failures,
+There are certain places in code where you may want to recover from call failures,
 for example by calling the same code again for improved user input, or by
 falling back to some secondary functionality. This is achieved with the
-`try` keyword, which parses an expression without stopping at failing functions, 
-if any (their returns are just zero-initialized). Then, failures are converted into 
-boolean values. Below is an example where we safeguard against failing allocation.
+`try` keyword. That parses an expression without stopping at the first failing functions, 
+if any (their returns are just zero-initialized). You can fail only once within a try
+and the compiler will complain for multiple failures - split those among multiple declaration
+to avoid ambiguity.
+
+Finally, the failure within tried expressions is converted into 
+boolean values. Below is an example that safeguards against failing allocation.
 
 ```python
 import "std/core.s"
@@ -804,20 +818,33 @@ def main()
 ```
 
 
-## catching error type
+## catching errors
 
 The `compiler::catch()` function provides the means of retrieving
-an error code intercepted by `try` statements.
-Error codes can be compared for equality and cleared
-with `try noerr()`; the latter is a shorthand for `try fail "noerr"`,
-where the message is a builtin message by the compiler to indicate
-the absense of errors.
+an error code intercepted by `try` statements. This function creates
+an error itself if it *fails* to find an error. To avoid confusion, the
+compiler just mandates that you should wrap the catch function inside a `try` 
+of its own. This ways, you can obtain the error and check that it exists
+simultaneously.
 
-Importantly, error codes are not retrieved from called functions
-but *are* obtained from deferred statements triggered by `del`.
-The next snippet demonstrates how to clear errors, check that they
-are not *noerr* and convert them to `cstr` so that they can be
-manipulated.
+```python
+import "std/core.s"
+import "std/io.s" as io
+
+def main()
+    try file = mut io::file::read "non_existent_file"
+    if try error = compiler::catch()
+        print "failed to open file"
+```
+
+
+The same function also clears the intercepted error code so that thee next call 
+captures only subsequent messages. Caught errors can be compared for equality and
+converted to strings per `cstr error`.
+
+Errors are not retrieved when intercepted within called functions.
+But, importently, they *are* obtained from deferred statements triggered by 
+`del`. The next snippet demonstrates how to clear errors and check on them.
 
 
 ```python
@@ -828,13 +855,13 @@ def bye_error()
     fail "bye!" 
 
 def main()
-    try noerr()
+    try compiler::catch()
     proc = mut process::read "echo \"hello world!\""
     try bye_error()
     del proc
 
-    if exists compiler::catch()
-        print cstr compiler::catch() # prints 'bye!' if no process error
+    if try error = compiler::catch()
+        print cstr error # prints 'bye!' if no process error
 ```
 
 
@@ -951,7 +978,7 @@ import "std/io.s"::dir as dir
 def main()
     dir = mut dir::read "."
     buf = alloc 128
-    while try entry=buf.dir::entry dir
+    while try entry=dir::entry dir
         print(entry, " ")
         if dir::is_file entry
             print "file"

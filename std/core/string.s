@@ -125,6 +125,9 @@ def unsafe_temporary_cstr(cstr other)
     return other
 
 def bufpos(any[] buf)
+    doc "a buffer and mutable position pair"
+    doc "The position starts from 0. This structure is often used in leau of pointers"
+    doc "to maintain stable references within specified storage buffers."
     pos = mut 0
     return (buf, pos)
 

@@ -12,6 +12,8 @@
 #include <sys/stat.h>
 #include <string.h>
 
+const char* const __temp_osname = "windows";
+
 /* ── process ── */
 #define popen  _popen
 #define pclose _pclose

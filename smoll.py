@@ -3021,7 +3021,6 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     header = "\n".join("#include \""+k.path+"\"" for k in externals)+"\n"
     used_globs = set(k for main_def in main_defs for k in main_def.used_globals)
 
-
     discovered_defs: list[ImplementedType] = list()
     already_generated: set[ImplementedType] = set()
     new_error_code_list: list[str] = list()
@@ -3063,7 +3062,9 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         transpiled = next_def.transpile()
         if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
         generated_c_funcs.append(transpiled)
-    if entry_point: generated_c_funcs.append(f"""int main() {{{entry_point}();return 0;}}""")
+    if entry_point: 
+        header += "int __temp_argc;\nchar** __temp_argv;\n"
+        generated_c_funcs.append(f"""int main(int argc, char** argv) {{__temp_argc = argc;__temp_argv = argv;{entry_point}();return 0;}}""")
     body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
     src_path.write_text(header + globs + set_errcodes + define_errors + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")
@@ -3103,7 +3104,7 @@ parser.add_argument("--lsp", action="store_true", help="No compilation, and outp
 parser.add_argument("--build", action="store_true", help="Build without running.",)
 parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
 parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang, none (the last option only creates a C file).",)
-args = parser.parse_args()
+args, extra_args = parser.parse_known_args()
 debug_mode = args.debug
 chosen_compiler = args.back or "auto"
 is_lsp = args.lsp
@@ -3125,9 +3126,11 @@ async def main():
         exe_path = src_path.with_suffix("")
         write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
         if not args.build and chosen_compiler!="none":
+            extra_args_str = " ".join(extra_args)
+            if extra_args_str: extra_args_str = " "+extra_args_str
             if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); os._exit(1)
-            print(f"[{YELLOW}+{RESET}] run          ./{exe_path}")
-            result = subprocess.run("./"+str(exe_path), text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+            print(f"[{YELLOW}+{RESET}] run          ./{exe_path}{extra_args_str}")
+            result = subprocess.run("./"+str(exe_path)+extra_args_str, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
             if result.returncode != 0: os._exit(result.returncode)
         
         os._exit(0) # not in lsp case, as it inteferes with the stdout pipe

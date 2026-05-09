@@ -19,7 +19,7 @@ the compiler stops you from doing unsafe stuff.
 ## 🚀 Features
 
 - Function returns as type declarations
-- Predictable tuple-based type system (reads sequentially, rseolves in finite time)
+- Predictable tuple-based type system (reads sequentially, resolves in finite time)
 - Function and type overloading
 - Safe yet permissive
 - Immutability by default (can still define mutables)

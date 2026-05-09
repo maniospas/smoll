@@ -1,7 +1,7 @@
 import "std/core.s"
+import "std/io.s" as io
 
 def main()
-    x = (mut cstr[]).alloc KB 4
-    x[0] = "test"
-    x0 = x[0]&&
-    print x0..
+    args = io::process::args()
+    print args[0]
+    print io::process::osname()

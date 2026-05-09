@@ -15,6 +15,8 @@
 #include <sys/wait.h>
 #include <mach/mach_time.h>
 
+const char* const __temp_osname = "mac";
+
 /* ── sleep ── */
 static inline void __smo_exact_sleep(double duration) {
     struct timespec ts;

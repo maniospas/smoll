@@ -20,6 +20,8 @@
 #include <sys/wait.h>
 #include <pty.h>
 
+const char* const __temp_osname = "linux";
+
 /* ── sleep ── */
 static inline void __smo_exact_sleep(double duration) {
     struct timespec ts;

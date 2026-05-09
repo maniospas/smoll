@@ -1,6 +1,21 @@
 local import "std/core.s"
 local import "std/unsafe.s" as unsafe
 
+def osname() 
+    doc "the operating system name"
+    doc "One of \"linux\", \"windows\", \"mac\"."
+    {builtins::cstr ret=__temp_osname;}
+    return ret
+
+def args()
+    doc "process arguments"
+    doc "This buffer is stable and accessible from anywhere."
+    doc "The first argument is the executable name."
+    ret = const cstr[]
+    {ret__unsafe_ptr=__temp_argv;}
+    {ret__unsafe_size=__temp_argc;}
+    return ret
+
 def read(str|cstr _cmd)
     doc "create a readable system process"
     cmd = unsafe_temporary_cstr _cmd

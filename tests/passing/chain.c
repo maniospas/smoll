@@ -1,11 +1,9 @@
-#include <std/common.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-const char* const __temp1200v="123";
-const char* const __temp348v="\n";
+#include "std/extern/linux.h"
+#include "std/extern/win.h"
+#include "std/extern/mac.h"
+#include "std/extern/extern.h"
+const char* const __temp1199v="123";
+const char* const __temp350v="\n";
 static const char* __temp_all_errcodes[28] = {"noerr",
 "error",
 "id subtraction would yield a negative",
@@ -36,22 +34,22 @@ static const char* __temp_all_errcodes[28] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__temp736v(const char* x, const char* y, int* __temp1203v) {
+static inline __attribute__((always_inline)) void eq__temp735v(const char* x, const char* y, int* __temp1202v) {
   int z=0;
   z=(x==y);
-  *__temp1203v=z;
+  *__temp1202v=z;
 }
 
-static inline __attribute__((always_inline)) void print__temp363v(int value) {
+static inline __attribute__((always_inline)) void print__temp365v(int value) {
   const char* endl=0;
-  endl=__temp348v;
+  endl=__temp350v;
   printf("%s%s",value? "true":"false",endl);
 }
 
-static inline __attribute__((always_inline)) void main__temp1199v() {
-  int __temp1201v__=0;
-  eq__temp736v(__temp1200v,__temp1200v,&__temp1201v__);
-  print__temp363v(__temp1201v__);
+static inline __attribute__((always_inline)) void main__temp1198v() {
+  int __temp1200v__=0;
+  eq__temp735v(__temp1199v,__temp1199v,&__temp1200v__);
+  print__temp365v(__temp1200v__);
 }
 
-int main() {main__temp1199v();return 0;}
+int main() {main__temp1198v();return 0;}

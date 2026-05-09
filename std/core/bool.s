@@ -14,7 +14,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
-import "builtins"
+local import "builtins"
+local import "std/extern.s"
 
 def eq(bool x, bool y)
     doc "equal to"

@@ -15,6 +15,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
 import "builtins"
+import "std/extern.s"
 
 def print(cstr value, cstr|blank endl)
     doc "prints a cstr"

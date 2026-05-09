@@ -1,11 +1,9 @@
-#include <std/common.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-const char* const __temp1643v="hello world";
-const char* const __temp1640v="tmp.txt";
+#include "std/extern/linux.h"
+#include "std/extern/win.h"
+#include "std/extern/mac.h"
+#include "std/extern/extern.h"
+const char* const __temp1642v="hello world";
+const char* const __temp1639v="tmp.txt";
 static const char* __temp_all_errcodes[45] = {"noerr",
 "error",
 "id subtraction would yield a negative",
@@ -53,83 +51,83 @@ static const char* __temp_all_errcodes[45] = {"noerr",
 "end of dir"
 };
 
-static inline __attribute__((always_inline)) void unsafe_temporary_cstr__temp592v(const char* other, const char** __temp1645v) {
-  *__temp1645v=other;
+static inline __attribute__((always_inline)) void unsafe_temporary_cstr__temp591v(const char* other, const char** __temp1644v) {
+  *__temp1644v=other;
 }
 
-static inline __attribute__((always_inline)) void exists__temp396v(void* x, int* __temp1646v) {
+static inline __attribute__((always_inline)) void exists__temp398v(void* x, int* __temp1645v) {
   int z=0;
   z=x!=0;
+  *__temp1645v=z;
+}
+
+static inline __attribute__((always_inline)) void not__temp18v(int value, int* __temp1646v) {
+  int z=0;
+  z=value?0:1;
   *__temp1646v=z;
 }
 
-static inline __attribute__((always_inline)) void not__temp18v(int value, int* __temp1647v) {
-  int z=0;
-  z=value?0:1;
-  *__temp1647v=z;
-}
-
-static inline __attribute__((always_inline)) int write__temp1318v(const char* _path, void** __temp1648v) {
-  const char* __temp1319v__=0;
+static inline __attribute__((always_inline)) int write__temp1317v(const char* _path, void** __temp1647v) {
+  const char* __temp1318v__=0;
   const char* path=0;
   void* unsafe_ptr=0;
+  int __temp1319v__=0;
   int __temp1320v__=0;
-  int __temp1321v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  unsafe_temporary_cstr__temp592v(_path,&__temp1319v__);
-  path=__temp1319v__;
+  unsafe_temporary_cstr__temp591v(_path,&__temp1318v__);
+  path=__temp1318v__;
   unsafe_ptr=fopen(path,"wx+");
-  exists__temp396v(unsafe_ptr,&__temp1320v__);
-  not__temp18v(__temp1320v__,&__temp1321v__);
-  if(__temp1321v__){
+  exists__temp398v(unsafe_ptr,&__temp1319v__);
+  not__temp18v(__temp1319v__,&__temp1320v__);
+  if(__temp1320v__){
   __temp_errcode=33;
   goto __temp_failure;
   }
-  *__temp1648v=unsafe_ptr;
+  *__temp1647v=unsafe_ptr;
   
   __temp_failure:
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int print__temp1586v(void** __temp1649v, const char* text) {
-  void* f__unsafe_ptr=*__temp1649v;
-  int __temp1587v__=0;
-  int __temp1588v__=0;
+static inline __attribute__((always_inline)) int print__temp1582v(void** __temp1648v, const char* text) {
+  void* f__unsafe_ptr=*__temp1648v;
+  int __temp1583v__=0;
+  int __temp1584v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  exists__temp396v(f__unsafe_ptr,&__temp1587v__);
-  not__temp18v(__temp1587v__,&__temp1588v__);
-  if(__temp1588v__){
+  exists__temp398v(f__unsafe_ptr,&__temp1583v__);
+  not__temp18v(__temp1583v__,&__temp1584v__);
+  if(__temp1584v__){
   __temp_errcode=39;
   goto __temp_failure;
   }
   fwrite(text,1,strlen(text),(FILE*)f__unsafe_ptr);
-  *__temp1649v=f__unsafe_ptr;
+  *__temp1648v=f__unsafe_ptr;
   
   __temp_failure:
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int main__temp1639v() {
-  void* __temp1641v__unsafe_ptr=0;
+static inline __attribute__((always_inline)) int main__temp1638v() {
+  void* __temp1640v__unsafe_ptr=0;
   void* f__unsafe_ptr=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  __temp_errcode=write__temp1318v(__temp1640v,&__temp1641v__unsafe_ptr);
+  __temp_errcode=write__temp1317v(__temp1639v,&__temp1640v__unsafe_ptr);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  f__unsafe_ptr=__temp1641v__unsafe_ptr;
-  __temp_errcode=print__temp1586v(&f__unsafe_ptr,__temp1643v);
+  f__unsafe_ptr=__temp1640v__unsafe_ptr;
+  __temp_errcode=print__temp1582v(&f__unsafe_ptr,__temp1642v);
   if(__temp_errcode){
   goto __temp_failure;
   }
   
-  __temp_failure:if(__temp1641v__unsafe_ptr)fclose((FILE*)__temp1641v__unsafe_ptr);
-  __temp1641v__unsafe_ptr=0;
+  __temp_failure:if(__temp1640v__unsafe_ptr)fclose((FILE*)__temp1640v__unsafe_ptr);
+  __temp1640v__unsafe_ptr=0;
   
   return __temp_errcode;
 }
 
-int main() {main__temp1639v();return 0;}
+int main() {main__temp1638v();return 0;}

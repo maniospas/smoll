@@ -14,8 +14,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
-import "builtins"
-import "std/core/numbers.s"
+local import "builtins"
+local import "std/core/numbers.s"
 
 def float(Number x)
     doc "cast a number to float - may lose information"

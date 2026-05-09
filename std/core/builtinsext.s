@@ -15,6 +15,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
 import "builtins"
+import "std/extern.s"
 import "std/core/bool.s"
 import "std/core/numbers.s"
 import "std/core/print.s"

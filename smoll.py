@@ -48,6 +48,7 @@ err_code_table["noerr"] = 0
 err_code_table["error"] = 1
 debug_mode = True
 repositories: dict[str, str] = dict()
+externals: list["File"] = list()
 
 def strip_quotes(text: str) -> str:
     if len(text)>=2 and text[0]=="\"" and text[-1]=="\"": return text[1:-1]
@@ -707,6 +708,7 @@ class File:
         self.types: dict[str, UnionType] = dict()
         self.namespaces: dict[str, File] = dict()
         self.is_main_file: bool = False
+        self.is_extern_file: bool = False
         self.localdefs: set[UnionType|ImplementedType|File] = set() # a set of references to local types and namespaces
 
 class Token:
@@ -2458,6 +2460,14 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         name = await resolve_name(name, name_token)
         if not os.path.exists(name) and name not in file_cache: name_token.error("import", "non-existent file '"+name+"'")
         if os.path.isdir(name) and name not in file_cache: name_token.error("import", "expecting file but got directory '"+name+"'")
+        if name.endswith(".h") or name.endswith(".c"):
+            for f in externals:
+                if f.path==name: return pos+1, f
+            new_file = File(name)
+            new_file.is_extern_file = True
+            externals.append(new_file)
+            return pos+1, new_file
+        #if not name.endswith(".s") and not name.endswith(".smoll"): name_token.error("safety", "expecting a .s or .smoll (for smoll source code) or .h or .c (for C dependent source code) file extension but got '"+name+"'")
         imported = await load(name, err_token=name_token)
     pos += 1
     if peek_text(tokens, pos)=="::":
@@ -3008,14 +3018,7 @@ file_cache["builtins"] = smol_namespace
 def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_point: str|None) -> None:
     src_path = Path(f"{output_name}.c")
     exe_path = Path(output_name)
-    header = (
-        "#include <std/common.h>\n"
-        "#include <stdio.h>\n"
-        "#include <stdlib.h>\n"
-        "#include <string.h>\n"
-        "#include <time.h>\n"
-        "\n"
-    )
+    header = "\n".join("#include \""+k.path+"\"" for k in externals)+"\n"
     used_globs = set(k for main_def in main_defs for k in main_def.used_globals)
 
 

@@ -130,11 +130,11 @@ def print_lsp_var(tok, signature:str):
 def print_lsp_string(tok):
     print("---")
     print("string")
-    print(os.path.abspath(tok.file.path))
+    print(os.path.abspath(tok.file.resolved_path))
     print(tok.row)
     print(tok.col)
     print(len(tok.text))
-    print(os.path.abspath(tok.file.path))
+    print(os.path.abspath(tok.file.resolved_path))
     print(tok.row)
     print(tok.col)
     print("a string literal")
@@ -705,6 +705,7 @@ class UnionType:
 class File:
     def __init__(self, path: str):
         self.path = path
+        self.resolved_path = path
         self.types: dict[str, UnionType] = dict()
         self.namespaces: dict[str, File] = dict()
         self.is_main_file: bool = False
@@ -750,7 +751,7 @@ class Token:
                 print(at.row)
                 print(at.col)
                 # message (may span multiple lines))
-                print(errtype+" error: "+message+" "+(raason_message+" "+reason.file.path if reason else ""))
+                print(errtype+" error: "+message+" "+(raason_message+" "+reason.file.resolved_path if reason else ""))
                 if suggestions:
                     print("    with alternatives:")
                     for suggestion in suggestions:
@@ -766,7 +767,7 @@ class Token:
             for suggestion in suggestions:
                 print("    -", suggestion)
         try:
-            with open(self.file.path, "r", encoding="utf-8") as f:
+            with open(self.file.resolved_path, "r", encoding="utf-8") as f:
                 for i, line in enumerate(f, start=1):
                     if i == self.row:
                         source_line = line.rstrip("\n")
@@ -775,14 +776,14 @@ class Token:
         except OSError as exc:
             os._exit(1)
         token_len = max(len(self.text), 1)
-        location = f"{self.file.path} line {self.row} column {self.col}"
+        location = f"{self.file.resolved_path} line {self.row} column {self.col}"
         print(f"{RED}at{RESET} {location}")
         print(source_line)
         if not reason: print(RED+" "*(self.col - 1)+"^"*token_len+RESET)
         if reason:
             orignal_token_len = token_len
             try:
-                with open(reason.file.path, "r", encoding="utf-8") as f:
+                with open(reason.file.resolved_path, "r", encoding="utf-8") as f:
                     for i, line in enumerate(f, start=1):
                         if i == reason.row:
                             source_line = line.rstrip("\n")
@@ -792,7 +793,7 @@ class Token:
                 os._exit(1)
             token_len = max(len(reason.text), 1)
             pointer = " " * (reason.col - 1) + "^" * token_len
-            location = f"{reason.file.path} line {reason.row} column {reason.col}"
+            location = f"{reason.file.resolved_path} line {reason.row} column {reason.col}"
             prefix = " "*(self.col-1)
             print(prefix+RED+"^"*orignal_token_len+"|"+RESET)
             print(prefix+RED+" "*orignal_token_len+"|"+raason_message+RESET+" "+location)
@@ -872,12 +873,12 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         print("---")
         # position in processed file
         print("function")
-        print(os.path.abspath(error_token.file.path))
+        print(os.path.abspath(error_token.file.resolved_path))
         print(error_token.row)
         print(error_token.col)
         print(len(error_token.text))
         # defined at
-        print(os.path.abspath(at.file.path))
+        print(os.path.abspath(at.file.resolved_path))
         print(at.row)
         print(at.col)
         # message (may span multiple lines))
@@ -2457,6 +2458,7 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         if is_lsp and name_token.file.is_main_file: print_lsp_string(name_token)
         name = name_token.text
         name = name[1:len(name)-1]
+        prev_name = name
         name = await resolve_name(name, name_token)
         if not os.path.exists(name) and name not in file_cache: name_token.error("import", "non-existent file '"+name+"'")
         if os.path.isdir(name) and name not in file_cache: name_token.error("import", "expecting file but got directory '"+name+"'")
@@ -2469,6 +2471,8 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
             return pos+1, new_file
         #if not name.endswith(".s") and not name.endswith(".smoll"): name_token.error("safety", "expecting a .s or .smoll (for smoll source code) or .h or .c (for C dependent source code) file extension but got '"+name+"'")
         imported = await load(name, err_token=name_token)
+        name = prev_name
+        imported.path = name
     pos += 1
     if peek_text(tokens, pos)=="::":
         if not isinstance(imported, File): get(tokens, pos).error("import", "expecting file before '::' but got type '"+name+"'")

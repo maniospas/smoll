@@ -59,7 +59,8 @@ def main()
     print ""
 ```
 
-Download the executable from the latest release and run:
+Download the executable from the 
+[latest release](https://github.com/maniospas/smoll/releases/tag/main) and run:
 
 ```bash
 ./smoll test.s

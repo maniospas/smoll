@@ -1003,7 +1003,6 @@ def main()
 One can also open and communicate with running processes.
 
 ```python
-
 import "std/core.s"
 import "std/io.s"::process as proc
 
@@ -1012,4 +1011,21 @@ def main()
     buffer = (alloc KB 4, mut 0) # example with growing position
     while try line=buffer.proc::line process
         print line
+```
+
+Equivalently, manually release the process to wait for its conclusions.
+Recall that running processes can create errors, whereas releasing
+resources contains those errors with `try`, which intercepts errors so that
+they can be retrieved with `compiler::catch()`. To repropagate or otherwise
+handle those errors, use a pattern like below.
+
+```python
+import "std/core.s"
+import "std/io.s"::process as proc
+
+def main()
+    process = proc::process "ls"
+    del process
+    if try error = compiler::catch()
+        fail error # can fail on error codes too
 ```

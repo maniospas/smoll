@@ -1,7 +1,13 @@
+repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
+
 import "std/core.s"
-import "std/io.s" as io
+import "std/io.s"::file as file
 
 def main()
-    args = io::process::args()
-    print args[0]
-    print io::process::osname()
+    file = file::read "README.md"
+    buf = bufpos alloc KB 4
+    while try line = buf.file::line file
+        print line
+    #args = io::process::args()
+    #print args[0]
+    #print io::process::osname()

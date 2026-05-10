@@ -193,7 +193,7 @@ def print(str s, cstr|blank endl)
         endl = "\n"
     if s.dat.length+s.dat.pos>s.buf.unsafe_size
         fail "string out of bounds"
-    {printf("%.*s%s", (int)s__dat__length, s__dat__pos+(const char*)s__buf__unsafe_ptr, endl);}
+    {printf("%.*s%s", s__dat__length, s__dat__pos+s__buf__unsafe_ptr, endl);}
 
 local def charlist()
     return list mut char[]

@@ -118,6 +118,8 @@ def list(mut any[] buffer)
     doc "list of buffer"
     doc "List defined over a mutable buffer that is automatically managed and resized."
     doc "A capacity is maintained so that resizes are not performed too frequently."
+    if 0==len buffer
+        buffer = buffer.alloc 1
     length = mut len buffer
     return class(buffer, length)
 

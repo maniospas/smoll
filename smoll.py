@@ -69,19 +69,41 @@ class MemoryEmulator:
         self.consumed = 1
         self.size = size
         self.named_locs: dict[str,int] = dict()
+        self.alloc_sizes: dict[int,int] = dict()
 
     def alloc(self, size: int):
         if self.consumed+size>self.size: return 0
         ret = self.consumed
         self.consumed += size
+        self.alloc_sizes[ret] = size
         return ret
+
+    def realloc(self, original: int, size: int):
+        # TODO: for now we just alloc again and disuse the previous location
+        if original not in self.alloc_sizes: return 0
+        if self.alloc_sizes[original]<=size:
+            #self.alloc_sizes[original] = size
+            return original
+        if self.consumed+size>self.size: return 0
+        ret = self.consumed
+        self.consumed += size
+        self.memcpy(ret, original, self.alloc_sizes[original])
+        del self.alloc_sizes[original]
+        self.alloc_sizes[ret] = size
+        return ret
+
+    def free(self, original: int):
+        if original not in self.alloc_sizes: return original
+        del self.alloc_sizes[original]
+        return 0
     
     def named_alloc_value(self, text: str, contents: str):
         if text not in self.named_locs: 
+            contents = contents.encode('raw_unicode_escape').decode('unicode_escape').encode('utf-8')
             size = len(contents)
             addr = self.alloc(size+1)
             self.named_locs[text] = addr
-            self.contents[addr:(addr+size)] = contents.encode('raw_unicode_escape').decode('unicode_escape').encode('utf-8')
+            self.contents[addr:(addr+size)] = contents
             self.contents[addr+len(contents)] = 0
         return self.named_locs[text]
 
@@ -104,7 +126,9 @@ class MemoryEmulator:
         self.contents[addr:(addr+size)] = self.contents[addr2:(addr2+size)]
 
     def as_str(self, addr: int, size: int):
-        self.contents[addr:(addr+size)].decode('utf-8')
+        try: end = self.contents.index(0, addr)
+        except ValueError: end = len(self.contents)
+        return self.contents[addr:min(addr+size,end)].decode('utf-8')
     
     def as_cstr(self, addr: int) -> str:
         try: end = self.contents.index(0, addr)
@@ -820,6 +844,19 @@ class ImplementedType:
                     if len(values)!=1: self.at.error("malformed smollC", "'malloc' requires one argument")
                     if not isinstance(values[0],int): self.at.error("malformed smollC", "'malloc' requires an integer argument")
                     return memory.alloc(values[0])
+
+                if candidate_name == "free":
+                    if len(values)!=1: self.at.error("malformed smollC", "'free' requires one argument")
+                    if not isinstance(values[0],int): self.at.error("malformed smollC", "'free' requires an integer argument")
+                    ret = memory.free(values[0])
+                    if ret: self.at.error("interpreter", "'free' tried to free non-allocated (are already freed) memory")
+                    return None
+
+                if candidate_name == "realloc":
+                    if len(values)!=2: self.at.error("malformed smollC", "'realloc' requires two arguments")
+                    if not isinstance(values[0],int): self.at.error("malformed smollC", "'realloc' requires an integer argument")
+                    if not isinstance(values[1],int): self.at.error("malformed smollC", "'realloc' requires an integer argument")
+                    return memory.realloc(values[0], values[1])
                 
                 if candidate_name == "strlen":
                     if len(values)!=1: self.at.error("malformed smollC", "'strlen' requires one argument")
@@ -888,9 +925,14 @@ class ImplementedType:
                         precision = None
                         if fmt[i] == '.':
                             i += 1
-                            prec_start = i
-                            while i < len(fmt) and fmt[i].isdigit(): i += 1
-                            precision = int(fmt[prec_start:i]) if prec_start < i else 0
+                            if fmt[i]=="*":
+                                precision = values[arg_index]
+                                arg_index += 1
+                                i += 1
+                            else:
+                                prec_start = i
+                                while i < len(fmt) and fmt[i].isdigit(): i += 1
+                                precision = int(fmt[prec_start:i]) if prec_start < i else 0
                         # collect specifier (possibly multi-char like "ll")
                         spec = ""
                         while i < len(fmt) and fmt[i] in "lh":
@@ -901,7 +943,10 @@ class ImplementedType:
                             i += 1
                         val = values[arg_index] if arg_index < len(values) else 0
                         arg_index += 1
-                        if spec == "s": result.append(memory.as_cstr(int(val)))
+                        if spec == "s":
+                            if precision is not None: s = memory.as_str(int(val), precision)
+                            else: s = memory.as_cstr(int(val))
+                            result.append(s)
                         elif spec == "c":  result.append(chr(int(val)))
                         elif spec in ("lld", "d", "i"): result.append(str(int(val)))
                         elif spec in ("llu", "u"): result.append(str(int(val) & 0xFFFFFFFFFFFFFFFF))
@@ -3569,6 +3614,7 @@ async def main():
         if main_type.variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); os._exit(1)
         exe_path = src_path.with_suffix("")
         if chosen_compiler=="vm":
+            print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
             main_type.variations[0].interpret([], MemoryEmulator(4096*4)) # emulate 16kb memory
             os._exit(0) # not in lsp case, as it inteferes with the stdout pipe
         write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)

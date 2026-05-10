@@ -25,7 +25,9 @@ def alloc(nat bytes)
 def realloc(any ptr allocated__unsafe_ptr, nat bytes) 
     # the __unsafe_ptr suffix is needed to skip invalidation internally
     INVALIDATE compiler::ptr
-    {builtins::compiler::ptr new_allocated = allocated__unsafe_ptr?realloc(allocated__unsafe_ptr, bytes):malloc(bytes);builtins::bool failed=new_allocated==0;}
+    {if(allocated__unsafe_ptr){builtins::compiler::ptr new_allocated = realloc(allocated__unsafe_ptr, bytes);}}
+    {else{new_allocated=malloc(bytes);}}
+    {builtins::bool failed=new_allocated==0;}
     if failed fail "reallocation failed"
     return new_allocated.compiler::attach_type(allocated__unsafe_ptr)
 

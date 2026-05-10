@@ -3616,17 +3616,17 @@ async def main():
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
             main_type.variations[0].interpret([], MemoryEmulator(4096*4)) # emulate 16kb memory
+        else:
+            write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
+            if not args.build and chosen_compiler!="none":
+                extra_args_str = " ".join(extra_args)
+                if extra_args_str: extra_args_str = " "+extra_args_str
+                if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); os._exit(1)
+                print(f"[{YELLOW}+{RESET}] run          ./{exe_path}{extra_args_str}")
+                result = subprocess.run("./"+str(exe_path)+extra_args_str, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+                if result.returncode != 0: os._exit(result.returncode)
+            
             os._exit(0) # not in lsp case, as it inteferes with the stdout pipe
-        write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
-        if not args.build and chosen_compiler!="none":
-            extra_args_str = " ".join(extra_args)
-            if extra_args_str: extra_args_str = " "+extra_args_str
-            if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); os._exit(1)
-            print(f"[{YELLOW}+{RESET}] run          ./{exe_path}{extra_args_str}")
-            result = subprocess.run("./"+str(exe_path)+extra_args_str, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
-            if result.returncode != 0: os._exit(result.returncode)
-        
-        os._exit(0) # not in lsp case, as it inteferes with the stdout pipe
 
 # compatibility with pyodine
 def is_event_loop_running():

@@ -22,6 +22,7 @@
 import asyncio
 import os
 import sys
+import struct
 import argparse
 import itertools
 import subprocess
@@ -58,8 +59,76 @@ class CompfailException(Exception): pass
 class FastReturnException(Exception): pass
 class FatalException(Exception): pass
 class ImportError(Exception): 
-    def __init__(text):
-        super().__init__(text)
+    def __init__(self):
+        super().__init__(self)
+
+class MemoryEmulator:
+    def __init__(self, size: int):
+        self.contents = bytearray(size)
+        self.consumed = 1
+        self.size = size
+        self.named_locs: dict[str,int] = dict()
+
+    def alloc(self, size: int):
+        if self.consumed+size>self.size: return 0
+        ret = self.consumed
+        self.consumed += size
+        return ret
+    
+    def named_alloc_value(self, text: str, contents: str):
+        if text not in self.named_locs: 
+            size = len(contents)
+            addr = self.alloc(size+1)
+            self.named_locs[text] = addr
+            self.contents[addr:(addr+size)] = contents.encode('raw_unicode_escape').decode('unicode_escape').encode('utf-8')
+            self.contents[addr+len(contents)] = 0
+        return self.named_locs[text]
+
+    def named_alloc(self, text: str, size: int):
+        if text not in self.named_locs: 
+            self.named_locs[text] = self.alloc(size)
+        return self.named_locs[text]
+
+    def strcpy(self, addr: int, addr2: int):
+        try: end = self.contents.index(0, addr2)
+        except ValueError: end = len(self.contents)
+        self.contents[addr:(addr+end-addr2)] = self.contents[addr2:end]
+
+    def memcpy(self, addr: int, addr2: int, size: int):
+        self.contents[addr:(addr+size)] = self.contents[addr2:(addr2+size)]
+
+    def as_str(self, addr: int, size: int):
+        self.contents[addr:(addr+size)].decode('utf-8')
+    
+    def as_cstr(self, addr: int) -> str:
+        try: end = self.contents.index(0, addr)
+        except ValueError: end = len(self.contents)
+        return self.contents[addr:end].decode('utf-8')
+
+    def write_int64(self, addr: int, value: int):
+        struct.pack_into('<q', self.contents, addr, value)
+
+    def read_int64(self, addr: int) -> int:
+        return struct.unpack_from('<q', self.contents, addr)[0]
+
+    def write_uint64(self, addr: int, value: int):
+        struct.pack_into('<Q', self.contents, addr, value)
+
+    def read_uint64(self, addr: int) -> int:
+        return struct.unpack_from('<Q', self.contents, addr)[0]
+
+    def write_int64(self, addr: int, value: int):
+        struct.pack_into('<q', self.contents, addr, value)
+
+    def write_float64(self, addr: int, value: float):
+        struct.pack_into('<d', self.contents, addr, value)
+
+    def read_float64(self, addr: int) -> float:
+        return struct.unpack_from('<d', self.contents, addr)[0]
+
+    def memset(self, addr: int, value: int, size: int):
+        self.contents[addr:(addr + size)] = bytes([value & 0xFF]) * size
+
 
 def pretty_name(name: str):
     return name.replace("__", ".")
@@ -290,6 +359,7 @@ class ImplementedType:
         self.accumulating_defers: list[dict[str, Token]] = [dict()] # for the top level we defer at the end of file
         self.is_parsing_a_defer = False
         self.is_parsing_a_try: list[Variable|None] = list() # list of variables that hold try results
+        self.can_try_interpreter: bool = True
         if self.builtin is not None:
             self.vars["value"] = Variable("value", self)
             self.rets.append("value")
@@ -607,6 +677,273 @@ class ImplementedType:
             self.force_not_inline = True
             self.has_returned_once = True
             raise FastReturnException
+    
+    def interpret(self, values: list[int|float], memory: MemoryEmulator) -> list:
+        if not self.can_try_interpreter: self.at.error("interpreter", "'"+self.name+"' is not interpretable")
+        # memory is basically a list of chars
+        args = [k for k in self.args if self.vars[k].type.builtin]+[k for k in self.rets if self.vars[k].type.builtin]
+        input_args = len([k for k in self.args if self.vars[k].type.builtin])
+        #by_reference = [not self.vals[k].immutable for k in self.args if self.vals[k].builtin]+[True for k in self.rets if self.vals[k].builtin]
+        assert isinstance(values, list)
+        assert len(values)==len(args)
+        _arg_values = values
+        local_vars: dict[str,int|float] = dict(zip(args[:input_args],values[:input_args]))
+        #print(self.name, values)
+        self.can_try_interpreter = False
+
+        def process_expression(impl: list["Token"], pos: int, end: int):
+            if pos>end: return
+            if impl[pos].tostring()=="(" and impl[end].tostring()==")":
+                return process_expression(impl,pos+1,end-1)
+            if impl[pos].tostring()=="!":
+                condition = process_expression(impl,pos+1,end)
+                return 0 if condition else 1
+            if impl[pos].tostring()=="__temp_all_errcodes":
+                assert impl[pos+1].tostring()=="["
+                assert impl[pos+3].tostring()=="]"
+                value = process_expression(impl, pos+2,pos+2)
+                assert isinstance(value, int)
+                k = err_code_list[value]
+                return memory.named_alloc_value(k, k[1:-1])
+            if pos==end:
+                tok = impl[pos]
+                k = tok.tostring()
+                value: float|int|None = local_vars.get(tok.tostring(), None)
+                if value is not None: return value
+                if k in global_var2cstr: 
+                    cstr_global = global_var2cstr[k]
+                    return memory.named_alloc_value(k, cstr_global[1:-1])
+                if len(k)>=2 and k.startswith("\"") and k.endswith("\""):
+                    return memory.named_alloc_value(k, k[1:-1])
+                try:
+                    int_ret = int(tok.tostring())
+                    return int_ret
+                except: pass
+                try:
+                    float_ret = float(tok.tostring())
+                    return float_ret
+                except: pass
+                if k in self.vars: 
+                    if self.vars[k].type==FLOAT_TYPE: return 0.0
+                    return 0
+                return self.at.error("interpreter", "failed to parse '"+k+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+            elif impl[pos+1].tostring()=="=":
+                varname = impl[pos].tostring()
+                local_vars[varname] = process_expression(impl, pos+2,end)
+            elif impl[pos+1].tostring()[0] in "+-*/<>=!":
+                op = impl[pos+1].tostring()
+                v1 = process_expression(impl,pos,pos)
+                v2 = process_expression(impl,pos+2,pos+2)
+                if op=="+": return v1+v2
+                if op=="-": return v1-v2
+                if op=="*": return v1*v2
+                if op=="/": 
+                    if isinstance(v1,int) and isinstance(v2,int): return v1//v2
+                    return v1/v2
+                if op==">": return 1 if v1>v2 else 0
+                if op=="<": return 1 if v1<v2 else 0
+                if op==">=": return 1 if v1>=v2 else 0
+                if op=="<=": return 1 if v1<=v2 else 0
+                if op=="==": return 1 if v1==v2 else 0
+                if op=="!=": return 1 if v1!=v2 else 0
+                self.at.error("interpreter", "unknown operator '"+impl[pos+1].tostring()+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+            elif impl[pos+1].tostring()=="(":
+                callee: Optional["ImplementedType"] = None
+                candidate_name = impl[pos].tostring()
+                for candidate in self.dependent_implementations:
+                    if candidate.monomorphic_name==candidate_name:
+                        callee = candidate
+                        break
+                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy"]:
+                    self.at.error("interpreter", "failed to interpret C function '"+candidate_name+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+                gathered_args: list[str] = list()
+                gathered_args_by_pointer: list[bool] = list()
+                pos = pos+2
+                prev_pos = pos
+                last_arg_name: str = ""
+                by_pointer: bool = False
+                values: list[int|float] = list()
+                while pos<=end:
+                    # TODO: this skips operations within memcpy
+                    tok = impl[pos]
+                    if tok.tostring()=="," or tok.tostring()==")":
+                        if last_arg_name:
+                            gathered_args.append(last_arg_name)
+                            gathered_args_by_pointer.append(by_pointer)
+                            last_arg_name = ""
+                            by_pointer = False
+                        values.append(process_expression(impl, prev_pos, pos-1))
+                        prev_pos = pos+1
+                        if tok.tostring()==")": break
+                    elif tok.tostring() == "&":
+                        by_pointer = True
+                        prev_pos = pos+1
+                    elif tok.tostring()[0] in "([+-*/":
+                        self.at.error("interpreter", "the C interpreter does not allow complicated function arguments'"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+                    else:
+                        #assert not last_arg_name
+                        last_arg_name = tok.tostring()
+                    pos += 1
+                assert pos==end
+                if candidate_name == "malloc":
+                    assert len(values)==1
+                    assert isinstance(values[0],int)
+                    return memory.alloc(values[0])
+
+                if candidate_name == "memcpy":
+                    assert len(values)==3
+                    assert isinstance(values[0],int)
+                    assert isinstance(values[1],int)
+                    assert isinstance(values[2],int)
+                    if gathered_args_by_pointer[0]:
+                        assert not gathered_args_by_pointer[1]
+                        if values[1]==0: 
+                            self.at.error("interpreter", "null pointer dereference at 'memcpy( "+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
+                        assert values[2]==8#, str(values)+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'"
+                        if self.vars[gathered_args[0]].type==FLOAT_TYPE: 
+                            local_vars[gathered_args[0]] = memory.read_float64(values[1])
+                        else:
+                            local_vars[gathered_args[0]] = memory.read_int64(values[1])
+                        return None
+                    if gathered_args_by_pointer[1]:
+                        if values[0]==0: 
+                            self.at.error("interpreter", "null pointer dereference at 'memcpy( "+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
+                        assert values[2]==8#, str(values)+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'"
+                        if self.vars[gathered_args[1]].type==FLOAT_TYPE: 
+                            memory.write_float64(values[0], values[1])
+                        else:
+                            memory.write_int64(values[0], values[1])
+                        return None
+                    memory.memcpy(values[0], values[1], values[2])
+                    return None
+
+                if candidate_name == "ptr_memzero":
+                    assert len(values)==3
+                    assert isinstance(values[0],int)
+                    assert isinstance(values[1],int)
+                    assert isinstance(values[2],int)
+                    return memory.memset(values[0]+values[1], 0, values[2]-values[1])
+
+                if candidate_name == "printf":
+                    if not values: return None
+                    fmt_arg = values[0]
+                    assert isinstance(fmt_arg, int)
+                    fmt = memory.as_cstr(fmt_arg)
+                    arg_index = 1
+                    result = []
+                    i = 0
+                    while i < len(fmt):
+                        if fmt[i] != '%':
+                            result.append(fmt[i])
+                            i += 1
+                            continue
+                        i += 1  # skip '%'
+                        if i >= len(fmt):
+                            break
+                        # collect optional precision (e.g. ".6" in "%.6f")
+                        precision = None
+                        if fmt[i] == '.':
+                            i += 1
+                            prec_start = i
+                            while i < len(fmt) and fmt[i].isdigit(): i += 1
+                            precision = int(fmt[prec_start:i]) if prec_start < i else 0
+                        # collect specifier (possibly multi-char like "ll")
+                        spec = ""
+                        while i < len(fmt) and fmt[i] in "lh":
+                            spec += fmt[i]
+                            i += 1
+                        if i < len(fmt):
+                            spec += fmt[i]
+                            i += 1
+                        val = values[arg_index] if arg_index < len(values) else 0
+                        arg_index += 1
+                        if spec == "s": result.append(memory.as_cstr(int(val)))
+                        elif spec == "c":  result.append(chr(int(val)))
+                        elif spec in ("lld", "d", "i"): result.append(str(int(val)))
+                        elif spec in ("llu", "u"): result.append(str(int(val) & 0xFFFFFFFFFFFFFFFF))
+                        elif spec in ("f", "lf"):
+                            prec = precision if precision is not None else 6
+                            result.append(f"{float(val):.{prec}f}")
+                        else:
+                            print("".join(result), end="", flush=True)  # flush what we have before raising
+                            self.at.error("interpreter", f"unimplemented printf specifier {spec}")
+                    print("".join(result), end="", flush=True)
+                    return None
+                assert callee, candidate_name
+                #print(self.name, callee.name, values, gathered_args)
+                retcode = callee.interpret(values, memory) # may modify values
+                #rets = ""
+                for ismut, value, k in zip(gathered_args_by_pointer, values, gathered_args):
+                    if not ismut: continue
+                    local_vars[k] = value
+                    #rets += k+"="+str(value)+"\n"
+                #print(self.name, callee.name)
+                #print(rets)
+                return retcode
+            else:
+                self.at.error("interpreter", "failed to interpret C code: "+" ".join([impl[i].tostring() for i in range(pos,end+1)]))
+        
+        def process_block(impl: list["Token"], pos: int, npos: int):
+            # returns breaking variable or continue or break
+            prev_pos: int = pos
+            while pos<=npos:
+                if pos==prev_pos and impl[pos].tostring()=="if":
+                    assert impl[pos+1].tostring()=="("
+                    depth = 1
+                    endpos = pos+1
+                    while depth:
+                        endpos += 1
+                        assert endpos<npos
+                        if impl[endpos].tostring()=="(": depth += 1
+                        if impl[endpos].tostring()==")": depth -= 1
+                    condition = process_expression(impl, pos+2, endpos-1)
+                    assert condition is not None
+                    pos = endpos+1
+                    assert impl[pos].tostring()=="{"
+                    depth = 1
+                    endpos = pos
+                    while depth:
+                        endpos += 1
+                        assert endpos<=npos
+                        if impl[endpos].tostring()=="{": depth += 1
+                        if impl[endpos].tostring()=="}": depth -= 1
+                    if condition:
+                        ret = process_block(impl, pos+1, endpos-1)
+                        if ret: return ret
+                    pos = endpos+1
+                    if endpos<npos and impl[pos].tostring()=="else":
+                        pos += 1
+                        assert impl[pos].tostring()=="{"
+                        depth = 1
+                        endpos = pos
+                        while depth:
+                            endpos += 1
+                            assert endpos<=npos
+                            if impl[endpos].tostring()=="{": depth += 1
+                            if impl[endpos].tostring()=="}": depth -= 1
+                        if not condition:
+                            ret = process_block(impl, pos+1, endpos-1)
+                            if ret: return ret
+                        pos = endpos+1
+                    prev_pos = pos
+                    continue
+                if impl[pos].tostring()==";":
+                    if pos==prev_pos+2 and impl[prev_pos].tostring()=="goto":
+                        if impl[pos-1].tostring() in "__temp_return": return "return"
+                        if impl[pos-1].tostring() == "__temp_failure":  return "failure"
+                        self.at.error("interpreter", "cannot goto arbitrary C position 'goto "+impl[pos-1].tostring()+"'")
+                    process_expression(impl, prev_pos, pos-1)
+                    prev_pos = pos+1
+                pos += 1
+
+        ret = process_block(self.implementation, 0, len(self.implementation)-1)
+        if ret=="return" or not ret:
+            values = _arg_values
+            for pos in range(len(values)):
+                if self.vars[args[pos]].type==FLOAT_TYPE: values[pos] = local_vars.get(args[pos], 0.0)
+                else: values[pos] = local_vars.get(args[pos], 0)
+        self.can_try_interpreter = True
+        return local_vars.get("__temp_errcode", 0)
             
     def transpile(self) -> str:
         #print(self.signature())
@@ -1058,7 +1395,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             impl.implementation.extend([
                 CODEWORD_PRINTF,
                 CODEWORD_LPAR,
-                CodeWord('"%s", "'+text+'"'),
+                CodeWord('"%s'+text+'"'),
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
@@ -1169,7 +1506,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
             impl.implementation.extend([
                 CODEWORD_PRINTF,
                 CODEWORD_LPAR,
-                CodeWord('"%s", "'+text+'"'),
+                CodeWord('"%s'+text+'"'),
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
@@ -1185,7 +1522,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
             + [CODEWORD_AMP]
             + [r_var]
             + [CODEWORD_COMMA]
-            + [CodeWord(w) for w in "( char * )".split(" ")]
+            #+ [CodeWord(w) for w in "( char * )".split(" ")]
             + [ret[0]]
           
             + ([CODEWORD_ADD, CodeWord(str(progress))] if progress else [])
@@ -1347,7 +1684,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                 print(at.row)
                 print(at.col)
                 # message (may span multiple lines))
-                print(variation.signature()+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
+                print("```rust\n"+variation.signature()+(" defined in "+at.file.path if variation.at else " from compiler definitions")+"\n```")
 
         return pos+1, type
     namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
@@ -1472,7 +1809,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                     impl.implementation.extend([
                         CODEWORD_PRINTF,
                         CODEWORD_LPAR,
-                        CodeWord('"%s", "'+text+'"'),
+                        CodeWord('"%s'+text+'"'),
                         CODEWORD_RPAR,
                         CODEWORD_SEMICOLON,
                     ])
@@ -1484,8 +1821,8 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 ])
                 impl.needs_failure_mode = True
                 impl.implementation.extend(
-                    [CodeWord(w) for w in "memcpy ( ( char * )".split(" ")]
-                    + [var]
+                    [CodeWord("memcpy"), CODEWORD_LPAR]
+                    +[var]
                     + ([CODEWORD_ADD, CodeWord(str(progress))] if progress else [])
                     + [CODEWORD_COMMA, CODEWORD_AMP]
                     + [r]
@@ -1648,13 +1985,13 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                         impl.implementation.extend([
                             new_var,
                             CODEWORD_EQUALS,
-                            CODEWORD_LPAR,
-                            CODEWORD_LPAR,
-                            CodeWord("char"),
-                            CODEWORD_MUL,
-                            CODEWORD_RPAR,
+                            #CODEWORD_LPAR,
+                            #CODEWORD_LPAR,
+                            #CodeWord("char"),
+                            #CODEWORD_MUL,
+                            #CODEWORD_RPAR,
                             var,
-                            CODEWORD_RPAR,
+                            #CODEWORD_RPAR,
                             CODEWORD_ADD,
                             CodeWord(str(offset)),
                             CODEWORD_SEMICOLON
@@ -1805,7 +2142,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                 impl.implementation.extend([
                     CODEWORD_PRINTF,
                     CODEWORD_LPAR,
-                    CodeWord('"%s", "'+text+'"'),
+                    CodeWord('"%s'+text+'"'),
                     CODEWORD_RPAR,
                     CODEWORD_SEMICOLON,
                 ])
@@ -1846,7 +2183,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             impl.implementation.extend([
                 CODEWORD_PRINTF,
                 CODEWORD_LPAR,
-                CodeWord('"%s", "'+text+'"'),
+                CodeWord('"%s'+text+'"'),
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
@@ -2205,7 +2542,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
         if name.text=="return":
             def process_return(pos: int):
                 if is_lsp and name.file.is_main_file: 
-                    print_lsp_keyword(name, "returns from the current function immediately - function returns form a type")
+                    print_lsp_keyword(name, "**return**\n\nReturns from the current function immediately. This still calls any necessary 'defer' statements. Function returns form a type.")
                 if impl.is_parsing_a_defer: name.error("safety", "cannot return within a 'defer'")
                 #if impl.fast_return_exception and not impl.nesting and not impl.has_returned_once: 
                 #    name.error("safety", "the first return must occur conditionally in recursive functions: 'rec "+impl.name+"'")
@@ -2540,7 +2877,7 @@ def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception
         if peek_text(tokens, pos)=="ptr":
             tokens[pos].error("syntax", "pointers should follow their attached data type. Perhaps you meant 'any ptr'?")
         if peek_text(tokens, pos)=="any" and peek_text(tokens, pos+1)=="ptr":
-            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "generic type - the implementation is determined now, but is independent of the type and therefore can be called with appropriate types later")
+            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "**any type**\n\nThis marks a generic type, which depends on what is passed as arguments later. HOWEVER, this function's implementation is determined now.")
             pos += 1
             arg_type = smol_namespace.types["any"]
         else: pos, arg_type = process_linear_type(file, tokens, pos, True)
@@ -2559,7 +2896,7 @@ def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception
                 print(at.row)
                 print(at.col)
                 # message (may span multiple lines))
-                print(POINTER_TYPE.signature()+"\n"+" from compiler definitions")
+                print("```rust\n"+POINTER_TYPE.signature()+"\n"+" from compiler definitions\n```")
             pos += 1
             abstract_arg_convert_to_ptr.append(True)
         else: abstract_arg_convert_to_ptr.append(False)
@@ -2686,13 +3023,13 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
             is_local = tok.text=="local"
             if is_local:
                 if is_lsp and tok.file.is_main_file: 
-                    print_lsp_definition(tok, "the next import or definition has local visibility (does not affect files importing this file)")
+                    print_lsp_definition(tok, "**local declaration**\n\nThe next import or definition has local visibility (does not affect files importing this file).")
                 i += 1
                 tok = get(tokens, i)
             if tok.text=="def" or tok.text=="rec":
                 if is_lsp and tok.file.is_main_file: 
-                    if tok.text=="def": print_lsp_definition(tok, "defines a function that takes into account all previous definitions - its return forms a type")
-                    if tok.text=="rec": print_lsp_definition(tok, "defines a recursive function that can take into account later definitions in this file")
+                    if tok.text=="def": print_lsp_definition(tok, "**definition**\n\nDefines a function that takes into account all previous definitions. Its return forms a type.")
+                    if tok.text=="rec": print_lsp_definition(tok, "**recursive definition**\n\nDefines a recursive function that can take into account later definitions in this file.")
                 
                 has_made_def = True
                 first_def_tok = tok
@@ -2716,7 +3053,7 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
                 defname = get(tokens, i+1)
                 i, imported = await process_import(file, tokens, i, is_local=is_local)
                 if is_lsp and tok.file.is_main_file:
-                    print_lsp_keyword(tok, "imports a namespace or function")
+                    print_lsp_keyword(tok, "**import**\n\nimports a namespace or function")
                     print("---")
                     # position in processed file
                     print("namespace") # type of token: namespace, string, keyword, function, variable
@@ -2949,7 +3286,7 @@ async def load(path: str, is_main_file: bool=False, err_token:Token|None=None) -
     assert file is not None
     return file
 
-POINTER_TYPE = ImplementedType("ptr", "void*", memory_size=8)
+POINTER_TYPE = ImplementedType("ptr", "char*", memory_size=8)
 POINTER_TYPE.vars[POINTER_TYPE.rets[0]].immutable = False
 CSTR_TYPE = ImplementedType("cstr", "const char*", memory_size=8)
 CSTR_TYPE.doc.append("constant string")
@@ -2995,7 +3332,7 @@ SAME_CONTENTS_TYPE.doc.append("pointer references the same type as another")
 SAME_CONTENTS_TYPE.doc.append("Forces the first pointer to reference the same type of object as another. The function returns the first one to enable chain notation.")
 
 smol_namespace = File("builtins")
-builtin_token = Token("builtina", smol_namespace, 1, 1)
+builtin_token = Token("builtins", smol_namespace, 1, 1)
 smol_namespace.types["cstr"] = UnionType("cstr", at=builtin_token).append(CSTR_TYPE)
 smol_namespace.types["int"] = UnionType("int", at=builtin_token).append(INT_TYPE)
 smol_namespace.types["nat"] = UnionType("nat", at=builtin_token).append(UINT_TYPE)
@@ -3128,6 +3465,9 @@ async def main():
         if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); os._exit(1)
         if main_type.variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); os._exit(1)
         exe_path = src_path.with_suffix("")
+        if chosen_compiler=="vm":
+            main_type.variations[0].interpret([], MemoryEmulator(4096*4)) # emulate 16kb memory
+            os._exit(0) # not in lsp case, as it inteferes with the stdout pipe
         write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
         if not args.build and chosen_compiler!="none":
             extra_args_str = " ".join(extra_args)

@@ -35,8 +35,10 @@ def free(mut any ptr allocated)
     INVALIDATE compiler::ptr
 
 def zero(any ptr allocated, nat from, nat to)
-    {memset(((char*)allocated)+from, 0, to-from);}
+    # memzero is an abstraction over memset to ensure that the interpreter can understand it
+    {ptr_memzero(allocated, from, to);}
 
 def add(any ptr allocated, nat offset)
-    {builtins::compiler::ptr element = ((char*)allocated)+offset;}
+    # ptr_add is an abstraction over char cast and addition to ensure that the interpreter can understand it
+    {builtins::compiler::ptr element = allocated + offset;}
     return element.compiler::attach_type(allocated)

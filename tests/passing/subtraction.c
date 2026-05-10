@@ -48,7 +48,7 @@ static inline __attribute__((always_inline)) void lt__temp182v(unsigned long lon
   int __temp183v__=0;
   int z=0;
   is_different__temp85v(x,y,&__temp183v__);
-  z=x<y?1:0;
+  z=x<y;
   *__temp431v=z;
 }
 

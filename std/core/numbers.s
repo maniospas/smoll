@@ -48,42 +48,42 @@ def lt(Number x, Number y)
     doc "less than"
     if is_different(x,y)
         compiler::skip()
-    {builtins::bool z = x<y?1:0;}
+    {builtins::bool z = x<y;}
     return z
 
 def gt(Number x, Number y)
     doc "greater than"
     if is_different(x,y)
         compiler::skip()
-    {builtins::bool z = x>y?1:0;}
+    {builtins::bool z = x>y;}
     return z
 
 def le(Number x, Number y)
     doc "less than or equal to"
     if is_different(x,y)
         compiler::skip()
-    {builtins::bool z = x<=y?1:0;}
+    {builtins::bool z = x<=y;}
     return z
 
 def ge(Number x, Number y)
     doc "greater than or equal to"
     if is_different(x,y)
         compiler::skip()
-    {builtins::bool z = x>=y?1:0;}
+    {builtins::bool z = x>=y;}
     return z
 
 def eq(Number x, Number y)
     doc "equal to"
     if is_different(x,y)
         compiler::skip()
-    {builtins::bool z = x==y?1:0;}
+    {builtins::bool z = x==y;}
     return z
 
 def neq(Number x, Number y)
     doc "unequal to"
     if is_different(x,y)
         compiler::skip()
-    {builtins::bool z = x!=y?1:0;}
+    {builtins::bool z = x!=y;}
     return z
     
 def sub(Number x, Number y)

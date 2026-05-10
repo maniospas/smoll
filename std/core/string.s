@@ -83,15 +83,15 @@ def copy(str|cstr _other)
     doc "copy a string to a new buffer"
     other = str _other
     buf = alloc len other
-    {memcpy(((char*)buf__unsafe_ptr), ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
+    {memcpy(buf__unsafe_ptr, other__buf__unsafe_ptr+other__dat__pos, other__dat__length);}
     return str(buf, 0, other.dat.length, other.dat.first)
 
 local def copy_null_terminated(str other)
     doc "copy a string to a new buffer while ensuring null termination"
     doc "This is useful only for supporting unsafe_temporary_cstr."
     buf = alloc 1+len other
-    {memcpy(((char*)buf__unsafe_ptr), ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
-    {((char*)buf__unsafe_ptr)[other__dat__length] = 0;}
+    {memcpy(buf__unsafe_ptr, other__buf__unsafe_ptr+other__dat__pos, other__dat__length);}
+    {buf__unsafe_ptr[other__dat__length] = 0;}
     return str(buf, 0, other.dat.length, other.dat.first)
 
 def unsafe_temporary_cstr(str other) 
@@ -164,7 +164,7 @@ def copy(char[] buf, mut nat pos, str|cstr _other)
     next_pos = pos+len other
     if next_pos>len buf
         fail "string buffer out of memory"
-    {memcpy(((char*)buf__unsafe_ptr)+pos, ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
+    {memcpy(buf__unsafe_ptr+pos, ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length);}
     prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)
@@ -179,8 +179,8 @@ def copy_null_terminated(char[] buf, mut nat pos, str|cstr _other)
     next_pos = null_pos + 1
     if next_pos>len buf
         fail "string buffer out of memory"
-    {memcpy(((char*)buf__unsafe_ptr)+pos, ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length*sizeof(char));}
-    {((char*)buf__unsafe_ptr)[null_pos]=0;}
+    {memcpy(buf__unsafe_ptr+pos, ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length);}
+    {buf__unsafe_ptr[null_pos]=0;}
     prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)

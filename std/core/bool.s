@@ -19,12 +19,12 @@ local import "std/extern.s"
 
 def eq(bool x, bool y)
     doc "equal to"
-    {builtins::bool z = x==y?1:0;}
+    {builtins::bool z = x==y;}
     return z
 
 def neq(bool x, bool y)
     doc "not equal to"
-    {builtins::bool z = x!=y?1:0;}
+    {builtins::bool z = x!=y;}
     return z
 
 def not(bool value)

@@ -65,7 +65,7 @@ static inline __attribute__((always_inline)) void eq__temp278v(unsigned long lon
   int __temp279v__=0;
   int z=0;
   is_different__temp85v(x,y,&__temp279v__);
-  z=x==y?1:0;
+  z=x==y;
   *__temp1222v=z;
 }
 
@@ -111,7 +111,7 @@ static inline __attribute__((always_inline)) void lt__temp182v(unsigned long lon
   int __temp183v__=0;
   int z=0;
   is_different__temp85v(x,y,&__temp183v__);
-  z=x<y?1:0;
+  z=x<y;
   *__temp1227v=z;
 }
 
@@ -185,7 +185,7 @@ static inline __attribute__((always_inline)) void ge__temp254v(unsigned long lon
   int __temp255v__=0;
   int z=0;
   is_different__temp85v(x,y,&__temp255v__);
-  z=x>=y?1:0;
+  z=x>=y;
   *__temp1234v=z;
 }
 

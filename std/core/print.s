@@ -20,48 +20,49 @@ import "std/extern.s"
 def print(cstr value, cstr|blank endl)
     doc "prints a cstr"
     if endl is blank 
-        doc "automatically ends the line too"
+        doc "Automatically ends the line too."
         endl = "\n"
     {printf("%s%s", value, endl);}
 
 def print(float value, cstr|blank endl)
     doc "prints a float"
+    doc "To pre-specified 6 decimal digits."
     if endl is blank 
-        doc "automatically ends the line too"
+        doc "Automatically ends the line too."
         endl = "\n"
     {printf("%.6f%s", value, endl);}
 
 def print(int value, cstr|blank endl)
     doc "prints an integer"
     if endl is blank 
-        doc "automatically ends the line too"
+        doc "Automatically ends the line too."
         endl = "\n"
     {printf("%lld%s", value, endl);}
 
 def print(nat value, cstr|blank endl)
     doc "prints an unsigned integer"
     if endl is blank 
-        doc "automatically ends the line too"
+        doc "Automatically ends the line too."
         endl = "\n"
     {printf("%llu%s", value, endl);}
 
 def print(bool value, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
-        doc "automatically ends the line too"
+        doc "Automatically ends the line too."
         endl = "\n"
     {printf("%s%s", value?"true":"false", endl);}
 
 def print(compiler::true, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
-        doc "automatically ends the line too"
+        doc "Automatically ends the line too."
         endl = "\n"
     {printf("true%s", endl);}
     
 def print(compiler::false, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
-        doc "automatically ends the line too"
+        doc "Automatically ends the line too."
         endl = "\n"
     {printf("true%s", endl);}

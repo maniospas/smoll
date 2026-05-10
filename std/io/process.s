@@ -52,8 +52,14 @@ def line(char[] buf, mut nat|blank pos, read f)
     pos = pos+bytes_read
     return str(buf, prev_pos, bytes_read)
 
-def system(cstr|str _cmd)
-    cmd = unsafe_temporary_cstr _cmd
-    {builtins::int result = system((const char*)cmd);}
-    if result!=int 0 fail "system call failed"
+local def system_return(cstr cmd)
+    VM "[os.system($cmd)]"
+    {builtins::int result = system(cmd);}
+    return result
 
+def system(cstr|str _cmd)
+    doc "system command"
+    doc "Runs a system command and waits until that completes."
+    doc "Fails if the return code is non-zero, but does not expose that code."
+    result = system_return unsafe_temporary_cstr _cmd
+    if result!=int 0 fail "system call failed"

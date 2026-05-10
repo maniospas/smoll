@@ -19,7 +19,7 @@
 # nuitka --standalone --onefile --lto=yes --output-filename=smoll --python-flag=no_asserts --python-flag=no_site --python-flag=static_hashes smoll.py
 
 
-import time as time
+import time
 import asyncio
 import os
 import sys
@@ -705,6 +705,15 @@ class ImplementedType:
             if impl[pos].tostring()=="!":
                 condition = process_expression(impl,pos+1,end)
                 return 0 if condition else 1
+            if impl[pos].tostring()=="*":
+                if pos<=end-3 and impl[pos+2].tostring()=="=":
+                    index = process_expression(impl,pos+1,pos+1)
+                    value = process_expression(impl,pos+3,end)
+                    memory.contents[index] = (value)
+                    return None
+                else:
+                    index = process_expression(impl,pos+1,end)
+                    return int(memory.contents[index])
             if impl[pos].tostring()=="__temp_all_errcodes":
                 assert impl[pos+1].tostring()=="["
                 assert impl[pos+3].tostring()=="]"
@@ -742,7 +751,7 @@ class ImplementedType:
                 parsed_value: float|int = process_expression(impl, pos+2,end)
                 if parsed_value is None: 
                     self.at.error("interpreter", "failed to parse right hand side at '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
-                if self.vars[varname].type==FLOAT_TYPE: parsed_value = float(parsed_value)
+                if varname in self.vars and self.vars[varname].type==FLOAT_TYPE: parsed_value = float(parsed_value)
                 else: parsed_value = int(parsed_value)
                 local_vars[varname] = parsed_value
             elif impl[pos+1].tostring()[0] in "+-*/<>=!^|&":
@@ -839,7 +848,7 @@ class ImplementedType:
                         if values[0]==0: 
                             self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
                         if values[2]==1 and (self.vars[gathered_args[1]].type==CHAR_TYPE or self.vars[gathered_args[1]].type==BOOL_TYPE):
-                            memory.contents[value[0]] = byte(value[1])
+                            memory.contents[value[0]] = (value[1])
                         elif values[2]!=8:
                             self.at.error("interpreter", "expecting 1 or 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         if self.vars[gathered_args[1]].type==FLOAT_TYPE: 
@@ -1006,7 +1015,14 @@ class ImplementedType:
                 pos += 1
 
         if self.VM is not None: 
-            evaluated = eval(self.VM[1:-1])
+            call_text = self.VM[1:-1]
+            for pos, arg in enumerate(args[:input_args]):
+                if arg in call_text:
+                    if self.vars[arg].type==CSTR_TYPE: value = "\""+memory.as_cstr(int(values[pos]))+"\""
+                    elif self.vars[arg].type==FLOAT_TYPE: value = str(float(values[pos]))
+                    else: value = str(int(values[pos]))
+                    call_text = call_text.replace("$"+arg, value)
+            evaluated = eval(call_text)
             assert isinstance(evaluated, list)
             assert len(evaluated)==len(args)-input_args
             values[input_args:] = evaluated
@@ -2744,8 +2760,8 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                     CODEWORD_RPAR,
                     CODEWORD_LBRACKET,
                     CodeWord("break"),
-                    CODEWORD_RBRACKET,
                     CODEWORD_SEMICOLON,
+                    CODEWORD_RBRACKET,
                 ])
                 if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
                 else: pos = process_body(file, tokens, pos-1, impl, one_line=True)

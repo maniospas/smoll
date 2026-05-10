@@ -4,7 +4,7 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp350v="\n";
+const char* const __temp352v="\n";
 static const char* __temp_all_errcodes[28] = {"noerr",
 "error",
 "id subtraction would yield a negative",
@@ -329,7 +329,9 @@ static inline __attribute__((always_inline)) int sum__temp1201v(char** __temp128
   while(1){
   len__temp486v(v__unsafe_ptr,v__unsafe_size,v__unsafe_align,&__temp1208v__);
   lt__temp182v(i,__temp1208v__,&__temp1209v__);
-  if(!__temp1209v__)break;
+  if(!__temp1209v__){
+  break;
+  }
   __temp_errcode=get__temp482v(v__unsafe_ptr,v__unsafe_size,v__unsafe_align,i,&__temp1210v__);
   if(__temp_errcode){
   goto __temp_failure;
@@ -372,9 +374,9 @@ static inline __attribute__((always_inline)) int sum__temp1201v(char** __temp128
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) void print__temp353v(double value) {
+static inline __attribute__((always_inline)) void print__temp355v(double value) {
   const char* endl=0;
-  endl=__temp350v;
+  endl=__temp352v;
   printf("%.6f%s",value,endl);
 }
 
@@ -494,8 +496,8 @@ static inline __attribute__((always_inline)) int main__temp1221v() {
   }
   sums__x=__temp1251v__x;
   sums__y=__temp1251v__y;
-  print__temp353v(sums__x);
-  print__temp353v(sums__y);
+  print__temp355v(sums__x);
+  print__temp355v(sums__y);
   
   __temp_failure:__temp1297v=0;
   neq__temp302v(__temp1227v__unsafe_size,__temp1297v,&__temp1298v);

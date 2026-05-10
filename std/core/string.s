@@ -66,7 +66,7 @@ def char(str s)
 def char(cstr s)
     doc "treat as character"
     doc "The first character of a string is extracted, for example to write `c = char \"C\"`."
-    {builtins::char c = s?s[0]:0;}
+    {if(s) {builtins::char c = *s;}}
     return c
 
 def eq(char x, char y)
@@ -91,7 +91,8 @@ local def copy_null_terminated(str other)
     doc "This is useful only for supporting unsafe_temporary_cstr."
     buf = alloc 1+len other
     {memcpy(buf__unsafe_ptr, other__buf__unsafe_ptr+other__dat__pos, other__dat__length);}
-    {buf__unsafe_ptr[other__dat__length] = 0;}
+    {builtins::nat endpos = buf__unsafe_ptr+other__dat__length;}
+    {*endpos = 0;}
     return str(buf, 0, other.dat.length, other.dat.first)
 
 def unsafe_temporary_cstr(str other) 
@@ -113,7 +114,7 @@ def unsafe_temporary_cstr(str other)
         c = other
     else
         c = copy_null_terminated(other)
-    {builtins::cstr ret = ((char*)c__buf__unsafe_ptr)+c__dat__pos;}
+    {builtins::cstr ret = c__buf__unsafe_ptr+c__dat__pos;}
     defer
         # will do nothing but ties ret and c together
         if not exists ret 

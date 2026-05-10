@@ -91,7 +91,7 @@ local def copy_null_terminated(str other)
     doc "This is useful only for supporting unsafe_temporary_cstr."
     buf = alloc 1+len other
     {memcpy(buf__unsafe_ptr, other__buf__unsafe_ptr+other__dat__pos, other__dat__length);}
-    {builtins::nat endpos = buf__unsafe_ptr+other__dat__length;}
+    {builtins::compiler::ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}
     return str(buf, 0, other.dat.length, other.dat.first)
 

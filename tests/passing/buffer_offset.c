@@ -5,7 +5,7 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp1225v="starting point creation";
-const char* const __temp352v="\n";
+const char* const __temp350v="\n";
 static const char* __temp_all_errcodes[28] = {"noerr",
 "error",
 "id subtraction would yield a negative",
@@ -224,9 +224,9 @@ static inline __attribute__((always_inline)) void Point2D__temp1205v(double x, d
   *__temp1280v=y;
 }
 
-static inline __attribute__((always_inline)) void print__temp350v(const char* value) {
+static inline __attribute__((always_inline)) void print__temp348v(const char* value) {
   const char* endl=0;
-  endl=__temp352v;
+  endl=__temp350v;
   printf("%s%s",value,endl);
 }
 
@@ -238,7 +238,7 @@ static inline __attribute__((always_inline)) void Point3D__temp1223v(double x, d
   Point2D__temp1205v(x,y,&__temp1224v__x,&__temp1224v__y);
   plane__x=__temp1224v__x;
   plane__y=__temp1224v__y;
-  print__temp350v(__temp1225v);
+  print__temp348v(__temp1225v);
   *__temp1281v=plane__x;
   *__temp1282v=plane__y;
   *__temp1283v=z;
@@ -412,9 +412,9 @@ static inline __attribute__((always_inline)) int sum__temp1208v(char** __temp129
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) void print__temp355v(double value) {
+static inline __attribute__((always_inline)) void print__temp353v(double value) {
   const char* endl=0;
-  endl=__temp352v;
+  endl=__temp350v;
   printf("%.6f%s",value,endl);
 }
 
@@ -528,8 +528,8 @@ static inline __attribute__((always_inline)) int main__temp1228v() {
   }
   sums__x=__temp1252v__x;
   sums__y=__temp1252v__y;
-  print__temp355v(sums__x);
-  print__temp355v(sums__y);
+  print__temp353v(sums__x);
+  print__temp353v(sums__y);
   
   __temp_failure:__temp1301v=0;
   neq__temp302v(__temp1234v__unsafe_size,__temp1301v,&__temp1302v);

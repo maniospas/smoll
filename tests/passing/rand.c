@@ -4,7 +4,7 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp350v="\n";
+const char* const __temp352v="\n";
 static const char* __temp_all_errcodes[28] = {"noerr",
 "error",
 "id subtraction would yield a negative",
@@ -47,10 +47,17 @@ static inline __attribute__((always_inline)) void splitmix64__temp1200v(unsigned
 static inline __attribute__((always_inline)) void splitmix64__temp1199v(unsigned long long* __temp1238v, unsigned long long* __temp1239v) {
   unsigned long long x=*__temp1238v;
   unsigned long long z=0;
-  z=(x+=0x9E3779B97F4A7C15ULL);
-  z=(z ^(z>>30))*0xBF58476D1CE4E5B9ULL;
-  z=(z ^(z>>27))*0x94D049BB133111EBULL;
-  z=z ^(z>>31);
+  unsigned long long rot=0;
+  x=x+0x9E3779B97F4A7C15ULL;
+  z=x;
+  rot=z>>30;
+  z=z^rot;
+  z=z*0xBF58476D1CE4E5B9ULL;
+  rot=z>>27;
+  z=z^rot;
+  z=z*0x94D049BB133111EBULL;
+  rot=z>>31;
+  z=z^rot;
   *__temp1238v=x;
   *__temp1239v=z;
 }
@@ -95,8 +102,14 @@ static inline __attribute__((always_inline)) void Rand__temp1213v(unsigned long 
 }
 
 static inline __attribute__((always_inline)) void rotl__temp1198v(unsigned long long x, unsigned long long k, unsigned long long* __temp1244v) {
+  unsigned long long left=0;
+  unsigned long long compk=0;
+  unsigned long long right=0;
   unsigned long long z=0;
-  z=(x<<k)|(x>>(64-k));
+  left=x<<k;
+  compk=64-k;
+  right=x>>compk;
+  z=left|right;
   *__temp1244v=z;
 }
 
@@ -109,18 +122,22 @@ static inline __attribute__((always_inline)) void next__temp1229v(unsigned long 
   unsigned long long t=0;
   unsigned long long __temp1230v=0;
   unsigned long long __temp1231v__=0;
+  double denom=0;
+  double nom=0;
   double value=0;
   result=self__s0+self__s3;
   t=self__s1<<17;
-  self__s2 ^=self__s0;
-  self__s3 ^=self__s1;
-  self__s1 ^=self__s2;
-  self__s0 ^=self__s3;
-  self__s2 ^=t;
+  self__s2=self__s2^self__s0;
+  self__s3=self__s3^self__s1;
+  self__s1=self__s1^self__s2;
+  self__s0=self__s0^self__s3;
+  self__s2=self__s2^t;
   __temp1230v=45;
   rotl__temp1198v(self__s3,__temp1230v,&__temp1231v__);
   self__s3=__temp1231v__;
-  value=((double)(result>>11))/((double)((unsigned long long)(1)<<53));
+  denom=0x0020000000000000ULL;
+  nom=result>>11;
+  value=nom/denom;
   *__temp1245v=self__s0;
   *__temp1246v=self__s1;
   *__temp1247v=self__s2;
@@ -128,9 +145,9 @@ static inline __attribute__((always_inline)) void next__temp1229v(unsigned long 
   *__temp1249v=value;
 }
 
-static inline __attribute__((always_inline)) void print__temp353v(double value) {
+static inline __attribute__((always_inline)) void print__temp355v(double value) {
   const char* endl=0;
-  endl=__temp350v;
+  endl=__temp352v;
   printf("%.6f%s",value,endl);
 }
 
@@ -158,7 +175,7 @@ static inline __attribute__((always_inline)) void main__temp1232v() {
   rand__s2=__temp1234v__s2;
   rand__s3=__temp1234v__s3;
   next__temp1229v(&rand__s0,&rand__s1,&rand__s2,&rand__s3,&__temp1235v__);
-  print__temp353v(__temp1235v__);
+  print__temp355v(__temp1235v__);
 }
 
 int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1232v();return 0;}

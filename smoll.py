@@ -19,6 +19,7 @@
 # nuitka --standalone --onefile --lto=yes --output-filename=smoll --python-flag=no_asserts --python-flag=no_site --python-flag=static_hashes smoll.py
 
 
+import time as time
 import asyncio
 import os
 import sys
@@ -40,7 +41,7 @@ GREEN = "\033[32m"
 YELLOW= "\033[33m"
 PURPLE= "\033[35m"
 RESET = "\033[0m"
-symbols = "=\\/+-*@<>!%&#!(){}[]:.',;|"
+symbols = "=\\/+-*@<>!%&#!(){}[]:.',;|^"
 END_TOKEN = "...]" # impossible for something else to be tokenized as this
 START_TOKEN = "[..." # impossible for something else to be tokenized as this
 err_code_table: dict[str,int] = dict()
@@ -335,6 +336,7 @@ class ImplementedType:
         self.has_retrieved_singleton: Optional["Token"] = None
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
         self.doc: list[str] = list()
+        self.VM: str|None = None # an equivalent python implementation for the VM
         self.args: list[str] = list()
         self.rets: list[str] = list()
         self.vars: dict[str, Variable] = dict()
@@ -721,7 +723,10 @@ class ImplementedType:
                 if len(k)>=2 and k.startswith("\"") and k.endswith("\""):
                     return memory.named_alloc_value(k, k[1:-1])
                 try:
-                    int_ret = int(tok.tostring())
+                    s = tok.tostring().rstrip('UuLl')
+                    if s.startswith('0x') or s.startswith('0X'): int_ret = int(s, 16)
+                    elif s.startswith('0') and len(s) > 1: int_ret = int(s, 8)
+                    else: int_ret = int(s, 10)
                     return int_ret
                 except: pass
                 try:
@@ -734,8 +739,13 @@ class ImplementedType:
                 return self.at.error("interpreter", "failed to parse '"+k+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
             elif impl[pos+1].tostring()=="=":
                 varname = impl[pos].tostring()
-                local_vars[varname] = process_expression(impl, pos+2,end)
-            elif impl[pos+1].tostring()[0] in "+-*/<>=!":
+                parsed_value: float|int = process_expression(impl, pos+2,end)
+                if parsed_value is None: 
+                    self.at.error("interpreter", "failed to parse right hand side at '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+                if self.vars[varname].type==FLOAT_TYPE: parsed_value = float(parsed_value)
+                else: parsed_value = int(parsed_value)
+                local_vars[varname] = parsed_value
+            elif impl[pos+1].tostring()[0] in "+-*/<>=!^|&":
                 op = impl[pos+1].tostring()
                 v1 = process_expression(impl,pos,pos)
                 v2 = process_expression(impl,pos+2,pos+2)
@@ -743,6 +753,7 @@ class ImplementedType:
                 if op=="-": return v1-v2
                 if op=="*": return v1*v2
                 if op=="/": 
+                    if v2==0: self.at.error("interpreter", "division by zero in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                     if isinstance(v1,int) and isinstance(v2,int): return v1//v2
                     return v1/v2
                 if op==">": return 1 if v1>v2 else 0
@@ -751,7 +762,12 @@ class ImplementedType:
                 if op=="<=": return 1 if v1<=v2 else 0
                 if op=="==": return 1 if v1==v2 else 0
                 if op=="!=": return 1 if v1!=v2 else 0
-                self.at.error("interpreter", "unknown operator '"+impl[pos+1].tostring()+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+                if op=="^": return v1^v2
+                if op=="|": return v1|v2
+                if op=="&": return v1&v2
+                if op==">>": return (v1 & 0xFFFFFFFFFFFFFFFF) >> v2
+                if op=="<<": return (v1 << v2) & 0xFFFFFFFFFFFFFFFF
+                self.at.error("interpreter", "not implemented operator '"+impl[pos+1].tostring()+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
             elif impl[pos+1].tostring()=="(":
                 expr_pos = pos
                 callee: Optional["ImplementedType"] = None
@@ -989,12 +1005,19 @@ class ImplementedType:
                     prev_pos = pos+1
                 pos += 1
 
-        ret = process_block(self.implementation, 0, len(self.implementation)-1)
-        if ret=="return" or not ret:
-            values = _arg_values
-            for pos in range(len(values)):
-                if self.vars[args[pos]].type==FLOAT_TYPE: values[pos] = local_vars.get(args[pos], 0.0)
-                else: values[pos] = local_vars.get(args[pos], 0)
+        if self.VM is not None: 
+            evaluated = eval(self.VM[1:-1])
+            assert isinstance(evaluated, list)
+            assert len(evaluated)==len(args)-input_args
+            values[input_args:] = evaluated
+            ret = None
+        else: 
+            ret = process_block(self.implementation, 0, len(self.implementation)-1)
+            if ret=="return" or not ret:
+                values = _arg_values
+                for pos in range(len(values)):
+                    if self.vars[args[pos]].type==FLOAT_TYPE: values[pos] = local_vars.get(args[pos], 0.0)
+                    else: values[pos] = local_vars.get(args[pos], 0)
         self.can_try_interpreter = True
         return local_vars.get("__temp_errcode", 0)
             
@@ -2321,13 +2344,18 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         next_token = get(tokens, pos+1)
         if not next_token.is_string(): next_token.error("type", "expecting 'cstr' documentation")
         pos += 1
-        #tmp = create_temp()
-        #variable = Variable(tmp, CSTR_TYPE)
-        #impl.vars[tmp] = variable
         if is_lsp and next_token.file.is_main_file: print_lsp_string(next_token)
-        #impl.implementation.extend([variable, CODEWORD_EQUALS, CodeWord(next_token.text), CODEWORD_SEMICOLON])
         impl.doc.append(next_token.text)
-        return pos+1,[] #process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
+        return pos+1,[]
+    if current=="VM":
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**virtual machine equivalent**\n\nProvides a Python implementation that the virtual machine should evaluate to obtain return values.")
+        next_token = get(tokens, pos+1)
+        if not next_token.is_string(): next_token.error("type", "expecting 'cstr' virtual machine instruction")
+        if impl.VM is not None: next_token.error("type", "VM implementation has already been provided")
+        pos += 1
+        if is_lsp and next_token.file.is_main_file: print_lsp_string(next_token)
+        impl.VM = next_token.text
+        return pos+1,[]
     if current=="mut":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable. This means that variables, fields and pointer contents may modified. This creates an error if mutable treatment is unsafe.")
         prev_pos = pos

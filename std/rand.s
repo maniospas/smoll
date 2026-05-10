@@ -51,7 +51,7 @@ def splitmix64()
     doc "current time is provided. That can only be the start of a sequence, and "
     doc "marked as a leaking resource to prevent time-based randomization (which is "
     doc "not random)."
-    {builtins::compiler::ptr ts = (struct timespec *)alloca(sizeof(struct timespec));}
+    {builtins::compiler::ptr ts = alloca(sizeof(struct timespec));}
     {clock_gettime(CLOCK_REALTIME, (struct timespec*)ts);}
     {builtins::nat seed = (unsigned long long)((struct timespec*)ts)->tv_sec * (unsigned long long)1000000000 + ((struct timespec*)ts)->tv_nsec;}
     return seed

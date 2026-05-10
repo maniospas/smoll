@@ -2,6 +2,8 @@
 #include "std/extern/win.h"
 #include "std/extern/mac.h"
 #include "std/extern/extern.h"
+int __temp_argc;
+char** __temp_argv;
 const char* const __temp350v="\n";
 static const char* __temp_all_errcodes[28] = {"noerr",
 "error",
@@ -51,17 +53,17 @@ static inline __attribute__((always_inline)) void is_different__temp85v(unsigned
   *__temp1221v=__temp87v__;
 }
 
-static inline __attribute__((always_inline)) void le__temp230v(unsigned long long x, unsigned long long y, int* __temp1222v) {
+static inline __attribute__((always_inline)) void le__temp230v(unsigned long long x, unsigned long long y, char* __temp1222v) {
   int __temp231v__=0;
-  int z=0;
+  char z=0;
   is_different__temp85v(x,y,&__temp231v__);
   z=x<=y;
   *__temp1222v=z;
 }
 
-static inline __attribute__((always_inline)) void lt__temp182v(unsigned long long x, unsigned long long y, int* __temp1223v) {
+static inline __attribute__((always_inline)) void lt__temp182v(unsigned long long x, unsigned long long y, char* __temp1223v) {
   int __temp183v__=0;
-  int z=0;
+  char z=0;
   is_different__temp85v(x,y,&__temp183v__);
   z=x<y;
   *__temp1223v=z;
@@ -69,7 +71,7 @@ static inline __attribute__((always_inline)) void lt__temp182v(unsigned long lon
 
 static inline __attribute__((always_inline)) int sub__temp330v(unsigned long long x, unsigned long long y, unsigned long long* __temp1224v) {
   int __temp331v__=0;
-  int __temp334v__=0;
+  char __temp334v__=0;
   unsigned long long z=0;
   int __temp_errcode=0;
   int __temp_complain=0;
@@ -102,7 +104,7 @@ static inline __attribute__((always_inline)) void add__temp110v(unsigned long lo
 
 int fib__temp1198v(unsigned long long n, unsigned long long* __temp1227v) {
   unsigned long long __temp1209v=0;
-  int __temp1210v__=0;
+  char __temp1210v__=0;
   unsigned long long __temp1211v=0;
   unsigned long long __temp1212v=0;
   unsigned long long __temp1213v__=0;
@@ -154,4 +156,4 @@ static inline __attribute__((always_inline)) void main__temp1204v() {
   print__temp361v(__temp1206v__);
 }
 
-int main() {main__temp1204v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1204v();return 0;}

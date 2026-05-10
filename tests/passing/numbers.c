@@ -2,6 +2,8 @@
 #include "std/extern/win.h"
 #include "std/extern/mac.h"
 #include "std/extern/extern.h"
+int __temp_argc;
+char** __temp_argv;
 const char* const __temp350v="\n";
 static const char* __temp_all_errcodes[28] = {"noerr",
 "error",
@@ -103,4 +105,4 @@ static inline __attribute__((always_inline)) void main__temp1198v() {
   print__temp353v(__temp1207v__);
 }
 
-int main() {main__temp1198v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1198v();return 0;}

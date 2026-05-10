@@ -50,7 +50,7 @@ def str(cstr c)
     doc "Subsequent comparisons no longer use the underlying pointer value."
     buf = const char[]  # const because we do not allow resizing operations
     {buf__unsafe_ptr = c;}
-    {builtins::nat length = c?strlen(c):0;}
+    {if(c){builtins::nat length = strlen(c);}} # length initializes to zero
     {buf__unsafe_size = length+1;}  # account for null termination
     return str(buf,0,length)
 
@@ -164,7 +164,7 @@ def copy(char[] buf, mut nat pos, str|cstr _other)
     next_pos = pos+len other
     if next_pos>len buf
         fail "string buffer out of memory"
-    {memcpy(buf__unsafe_ptr+pos, ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length);}
+    {memcpy(buf__unsafe_ptr+pos, other__buf__unsafe_ptr+other__dat__pos, other__dat__length);}
     prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)

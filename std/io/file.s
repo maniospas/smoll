@@ -20,7 +20,7 @@ local import "std/unsafe.s" as unsafe
 def read(str|cstr _path)
     path = unsafe_temporary_cstr _path
     doc "loads a cstr path as a readable file"
-    {builtins::compiler::ptr unsafe_ptr = fopen(path, "r");}
+    {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "r");}
     defer
         {if(unsafe_ptr) fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}
     if not exists unsafe_ptr fail "failed to open file"
@@ -29,7 +29,7 @@ def read(str|cstr _path)
 def write(str|cstr _path)
     path = unsafe_temporary_cstr _path
     doc "creates a new file at cstr path as a writable object, fails if it already exists"
-    {builtins::compiler::ptr unsafe_ptr = fopen(path, "wx+");}
+    {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "wx+");}
     defer
         {if(unsafe_ptr) fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}
     if not exists unsafe_ptr fail "failed to create file"

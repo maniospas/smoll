@@ -2,6 +2,8 @@
 #include "std/extern/win.h"
 #include "std/extern/mac.h"
 #include "std/extern/extern.h"
+int __temp_argc;
+char** __temp_argv;
 const char* const __temp350v="\n";
 const char* const __temp414v="hello world";
 static const char* __temp_all_errcodes[6] = {"noerr",
@@ -44,9 +46,9 @@ static inline __attribute__((always_inline)) void mul__temp134v(unsigned long lo
   *__temp430v=z;
 }
 
-static inline __attribute__((always_inline)) void lt__temp182v(unsigned long long x, unsigned long long y, int* __temp431v) {
+static inline __attribute__((always_inline)) void lt__temp182v(unsigned long long x, unsigned long long y, char* __temp431v) {
   int __temp183v__=0;
-  int z=0;
+  char z=0;
   is_different__temp85v(x,y,&__temp183v__);
   z=x<y;
   *__temp431v=z;
@@ -54,7 +56,7 @@ static inline __attribute__((always_inline)) void lt__temp182v(unsigned long lon
 
 static inline __attribute__((always_inline)) int sub__temp330v(unsigned long long x, unsigned long long y, unsigned long long* __temp432v) {
   int __temp331v__=0;
-  int __temp334v__=0;
+  char __temp334v__=0;
   unsigned long long z=0;
   int __temp_errcode=0;
   int __temp_complain=0;
@@ -86,13 +88,13 @@ static inline __attribute__((always_inline)) void cstr__temp410v(long long int v
 }
 
 static inline __attribute__((always_inline)) void main__temp413v() {
-  int __temp416v=0;
+  char __temp416v=0;
   unsigned long long __temp417v=0;
   unsigned long long __temp418v=0;
   unsigned long long __temp419v__=0;
   unsigned long long __temp420v=0;
   unsigned long long __temp421v__=0;
-  int __temp423v=0;
+  char __temp423v=0;
   long long int __temp424v=0;
   const char* __temp425v__=0;
   int __temp_complain=0;
@@ -113,4 +115,4 @@ static inline __attribute__((always_inline)) void main__temp413v() {
   __temp423v=__temp423v==0;
 }
 
-int main() {main__temp413v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp413v();return 0;}

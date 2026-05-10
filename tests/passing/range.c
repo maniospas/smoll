@@ -2,6 +2,8 @@
 #include "std/extern/win.h"
 #include "std/extern/mac.h"
 #include "std/extern/extern.h"
+int __temp_argc;
+char** __temp_argv;
 const char* const __temp350v="\n";
 static const char* __temp_all_errcodes[28] = {"noerr",
 "error",
@@ -64,9 +66,9 @@ static inline __attribute__((always_inline)) void is_different__temp85v(unsigned
   *__temp1212v=__temp87v__;
 }
 
-static inline __attribute__((always_inline)) void ge__temp254v(unsigned long long x, unsigned long long y, int* __temp1213v) {
+static inline __attribute__((always_inline)) void ge__temp254v(unsigned long long x, unsigned long long y, char* __temp1213v) {
   int __temp255v__=0;
-  int z=0;
+  char z=0;
   is_different__temp85v(x,y,&__temp255v__);
   z=x>=y;
   *__temp1213v=z;
@@ -82,7 +84,7 @@ static inline __attribute__((always_inline)) void add__temp110v(unsigned long lo
 
 static inline __attribute__((always_inline)) int next__temp406v(unsigned long long* __temp1215v, unsigned long long r__to, unsigned long long* __temp1216v) {
   unsigned long long r__from=*__temp1215v;
-  int __temp407v__=0;
+  char __temp407v__=0;
   unsigned long long ret=0;
   unsigned long long __temp408v=0;
   unsigned long long __temp409v__=0;
@@ -116,7 +118,7 @@ static inline __attribute__((always_inline)) void main__temp1198v() {
   unsigned long long __temp1200v__to=0;
   unsigned long long r__from=0;
   unsigned long long r__to=0;
-  int __temp1201v=0;
+  char __temp1201v=0;
   unsigned long long __temp1202v__=0;
   unsigned long long __temp1203v=0;
   unsigned long long value=0;
@@ -142,4 +144,4 @@ static inline __attribute__((always_inline)) void main__temp1198v() {
   print__temp361v(value);
 }
 
-int main() {main__temp1198v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1198v();return 0;}

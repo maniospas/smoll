@@ -2,6 +2,8 @@
 #include "std/extern/win.h"
 #include "std/extern/mac.h"
 #include "std/extern/extern.h"
+int __temp_argc;
+char** __temp_argv;
 const char* const __temp350v="\n";
 static const char* __temp_all_errcodes[28] = {"noerr",
 "error",
@@ -34,9 +36,9 @@ static const char* __temp_all_errcodes[28] = {"noerr",
 };
 
 static inline __attribute__((always_inline)) void splitmix64__temp1200v(unsigned long long* __temp1237v) {
-  void* ts=0;
+  char* ts=0;
   unsigned long long seed=0;
-  ts=(struct timespec*)alloca(sizeof(struct timespec));
+  ts=alloca(sizeof(struct timespec));
   clock_gettime(CLOCK_REALTIME,(struct timespec*)ts);
   seed=(unsigned long long)((struct timespec*)ts)->tv_sec*(unsigned long long)1000000000+((struct timespec*)ts)->tv_nsec;
   *__temp1237v=seed;
@@ -159,4 +161,4 @@ static inline __attribute__((always_inline)) void main__temp1232v() {
   print__temp353v(__temp1235v__);
 }
 
-int main() {main__temp1232v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1232v();return 0;}

@@ -94,6 +94,11 @@ class MemoryEmulator:
         except ValueError: end = len(self.contents)
         self.contents[addr:(addr+end-addr2)] = self.contents[addr2:end]
 
+    def strlen(self, addr: int):
+        try: end = self.contents.index(0, addr)
+        except ValueError: end = len(self.contents)
+        return end-addr
+
     def memcpy(self, addr: int, addr2: int, size: int):
         self.contents[addr:(addr+size)] = self.contents[addr2:(addr2+size)]
 
@@ -527,7 +532,7 @@ class ImplementedType:
         return ret
 
     def signature(self):
-        if self.is_buffer_of: return "buffer of "+self.is_buffer_of.signature()
+        if self.is_buffer_of: return "buffer of "+signature_like([self.is_buffer_of.vars[arg] for arg in self.is_buffer_of.rets], self.is_buffer_of)
         args = signature_like([self.vars[arg] for arg in self.args], impl=self)
         rets = signature_like([self.vars[arg] for arg in self.rets], impl=self)
         return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"
@@ -748,13 +753,14 @@ class ImplementedType:
                 if op=="!=": return 1 if v1!=v2 else 0
                 self.at.error("interpreter", "unknown operator '"+impl[pos+1].tostring()+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
             elif impl[pos+1].tostring()=="(":
+                expr_pos = pos
                 callee: Optional["ImplementedType"] = None
                 candidate_name = impl[pos].tostring()
                 for candidate in self.dependent_implementations:
                     if candidate.monomorphic_name==candidate_name:
                         callee = candidate
                         break
-                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy"]:
+                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy", "strlen"]:
                     self.at.error("interpreter", "failed to interpret C function '"+candidate_name+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                 gathered_args: list[str] = list()
                 gathered_args_by_pointer: list[bool] = list()
@@ -778,50 +784,63 @@ class ImplementedType:
                     elif tok.tostring() == "&":
                         by_pointer = True
                         prev_pos = pos+1
-                    elif tok.tostring()[0] in "([+-*/":
-                        self.at.error("interpreter", "the C interpreter does not allow complicated function arguments'"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+                    elif tok.tostring()[0] in "([":
+                        self.at.error("interpreter", "the C interpreter does not allow complicated function arguments '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                     else:
                         #assert not last_arg_name
                         last_arg_name = tok.tostring()
                     pos += 1
-                assert pos==end
+                if pos!=end: self.at.error("malformed smollC", "call parenthesis closed prematurely for '"+candidate_name+"' at"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                 if candidate_name == "malloc":
-                    assert len(values)==1
-                    assert isinstance(values[0],int)
+                    if len(values)!=1: self.at.error("malformed smollC", "'malloc' requires one argument")
+                    if not isinstance(values[0],int): self.at.error("malformed smollC", "'malloc' requires an integer argument")
                     return memory.alloc(values[0])
+                
+                if candidate_name == "strlen":
+                    if len(values)!=1: self.at.error("malformed smollC", "'strlen' requires one argument")
+                    if not isinstance(values[0],int): self.at.error("malformed smollC", "'strlen' requires an integer argument")
+                    return memory.strlen(values[0])
 
                 if candidate_name == "memcpy":
-                    assert len(values)==3
-                    assert isinstance(values[0],int)
-                    assert isinstance(values[1],int)
-                    assert isinstance(values[2],int)
+                    if len(values)!=3: self.at.error("malformed smollC", "'memcpy' requires three arguments")
+                    if not isinstance(values[2], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                     if gathered_args_by_pointer[0]:
-                        assert not gathered_args_by_pointer[1]
+                        if gathered_args_by_pointer[1]: self.at.arror("malformed smollC", "Cannot use memcpy to copy variables.")
+                        if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         if values[1]==0: 
-                            self.at.error("interpreter", "null pointer dereference at 'memcpy( "+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
-                        assert values[2]==8#, str(values)+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'"
-                        if self.vars[gathered_args[0]].type==FLOAT_TYPE: 
+                            self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
+                        if values[2]==1 and (self.vars[gathered_args[0]].type==CHAR_TYPE or self.vars[gathered_args[0]].type==BOOL_TYPE):
+                            local_vars[gathered_args[0]] = int(memory.contents[values[1]])
+                        elif values[2]!=8:
+                            self.at.error("interpreter", "expecting 1 or 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                        elif self.vars[gathered_args[0]].type==FLOAT_TYPE: 
                             local_vars[gathered_args[0]] = memory.read_float64(values[1])
                         else:
                             local_vars[gathered_args[0]] = memory.read_int64(values[1])
                         return None
                     if gathered_args_by_pointer[1]:
+                        if not isinstance(values[0], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         if values[0]==0: 
-                            self.at.error("interpreter", "null pointer dereference at 'memcpy( "+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
-                        assert values[2]==8#, str(values)+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'"
+                            self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
+                        if values[2]==1 and (self.vars[gathered_args[1]].type==CHAR_TYPE or self.vars[gathered_args[1]].type==BOOL_TYPE):
+                            memory.contents[value[0]] = byte(value[1])
+                        elif values[2]!=8:
+                            self.at.error("interpreter", "expecting 1 or 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         if self.vars[gathered_args[1]].type==FLOAT_TYPE: 
                             memory.write_float64(values[0], values[1])
                         else:
                             memory.write_int64(values[0], values[1])
                         return None
+                    if not isinstance(values[0], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                    if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                     memory.memcpy(values[0], values[1], values[2])
                     return None
 
                 if candidate_name == "ptr_memzero":
-                    assert len(values)==3
-                    assert isinstance(values[0],int)
-                    assert isinstance(values[1],int)
-                    assert isinstance(values[2],int)
+                    if len(values)!=3: self.at.error("malformed smollC", "'ptr_memzero' requires three arguments")
+                    if not isinstance(values[0], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
+                    if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
+                    if not isinstance(values[2], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
                     return memory.memset(values[0]+values[1], 0, values[2]-values[1])
 
                 if candidate_name == "printf":
@@ -887,24 +906,57 @@ class ImplementedType:
             # returns breaking variable or continue or break
             prev_pos: int = pos
             while pos<=npos:
-                if pos==prev_pos and impl[pos].tostring()=="if":
-                    assert impl[pos+1].tostring()=="("
+                if pos==prev_pos and impl[pos].tostring()=="break": return "break"
+                if pos==prev_pos and impl[pos].tostring()=="continue": return "continue"
+                if pos==prev_pos and impl[pos].tostring()=="while":
+                    if impl[pos+1].tostring()!="(": self.at.error("malformed smollC", "Expecting parenthesis after 'while'")
                     depth = 1
                     endpos = pos+1
                     while depth:
                         endpos += 1
-                        assert endpos<npos
+                        if endpos>npos: self.at.error("malformed smollC", "Unclosed if condition.")
+                        if impl[endpos].tostring()=="(": depth += 1
+                        if impl[endpos].tostring()==")": depth -= 1
+                        cond_start = pos+2
+                        cond_end = endpos-1
+                    pos = endpos+1
+                    if pos>npos: self.at.error("malformed smollC", "Missing 'while' code body.")
+                    if impl[pos].tostring()!="{": self.at.error("malformed smollC", "The use of brackets is mandatory in conditions.")
+                    depth = 1
+                    endpos = pos
+                    while depth:
+                        endpos += 1
+                        if endpos>npos: self.at.error("malformed smollC", "Unclosed code block.")
+                        if impl[endpos].tostring()=="{": depth += 1
+                        if impl[endpos].tostring()=="}": depth -= 1
+                    while True:
+                        condition = process_expression(impl, cond_start, cond_end)
+                        if not condition: break
+                        ret = process_block(impl, pos+1, endpos-1)
+                        if ret=="break": break
+                        if ret=="return" or ret=="failure": return
+                    pos = endpos+1
+                    prev_pos = pos
+                    continue
+                if pos==prev_pos and impl[pos].tostring()=="if":
+                    if impl[pos+1].tostring()!="(": self.at.error("malformed smollC", "Expecting parenthesis after 'if'")
+                    depth = 1
+                    endpos = pos+1
+                    while depth:
+                        endpos += 1
+                        if endpos>npos: self.at.error("malformed smollC", "Unclosed if condition.")
                         if impl[endpos].tostring()=="(": depth += 1
                         if impl[endpos].tostring()==")": depth -= 1
                     condition = process_expression(impl, pos+2, endpos-1)
                     assert condition is not None
                     pos = endpos+1
-                    assert impl[pos].tostring()=="{"
+                    if pos>npos: self.at.error("malformed smollC", "Missing 'if' code body.")
+                    if impl[pos].tostring()!="{": self.at.error("malformed smollC", "The use of brackets is mandatory in conditions.")
                     depth = 1
                     endpos = pos
                     while depth:
                         endpos += 1
-                        assert endpos<=npos
+                        if endpos>npos: self.at.error("malformed smollC", "Unclosed code block.")
                         if impl[endpos].tostring()=="{": depth += 1
                         if impl[endpos].tostring()=="}": depth -= 1
                     if condition:
@@ -912,13 +964,14 @@ class ImplementedType:
                         if ret: return ret
                     pos = endpos+1
                     if endpos<npos and impl[pos].tostring()=="else":
+                        if pos>npos: self.at.error("malformed smollC", "Missing 'else' code body.")
                         pos += 1
                         assert impl[pos].tostring()=="{"
                         depth = 1
                         endpos = pos
                         while depth:
                             endpos += 1
-                            assert endpos<=npos
+                            if endpos>npos: self.at.error("malformed smollC", "Unclosed code block.")
                             if impl[endpos].tostring()=="{": depth += 1
                             if impl[endpos].tostring()=="}": depth -= 1
                         if not condition:
@@ -2631,7 +2684,10 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             impl.nesting.append("while")
             if_pos = pos-1
             impl.implementation.extend([
-                CodeWord("while(1)"),
+                CodeWord("while"),
+                CODEWORD_LPAR,
+                CodeWord("1"),
+                CODEWORD_RPAR,
                 CODEWORD_LBRACKET,
             ])
             pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
@@ -2658,7 +2714,9 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                     CodeWord("!"),
                     ret[0],
                     CODEWORD_RPAR,
+                    CODEWORD_LBRACKET,
                     CodeWord("break"),
+                    CODEWORD_RBRACKET,
                     CODEWORD_SEMICOLON,
                 ])
                 if peek_text(tokens, pos)==START_TOKEN: pos = process_body(file, tokens, pos, impl)
@@ -3290,7 +3348,7 @@ POINTER_TYPE = ImplementedType("ptr", "char*", memory_size=8)
 POINTER_TYPE.vars[POINTER_TYPE.rets[0]].immutable = False
 CSTR_TYPE = ImplementedType("cstr", "const char*", memory_size=8)
 CSTR_TYPE.doc.append("constant string")
-BOOL_TYPE = ImplementedType("bool", "int", memory_size=8)
+BOOL_TYPE = ImplementedType("bool", "char", memory_size=1)
 BOOL_TYPE.doc.append("boolean value")
 BOOL_TYPE.doc.append("Can only be `true` or `false`.")
 INT_TYPE = ImplementedType("int", "long long int", memory_size=8)
@@ -3317,8 +3375,9 @@ ANY_TYPE = ImplementedType("any")
 ANY_TYPE.doc.append("any type")
 ANY_TYPE.doc.append("Represents a generic for buffers and pointers for type-independent code that can be matched to a concrete type later.")
 CAUGHT_TYPE = ImplementedType("catch", "long long int", memory_size=8)
-CAUGHT_TYPE.doc.append("the error code intercepted by 'try'")
-CAUGHT_TYPE.doc.append("Includes error codes produced by defers.")
+CAUGHT_TYPE.doc.append("catch the error code intercepted by 'try'")
+CAUGHT_TYPE.doc.append("Also catches the error codes produced by defers triggered by 'del'.")
+CAUGHT_TYPE.doc.append("Fails if there is no error code, otherwise returns and cleans the last error code.")
 # FAIL_TYPE.vars["message"] = CSTR_TYPE
 # FAIL_TYPE.args.append("message") 
 SAME_CONTENTS_TYPE = ImplementedType("attach_type")

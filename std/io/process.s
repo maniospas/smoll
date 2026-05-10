@@ -19,7 +19,7 @@ def args()
 def read(str|cstr _cmd)
     doc "create a readable system process"
     cmd = unsafe_temporary_cstr _cmd
-    {builtins::compiler::ptr unsafe_ptr = popen((const char*)cmd, "r");}
+    {builtins::compiler::ptr unsafe_ptr = (void*)popen((const char*)cmd, "r");}
     if not exists unsafe_ptr fail "failed to start process"
     defer
         if exists unsafe_ptr

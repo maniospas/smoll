@@ -710,7 +710,8 @@ class ImplementedType:
             raise FastReturnException
     
     def interpret(self, values: list[int|float], memory: MemoryEmulator) -> list:
-        if not self.can_try_interpreter: self.at.error("interpreter", "'"+self.name+"' is not interpretable")
+        #if not self.can_try_interpreter: self.at.error("interpreter", "'"+self.name+"' is not interpretable")
+        
         # memory is basically a list of chars
         args = [k for k in self.args if self.vars[k].type.builtin]+[k for k in self.rets if self.vars[k].type.builtin]
         input_args = len([k for k in self.args if self.vars[k].type.builtin])

@@ -29,7 +29,8 @@ the compiler stops you from doing unsafe stuff.
 
 ## 🔗 Material
 
-[Reference guide](https://maniospas.github.io/smoll/)
+[Reference guide](https://maniospas.github.io/smoll/)<br>
+[Web playground](https://maniospas.github.io/smoll/smoll_ide.html)
 
 *Use the smoll lsp, or Python keyword and comment highlighting works pretty well.*
 

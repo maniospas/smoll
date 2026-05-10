@@ -81,6 +81,7 @@ html,body{height:100%;background:#1e1e1e;overflow:hidden}
 
   <!-- titlebar -->
   <div id="titlebar">
+    <a href="https://github.com/maniospas/smoll" target="_blank" style="color:#888;font-size:12px;text-decoration:none;letter-spacing:.5px;font-family:inherit;margin-right:8px;font-size:1rem" onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#888'">github.com/maniospas/smoll</a>
     <div id="toolbar">
       <div id="py-status"><div class="sdot loading" id="sdot"></div><span id="stxt">Loading…</span></div>
       <button class="tbtn" id="btn-run" disabled>
@@ -182,7 +183,7 @@ let pyodide = null, smollSource = null, pyodideReady = false;
 let running = false;
 
 // ── default program ──
-editor.value = 'repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"\nimport "std/core.s"\n\ndef main()\n    print "Hello world!"\n';
+editor.value = 'repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"\nimport "std/core.s"\n\ndef main()\n\tprint "Hello world!"\n';
 updateLnums();
 
 // ── editor helpers ──
@@ -269,9 +270,13 @@ function filterTraceback(lines){
     const s=line.replace(/\x1b\[[0-9;]*m/g,'');
     if(s.startsWith('Traceback (most recent call last):')){inTB=true;continue;}
     if(inTB){
-      if(s.startsWith('RuntimeError:')||s.startsWith('_SmollExit')||s.startsWith('smoll exited')){inTB=false;}
+      // end of traceback block — swallow exit lines, stop filtering on others
+      if(s.startsWith('SystemExit')||s.startsWith('_SmollExit')||s.startsWith('smoll exited')){inTB=false;continue;}
+      if(s.startsWith('RuntimeError: smoll exited')){inTB=false;continue;}
       continue;
     }
+    // also suppress stray exit lines that appear without a traceback header
+    if(s.startsWith('SystemExit')||s.startsWith('_SmollExit')||s.startsWith('smoll exited with code 0'))continue;
     result.push(line);
   }
   return result;
@@ -436,7 +441,7 @@ except SystemExit as e:
     if(ok)cCode=pyodide.FS.readFile('/program.c',{encoding:'utf8'});
   }catch(err){
     const msg=err.message||String(err);
-    if(!msg.includes('SystemExit: 0'))captured.push(msg);
+    if(!isExitError(msg))captured.push(msg);
   }
 
   const elapsed=((performance.now()-t0)/1000).toFixed(3);
@@ -454,16 +459,19 @@ except SystemExit as e:
   }
 }
 
+function isExitError(msg){
+  return msg.includes('SystemExit: 0') || msg.includes('SystemExit: None') ||
+         msg.includes('_SmollExit') || msg.includes('smoll exited with code 0');
+}
+
 // ── RUN (VM) ──
-// We install JS-side print/input callbacks into the Python globals so smoll's
-// VM backend can call them directly during execution.
 async function runVM(){
   if(!pyodideReady||!smollSource||running)return;
   preRun();
   const t0=performance.now();
-  const captured=[];
+  const stderrBuf=[];
   pyodide.setStdout({batched:s=>{s.split('\n').forEach(l=>clog(l));}});
-  pyodide.setStderr({batched:s=>{s.split('\n').forEach(l=>clog(l,'#f44747'));}});
+  pyodide.setStderr({batched:s=>stderrBuf.push(s)});
 
   // Expose JS callbacks to Python
   pyodide.globals.set('_js_print', (msg)=>{ clog(String(msg)); });
@@ -528,9 +536,13 @@ finally:
 `);
   }catch(err){
     const msg=err.message||String(err);
-    if(!msg.includes('SystemExit: 0')&&!msg.includes('SmollExit'))
-      clog('Error: '+msg,'#f44747');
+    if(!isExitError(msg)) stderrBuf.push(msg);
   }
+
+  // flush stderr through traceback filter
+  const errLines=[];
+  for(const s of stderrBuf)s.split('\n').forEach(l=>errLines.push(l));
+  filterTraceback(errLines).forEach(line=>{if(line.trim()||line==='')clog(line,'#f44747');});
 
   const elapsed=((performance.now()-t0)/1000).toFixed(3);
   postRun(elapsed);

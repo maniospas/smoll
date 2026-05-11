@@ -34,7 +34,7 @@ static inline __attribute__((always_inline)) void not__temp27v(int __temp_anon0,
   *__temp428v=__temp28v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp85v(unsigned long long x, unsigned long long y, int* __temp429v) {
+static inline __attribute__((always_inline)) void is_different__temp85v(uint64_t x, uint64_t y, int* __temp429v) {
   int __temp86v=0;
   int __temp87v__=0;
   not__temp27v(__temp86v,&__temp87v__);
@@ -43,9 +43,9 @@ static inline __attribute__((always_inline)) void is_different__temp85v(unsigned
   *__temp429v=__temp87v__;
 }
 
-static inline __attribute__((always_inline)) void mul__temp134v(unsigned long long x, unsigned long long y, unsigned long long* __temp430v) {
+static inline __attribute__((always_inline)) void mul__temp134v(uint64_t x, uint64_t y, uint64_t* __temp430v) {
   int __temp135v__=0;
-  unsigned long long z=0;
+  uint64_t z=0;
   is_different__temp85v(x,y,&__temp135v__);
   z=x*y;
   goto __temp_return;
@@ -53,9 +53,9 @@ static inline __attribute__((always_inline)) void mul__temp134v(unsigned long lo
   *__temp430v=z;
 }
 
-static inline __attribute__((always_inline)) void lt__temp182v(unsigned long long x, unsigned long long y, char* __temp431v) {
+static inline __attribute__((always_inline)) void lt__temp182v(uint64_t x, uint64_t y, uint8_t* __temp431v) {
   int __temp183v__=0;
-  char z=0;
+  uint8_t z=0;
   is_different__temp85v(x,y,&__temp183v__);
   z=x<y;
   goto __temp_return;
@@ -63,12 +63,12 @@ static inline __attribute__((always_inline)) void lt__temp182v(unsigned long lon
   *__temp431v=z;
 }
 
-static inline __attribute__((always_inline)) int sub__temp330v(unsigned long long x, unsigned long long y, unsigned long long* __temp432v) {
+static inline __attribute__((always_inline)) int sub__temp330v(uint64_t x, uint64_t y, uint64_t* __temp432v) {
   int __temp331v__=0;
   int __temp332v=0;
   int __temp333v=0;
-  char __temp334v__=0;
-  unsigned long long z=0;
+  uint8_t __temp334v__=0;
+  uint64_t z=0;
   int __temp_errcode=0;
   int __temp_complain=0;
   is_different__temp85v(x,y,&__temp331v__);
@@ -86,14 +86,14 @@ static inline __attribute__((always_inline)) int sub__temp330v(unsigned long lon
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) void print__temp361v(unsigned long long value) {
+static inline __attribute__((always_inline)) void print__temp361v(uint64_t value) {
   int __temp362v=0;
   const char* endl=0;
   endl=__temp350v;
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void cstr__temp410v(long long int value, const char** __temp433v) {
+static inline __attribute__((always_inline)) void cstr__temp410v(int64_t value, const char** __temp433v) {
   int __temp411v=0;
   const char* endl=0;
   const char* ret=0;
@@ -105,14 +105,14 @@ static inline __attribute__((always_inline)) void cstr__temp410v(long long int v
 }
 
 static inline __attribute__((always_inline)) void main__temp413v() {
-  char __temp416v=0;
-  unsigned long long __temp417v=0;
-  unsigned long long __temp418v=0;
-  unsigned long long __temp419v__=0;
-  unsigned long long __temp420v=0;
-  unsigned long long __temp421v__=0;
-  char __temp423v=0;
-  long long int __temp424v=0;
+  uint8_t __temp416v=0;
+  uint64_t __temp417v=0;
+  uint64_t __temp418v=0;
+  uint64_t __temp419v__=0;
+  uint64_t __temp420v=0;
+  uint64_t __temp421v__=0;
+  uint8_t __temp423v=0;
+  int64_t __temp424v=0;
   const char* __temp425v__=0;
   int __temp_complain=0;
   print__temp348v(__temp414v);

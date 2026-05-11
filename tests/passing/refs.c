@@ -14,7 +14,7 @@ static const char* __temp_all_errcodes[27] = {"noerr",
 "allocation failed",
 "reallocation failed",
 "cannot resize buffers with alloc; it promises no data reallocation",
-"cannot resize an unallocated buffer",
+"cannot resize an unallocated or freed buffer",
 "out of bounds",
 "character copy does not fit on buffer",
 "cannot extend the string's left side outside its right range",
@@ -34,60 +34,60 @@ static const char* __temp_all_errcodes[27] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void false__temp7v(int* __temp1193v) {
+static inline __attribute__((always_inline)) void false__temp7v(int* __temp1188v) {
   int value=0;
-  *__temp1193v=value;
+  *__temp1188v=value;
 }
 
-static inline __attribute__((always_inline)) void not__temp27v(int __temp_anon0, int* __temp1194v) {
+static inline __attribute__((always_inline)) void not__temp27v(int __temp_anon0, int* __temp1189v) {
   int __temp28v__=0;
   false__temp7v(&__temp28v__);
   goto __temp_return;
   __temp_return:
-  *__temp1194v=__temp28v__;
+  *__temp1189v=__temp28v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp85v(unsigned long long x, unsigned long long y, int* __temp1195v) {
+static inline __attribute__((always_inline)) void is_different__temp85v(uint64_t x, uint64_t y, int* __temp1190v) {
   int __temp86v=0;
   int __temp87v__=0;
   not__temp27v(__temp86v,&__temp87v__);
   goto __temp_return;
   __temp_return:
-  *__temp1195v=__temp87v__;
+  *__temp1190v=__temp87v__;
 }
 
-static inline __attribute__((always_inline)) void add__temp110v(unsigned long long x, unsigned long long y, unsigned long long* __temp1196v) {
+static inline __attribute__((always_inline)) void add__temp110v(uint64_t x, uint64_t y, uint64_t* __temp1191v) {
   int __temp111v__=0;
-  unsigned long long z=0;
+  uint64_t z=0;
   is_different__temp85v(x,y,&__temp111v__);
   z=x+y;
   goto __temp_return;
   __temp_return:
-  *__temp1196v=z;
+  *__temp1191v=z;
 }
 
-static inline __attribute__((always_inline)) void print__temp361v(unsigned long long value) {
+static inline __attribute__((always_inline)) void print__temp361v(uint64_t value) {
   int __temp362v=0;
   const char* endl=0;
   endl=__temp350v;
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__temp1187v() {
-  unsigned long long __temp1188v=0;
-  unsigned long long __temp1189v=0;
-  unsigned long long x=0;
-  unsigned long long y=0;
-  unsigned long long z=0;
-  unsigned long long __temp1190v=0;
-  unsigned long long __temp1191v__=0;
-  __temp1188v=1;
-  __temp1189v=__temp1188v;
-  x=__temp1189v;
-  __temp1190v=2;
-  x=__temp1190v;
-  add__temp110v(x,x,&__temp1191v__);
-  print__temp361v(__temp1191v__);
+static inline __attribute__((always_inline)) void main__temp1182v() {
+  uint64_t __temp1183v=0;
+  uint64_t __temp1184v=0;
+  uint64_t x=0;
+  uint64_t y=0;
+  uint64_t z=0;
+  uint64_t __temp1185v=0;
+  uint64_t __temp1186v__=0;
+  __temp1183v=1;
+  __temp1184v=__temp1183v;
+  x=__temp1184v;
+  __temp1185v=2;
+  x=__temp1185v;
+  add__temp110v(x,x,&__temp1186v__);
+  print__temp361v(__temp1186v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1187v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1182v();return 0;}

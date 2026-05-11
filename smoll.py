@@ -137,6 +137,16 @@ class MemoryEmulator:
         except ValueError: end = len(self.contents)
         return self.contents[addr:end].decode('utf-8')
 
+    def write_uint32(self, addr: int, value: int):
+        struct.pack_into('<I', self.contents, addr, value)
+    def read_uint32(self, addr: int) -> int:
+        return struct.unpack_from('<I', self.contents, addr)[0]
+
+    def write_uint16(self, addr: int, value: int):
+        struct.pack_into('<H', self.contents, addr, value)
+    def read_uint16(self, addr: int) -> int:
+        return struct.unpack_from('<H', self.contents, addr)[0]
+
     def write_int64(self, addr: int, value: int):
         struct.pack_into('<q', self.contents, addr, value)
 
@@ -878,7 +888,7 @@ class ImplementedType:
                     if len(values)!=1: self.at.error("malformed smollC", "'free' requires one argument")
                     if not isinstance(values[0],int): self.at.error("malformed smollC", "'free' requires an integer argument")
                     ret = memory.free(values[0])
-                    if ret: self.at.error("interpreter", "'free' tried to free non-allocated (are already freed) memory")
+                    if ret: self.at.error("interpreter", "'free' tried to free non-allocated or already freed memory")
                     return None
 
                 if candidate_name == "realloc":
@@ -900,10 +910,20 @@ class ImplementedType:
                         if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         if values[1]==0: 
                             self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
-                        if values[2]==1 and (self.vars[gathered_args[0]].type==CHAR_TYPE or self.vars[gathered_args[0]].type==BOOL_TYPE):
+                        if values[2]==1:
+                            if self.vars[gathered_args[0]].type not in [UINT8_TYPE, CHAR_TYPE, BOOL_TYPE]:
+                                self.at.error("interpreter", "got 1 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                             local_vars[gathered_args[0]] = int(memory.contents[values[1]])
+                        elif values[2]==2:
+                            if self.vars[gathered_args[0]].type!=UINT16_TYPE:
+                                self.at.error("interpreter", "got 2 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                            local_vars[gathered_args[0]] = memory.read_uint16(values[1])
+                        elif values[2]==4:
+                            if self.vars[gathered_args[0]].type!=UINT32_TYPE:
+                                self.at.error("interpreter", "got 4 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                            local_vars[gathered_args[0]] = memory.read_uint32(values[1])
                         elif values[2]!=8:
-                            self.at.error("interpreter", "expecting 1 or 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                            self.at.error("interpreter", "expecting 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         elif self.vars[gathered_args[0]].type==FLOAT_TYPE: 
                             local_vars[gathered_args[0]] = memory.read_float64(values[1])
                         else:
@@ -913,10 +933,20 @@ class ImplementedType:
                         if not isinstance(values[0], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         if values[0]==0: 
                             self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
-                        if values[2]==1 and (self.vars[gathered_args[1]].type==CHAR_TYPE or self.vars[gathered_args[1]].type==BOOL_TYPE):
+                        if values[2]==1:
+                            if self.vars[gathered_args[1]].type not in [UINT8_TYPE, CHAR_TYPE, BOOL_TYPE]:
+                                self.at.error("interpreter", "got 1 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                             memory.contents[values[0]] = (values[1])
+                        elif values[2]==2:
+                            if self.vars[gathered_args[1]].type!=UINT16_TYPE:
+                                self.at.error("interpreter", "got 4 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                            memory.write_uint16(values[0], values[1])
+                        elif values[2]==4:
+                            if self.vars[gathered_args[1]].type!=UINT32_TYPE:
+                                self.at.error("interpreter", "got 4 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                            memory.write_uint32(values[0], values[1])
                         elif values[2]!=8:
-                            self.at.error("interpreter", "expecting 1 or 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                            self.at.error("interpreter", "expecting 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         elif self.vars[gathered_args[1]].type==FLOAT_TYPE: 
                             memory.write_float64(values[0], values[1])
                         else:
@@ -2745,8 +2775,12 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                     pos, type = process_type(file_cache["builtins"], tokens, pos)
                     if not isinstance(type, UnionType): get(tokens, pos).error("type", "only builtin types can be unpacked here but found file '"+pretty_name(type.path)+"'")
                     assert isinstance(type, UnionType)
-                    if len(type.variations)!=1: get(tokens, pos).error("type", "more than one types in union '"+pretty_name(type.name)+"'")
-                    if type.variations[0].builtin is None: get(tokens, pos).error("type", "only builtin types can be unpacked here '"+pretty_name(type.name)+"'")
+                    variations = [variation for variation in type.variations if variation.builtin]
+                    if not variations: get(tokens, pos).error("type", "only builtin types can be unpacked here '"+pretty_name(type.name)+"'",suggestions=list(set(t.name for ut in type.at.file.types for t in ut.variations if t.builtin)))
+                    for variation in variations:
+                        if type.variations[0].builtin!=variation.builtin:
+                            get(tokens, pos).error("type", "more than one types in union '"+pretty_name(type.name)+"'",suggestions=[t.signature() for t in variations])
+                    
                     #impl.implementation.append(CodeWord(type.variations[0].builtin))
                     varname = get(tokens, pos).text
                     variable = Variable(varname, type.variations[0])
@@ -3538,16 +3572,25 @@ CSTR_TYPE.doc.append("constant string")
 BOOL_TYPE = ImplementedType("bool", "char", memory_size=1)
 BOOL_TYPE.doc.append("boolean value")
 BOOL_TYPE.doc.append("Can only be `true` or `false`.")
-INT_TYPE = ImplementedType("int", "long long int", memory_size=8)
+INT_TYPE = ImplementedType("int", "int64_t", memory_size=8)
 INT_TYPE.doc.append("a signed integer value")
 INT_TYPE.doc.append("Represents values in the range `2^-63 to 2^63-1`.")
 FLOAT_TYPE = ImplementedType("float", "double", memory_size=8)
-UINT_TYPE = ImplementedType("nat", "unsigned long long", memory_size=8)
+UINT_TYPE = ImplementedType("nat", "uint64_t", memory_size=8)
 UINT_TYPE.doc.append("an unsigned integer value")
-UINT_TYPE.doc.append("Represents values in the range `0 to 2^65-1`.")
+UINT_TYPE.doc.append("Represents values in the range `0 to 2^64-1`.")
+UINT32_TYPE = ImplementedType("nat32", "uint32_t", memory_size=4)
+UINT32_TYPE.doc.append("a 32-bit unsigned integer value")
+UINT32_TYPE.doc.append("Represents values in the range `0 to 2^32-1`.")
+UINT16_TYPE = ImplementedType("nat16", "uint16_t", memory_size=2)
+UINT16_TYPE.doc.append("a 16-bit unsigned integer value")
+UINT16_TYPE.doc.append("Represents values in the range `0 to 2^16-1`.")
+UINT8_TYPE = ImplementedType("nat8", "uint8_t", memory_size=1)
+UINT8_TYPE.doc.append("a 8-bit unsigned integer value")
+UINT8_TYPE.doc.append("Represents values in the range `0 to 255`.")
 CHAR_TYPE = ImplementedType("char", "char", memory_size=1)
 CHAR_TYPE.doc.append("a character")
-CHAR_TYPE.doc.append("Represents characters in the numeric range `-128 to 127`.")
+CHAR_TYPE.doc.append("Represents characters in the numeric range `0 to 255`.")
 FALSE_TYPE = ImplementedType("false", "int")
 FALSE_TYPE._memory_size = 0
 TRUE_TYPE = ImplementedType("true", "int")
@@ -3561,7 +3604,7 @@ SUCCESS_TYPE.doc.append("Branchless code refers loops or conditions that are eli
 ANY_TYPE = ImplementedType("any")
 ANY_TYPE.doc.append("any type")
 ANY_TYPE.doc.append("Represents a generic for buffers and pointers for type-independent code that can be matched to a concrete type later.")
-CAUGHT_TYPE = ImplementedType("catch", "long long int", memory_size=8)
+CAUGHT_TYPE = ImplementedType("catch", "int64_t", memory_size=8)
 CAUGHT_TYPE.doc.append("catch the error code intercepted by 'try'")
 CAUGHT_TYPE.doc.append("Also catches the error codes produced by defers triggered by 'del'.")
 CAUGHT_TYPE.doc.append("Fails if there is no error code, otherwise returns and cleans the last error code.")
@@ -3582,6 +3625,9 @@ builtin_token = Token("builtins", smol_namespace, 1, 1)
 smol_namespace.types["cstr"] = UnionType("cstr", at=builtin_token).append(CSTR_TYPE)
 smol_namespace.types["int"] = UnionType("int", at=builtin_token).append(INT_TYPE)
 smol_namespace.types["nat"] = UnionType("nat", at=builtin_token).append(UINT_TYPE)
+smol_namespace.types["nat32"] = UnionType("nat32", at=builtin_token).append(UINT32_TYPE)
+smol_namespace.types["nat16"] = UnionType("nat16", at=builtin_token).append(UINT16_TYPE)
+smol_namespace.types["nat8"] = UnionType("nat8", at=builtin_token).append(UINT8_TYPE)
 smol_namespace.types["float"] = UnionType("float", at=builtin_token).append(FLOAT_TYPE)
 smol_namespace.types["bool"] = UnionType("bool", at=builtin_token).append(BOOL_TYPE)
 smol_namespace.types["err"] = UnionType("err", at=builtin_token).append(ImplementedType("err", "int"))

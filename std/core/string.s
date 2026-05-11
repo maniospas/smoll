@@ -27,13 +27,13 @@ local def strdat(nat pos, nat length, char first)
     doc "string data without the buffer storage"
     return (pos, length, first)
 
-local def str(const char ptr unsafe_ptr, strdat dat)
+def str(const char ptr unsafe_ptr, strdat dat)
     doc "a string residing on a buffer"
     return class(unsafe_ptr, dat)
 
-local def str(const char ptr unsafe_ptr, nat pos, nat length)
+def str(const char ptr unsafe_ptr, nat pos, nat length)
     doc "a string residing on a buffer"
-    {if(length){builtins::compiler::ptr first_pos = unsafe_ptr+pos;builtins::char first=*first_pos;}} # properly zero-initialized otherwise
+    {if(length){builtins::compiler::ptr first_pos = unsafe_ptr+pos;builtins::char first = *first_pos;}} # properly zero-initialized otherwise
     return str(unsafe_ptr, pos, length, first)
 
 def str(const char[] buf, strdat dat)

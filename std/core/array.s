@@ -38,6 +38,7 @@ def alloc(mut any[] buffer, nat|blank size)
     if size is blank
         size = 1
     defer
+        print "free"
         if buffer.unsafe_size!=0
             buffer.unsafe_size = 0
             buffer.unsafe_ptr.unsafe::free()

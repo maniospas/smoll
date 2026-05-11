@@ -386,7 +386,8 @@ class ImplementedType:
         self._pointer_type_dependencies: dict[str, str] = dict() # only place pointer variables here
         self.invalidated: dict[str, Token] = dict() # invalidated variables and the place where the invalidation occurred
         self.invalidate_types_when_called: list[ImplementedType] = list()
-        self.accumulating_defers: list[dict[str, Token]] = [dict()] # for the top level we defer at the end of file
+        self.invalidate_types_on_defer: list[ImplementedType] = list() # add to invalidate_types_when_called only if there if we keep at least one defer locally
+        self.accumulating_defers: list[dict[str, Token]] = [dict()] # for the top level we defer at the end of code block, but track loop defers here
         self.is_parsing_a_defer = False
         self.is_parsing_a_try: list[Variable|None] = list() # list of variables that hold try results
         self.can_try_interpreter: bool = True
@@ -670,7 +671,7 @@ class ImplementedType:
 
         for v in value: 
             if v.type.invalidated_by==POINTER_TYPE and not v.stabilized_name().endswith("__unsafe_ptr") and v.stabilized_name()!="unsafe_ptr":
-                error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' is a pointer and hence cannot be returned - name it 'unsafe_ptr' to permit this but consider that it may have gone out of scope")
+                error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' is a pointer and hence cannot be returned - name it 'unsafe_ptr' to permit this but consider that the pointed resource may not exist anymore")
             if v.stabilized_name() in self.invalidated:
                 error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' has been invalidated", reason=self.invalidated[v.stabilized_name()])
         
@@ -1320,7 +1321,7 @@ class Token:
 
 def get(tokens: list[Token], pos: int) -> Token:
     if pos>=len(tokens): tokens[len(tokens)-1].error("syntax", "unexpected end of file")
-    if tokens[pos].starts(): tokens[pos].error("syntax", "unexpected indentation")
+    if tokens[pos].starts(): tokens[pos].error("syntax", "unexpected indentation - this line starts deeper than the previous one but this can only be done to mark new code blocks within 'def', 'if', 'else', 'while', or 'defer'")
     return tokens[pos]
 
 
@@ -1499,13 +1500,27 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             #elif not var.immutable: error_token.error("type", "an immutable variable '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
             impl.implementation.extend([CODEWORD_AMP, var, CODEWORD_COMMA])
 
+    if callee.defers and callee.invalidate_types_on_defer:
+        # if the called function has any defers, we know that it's complete and now we can kind of safely tell
+        # whether it should invalidate the defers
+        for p in callee.invalidate_types_on_defer:
+            if p not in callee.invalidate_types_when_called:
+                callee.invalidate_types_when_called.append(p)
+        callee.invalidate_types_on_defer.clear()
+
     for invalid_type in callee.invalidate_types_when_called:
         for varname, val in impl.vars.items():
             if val.type.invalidated_by == invalid_type and not varname.endswith("__unsafe_ptr"):
                 impl.invalidated[val.stabilized_name()] = error_token
-    for p in callee.invalidate_types_when_called:
-        if p not in impl.invalidate_types_when_called:
-            impl.invalidate_types_when_called.append(p)
+    if impl.is_parsing_a_defer:
+        for p in callee.invalidate_types_when_called:
+            if p not in impl.invalidate_types_on_defer: impl.invalidate_types_on_defer.append(p)
+    else:
+        for p in callee.invalidate_types_when_called:
+            if p not in impl.invalidate_types_when_called: impl.invalidate_types_when_called.append(p)
+    for p in callee.invalidate_types_on_defer:
+        if p not in impl.invalidate_types_on_defer:
+            impl.invalidate_types_on_defer.append(p)
 
     # this is a critical point for ... pointers ;-) actually for buffers
     # we are next going to go through all the actual pointer compliance checks
@@ -2531,7 +2546,8 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                         CodeWord("0"),
                         CODEWORD_SEMICOLON
                     ])
-        impl.invalidate_types_when_called.extend(type.variations)
+        if impl.is_parsing_a_defer: impl.invalidate_types_on_defer.extend(type.variations)
+        else: impl.invalidate_types_when_called.extend(type.variations)
         return pos, []
     # if current == "deref" or current==":":
     #     pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
@@ -2768,6 +2784,11 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                     if impl.get_assignment(varname, rets):
                         invalidated.add(val)
                         impl.invalidated[varname] = name
+
+                for invalid_type in impl.invalidate_types_on_defer: # TODO: track defers for each variable to be deleted
+                    for varname, val in impl.vars.items():
+                        if val.type.invalidated_by == invalid_type and not varname.endswith("__unsafe_ptr"):
+                            impl.invalidated[val.stabilized_name()] = name
 
                 to_remove = list()
                 for defer in impl.defers:
@@ -3342,6 +3363,8 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
     tokens = list()
     nesting_levels = [0]
     row = 0
+    has_tabs = False
+    has_spaces = False
     try:
         with open(path, "r") as f:
             for line in f:
@@ -3351,11 +3374,24 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
                 count_spaces -= len(line)
                 if not len(line) or line.startswith("//") or line.startswith("#") or line=="\n": continue
                 prev_nesting_level = nesting_levels[len(nesting_levels)-1]
+                has_space = " " in line[:(count_spaces+1)] 
+                has_tab = "\t" in line[:(count_spaces+1)]
+                if has_tab:
+                    if has_space: 
+                        Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you have mixed tabs and spaces in this line's indentation")
+                    if has_spaces: 
+                        Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you are using tabs for this line's indentation, but previous lines used spaces")
+                    has_tabs = True
+                elif has_space:
+                    if has_tabs: 
+                        Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you are using spaces for this line's indentation, but previous lines used tabs")
+                    has_spaces = True
                 while count_spaces < prev_nesting_level:
                     tokens.append(Token(END_TOKEN, file, row, prev_nesting_level+1))
+                    error_nesting_level = prev_nesting_level
                     nesting_levels.pop() # pop from back
                     prev_nesting_level = nesting_levels[len(nesting_levels)-1]
-                    if count_spaces > prev_nesting_level: Token(" "*count_spaces, file, row, 1).error("syntax", "misaligned indentation")
+                    if count_spaces > prev_nesting_level: Token(" "*count_spaces, file, row, 1).error("syntax", f"misaligned indentation - expecting this line to start {error_nesting_level} {'tab' if has_tabs else 'space'}{'s' if error_nesting_level!=1 else 0} deep but it starts at {prev_nesting_level+1}")
                 if count_spaces > prev_nesting_level:
                     tokens.append(Token(START_TOKEN, file, row, count_spaces+1))
                     nesting_levels.append(count_spaces)

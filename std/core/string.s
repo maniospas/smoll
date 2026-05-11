@@ -217,7 +217,8 @@ def copy(charlist li, str|cstr _other)
 
 def get(str s, nat i)
     doc "a character in a string"
-    return s.buf[s.dat.pos+i]&
+    unsafe_ptr = s.buf[s.dat.pos+i]&
+    return unsafe_ptr
 
 def eq(cstr x, cstr y)
     doc "equals"
@@ -277,7 +278,8 @@ def starts_with(cstr|str _stack, cstr|str _needle)
 def ends_with(cstr|str _stack, cstr|str _needle)
     stack = str _stack
     needle = str _needle
-    if stack.dat.length<needle.dat.length return false
+    if stack.dat.length<needle.dat.length
+        return false
     n = len stack
     ret = stack.slice(n-len needle, n)
     return ret==needle

@@ -355,6 +355,7 @@ global_var2cstr: dict[str,str] = dict() # from variable name to literal
 class ImplementedType:
     def __init__(self, name: str, builtin:str|None=None, at:Optional["Token"]=None, memory_size=0):
         self.name = name
+        self.invalidated_by = self # which type's invalidation cause invalidation of this - right now helps invalidate pointer buffers
         self.monomorphic_name = name+create_temp()
         self.has_retrieved_class: Optional["Token"] = None
         self.has_retrieved_singleton: Optional["Token"] = None
@@ -527,18 +528,27 @@ class ImplementedType:
     def follow_pointer_dependency(self, var: Variable) -> Variable|None:
         varname = var.name
         if varname not in self._pointer_type_dependencies: return None
+        visited: set[str] = set()
         while varname in self._pointer_type_dependencies:
             varname = self._pointer_type_dependencies.get(varname, "")
+            if varname in visited: return None
+            visited.add(varname)
         return self.vars[varname]
 
     def get_pointer_type(self, var: Variable) -> Optional["ImplementedType"]:
-        ret = self._pointer_types.get(var.name, None)
-        if ret is not None: return ret
-        dependency: str|None = self._pointer_type_dependencies.get(var.name, None)
-        if dependency is None: return None
-        return self.get_pointer_type(self.vars[dependency])
+        visited: set[str] = set()
+        while True:
+            ret = self._pointer_types.get(var.name, None)
+            if ret is not None: return ret
+            dependency: str|None = self._pointer_type_dependencies.get(var.name, None)
+            if dependency is None: return None
+            if dependency in visited: return None
+            visited.add(dependency)
+            var = self.vars[dependency]
 
     def set_pointer_depedency(self, var: Variable, depends_on: Variable):
+        assert isinstance(var, Variable)
+        assert isinstance(depends_on, Variable)
         assert var not in self._pointer_type_dependencies
         assert not self.get_pointer_type(var)
         #assert self.get_pointer_type(depends_on), "Need to have pointer type for "+depends_on.name+" in "+self.name
@@ -615,7 +625,7 @@ class ImplementedType:
                 if existing_pointer_type!=other_pointer_type and (other_pointer_type is None or not match_structure_with(existing_pointer_type, other_pointer_type)):
                     error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
             else:
-                if self.get_pointer_type(value[0]): self.set_pointer_depedency(existing, value[0])
+                self.set_pointer_depedency(existing, value[0])
 
         accumulated_defer = self.accumulating_defers[-1].get(existing.name, None)
         if accumulated_defer is not None: # important to do this before setting dependent_assignments
@@ -661,6 +671,8 @@ class ImplementedType:
                 v._references = None
 
         for v in value: 
+            if v.type.invalidated_by==POINTER_TYPE and not v.stabilized_name().endswith("__unsafe_ptr") and v.stabilized_name()!="unsafe_ptr":
+                error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' is a pointer and hence cannot be returned - name it 'unsafe_ptr' to permit this but consider that it may have gone out of scope")
             if v.stabilized_name() in self.invalidated:
                 error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' has been invalidated", reason=self.invalidated[v.stabilized_name()])
         
@@ -886,7 +898,7 @@ class ImplementedType:
                         if values[0]==0: 
                             self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
                         if values[2]==1 and (self.vars[gathered_args[1]].type==CHAR_TYPE or self.vars[gathered_args[1]].type==BOOL_TYPE):
-                            memory.contents[value[0]] = (value[1])
+                            memory.contents[values[0]] = (values[1])
                         elif values[2]!=8:
                             self.at.error("interpreter", "expecting 1 or 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         if self.vars[gathered_args[1]].type==FLOAT_TYPE: 
@@ -1089,7 +1101,7 @@ class ImplementedType:
         #    print("  ", v, "->", k)
         #print(len(self.defers))
         #print(len(self.returned_defers))
-        self.simplify()
+        #self.simplify()
         ret_body_start = ""
         ret_body_end = ""
         arg_code = ""
@@ -1137,32 +1149,55 @@ class ImplementedType:
             elif tok=="{": ret += "{\n  "
             elif tok=="}": ret += "}\n  "
             else: ret += tok
-        if any(token.tostring()=="__temp_return" for token in self.implementation):
-            if ret_body_end: ret += "__temp_return:\n  "
-        # apply defers that are applied on success mode
-        defer_ret = ""
-        for defer in reversed(self.defers):
-            prev = ";"
-            for token in defer:
-                tok = token.tostring()
-                if prev[0] not in symbols and tok[0] not in symbols and prev!=";": defer_ret += " "
-                prev = tok
-                if tok==";": defer_ret += ";\n  "
-                elif tok=="{": defer_ret += "{\n  "
-                elif tok=="}": defer_ret += "}\n  "
-                else: defer_ret += tok
-        # set return values if needed
-        ret += ret_body_end
         if self.needs_failure_mode:
             #ret += "\n  goto __temp_final;" # skip failure handling
             ret += "\n  __temp_failure:"
-            # TODO: here we place all the defers that are applied only when there is a need to invalidate returns
-            # TODO: may such defers will never be needed
-            # then we move to the last defers
-            #ret += "\n  __temp_final:"
-            ret += defer_ret
+            # apply defers that are applied on failure
+            defer_ret = ""
+            for defer in reversed(self.returned_defers):
+                prev = ";"
+                for token in defer:
+                    tok = token.tostring()
+                    if prev[0] not in symbols and tok[0] not in symbols and prev!=";": defer_ret += " "
+                    prev = tok
+                    if tok==";": defer_ret += ";\n  "
+                    elif tok=="{": defer_ret += "{\n  "
+                    elif tok=="}": defer_ret += "}\n  "
+                    else: defer_ret += tok
+            if any(token.tostring()=="__temp_return" for token in self.implementation):
+                ret += "__temp_return:\n  "
+            # set return values if needed
+            ret += ret_body_end
+            # apply defers that are applied on success
+            defer_ret = ""
+            for defer in reversed(self.defers):
+                prev = ";"
+                for token in defer:
+                    tok = token.tostring()
+                    if prev[0] not in symbols and tok[0] not in symbols and prev!=";": defer_ret += " "
+                    prev = tok
+                    if tok==";": defer_ret += ";\n  "
+                    elif tok=="{": defer_ret += "{\n  "
+                    elif tok=="}": defer_ret += "}\n  "
+                    else: defer_ret += tok
             ret += "\n  return __temp_errcode;\n}"
         else: 
+            if any(token.tostring()=="__temp_return" for token in self.implementation):
+                ret += "__temp_return:\n  "
+            # set return values if needed
+            ret += ret_body_end
+            # apply defers that are applied on success
+            defer_ret = ""
+            for defer in reversed(self.defers):
+                prev = ";"
+                for token in defer:
+                    tok = token.tostring()
+                    if prev[0] not in symbols and tok[0] not in symbols and prev!=";": defer_ret += " "
+                    prev = tok
+                    if tok==";": defer_ret += ";\n  "
+                    elif tok=="{": defer_ret += "{\n  "
+                    elif tok=="}": defer_ret += "}\n  "
+                    else: defer_ret += tok
             ret += defer_ret
             ret = ret[:-2]+"}"
         return ret
@@ -1461,7 +1496,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
 
     for invalid_type in callee.invalidate_types_when_called:
         for varname, val in impl.vars.items():
-            if val.type == invalid_type and not varname.endswith("__unsafe_ptr"):
+            if val.type.invalidated_by == invalid_type and not varname.endswith("__unsafe_ptr"):
                 impl.invalidated[val.stabilized_name()] = error_token
     for p in callee.invalidate_types_when_called:
         if p not in impl.invalidate_types_when_called:
@@ -1489,6 +1524,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if original_pointer_type is None or original_pointer_type==ANY_TYPE:
             original_pointer_dependency: Variable|None = callee.follow_pointer_dependency(original)
             if original_pointer_dependency is None: original_pointer_dependency = original
+            if callee==SAME_CONTENTS_TYPE: assert original_pointer_dependency
             if original_pointer_dependency is not None:
                 for varpos, varname in enumerate(callee.args):
                     if varname!=original_pointer_dependency.name: continue
@@ -1698,10 +1734,11 @@ def create_buffer_type(name, memory_size, variation, error_token):
     while i<len(variation.rets):
         varg = variation.rets[i]
         # if variation.vars[varg].type.is_buffer_of:
-        #     i += 4
-        #     continue
+        #      i += 4
+        #      continue
         if variation.vars[varg].type == POINTER_TYPE:
-            error_token.error("safety", "cannot place a pointer '"+pretty_name(varg)+"' onto a buffer", reason=variation.at)
+            actual_variation.invalidated_by = POINTER_TYPE
+            #error_token.error("safety", "cannot place a pointer '"+pretty_name(varg)+"' onto a buffer", reason=variation.at)
         i += 1
     actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=True, isprivate=False)
     actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
@@ -1963,7 +2000,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                     +[var]
                     + ([CODEWORD_ADD, CodeWord(str(progress))] if progress else [])
                     + [CODEWORD_COMMA, CODEWORD_AMP]
-                    + [r]
+                    + [impl.vars[r.stabilized_name()]]
                     + [CODEWORD_COMMA, CodeWord(str(mem_size))]
                     + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
                 )
@@ -2692,8 +2729,9 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
                 pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
                 impl.returns(ret, name)
-                if not ret: impl.implementation.extend([CodeWord("return"), CODEWORD_SEMICOLON])
-                else: impl.implementation.extend([CODEWORD_GOTO, CodeWord("__temp_return"), CODEWORD_SEMICOLON])
+                #if not ret: impl.implementation.extend([CodeWord("return"), CODEWORD_SEMICOLON])
+                #else: 
+                impl.implementation.extend([CODEWORD_GOTO, CodeWord("__temp_return"), CODEWORD_SEMICOLON])
                 return pos, ret
             pos, ret = process_return(pos)
             continue

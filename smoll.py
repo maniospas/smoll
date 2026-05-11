@@ -94,6 +94,7 @@ class MemoryEmulator:
 
     def free(self, original: int):
         if original not in self.alloc_sizes: return original
+        self.memset(original, 0, self.alloc_sizes[original]) # safety in case the VM ends up actually useful
         del self.alloc_sizes[original]
         return 0
     
@@ -116,7 +117,7 @@ class MemoryEmulator:
         try: end = self.contents.index(0, addr2)
         except ValueError: end = len(self.contents)
         self.contents[addr:(addr+end-addr2)] = self.contents[addr2:end]
-        self.contents[addr+length] = 0
+        self.contents[addr+end-addr2] = 0
 
     def strlen(self, addr: int):
         try: end = self.contents.index(0, addr)
@@ -883,7 +884,7 @@ class ImplementedType:
                     if len(values)!=3: self.at.error("malformed smollC", "'memcpy' requires three arguments")
                     if not isinstance(values[2], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                     if gathered_args_by_pointer[0]:
-                        if gathered_args_by_pointer[1]: self.at.arror("malformed smollC", "Cannot use memcpy to copy variables.")
+                        if gathered_args_by_pointer[1]: self.at.error("malformed smollC", "Cannot use memcpy to copy variables.")
                         if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         if values[1]==0: 
                             self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
@@ -904,7 +905,7 @@ class ImplementedType:
                             memory.contents[values[0]] = (values[1])
                         elif values[2]!=8:
                             self.at.error("interpreter", "expecting 1 or 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                        if self.vars[gathered_args[1]].type==FLOAT_TYPE: 
+                        elif self.vars[gathered_args[1]].type==FLOAT_TYPE: 
                             memory.write_float64(values[0], values[1])
                         else:
                             memory.write_int64(values[0], values[1])
@@ -1003,8 +1004,8 @@ class ImplementedType:
                         if endpos>npos: self.at.error("malformed smollC", "Unclosed if condition.")
                         if impl[endpos].tostring()=="(": depth += 1
                         if impl[endpos].tostring()==")": depth -= 1
-                        cond_start = pos+2
-                        cond_end = endpos-1
+                    cond_start = pos+2
+                    cond_end = endpos-1
                     pos = endpos+1
                     if pos>npos: self.at.error("malformed smollC", "Missing 'while' code body.")
                     if impl[pos].tostring()!="{": self.at.error("malformed smollC", "The use of brackets is mandatory in conditions.")

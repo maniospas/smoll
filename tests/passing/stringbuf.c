@@ -4,13 +4,13 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp1256v="it's a me";
-const char* const __temp1233v="name      ";
-const char* const __temp604v="";
-const char* const __temp1258v="mario";
-const char* const __temp1231v="-------------------";
-const char* const __temp352v="\n";
 const char* const __temp1236v="surnname  ";
+const char* const __temp1231v="-------------------";
+const char* const __temp1233v="name      ";
+const char* const __temp1256v="it's a me";
+const char* const __temp604v="";
+const char* const __temp352v="\n";
+const char* const __temp1258v="mario";
 const char* const __temp436v="free";
 static const char* __temp_all_errcodes[28] = {"noerr",
 "error",

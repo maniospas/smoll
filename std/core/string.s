@@ -133,20 +133,22 @@ def bufpos(any[] buf)
     return (buf, pos)
 
 def rextend(str s, nat|blank by, char|blank character)
-    doc "extend a string right on its enclosing buffer"
+    doc "extend a string right"
+    doc "This refers to extending within the string's enclosing buffer. No memory is allocated."
     if by is blank
-        doc "The extension extends by one character."
+        doc "Extends by one character."
         by = 1
     new_length = s.dat.length+by
     if new_length+s.dat.pos>len s.buf fail "string does not fit on buffer"
     if not character is blank
-        doc "The extension sets a specified character to all new positions."
+        doc "Also sets a specified character to all new positions."
         {memset(((char*)s__buf__unsafe_ptr)+s__dat__pos+s__dat__length, character, by);}
     return str(s.buf, s.dat.pos, new_length, s.dat.first)
 
 def lextend(const str s, nat|blank pos)
-    doc "extend a string left on its enclosing buffer"
-    doc "The extension reached a position left of the string's end. No memory is allocated"
+    doc "extend a string left"
+    doc "This refers to extending whing the string's enclosing buffer."
+    doc "The extension can only reach to a position left of the string's end. No memory is allocated"
     doc "and the result of the extension is returned. This counts as concatenating the string"
     doc "with its previous data."
     if pos is blank

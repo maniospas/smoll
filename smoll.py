@@ -81,7 +81,7 @@ class MemoryEmulator:
     def realloc(self, original: int, size: int):
         # TODO: for now we just alloc again and disuse the previous location
         if original not in self.alloc_sizes: return 0
-        if self.alloc_sizes[original]<=size:
+        if self.alloc_sizes[original]>=size:
             #self.alloc_sizes[original] = size
             return original
         if self.consumed+size>self.size: return 0
@@ -116,6 +116,7 @@ class MemoryEmulator:
         try: end = self.contents.index(0, addr2)
         except ValueError: end = len(self.contents)
         self.contents[addr:(addr+end-addr2)] = self.contents[addr2:end]
+        self.contents[addr+length] = 0
 
     def strlen(self, addr: int):
         try: end = self.contents.index(0, addr)
@@ -146,9 +147,6 @@ class MemoryEmulator:
 
     def read_uint64(self, addr: int) -> int:
         return struct.unpack_from('<Q', self.contents, addr)[0]
-
-    def write_int64(self, addr: int, value: int):
-        struct.pack_into('<q', self.contents, addr, value)
 
     def write_float64(self, addr: int, value: float):
         struct.pack_into('<d', self.contents, addr, value)
@@ -840,7 +838,11 @@ class ImplementedType:
                             gathered_args_by_pointer.append(by_pointer)
                             last_arg_name = ""
                             by_pointer = False
-                        values.append(process_expression(impl, prev_pos, pos-1))
+                        processed = process_expression(impl, prev_pos, pos-1)
+                        if processed is None:
+                            del gathered_args[-1]
+                            del gathered_args_by_pointer[-1]
+                        else: values.append(processed)
                         prev_pos = pos+1
                         if tok.tostring()==")": break
                     elif tok.tostring() == "&":
@@ -972,14 +974,14 @@ class ImplementedType:
                     print("".join(result), end="", flush=True)
                     return None
                 assert callee, candidate_name
-                #print(self.name, callee.name, values, gathered_args)
+                #inputs = [v for v in values]
                 retcode = callee.interpret(values, memory) # may modify values
                 #rets = ""
                 for ismut, value, k in zip(gathered_args_by_pointer, values, gathered_args):
-                    if not ismut: continue
-                    local_vars[k] = value
+                    if ismut: local_vars[k] = value
                     #rets += k+"="+str(value)+"\n"
                 #print(self.name, callee.name)
+                #print(self.name, callee.name, inputs, "->", values)#, gathered_args)
                 #print(rets)
                 return retcode
             else:
@@ -1265,8 +1267,11 @@ class Token:
                 if suggestions:
                     print("    with alternatives:")
                     for suggestion in suggestions:
-                        if "->" in suggestion: print("```rust\n"+suggestion+"\n```")
-                        else: print("    -", suggestion)
+                        if "->" in suggestion: 
+                            suggestion_splits = suggestion.split("defined in")
+                            print("```rust\n"+suggestion_splits[0]+"\n```")
+                            #if len(suggestion_splits)>1: print("defined in "+suggestion_splits[1])
+                        else: print("\n    -", suggestion)
             if is_lsp and self.file.is_main_file and errtype=="safety": return
             raise FatalException
 
@@ -1394,7 +1399,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         # message (may span multiple lines))
         if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
         if len(callee.doc)>1: print("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:]))
-        print("```rust\n"+callee.signature()+(" defined in "+at.file.path if callee.at else " from compiler definitions")+"\n```")
+        print("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
     return callee
 
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
@@ -1835,7 +1840,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                     print(at.row)
                     print(at.col)
                     # message (may span multiple lines))
-                    print("```rust\n"+variation.signature()+(" defined in "+at.file.path if variation.at else " from compiler definitions")+"\n```")
+                    print("```rust\n"+variation.signature()+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
 
             return pos+3, buffer_type
         for variation in type.variations: 
@@ -1859,7 +1864,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                 print(at.row)
                 print(at.col)
                 # message (may span multiple lines))
-                print("```rust\n"+variation.signature()+(" defined in "+at.file.path if variation.at else " from compiler definitions")+"\n```")
+                print("```rust\n"+variation.signature()+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
 
         return pos+1, type
     namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)

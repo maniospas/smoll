@@ -29,7 +29,7 @@ def neq(bool x, bool y)
 
 def not(bool value)
     doc "logical inverse"
-    {builtins::bool z = value?0:1;}
+    {if(!value){builtins::bool z = 1;}}
     return z
 
 def eq(compiler::true, compiler::true) 

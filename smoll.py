@@ -285,6 +285,13 @@ def print_lsp_decorator(tok: "Token", description: str):
     print(tok.col)
     print(description)
 
+class CallPointer(CodeSegment):
+    def __init__(self, callee: "ImplementedType"):
+        self.name = callee.monomorphic_name
+        self.callee = callee
+    def tostring(self): return self.name
+    def copy(self, prefix: str): return self
+
 #@mypyc_attr(acyclic=True)
 class Variable(CodeSegment):
     def __init__(self, name: str, type: "ImplementedType", immutable: bool=True, isprivate: bool=False, _references: str|None=None):
@@ -544,7 +551,8 @@ class ImplementedType:
             if dependency is None: return None
             if dependency in visited: return None
             visited.add(dependency)
-            var = self.vars[dependency]
+            var = self.vars.get(dependency)
+            if var is None: return None
 
     def set_pointer_depedency(self, var: Variable, depends_on: Variable):
         assert isinstance(var, Variable)
@@ -817,11 +825,15 @@ class ImplementedType:
             elif impl[pos+1].tostring()=="(":
                 expr_pos = pos
                 callee: Optional["ImplementedType"] = None
-                candidate_name = impl[pos].tostring()
-                for candidate in self.dependent_implementations:
-                    if candidate.monomorphic_name==candidate_name:
-                        callee = candidate
-                        break
+                if isinstance(impl[pos], CallPointer):
+                    callee = impl[pos].callee
+                    candidate_name = callee.name
+                else:
+                    candidate_name = impl[pos].tostring()
+                    for candidate in self.dependent_implementations:
+                        if candidate.monomorphic_name==candidate_name:
+                            callee = candidate
+                            break
                 if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy", "strlen"]:
                     self.at.error("interpreter", "failed to interpret C function '"+candidate_name+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                 gathered_args: list[str] = list()
@@ -1091,11 +1103,14 @@ class ImplementedType:
             ret = None
         else: 
             ret = process_block(self.implementation, 0, len(self.implementation)-1)
-            if ret=="return" or not ret:
+            if ret=="failure":
+                for defer in reversed(self.returned_defers): process_block(defer, 0, len(defer)-1)
+            elif ret=="return" or not ret:
                 values = _arg_values
                 for pos in range(len(values)):
                     if self.vars[args[pos]].type==FLOAT_TYPE: values[pos] = local_vars.get(args[pos], 0.0)
                     else: values[pos] = local_vars.get(args[pos], 0)
+            for defer in reversed(self.defers): process_block(defer, 0, len(defer)-1)
         self.can_try_interpreter = True
         return local_vars.get("__temp_errcode", 0)
             
@@ -1168,6 +1183,7 @@ class ImplementedType:
                     elif tok=="{": defer_ret += "{\n  "
                     elif tok=="}": defer_ret += "}\n  "
                     else: defer_ret += tok
+            ret += defer_ret
             if any(token.tostring()=="__temp_return" for token in self.implementation):
                 ret += "__temp_return:\n  "
             # set return values if needed
@@ -1184,8 +1200,9 @@ class ImplementedType:
                     elif tok=="{": defer_ret += "{\n  "
                     elif tok=="}": defer_ret += "}\n  "
                     else: defer_ret += tok
+            ret += defer_ret
             ret += "\n  return __temp_errcode;\n}"
-        else: 
+        else:
             if any(token.tostring()=="__temp_return" for token in self.implementation):
                 ret += "__temp_return:\n  "
             # set return values if needed
@@ -1471,19 +1488,19 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             impl.implementation.extend([
                 CodeWord("__temp_complain"),
                 CODEWORD_EQUALS,
-                CodeWord(callee.monomorphic_name),
+                CallPointer(callee),#CodeWord(callee.monomorphic_name),
                 CODEWORD_LPAR,
             ])
         else:
             impl.implementation.extend([
                 CodeWord("__temp_errcode"),
                 CODEWORD_EQUALS,
-                CodeWord(callee.monomorphic_name),
+                CallPointer(callee),#CodeWord(callee.monomorphic_name),
                 CODEWORD_LPAR,
             ])
     else:
         impl.implementation.extend([
-            CodeWord(callee.monomorphic_name),
+            CallPointer(callee),#CodeWord(callee.monomorphic_name),
             CODEWORD_LPAR,
         ])
     impl.used_error_codes.add(callee)

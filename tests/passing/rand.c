@@ -5,7 +5,7 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp350v="\n";
-static const char* __temp_all_errcodes[28] = {"noerr",
+static const char* __temp_all_errcodes[27] = {"noerr",
 "error",
 "id subtraction would yield a negative",
 "cannot convert negative float to id",
@@ -16,10 +16,9 @@ static const char* __temp_all_errcodes[28] = {"noerr",
 "cannot resize buffers with alloc; it promises no data reallocation",
 "cannot resize an unallocated buffer",
 "out of bounds",
-"string does not fit on buffer",
+"character copy does not fit on buffer",
 "cannot extend the string's left side outside its right range",
 "string buffer out of memory",
-"string out of bounds",
 "slice out of string bounds",
 "user input was not an int",
 "user input was not a nat",
@@ -35,17 +34,19 @@ static const char* __temp_all_errcodes[28] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void splitmix64__temp1227v(unsigned long long* __temp1264v) {
+static inline __attribute__((always_inline)) void splitmix64__temp1189v(unsigned long long* __temp1226v) {
   char* ts=0;
   unsigned long long seed=0;
   ts=alloca(sizeof(struct timespec));
   clock_gettime(CLOCK_REALTIME,(struct timespec*)ts);
   seed=(unsigned long long)((struct timespec*)ts)->tv_sec*(unsigned long long)1000000000+((struct timespec*)ts)->tv_nsec;
-  *__temp1264v=seed;
+  goto __temp_return;
+  __temp_return:
+  *__temp1226v=seed;
 }
 
-static inline __attribute__((always_inline)) void splitmix64__temp1226v(unsigned long long* __temp1265v, unsigned long long* __temp1266v) {
-  unsigned long long x=*__temp1265v;
+static inline __attribute__((always_inline)) void splitmix64__temp1188v(unsigned long long* __temp1227v, unsigned long long* __temp1228v) {
+  unsigned long long x=*__temp1227v;
   unsigned long long z=0;
   unsigned long long rot=0;
   x=x+0x9E3779B97F4A7C15ULL;
@@ -58,50 +59,55 @@ static inline __attribute__((always_inline)) void splitmix64__temp1226v(unsigned
   z=z*0x94D049BB133111EBULL;
   rot=z>>31;
   z=z^rot;
-  *__temp1265v=x;
-  *__temp1266v=z;
+  goto __temp_return;
+  __temp_return:
+  *__temp1227v=x;
+  *__temp1228v=z;
 }
 
-static inline __attribute__((always_inline)) void Rand__temp1240v(unsigned long long* __temp1267v, unsigned long long* __temp1268v, unsigned long long* __temp1269v, unsigned long long* __temp1270v) {
-  unsigned long long __temp1242v__=0;
+static inline __attribute__((always_inline)) void Rand__temp1202v(unsigned long long* __temp1229v, unsigned long long* __temp1230v, unsigned long long* __temp1231v, unsigned long long* __temp1232v) {
+  int __temp1203v=0;
+  unsigned long long __temp1204v__=0;
   unsigned long long seed=0;
-  unsigned long long __temp1243v=0;
+  unsigned long long __temp1205v=0;
   unsigned long long modifying_seed=0;
-  unsigned long long __temp1244v__=0;
-  unsigned long long __temp1245v=0;
+  unsigned long long __temp1206v__=0;
+  unsigned long long __temp1207v=0;
   unsigned long long s0=0;
-  unsigned long long __temp1246v__=0;
-  unsigned long long __temp1247v=0;
+  unsigned long long __temp1208v__=0;
+  unsigned long long __temp1209v=0;
   unsigned long long s1=0;
-  unsigned long long __temp1248v__=0;
-  unsigned long long __temp1249v=0;
+  unsigned long long __temp1210v__=0;
+  unsigned long long __temp1211v=0;
   unsigned long long s2=0;
-  unsigned long long __temp1250v__=0;
-  unsigned long long __temp1251v=0;
+  unsigned long long __temp1212v__=0;
+  unsigned long long __temp1213v=0;
   unsigned long long s3=0;
-  splitmix64__temp1227v(&__temp1242v__);
-  seed=__temp1242v__;
-  __temp1243v=seed;
-  modifying_seed=__temp1243v;
-  splitmix64__temp1226v(&modifying_seed,&__temp1244v__);
-  __temp1245v=__temp1244v__;
-  s0=__temp1245v;
-  splitmix64__temp1226v(&modifying_seed,&__temp1246v__);
-  __temp1247v=__temp1246v__;
-  s1=__temp1247v;
-  splitmix64__temp1226v(&modifying_seed,&__temp1248v__);
-  __temp1249v=__temp1248v__;
-  s2=__temp1249v;
-  splitmix64__temp1226v(&modifying_seed,&__temp1250v__);
-  __temp1251v=__temp1250v__;
-  s3=__temp1251v;
-  *__temp1267v=s0;
-  *__temp1268v=s1;
-  *__temp1269v=s2;
-  *__temp1270v=s3;
+  splitmix64__temp1189v(&__temp1204v__);
+  seed=__temp1204v__;
+  __temp1205v=seed;
+  modifying_seed=__temp1205v;
+  splitmix64__temp1188v(&modifying_seed,&__temp1206v__);
+  __temp1207v=__temp1206v__;
+  s0=__temp1207v;
+  splitmix64__temp1188v(&modifying_seed,&__temp1208v__);
+  __temp1209v=__temp1208v__;
+  s1=__temp1209v;
+  splitmix64__temp1188v(&modifying_seed,&__temp1210v__);
+  __temp1211v=__temp1210v__;
+  s2=__temp1211v;
+  splitmix64__temp1188v(&modifying_seed,&__temp1212v__);
+  __temp1213v=__temp1212v__;
+  s3=__temp1213v;
+  goto __temp_return;
+  __temp_return:
+  *__temp1229v=s0;
+  *__temp1230v=s1;
+  *__temp1231v=s2;
+  *__temp1232v=s3;
 }
 
-static inline __attribute__((always_inline)) void rotl__temp1225v(unsigned long long x, unsigned long long k, unsigned long long* __temp1271v) {
+static inline __attribute__((always_inline)) void rotl__temp1187v(unsigned long long x, unsigned long long k, unsigned long long* __temp1233v) {
   unsigned long long left=0;
   unsigned long long compk=0;
   unsigned long long right=0;
@@ -110,18 +116,20 @@ static inline __attribute__((always_inline)) void rotl__temp1225v(unsigned long 
   compk=64-k;
   right=x>>compk;
   z=left|right;
-  *__temp1271v=z;
+  goto __temp_return;
+  __temp_return:
+  *__temp1233v=z;
 }
 
-static inline __attribute__((always_inline)) void next__temp1256v(unsigned long long* __temp1272v, unsigned long long* __temp1273v, unsigned long long* __temp1274v, unsigned long long* __temp1275v, double* __temp1276v) {
-  unsigned long long self__s0=*__temp1272v;
-  unsigned long long self__s1=*__temp1273v;
-  unsigned long long self__s2=*__temp1274v;
-  unsigned long long self__s3=*__temp1275v;
+static inline __attribute__((always_inline)) void next__temp1218v(unsigned long long* __temp1234v, unsigned long long* __temp1235v, unsigned long long* __temp1236v, unsigned long long* __temp1237v, double* __temp1238v) {
+  unsigned long long self__s0=*__temp1234v;
+  unsigned long long self__s1=*__temp1235v;
+  unsigned long long self__s2=*__temp1236v;
+  unsigned long long self__s3=*__temp1237v;
   unsigned long long result=0;
   unsigned long long t=0;
-  unsigned long long __temp1257v=0;
-  unsigned long long __temp1258v__=0;
+  unsigned long long __temp1219v=0;
+  unsigned long long __temp1220v__=0;
   double denom=0;
   double nom=0;
   double value=0;
@@ -132,50 +140,53 @@ static inline __attribute__((always_inline)) void next__temp1256v(unsigned long 
   self__s1=self__s1^self__s2;
   self__s0=self__s0^self__s3;
   self__s2=self__s2^t;
-  __temp1257v=45;
-  rotl__temp1225v(self__s3,__temp1257v,&__temp1258v__);
-  self__s3=__temp1258v__;
+  __temp1219v=45;
+  rotl__temp1187v(self__s3,__temp1219v,&__temp1220v__);
+  self__s3=__temp1220v__;
   denom=0x0020000000000000ULL;
   nom=result>>11;
   value=nom/denom;
-  *__temp1272v=self__s0;
-  *__temp1273v=self__s1;
-  *__temp1274v=self__s2;
-  *__temp1275v=self__s3;
-  *__temp1276v=value;
+  goto __temp_return;
+  __temp_return:
+  *__temp1234v=self__s0;
+  *__temp1235v=self__s1;
+  *__temp1236v=self__s2;
+  *__temp1237v=self__s3;
+  *__temp1238v=value;
 }
 
 static inline __attribute__((always_inline)) void print__temp353v(double value) {
+  int __temp354v=0;
   const char* endl=0;
   endl=__temp350v;
   printf("%.6f%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__temp1259v() {
-  unsigned long long __temp1260v__s0=0;
-  unsigned long long __temp1260v__s1=0;
-  unsigned long long __temp1260v__s2=0;
-  unsigned long long __temp1260v__s3=0;
-  unsigned long long __temp1261v__s0=0;
-  unsigned long long __temp1261v__s1=0;
-  unsigned long long __temp1261v__s2=0;
-  unsigned long long __temp1261v__s3=0;
+static inline __attribute__((always_inline)) void main__temp1221v() {
+  unsigned long long __temp1222v__s0=0;
+  unsigned long long __temp1222v__s1=0;
+  unsigned long long __temp1222v__s2=0;
+  unsigned long long __temp1222v__s3=0;
+  unsigned long long __temp1223v__s0=0;
+  unsigned long long __temp1223v__s1=0;
+  unsigned long long __temp1223v__s2=0;
+  unsigned long long __temp1223v__s3=0;
   unsigned long long rand__s0=0;
   unsigned long long rand__s1=0;
   unsigned long long rand__s2=0;
   unsigned long long rand__s3=0;
-  double __temp1262v__=0;
-  Rand__temp1240v(&__temp1260v__s0,&__temp1260v__s1,&__temp1260v__s2,&__temp1260v__s3);
-  __temp1261v__s0=__temp1260v__s0;
-  __temp1261v__s1=__temp1260v__s1;
-  __temp1261v__s2=__temp1260v__s2;
-  __temp1261v__s3=__temp1260v__s3;
-  rand__s0=__temp1261v__s0;
-  rand__s1=__temp1261v__s1;
-  rand__s2=__temp1261v__s2;
-  rand__s3=__temp1261v__s3;
-  next__temp1256v(&rand__s0,&rand__s1,&rand__s2,&rand__s3,&__temp1262v__);
-  print__temp353v(__temp1262v__);
+  double __temp1224v__=0;
+  Rand__temp1202v(&__temp1222v__s0,&__temp1222v__s1,&__temp1222v__s2,&__temp1222v__s3);
+  __temp1223v__s0=__temp1222v__s0;
+  __temp1223v__s1=__temp1222v__s1;
+  __temp1223v__s2=__temp1222v__s2;
+  __temp1223v__s3=__temp1222v__s3;
+  rand__s0=__temp1223v__s0;
+  rand__s1=__temp1223v__s1;
+  rand__s2=__temp1223v__s2;
+  rand__s3=__temp1223v__s3;
+  next__temp1218v(&rand__s0,&rand__s1,&rand__s2,&rand__s3,&__temp1224v__);
+  print__temp353v(__temp1224v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1259v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1221v();return 0;}

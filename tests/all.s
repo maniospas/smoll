@@ -19,7 +19,7 @@ def main()
     while try entry = dir::entry test_dir # do not move the position
         if not entry.ends_with ".s"
             continue
-        command = (local bp).copy(str entry).lextend()
-        print command.rextend(max_command_length-len command, char " ")
-        run command.rextend char "" # null-terminate to avoid copying in cstr conversion
+        command = (local bp).copy_null_terminated(str entry).lextend()
+        print command
+        run command
     

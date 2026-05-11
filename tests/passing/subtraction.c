@@ -15,6 +15,7 @@ static const char* __temp_all_errcodes[6] = {"noerr",
 };
 
 static inline __attribute__((always_inline)) void print__temp348v(const char* value) {
+  int __temp349v=0;
   const char* endl=0;
   endl=__temp350v;
   printf("%s%s",value,endl);
@@ -28,6 +29,8 @@ static inline __attribute__((always_inline)) void false__temp7v(int* __temp427v)
 static inline __attribute__((always_inline)) void not__temp27v(int __temp_anon0, int* __temp428v) {
   int __temp28v__=0;
   false__temp7v(&__temp28v__);
+  goto __temp_return;
+  __temp_return:
   *__temp428v=__temp28v__;
 }
 
@@ -35,6 +38,8 @@ static inline __attribute__((always_inline)) void is_different__temp85v(unsigned
   int __temp86v=0;
   int __temp87v__=0;
   not__temp27v(__temp86v,&__temp87v__);
+  goto __temp_return;
+  __temp_return:
   *__temp429v=__temp87v__;
 }
 
@@ -43,6 +48,8 @@ static inline __attribute__((always_inline)) void mul__temp134v(unsigned long lo
   unsigned long long z=0;
   is_different__temp85v(x,y,&__temp135v__);
   z=x*y;
+  goto __temp_return;
+  __temp_return:
   *__temp430v=z;
 }
 
@@ -51,11 +58,15 @@ static inline __attribute__((always_inline)) void lt__temp182v(unsigned long lon
   char z=0;
   is_different__temp85v(x,y,&__temp183v__);
   z=x<y;
+  goto __temp_return;
+  __temp_return:
   *__temp431v=z;
 }
 
 static inline __attribute__((always_inline)) int sub__temp330v(unsigned long long x, unsigned long long y, unsigned long long* __temp432v) {
   int __temp331v__=0;
+  int __temp332v=0;
+  int __temp333v=0;
   char __temp334v__=0;
   unsigned long long z=0;
   int __temp_errcode=0;
@@ -67,23 +78,29 @@ static inline __attribute__((always_inline)) int sub__temp330v(unsigned long lon
   goto __temp_failure;
   }
   z=x-y;
+  goto __temp_return;
+  
+  __temp_failure:__temp_return:
   *__temp432v=z;
   
-  __temp_failure:
   return __temp_errcode;
 }
 
 static inline __attribute__((always_inline)) void print__temp361v(unsigned long long value) {
+  int __temp362v=0;
   const char* endl=0;
   endl=__temp350v;
   printf("%llu%s",value,endl);
 }
 
 static inline __attribute__((always_inline)) void cstr__temp410v(long long int value, const char** __temp433v) {
+  int __temp411v=0;
   const char* endl=0;
   const char* ret=0;
   endl=__temp350v;
   ret=__temp_all_errcodes[value];
+  goto __temp_return;
+  __temp_return:
   *__temp433v=ret;
 }
 

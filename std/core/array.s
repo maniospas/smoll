@@ -38,8 +38,7 @@ def alloc(mut any[] buffer, nat|blank size)
     if size is blank
         size = 1
     defer
-        print "free"
-        if buffer.unsafe_size!=0
+        if exists buffer.unsafe_ptr
             buffer.unsafe_size = 0
             buffer.unsafe_ptr.unsafe::free()
     if buffer.unsafe_size==size
@@ -70,17 +69,17 @@ def alloc(mut any[] buffer, nat|blank size)
 
 def resize(mut any[] buffer, nat size)
     doc "resize the buffer"
-    doc "This does nothing if the previous size is the same, frees the buffer if new size is zero."
+    doc "This does nothing if the previous size is the same or less, frees the buffer if new size is zero."
     doc "If old size was zero, an error is created instead of allocating so that this does not leak"
     doc "resources."
-    if buffer.unsafe_size==size 
+    if buffer.unsafe_size>=size 
         return buffer
     if size==0
         buffer.unsafe_size = 0
         buffer.unsafe_ptr.unsafe::free()
         return buffer
     if buffer.unsafe_size==0
-        fail "cannot resize an unallocated buffer"
+        fail "cannot resize an unallocated or freed buffer"
     prev_bytes = buffer.unsafe_size*buffer.unsafe_align
     buffer.unsafe_size = size
     bytes = buffer.unsafe_align*size

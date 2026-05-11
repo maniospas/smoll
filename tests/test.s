@@ -1,10 +1,10 @@
 import "std/core.s"
 
-def test(nat x)
-    if x<2 fail "test"
-    return x
+def test()
+    buf = bufpos alloc KB 4
+    s = buf.copy str "test"
+    return s
 
 def main()
-    try x = test(1)
-    if not try compiler::catch()
-        print x
+    s = test()
+    print s

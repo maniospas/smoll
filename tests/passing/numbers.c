@@ -5,7 +5,7 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp350v="\n";
-static const char* __temp_all_errcodes[28] = {"noerr",
+static const char* __temp_all_errcodes[27] = {"noerr",
 "error",
 "id subtraction would yield a negative",
 "cannot convert negative float to id",
@@ -16,10 +16,9 @@ static const char* __temp_all_errcodes[28] = {"noerr",
 "cannot resize buffers with alloc; it promises no data reallocation",
 "cannot resize an unallocated buffer",
 "out of bounds",
-"string does not fit on buffer",
+"character copy does not fit on buffer",
 "cannot extend the string's left side outside its right range",
 "string buffer out of memory",
-"string out of bounds",
 "slice out of string bounds",
 "user input was not an int",
 "user input was not a nat",
@@ -35,74 +34,85 @@ static const char* __temp_all_errcodes[28] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void float__temp379v(unsigned long long x, double* __temp1236v) {
+static inline __attribute__((always_inline)) void float__temp379v(unsigned long long x, double* __temp1198v) {
   double z=0;
   z=x;
-  *__temp1236v=z;
+  goto __temp_return;
+  __temp_return:
+  *__temp1198v=z;
 }
 
-static inline __attribute__((always_inline)) void false__temp7v(int* __temp1237v) {
+static inline __attribute__((always_inline)) void false__temp7v(int* __temp1199v) {
   int value=0;
-  *__temp1237v=value;
+  *__temp1199v=value;
 }
 
-static inline __attribute__((always_inline)) void not__temp27v(int __temp_anon0, int* __temp1238v) {
+static inline __attribute__((always_inline)) void not__temp27v(int __temp_anon0, int* __temp1200v) {
   int __temp28v__=0;
   false__temp7v(&__temp28v__);
-  *__temp1238v=__temp28v__;
+  goto __temp_return;
+  __temp_return:
+  *__temp1200v=__temp28v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp61v(double x, double y, int* __temp1239v) {
+static inline __attribute__((always_inline)) void is_different__temp61v(double x, double y, int* __temp1201v) {
   int __temp62v=0;
   int __temp63v__=0;
   not__temp27v(__temp62v,&__temp63v__);
-  *__temp1239v=__temp63v__;
+  goto __temp_return;
+  __temp_return:
+  *__temp1201v=__temp63v__;
 }
 
-static inline __attribute__((always_inline)) void mul__temp112v(double x, double y, double* __temp1240v) {
+static inline __attribute__((always_inline)) void mul__temp112v(double x, double y, double* __temp1202v) {
   int __temp113v__=0;
   double z=0;
   is_different__temp61v(x,y,&__temp113v__);
   z=x*y;
-  *__temp1240v=z;
+  goto __temp_return;
+  __temp_return:
+  *__temp1202v=z;
 }
 
-static inline __attribute__((always_inline)) void add__temp88v(double x, double y, double* __temp1241v) {
+static inline __attribute__((always_inline)) void add__temp88v(double x, double y, double* __temp1203v) {
   int __temp89v__=0;
   double z=0;
   is_different__temp61v(x,y,&__temp89v__);
   z=x+y;
-  *__temp1241v=z;
+  goto __temp_return;
+  __temp_return:
+  *__temp1203v=z;
 }
 
 static inline __attribute__((always_inline)) void print__temp353v(double value) {
+  int __temp354v=0;
   const char* endl=0;
   endl=__temp350v;
   printf("%.6f%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__temp1225v() {
-  double __temp1226v=0;
+static inline __attribute__((always_inline)) void main__temp1187v() {
+  double __temp1188v=0;
   double x=0;
-  unsigned long long __temp1227v=0;
-  double __temp1228v__=0;
-  unsigned long long __temp1229v=0;
-  double __temp1230v__=0;
-  double __temp1231v=0;
-  double __temp1232v__=0;
-  double __temp1233v__=0;
-  double __temp1234v__=0;
-  __temp1226v=1.0;
-  x=__temp1226v;
-  __temp1227v=1;
-  float__temp379v(__temp1227v,&__temp1228v__);
-  __temp1229v=2;
-  float__temp379v(__temp1229v,&__temp1230v__);
-  __temp1231v=2.0;
-  mul__temp112v(__temp1230v__,__temp1231v,&__temp1232v__);
-  add__temp88v(__temp1228v__,__temp1232v__,&__temp1233v__);
-  add__temp88v(x,__temp1233v__,&__temp1234v__);
-  print__temp353v(__temp1234v__);
+  unsigned long long __temp1189v=0;
+  double __temp1190v__=0;
+  unsigned long long __temp1191v=0;
+  double __temp1192v__=0;
+  double __temp1193v=0;
+  double __temp1194v__=0;
+  double __temp1195v__=0;
+  double __temp1196v__=0;
+  __temp1188v=1.0;
+  x=__temp1188v;
+  __temp1189v=1;
+  float__temp379v(__temp1189v,&__temp1190v__);
+  __temp1191v=2;
+  float__temp379v(__temp1191v,&__temp1192v__);
+  __temp1193v=2.0;
+  mul__temp112v(__temp1192v__,__temp1193v,&__temp1194v__);
+  add__temp88v(__temp1190v__,__temp1194v__,&__temp1195v__);
+  add__temp88v(x,__temp1195v__,&__temp1196v__);
+  print__temp353v(__temp1196v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1225v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1187v();return 0;}

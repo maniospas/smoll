@@ -16,6 +16,7 @@
 
 local import "std/core/builtinsext.s"
 local import "std/core/array.s"
+local import "std/unsafe.s" as unsafe
 
 def exists(cstr c)
     doc "checks whether a cstr is not zero-initialized"
@@ -26,9 +27,19 @@ local def strdat(nat pos, nat length, char first)
     doc "string data without the buffer storage"
     return (pos, length, first)
 
+local def str(const char ptr unsafe_ptr, strdat dat)
+    doc "a string residing on a buffer"
+    return class(unsafe_ptr, dat)
+
+local def str(const char ptr unsafe_ptr, nat pos, nat length)
+    doc "a string residing on a buffer"
+    {if(length){builtins::compiler::ptr first_pos = unsafe_ptr+pos;builtins::char first=*first_pos;}} # properly zero-initialized otherwise
+    return str(unsafe_ptr, pos, length, first)
+
 def str(const char[] buf, strdat dat)
     doc "a string residing on a buffer"
-    return class(buf, dat)
+    unsafe_ptr = buf.unsafe_ptr
+    return str(unsafe_ptr, dat)
 
 def str(const char[] buf)
     doc "a string residing on the full breadth of a buffer"
@@ -40,8 +51,7 @@ def str(str other)
 
 def str(const char[] buf, nat pos, nat length)
     doc "a string residing on a buffer that automatically detects the first character"
-    if length!=0
-        first = buf[pos]  # properly zero-initialized otherwise
+    if length!=0 first = buf[pos]  # properly zero-initialized otherwise
     return str(buf, pos, length, first)
 
 def str(cstr c)
@@ -83,14 +93,14 @@ def copy(str|cstr _other)
     doc "copy a string to a new buffer"
     other = str _other
     buf = alloc len other
-    {memcpy(buf__unsafe_ptr, other__buf__unsafe_ptr+other__dat__pos, other__dat__length);}
+    {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     return str(buf, 0, other.dat.length, other.dat.first)
 
 local def copy_null_terminated(str other)
     doc "copy a string to a new buffer while ensuring null termination"
     doc "This is useful only for supporting unsafe_temporary_cstr."
     buf = alloc 1+len other
-    {memcpy(buf__unsafe_ptr, other__buf__unsafe_ptr+other__dat__pos, other__dat__length);}
+    {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     {builtins::compiler::ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}
     return str(buf, 0, other.dat.length, other.dat.first)
@@ -107,14 +117,9 @@ def unsafe_temporary_cstr(str other)
     doc "invalidates the null termination property, so in general do not manipulate" 
     doc "strings while this is used in code; it should only be used for operating"
     doc "system calls."
-    end_pos = other.dat.pos+other.dat.length
-    if end_pos!=0 and end_pos<=len(other.buf) and other.buf[end_pos-1]==char ""
-        c = other
-    else if end_pos<len(other.buf) and other.buf[end_pos]==char ""
-        c = other
-    else
-        c = copy_null_terminated(other)
-    {builtins::cstr ret = c__buf__unsafe_ptr+c__dat__pos;}
+    {if(other__dat__length){builtins::compiler::ptr endpos=other__unsafe_ptr+other__dat__pos+other__dat__length;builtins::char endchar=*endpos;}builtins::bool needs_copying=endchar;}
+    c = copy_null_terminated(other)
+    {builtins::cstr ret = c__unsafe_ptr+c__dat__pos;}
     defer
         # will do nothing but ties ret and c together
         if not exists ret 
@@ -132,18 +137,14 @@ def bufpos(any[] buf)
     pos = mut 0
     return (buf, pos)
 
-def rextend(str s, nat|blank by, char|blank character)
-    doc "extend a string right"
-    doc "This refers to extending within the string's enclosing buffer. No memory is allocated."
+def copy(char[] buf, mut nat pos, char character, nat|blank by)
     if by is blank
-        doc "Extends by one character."
         by = 1
-    new_length = s.dat.length+by
-    if new_length+s.dat.pos>len s.buf fail "string does not fit on buffer"
+    if pos+by>len buf fail "character copy does not fit on buffer"
     if not character is blank
         doc "Also sets a specified character to all new positions."
-        {memset(((char*)s__buf__unsafe_ptr)+s__dat__pos+s__dat__length, character, by);}
-    return str(s.buf, s.dat.pos, new_length, s.dat.first)
+        {memset(buf__unsafe_ptr+pos, character, by);}
+    return str(buf, pos, by)
 
 def lextend(const str s, nat|blank pos)
     doc "extend a string left"
@@ -156,7 +157,8 @@ def lextend(const str s, nat|blank pos)
         pos = 0
     if pos==s.dat.pos return s
     if pos>s.dat.pos+s.dat.length fail "cannot extend the string's left side outside its right range"
-    return str(s.buf, pos, (s.dat.pos+s.dat.length)-pos)
+    return str(s.unsafe_ptr, pos, (s.dat.pos+s.dat.length)-pos)
+    
 
 def copy(char[] buf, mut nat pos, str|cstr _other)
     doc "copy a string"
@@ -167,7 +169,7 @@ def copy(char[] buf, mut nat pos, str|cstr _other)
     next_pos = pos+len other
     if next_pos>len buf
         fail "string buffer out of memory"
-    {memcpy(buf__unsafe_ptr+pos, other__buf__unsafe_ptr+other__dat__pos, other__dat__length);}
+    {memcpy(buf__unsafe_ptr+pos, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)
@@ -182,7 +184,7 @@ def copy_null_terminated(char[] buf, mut nat pos, str|cstr _other)
     next_pos = null_pos + 1
     if next_pos>len buf
         fail "string buffer out of memory"
-    {memcpy(buf__unsafe_ptr+pos, ((char*)other__buf__unsafe_ptr)+other__dat__pos, other__dat__length);}
+    {memcpy(buf__unsafe_ptr+pos, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     {buf__unsafe_ptr[null_pos]=0;}
     prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
     pos = next_pos
@@ -193,9 +195,7 @@ def print(str s, cstr|blank endl)
     if endl is blank
         doc "Ends the line too."
         endl = "\n"
-    if s.dat.length+s.dat.pos>s.buf.unsafe_size
-        fail "string out of bounds"
-    {printf("%.*s%s", s__dat__length, s__dat__pos+s__buf__unsafe_ptr, endl);}
+    {printf("%.*s%s", s__dat__length, s__dat__pos+s__unsafe_ptr, endl);}
 
 local def charlist()
     return list mut char[]
@@ -219,7 +219,7 @@ def copy(charlist li, str|cstr _other)
 
 def get(str s, nat i)
     doc "a character in a string"
-    unsafe_ptr = s.buf[s.dat.pos+i]&
+    unsafe_ptr = s.unsafe_ptr.unsafe::add(s.dat.pos+i)
     return unsafe_ptr
 
 def eq(cstr x, cstr y)
@@ -234,7 +234,7 @@ def eq(str x, str y)
         return false
     if x.dat.first!=y.dat.first
         return false
-    {builtins::bool z = !memcmp(((char*)x__buf__unsafe_ptr)+x__dat__pos, ((char*)y__buf__unsafe_ptr)+y__dat__pos, n);}
+    {builtins::bool z = !memcmp(x__unsafe_ptr+x__dat__pos, y__unsafe_ptr+y__dat__pos, n);}
     return z
 
 def eq(str x, cstr y)
@@ -265,10 +265,9 @@ def slice(str _s, nat from, nat to)
     if from==to return str ""
     if from<to or to>s.dat.length fail "slice out of string bounds"
     new_length = to-from
-    new_pos = s.dat.pos+from
-    if from!=0 new_first = s.buf[new_pos]
+    if from!=0 new_first = s[from]
     else new_first = const s.dat.first
-    return str(s.buf, new_pos, new_length, new_first)
+    return str(s.unsafe_ptr, s.dat.pos+from, new_length, new_first)
 
 def starts_with(cstr|str _stack, cstr|str _needle)
     stack = str _stack

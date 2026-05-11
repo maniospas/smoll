@@ -17,7 +17,7 @@ def main()
   buff[3] = str "is"
   buff[4] = str "manios"
   buff[5] = concat(buff)
-
+  debug_type buff
   full_iter = range len buff
   while try j=next full_iter
     print (j," ")

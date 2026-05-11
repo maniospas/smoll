@@ -5,7 +5,7 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp350v="\n";
-static const char* __temp_all_errcodes[28] = {"noerr",
+static const char* __temp_all_errcodes[27] = {"noerr",
 "error",
 "id subtraction would yield a negative",
 "cannot convert negative float to id",
@@ -16,10 +16,9 @@ static const char* __temp_all_errcodes[28] = {"noerr",
 "cannot resize buffers with alloc; it promises no data reallocation",
 "cannot resize an unallocated buffer",
 "out of bounds",
-"string does not fit on buffer",
+"character copy does not fit on buffer",
 "cannot extend the string's left side outside its right range",
 "string buffer out of memory",
-"string out of bounds",
 "slice out of string bounds",
 "user input was not an int",
 "user input was not a nat",
@@ -35,102 +34,122 @@ static const char* __temp_all_errcodes[28] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void float__temp379v(unsigned long long x, double* __temp1299v) {
+static inline __attribute__((always_inline)) void float__temp379v(unsigned long long x, double* __temp1261v) {
   double z=0;
   z=x;
-  *__temp1299v=z;
+  goto __temp_return;
+  __temp_return:
+  *__temp1261v=z;
 }
 
-static inline __attribute__((always_inline)) void false__temp7v(int* __temp1300v) {
+static inline __attribute__((always_inline)) void false__temp7v(int* __temp1262v) {
   int value=0;
-  *__temp1300v=value;
+  *__temp1262v=value;
 }
 
-static inline __attribute__((always_inline)) void not__temp27v(int __temp_anon0, int* __temp1301v) {
+static inline __attribute__((always_inline)) void not__temp27v(int __temp_anon0, int* __temp1263v) {
   int __temp28v__=0;
   false__temp7v(&__temp28v__);
-  *__temp1301v=__temp28v__;
+  goto __temp_return;
+  __temp_return:
+  *__temp1263v=__temp28v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp61v(double x, double y, int* __temp1302v) {
+static inline __attribute__((always_inline)) void is_different__temp61v(double x, double y, int* __temp1264v) {
   int __temp62v=0;
   int __temp63v__=0;
   not__temp27v(__temp62v,&__temp63v__);
-  *__temp1302v=__temp63v__;
+  goto __temp_return;
+  __temp_return:
+  *__temp1264v=__temp63v__;
 }
 
-static inline __attribute__((always_inline)) void add__temp88v(double x, double y, double* __temp1303v) {
+static inline __attribute__((always_inline)) void add__temp88v(double x, double y, double* __temp1265v) {
   int __temp89v__=0;
   double z=0;
   is_different__temp61v(x,y,&__temp89v__);
   z=x+y;
-  *__temp1303v=z;
+  goto __temp_return;
+  __temp_return:
+  *__temp1265v=z;
 }
 
-static inline __attribute__((always_inline)) void inc__temp1230v(double x, double* __temp1304v) {
-  unsigned long long __temp1232v=0;
-  double __temp1233v__=0;
+static inline __attribute__((always_inline)) void inc__temp1197v(double x, double* __temp1266v) {
+  int __temp1198v=0;
+  unsigned long long __temp1199v=0;
+  double __temp1200v__=0;
   double value=0;
-  int __temp1234v=0;
-  int __temp1235v__=0;
-  double __temp1236v__=0;
-  __temp1232v=1;
-  float__temp379v(__temp1232v,&__temp1233v__);
-  value=__temp1233v__;
-  not__temp27v(__temp1234v,&__temp1235v__);
-  add__temp88v(x,value,&__temp1236v__);
-  *__temp1304v=__temp1236v__;
+  int __temp1201v=0;
+  int __temp1202v__=0;
+  double __temp1203v__=0;
+  __temp1199v=1;
+  float__temp379v(__temp1199v,&__temp1200v__);
+  value=__temp1200v__;
+  not__temp27v(__temp1201v,&__temp1202v__);
+  add__temp88v(x,value,&__temp1203v__);
+  goto __temp_return;
+  __temp_return:
+  *__temp1266v=__temp1203v__;
 }
 
 static inline __attribute__((always_inline)) void print__temp353v(double value) {
+  int __temp354v=0;
   const char* endl=0;
   endl=__temp350v;
   printf("%.6f%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void is_different__temp85v(unsigned long long x, unsigned long long y, int* __temp1305v) {
+static inline __attribute__((always_inline)) void is_different__temp85v(unsigned long long x, unsigned long long y, int* __temp1267v) {
   int __temp86v=0;
   int __temp87v__=0;
   not__temp27v(__temp86v,&__temp87v__);
-  *__temp1305v=__temp87v__;
+  goto __temp_return;
+  __temp_return:
+  *__temp1267v=__temp87v__;
 }
 
-static inline __attribute__((always_inline)) void add__temp110v(unsigned long long x, unsigned long long y, unsigned long long* __temp1306v) {
+static inline __attribute__((always_inline)) void add__temp110v(unsigned long long x, unsigned long long y, unsigned long long* __temp1268v) {
   int __temp111v__=0;
   unsigned long long z=0;
   is_different__temp85v(x,y,&__temp111v__);
   z=x+y;
-  *__temp1306v=z;
+  goto __temp_return;
+  __temp_return:
+  *__temp1268v=z;
 }
 
-static inline __attribute__((always_inline)) void inc__temp1286v(unsigned long long x, unsigned long long value, unsigned long long* __temp1307v) {
-  int __temp1288v=0;
-  int __temp1289v__=0;
-  unsigned long long __temp1290v__=0;
-  not__temp27v(__temp1288v,&__temp1289v__);
-  add__temp110v(x,value,&__temp1290v__);
-  *__temp1307v=__temp1290v__;
+static inline __attribute__((always_inline)) void inc__temp1248v(unsigned long long x, unsigned long long value, unsigned long long* __temp1269v) {
+  int __temp1249v=0;
+  int __temp1250v=0;
+  int __temp1251v__=0;
+  unsigned long long __temp1252v__=0;
+  not__temp27v(__temp1250v,&__temp1251v__);
+  add__temp110v(x,value,&__temp1252v__);
+  goto __temp_return;
+  __temp_return:
+  *__temp1269v=__temp1252v__;
 }
 
 static inline __attribute__((always_inline)) void print__temp361v(unsigned long long value) {
+  int __temp362v=0;
   const char* endl=0;
   endl=__temp350v;
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__temp1291v() {
-  double __temp1292v=0;
-  double __temp1293v__=0;
-  unsigned long long __temp1295v=0;
-  unsigned long long __temp1296v=0;
-  unsigned long long __temp1297v__=0;
-  __temp1292v=2.0;
-  inc__temp1230v(__temp1292v,&__temp1293v__);
-  print__temp353v(__temp1293v__);
-  __temp1295v=2;
-  __temp1296v=2;
-  inc__temp1286v(__temp1295v,__temp1296v,&__temp1297v__);
-  print__temp361v(__temp1297v__);
+static inline __attribute__((always_inline)) void main__temp1253v() {
+  double __temp1254v=0;
+  double __temp1255v__=0;
+  unsigned long long __temp1257v=0;
+  unsigned long long __temp1258v=0;
+  unsigned long long __temp1259v__=0;
+  __temp1254v=2.0;
+  inc__temp1197v(__temp1254v,&__temp1255v__);
+  print__temp353v(__temp1255v__);
+  __temp1257v=2;
+  __temp1258v=2;
+  inc__temp1248v(__temp1257v,__temp1258v,&__temp1259v__);
+  print__temp361v(__temp1259v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1291v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1253v();return 0;}

@@ -41,9 +41,13 @@ def str(const char[] buf, strdat dat)
     unsafe_ptr = buf.unsafe_ptr
     return str(unsafe_ptr, dat)
 
-def str(const char[] buf)
+def str(const char[] buf, nat|blank length)
     doc "a string residing on the full breadth of a buffer"
-    return str(buf, 0, len buf, buf[0])
+    if length is blank
+        length = len buf
+    if not length is blank
+        if length>len buf fail "string does not fit on buffer"
+    return str(buf, 0, length, buf[0])
 
 def str(str other)
     doc "tautology function for strings"
@@ -58,11 +62,12 @@ def str(cstr c)
     doc "convert to string"
     doc "Defines an implicit constant buffer using the cstr's memory data."
     doc "Subsequent comparisons no longer use the underlying pointer value."
-    buf = const char[]  # const because we do not allow resizing operations
+    buf = mut char[]  # mut to create, convert to const on return to prevent resizing
     {buf__unsafe_ptr = c;}
+    buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler::attach_type(c)
     {if(c){builtins::nat length = strlen(c);}} # length initializes to zero
-    {buf__unsafe_size = length+1;}  # account for null termination
-    return str(buf,0,length)
+    buf.unsafe_size = length+1  # account for null termination
+    return str(const buf,0,length)
 
 def len(str s)
     doc "string length"
@@ -146,19 +151,9 @@ def copy(char[] buf, mut nat pos, char character, nat|blank by)
         {memset(buf__unsafe_ptr+pos, character, by);}
     return str(buf, pos, by)
 
-def lextend(const str s, nat|blank pos)
-    doc "extend a string left"
-    doc "This refers to extending whing the string's enclosing buffer."
-    doc "The extension can only reach to a position left of the string's end. No memory is allocated"
-    doc "and the result of the extension is returned. This counts as concatenating the string"
-    doc "with its previous data."
-    if pos is blank
-        doc "The extension reaches the buffer's start."
-        pos = 0
-    if pos==s.dat.pos return s
-    if pos>s.dat.pos+s.dat.length fail "cannot extend the string's left side outside its right range"
-    return str(s.unsafe_ptr, pos, (s.dat.pos+s.dat.length)-pos)
-    
+def endpos(const str s)
+    doc "the end position of a string in its buffer"
+    return s.dat.pos+s.dat.length
 
 def copy(char[] buf, mut nat pos, str|cstr _other)
     doc "copy a string"
@@ -219,8 +214,7 @@ def copy(charlist li, str|cstr _other)
 
 def get(str s, nat i)
     doc "a character in a string"
-    unsafe_ptr = s.unsafe_ptr.unsafe::add(s.dat.pos+i)
-    return unsafe_ptr
+    unsafe_return s.unsafe_ptr.unsafe::add(s.dat.pos+i)
 
 def eq(cstr x, cstr y)
     doc "equals"

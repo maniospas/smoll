@@ -4,8 +4,8 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp1183v="123";
-const char* const __temp350v="\n";
+const char* const __temp1187v="123";
+const char* const __temp353v="\n";
 static const char* __temp_all_errcodes[27] = {"noerr",
 "error",
 "id subtraction would yield a negative",
@@ -17,8 +17,8 @@ static const char* __temp_all_errcodes[27] = {"noerr",
 "cannot resize buffers with alloc; it promises no data reallocation",
 "cannot resize an unallocated or freed buffer",
 "out of bounds",
+"string does not fit on buffer",
 "character copy does not fit on buffer",
-"cannot extend the string's left side outside its right range",
 "string buffer out of memory",
 "slice out of string bounds",
 "user input was not an int",
@@ -35,25 +35,25 @@ static const char* __temp_all_errcodes[27] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__temp718v(const char* x, const char* y, uint8_t* __temp1186v) {
-  uint8_t z=0;
+static inline __attribute__((always_inline)) void eq__temp722v(const char* x, const char* y, char* __temp1190v) {
+  char z=0;
   z=(x==y);
   goto __temp_return;
   __temp_return:
-  *__temp1186v=z;
+  *__temp1190v=z;
 }
 
-static inline __attribute__((always_inline)) void print__temp365v(uint8_t value) {
-  int __temp366v=0;
+static inline __attribute__((always_inline)) void print__temp368v(char value) {
+  int __temp369v=0;
   const char* endl=0;
-  endl=__temp350v;
+  endl=__temp353v;
   printf("%s%s",value? "true":"false",endl);
 }
 
-static inline __attribute__((always_inline)) void main__temp1182v() {
-  uint8_t __temp1184v__=0;
-  eq__temp718v(__temp1183v,__temp1183v,&__temp1184v__);
-  print__temp365v(__temp1184v__);
+static inline __attribute__((always_inline)) void main__temp1186v() {
+  char __temp1188v__=0;
+  eq__temp722v(__temp1187v,__temp1187v,&__temp1188v__);
+  print__temp368v(__temp1188v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1182v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1186v();return 0;}

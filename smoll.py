@@ -126,6 +126,9 @@ class MemoryEmulator:
 
     def memcpy(self, addr: int, addr2: int, size: int):
         self.contents[addr:(addr+size)] = self.contents[addr2:(addr2+size)]
+    
+    def memcmp(self, addr: int, addr2: int, size: int):
+        return 0 if self.contents[addr:(addr+size)] == self.contents[addr2:(addr2+size)] else 1
 
     def as_str(self, addr: int, size: int):
         try: end = self.contents.index(0, addr)
@@ -680,7 +683,7 @@ class ImplementedType:
                 if candidate not in visited: pending.add(candidate)
         return None
 
-    def returns(self, value: list[Variable], error_token: "Token"):
+    def returns(self, value: list[Variable], error_token: "Token", is_safe: bool):
         for v in value:
             if v._references is not None: 
                 #if not any(u.name==v._references for u in value):
@@ -688,11 +691,12 @@ class ImplementedType:
                 self.assign(v.name, [self.vars[v._references]], error_token, perform_immutability_checks=False, top_entry=False)
                 v._references = None
 
-        for v in value: 
-            if v.type.invalidated_by==POINTER_TYPE and not v.stabilized_name().endswith("__unsafe_ptr") and v.stabilized_name()!="unsafe_ptr":
-                error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' is a pointer and hence cannot be returned - name it 'unsafe_ptr' to permit this but consider that the pointed resource may not exist anymore")
-            if v.stabilized_name() in self.invalidated:
-                error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' has been invalidated", reason=self.invalidated[v.stabilized_name()])
+        if is_safe:
+            for v in value: 
+                if v.type.invalidated_by==POINTER_TYPE and not v.stabilized_name().endswith("__unsafe_ptr") and v.stabilized_name()!="unsafe_ptr":
+                    error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' is a pointer and hence cannot be returned - name it 'unsafe_ptr' to permit this but consider that the pointed resource may not exist anymore")
+                if v.stabilized_name() in self.invalidated:
+                    error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' has been invalidated", reason=self.invalidated[v.stabilized_name()])
         
         if self.has_returned_once and len(self.rets)!=len(value):
             error_token.error("type", "this value returned here is a different type than previous returns '"+signature_like([self.vars[ret] for ret in self.rets])+"' vs '"+signature_like(value)+"'")
@@ -809,7 +813,7 @@ class ImplementedType:
                 if varname in self.vars and self.vars[varname].type==FLOAT_TYPE: parsed_value = float(parsed_value)
                 else: parsed_value = int(parsed_value)
                 local_vars[varname] = parsed_value
-            elif impl[pos+1].tostring()[0] in "+-*/<>=!^|&":
+            elif impl[pos+1].tostring()[0] in "+-*/<>=!^|&%":
                 op = impl[pos+1].tostring()
                 v1 = process_expression(impl,pos,pos)
                 v2 = process_expression(impl,pos+2,pos+2)
@@ -829,6 +833,7 @@ class ImplementedType:
                 if op=="^": return v1^v2
                 if op=="|": return v1|v2
                 if op=="&": return v1&v2
+                if op=="%": return v1%v2
                 if op==">>": return (v1 & 0xFFFFFFFFFFFFFFFF) >> v2
                 if op=="<<": return (v1 << v2) & 0xFFFFFFFFFFFFFFFF
                 self.at.error("interpreter", "not implemented operator '"+impl[pos+1].tostring()+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
@@ -844,7 +849,7 @@ class ImplementedType:
                         if candidate.monomorphic_name==candidate_name:
                             callee = candidate
                             break
-                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy", "strlen"]:
+                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy", "strlen", "memcmp"]:
                     self.at.error("interpreter", "failed to interpret C function '"+candidate_name+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                 gathered_args: list[str] = list()
                 gathered_args_by_pointer: list[bool] = list()
@@ -902,12 +907,12 @@ class ImplementedType:
                     if not isinstance(values[0],int): self.at.error("malformed smollC", "'strlen' requires an integer argument")
                     return memory.strlen(values[0])
 
-                if candidate_name == "memcpy":
-                    if len(values)!=3: self.at.error("malformed smollC", "'memcpy' requires three arguments")
-                    if not isinstance(values[2], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                if candidate_name == "memcpy" or candidate_name=="memcmp":
+                    if len(values)!=3: self.at.error("malformed smollC", f"'{candidate_name}' requires three arguments")
+                    if not isinstance(values[2], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                     if gathered_args_by_pointer[0]:
-                        if gathered_args_by_pointer[1]: self.at.error("malformed smollC", "Cannot use memcpy to copy variables.")
-                        if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                        if gathered_args_by_pointer[1]: self.at.error("malformed smollC", f"Cannot use '{candidate_name}' between two variables.")
+                        if not isinstance(values[1], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         if values[1]==0: 
                             self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
                         if values[2]==1:
@@ -930,7 +935,7 @@ class ImplementedType:
                             local_vars[gathered_args[0]] = memory.read_int64(values[1])
                         return None
                     if gathered_args_by_pointer[1]:
-                        if not isinstance(values[0], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                        if not isinstance(values[0], int): self.at.error(f"malformed smollC", "non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                         if values[0]==0: 
                             self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
                         if values[2]==1:
@@ -952,10 +957,12 @@ class ImplementedType:
                         else:
                             memory.write_int64(values[0], values[1])
                         return None
-                    if not isinstance(values[0], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                    if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer argument to 'memcpy' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                    memory.memcpy(values[0], values[1], values[2])
-                    return None
+                    if not isinstance(values[0], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                    if not isinstance(values[1], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                    if candidate_name=="memcpy":
+                        memory.memcpy(values[0], values[1], values[2])
+                        return None
+                    return memory.memcmp(values[0], values[1], values[2])
 
                 if candidate_name == "ptr_memzero":
                     if len(values)!=3: self.at.error("malformed smollC", "'ptr_memzero' requires three arguments")
@@ -2792,7 +2799,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
             if depth: name.error("syntax", "imbalanced brackets")
             pos += 1
             continue
-        if name.text=="return":
+        if name.text=="return" or name.text=="unsafe_return":
             def process_return(pos: int):
                 if is_lsp and name.file.is_main_file: 
                     print_lsp_keyword(name, "**return**\n\nReturns from the current function immediately. This still calls any necessary 'defer' statements. Function returns form a type.")
@@ -2801,7 +2808,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 #    name.error("safety", "the first return must occur conditionally in recursive functions: 'rec "+impl.name+"'")
                 pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
                 pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
-                impl.returns(ret, name)
+                impl.returns(ret, name, name.text=="return")
                 #if not ret: impl.implementation.extend([CodeWord("return"), CODEWORD_SEMICOLON])
                 #else: 
                 impl.implementation.extend([CODEWORD_GOTO, CodeWord("__temp_return"), CODEWORD_SEMICOLON])
@@ -3609,7 +3616,7 @@ CAUGHT_TYPE.doc.append("catch the error code intercepted by 'try'")
 CAUGHT_TYPE.doc.append("Also catches the error codes produced by defers triggered by 'del'.")
 CAUGHT_TYPE.doc.append("Fails if there is no error code, otherwise returns and cleans the last error code.")
 # FAIL_TYPE.vars["message"] = CSTR_TYPE
-# FAIL_TYPE.args.append("message") 
+# FAIL_TYPE.args.append("message")
 SAME_CONTENTS_TYPE = ImplementedType("attach_type")
 SAME_CONTENTS_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
 SAME_CONTENTS_TYPE.vars["from"] = Variable("from", POINTER_TYPE)
@@ -3619,6 +3626,17 @@ SAME_CONTENTS_TYPE.set_pointer_type(SAME_CONTENTS_TYPE.vars["from"], ANY_TYPE)
 SAME_CONTENTS_TYPE.set_pointer_depedency(SAME_CONTENTS_TYPE.vars["to"], SAME_CONTENTS_TYPE.vars["from"])
 SAME_CONTENTS_TYPE.doc.append("pointer references the same type as another")
 SAME_CONTENTS_TYPE.doc.append("Forces the first pointer to reference the same type of object as another. The function returns the first one to enable chain notation.")
+
+SAME_CONTENTS_TYPE_CSTR = ImplementedType("attach_type")
+SAME_CONTENTS_TYPE_CSTR.vars["to"] = Variable("to", POINTER_TYPE)
+SAME_CONTENTS_TYPE_CSTR.vars["from"] = Variable("from", CSTR_TYPE)
+SAME_CONTENTS_TYPE_CSTR.rets.append("to")
+SAME_CONTENTS_TYPE_CSTR.args.extend(["to", "from"])
+SAME_CONTENTS_TYPE_CSTR.set_pointer_type(SAME_CONTENTS_TYPE_CSTR.vars["to"], CHAR_TYPE)
+SAME_CONTENTS_TYPE_CSTR.doc.append("pointer references the same type as another")
+SAME_CONTENTS_TYPE_CSTR.doc.append("Forces the first pointer to reference a buffer of characters.")
+
+
 
 smol_namespace = File("builtins")
 builtin_token = Token("builtins", smol_namespace, 1, 1)
@@ -3642,7 +3660,7 @@ fixed_namespace.types["branchless"] = UnionType("branchless", at=compiler_token)
 fixed_namespace.types["true"] = UnionType("true", at=compiler_token).append(TRUE_TYPE)
 fixed_namespace.types["false"] = UnionType("false", at=compiler_token).append(FALSE_TYPE)
 fixed_namespace.types["ptr"] = UnionType("ptr", at=compiler_token).append(POINTER_TYPE)
-fixed_namespace.types["attach_type"] = UnionType("attach_type", at=compiler_token).append(SAME_CONTENTS_TYPE)
+fixed_namespace.types["attach_type"] = UnionType("attach_type", at=compiler_token).append(SAME_CONTENTS_TYPE).append(SAME_CONTENTS_TYPE_CSTR)
 fixed_namespace.types["catch"] = UnionType("catch", at=compiler_token).append(CAUGHT_TYPE)
 smol_namespace.namespaces["compiler"] = fixed_namespace
 

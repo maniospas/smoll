@@ -42,9 +42,9 @@ def remove(str|cstr _path)
     if not result fail "failed to remove file"
 
 def read(str|cstr _path)
-    path = unsafe_temporary_cstr _path
     doc "loads a cstr path as a readable directory"
-    {builtins::compiler::ptr unsafe_ptr = (void*)opendir(path);}
+    path = unsafe_temporary_cstr _path
+    {builtins::compiler::ptr unsafe_ptr = (char*)opendir(path);}
     defer
         {if(unsafe_ptr) {closedir((DIR*)unsafe_ptr); unsafe_ptr=0;}}
     if not exists unsafe_ptr fail "failed to open file"
@@ -56,7 +56,7 @@ def entry(read f)
     doc "from the same directory."
     if not exists f.unsafe_ptr
         fail "not open dir"
-    {builtins::compiler::ptr de = (void*)readdir((DIR*)f__unsafe_ptr);}
+    {builtins::compiler::ptr de = (char*)readdir((DIR*)f__unsafe_ptr);}
     if not exists de
         fail "end of dir"
     {builtins::cstr dirname=((struct dirent*)de)->d_name;}

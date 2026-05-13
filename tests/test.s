@@ -1,10 +1,7 @@
 import "std/core.s"
-
-def test()
-    buf = bufpos alloc KB 4
-    s = buf.copy str "test"
-    return s
+import "std/map.s"
 
 def main()
-    s = test()
-    print s
+    map = strmap alloc(mut str[], 128)
+    map["hello"] = str "hello world!"
+    print map["hello"]

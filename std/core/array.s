@@ -91,26 +91,22 @@ def resize(mut any[] buffer, nat size)
 def last(const any[] buffer)
     doc "get a pointer to the last buffer element"
     if 0==buffer.unsafe_size fail "out of bounds"
-    unsafe_ptr = buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1)*buffer.unsafe_align)
-    return unsafe_ptr
+    unsafe_return buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1)*buffer.unsafe_align)
 
 def mutlast(any[] buffer)
     doc "get a mutable pointer to the last buffer element"
     if 0==buffer.unsafe_size fail "out of bounds"
-    unsafe_ptr = unsafe_mut buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1)*buffer.unsafe_align)
-    return unsafe_ptr
+    unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1)*buffer.unsafe_align)
     
 def mutget(any[] buffer, nat i)
     doc "get a mutable pointer to a buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
-    unsafe_ptr = unsafe_mut buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align)
-    return unsafe_ptr
+    unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align)
     
 def get(const any[] buffer, nat i)
     doc "get a pointer to a buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
-    unsafe_ptr = buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align)
-    return unsafe_ptr
+    unsafe_return buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align)
 
 def len(const any[] buffer)
     doc "the number of buffer elements"
@@ -132,14 +128,12 @@ def list(mut any[] buffer)
 def get(list l, nat pos)
     doc "get a list element pointer"
     if pos>=l.length fail "out of bounds"
-    unsafe_ptr = get(l.buffer,pos)
-    return unsafe_ptr
+    unsafe_return get(l.buffer,pos)
 
 def mutget(list l, nat pos)
     doc "get a mutable list element pointer"
     if pos>=l.length fail "out of bounds"
-    unsafe_ptr = l.buffer.mutget pos
-    return unsafe_ptr
+    unsafe_return l.buffer.mutget pos
 
 def push(list l)
     doc "get a mutable pointer to a new list element"
@@ -148,5 +142,4 @@ def push(list l)
     if prev_length >= len l.buffer
         l.buffer = l.buffer.resize(prev_length+prev_length/2+1)
     l.length = prev_length + 1
-    unsafe_ptr = l.buffer.mutget prev_length
-    return unsafe_ptr
+    unsafe_return l.buffer.mutget prev_length

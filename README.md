@@ -67,6 +67,7 @@ Download the executable from the
 ./smoll test.s
 ```
 
+Or experiment with the online playground linked above.
 
 ## 🏷️ License
 

@@ -23,6 +23,36 @@ def Number = float|int|nat
 def is_different(Number x, Number y)
     return not x is type(y)
 
+def eq(Number x, Number y)
+    doc "equal to"
+    if is_different(x,y)
+        compiler::skip()
+    {builtins::bool z = x==y;}
+    return z
+
+def neq(Number x, Number y)
+    doc "unequal to"
+    if is_different(x,y)
+        compiler::skip()
+    {builtins::bool z = x!=y;}
+    return z
+
+def eq(compiler::catch x, compiler::catch y)
+    {builtins::bool z=(x==y);}
+    return z
+
+def neq(compiler::catch x, compiler::catch y)
+    {builtins::bool z=(x!=y);}
+    return z
+
+def eq(any ptr x, any ptr y)
+    {builtins::bool z=(x==y);}
+    return z
+
+def neq(any ptr x, any ptr y)
+    {builtins::bool z=(x!=y);}
+    return z
+
 def add(Number x, Number y)
     doc "add"
     if is_different(x,y)
@@ -41,7 +71,18 @@ def div(Number x, Number y)
     doc "divide by"
     if is_different(x,y)
         compiler::skip()
+    {type(x) zero = 0;}
+    if y==zero
+        fail "division by zero "
     {type(x) z=x/y;}
+    return z
+
+def mod(nat x, nat y)
+    doc "modulo by"
+    {type(x) zero = 0;}
+    if y==zero
+        fail "modulo by zero "
+    {type(x) z=x%y;}
     return z
 
 def lt(Number x, Number y)
@@ -71,20 +112,6 @@ def ge(Number x, Number y)
         compiler::skip()
     {builtins::bool z = x>=y;}
     return z
-
-def eq(Number x, Number y)
-    doc "equal to"
-    if is_different(x,y)
-        compiler::skip()
-    {builtins::bool z = x==y;}
-    return z
-
-def neq(Number x, Number y)
-    doc "unequal to"
-    if is_different(x,y)
-        compiler::skip()
-    {builtins::bool z = x!=y;}
-    return z
     
 def sub(Number x, Number y)
     doc "substract by"
@@ -105,19 +132,3 @@ def pow(nat x, nat y)
         ret = ret*x
         i = i+1
     return ret
-
-def eq(compiler::catch x, compiler::catch y)
-    {builtins::bool z=(x==y);}
-    return z
-
-def neq(compiler::catch x, compiler::catch y)
-    {builtins::bool z=(x!=y);}
-    return z
-
-def eq(any ptr x, any ptr y)
-    {builtins::bool z=(x==y);}
-    return z
-
-def neq(any ptr x, any ptr y)
-    {builtins::bool z=(x!=y);}
-    return z

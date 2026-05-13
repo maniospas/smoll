@@ -69,8 +69,9 @@
 <em>1.6.</em> <a href="#conditions">conditions</a><br>
 <em>1.7.</em> <a href="#recursion">recursion</a> <br>
 <em>1.8.</em> <a href="#unions">unions</a> <br>
-<em>1.9.</em> <a href="#conditional-compilation-and-default-arguments">conditional compilation and default arguments</a><br>
-<em>1.10.</em> <a href="#local-definitions">local definitions</a></p>
+<em>1.9.</em> <a href="#literal-types">literal types</a> <br>
+<em>1.10.</em> <a href="#conditional-compilation-and-default-arguments">conditional compilation and default arguments</a><br>
+<em>1.11.</em> <a href="#local-definitions">local definitions</a></p>
 
 <p><strong>Section 2. Safe resources</strong><br>
 <em>2.1.</em> <a href="#buffers">buffers</a><br>
@@ -468,6 +469,76 @@ An example follows.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="n">Number</span> <span class="n">x</span><span class="p">,</span> <span class="n">Number</span> <span class="n">y</span><span class="p">)</span>
     <span class="p">{</span><span class="n">builtins</span><span class="p">::</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
     <span class="k">return</span> <span class="n">z</span>
+</code></pre>
+</div>
+
+<h2 id="literal-types">literal types</h2>
+
+<p>Often there is a need to distinguish functionality based on some exact
+literal value. Or you may want to have some constant that is used everywhere
+in your code. This is done by having literal types, as in, types that
+are attached to specific values.</p>
+
+<p>Below is an example on constants first. Literal types evaluate to their
+value when used within code.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">INCREMENT</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">INCREMENT</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="mi">0</span>  <span class="c1"># prints 1</span>
+</code></pre>
+</div>
+
+<p>Aside from usage as constants, types can be used to specialize among which
+function to call. To do this, it is needed to prevent them from devolving
+into type values, which can be done by following them with <code>&amp;</code> when used
+in function bodies. Below is an example.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="s2">&quot;one&quot;</span><span class="p">)</span> <span class="c1"># just a literal type</span>
+    <span class="nb">print</span> <span class="s2">&quot;version one&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s2">&quot;version two&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span><span class="o">&amp;</span> <span class="c1"># can assign to variables normally</span>
+    <span class="n">version</span> <span class="n">v</span>  <span class="c1"># calls the correct version</span>
+</code></pre>
+</div>
+
+<p>It is important to remember that types likes these look like constants, 
+but they adhere to all type system conventions too, including the ability
+to declare unions. Furthermore, when used as
+arguments, literal types can still have an associated variable, which
+has the result of applying <code>&amp;</code> to them.</p>
+
+<p>Getting back the literal value from the variable can be done by following
+the latter with <code>..</code>. This is similar to pointer operators seen later,
+with the reasoning that literals can point to and from compilation state.
+Importantly, they are zero cost in that their type itself takes up no storage.</p>
+
+<p>An example that restricts how a functions are called is presented next.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">inc</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inc</span> <span class="ow">is</span> <span class="n">blank</span>
+        <span class="n">inc</span> <span class="o">=</span> <span class="mi">1</span><span class="o">&amp;</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">inc</span><span class="o">..</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="mi">0</span>       <span class="c1"># prints 1</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">&amp;</span><span class="p">)</span> <span class="c1"># prints 2</span>
 </code></pre>
 </div>
 
@@ -1098,6 +1169,24 @@ that fails on non-zero error code can be evoked like below.</p>
     <span class="n">buffer</span> <span class="o">=</span> <span class="p">(</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span><span class="p">,</span> <span class="n">mut</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># example with growing position</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">line</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">proc</span><span class="p">::</span><span class="n">line</span> <span class="n">process</span>
         <span class="nb">print</span> <span class="n">line</span>
+</code></pre>
+</div>
+
+<p>Equivalently, manually release the process to wait for its conclusions.
+Recall that running processes can create errors, whereas releasing
+resources contains those errors with <code>try</code>, which intercepts errors so that
+they can be retrieved with <code>compiler::catch()</code>. To repropagate or otherwise
+handle those errors, use a pattern like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">::</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">::</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
+    <span class="k">del</span> <span class="n">process</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+        <span class="n">fail</span> <span class="n">error</span> <span class="c1"># can fail on error codes too</span>
 </code></pre>
 </div>
 

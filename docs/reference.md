@@ -11,8 +11,9 @@ _1.5._ [type mutability](#type-mutability) <br>
 _1.6._ [conditions](#conditions)<br>
 _1.7._ [recursion](#recursion) <br>
 _1.8._ [unions](#unions) <br>
-_1.9._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)<br>
-_1.10._ [local definitions](#local-definitions)
+_1.9._ [literal types](#literal-types) <br>
+_1.10._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)<br>
+_1.11._ [local definitions](#local-definitions)
 
 **Section 2. Safe resources**<br>
 _2.1._ [buffers](#buffers)<br>
@@ -400,6 +401,75 @@ def unsafe_add(Number x, Number y)
     {builtins::float z=x+y;}
     return z
 ```
+
+## literal types
+
+Often there is a need to distinguish functionality based on some exact
+literal value. Or you may want to have some constant that is used everywhere
+in your code. This is done by having literal types, as in, types that
+are attached to specific values.
+
+Below is an example on constants first. Literal types evaluate to their
+value when used within code.
+
+```python
+import "std/core.s"
+
+def INCREMENT = 1
+
+def inc(nat x)
+    return x+INCREMENT
+
+def main()
+    print inc 0  # prints 1
+```
+
+Aside from usage as constants, types can be used to specialize among which
+function to call. To do this, it is needed to prevent them from devolving
+into type values, which can be done by following them with `&` when used
+in function bodies. Below is an example.
+
+```python
+import "std/core.s"
+
+def version("one") # just a literal type
+    print "version one"
+
+def version("two")
+    print "version two"
+
+def main()
+    v = "two"& # can assign to variables normally
+    version v  # calls the correct version
+```
+
+
+It is important to remember that types likes these look like constants, 
+but they adhere to all type system conventions too, including the ability
+to declare unions. Furthermore, when used as
+arguments, literal types can still have an associated variable, which
+has the result of applying `&` to them.
+
+Getting back the literal value from the variable can be done by following
+the latter with `..`. This is similar to pointer operators seen later,
+with the reasoning that literals can point to and from compilation state.
+Importantly, they are zero cost in that their type itself takes up no storage.
+
+An example that restricts how a functions are called is presented next.
+
+```python
+import "std/core.s"
+
+def inc(nat x, blank|1|2 inc)
+    if inc is blank
+        inc = 1&
+    return x+inc..
+
+def main()
+    print inc 0       # prints 1
+    print inc (0, 2&) # prints 2
+```
+
 
 ## conditional compilation and default arguments
 

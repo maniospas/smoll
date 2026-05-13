@@ -1,14 +1,20 @@
 import "std/core.s"
 import "std/map.s"
 
+def OPTIONS = "zero"|"one"|"two"
+
+def inc(nat x, blank|"one")
+    return x+1
+
+def inc(nat x, "two")
+    return x+2
+
+def which(OPTIONS option)
+    print option..
+
 def main()
-    map = strmap alloc(mut str[], 128)
-    map["hello"] = str "hello world!"
-    map["manio"] = str "it's a me, manio."
-    print map["hello"]
-    print map["manio"]
-    
-    # print all keys ("" is always the first key and we skip it)
-    it = (map.keys, mut 1)
-    while try key=next it
-        print key
+    lit = "one"&
+    which lit
+    print inc 0
+    print inc (0, lit)
+    print inc (0, "two"&)

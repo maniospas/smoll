@@ -51,7 +51,7 @@ def print(bool value, cstr|blank endl)
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
-    {printf("%s%s", value?"true":"false", endl);}
+    {if(value){printf("%s%s", "true", endl);}else{printf("%s%s", "false", endl);}}
 
 def print(compiler::true, cstr|blank endl)
     doc "prints a boolean"

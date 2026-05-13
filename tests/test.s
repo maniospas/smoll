@@ -10,11 +10,11 @@ def inc(nat x, "two")
     return x+2
 
 def which(OPTIONS option)
-    print option..
+    return option..
 
 def main()
     lit = "one"&
-    which lit
+    print which lit
     print inc 0
     print inc (0, lit)
     print inc (0, "two"&)

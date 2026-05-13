@@ -122,7 +122,7 @@ def unsafe_temporary_cstr(str other)
     doc "invalidates the null termination property, so in general do not manipulate" 
     doc "strings while this is used in code; it should only be used for operating"
     doc "system calls."
-    {if(other__dat__length){builtins::compiler::ptr endpos=other__unsafe_ptr+other__dat__pos+other__dat__length;builtins::char endchar=*endpos;}builtins::bool needs_copying=endchar;}
+    {if(other__dat__length){builtins::compiler::ptr endpos=other__unsafe_ptr+other__dat__pos+other__dat__length;builtins::char endchar = *endpos;}builtins::bool needs_copying=endchar;}
     c = copy_null_terminated(other)
     {builtins::cstr ret = c__unsafe_ptr+c__dat__pos;}
     defer

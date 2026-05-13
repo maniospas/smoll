@@ -2,7 +2,8 @@ import "std/core.s"
 
 def main()
     buf1 = mut float[]
-    buf1.resize(10)
+    buf1.alloc 20
+    buf1.resize 10
 
     buf2 = buf1
     # buf2.resize(10) # would create an error

@@ -356,7 +356,7 @@ def signature_like(vars: list[Variable], impl=None):
             ret += type.name+arg_name
             i += 1
         elif type.is_literal_of: 
-            ret += "literal "+type.at.text
+            ret += type.at.text+"&"
             i += len(type.rets)
         elif type.is_buffer_of: 
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
@@ -560,6 +560,7 @@ class ImplementedType:
         return self.vars[varname]
 
     def get_pointer_type(self, var: Variable) -> Optional["ImplementedType"]:
+        assert isinstance(var, Variable)
         visited: set[str] = set()
         while True:
             ret = self._pointer_types.get(var.name, None)
@@ -770,13 +771,41 @@ class ImplementedType:
                 return 0 if condition else 1
             if impl[pos].tostring()=="*":
                 if pos<=end-3 and impl[pos+2].tostring()=="=":
-                    index = process_expression(impl,pos+1,pos+1)
-                    value = process_expression(impl,pos+3,end)
-                    memory.contents[index] = (value)
+                    index = process_expression(impl, pos+1, pos+1)
+                    value = process_expression(impl, pos+3, end)
+                    # determine the pointee type to know write width
+                    ptr_var = impl[pos+1].tostring()
+                    if ptr_var in self.vars:
+                        pointee_type = self.get_pointer_type(self.vars[ptr_var])
+                        if pointee_type == FLOAT_TYPE:
+                            memory.write_float64(index, float(value))
+                        elif pointee_type in (UINT8_TYPE, CHAR_TYPE, BOOL_TYPE):
+                            memory.contents[index] = int(value) & 0xFF
+                        elif pointee_type == UINT16_TYPE:
+                            memory.write_uint16(index, int(value))
+                        elif pointee_type == UINT32_TYPE:
+                            memory.write_uint32(index, int(value))
+                        else:  # 64-bit int or pointer
+                            memory.write_int64(index, int(value))
                     return None
                 else:
-                    index = process_expression(impl,pos+1,end)
-                    return int(memory.contents[index])
+                    ptr_var = impl[pos+1].tostring()
+                    index = process_expression(impl, pos+1, end)
+                    if ptr_var in self.vars:
+                        pointee_type = self.get_pointer_type(self.vars[ptr_var])
+                        #if pointee_type is None or pointee_type==ANY_TYPE:
+                        #    self.at.error("interpreter", "cannot dereference unknown pointer type")
+                        if pointee_type == FLOAT_TYPE:
+                            return memory.read_float64(index)
+                        elif pointee_type in (UINT8_TYPE, CHAR_TYPE, BOOL_TYPE):
+                            return int(memory.contents[index])
+                        elif pointee_type == UINT16_TYPE:
+                            return memory.read_uint16(index)
+                        elif pointee_type == UINT32_TYPE:
+                            return memory.read_uint32(index)
+                        else:  # 64-bit int or pointer
+                            return memory.read_int64(index)
+                    return int(memory.contents[index])  # fallback
             if impl[pos].tostring()=="__temp_all_errcodes":
                 assert impl[pos+1].tostring()=="["
                 assert impl[pos+3].tostring()=="]"
@@ -888,146 +917,147 @@ class ImplementedType:
                         last_arg_name = tok.tostring()
                     pos += 1
                 if pos!=end: self.at.error("malformed smollC", "call parenthesis closed prematurely for '"+candidate_name+"' at"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
-                if candidate_name == "malloc":
-                    if len(values)!=1: self.at.error("malformed smollC", "'malloc' requires one argument")
-                    if not isinstance(values[0],int): self.at.error("malformed smollC", "'malloc' requires an integer argument")
-                    return memory.alloc(values[0])
+                if callee is None: # in case we have overlapping names
+                    if candidate_name == "malloc":
+                        if len(values)!=1: self.at.error("malformed smollC", "'malloc' requires one argument")
+                        if not isinstance(values[0],int): self.at.error("malformed smollC", "'malloc' requires an integer argument")
+                        return memory.alloc(values[0])
 
-                if candidate_name == "free":
-                    if len(values)!=1: self.at.error("malformed smollC", "'free' requires one argument")
-                    if not isinstance(values[0],int): self.at.error("malformed smollC", "'free' requires an integer argument")
-                    ret = memory.free(values[0])
-                    if ret: self.at.error("interpreter", "'free' tried to free non-allocated or already freed memory")
-                    return None
-
-                if candidate_name == "realloc":
-                    if len(values)!=2: self.at.error("malformed smollC", "'realloc' requires two arguments")
-                    if not isinstance(values[0],int): self.at.error("malformed smollC", "'realloc' requires an integer argument")
-                    if not isinstance(values[1],int): self.at.error("malformed smollC", "'realloc' requires an integer argument")
-                    return memory.realloc(values[0], values[1])
-                
-                if candidate_name == "strlen":
-                    if len(values)!=1: self.at.error("malformed smollC", "'strlen' requires one argument")
-                    if not isinstance(values[0],int): self.at.error("malformed smollC", "'strlen' requires an integer argument")
-                    return memory.strlen(values[0])
-
-                if candidate_name == "memcpy" or candidate_name=="memcmp":
-                    if len(values)!=3: self.at.error("malformed smollC", f"'{candidate_name}' requires three arguments")
-                    if not isinstance(values[2], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                    if gathered_args_by_pointer[0]:
-                        if gathered_args_by_pointer[1]: self.at.error("malformed smollC", f"Cannot use '{candidate_name}' between two variables.")
-                        if not isinstance(values[1], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                        if values[1]==0: 
-                            self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
-                        if values[2]==1:
-                            if self.vars[gathered_args[0]].type not in [UINT8_TYPE, CHAR_TYPE, BOOL_TYPE]:
-                                self.at.error("interpreter", "got 1 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                            local_vars[gathered_args[0]] = int(memory.contents[values[1]])
-                        elif values[2]==2:
-                            if self.vars[gathered_args[0]].type!=UINT16_TYPE:
-                                self.at.error("interpreter", "got 2 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                            local_vars[gathered_args[0]] = memory.read_uint16(values[1])
-                        elif values[2]==4:
-                            if self.vars[gathered_args[0]].type!=UINT32_TYPE:
-                                self.at.error("interpreter", "got 4 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                            local_vars[gathered_args[0]] = memory.read_uint32(values[1])
-                        elif values[2]!=8:
-                            self.at.error("interpreter", "expecting 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                        elif self.vars[gathered_args[0]].type==FLOAT_TYPE: 
-                            local_vars[gathered_args[0]] = memory.read_float64(values[1])
-                        else:
-                            local_vars[gathered_args[0]] = memory.read_int64(values[1])
+                    if candidate_name == "free":
+                        if len(values)!=1: self.at.error("malformed smollC", "'free' requires one argument")
+                        if not isinstance(values[0],int): self.at.error("malformed smollC", "'free' requires an integer argument")
+                        ret = memory.free(values[0])
+                        if ret: self.at.error("interpreter", "'free' tried to free non-allocated or already freed memory")
                         return None
-                    if gathered_args_by_pointer[1]:
-                        if not isinstance(values[0], int): self.at.error(f"malformed smollC", "non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                        if values[0]==0: 
-                            self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
-                        if values[2]==1:
-                            if self.vars[gathered_args[1]].type not in [UINT8_TYPE, CHAR_TYPE, BOOL_TYPE]:
-                                self.at.error("interpreter", "got 1 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                            memory.contents[values[0]] = (values[1])
-                        elif values[2]==2:
-                            if self.vars[gathered_args[1]].type!=UINT16_TYPE:
-                                self.at.error("interpreter", "got 4 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                            memory.write_uint16(values[0], values[1])
-                        elif values[2]==4:
-                            if self.vars[gathered_args[1]].type!=UINT32_TYPE:
-                                self.at.error("interpreter", "got 4 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                            memory.write_uint32(values[0], values[1])
-                        elif values[2]!=8:
-                            self.at.error("interpreter", "expecting 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                        elif self.vars[gathered_args[1]].type==FLOAT_TYPE: 
-                            memory.write_float64(values[0], values[1])
-                        else:
-                            memory.write_int64(values[0], values[1])
-                        return None
-                    if not isinstance(values[0], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                    if not isinstance(values[1], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
-                    if candidate_name=="memcpy":
-                        memory.memcpy(values[0], values[1], values[2])
-                        return None
-                    return memory.memcmp(values[0], values[1], values[2])
 
-                if candidate_name == "ptr_memzero":
-                    if len(values)!=3: self.at.error("malformed smollC", "'ptr_memzero' requires three arguments")
-                    if not isinstance(values[0], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
-                    if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
-                    if not isinstance(values[2], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
-                    return memory.memset(values[0]+values[1], 0, values[2]-values[1])
+                    if candidate_name == "realloc":
+                        if len(values)!=2: self.at.error("malformed smollC", "'realloc' requires two arguments")
+                        if not isinstance(values[0],int): self.at.error("malformed smollC", "'realloc' requires an integer argument")
+                        if not isinstance(values[1],int): self.at.error("malformed smollC", "'realloc' requires an integer argument")
+                        return memory.realloc(values[0], values[1])
+                    
+                    if candidate_name == "strlen":
+                        if len(values)!=1: self.at.error("malformed smollC", "'strlen' requires one argument")
+                        if not isinstance(values[0],int): self.at.error("malformed smollC", "'strlen' requires an integer argument")
+                        return memory.strlen(values[0])
 
-                if candidate_name == "printf":
-                    if not values: return None
-                    fmt_arg = values[0]
-                    assert isinstance(fmt_arg, int)
-                    fmt = memory.as_cstr(fmt_arg)
-                    arg_index = 1
-                    result = []
-                    i = 0
-                    while i < len(fmt):
-                        if fmt[i] != '%':
-                            result.append(fmt[i])
-                            i += 1
-                            continue
-                        i += 1  # skip '%'
-                        if i >= len(fmt):
-                            break
-                        # collect optional precision (e.g. ".6" in "%.6f")
-                        precision = None
-                        if fmt[i] == '.':
-                            i += 1
-                            if fmt[i]=="*":
-                                precision = values[arg_index]
-                                arg_index += 1
-                                i += 1
+                    if candidate_name == "memcpy" or candidate_name=="memcmp":
+                        if len(values)!=3: self.at.error("malformed smollC", f"'{candidate_name}' requires three arguments")
+                        if not isinstance(values[2], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                        if gathered_args_by_pointer[0]:
+                            if gathered_args_by_pointer[1]: self.at.error("malformed smollC", f"Cannot use '{candidate_name}' between two variables.")
+                            if not isinstance(values[1], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                            if values[1]==0: 
+                                self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
+                            if values[2]==1:
+                                if self.vars[gathered_args[0]].type not in [UINT8_TYPE, CHAR_TYPE, BOOL_TYPE]:
+                                    self.at.error("interpreter", "got 1 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                                local_vars[gathered_args[0]] = int(memory.contents[values[1]])
+                            elif values[2]==2:
+                                if self.vars[gathered_args[0]].type!=UINT16_TYPE:
+                                    self.at.error("interpreter", "got 2 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                                local_vars[gathered_args[0]] = memory.read_uint16(values[1])
+                            elif values[2]==4:
+                                if self.vars[gathered_args[0]].type!=UINT32_TYPE:
+                                    self.at.error("interpreter", "got 4 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                                local_vars[gathered_args[0]] = memory.read_uint32(values[1])
+                            elif values[2]!=8:
+                                self.at.error("interpreter", "expecting 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                            elif self.vars[gathered_args[0]].type==FLOAT_TYPE: 
+                                local_vars[gathered_args[0]] = memory.read_float64(values[1])
                             else:
-                                prec_start = i
-                                while i < len(fmt) and fmt[i].isdigit(): i += 1
-                                precision = int(fmt[prec_start:i]) if prec_start < i else 0
-                        # collect specifier (possibly multi-char like "ll")
-                        spec = ""
-                        while i < len(fmt) and fmt[i] in "lh":
-                            spec += fmt[i]
-                            i += 1
-                        if i < len(fmt):
-                            spec += fmt[i]
-                            i += 1
-                        val = values[arg_index] if arg_index < len(values) else 0
-                        arg_index += 1
-                        if spec == "s":
-                            if precision is not None: s = memory.as_str(int(val), precision)
-                            else: s = memory.as_cstr(int(val))
-                            result.append(s)
-                        elif spec == "c":  result.append(chr(int(val)))
-                        elif spec in ("lld", "d", "i"): result.append(str(int(val)))
-                        elif spec in ("llu", "u"): result.append(str(int(val) & 0xFFFFFFFFFFFFFFFF))
-                        elif spec in ("f", "lf"):
-                            prec = precision if precision is not None else 6
-                            result.append(f"{float(val):.{prec}f}")
-                        else:
-                            print("".join(result), end="", flush=True)  # flush what we have before raising
-                            self.at.error("interpreter", f"unimplemented printf specifier {spec}")
-                    print("".join(result), end="", flush=True)
-                    return None
+                                local_vars[gathered_args[0]] = memory.read_int64(values[1])
+                            return None
+                        if gathered_args_by_pointer[1]:
+                            if not isinstance(values[0], int): self.at.error(f"malformed smollC", "non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                            if values[0]==0: 
+                                self.at.error("interpreter", "null pointer dereference at '"+" ".join([impl[i].tostring() for i in range(prev_pos,end+1)])+"'")
+                            if values[2]==1:
+                                if self.vars[gathered_args[1]].type not in [UINT8_TYPE, CHAR_TYPE, BOOL_TYPE]:
+                                    self.at.error("interpreter", "got 1 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                                memory.contents[values[0]] = (values[1])
+                            elif values[2]==2:
+                                if self.vars[gathered_args[1]].type!=UINT16_TYPE:
+                                    self.at.error("interpreter", "got 4 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                                memory.write_uint16(values[0], values[1])
+                            elif values[2]==4:
+                                if self.vars[gathered_args[1]].type!=UINT32_TYPE:
+                                    self.at.error("interpreter", "got 4 byte alignment for incompatible type at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                                memory.write_uint32(values[0], values[1])
+                            elif values[2]!=8:
+                                self.at.error("interpreter", "expecting 8 byte alignment but got '"+str(values[2])+"' bytes at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                            elif self.vars[gathered_args[1]].type==FLOAT_TYPE: 
+                                memory.write_float64(values[0], values[1])
+                            else:
+                                memory.write_int64(values[0], values[1])
+                            return None
+                        if not isinstance(values[0], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                        if not isinstance(values[1], int): self.at.error("malformed smollC", f"non-integer argument to '{candidate_name}' at '"+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
+                        if candidate_name=="memcpy":
+                            memory.memcpy(values[0], values[1], values[2])
+                            return None
+                        return memory.memcmp(values[0], values[1], values[2])
+
+                    if candidate_name == "ptr_memzero":
+                        if len(values)!=3: self.at.error("malformed smollC", "'ptr_memzero' requires three arguments")
+                        if not isinstance(values[0], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
+                        if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
+                        if not isinstance(values[2], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
+                        return memory.memset(values[0]+values[1], 0, values[2]-values[1])
+
+                    if candidate_name == "printf":
+                        if not values: return None
+                        fmt_arg = values[0]
+                        assert isinstance(fmt_arg, int)
+                        fmt = memory.as_cstr(fmt_arg)
+                        arg_index = 1
+                        result = []
+                        i = 0
+                        while i < len(fmt):
+                            if fmt[i] != '%':
+                                result.append(fmt[i])
+                                i += 1
+                                continue
+                            i += 1  # skip '%'
+                            if i >= len(fmt):
+                                break
+                            # collect optional precision (e.g. ".6" in "%.6f")
+                            precision = None
+                            if fmt[i] == '.':
+                                i += 1
+                                if fmt[i]=="*":
+                                    precision = values[arg_index]
+                                    arg_index += 1
+                                    i += 1
+                                else:
+                                    prec_start = i
+                                    while i < len(fmt) and fmt[i].isdigit(): i += 1
+                                    precision = int(fmt[prec_start:i]) if prec_start < i else 0
+                            # collect specifier (possibly multi-char like "ll")
+                            spec = ""
+                            while i < len(fmt) and fmt[i] in "lh":
+                                spec += fmt[i]
+                                i += 1
+                            if i < len(fmt):
+                                spec += fmt[i]
+                                i += 1
+                            val = values[arg_index] if arg_index < len(values) else 0
+                            arg_index += 1
+                            if spec == "s":
+                                if precision is not None: s = memory.as_str(int(val), precision)
+                                else: s = memory.as_cstr(int(val))
+                                result.append(s)
+                            elif spec == "c":  result.append(chr(int(val)))
+                            elif spec in ("lld", "d", "i"): result.append(str(int(val)))
+                            elif spec in ("llu", "u"): result.append(str(int(val) & 0xFFFFFFFFFFFFFFFF))
+                            elif spec in ("f", "lf"):
+                                prec = precision if precision is not None else 6
+                                result.append(f"{float(val):.{prec}f}")
+                            else:
+                                print("".join(result), end="", flush=True)  # flush what we have before raising
+                                self.at.error("interpreter", f"unimplemented printf specifier {spec}")
+                        print("".join(result), end="", flush=True)
+                        return None
                 assert callee, candidate_name
                 #inputs = [v for v in values]
                 retcode = callee.interpret(values, memory) # may modify values
@@ -1149,8 +1179,16 @@ class ImplementedType:
             elif ret=="return" or not ret:
                 values = _arg_values
                 for pos in range(len(values)):
-                    if self.vars[args[pos]].type==FLOAT_TYPE: values[pos] = local_vars.get(args[pos], 0.0)
-                    else: values[pos] = local_vars.get(args[pos], 0)
+                    if self.vars[args[pos]].type==FLOAT_TYPE: 
+                        values[pos] = local_vars.get(args[pos], 0.0)
+                        continue
+                    test_value = local_vars.get(args[pos], None)
+                    if test_value is None:
+                        if args[pos] in global_var2cstr:
+                            cstr_global = global_var2cstr[args[pos]]
+                            test_value = memory.named_alloc_value(args[pos], cstr_global[1:-1])
+                        else: test_value = 0
+                    values[pos] = test_value
             for defer in reversed(self.defers): process_block(defer, 0, len(defer)-1)
         self.can_try_interpreter = True
         return local_vars.get("__temp_errcode", 0)
@@ -1557,7 +1595,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             if callee_arg.immutable:
                 impl.implementation.extend([var, CODEWORD_COMMA])
                 continue
-            if var.isprivate: error_token.error("type", "an immutable class field '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
+            if var.isprivate: error_token.error("safety", "an immutable class field '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
             #elif not var.immutable: error_token.error("type", "an immutable variable '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
             impl.implementation.extend([CODEWORD_AMP, var, CODEWORD_COMMA])
 
@@ -1988,7 +2026,7 @@ def process_linear_type(file: File, tokens: list[Token], pos: int, show_lsp: boo
     assert isinstance(tmptype, UnionType)
     type: UnionType = tmptype
     if peek_text(tokens, pos) == "|":
-        if is_lsp and get(tokens, pos).file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "either of either side's types")
+        if is_lsp and get(tokens, pos).file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "either of the types")
         prev_pos = pos
         pos, alternatives = process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=reduce_to_unique_variations)
         ret = UnionType(type.name+"|"+alternatives.name, at=get(tokens, prev_pos))
@@ -3379,6 +3417,7 @@ def process_union(file: File, tokens: list[Token], pos: int):
         if not isinstance(variation, UnionType): break
         union_type.variations.extend(variation.variations)
         if peek_text(tokens, pos)!="|": break
+        if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_keyword(get(tokens, pos), "either of the types")
         pos += 1
     file.types[union_name] = union_type
     return pos

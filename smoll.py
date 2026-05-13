@@ -1503,7 +1503,14 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
     if ANY_TYPE in method.variations:
         return vars
+    if DEBUG_TYPE in method.variations:
+        if not is_lsp: print(signature_like(vars, impl))
+        return vars
     callee = _select_call(file, impl, method, vars, error_token)
+
+    if callee==NOCATCH_TYPE:
+        if impl.needs_failure_mode: error_token.error("safety", "there are potential errors that can occur up to here that have not been intercepted with `try`")
+        #return [TRUE_TYPE if impl.needs_failure_mode else FALSE_TYPE]
 
     if callee==CAUGHT_TYPE:
         tmp = create_temp()
@@ -2954,20 +2961,20 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                 return pos, ret
             pos, ret = process_return(pos)
             continue
-        if name.text=="debug_msg":
-            message = get(tokens, pos)
-            pos += 1
-            print(impl.name+":", message.text)
-            if is_lsp and name.file.is_main_file: 
-                print_lsp_keyword(name, "prints a debug message once this position is reached during compilation:\n"+message.text)
-            continue
-        if name.text=="debug_type":
-            pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
-            pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
-            print(impl.name+":", signature_like(ret, impl), "|", ", ".join([r.name.replace("__", ".") for r in ret]))
-            if is_lsp and name.file.is_main_file: 
-                print_lsp_keyword(name, "prints this inferred type when this position is reached during compilation:\n"+signature_like(ret, impl))
-            continue
+        # if name.text=="debug_msg":
+        #     message = get(tokens, pos)
+        #     pos += 1
+        #     print(impl.name+":", message.text)
+        #     if is_lsp and name.file.is_main_file: 
+        #         print_lsp_keyword(name, "prints a debug message once this position is reached during compilation:\n"+message.text)
+        #     continue
+        # if name.text=="debug_type":
+        #     pos, ret = process_statement(file, tokens, pos, impl, current_operator_priority=0)
+        #     pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+        #     print(impl.name+":", signature_like(ret, impl), "|", ", ".join([r.name.replace("__", ".") for r in ret]))
+        #     if is_lsp and name.file.is_main_file: 
+        #         print_lsp_keyword(name, "prints this inferred type when this position is reached during compilation:\n"+signature_like(ret, impl))
+        #     continue
         if name.text=="del":
             if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "invalidates the subsequent value, potentially calling deferred destructors")
             def process_del(pos: int):
@@ -3748,6 +3755,12 @@ FAIL_TYPE.doc.append("Branchless code refers loops or conditions that are elimin
 SUCCESS_TYPE = ImplementedType("branchless")
 SUCCESS_TYPE.doc.append("verify branchless code")
 SUCCESS_TYPE.doc.append("Branchless code refers loops or conditions that are eliminated during compilation as either always true or always false, based on type analysis and data analysis. This is meaningful for compiling different versions of functions based on specific conditions occuring. This function is hard-wired to create an error if it is called withing a condition or loop that has not been eliminated this way.")
+NOCATCH_TYPE = ImplementedType("nocatch")
+NOCATCH_TYPE.doc.append("verify no errors up to now")
+NOCATCH_TYPE.doc.append("Creates a compiler error if it is possible to have seen an error outside a 'try' statement that would have terminate this function before this point.")
+DEBUG_TYPE = ImplementedType("debug")
+DEBUG_TYPE.doc.append("prints a type during compilation")
+DEBUG_TYPE.doc.append("This runs even if subsequent code fails.")
 ANY_TYPE = ImplementedType("any")
 ANY_TYPE.doc.append("any type")
 ANY_TYPE.doc.append("Represents a generic for buffers and pointers for type-independent code that can be matched to a concrete type later.")
@@ -3802,6 +3815,8 @@ fixed_namespace.types["false"] = UnionType("false", at=compiler_token).append(FA
 fixed_namespace.types["ptr"] = UnionType("ptr", at=compiler_token).append(POINTER_TYPE)
 fixed_namespace.types["attach_type"] = UnionType("attach_type", at=compiler_token).append(SAME_CONTENTS_TYPE).append(SAME_CONTENTS_TYPE_CSTR)
 fixed_namespace.types["catch"] = UnionType("catch", at=compiler_token).append(CAUGHT_TYPE)
+fixed_namespace.types["nocatch"] = UnionType("nocatch", at=compiler_token).append(NOCATCH_TYPE)
+fixed_namespace.types["debug"] = UnionType("debug", at=compiler_token).append(DEBUG_TYPE)
 smol_namespace.namespaces["compiler"] = fixed_namespace
 
 file_cache["builtins"] = smol_namespace

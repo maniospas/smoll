@@ -23,6 +23,7 @@ _2.4._ [substructures](#substructures)<br>
 _2.5._ [try and fail](#try-and-fail)<br>
 _2.6._ [defer](#defer)<br>
 _2.7._ [catching errors](#catching-errors)<br>
+_2.8._ [more compiler functions](#more-compiler-functions)<br>
 
 **Section 3. Standard library**<br>
 _3.1._ [strings](#strings)<br>
@@ -48,9 +49,12 @@ def main()
 ```
 
 If you are new to the language, now is a good point to mention
-that you need only the executable to start working with it. You can
-then reference local or **online** directory. Below is an example,
-where the theoretical *std/* location is grabbed from the development repository. For safety, imported files other than the one you run can only make suggestions about repos, and fail to compile if these are not present.
+that you need only the executable (and a local C compiler) to start working. Once
+you download the language's executable, you can reference local or **online** directories 
+in your code. The second type are automatically downloaded. Below is an example,
+where the theoretical *std/* location is grabbed from the development repository. 
+For safety, imported files other than the one you run can only make suggestions about repos, 
+and fail to compile if these are not present.
 
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
@@ -106,8 +110,8 @@ def main()
     print add(1,2)
 ```
 
-You can also use the `.` operator to pipe some data
-into the beginning of a function like below. This also
+The `.` operator can also pipe some data
+into the beginning of a function like below. This
 works as a notation for calling functions like class 
 methods. In general, do try to avoid needless parentheses,
 as the snippet below does (`f1 f2 ... args` is a chain of 
@@ -348,7 +352,7 @@ Below is an overengineered and thus algorithmically
 slow Fibonacci number calculator that demonstrates recursion
 concepts. The function `call_fib` is completely useless too. :-)
 
-Reminder that recursive functions can call both
+Recall that recursive functions can call both
 themselves and others that appear *later*. But normal functions
 can still only see previous declarations. Do note that only
 one function in a chain of multiple ones needs to be declared
@@ -425,9 +429,12 @@ def main()
 ```
 
 Aside from usage as constants, types can be used to specialize among which
-function to call. To do this, it is needed to prevent them from devolving
-into type values, which can be done by following them with `&` when used
-in function bodies. Below is an example.
+function to call. To do this, they must be prevented from devolving
+into values, this is done by following them with `&` when used
+in function bodies, which creates literal type *values* (type values
+exist only for literals). 
+
+Below is an example.
 
 ```python
 import "std/core.s"
@@ -443,17 +450,18 @@ def main()
     version v  # calls the correct version
 ```
 
-
 It is important to remember that types likes these look like constants, 
 but they adhere to all type system conventions too, including the ability
 to declare unions. Furthermore, when used as
 arguments, literal types can still have an associated variable, which
-has the result of applying `&` to them.
+contains the result of applying `&` to them.
 
-Getting back the literal value from the variable can be done by following
-the latter with `..`. This is similar to pointer operators seen later,
-with the reasoning that literals can point to and from compilation state.
-Importantly, they are zero cost in that their type itself takes up no storage.
+Getting back the literal value from a literal type value can be done by following
+the latter with `..`. The pair of `&`/`..` is deliberately similar to point
+conversion later, as the two follow similar patterns of getting lowered in an intermediate
+value (the literal type value or memory address) that can retrieve the original.
+Notably, `"two"&..` is the same as writing `"two"`, and the benefit lies purely in
+involving values in the type system.
 
 An example that restricts how a functions are called is presented next.
 
@@ -481,7 +489,7 @@ whether conditions will always be true or false and **eliminate code without par
 
 In other words, you can make `is` checks to determine conditionally which code
 segment to compile. This incurs *zero* runtime overhead. 
-At the same type, you can mingle them together with other condition checking,
+At the same time, you can mingle them together with other condition checking,
 as the standard library's core. Below is an example of a conditional check.
 
 ```python
@@ -517,11 +525,12 @@ def main()
 
 Here is a much more complicated example, where `compiler::skip()` 
 is used to prevent certain versions of the function from being
-created (e.g. there is no `inc(flaot,int)`). Do note that you
+created (e.g. there is no `inc(float,int)`). Do note that you
 can also specialize a type `T` that could have produced
 `x` per `type T x`. In total, the compiler investigates 3*4=12
 variations and eventually keeps 6 of them. Both conditions
-are fully zero-cost abstractions.
+are fully zero-cost abstractions. Do note that usually the
+signature would be kept simple by declaring a helper `def Number = float|int|nat`.
 
 ```python
 import "std/core.s"
@@ -646,7 +655,9 @@ access notation. Move values onto pointed locations
 of mutable pointers per `ptr << value`.
 
 *Smoλ* makes necessary checks on pointer safety; it would be too restrictive
-to impose those checks on the type system. 
+to granularly impose those checks via the type system, so there is only one main rule:
+**pointers are invalidated if any memory is resized, moved, or freed**. This
+rule is introduced by the memory manipulation functions of the standard library.
 
 Mainly, the type of data stored on pointers
 is checked for consistency, and invalidated pointers (for example whose
@@ -654,7 +665,8 @@ data have moved in memory by modifying a buffer) cannot be used.
 Functions declare pointer arguments per `any ptr`, `float ptr`, etc.
 
 There is a particular contract for pointers: unless
-they create a runtime error by remaining uninitialized, it is always
+they create a runtime error by remaining uninitialized, and granted that they
+remain valid, it is always
 valid to move data to their memory address. Below is an example.
 
 ```python
@@ -675,29 +687,6 @@ last two prints, `element` would become invalidated and would
 need to be re-obtained from the buffer.
 In general, try to work with buffers and only use pointers
 for rapidly moving temporary data around.
-
-As we now know about pointer invalidation, it becomes apparent
-why the syntax `data >> ptr` is necessary when moving data
-within a buffer while resizing it; it lets us put dereferencing
-on the left-hand-side to evaluate it before moving data. 
-
-Below is how one could do
-this without intermediate variables
-by leveraging the fact that `resize` returns the buffer
-while a helper function `mutlast` is provided to retrieve a 
-mutable pointer to the last element (or fail for an empty buffer).
-If we used `<<` we would not have access to `buf[2]` after resizing.
-
-```python
-import "std/core.s"
-import "std/array.s"
-
-def main()
-    buf = (mut nat[]).alloc 3
-    buf[2] = 1
-    buf[2] >> mutlast buf.resize 2
-    print buf[1]  # prints 1
-```
 
 ## stable references
 
@@ -793,8 +782,9 @@ def Point3D(float x, float y, float z)
 def main()
     points = (mut Point3D[]).alloc(10)
     points[0] = Point3D(1.0,2.0,3.0)
-    print points@plane@x[0]
-    print points[0].plane.x  # equivalent
+    plane = points@plane # can move this around
+    print plane@x[0]
+    print points[0].plane.x # equivalent data path
 ```
 
 ## try and fail
@@ -821,16 +811,43 @@ def main()
     print "this line is never printed"
 ```
 
+Propagating failures is done in the spirit of writing concise but well-controlled code.
+**Don't care about failures. Unless you must.** That is, assume correct execution,
+as if you were scripting, and only handle failures at places where they can be handled
+safely or where they would be critical. If it is important to ensure that 
+a function does not fail up to a certain point, place the `compiler::nocatch()` 
+assertion. There are various other compiler assetions too, which are covered later.
+
+```python
+import "std/core.s"
+
+def main()
+    try x = alloc KB 4  # buffer of chars
+    try x[0] = char "a" # still needs a try for buffer elements - though checks can be optimized away
+    try print x[0]
+    print "this must run at all costs"
+    compiler::nocatch() # compiler error without 'try' on all PREVIOUS calls that could fail
+    print x[10000]      # allowed to fail now
+    print "this will never run due to out of bounds error"
+```
+
 There are certain places in code where you may want to recover from call failures,
 for example by calling the same code again for improved user input, or by
 falling back to some secondary functionality. This is achieved with the
 `try` keyword. That parses an expression without stopping at the first failing functions, 
-if any (their returns are just zero-initialized). You can fail only once within a try
-and the compiler will complain for multiple failures - split those among multiple declaration
-to avoid ambiguity.
+if any. Stressing again: this intercepts the
+first error of an *expression* not a whole block of code. 
 
-Finally, the failure within tried expressions is converted into 
-boolean values. Below is an example that safeguards against failing allocation.
+You can fail only once within a try
+and the compiler will complain for multiple failures. This is done so that each prospective
+failure is split among multiple declarations to avoid ambiguity of how error handling takes
+place. For example, you can handle each error differently.
+Create and call helper methods to compartmentalize error-prone code chunks and handle
+their failure all at once. See later for how to reconstruct and handle specific error codes.
+
+Finally, returns from failing
+functions are just zero-initialized, but `try` has a boolean outcome that shows whether
+an error is intercepted. Below is an example that safeguards against failing allocation.
 
 ```python
 import "std/core.s"
@@ -845,6 +862,18 @@ def main()
     print(len v, " numbers allocated\n")
 ```
 
+Since failure is a fast abstraction in *smoλ*, it is also the preferred syntax for 
+iterators reaching their end. Below is an example, where all standard library iterators
+follow the same pattern for terminating loops and you should try to reuse in your code.
+
+```python
+import "std/core.s"
+
+def main()
+    it = range 5
+    while try i=next it
+        print i
+```
 
 ## defer
 
@@ -902,7 +931,7 @@ import "std/core.s"
 import "std/io.s" as io
 
 def main()
-    try print 2*3-20
+    try print 2*3-20 # nat cannot become negative
     if try error = compiler::catch()
         print "cannot substract two nat numbers and obtain a negative result"
 ```
@@ -913,7 +942,7 @@ captures only subsequent messages. Caught errors can be compared for equality an
 converted to strings per `cstr error`.
 
 Errors are not retrieved when intercepted within called functions.
-But, importently, they *are* obtained from deferred statements triggered by 
+But, importantly, they *are* obtained from deferred statements triggered by 
 `del`. The next snippet demonstrates how to clear errors and check on them.
 
 
@@ -934,6 +963,39 @@ def main()
         fail error       # can fail with error codes too
 ```
 
+
+## more compiler functions
+
+Till now there was mention of `compiler::skip()`, 
+`compiler::catch()` and `compiler::nocatch()`
+as mechanisms that let your code interface with 
+the compiler to an extend.
+
+There are some more mechanisms that help inspect
+programs or grant access to internal state that
+you can then analyze. Foremost of those is
+`compiler::debug(expression)`. This 
+runs an expression, prints its return at compile time, 
+and returns its value. It works this way so that it can 
+be effortlessly interweaved in code. Do note that you
+can use it with literal types to print messages too.
+For example, one pattern usable for debuggining is the following.
+
+```python
+import "std/core.s"
+
+def main()
+    s1 = str "s1"
+    s2 = str "s2"
+    compiler::debug "--- main ---"&     # prints '"--- main ---"&' at compile time
+    s = compiler::debug (s1,s2)         # prints 'const str, const str' at compile time
+    print s # ERROR due to undefined print, but the above still prints
+```
+
+Finally, assert that a specific point in a function does not lie within a loop
+or condition with the `compiler::branchless()` check. The main usage of this
+is as a sanity check within conditional compilation conditions, ensuring that
+they are not accidentally evaluated at runtime.
 
 # Section 3. Standard library
 
@@ -961,13 +1023,13 @@ def main()
 ## strings
 
 The standard library provides the `str` structural type for representing
-strings by combining character buffers, an offset within the buffer
-where the string starts (more stable than using a pointer), its length,
-and its first character for quicker comparison; that is `\0` for empty
+strings by combining character buffers (at least their addresses), 
+an offset within the buffer where the string starts (more stable than using a pointer), 
+its length, and its first character for fast cache-friendly comparisons; that is `\0` for empty
 strings.
 
-`cstr` data are trivially castable to strings if their length is not
-needed. Below is an example, where printing is also implemented for
+`cstr` data are trivially castable to strings. 
+Below is an example, where printing is also implemented for
 strings.
 
 ```python
@@ -987,14 +1049,15 @@ def main()
     print float "123"
 ```
 
-Strings can be copied both on `char[], mut nat` buffers and on
-lists defined on character arrays like below.
+Strings can be copied both on `char[], mut nat` buffers, which for 
+convenience can be constructed to start from zero position with the
+`bufpos` function, as on lists defined on character arrays.
 
 ```python
 import "std/core.s"
 
 def main()
-    buf = list mut char[] # or buf = (alloc(mut char[], KB 4), mut 0)
+    buf = bufpos alloc KB 4 # or \buf = list mut char[]' for dynamic sizing
     s = buf.copy "hello world!"
     print s
 ```
@@ -1084,10 +1147,11 @@ def main()
 ```
 
 Equivalently, manually release the process to wait for its conclusions.
-Recall that running processes can create errors, whereas releasing
-resources contains those errors with `try`, which intercepts errors so that
-they can be retrieved with `compiler::catch()`. To repropagate or otherwise
-handle those errors, use a pattern like below.
+Recall that running processes can create errors, while resource release
+code may intercepts those errors with `try` so that
+they can be retrieved with `compiler::catch()`. 
+To repropagate or otherwise
+handle the intercepted errors, use a pattern like below.
 
 ```python
 import "std/core.s"

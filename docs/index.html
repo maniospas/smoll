@@ -80,7 +80,8 @@
 <em>2.4.</em> <a href="#substructures">substructures</a><br>
 <em>2.5.</em> <a href="#try-and-fail">try and fail</a><br>
 <em>2.6.</em> <a href="#defer">defer</a><br>
-<em>2.7.</em> <a href="#catching-errors">catching errors</a><br></p>
+<em>2.7.</em> <a href="#catching-errors">catching errors</a><br>
+<em>2.8.</em> <a href="#more-compiler-functions">more compiler functions</a><br></p>
 
 <p><strong>Section 3. Standard library</strong><br>
 <em>3.1.</em> <a href="#strings">strings</a><br>
@@ -107,9 +108,12 @@ file; the <code>print</code> function is imported from the core.</p>
 </div>
 
 <p>If you are new to the language, now is a good point to mention
-that you need only the executable to start working with it. You can
-then reference local or <strong>online</strong> directory. Below is an example,
-where the theoretical <em>std/</em> location is grabbed from the development repository. For safety, imported files other than the one you run can only make suggestions about repos, and fail to compile if these are not present.</p>
+that you need only the executable (and a local C compiler) to start working. Once
+you download the language&#8217;s executable, you can reference local or <strong>online</strong> directories 
+in your code. The second type are automatically downloaded. Below is an example,
+where the theoretical <em>std/</em> location is grabbed from the development repository. 
+For safety, imported files other than the one you run can only make suggestions about repos, 
+and fail to compile if these are not present.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">repo</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/&quot;</span> <span class="k">as</span> <span class="s2">&quot;std/&quot;</span>
@@ -166,8 +170,8 @@ tuples.</p>
 </code></pre>
 </div>
 
-<p>You can also use the <code>.</code> operator to pipe some data
-into the beginning of a function like below. This also
+<p>The <code>.</code> operator can also pipe some data
+into the beginning of a function like below. This
 works as a notation for calling functions like class 
 methods. In general, do try to avoid needless parentheses,
 as the snippet below does (<code>f1 f2 ... args</code> is a chain of 
@@ -415,7 +419,7 @@ as a means of presenting the aforementioned properties.</p>
 slow Fibonacci number calculator that demonstrates recursion
 concepts. The function <code>call_fib</code> is completely useless too. :-)</p>
 
-<p>Reminder that recursive functions can call both
+<p>Recall that recursive functions can call both
 themselves and others that appear <em>later</em>. But normal functions
 can still only see previous declarations. Do note that only
 one function in a chain of multiple ones needs to be declared
@@ -496,9 +500,12 @@ value when used within code.</p>
 </div>
 
 <p>Aside from usage as constants, types can be used to specialize among which
-function to call. To do this, it is needed to prevent them from devolving
-into type values, which can be done by following them with <code>&amp;</code> when used
-in function bodies. Below is an example.</p>
+function to call. To do this, they must be prevented from devolving
+into values, this is done by following them with <code>&amp;</code> when used
+in function bodies, which creates literal type <em>values</em> (type values
+exist only for literals). </p>
+
+<p>Below is an example.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -519,12 +526,14 @@ in function bodies. Below is an example.</p>
 but they adhere to all type system conventions too, including the ability
 to declare unions. Furthermore, when used as
 arguments, literal types can still have an associated variable, which
-has the result of applying <code>&amp;</code> to them.</p>
+contains the result of applying <code>&amp;</code> to them.</p>
 
-<p>Getting back the literal value from the variable can be done by following
-the latter with <code>..</code>. This is similar to pointer operators seen later,
-with the reasoning that literals can point to and from compilation state.
-Importantly, they are zero cost in that their type itself takes up no storage.</p>
+<p>Getting back the literal value from a literal type value can be done by following
+the latter with <code>..</code>. The pair of <code>&amp;</code>/<code>..</code> is deliberately similar to point
+conversion later, as the two follow similar patterns of getting lowered in an intermediate
+value (the literal type value or memory address) that can retrieve the original.
+Notably, <code>"two"&amp;..</code> is the same as writing <code>"two"</code>, and the benefit lies purely in
+involving values in the type system.</p>
 
 <p>An example that restricts how a functions are called is presented next.</p>
 
@@ -552,7 +561,7 @@ whether conditions will always be true or false and <strong>eliminate code witho
 
 <p>In other words, you can make <code>is</code> checks to determine conditionally which code
 segment to compile. This incurs <em>zero</em> runtime overhead. 
-At the same type, you can mingle them together with other condition checking,
+At the same time, you can mingle them together with other condition checking,
 as the standard library&#8217;s core. Below is an example of a conditional check.</p>
 
 <div class="codehilite">
@@ -589,11 +598,12 @@ by one, or by a value provided as second argument. </p>
 
 <p>Here is a much more complicated example, where <code>compiler::skip()</code> 
 is used to prevent certain versions of the function from being
-created (e.g. there is no <code>inc(flaot,int)</code>). Do note that you
+created (e.g. there is no <code>inc(float,int)</code>). Do note that you
 can also specialize a type <code>T</code> that could have produced
 <code>x</code> per <code>type T x</code>. In total, the compiler investigates 3*4=12
 variations and eventually keeps 6 of them. Both conditions
-are fully zero-cost abstractions.</p>
+are fully zero-cost abstractions. Do note that usually the
+signature would be kept simple by declaring a helper <code>def Number = float|int|nat</code>.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -722,7 +732,9 @@ access notation. Move values onto pointed locations
 of mutable pointers per <code>ptr &lt;&lt; value</code>.</p>
 
 <p><em>Smoλ</em> makes necessary checks on pointer safety; it would be too restrictive
-to impose those checks on the type system. </p>
+to granularly impose those checks via the type system, so there is only one main rule:
+<strong>pointers are invalidated if any memory is resized, moved, or freed</strong>. This
+rule is introduced by the memory manipulation functions of the standard library.</p>
 
 <p>Mainly, the type of data stored on pointers
 is checked for consistency, and invalidated pointers (for example whose
@@ -730,7 +742,8 @@ data have moved in memory by modifying a buffer) cannot be used.
 Functions declare pointer arguments per <code>any ptr</code>, <code>float ptr</code>, etc.</p>
 
 <p>There is a particular contract for pointers: unless
-they create a runtime error by remaining uninitialized, it is always
+they create a runtime error by remaining uninitialized, and granted that they
+remain valid, it is always
 valid to move data to their memory address. Below is an example.</p>
 
 <div class="codehilite">
@@ -752,30 +765,6 @@ last two prints, <code>element</code> would become invalidated and would
 need to be re-obtained from the buffer.
 In general, try to work with buffers and only use pointers
 for rapidly moving temporary data around.</p>
-
-<p>As we now know about pointer invalidation, it becomes apparent
-why the syntax <code>data &gt;&gt; ptr</code> is necessary when moving data
-within a buffer while resizing it; it lets us put dereferencing
-on the left-hand-side to evaluate it before moving data. </p>
-
-<p>Below is how one could do
-this without intermediate variables
-by leveraging the fact that <code>resize</code> returns the buffer
-while a helper function <code>mutlast</code> is provided to retrieve a 
-mutable pointer to the last element (or fail for an empty buffer).
-If we used <code>&lt;&lt;</code> we would not have access to <code>buf[2]</code> after resizing.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/array.s&quot;</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">nat</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">3</span>
-    <span class="n">buf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">buf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;&gt;</span> <span class="n">mutlast</span> <span class="n">buf</span><span class="o">.</span><span class="n">resize</span> <span class="mi">2</span>
-    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># prints 1</span>
-</code></pre>
-</div>
 
 <h2 id="stable-references">stable references</h2>
 
@@ -871,8 +860,9 @@ an example:</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">points</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">Point3D</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
     <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="n">points</span><span class="nd">@plane@x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="nb">print</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">x</span>  <span class="c1"># equivalent</span>
+    <span class="n">plane</span> <span class="o">=</span> <span class="n">points</span><span class="nd">@plane</span> <span class="c1"># can move this around</span>
+    <span class="nb">print</span> <span class="n">plane</span><span class="nd">@x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">x</span> <span class="c1"># equivalent data path</span>
 </code></pre>
 </div>
 
@@ -901,16 +891,44 @@ You can manually <code>fail</code> like so:</p>
 </code></pre>
 </div>
 
+<p>Propagating failures is done in the spirit of writing concise but well-controlled code.
+<strong>Don&#8217;t care about failures. Unless you must.</strong> That is, assume correct execution,
+as if you were scripting, and only handle failures at places where they can be handled
+safely or where they would be critical. If it is important to ensure that 
+a function does not fail up to a certain point, place the <code>compiler::nocatch()</code> 
+assertion. There are various other compiler assetions too, which are covered later.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="k">try</span> <span class="n">x</span> <span class="o">=</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>  <span class="c1"># buffer of chars</span>
+    <span class="k">try</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">char</span> <span class="s2">&quot;a&quot;</span> <span class="c1"># still needs a try for buffer elements - though checks can be optimized away</span>
+    <span class="k">try</span> <span class="nb">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="s2">&quot;this must run at all costs&quot;</span>
+    <span class="n">compiler</span><span class="p">::</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># compiler error without &#39;try&#39; on all PREVIOUS calls that could fail</span>
+    <span class="nb">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">10000</span><span class="p">]</span>      <span class="c1"># allowed to fail now</span>
+    <span class="nb">print</span> <span class="s2">&quot;this will never run due to out of bounds error&quot;</span>
+</code></pre>
+</div>
+
 <p>There are certain places in code where you may want to recover from call failures,
 for example by calling the same code again for improved user input, or by
 falling back to some secondary functionality. This is achieved with the
 <code>try</code> keyword. That parses an expression without stopping at the first failing functions, 
-if any (their returns are just zero-initialized). You can fail only once within a try
-and the compiler will complain for multiple failures - split those among multiple declaration
-to avoid ambiguity.</p>
+if any. Stressing again: this intercepts the
+first error of an <em>expression</em> not a whole block of code. </p>
 
-<p>Finally, the failure within tried expressions is converted into 
-boolean values. Below is an example that safeguards against failing allocation.</p>
+<p>You can fail only once within a try
+and the compiler will complain for multiple failures. This is done so that each prospective
+failure is split among multiple declarations to avoid ambiguity of how error handling takes
+place. For example, you can handle each error differently.
+Create and call helper methods to compartmentalize error-prone code chunks and handle
+their failure all at once. See later for how to reconstruct and handle specific error codes.</p>
+
+<p>Finally, returns from failing
+functions are just zero-initialized, but <code>try</code> has a boolean outcome that shows whether
+an error is intercepted. Below is an example that safeguards against failing allocation.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -923,6 +941,20 @@ boolean values. Below is an example that safeguards against failing allocation.<
     <span class="k">if</span> <span class="ow">not</span> <span class="k">try</span> <span class="n">v</span> <span class="o">=</span> <span class="n">vector</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
         <span class="nb">print</span> <span class="s2">&quot;failed to allocate&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="nb">len</span> <span class="n">v</span><span class="p">,</span> <span class="s2">&quot; numbers allocated</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Since failure is a fast abstraction in <em>smoλ</em>, it is also the preferred syntax for 
+iterators reaching their end. Below is an example, where all standard library iterators
+follow the same pattern for terminating loops and you should try to reuse in your code.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">5</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
+        <span class="nb">print</span> <span class="n">i</span>
 </code></pre>
 </div>
 
@@ -983,7 +1015,7 @@ simultaneously.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span> <span class="k">as</span> <span class="n">io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="k">try</span> <span class="nb">print</span> <span class="mi">2</span><span class="o">*</span><span class="mi">3</span><span class="o">-</span><span class="mi">20</span>
+    <span class="k">try</span> <span class="nb">print</span> <span class="mi">2</span><span class="o">*</span><span class="mi">3</span><span class="o">-</span><span class="mi">20</span> <span class="c1"># nat cannot become negative</span>
     <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="s2">&quot;cannot substract two nat numbers and obtain a negative result&quot;</span>
 </code></pre>
@@ -994,7 +1026,7 @@ captures only subsequent messages. Caught errors can be compared for equality an
 converted to strings per <code>cstr error</code>.</p>
 
 <p>Errors are not retrieved when intercepted within called functions.
-But, importently, they <em>are</em> obtained from deferred statements triggered by 
+But, importantly, they <em>are</em> obtained from deferred statements triggered by 
 <code>del</code>. The next snippet demonstrates how to clear errors and check on them.</p>
 
 <div class="codehilite">
@@ -1014,6 +1046,40 @@ But, importently, they <em>are</em> obtained from deferred statements triggered 
         <span class="n">fail</span> <span class="n">error</span>       <span class="c1"># can fail with error codes too</span>
 </code></pre>
 </div>
+
+<h2 id="more-compiler-functions">more compiler functions</h2>
+
+<p>Till now there was mention of <code>compiler::skip()</code>, 
+<code>compiler::catch()</code> and <code>compiler::nocatch()</code>
+as mechanisms that let your code interface with 
+the compiler to an extend.</p>
+
+<p>There are some more mechanisms that help inspect
+programs or grant access to internal state that
+you can then analyze. Foremost of those is
+<code>compiler::debug(expression)</code>. This 
+runs an expression, prints its return at compile time, 
+and returns its value. It works this way so that it can 
+be effortlessly interweaved in code. Do note that you
+can use it with literal types to print messages too.
+For example, one pattern usable for debuggining is the following.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s1&quot;</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s2&quot;</span>
+    <span class="n">compiler</span><span class="p">::</span><span class="n">debug</span> <span class="s2">&quot;--- main ---&quot;</span><span class="o">&amp;</span>     <span class="c1"># prints &#39;&quot;--- main ---&quot;&amp;&#39; at compile time</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">debug</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>         <span class="c1"># prints &#39;const str, const str&#39; at compile time</span>
+    <span class="nb">print</span> <span class="n">s</span> <span class="c1"># ERROR due to undefined print, but the above still prints</span>
+</code></pre>
+</div>
+
+<p>Finally, assert that a specific point in a function does not lie within a loop
+or condition with the <code>compiler::branchless()</code> check. The main usage of this
+is as a sanity check within conditional compilation conditions, ensuring that
+they are not accidentally evaluated at runtime.</p>
 
 <h1 id="section-3-standard-library">Section 3. Standard library</h1>
 
@@ -1042,13 +1108,13 @@ buffers. An example follows.</p>
 <h2 id="strings">strings</h2>
 
 <p>The standard library provides the <code>str</code> structural type for representing
-strings by combining character buffers, an offset within the buffer
-where the string starts (more stable than using a pointer), its length,
-and its first character for quicker comparison; that is <code>\0</code> for empty
+strings by combining character buffers (at least their addresses), 
+an offset within the buffer where the string starts (more stable than using a pointer), 
+its length, and its first character for fast cache-friendly comparisons; that is <code>\0</code> for empty
 strings.</p>
 
-<p><code>cstr</code> data are trivially castable to strings if their length is not
-needed. Below is an example, where printing is also implemented for
+<p><code>cstr</code> data are trivially castable to strings. 
+Below is an example, where printing is also implemented for
 strings.</p>
 
 <div class="codehilite">
@@ -1070,14 +1136,15 @@ errors on failure.</p>
 </code></pre>
 </div>
 
-<p>Strings can be copied both on <code>char[], mut nat</code> buffers and on
-lists defined on character arrays like below.</p>
+<p>Strings can be copied both on <code>char[], mut nat</code> buffers, which for 
+convenience can be constructed to start from zero position with the
+<code>bufpos</code> function, as on lists defined on character arrays.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span> <span class="c1"># or buf = (alloc(mut char[], KB 4), mut 0)</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># or \buf = list mut char[]&#39; for dynamic sizing</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">print</span> <span class="n">s</span>
 </code></pre>
@@ -1173,10 +1240,11 @@ that fails on non-zero error code can be evoked like below.</p>
 </div>
 
 <p>Equivalently, manually release the process to wait for its conclusions.
-Recall that running processes can create errors, whereas releasing
-resources contains those errors with <code>try</code>, which intercepts errors so that
-they can be retrieved with <code>compiler::catch()</code>. To repropagate or otherwise
-handle those errors, use a pattern like below.</p>
+Recall that running processes can create errors, while resource release
+code may intercepts those errors with <code>try</code> so that
+they can be retrieved with <code>compiler::catch()</code>. 
+To repropagate or otherwise
+handle the intercepted errors, use a pattern like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>

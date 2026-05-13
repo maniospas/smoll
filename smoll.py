@@ -1459,6 +1459,8 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     return callee
 
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
+    if ANY_TYPE in method.variations:
+        return vars
     callee = _select_call(file, impl, method, vars, error_token)
 
     if callee==CAUGHT_TYPE:
@@ -1913,8 +1915,9 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                     print("```rust\n"+variation.signature()+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
 
             return pos+3, buffer_type
-        for variation in type.variations: 
-            if variation==ANY_TYPE: tokens[pos].error("safety", "can only use 'any' type within pointers or buffers")
+        # if not reduce_to_unique_variations:  # TODO: determine what we should do
+        #     for variation in type.variations: 
+        #         if variation==ANY_TYPE: tokens[pos].error("safety", "can only use 'any' type within pointers or buffers")
 
         if is_lsp and type_start.file.is_main_file and show_lsp:
             type_end = get(tokens, pos)
@@ -2667,7 +2670,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         pos, ret = process_statement(file, tokens, pos+2, impl, current_operator_priority=0)
         pos, ret = process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
         previous = [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
-        if len(previous)!=len(ret) and previous: current_token.error("type", "cannot set an incompatible type on '"+pretty_name(current)+"'")
+        if len(previous)!=len(ret) and previous: current_token.error("type", "cannot set an incompatible type on '"+pretty_name(current)+"' previous type was '"+signature_like(previous, impl)+"' and cannot be replaced by '"+signature_like(ret, impl)+"'")
         if previous:
             for p, r in zip(previous, ret): impl.assign(p.name, [r], current_token)
         else: impl.assign(current, ret, current_token)

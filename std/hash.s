@@ -31,7 +31,7 @@ def to_hash_base(Number k)
 def robinhood_entry(str s, nat cost)
     return (s, cost)
 
-local def str(robinhood_entry r)
+def str(robinhood_entry r)
     return r.s
 
 def find(const robinhood_entry[]|str[] data, cstr|str _k)

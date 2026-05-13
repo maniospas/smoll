@@ -17,3 +17,15 @@ def mutget(hash::robinhood_entry[]|str[] keys, any[] values, cstr|str key)
     doc "get a mutable hash map entry"
     doc "Implemented for string or cstr keys but buffer of any values."
     unsafe_return values[keys. hash::at str key]&&
+
+local def tostr = hash::str|str
+def next(const hash::robinhood_entry[]|str[] keys, mut nat pos)
+    if pos==0
+        pos = pos+1
+        return str ""
+    ret = unsafe_mut tostr keys[pos]
+    pos = pos+1
+    while 0==len tostr ret 
+        ret = unsafe_mut tostr keys[pos]
+        pos = pos+1
+    return ret

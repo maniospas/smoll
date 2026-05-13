@@ -8,7 +8,6 @@ def main()
     print map["hello"]
     print map["manio"]
     
-    # print all keys ("" is always the first key and we skip it)
-    it = (map.keys, mut 1)
+    it = bufpos map.keys
     while try key=next it
         print key

@@ -9,7 +9,7 @@ def hash(str k, nat size)
     iter = range len k
     while try i = next iter
         h = h.bits().lshift(5).nat().add(h) + nat k[i]
-    return h.mod(size)
+    return h.mod size
 
 def hash(nat k, nat size)
     {builtins::nat c1 = 0xff51afd7ed558ccd;}
@@ -28,16 +28,35 @@ def to_hash_base(str|cstr k)
 def to_hash_base(Number k)
     return bits k
 
-def robinhood_entry(str s, nat cost)
+def robinhood_str_entry(str s, nat cost)
     return (s, cost)
 
-def str(robinhood_entry r)
+def robinhood_nat_entry(nat s, nat cost)
+    return (s, cost)
+
+def robinhood_entry = robinhood_str_entry|robinhood_nat_entry
+
+def raw(robinhood_entry r)
     return r.s
 
-def find(const robinhood_entry[]|str[] data, cstr|str _k)
-    k = str _k
-    if 0==len k
+def raw(str|nat r)
+    return r
+
+def raw(cstr r)
+    return str r
+
+def is_zero(str k)
+    return 0==len k
+
+def is_zero(nat k)
+    return 0==k
+
+def find(const robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
+    k = raw _k
+    if is_zero k
         return 0
+    if not k is type raw data[0]
+        compiler::skip()
     n = len data
     pos = hash(k, n)
     iter = range n
@@ -46,15 +65,17 @@ def find(const robinhood_entry[]|str[] data, cstr|str _k)
         if idx>=n idx = idx-n
         if idx==0 continue
         entry = data[idx]
-        if 0==len str entry continue
-        if k==str entry 
+        if is_zero raw entry continue
+        if k==raw entry 
             return idx
     fail "index not found"
 
-def at(str[] data, cstr|str _k)
-    k = str _k # allow overwritting 'k' in case of robin hood hashing
-    if 0==len k
+def at(robinhood_entry[] data, cstr|str|nat _k)
+    k = unsafe_mut raw _k
+    if is_zero k
         return 0
+    if not k is type raw data[0]
+        compiler::skip()
     n = len data
     pos = hash(k, n)
     iter = range n
@@ -63,40 +84,13 @@ def at(str[] data, cstr|str _k)
         if idx>=n idx = idx-n
         if idx==0 continue
         entry = data[idx]
-        if 0==len entry 
-            data[idx] = k
-            if not search_cost is blank
-                search_cost[idx] = i
-            return idx
-        if entry==k 
-            return idx
-        if not search_cost is blank
-            if i>search_cost[idx]
-                tmp = k
-                k = unsafe_mut str data[idx] # TODO: investigate why this str cast is needed
-                search_cost[idx] = i
-                data[idx] = tmp
-    fail "string buffer is full"
-
-def at(robinhood_entry[] data, cstr|str _k)
-    k = unsafe_mut str _k #
-    if 0==len k
-        return 0
-    n = len data
-    pos = hash(k, n)
-    iter = range n
-    while try i=next iter
-        idx = mut (pos+i)
-        if idx>=n idx = idx-n
-        if idx==0 continue
-        entry = data[idx]
-        if 0==len str entry 
+        if is_zero raw entry 
             data[idx] = (k,i)
             return idx
-        if k==str entry 
+        if k==raw entry 
             return idx
         if i>entry.cost
             tmp = k
-            k = unsafe_mut str data[idx]
+            k = unsafe_mut raw data[idx]
             data[idx] = (tmp, i)
     fail "string buffer is full"

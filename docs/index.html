@@ -38,7 +38,7 @@
         padding-left:20px;
         width:200px;
         border-right: 1px solid #444;height:100%;
-        background:#f0f0f0!important;
+        background:#ffffc0!important;
         overflow-y:auto;
         font-size:0.9rem;
         z-index:1000;
@@ -84,10 +84,14 @@
 <em>2.8.</em> <a href="#more-compiler-functions">more compiler functions</a><br></p>
 
 <p><strong>Section 3. Standard library</strong><br>
-<em>3.1.</em> <a href="#strings">strings</a><br>
-<em>3.2.</em> <a href="#lists">lists</a><br>
-<em>3.3.</em> <a href="#io">io</a><br>
-<em>3.4.</em> <a href="#processes">processes</a><br></p>
+<em>3.1.</em> <a href="#lists">lists</a><br>
+<em>3.2.</em> <a href="#strings">strings</a><br>
+<em>3.3.</em> <a href="#maps">maps</a><br>
+<em>3.4.</em> <a href="#io">io</a><br>
+<em>3.5.</em> <a href="#processes">processes</a><br>
+<em>3.6.</em> <a href="#random">random</a><br>
+<em>3.7.</em> <a href="#mini-and-bits">mini and bits</a><br>
+<em>3.8.</em> <a href="#vectors">vectors</a><br></p>
 
 </div>
 
@@ -1115,7 +1119,8 @@ strings.</p>
 
 <p><code>cstr</code> data are trivially castable to strings. 
 Below is an example, where printing is also implemented for
-strings.</p>
+strings. Theoretically, this extract the size and first
+character too, but such data are ignored if not needed.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1125,8 +1130,8 @@ strings.</p>
 </code></pre>
 </div>
 
-<p>You can convert string contents to numeric types. This creates
-errors on failure.</p>
+<p>You can convert string contents to numeric types. 
+This creates errors on failure.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1136,17 +1141,64 @@ errors on failure.</p>
 </code></pre>
 </div>
 
-<p>Strings can be copied both on <code>char[], mut nat</code> buffers, which for 
-convenience can be constructed to start from zero position with the
-<code>bufpos</code> function, as on lists defined on character arrays.</p>
+<p>Strings can be copied on a pair of buffer and mutable used size <code>char[], mut nat</code>.
+For convenience, this structure can be initialized to start from zero position with the
+<code>bufpos</code> function, like below. </p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># or \buf = list mut char[]&#39; for dynamic sizing</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">print</span> <span class="n">s</span>
+</code></pre>
+</div>
+
+<p>You can also copy strings on buffers managed by lists.
+In this case, DO use <code>ref</code> for stability, as potential list resizing
+could invalidate the pointer where the string thinks the buffer starts,
+and the compiler would correctly point that out and refuse to progress
+on an erroneous program.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">ref</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span> <span class="c1"># would have been invalidated if we did not use `ref`</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="nb">print</span> <span class="n">s1</span>
+    <span class="nb">print</span> <span class="n">s2</span>
+</code></pre>
+</div>
+
+<h2 id="maps">maps</h2>
+
+<p>There are some useful hashing utilities under <em>std/hash.s</em> that you can read,
+but these culminate to allowing hashmaps with string-valued and nat-valued
+keys. These two key types cover most useful scenarios, especially given that
+the standard library offers the ability can serialize data as strings or -for smaller
+structures- as bits. Map values can reside on any buffer.</p>
+
+<p>The empty string or zero are stored in the first positions of maps and are considered
+always-presented. For now, map size is fixed. Place contents and iterate through map keys 
+like below. Map initialization takes any allocated buffer and creates a similarly-sized map.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="n">alloc</span><span class="p">(</span><span class="n">mut</span> <span class="nb">str</span><span class="p">[],</span> <span class="mi">128</span><span class="p">)</span>
+    <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
+    <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span>
+
+    <span class="n">it</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="nb">map</span><span class="o">.</span><span class="n">keys</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">key</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
+        <span class="nb">print</span> <span class="n">key</span>
 </code></pre>
 </div>
 
@@ -1257,6 +1309,86 @@ handle the intercepted errors, use a pattern like below.</p>
         <span class="n">fail</span> <span class="n">error</span> <span class="c1"># can fail on error codes too</span>
 </code></pre>
 </div>
+
+<h2 id="random">random</h2>
+
+<p><em>This section is under construction.</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/rand.s&quot;</span> <span class="k">as</span> <span class="n">rand</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">rand</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">rand</span><span class="p">::</span><span class="n">Rand</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="nb">next</span> <span class="n">rand</span>
+</code></pre>
+</div>
+
+<h2 id="mini-and-bits">mini and bits</h2>
+
+<p>Here are some concepts about bitwise manipulation and type size awareness.</p>
+
+<p>Bitwise manipulations of <code>nat</code> data are made available from the standard library&#8217;s core.
+To ensure that semantics are not mistaken, you need to convert to and from a <code>bits</code> data
+structure. For example, here is a (non-cryptographically-secure but usable) hash function for strings.
+Floats and ints can also be converted to bits.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hash</span><span class="p">(</span><span class="nb">str</span> <span class="n">k</span><span class="p">,</span> <span class="n">nat</span> <span class="n">size</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">5381</span>
+    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">k</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">iter</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">bits</span><span class="p">()</span><span class="o">.</span><span class="n">lshift</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">nat</span><span class="p">()</span> <span class="o">+</span> <span class="n">h</span> <span class="o">+</span> <span class="n">nat</span> <span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">mod</span> <span class="n">size</span>
+</code></pre>
+</div>
+
+<p>Sometimes, it is useful to store arithmetic data in more compressed formats.
+The default builtin types (float, nat, int) consumed 64 bits of stoage 
+but there are some variations, namely float32, nat32, nat16, nat8, int32, int16, int8.</p>
+
+<p>The <em>std/mini.s</em> namespace provides conversions from the 64-bit to lessr bit types.
+To ensure semantic safety and no information loss, 
+the standard library does not provide arithmetic operations for these operations,
+and they should be converted to and from the more expressive types. Errors are created
+if the conversion would overflow in number magnitude.</p>
+
+<p>The same namespace also provides a string variation that is stored in buffers of up
+to <code>65535</code> length and elements, hereby consuming 12 instead of 25 bytes per element
+when organized in a string buffer.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/mini.s&quot;</span> <span class="k">as</span> <span class="n">mini</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="n">mini</span><span class="p">::</span><span class="nb">str</span><span class="p">[]</span> <span class="n">buff</span><span class="p">)</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">mut</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">pos</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="nb">iter</span>
+        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">::</span><span class="n">unpack</span><span class="p">(</span><span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot; &quot;</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">buf</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">mem</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">buff</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">6</span>
+    <span class="n">compiler</span><span class="p">::</span><span class="n">debug</span> <span class="n">buff</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;hi&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;my&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;name&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;is&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;manios&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="n">concat</span><span class="p">(</span><span class="n">buff</span><span class="p">)</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">mini</span><span class="p">::</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<h2 id="vectors">vectors</h2>
+
+<p><em>This feature is still incomplete.</em></p>
 
 </body>
 </html>

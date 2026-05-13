@@ -110,7 +110,7 @@ local def copy_null_terminated(str other)
     {*endpos = 0;}
     return str(buf, 0, other.dat.length, other.dat.first)
 
-def unsafe_temporary_cstr(str other) 
+def unsafe_temporary_cstr(str other)
     doc "convert a string to a temporary cstr"
     doc "This function's return is meant to be passed to operating system calls,"
     doc "and will become invalid once the calling site ends."

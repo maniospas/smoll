@@ -4,10 +4,12 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp1187v="123";
-const char* const __temp353v="\n";
-static const char* __temp_all_errcodes[27] = {"noerr",
+const char* const __temp1220v="123";
+const char* const __temp364v="\n";
+static const char* __temp_all_errcodes[29] = {"noerr",
 "error",
+"division by zero ",
+"modulo by zero ",
 "id subtraction would yield a negative",
 "cannot convert negative float to id",
 "cannot convert negative int to id",
@@ -35,25 +37,30 @@ static const char* __temp_all_errcodes[27] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__temp722v(const char* x, const char* y, char* __temp1190v) {
+static inline __attribute__((always_inline)) void eq__temp755v(const char* x, const char* y, char* __temp1223v) {
   char z=0;
   z=(x==y);
   goto __temp_return;
   __temp_return:
-  *__temp1190v=z;
+  *__temp1223v=z;
 }
 
-static inline __attribute__((always_inline)) void print__temp368v(char value) {
-  int __temp369v=0;
+static inline __attribute__((always_inline)) void print__temp379v(char value) {
+  int __temp380v=0;
   const char* endl=0;
-  endl=__temp353v;
-  printf("%s%s",value? "true":"false",endl);
+  endl=__temp364v;
+  if(value){
+  printf("%s%s","true",endl);
+  }
+  else{
+  printf("%s%s","false",endl);
+  }
 }
 
-static inline __attribute__((always_inline)) void main__temp1186v() {
-  char __temp1188v__=0;
-  eq__temp722v(__temp1187v,__temp1187v,&__temp1188v__);
-  print__temp368v(__temp1188v__);
+static inline __attribute__((always_inline)) void main__temp1219v() {
+  char __temp1221v__=0;
+  eq__temp755v(__temp1220v,__temp1220v,&__temp1221v__);
+  print__temp379v(__temp1221v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1186v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1219v();return 0;}

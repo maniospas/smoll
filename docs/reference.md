@@ -26,10 +26,14 @@ _2.7._ [catching errors](#catching-errors)<br>
 _2.8._ [more compiler functions](#more-compiler-functions)<br>
 
 **Section 3. Standard library**<br>
-_3.1._ [strings](#strings)<br>
-_3.2._ [lists](#lists)<br>
-_3.3._ [io](#io)<br>
-_3.4._ [processes](#processes)<br>
+_3.1._ [lists](#lists)<br>
+_3.2._ [strings](#strings)<br>
+_3.3._ [maps](#maps)<br>
+_3.4._ [io](#io)<br>
+_3.5._ [processes](#processes)<br>
+_3.6._ [random](#random)<br>
+_3.7._ [mini and bits](#mini-and-bits)<br>
+_3.8._ [vectors](#vectors)<br>
 
 </div>
 
@@ -1030,7 +1034,8 @@ strings.
 
 `cstr` data are trivially castable to strings. 
 Below is an example, where printing is also implemented for
-strings.
+strings. Theoretically, this extract the size and first
+character too, but such data are ignored if not needed.
 
 ```python
 import "std/core.s"
@@ -1038,9 +1043,8 @@ import "std/core.s"
 def main()
     print str "hello world!"
 ```
-
-You can convert string contents to numeric types. This creates
-errors on failure.
+You can convert string contents to numeric types. 
+This creates errors on failure.
 
 ```python
 import "std/core.s"
@@ -1049,18 +1053,64 @@ def main()
     print float "123"
 ```
 
-Strings can be copied both on `char[], mut nat` buffers, which for 
-convenience can be constructed to start from zero position with the
-`bufpos` function, as on lists defined on character arrays.
+Strings can be copied on a pair of buffer and mutable used size `char[], mut nat`.
+For convenience, this structure can be initialized to start from zero position with the
+`bufpos` function, like below. 
 
 ```python
 import "std/core.s"
 
 def main()
-    buf = bufpos alloc KB 4 # or \buf = list mut char[]' for dynamic sizing
+    buf = bufpos alloc KB 4
     s = buf.copy "hello world!"
     print s
 ```
+
+You can also copy strings on buffers managed by lists.
+In this case, DO use `ref` for stability, as potential list resizing
+could invalidate the pointer where the string thinks the buffer starts,
+and the compiler would correctly point that out and refuse to progress
+on an erroneous program.
+
+```python
+import "std/core.s"
+
+def main()
+    buf = list ref mut char[]
+    s1 = buf.copy "hello world!" # would have been invalidated if we did not use `ref`
+    s2 = buf.copy "hello world!"
+    print s1
+    print s2
+```
+
+## maps
+
+There are some useful hashing utilities under *std/hash.s* that you can read,
+but these culminate to allowing hashmaps with string-valued and nat-valued
+keys. These two key types cover most useful scenarios, especially given that
+the standard library offers the ability can serialize data as strings or -for smaller
+structures- as bits. Map values can reside on any buffer.
+
+The empty string or zero are stored in the first positions of maps and are considered
+always-presented. For now, map size is fixed. Place contents and iterate through map keys 
+like below. Map initialization takes any allocated buffer and creates a similarly-sized map.
+
+```python
+import "std/core.s"
+import "std/map.s"
+
+def main()
+    map = strmap alloc(mut str[], 128)
+    map["hello"] = str "hello world!"
+    map["manio"] = str "it's a me, manio."
+    print map["hello"]
+    print map["manio"]
+    
+    it = bufpos map.keys
+    while try key=next it
+        print key
+```
+
 
 ## io
 
@@ -1163,3 +1213,81 @@ def main()
     if try error = compiler::catch()
         fail error # can fail on error codes too
 ```
+
+## random
+
+*This section is under construction.*
+
+```python
+import "std/core.s"
+import "std/rand.s" as rand
+
+def main()
+    rand = mut rand::Rand()
+    print next rand
+```
+
+## mini and bits
+
+Here are some concepts about bitwise manipulation and type size awareness.
+
+Bitwise manipulations of `nat` data are made available from the standard library's core.
+To ensure that semantics are not mistaken, you need to convert to and from a `bits` data
+structure. For example, here is a (non-cryptographically-secure but usable) hash function for strings.
+Floats and ints can also be converted to bits.
+
+```python
+def hash(str k, nat size)
+    h = mut 5381
+    iter = range len k
+    while try i = next iter
+        h = h.bits().lshift(5).nat() + h + nat k[i]
+    return h.mod size
+```
+
+Sometimes, it is useful to store arithmetic data in more compressed formats.
+The default builtin types (float, nat, int) consumed 64 bits of stoage 
+but there are some variations, namely float32, nat32, nat16, nat8, int32, int16, int8.
+
+The *std/mini.s* namespace provides conversions from the 64-bit to lessr bit types.
+To ensure semantic safety and no information loss, 
+the standard library does not provide arithmetic operations for these operations,
+and they should be converted to and from the more expressive types. Errors are created
+if the conversion would overflow in number magnitude.
+
+The same namespace also provides a string variation that is stored in buffers of up
+to `65535` length and elements, hereby consuming 12 instead of 25 bytes per element
+when organized in a string buffer.
+
+```python
+import "std/core.s"
+import "std/mini.s" as mini
+
+def concat(mini::str[] buff)
+    mem = bufpos mut alloc KB 4
+    iter = range len buff
+    start = mem.pos
+    while try i=next iter
+        mem.copy mini::unpack(buff[i])
+        mem.copy " "
+    return str(mem.buf,start,mem.pos)
+
+def main()
+    buff = (mut mini::str[]).alloc 6
+    compiler::debug buff
+    buff[0] = mini::str "hi"
+    buff[1] = mini::str "my"
+    buff[2] = mini::str "name"
+    buff[3] = mini::str "is"
+    buff[4] = mini::str "manios"
+    buff[5] = mini::str concat(buff)
+    it = range len buff
+    while try i=next it
+        print (i," ")
+        print mini::unpack buff[i]
+```
+
+
+## vectors
+
+*This feature is still incomplete.*

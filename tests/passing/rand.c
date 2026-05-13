@@ -4,9 +4,11 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp353v="\n";
-static const char* __temp_all_errcodes[27] = {"noerr",
+const char* const __temp364v="\n";
+static const char* __temp_all_errcodes[29] = {"noerr",
 "error",
+"division by zero ",
+"modulo by zero ",
 "id subtraction would yield a negative",
 "cannot convert negative float to id",
 "cannot convert negative int to id",
@@ -34,7 +36,7 @@ static const char* __temp_all_errcodes[27] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void splitmix64__temp1188v(uint64_t* __temp1225v) {
+static inline __attribute__((always_inline)) void splitmix64__temp1221v(uint64_t* __temp1258v) {
   char* ts=0;
   uint64_t seed=0;
   ts=alloca(sizeof(struct timespec));
@@ -42,11 +44,11 @@ static inline __attribute__((always_inline)) void splitmix64__temp1188v(uint64_t
   seed=(unsigned long long)((struct timespec*)ts)->tv_sec*(unsigned long long)1000000000+((struct timespec*)ts)->tv_nsec;
   goto __temp_return;
   __temp_return:
-  *__temp1225v=seed;
+  *__temp1258v=seed;
 }
 
-static inline __attribute__((always_inline)) void splitmix64__temp1187v(uint64_t* __temp1226v, uint64_t* __temp1227v) {
-  uint64_t x=*__temp1226v;
+static inline __attribute__((always_inline)) void splitmix64__temp1220v(uint64_t* __temp1259v, uint64_t* __temp1260v) {
+  uint64_t x=*__temp1259v;
   uint64_t z=0;
   uint64_t rot=0;
   x=x+0x9E3779B97F4A7C15ULL;
@@ -61,53 +63,53 @@ static inline __attribute__((always_inline)) void splitmix64__temp1187v(uint64_t
   z=z^rot;
   goto __temp_return;
   __temp_return:
-  *__temp1226v=x;
-  *__temp1227v=z;
+  *__temp1259v=x;
+  *__temp1260v=z;
 }
 
-static inline __attribute__((always_inline)) void Rand__temp1201v(uint64_t* __temp1228v, uint64_t* __temp1229v, uint64_t* __temp1230v, uint64_t* __temp1231v) {
-  int __temp1202v=0;
-  uint64_t __temp1203v__=0;
+static inline __attribute__((always_inline)) void Rand__temp1234v(uint64_t* __temp1261v, uint64_t* __temp1262v, uint64_t* __temp1263v, uint64_t* __temp1264v) {
+  int __temp1235v=0;
+  uint64_t __temp1236v__=0;
   uint64_t seed=0;
-  uint64_t __temp1204v=0;
+  uint64_t __temp1237v=0;
   uint64_t modifying_seed=0;
-  uint64_t __temp1205v__=0;
-  uint64_t __temp1206v=0;
+  uint64_t __temp1238v__=0;
+  uint64_t __temp1239v=0;
   uint64_t s0=0;
-  uint64_t __temp1207v__=0;
-  uint64_t __temp1208v=0;
+  uint64_t __temp1240v__=0;
+  uint64_t __temp1241v=0;
   uint64_t s1=0;
-  uint64_t __temp1209v__=0;
-  uint64_t __temp1210v=0;
+  uint64_t __temp1242v__=0;
+  uint64_t __temp1243v=0;
   uint64_t s2=0;
-  uint64_t __temp1211v__=0;
-  uint64_t __temp1212v=0;
+  uint64_t __temp1244v__=0;
+  uint64_t __temp1245v=0;
   uint64_t s3=0;
-  splitmix64__temp1188v(&__temp1203v__);
-  seed=__temp1203v__;
-  __temp1204v=seed;
-  modifying_seed=__temp1204v;
-  splitmix64__temp1187v(&modifying_seed,&__temp1205v__);
-  __temp1206v=__temp1205v__;
-  s0=__temp1206v;
-  splitmix64__temp1187v(&modifying_seed,&__temp1207v__);
-  __temp1208v=__temp1207v__;
-  s1=__temp1208v;
-  splitmix64__temp1187v(&modifying_seed,&__temp1209v__);
-  __temp1210v=__temp1209v__;
-  s2=__temp1210v;
-  splitmix64__temp1187v(&modifying_seed,&__temp1211v__);
-  __temp1212v=__temp1211v__;
-  s3=__temp1212v;
+  splitmix64__temp1221v(&__temp1236v__);
+  seed=__temp1236v__;
+  __temp1237v=seed;
+  modifying_seed=__temp1237v;
+  splitmix64__temp1220v(&modifying_seed,&__temp1238v__);
+  __temp1239v=__temp1238v__;
+  s0=__temp1239v;
+  splitmix64__temp1220v(&modifying_seed,&__temp1240v__);
+  __temp1241v=__temp1240v__;
+  s1=__temp1241v;
+  splitmix64__temp1220v(&modifying_seed,&__temp1242v__);
+  __temp1243v=__temp1242v__;
+  s2=__temp1243v;
+  splitmix64__temp1220v(&modifying_seed,&__temp1244v__);
+  __temp1245v=__temp1244v__;
+  s3=__temp1245v;
   goto __temp_return;
   __temp_return:
-  *__temp1228v=s0;
-  *__temp1229v=s1;
-  *__temp1230v=s2;
-  *__temp1231v=s3;
+  *__temp1261v=s0;
+  *__temp1262v=s1;
+  *__temp1263v=s2;
+  *__temp1264v=s3;
 }
 
-static inline __attribute__((always_inline)) void rotl__temp1186v(uint64_t x, uint64_t k, uint64_t* __temp1232v) {
+static inline __attribute__((always_inline)) void rotl__temp1219v(uint64_t x, uint64_t k, uint64_t* __temp1265v) {
   uint64_t left=0;
   uint64_t compk=0;
   uint64_t right=0;
@@ -118,18 +120,18 @@ static inline __attribute__((always_inline)) void rotl__temp1186v(uint64_t x, ui
   z=left|right;
   goto __temp_return;
   __temp_return:
-  *__temp1232v=z;
+  *__temp1265v=z;
 }
 
-static inline __attribute__((always_inline)) void next__temp1217v(uint64_t* __temp1233v, uint64_t* __temp1234v, uint64_t* __temp1235v, uint64_t* __temp1236v, double* __temp1237v) {
-  uint64_t self__s0=*__temp1233v;
-  uint64_t self__s1=*__temp1234v;
-  uint64_t self__s2=*__temp1235v;
-  uint64_t self__s3=*__temp1236v;
+static inline __attribute__((always_inline)) void next__temp1250v(uint64_t* __temp1266v, uint64_t* __temp1267v, uint64_t* __temp1268v, uint64_t* __temp1269v, double* __temp1270v) {
+  uint64_t self__s0=*__temp1266v;
+  uint64_t self__s1=*__temp1267v;
+  uint64_t self__s2=*__temp1268v;
+  uint64_t self__s3=*__temp1269v;
   uint64_t result=0;
   uint64_t t=0;
-  uint64_t __temp1218v=0;
-  uint64_t __temp1219v__=0;
+  uint64_t __temp1251v=0;
+  uint64_t __temp1252v__=0;
   double denom=0;
   double nom=0;
   double value=0;
@@ -140,53 +142,53 @@ static inline __attribute__((always_inline)) void next__temp1217v(uint64_t* __te
   self__s1=self__s1^self__s2;
   self__s0=self__s0^self__s3;
   self__s2=self__s2^t;
-  __temp1218v=45;
-  rotl__temp1186v(self__s3,__temp1218v,&__temp1219v__);
-  self__s3=__temp1219v__;
+  __temp1251v=45;
+  rotl__temp1219v(self__s3,__temp1251v,&__temp1252v__);
+  self__s3=__temp1252v__;
   denom=0x0020000000000000ULL;
   nom=result>>11;
   value=nom/denom;
   goto __temp_return;
   __temp_return:
-  *__temp1233v=self__s0;
-  *__temp1234v=self__s1;
-  *__temp1235v=self__s2;
-  *__temp1236v=self__s3;
-  *__temp1237v=value;
+  *__temp1266v=self__s0;
+  *__temp1267v=self__s1;
+  *__temp1268v=self__s2;
+  *__temp1269v=self__s3;
+  *__temp1270v=value;
 }
 
-static inline __attribute__((always_inline)) void print__temp356v(double value) {
-  int __temp357v=0;
+static inline __attribute__((always_inline)) void print__temp367v(double value) {
+  int __temp368v=0;
   const char* endl=0;
-  endl=__temp353v;
+  endl=__temp364v;
   printf("%.6f%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__temp1220v() {
-  uint64_t __temp1221v__s0=0;
-  uint64_t __temp1221v__s1=0;
-  uint64_t __temp1221v__s2=0;
-  uint64_t __temp1221v__s3=0;
-  uint64_t __temp1222v__s0=0;
-  uint64_t __temp1222v__s1=0;
-  uint64_t __temp1222v__s2=0;
-  uint64_t __temp1222v__s3=0;
+static inline __attribute__((always_inline)) void main__temp1253v() {
+  uint64_t __temp1254v__s0=0;
+  uint64_t __temp1254v__s1=0;
+  uint64_t __temp1254v__s2=0;
+  uint64_t __temp1254v__s3=0;
+  uint64_t __temp1255v__s0=0;
+  uint64_t __temp1255v__s1=0;
+  uint64_t __temp1255v__s2=0;
+  uint64_t __temp1255v__s3=0;
   uint64_t rand__s0=0;
   uint64_t rand__s1=0;
   uint64_t rand__s2=0;
   uint64_t rand__s3=0;
-  double __temp1223v__=0;
-  Rand__temp1201v(&__temp1221v__s0,&__temp1221v__s1,&__temp1221v__s2,&__temp1221v__s3);
-  __temp1222v__s0=__temp1221v__s0;
-  __temp1222v__s1=__temp1221v__s1;
-  __temp1222v__s2=__temp1221v__s2;
-  __temp1222v__s3=__temp1221v__s3;
-  rand__s0=__temp1222v__s0;
-  rand__s1=__temp1222v__s1;
-  rand__s2=__temp1222v__s2;
-  rand__s3=__temp1222v__s3;
-  next__temp1217v(&rand__s0,&rand__s1,&rand__s2,&rand__s3,&__temp1223v__);
-  print__temp356v(__temp1223v__);
+  double __temp1256v__=0;
+  Rand__temp1234v(&__temp1254v__s0,&__temp1254v__s1,&__temp1254v__s2,&__temp1254v__s3);
+  __temp1255v__s0=__temp1254v__s0;
+  __temp1255v__s1=__temp1254v__s1;
+  __temp1255v__s2=__temp1254v__s2;
+  __temp1255v__s3=__temp1254v__s3;
+  rand__s0=__temp1255v__s0;
+  rand__s1=__temp1255v__s1;
+  rand__s2=__temp1255v__s2;
+  rand__s3=__temp1255v__s3;
+  next__temp1250v(&rand__s0,&rand__s1,&rand__s2,&rand__s3,&__temp1256v__);
+  print__temp367v(__temp1256v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1220v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1253v();return 0;}

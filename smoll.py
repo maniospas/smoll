@@ -1506,6 +1506,20 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if DEBUG_TYPE in method.variations:
         if not is_lsp: print(signature_like(vars, impl))
         return vars
+    if SIZEOF_TYPE in method.variations:
+        total_size = 0
+        for var in vars:
+            if var.type.builtin: total_size += var.type.memory_size()
+        tmp = create_temp()
+        var = Variable(tmp, UINT_TYPE)
+        impl.vars[tmp] = var
+        impl.implementation.extend([
+            var,
+            CODEWORD_EQUALS,
+            CodeWord(str(total_size)),
+            CODEWORD_SEMICOLON
+        ])
+        return [var]
     callee = _select_call(file, impl, method, vars, error_token)
 
     if callee==NOCATCH_TYPE:
@@ -1905,7 +1919,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
         # if is_lsp and type_start.file.is_main_file: print_lsp_keyword(type_start, "denotes a data literal")
         # pos += 1
     literal_tok = type_start#get(tokens, pos)
-    if literal_tok.is_string():
+    if literal_tok.is_string() and peek_text(tokens, pos+1)!="::":
         if is_lsp and literal_tok.file.is_main_file: print_lsp_string(literal_tok)
         return pos+1, create_literal_type(literal_tok, CSTR_TYPE)
     if literal_tok.is_uint():
@@ -3761,6 +3775,11 @@ NOCATCH_TYPE.doc.append("Creates a compiler error if it is possible to have seen
 DEBUG_TYPE = ImplementedType("debug")
 DEBUG_TYPE.doc.append("prints a type during compilation")
 DEBUG_TYPE.doc.append("This runs even if subsequent code fails.")
+SIZEOF_TYPE = ImplementedType("size")
+SIZEOF_TYPE.doc.append("memory size")
+SIZEOF_TYPE.doc.append("Retrieves the natural number storage size of given values.")
+SIZEOF_TYPE.vars["size"] = Variable("size", UINT_TYPE)
+SIZEOF_TYPE.rets.append("size")
 ANY_TYPE = ImplementedType("any")
 ANY_TYPE.doc.append("any type")
 ANY_TYPE.doc.append("Represents a generic for buffers and pointers for type-independent code that can be matched to a concrete type later.")
@@ -3817,6 +3836,7 @@ fixed_namespace.types["attach_type"] = UnionType("attach_type", at=compiler_toke
 fixed_namespace.types["catch"] = UnionType("catch", at=compiler_token).append(CAUGHT_TYPE)
 fixed_namespace.types["nocatch"] = UnionType("nocatch", at=compiler_token).append(NOCATCH_TYPE)
 fixed_namespace.types["debug"] = UnionType("debug", at=compiler_token).append(DEBUG_TYPE)
+fixed_namespace.types["size"] = UnionType("size", at=compiler_token).append(SIZEOF_TYPE)
 smol_namespace.namespaces["compiler"] = fixed_namespace
 
 file_cache["builtins"] = smol_namespace

@@ -45,7 +45,7 @@ html = """
         padding-left:20px;
         width:200px;
         border-right: 1px solid #444;height:100%;
-        background:#ffffc0!important;
+        background:#fafae3!important;
         overflow-y:auto;
         font-size:0.9rem;
         z-index:1000;

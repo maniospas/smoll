@@ -38,7 +38,7 @@
         padding-left:20px;
         width:200px;
         border-right: 1px solid #444;height:100%;
-        background:#ffffc0!important;
+        background:#fafae3!important;
         overflow-y:auto;
         font-size:0.9rem;
         z-index:1000;
@@ -60,7 +60,7 @@
 
 <div class="toc">
 
-<p><strong>Section 1. Basic syntax</strong><br>
+<p><strong>Section 1. Basic Syntax</strong><br>
 <em>1.1.</em> <a href="#import">import</a> <br>
 <em>1.2.</em> <a href="#calling-notation">calling notation</a> <br>
 <em>1.3.</em> <a href="#mutability">mutability</a> <br>
@@ -73,7 +73,7 @@
 <em>1.10.</em> <a href="#conditional-compilation-and-default-arguments">conditional compilation and default arguments</a><br>
 <em>1.11.</em> <a href="#local-definitions">local definitions</a></p>
 
-<p><strong>Section 2. Safe resources</strong><br>
+<p><strong>Section 2. Safe Resources</strong><br>
 <em>2.1.</em> <a href="#buffers">buffers</a><br>
 <em>2.2.</em> <a href="#pointers">pointers</a><br>
 <em>2.3.</em> <a href="#stable-references">stable references</a><br>
@@ -83,7 +83,7 @@
 <em>2.7.</em> <a href="#catching-errors">catching errors</a><br>
 <em>2.8.</em> <a href="#more-compiler-functions">more compiler functions</a><br></p>
 
-<p><strong>Section 3. Standard library</strong><br>
+<p><strong>Section 3. Standard Library</strong><br>
 <em>3.1.</em> <a href="#lists">lists</a><br>
 <em>3.2.</em> <a href="#strings">strings</a><br>
 <em>3.3.</em> <a href="#maps">maps</a><br>
@@ -95,7 +95,7 @@
 
 </div>
 
-<h1 id="section-1-basic-syntax">Section 1. Basic syntax</h1>
+<h1 id="section-1-basic-syntax">Section 1. Basic Syntax</h1>
 
 <h2 id="import">import</h2>
 
@@ -255,8 +255,8 @@ when applying <code>add</code> to the range construct. If you
 want to prevent implicit structural matches, 
 use the following <code>class</code> notation to wrap the returned value.</p>
 
-<p>Default for class definitions when declaring types with some
-contract of how they are constructed; such contracts should
+<p>Prefer class definitions when declaring types with some
+construction contract; such contracts should
 not be violated by matching with arbitrary data.</p>
 
 <div class="codehilite">
@@ -274,8 +274,22 @@ not be violated by matching with arbitrary data.</p>
 </code></pre>
 </div>
 
-<p>Can also use <code>singleton</code> instead of <code>class</code> to further
-ensure that the function runs at most one time in your program.</p>
+<p>Use <code>singleton</code> instead of <code>class</code> to further
+ensure that the function runs at most one time in your program.
+On the other hand, a shorthand for defining a structural type that would
+immediately return all its fields is to omit its body, like next.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Field</span><span class="p">(</span><span class="n">Point</span> <span class="n">a</span><span class="p">,</span> <span class="n">Point</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">f</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">f</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="c1"># prints 5.0</span>
+</code></pre>
+</div>
 
 <h2 id="type-mutability">type mutability</h2>
 
@@ -487,8 +501,9 @@ literal value. Or you may want to have some constant that is used everywhere
 in your code. This is done by having literal types, as in, types that
 are attached to specific values.</p>
 
-<p>Below is an example on constants first. Literal types evaluate to their
-value when used within code.</p>
+<p>Below is an example on using this concept to define numeric or cstr constants first. 
+Literal types evaluate to their value when used within code - nothing
+out of the ordinary.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -503,13 +518,12 @@ value when used within code.</p>
 </code></pre>
 </div>
 
-<p>Aside from usage as constants, types can be used to specialize among which
+<p>But literal types can also specialize among which
 function to call. To do this, they must be prevented from devolving
-into values, this is done by following them with <code>&amp;</code> when used
-in function bodies, which creates literal type <em>values</em> (type values
-exist only for literals). </p>
-
-<p>Below is an example.</p>
+into values by following them with <code>&amp;</code> (this is needed only when resolving
+values). This result is a <em>type value</em> that can be stored in variables. 
+The variable cannot change which type it refers to, but may be useful for
+conditional compilation later. Below is an example.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -521,25 +535,20 @@ exist only for literals). </p>
     <span class="nb">print</span> <span class="s2">&quot;version two&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">v</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span><span class="o">&amp;</span> <span class="c1"># can assign to variables normally</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span><span class="o">&amp;</span>
     <span class="n">version</span> <span class="n">v</span>  <span class="c1"># calls the correct version</span>
 </code></pre>
 </div>
 
-<p>It is important to remember that types likes these look like constants, 
-but they adhere to all type system conventions too, including the ability
-to declare unions. Furthermore, when used as
-arguments, literal types can still have an associated variable, which
-contains the result of applying <code>&amp;</code> to them.</p>
+<p>Literal types still adhere to all other type system conventions. 
+Those includes union declarations 
+and having associated arguments when used as function arguments.
+Argument values are equivalent to applying <code>&amp;</code>.</p>
 
-<p>Getting back the literal value from a literal type value can be done by following
-the latter with <code>..</code>. The pair of <code>&amp;</code>/<code>..</code> is deliberately similar to point
-conversion later, as the two follow similar patterns of getting lowered in an intermediate
-value (the literal type value or memory address) that can retrieve the original.
-Notably, <code>"two"&amp;..</code> is the same as writing <code>"two"</code>, and the benefit lies purely in
-involving values in the type system.</p>
-
-<p>An example that restricts how a functions are called is presented next.</p>
+<p>Follow a literal type value with <code>..</code> to get back its associated constant.
+That is, <code>"two"&amp;..</code> is the same as writing  <code>"two"</code>, and the benefit 
+lies purely in extracting values from the type system.
+An example that restricts how functions are called is presented next.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -555,12 +564,40 @@ involving values in the type system.</p>
 </code></pre>
 </div>
 
+<p>Assert that a variable belongs to a
+literal type by performing the <code>is</code> check to obtain
+a boolean value. Contrary to the zero-cost conditional 
+compilation of the next section when using <code>is</code> with 
+inferred types only, literal types may be resolved
+to several runtime checks. This creates a dynamic
+matching schema that checks for valid srtuctures.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">enum</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">|</span><span class="s2">&quot;B&quot;</span><span class="o">|</span><span class="s2">&quot;C&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">answer_schemas</span><span class="p">(</span><span class="n">enum</span> <span class="n">first</span><span class="p">,</span> <span class="n">enum</span> <span class="n">second</span><span class="p">,</span> <span class="n">nat</span> <span class="n">minutes_to_answer</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">answers</span><span class="p">(</span><span class="n">cstr</span> <span class="n">first</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">second</span><span class="p">,</span> <span class="n">nat</span> <span class="n">minutes_to_answer</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">answers</span> <span class="o">=</span> <span class="n">answers</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">answers</span> <span class="ow">is</span> <span class="n">answer_schemas</span> 
+        <span class="n">fail</span> <span class="s2">&quot;not a valid answer&quot;</span> <span class="c1"># this will fail</span>
+    <span class="nb">print</span> <span class="s2">&quot;answered: &quot;</span>
+    <span class="nb">print</span> <span class="n">answers</span><span class="o">.</span><span class="n">first</span>
+    <span class="nb">print</span> <span class="n">answers</span><span class="o">.</span><span class="n">second</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;in&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="n">answers</span><span class="o">.</span><span class="n">minutes_to_answer</span><span class="p">,</span> <span class="s2">&quot; minutes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre>
+</div>
+
 <h2 id="conditional-compilation-and-default-arguments">conditional compilation and default arguments</h2>
 
 <p>You can use the <code>[value] is [type]</code> operator to check that a value/tuple
-adheres to at least one variation of a union. The result is not
-merely a boolean, but in fact of type <code>compile::true</code> or <code>compile::false</code>;
-these values are significant because they let <em>smoλ</em> actually identify 
+adheres to at least one variation of a union. When no literal types are involved
+(and sometimes when they are), the result is not merely a boolean, 
+but in fact of type <code>compile::true</code> or <code>compile::false</code>;
+these values are significant because they let <em>smoλ</em> identify 
 whether conditions will always be true or false and <strong>eliminate code without parsing it</strong>.</p>
 
 <p>In other words, you can make <code>is</code> checks to determine conditionally which code
@@ -581,10 +618,10 @@ as the standard library&#8217;s core. Below is an example of a conditional check
 <p>The same mechanism can be used to create optional arguments
 using the <code>blank</code> builtin type; that has no contents and therefore
 skips respective variable definition. Conversely, non-existing
-variables are considered <code>blank</code>, and checks like the one below 
-can be made to check for the presence of <strong>optional arguments</strong>. 
-In the next example, the defined function implements either an increment
-by one, or by a value provided as second argument. </p>
+variables are considered blank, so that blank arguments can typecheck
+to their type correctly. In the end, you define <strong>optional arguments</strong>
+and their fallback values. In the next example, the defined function uses 
+either an increment value of one, or a value provided as second argument. </p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -600,7 +637,7 @@ by one, or by a value provided as second argument. </p>
 </code></pre>
 </div>
 
-<p>Here is a much more complicated example, where <code>compiler::skip()</code> 
+<p>Here is a much more complicated scenario, where <code>compiler::skip()</code> 
 is used to prevent certain versions of the function from being
 created (e.g. there is no <code>inc(float,int)</code>). Do note that you
 can also specialize a type <code>T</code> that could have produced
@@ -653,7 +690,7 @@ in your part of the code (e.g., handling of overflows).</p>
 </code></pre>
 </div>
 
-<h1 id="section-2-safe-resources">Section 2. Safe resources</h1>
+<h1 id="section-2-safe-resources">Section 2. Safe Resources</h1>
 
 <h2 id="buffers">buffers</h2>
 
@@ -839,6 +876,8 @@ for strings copied onto it.</p>
 
 <h2 id="substructures">substructures</h2>
 
+<p><em>This is an advanced feature, mainly useful for complicated data packing.</em></p>
+
 <p>You can work with &#8220;horizontal&#8221; data from buffers and pointers by
 obtaining or setting to specific items. However, you can also
 work with &#8220;vertical&#8221; data by being able to obtain sub-buffers
@@ -899,7 +938,7 @@ You can manually <code>fail</code> like so:</p>
 <strong>Don&#8217;t care about failures. Unless you must.</strong> That is, assume correct execution,
 as if you were scripting, and only handle failures at places where they can be handled
 safely or where they would be critical. If it is important to ensure that 
-a function does not fail up to a certain point, place the <code>compiler::nocatch()</code> 
+a function does not fail up to a certain point, place the <code>debug::nocatch()</code> 
 assertion. There are various other compiler assetions too, which are covered later.</p>
 
 <div class="codehilite">
@@ -910,7 +949,7 @@ assertion. There are various other compiler assetions too, which are covered lat
     <span class="k">try</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">char</span> <span class="s2">&quot;a&quot;</span> <span class="c1"># still needs a try for buffer elements - though checks can be optimized away</span>
     <span class="k">try</span> <span class="nb">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="nb">print</span> <span class="s2">&quot;this must run at all costs&quot;</span>
-    <span class="n">compiler</span><span class="p">::</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># compiler error without &#39;try&#39; on all PREVIOUS calls that could fail</span>
+    <span class="n">debug</span><span class="p">::</span><span class="n">nocatch</span><span class="p">()</span>    <span class="c1"># error if without &#39;try&#39; on all PREVIOUS calls that could fail</span>
     <span class="nb">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">10000</span><span class="p">]</span>      <span class="c1"># allowed to fail now</span>
     <span class="nb">print</span> <span class="s2">&quot;this will never run due to out of bounds error&quot;</span>
 </code></pre>
@@ -1053,15 +1092,18 @@ But, importantly, they <em>are</em> obtained from deferred statements triggered 
 
 <h2 id="more-compiler-functions">more compiler functions</h2>
 
+<p><em>This secion covers debugging tricks and is better suited for advanced readers.</em></p>
+
 <p>Till now there was mention of <code>compiler::skip()</code>, 
-<code>compiler::catch()</code> and <code>compiler::nocatch()</code>
+<code>compiler::catch()</code> and <code>debug::nocatch()</code>
 as mechanisms that let your code interface with 
 the compiler to an extend.</p>
 
 <p>There are some more mechanisms that help inspect
-programs or grant access to internal state that
-you can then analyze. Foremost of those is
-<code>compiler::debug(expression)</code>. This 
+programs or grant access to internal compilation state that
+can be analyzed for debugging.</p>
+
+<p>Foremost of debugging tools is <code>debug::print(expression)</code>. This 
 runs an expression, prints its return at compile time, 
 and returns its value. It works this way so that it can 
 be effortlessly interweaved in code. Do note that you
@@ -1074,22 +1116,40 @@ For example, one pattern usable for debuggining is the following.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">s1</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s1&quot;</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s2&quot;</span>
-    <span class="n">compiler</span><span class="p">::</span><span class="n">debug</span> <span class="s2">&quot;--- main ---&quot;</span><span class="o">&amp;</span>     <span class="c1"># prints &#39;&quot;--- main ---&quot;&amp;&#39; at compile time</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">debug</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>         <span class="c1"># prints &#39;const str, const str&#39; at compile time</span>
+    <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="s2">&quot;--- main ---&quot;</span><span class="o">&amp;</span> <span class="c1"># prints &#39;&quot;--- main ---&quot;&amp;&#39; at compile time</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>     <span class="c1"># prints &#39;const str, const str&#39; at compile time</span>
     <span class="nb">print</span> <span class="n">s</span> <span class="c1"># ERROR due to undefined print, but the above still prints</span>
 </code></pre>
 </div>
 
 <p>Finally, assert that a specific point in a function does not lie within a loop
-or condition with the <code>compiler::branchless()</code> check. The main usage of this
-is as a sanity check within conditional compilation conditions, ensuring that
-they are not accidentally evaluated at runtime.</p>
+or condition with the <code>debug::branchless()</code> check. This helps form sanity check within 
+conditional compilation conditions, ensuring that
+they are not accidentally evaluated at runtime. The next example uses it to verify that 
+there is no runtime overhead from a particular comparison involving enums.</p>
 
-<h1 id="section-3-standard-library">Section 3. Standard library</h1>
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test1</span><span class="p">(</span><span class="n">nat</span> <span class="n">a</span><span class="p">,</span> <span class="n">nat</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="o">|</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test2</span><span class="p">(</span><span class="nb">float</span> <span class="n">a</span><span class="p">,</span> <span class="nb">float</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="o">|</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="s2">&quot;one&quot;</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">test</span> <span class="ow">is</span> <span class="n">test1</span><span class="o">|</span><span class="n">test2</span>
+        <span class="n">debug</span><span class="p">::</span><span class="n">branchless</span><span class="p">()</span>
+        <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="s2">&quot;invalid data&quot;</span>
+</code></pre>
+</div>
+
+<h1 id="section-3-standard-library">Section 3. Standard Library</h1>
 
 <h2 id="lists">lists</h2>
 
-<p>You can manage buffers by adding push and pop operations, as well
+<p>Manage buffers by adding push and pop operations, as well
 as a capacity-based growth strategy. This is done by calling the 
 <code>list</code> function on a mutable buffer. List elements are accessed like 
 buffers. An example follows.</p>
@@ -1155,8 +1215,8 @@ For convenience, this structure can be initialized to start from zero position w
 </code></pre>
 </div>
 
-<p>You can also copy strings on buffers managed by lists.
-In this case, DO use <code>ref</code> for stability, as potential list resizing
+<p>Also copy strings on buffers managed by lists.
+DO use <code>ref</code> for stability, as potential list resizing
 could invalidate the pointer where the string thinks the buffer starts,
 and the compiler would correctly point that out and refuse to progress
 on an erroneous program.</p>
@@ -1175,8 +1235,8 @@ on an erroneous program.</p>
 
 <h2 id="maps">maps</h2>
 
-<p>There are some useful hashing utilities under <em>std/hash.s</em> that you can read,
-but these culminate to allowing hashmaps with string-valued and nat-valued
+<p>There are some useful hashing utilities under <em>std/hash.s</em>, whichc culminate to implementing hashmaps 
+under <em>std/map.s</em> with string-valued and nat-valued
 keys. These two key types cover most useful scenarios, especially given that
 the standard library offers the ability can serialize data as strings or -for smaller
 structures- as bits. Map values can reside on any buffer.</p>
@@ -1285,7 +1345,7 @@ that fails on non-zero error code can be evoked like below.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">::</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
-    <span class="n">buffer</span> <span class="o">=</span> <span class="p">(</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span><span class="p">,</span> <span class="n">mut</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># example with growing position</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># example with growing position</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">line</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">proc</span><span class="p">::</span><span class="n">line</span> <span class="n">process</span>
         <span class="nb">print</span> <span class="n">line</span>
 </code></pre>

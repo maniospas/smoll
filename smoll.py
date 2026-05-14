@@ -1907,6 +1907,8 @@ def create_literal_type(literal_tok: Token, type: ImplementedType):
     type_var = create_temp()
     ret.vars[type_var] = Variable(type_var, ret)
     ret.rets.append(type_var)
+    #ret.vars["arg"] = Variable("arg", type)
+    #ret.args.append("arg")
     uret = UnionType(ret.name, at=ret.at)
     uret.variations.append(ret)
     literal_types[text] = uret
@@ -2236,33 +2238,92 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 is_pos = pos
                 pos += 1
                 # first parse type extraction statements
+                found_variations: list[ImplementedType] = list()
                 if peek_text(tokens, pos)=="type":
                     pos, processed_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
                     matched = len(processed_rets)==len(rets)
                     if matched:
                         for processed_ret, rets_ret in zip(processed_rets, rets):
-                            if processed_ret.type!=rets_ret.type:
+                            if processed_ret.type!=rets_ret.type and processed_ret.type.is_literal_of!=rets_ret.type:
                                 matched = False
                                 break
-                    tmp = create_temp()
-                    rets = [Variable(tmp, TRUE_TYPE) if matched else Variable(tmp, FALSE_TYPE)]
-                    impl.vars[tmp] = rets[0]
+                    rets = [Variable(create_temp(), TRUE_TYPE) if matched else Variable(create_temp(), FALSE_TYPE)]
+                    impl.vars[rets[0].name] = rets[0]
                     return pos, rets
-                pos, type = process_linear_type(file, tokens, pos)
-                found = False
+                pos, type = process_linear_type(file, tokens, pos, reduce_to_unique_variations=True, show_lsp=True)
+                count_with_literals = 0
                 for variation in type.variations:
                     matched = len(variation.rets)==len(rets)
+                    is_with_literal = False
                     if matched:
                         for variation_ret, rets_ret in zip(variation.rets, rets):
-                            if variation.vars[variation_ret].type!=rets_ret.type:
+                            if variation.vars[variation_ret].type.is_literal_of: is_with_literal = True
+                            if variation.vars[variation_ret].type!=rets_ret.type and variation.vars[variation_ret].type.is_literal_of!=rets_ret.type:
                                 matched = False
                                 break
-                    if matched:
-                        found = True
-                        break
-                tmp = create_temp()
-                rets = [Variable(tmp, TRUE_TYPE) if found else Variable(tmp, FALSE_TYPE)]
-                impl.vars[tmp] = rets[0]
+                    if matched: 
+                        found_variations.append(variation)
+                        if is_with_literal: count_with_literals += 1
+                if count_with_literals<len(found_variations):
+                    rets = [Variable(create_temp(), TRUE_TYPE)]
+                elif count_with_literals:
+                    has_any_var = Variable(create_temp(), BOOL_TYPE)
+                    is_variation_matching_var = Variable(create_temp(), BOOL_TYPE)
+                    impl.vars[has_any_var.name] = has_any_var
+                    impl.vars[is_variation_matching_var.name] = is_variation_matching_var
+                    for variation in found_variations:
+                        impl.implementation.extend([is_variation_matching_var, CODEWORD_EQUALS, CodeWord("1"),CODEWORD_SEMICOLON])
+                        for arg_pos, arg in enumerate(variation.args):
+                            literal_method = variation.vars[arg].type
+                            if literal_method.is_literal_of is None: continue # already checked
+                            if literal_method.is_literal_of==CSTR_TYPE:
+                                current = literal_method.at.text
+                                tmp: str|None = global_cstr2var.get(current, None)
+                                variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE)
+                                if tmp is None: 
+                                    global_cstr2var[current] = variable.name
+                                    global_var2cstr[variable.name] = current
+                                impl.vars[variable.name] = variable
+                                impl.used_globals.add(variable.name)
+                            else:
+                                variable = Variable(create_temp(), literal_method.is_literal_of)
+                                impl.vars[variable.name] = variable
+                                impl.implementation.extend([
+                                    variable,
+                                    CODEWORD_EQUALS,
+                                    CodeWord(literal_method.at.text),
+                                    CODEWORD_SEMICOLON
+                                ])
+                            impl.implementation.extend([
+                                CODEWORD_IF,
+                                CODEWORD_LPAR,
+                                variable,
+                                CodeWord("!="),
+                                rets[arg_pos],
+                                CODEWORD_RPAR,
+                                CODEWORD_LBRACKET,
+                                is_variation_matching_var,
+                                CODEWORD_EQUALS,
+                                CodeWord("0"),
+                                CODEWORD_SEMICOLON,
+                                CODEWORD_RBRACKET,
+                            ])
+                        impl.implementation.extend([
+                            CODEWORD_IF,
+                            CODEWORD_LPAR,
+                            is_variation_matching_var,
+                            CODEWORD_RPAR,
+                            CODEWORD_LBRACKET,
+                            has_any_var,
+                            CODEWORD_EQUALS,
+                            CodeWord("1"),
+                            CODEWORD_SEMICOLON,
+                            CODEWORD_RBRACKET,
+                        ])
+                    rets = [has_any_var]
+                else:
+                    rets = [Variable(create_temp(), FALSE_TYPE)]
+                impl.vars[rets[0].name] = rets[0]
                 return pos, rets
             pos, rets = process_is(pos, rets)
             continue
@@ -2849,7 +2910,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
                 matches = len(variation.rets)==len(typevars)
                 if not matches: continue
                 for rv, rt in zip(variation.rets, typevars):
-                    if variation.vars[rv].type!=rt.type:
+                    if variation.vars[rv].type!=rt.type: #and variation.vars[rv].type.is_literal_of!=rt.type:
                         matches = False
                         break
                 if matches: method.variations.append(variation)
@@ -2858,7 +2919,48 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             pos, method = process_linear_type(file, tokens, pos)
         call_token = get(tokens, pos-1)
         if any(variation.is_literal_of is not None for variation in method.variations):
-            if len(method.variations)!=1: call_token.error("type", "cannot have a literal type with alterantives")
+            # if any(variation.is_literal_of is None for variation in method.variations): call_token.error("type", "cannot mix literal and non-literal types in allowed calls")
+            # if is_type_resolution:
+            #     has_any_var = Variable(create_temp(), BOOL_TYPE)
+            #     impl.vars[has_any_var.name] = has_any_var
+            #     for literal_method in method.variations:
+            #         if literal_method.is_literal_of==CSTR_TYPE:
+            #             current = literal_method.at.text
+            #             if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
+            #             tmp: str|None = global_cstr2var.get(current, None)
+            #             variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE)
+            #             if tmp is None: 
+            #                 global_cstr2var[current] = variable.name
+            #                 global_var2cstr[variable.name] = current
+            #             impl.vars[variable.name] = variable
+            #             impl.used_globals.add(variable.name)
+            #         else:
+            #             variable = Variable(create_temp(), literal_method.is_literal_of)
+            #             if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\nnumber defined to be "+literal_method.at.text)
+            #             impl.vars[variable.name] = variable
+            #             impl.implementation.extend([
+            #                 variable,
+            #                 CODEWORD_EQUALS,
+            #                 CodeWord(literal_method.at.text),
+            #                 CODEWORD_SEMICOLON
+            #             ])
+            #         impl.implementation.extend([
+            #             CODEWORD_IF,
+            #             CODEWORD_LPAR,
+            #             variable,
+            #             CodeWord("=="),
+            #             typevars[0],
+            #             CODEWORD_RPAR,
+            #             CODEWORD_LBRACKET,
+            #             has_any_var,
+            #             CODEWORD_EQUALS,
+            #             CodeWord("1"),
+            #             CODEWORD_SEMICOLON,
+            #             CODEWORD_RBRACKET,
+            #         ])
+            #     varsret = [has_any_var]
+            # else:
+            if len(method.variations)!=1: call_token.error("type", "cannot have multiple literal type alternatives")
             literal_method = method.variations[0]
             if peek_text(tokens, pos)=="&":
                 pos += 1
@@ -3404,7 +3506,10 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
                         candidates.append(found_type.variations[already_parsed])
                         continue
             try:
-                pos = process_body(file, tokens, pos, impl)
+                if peek_text(tokens, pos) in ["def", "repo", "import", "local"]:
+                    impl.rets = [arg for arg in impl.args]
+                else: 
+                    pos = process_body(file, tokens, pos, impl)
             except FastReturnException: 
                 assert fast_return_exception
             #if not impl.force_not_inline and fast_return_exception: continue # register only forcefully RECURSIVE variations
@@ -3471,15 +3576,17 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
                 else: 
                     pos_end = i
                     depth = 0
-                    while pos_end<len(tokens):
-                        txt = get_skip(tokens, pos_end).text
-                        if txt==START_TOKEN: depth += 1
-                        if txt==END_TOKEN: 
-                            depth -= 1
-                            if depth==0: break
-                        pos_end += 1
+                    followed_by_body = get_skip(tokens, pos_end).text==START_TOKEN or tok.text=="rec"
+                    if followed_by_body:
+                        while pos_end<len(tokens):
+                            txt = get_skip(tokens, pos_end).text
+                            if txt==START_TOKEN: depth += 1
+                            if txt==END_TOKEN: 
+                                depth -= 1
+                                if depth==0: break
+                            pos_end += 1
                     i = process_def(file, tokens, i, fast_return_exception=tok.text=="rec", is_local=is_local)
-                    i = pos_end+1
+                    if followed_by_body: i = pos_end+1
             elif tok.text=="import": 
                 if has_made_def: tok.error("safety", "can only import before the file's first definition", reason=first_def_tok, raason_message="first definition at")
                 defname = get(tokens, i+1)
@@ -3772,7 +3879,7 @@ SUCCESS_TYPE.doc.append("Branchless code refers loops or conditions that are eli
 NOCATCH_TYPE = ImplementedType("nocatch")
 NOCATCH_TYPE.doc.append("verify no errors up to now")
 NOCATCH_TYPE.doc.append("Creates a compiler error if it is possible to have seen an error outside a 'try' statement that would have terminate this function before this point.")
-DEBUG_TYPE = ImplementedType("debug")
+DEBUG_TYPE = ImplementedType("print")
 DEBUG_TYPE.doc.append("prints a type during compilation")
 DEBUG_TYPE.doc.append("This runs even if subsequent code fails.")
 SIZEOF_TYPE = ImplementedType("size")
@@ -3828,16 +3935,20 @@ smol_namespace.types["any"] = UnionType("any", at=builtin_token).append(ANY_TYPE
 fixed_namespace = File("compiler")
 compiler_token = Token("compiler", fixed_namespace, 1, 1)
 fixed_namespace.types["skip"] = UnionType("skip", at=compiler_token).append(FAIL_TYPE)
-fixed_namespace.types["branchless"] = UnionType("branchless", at=compiler_token).append(SUCCESS_TYPE)
 fixed_namespace.types["true"] = UnionType("true", at=compiler_token).append(TRUE_TYPE)
 fixed_namespace.types["false"] = UnionType("false", at=compiler_token).append(FALSE_TYPE)
 fixed_namespace.types["ptr"] = UnionType("ptr", at=compiler_token).append(POINTER_TYPE)
 fixed_namespace.types["attach_type"] = UnionType("attach_type", at=compiler_token).append(SAME_CONTENTS_TYPE).append(SAME_CONTENTS_TYPE_CSTR)
 fixed_namespace.types["catch"] = UnionType("catch", at=compiler_token).append(CAUGHT_TYPE)
-fixed_namespace.types["nocatch"] = UnionType("nocatch", at=compiler_token).append(NOCATCH_TYPE)
-fixed_namespace.types["debug"] = UnionType("debug", at=compiler_token).append(DEBUG_TYPE)
 fixed_namespace.types["size"] = UnionType("size", at=compiler_token).append(SIZEOF_TYPE)
 smol_namespace.namespaces["compiler"] = fixed_namespace
+
+debug_namespace = File("debug")
+debug_token = Token("debug", debug_namespace, 1, 1)
+debug_namespace.types["nocatch"] = UnionType("nocatch", at=compiler_token).append(NOCATCH_TYPE)
+debug_namespace.types["print"] = UnionType("print", at=compiler_token).append(DEBUG_TYPE)
+debug_namespace.types["branchless"] = UnionType("branchless", at=compiler_token).append(SUCCESS_TYPE)
+smol_namespace.namespaces["debug"] = debug_namespace
 
 file_cache["builtins"] = smol_namespace
 

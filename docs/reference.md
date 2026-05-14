@@ -2,7 +2,7 @@
 
 <div class="toc" markdown="1">
 
-**Section 1. Basic syntax**<br>
+**Section 1. Basic Syntax**<br>
 _1.1._ [import](#import) <br>
 _1.2._ [calling notation](#calling-notation) <br>
 _1.3._ [mutability](#mutability) <br>
@@ -15,7 +15,7 @@ _1.9._ [literal types](#literal-types) <br>
 _1.10._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)<br>
 _1.11._ [local definitions](#local-definitions)
 
-**Section 2. Safe resources**<br>
+**Section 2. Safe Resources**<br>
 _2.1._ [buffers](#buffers)<br>
 _2.2._ [pointers](#pointers)<br>
 _2.3._ [stable references](#stable-references)<br>
@@ -25,7 +25,7 @@ _2.6._ [defer](#defer)<br>
 _2.7._ [catching errors](#catching-errors)<br>
 _2.8._ [more compiler functions](#more-compiler-functions)<br>
 
-**Section 3. Standard library**<br>
+**Section 3. Standard Library**<br>
 _3.1._ [lists](#lists)<br>
 _3.2._ [strings](#strings)<br>
 _3.3._ [maps](#maps)<br>
@@ -37,7 +37,7 @@ _3.8._ [vectors](#vectors)<br>
 
 </div>
 
-# Section 1. Basic syntax
+# Section 1. Basic Syntax
 
 ## import
 
@@ -194,8 +194,8 @@ when applying `add` to the range construct. If you
 want to prevent implicit structural matches, 
 use the following `class` notation to wrap the returned value.
 
-Default for class definitions when declaring types with some
-contract of how they are constructed; such contracts should
+Prefer class definitions when declaring types with some
+construction contract; such contracts should
 not be violated by matching with arbitrary data.
 
 
@@ -213,8 +213,21 @@ def main()
     print sum p 
 ```
 
-Can also use `singleton` instead of `class` to further
+Use `singleton` instead of `class` to further
 ensure that the function runs at most one time in your program.
+On the other hand, a shorthand for defining a structural type that would
+immediately return all its fields is to omit its body, like next.
+
+```python
+import "std/core.s"
+
+def Point(float x, float y)
+def Field(Point a, Point b)
+
+def main()
+    f = Field(1.0, 2.0, 3.0, 4.0)
+    print f.a.x+f.b.y # prints 5.0
+```
 
 ## type mutability
 
@@ -417,8 +430,9 @@ literal value. Or you may want to have some constant that is used everywhere
 in your code. This is done by having literal types, as in, types that
 are attached to specific values.
 
-Below is an example on constants first. Literal types evaluate to their
-value when used within code.
+Below is an example on using this concept to define numeric or cstr constants first. 
+Literal types evaluate to their value when used within code - nothing
+out of the ordinary.
 
 ```python
 import "std/core.s"
@@ -432,13 +446,12 @@ def main()
     print inc 0  # prints 1
 ```
 
-Aside from usage as constants, types can be used to specialize among which
+But literal types can also specialize among which
 function to call. To do this, they must be prevented from devolving
-into values, this is done by following them with `&` when used
-in function bodies, which creates literal type *values* (type values
-exist only for literals). 
-
-Below is an example.
+into values by following them with `&` (this is needed only when resolving
+values). This result is a *type value* that can be stored in variables. 
+The variable cannot change which type it refers to, but may be useful for
+conditional compilation later. Below is an example.
 
 ```python
 import "std/core.s"
@@ -450,24 +463,19 @@ def version("two")
     print "version two"
 
 def main()
-    v = "two"& # can assign to variables normally
+    v = "two"&
     version v  # calls the correct version
 ```
 
-It is important to remember that types likes these look like constants, 
-but they adhere to all type system conventions too, including the ability
-to declare unions. Furthermore, when used as
-arguments, literal types can still have an associated variable, which
-contains the result of applying `&` to them.
+Literal types still adhere to all other type system conventions. 
+Those includes union declarations 
+and having associated arguments when used as function arguments.
+Argument values are equivalent to applying `&`.
 
-Getting back the literal value from a literal type value can be done by following
-the latter with `..`. The pair of `&`/`..` is deliberately similar to point
-conversion later, as the two follow similar patterns of getting lowered in an intermediate
-value (the literal type value or memory address) that can retrieve the original.
-Notably, `"two"&..` is the same as writing `"two"`, and the benefit lies purely in
-involving values in the type system.
-
-An example that restricts how a functions are called is presented next.
+Follow a literal type value with `..` to get back its associated constant.
+That is, `"two"&..` is the same as writing  `"two"`, and the benefit 
+lies purely in extracting values from the type system.
+An example that restricts how functions are called is presented next.
 
 ```python
 import "std/core.s"
@@ -482,13 +490,39 @@ def main()
     print inc (0, 2&) # prints 2
 ```
 
+Assert that a variable belongs to a
+literal type by performing the `is` check to obtain
+a boolean value. Contrary to the zero-cost conditional 
+compilation of the next section when using `is` with 
+inferred types only, literal types may be resolved
+to several runtime checks. This creates a dynamic
+matching schema that checks for valid srtuctures.
+
+```python
+import "std/core.s"
+
+def enum = "A"|"B"|"C"
+def answer_schemas(enum first, enum second, nat minutes_to_answer)
+def answers(cstr first, cstr second, nat minutes_to_answer)
+
+def main()
+    answers = answers("A", "F", 60)
+    if not answers is answer_schemas 
+        fail "not a valid answer" # this will fail
+    print "answered: "
+    print answers.first
+    print answers.second
+    print ("in", " ")
+    print (answers.minutes_to_answer, " minutes\n")
+```
 
 ## conditional compilation and default arguments
 
 You can use the `[value] is [type]` operator to check that a value/tuple
-adheres to at least one variation of a union. The result is not
-merely a boolean, but in fact of type `compile::true` or `compile::false`;
-these values are significant because they let *smoλ* actually identify 
+adheres to at least one variation of a union. When no literal types are involved
+(and sometimes when they are), the result is not merely a boolean, 
+but in fact of type `compile::true` or `compile::false`;
+these values are significant because they let *smoλ* identify 
 whether conditions will always be true or false and **eliminate code without parsing it**.
 
 In other words, you can make `is` checks to determine conditionally which code
@@ -509,10 +543,10 @@ def typed_print(int|float|cstr value)
 The same mechanism can be used to create optional arguments
 using the `blank` builtin type; that has no contents and therefore
 skips respective variable definition. Conversely, non-existing
-variables are considered `blank`, and checks like the one below 
-can be made to check for the presence of **optional arguments**. 
-In the next example, the defined function implements either an increment
-by one, or by a value provided as second argument. 
+variables are considered blank, so that blank arguments can typecheck
+to their type correctly. In the end, you define **optional arguments**
+and their fallback values. In the next example, the defined function uses 
+either an increment value of one, or a value provided as second argument. 
 
 ```python
 import "std/core.s"
@@ -527,7 +561,7 @@ def main()
     print inc(2,2) # prints 4
 ```
 
-Here is a much more complicated example, where `compiler::skip()` 
+Here is a much more complicated scenario, where `compiler::skip()` 
 is used to prevent certain versions of the function from being
 created (e.g. there is no `inc(float,int)`). Do note that you
 can also specialize a type `T` that could have produced
@@ -578,7 +612,7 @@ def next(range r, mut nat value)
     return true
 ```
 
-# Section 2. Safe resources
+# Section 2. Safe Resources
 
 ## buffers
 
@@ -760,6 +794,8 @@ def main()
 
 ## substructures
 
+*This is an advanced feature, mainly useful for complicated data packing.*
+
 You can work with "horizontal" data from buffers and pointers by
 obtaining or setting to specific items. However, you can also
 work with "vertical" data by being able to obtain sub-buffers
@@ -819,7 +855,7 @@ Propagating failures is done in the spirit of writing concise but well-controlle
 **Don't care about failures. Unless you must.** That is, assume correct execution,
 as if you were scripting, and only handle failures at places where they can be handled
 safely or where they would be critical. If it is important to ensure that 
-a function does not fail up to a certain point, place the `compiler::nocatch()` 
+a function does not fail up to a certain point, place the `debug::nocatch()` 
 assertion. There are various other compiler assetions too, which are covered later.
 
 ```python
@@ -830,7 +866,7 @@ def main()
     try x[0] = char "a" # still needs a try for buffer elements - though checks can be optimized away
     try print x[0]
     print "this must run at all costs"
-    compiler::nocatch() # compiler error without 'try' on all PREVIOUS calls that could fail
+    debug::nocatch()    # error if without 'try' on all PREVIOUS calls that could fail
     print x[10000]      # allowed to fail now
     print "this will never run due to out of bounds error"
 ```
@@ -970,15 +1006,18 @@ def main()
 
 ## more compiler functions
 
+*This secion covers debugging tricks and is better suited for advanced readers.*
+
 Till now there was mention of `compiler::skip()`, 
-`compiler::catch()` and `compiler::nocatch()`
+`compiler::catch()` and `debug::nocatch()`
 as mechanisms that let your code interface with 
 the compiler to an extend.
 
 There are some more mechanisms that help inspect
-programs or grant access to internal state that
-you can then analyze. Foremost of those is
-`compiler::debug(expression)`. This 
+programs or grant access to internal compilation state that
+can be analyzed for debugging.
+
+Foremost of debugging tools is `debug::print(expression)`. This 
 runs an expression, prints its return at compile time, 
 and returns its value. It works this way so that it can 
 be effortlessly interweaved in code. Do note that you
@@ -991,21 +1030,39 @@ import "std/core.s"
 def main()
     s1 = str "s1"
     s2 = str "s2"
-    compiler::debug "--- main ---"&     # prints '"--- main ---"&' at compile time
-    s = compiler::debug (s1,s2)         # prints 'const str, const str' at compile time
+    debug::print "--- main ---"& # prints '"--- main ---"&' at compile time
+    s = debug::print (s1,s2)     # prints 'const str, const str' at compile time
     print s # ERROR due to undefined print, but the above still prints
 ```
 
 Finally, assert that a specific point in a function does not lie within a loop
-or condition with the `compiler::branchless()` check. The main usage of this
-is as a sanity check within conditional compilation conditions, ensuring that
-they are not accidentally evaluated at runtime.
+or condition with the `debug::branchless()` check. This helps form sanity check within 
+conditional compilation conditions, ensuring that
+they are not accidentally evaluated at runtime. The next example uses it to verify that 
+there is no runtime overhead from a particular comparison involving enums.
 
-# Section 3. Standard library
+```python
+import "std/core.s"
+
+def test1(nat a, nat b, "one"|"two")
+def test2(float a, float b, "one"|"two")
+
+def main()
+    a = 1
+    b = 2.0
+    c = "one"
+    test = (a,b,c)
+    if not test is test1|test2
+        debug::branchless()
+        debug::print "invalid data"
+```
+
+
+# Section 3. Standard Library
 
 ## lists
 
-You can manage buffers by adding push and pop operations, as well
+Manage buffers by adding push and pop operations, as well
 as a capacity-based growth strategy. This is done by calling the 
 `list` function on a mutable buffer. List elements are accessed like 
 buffers. An example follows.
@@ -1066,8 +1123,8 @@ def main()
     print s
 ```
 
-You can also copy strings on buffers managed by lists.
-In this case, DO use `ref` for stability, as potential list resizing
+Also copy strings on buffers managed by lists.
+DO use `ref` for stability, as potential list resizing
 could invalidate the pointer where the string thinks the buffer starts,
 and the compiler would correctly point that out and refuse to progress
 on an erroneous program.
@@ -1085,8 +1142,8 @@ def main()
 
 ## maps
 
-There are some useful hashing utilities under *std/hash.s* that you can read,
-but these culminate to allowing hashmaps with string-valued and nat-valued
+There are some useful hashing utilities under *std/hash.s*, whichc culminate to implementing hashmaps 
+under *std/map.s* with string-valued and nat-valued
 keys. These two key types cover most useful scenarios, especially given that
 the standard library offers the ability can serialize data as strings or -for smaller
 structures- as bits. Map values can reside on any buffer.
@@ -1191,7 +1248,7 @@ import "std/io.s"::process as proc
 
 def main()
     process = proc::process "ls"
-    buffer = (alloc KB 4, mut 0) # example with growing position
+    buffer = bufpos alloc KB 4 # example with growing position
     while try line=buffer.proc::line process
         print line
 ```

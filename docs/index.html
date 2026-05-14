@@ -96,18 +96,17 @@
 <em>1.7.</em> <a href="#recursion">recursion</a> <br>
 <em>1.8.</em> <a href="#unions">unions</a> <br>
 <em>1.9.</em> <a href="#literal-types">literal types</a> <br>
-<em>1.10.</em> <a href="#conditional-compilation-and-default-arguments">conditional compilation and default arguments</a><br>
-<em>1.11.</em> <a href="#local-definitions">local definitions</a></p>
+<em>1.10.</em> <a href="#conditional-compilation-and-default-arguments">conditional compilation and default arguments</a></p>
 
 <p><strong>Section 2. Safe Resources</strong><br>
 <em>2.1.</em> <a href="#buffers">buffers</a><br>
-<em>2.2.</em> <a href="#pointers">pointers</a><br>
-<em>2.3.</em> <a href="#stable-references">stable references</a><br>
-<em>2.4.</em> <a href="#substructures">substructures</a><br>
+<em>2.2.</em> <a href="#pointers">⚠ pointers</a><br>
+<em>2.3.</em> <a href="#substructures">⚠ substructures</a><br>
+<em>2.4.</em> <a href="#stable-references">stable references</a><br>
 <em>2.5.</em> <a href="#try-and-fail">try and fail</a><br>
 <em>2.6.</em> <a href="#defer">defer</a><br>
 <em>2.7.</em> <a href="#catching-errors">catching errors</a><br>
-<em>2.8.</em> <a href="#debugging-tools">debugging tools</a><br></p>
+<em>2.8.</em> <a href="#debugging-tools">⚠ debugging tools</a><br></p>
 
 <p><strong>Section 3. Standard Library</strong><br>
 <em>3.1.</em> <a href="#lists">lists</a><br>
@@ -116,8 +115,10 @@
 <em>3.4.</em> <a href="#io">io</a><br>
 <em>3.5.</em> <a href="#processes">processes</a><br>
 <em>3.6.</em> <a href="#random">random</a><br>
-<em>3.7.</em> <a href="#mini-and-bits">mini and bits</a><br>
+<em>3.7.</em> <a href="#mini-and-bits">⚠ mini and bits</a><br>
 <em>3.8.</em> <a href="#vectors">vectors</a><br></p>
+
+<p>⚠ Advanced functionality.</p>
 
 </div>
 
@@ -181,6 +182,11 @@ from a file.</p>
     <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
 </code></pre>
 </div>
+
+<p>Finally, you can have imports
+-or function definitions- be preceded by <code>local</code> to avoid exposing
+unnecessary contents. This is used for isolating which functionality
+is introduced in each file, so that it can be uniquely referenced.</p>
 
 <h2 id="calling-notation">calling notation</h2>
 
@@ -494,10 +500,14 @@ adding either a float or an integer to a float. The brackets
 are used to add some C code, inside which <code>builtins::float</code> is
 injected by <em>smoλ</em> as the appropriate builtin type. </p>
 
-<p>This particular functionality is not part of the standard library, because the latter
-aims to lossy conversions between numeric types. Usually, you will
-not see any unsafe C code in front of you either (unless you are contributing 
-to the standard library).</p>
+<p>The exemplified functionality of adding any two numbers together
+is not part of the standard library, as it introduces lossy 
+conversion between numeric types. Usually, you will
+not see any unsafe C code -introduced by brackets- either, 
+unless you are contributing to the standard library or writing 
+helpers for low-level operations. A more complete reference 
+for interweaving a superset of C that interacts with smoll
+will be added in the future.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
@@ -505,10 +515,15 @@ to the standard library).</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span> <span class="n">y</span><span class="p">)</span>
     <span class="p">{</span><span class="n">builtins</span><span class="p">::</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
     <span class="k">return</span> <span class="n">z</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">unsafe_add</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Type alternatives can also be named for reusability.
+This is called a union type in that it brings together
+several alterantives to be referenced via the same name.
 An example follows.</p>
 
 <div class="codehilite">
@@ -518,6 +533,9 @@ An example follows.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="n">Number</span> <span class="n">x</span><span class="p">,</span> <span class="n">Number</span> <span class="n">y</span><span class="p">)</span>
     <span class="p">{</span><span class="n">builtins</span><span class="p">::</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
     <span class="k">return</span> <span class="n">z</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">unsafe_add</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -528,8 +546,9 @@ literal value. Or you may want to have some constant that is used everywhere
 in your code. This is done by having literal types, as in, types that
 are attached to specific values.</p>
 
-<p>Below is an example on using this concept to define numeric or cstr constants first. 
-Literal types evaluate to their value when used within code - nothing
+<p>Below is an example on using this concept to define numeric or 
+cstr constants first. Literal types evaluate to their value when 
+used within code - nothing
 out of the ordinary.</p>
 
 <div class="codehilite">
@@ -546,14 +565,14 @@ out of the ordinary.</p>
 </div>
 
 <p>But literal types can also specialize among which
-function to call. To do this, they must be prevented from devolving
-into values by following them with <code>&amp;</code> (this is needed only when resolving
-values). This result is a <em>type value</em> that can be stored in variables. 
-The variable cannot change which type it refers to, but may be useful for
-conditional compilation later. Below is an example.</p>
+function to call, like below. Doing so requires retrieving
+the literal&#8217;s type by evaluating <code>type value</code>, where value
+can be a string or number literal.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">VERSION</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="s2">&quot;one&quot;</span><span class="p">)</span> <span class="c1"># just a literal type</span>
     <span class="nb">print</span> <span class="s2">&quot;version one&quot;</span>
@@ -562,19 +581,19 @@ conditional compilation later. Below is an example.</p>
     <span class="nb">print</span> <span class="s2">&quot;version two&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">v</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span><span class="o">&amp;</span>
-    <span class="n">version</span> <span class="n">v</span>  <span class="c1"># calls the correct version</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="nb">type</span> <span class="s2">&quot;two&quot;</span>
+    <span class="n">version</span> <span class="n">v</span> <span class="c1"># calls the correct version</span>
+    <span class="n">version</span> <span class="nb">type</span> <span class="n">VERSION</span> <span class="c1"># calls the same version</span>
 </code></pre>
 </div>
 
 <p>Literal types still adhere to all other type system conventions. 
-Those includes union declarations 
-and having associated arguments when used as function arguments.
-Argument values are equivalent to applying <code>&amp;</code>.</p>
+Those includes union declarations and having associated variables
+holding their value when used as function arguments.</p>
 
-<p>Follow a literal type value with <code>..</code> to get back its associated constant.
-That is, <code>"two"&amp;..</code> is the same as writing  <code>"two"</code>, and the benefit 
-lies purely in extracting values from the type system.
+<p>Get back the associated value with the <code>compiler::literal</code> function. 
+That is, <code>compiler::literal type "two"</code> yields <code>"two"</code>.
+The benefit lies purely in extracting values from the type system.
 An example that restricts how functions are called is presented next.</p>
 
 <div class="codehilite">
@@ -582,22 +601,21 @@ An example that restricts how functions are called is presented next.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">inc</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">inc</span> <span class="ow">is</span> <span class="n">blank</span>
-        <span class="n">inc</span> <span class="o">=</span> <span class="mi">1</span><span class="o">&amp;</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">inc</span><span class="o">..</span>
+        <span class="n">inc</span> <span class="o">=</span> <span class="nb">type</span> <span class="mi">1</span> <span class="c1"># literal convertible</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">literal</span> <span class="n">inc</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="nb">print</span> <span class="n">inc</span> <span class="mi">0</span>       <span class="c1"># prints 1</span>
-    <span class="nb">print</span> <span class="n">inc</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">&amp;</span><span class="p">)</span> <span class="c1"># prints 2</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="mi">0</span>           <span class="c1"># prints 1</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">type</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># prints 2</span>
 </code></pre>
 </div>
 
-<p>Assert that a variable belongs to a
+<p>Check whether a variable belongs to a
 literal type by performing the <code>is</code> check to obtain
 a boolean value. Contrary to the zero-cost conditional 
 compilation of the next section when using <code>is</code> with 
 inferred types only, literal types may be resolved
-to several runtime checks. This creates a dynamic
-matching schema that checks for valid srtuctures.</p>
+to several runtime checks.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -620,7 +638,7 @@ matching schema that checks for valid srtuctures.</p>
 
 <h2 id="conditional-compilation-and-default-arguments">conditional compilation and default arguments</h2>
 
-<div class="notice-box box-info"><strong>Info:</strong> In conjunction with the type system, this feature creates zero-cost condition checks for consise creation of multiple definitions.</div>
+<div class="notice-box box-info"><strong>Info:</strong> In conjunction with the type system, this feature creates zero-cost condition checks for concise creation of multiple definitions.</div>
 
 <p>You can use the <code>[value] is [type]</code> operator to check that a value/tuple
 adheres to at least one variation of a union. When no literal types are involved
@@ -668,54 +686,32 @@ either an increment value of one, or a value provided as second argument. </p>
 
 <p>Here is a much more complicated scenario, where <code>compiler::skip()</code> 
 is used to prevent certain versions of the function from being
-created (e.g. there is no <code>inc(float,int)</code>). Do note that you
-can also specialize a type <code>T</code> that could have produced
-<code>x</code> per <code>type T x</code>. In total, the compiler investigates 3*4=12
-variations and eventually keeps 6 of them. Both conditions
-are fully zero-cost abstractions. Do note that usually the
-signature would be kept simple by declaring a helper <code>def Number = float|int|nat</code>.</p>
+created (e.g. there is no <code>inc(float,int)</code>). The example also shows 
+two type inference constructs: </p>
+
+<ul>
+<li>Obtain functions among alternatives <code>T</code> that could have produced value <code>x</code> (can be a tuple) per <code>type T-&gt;x</code>. This is a specialization of the <code>type T</code> syntax, which itself is a more verbose way of writing <code>T</code> but also works with literals without devolving them into values. The alternatives are needed because the language allows structural typing, meaning that there is not necessarily a unique way to infer a function from its output structure. For example, <code>type Num-&gt;x 1</code> can be used to cast the value 1 to the same number format as the variable <code>x</code> by calling one of the functions in the <code>Num</code> union that would output the same output as the variable. The same pattern could have been used to also run an appropriate string-to-number converter like <code>type Num-&gt;x "1"</code>.</li>
+<li>Compare against the exact structural type of <code>x</code> (that can be an expression) use <code>value is type x</code>. This is a short-circuit for a different compilation branch and is always inferred at compile time.</li>
+</ul>
+
+<p>In total, the compiler investigates 3*4=12
+variations and eventually keeps 6 of them. Both conditional checks in the example
+zero-cost abstractions in that they never occur during execution.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span><span class="o">|</span><span class="n">blank</span> <span class="n">value</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Num</span> <span class="o">=</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">Num</span> <span class="n">x</span><span class="p">,</span> <span class="n">Num</span><span class="o">|</span><span class="n">blank</span> <span class="n">value</span><span class="p">)</span> <span class="c1"># equivalent: def inc(float|int|nat x, float|int|nat|blank value) </span>
     <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">blank</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="nb">type</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span> <span class="n">x</span> <span class="mi">1</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">type</span> <span class="n">Num</span><span class="o">-&gt;</span><span class="n">x</span> <span class="mi">1</span> <span class="c1"># one with the same number format as x</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">is</span> <span class="nb">type</span> <span class="n">x</span>
         <span class="n">compiler</span><span class="p">::</span><span class="n">skip</span><span class="p">()</span> <span class="c1"># skip invalid &#39;inc&#39; definitions</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">value</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="nb">print</span> <span class="n">inc</span> <span class="mf">2.0</span>  <span class="c1"># prints 3.0</span>
     <span class="nb">print</span> <span class="n">inc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># prints 4</span>
-</code></pre>
-</div>
-
-<h2 id="local-definitions">local definitions</h2>
-
-<p>This is perhaps a good point to mention that you can have imports
-or function definitions be preceded by <code>local</code> to avoid exposing
-unnecessary contents.
-For example, the <em>range</em> module from the standard library imports
-the latter&#8217;s core locally but never exposes it, for example to
-cover cases where different arithmetic operations need to be defined 
-in your part of the code (e.g., handling of overflows).</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">local</span> <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">range</span><span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="n">blank</span> <span class="n">pos</span><span class="p">,</span> <span class="n">nat</span> <span class="n">to</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">pos</span> <span class="ow">is</span> <span class="n">blank</span>
-        <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">mut</span> <span class="n">pos</span><span class="p">,</span> <span class="n">to</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="nb">range</span> <span class="n">r</span><span class="p">,</span> <span class="n">mut</span> <span class="n">nat</span> <span class="n">value</span><span class="p">)</span>
-    <span class="n">next_pos</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span>
-    <span class="k">if</span> <span class="n">next_pos</span><span class="o">==</span><span class="n">r</span><span class="o">.</span><span class="n">to</span>
-        <span class="k">return</span> <span class="n">false</span>
-    <span class="n">value</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">pos</span>
-    <span class="n">r</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">next_pos</span>
-    <span class="k">return</span> <span class="n">true</span>
 </code></pre>
 </div>
 
@@ -759,9 +755,8 @@ buffers within loops. </p>
 <p>A second important feature is the element access operator <code>buffer[pos]</code>,
 which can be used to extract an object stored at a specific position. 
 In general, this operator is implemented by overloading the <code>get</code> 
-function and <code>mutget</code> functions. Use <code>buffer[pos] = value</code> to copy same data 
-on a buffer&#8217;s element. This is equivalent to the pointer notations
-<code>buffer[pos]&amp;&amp;&lt;&lt;value</code>, but more on pointers later.</p>
+and <code>mutget</code> functions, though beware that details do involve pointers. 
+Use <code>buffer[pos] = value</code> to copy some data on a buffer&#8217;s element.</p>
 
 <p>All buffer indexes are of type <code>nat</code>, which represents natural numbers 
 (non-negative integers). Here is an example of buffer usage.</p>
@@ -791,32 +786,33 @@ safeguard can improve performance and bring code safety.</p>
 to quickly move data around while sharing only one memory address. 
 Pointers are unstable in that, for safety, they become invalid whenever 
 any buffer is resized. Being invalid means that they can not be read 
-from or copy data to them.</p>
+from or copy data to them. This holds true mainly for safe pointers
+used in practical use. New C resources can added using unsafe pointer
+semantics that will be covered in a future section about C extensibility.</p>
 
 <p>Obtain a <code>const</code> pointer from a buffer whose
 pointed memory location cannot be modified per <code>ptr = buf[element]&amp;</code>, and
-a <code>mut</code> pointer per <code>ptr = buf[element]&amp;&amp;</code>. </p>
+a <code>mut</code> pointer per <code>ptr = buf[element]&amp;&amp;</code>. Constness means that pointer
+contents cannot be overwritten.</p>
 
 <p><code>ptr..</code> dereferences pointers onto local objects. 
 For example, <code>ptr...field</code> gets a field from an object stored 
 in a pointer by following up the dereferenced data with field
 access notation. Move values onto pointed locations
-of mutable pointers per <code>ptr &lt;&lt; value</code>.</p>
+of mutable pointers per <code>ptr &lt;&lt; value</code>. Given all these operators
+it is now possible to explain that <code>buffer[pos]=value</code> desugares 
+to the pointer notations <code>buffer[pos]&amp;&amp;&lt;&lt;value</code>.</p>
 
-<p><em>Smoλ</em> makes necessary checks on pointer safety; it would be too restrictive
-to granularly impose those checks via the type system, so there is only one main rule:
+<p><em>Smoλ</em> makes some checks on pointer safety. As it would be too cumbersome 
+to granularly impose such safety using the type system, there is only one main rule:
 <strong>pointers are invalidated if any memory is resized, moved, or freed</strong>. This
 rule is introduced by the memory manipulation functions of the standard library.</p>
 
 <p>Mainly, the type of data stored on pointers
-is checked for consistency, and invalidated pointers (for example whose
+is checked for consistency. Invalidated pointers (for example whose
 data have moved in memory by modifying a buffer) cannot be used. 
-Functions declare pointer arguments per <code>any ptr</code>, <code>float ptr</code>, etc.</p>
-
-<p>There is a particular contract for pointers: unless
-they create a runtime error by remaining uninitialized, and granted that they
-remain valid, it is always
-valid to move data to their memory address. Below is an example.</p>
+Functions declare pointer arguments per <code>any ptr</code>, <code>float ptr</code>, etc.
+Below is an example.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -833,10 +829,45 @@ valid to move data to their memory address. Below is an example.</p>
 
 <p>If, in the above example, a new line 
 <code>buf.resize 2</code> was applied before the
-last two prints, <code>element</code> would become invalidated and would
-need to be re-obtained from the buffer.
-In general, try to work with buffers and only use pointers
+last two prints, <code>element</code> would become invalidated and the code would
+need to re-obtained it from the buffer. Use references to avoid such 
+scenarios and, in general, try to work with buffers and only use pointers
 for rapidly moving temporary data around.</p>
+
+<h2 id="substructures">substructures</h2>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This is an advanced feature, mainly useful for complicated data packing. You can skip it.</div>
+
+<p>You can work with &#8220;horizontal&#8221; data from buffers and pointers by
+obtaining or setting to specific items. However, you can also
+work with &#8220;vertical&#8221; data by being able to obtain sub-buffers
+or sub-pointers for their fields.</p>
+
+<p>The method to do so is by using the <code>buf@field</code> or <code>ptr@field</code> notation, 
+where the field refers to a known field of the attached structure. This
+operator helps write very safe yet fast and memory-efficient code by
+obtaining necessary offsets within allocated memory. Below is
+an example:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/array.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Point2D</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Point3D</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">,</span> <span class="nb">float</span> <span class="n">z</span><span class="p">)</span>
+    <span class="n">plane</span> <span class="o">=</span> <span class="n">Point2D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">plane</span><span class="p">,</span><span class="n">class</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">Point3D</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">)</span>
+    <span class="n">plane</span> <span class="o">=</span> <span class="n">points</span><span class="nd">@plane</span> <span class="c1"># can move this around</span>
+    <span class="nb">print</span> <span class="n">plane</span><span class="nd">@x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">x</span> <span class="c1"># equivalent data path</span>
+</code></pre>
+</div>
 
 <h2 id="stable-references">stable references</h2>
 
@@ -902,41 +933,6 @@ for strings copied onto it.</p>
     <span class="n">s</span> <span class="o">=</span> <span class="n">test</span><span class="p">()</span>
     <span class="nb">print</span> <span class="n">s</span><span class="o">.</span><span class="n">s1</span>
     <span class="nb">print</span> <span class="n">s</span><span class="o">.</span><span class="n">s2</span>
-</code></pre>
-</div>
-
-<h2 id="substructures">substructures</h2>
-
-<div class="notice-box box-warning"><strong>Warning:</strong> This is an advanced feature, mainly useful for complicated data packing. You can skip it.</div>
-
-<p>You can work with &#8220;horizontal&#8221; data from buffers and pointers by
-obtaining or setting to specific items. However, you can also
-work with &#8220;vertical&#8221; data by being able to obtain sub-buffers
-or sub-pointers for their fields.</p>
-
-<p>The method to do so is by using the <code>buf@field</code> or <code>ptr@field</code> notation, 
-where the field refers to a known field of the attached structure. This
-operator helps write very safe yet fast and memory-efficient code by
-obtaining necessary offsets within allocated memory. Below is
-an example:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/array.s&quot;</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">Point2D</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">Point3D</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">,</span> <span class="nb">float</span> <span class="n">z</span><span class="p">)</span>
-    <span class="n">plane</span> <span class="o">=</span> <span class="n">Point2D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">plane</span><span class="p">,</span><span class="n">class</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">points</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">Point3D</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-    <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">)</span>
-    <span class="n">plane</span> <span class="o">=</span> <span class="n">points</span><span class="nd">@plane</span> <span class="c1"># can move this around</span>
-    <span class="nb">print</span> <span class="n">plane</span><span class="nd">@x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="nb">print</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">x</span> <span class="c1"># equivalent data path</span>
 </code></pre>
 </div>
 
@@ -1123,12 +1119,11 @@ But, importantly, they <em>are</em> obtained from deferred statements triggered 
 
 <h2 id="debugging-tools">debugging tools</h2>
 
-<div class="notice-box box-warning"><strong>Warning:</strong> This subsecion covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.</div>
+<div class="notice-box box-warning"><strong>Warning:</strong> This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.</div>
 
-<p>Till now there was mention of <code>compiler::skip()</code>, 
-<code>compiler::catch()</code> and <code>debug::nocatch()</code>
-as mechanisms that let your code interface with 
-the compiler to an extend.</p>
+<p>So far there was mention of <code>compiler::skip()</code>, 
+<code>compiler::catch()</code>, <code>compiler::literal(expression)</code> and <code>debug::nocatch()</code>
+that let code interface with the compiler to an extend.</p>
 
 <p>There are some more mechanisms that help inspect
 programs or grant access to internal compilation state that
@@ -1147,8 +1142,8 @@ For example, one pattern usable for debuggining is the following.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">s1</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s1&quot;</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s2&quot;</span>
-    <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="s2">&quot;--- main ---&quot;</span><span class="o">&amp;</span> <span class="c1"># prints &#39;&quot;--- main ---&quot;&amp;&#39; at compile time</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>     <span class="c1"># prints &#39;const str, const str&#39; at compile time</span>
+    <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;--- main ---&quot;</span> <span class="c1"># prints &#39;&quot;--- main ---&quot;&#39; at compile time</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>         <span class="c1"># prints &#39;const str, const str&#39; at compile time</span>
     <span class="nb">print</span> <span class="n">s</span> <span class="c1"># ERROR due to undefined print, but the above still prints</span>
 </code></pre>
 </div>
@@ -1172,7 +1167,7 @@ there is no runtime overhead from a particular comparison involving enums.</p>
     <span class="n">test</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">test</span> <span class="ow">is</span> <span class="n">test1</span><span class="o">|</span><span class="n">test2</span>
         <span class="n">debug</span><span class="p">::</span><span class="n">branchless</span><span class="p">()</span>
-        <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="s2">&quot;invalid data&quot;</span>
+        <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;invalid data&quot;</span> <span class="c1"># literal type to print the message instead of &#39;cstr&#39;</span>
 </code></pre>
 </div>
 
@@ -1182,17 +1177,19 @@ there is no runtime overhead from a particular comparison involving enums.</p>
 
 <p>Manage buffers by adding push and pop operations, as well
 as a capacity-based growth strategy. This is done by calling the 
-<code>list</code> function on a mutable buffer. List elements are accessed like 
-buffers. An example follows.</p>
+<code>list</code> function on a mutable buffer or -preferably- on a reference 
+of a mutable buffer like the following example. List elements are accessed like 
+buffers, and there exists a <code>push</code> function that grows the list by
+one place while returning a pointer to the last element.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">li</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
-    <span class="mf">0.1</span> <span class="o">&gt;&gt;</span> <span class="n">push</span> <span class="n">li</span>
-    <span class="mf">0.1</span> <span class="o">&gt;&gt;</span> <span class="n">push</span> <span class="n">li</span>
-    <span class="mf">0.1</span> <span class="o">&gt;&gt;</span> <span class="n">push</span> <span class="n">li</span>
+    <span class="n">li</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">ref</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
+    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
+    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
+    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
 
     <span class="n">li</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
     <span class="nb">print</span> <span class="n">li</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1210,7 +1207,7 @@ strings.</p>
 
 <p><code>cstr</code> data are trivially castable to strings. 
 Below is an example, where printing is also implemented for
-strings. Theoretically, this extract the size and first
+strings. Theoretically, this extracts the size and first
 character too, but such data are ignored if not needed.</p>
 
 <div class="codehilite">
@@ -1232,15 +1229,16 @@ This creates errors on failure.</p>
 </code></pre>
 </div>
 
-<p>Strings can be copied on a pair of buffer and mutable used size <code>char[], mut nat</code>.
-For convenience, this structure can be initialized to start from zero position with the
-<code>bufpos</code> function, like below. </p>
+<p>Strings can be copied on a pair of buffer and mutable position inside it <code>char[], mut nat</code>.
+For convenience, this structure can be initialized to start from the zero position with the
+<code>bufpos</code> (buffer-position) function, as below. This structure is used a lot when managing 
+memory directly with buffers and hence the introduction of this easier-to-read syntax sugar.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># equivalent to buf = (alloc KB 4, mut 0)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">print</span> <span class="n">s</span>
 </code></pre>
@@ -1266,7 +1264,7 @@ on an erroneous program.</p>
 
 <h2 id="maps">maps</h2>
 
-<p>There are some useful hashing utilities under <em>std/hash.s</em>, whichc culminate to implementing hashmaps 
+<p>There are some useful hashing utilities under <em>std/hash.s</em>, which culminate to implementing hashmaps 
 under <em>std/map.s</em> with string-valued and nat-valued
 keys. These two key types cover most useful scenarios, especially given that
 the standard library offers the ability can serialize data as strings or -for smaller
@@ -1417,6 +1415,8 @@ handle the intercepted errors, use a pattern like below.</p>
 
 <h2 id="mini-and-bits">mini and bits</h2>
 
+<div class="notice-box box-warning"><strong>Warning:</strong> This subsection covers low-level functionality that may not be immediately useful. It can be skipped.</div>
+
 <p>Here are some concepts about bitwise manipulation and type size awareness.</p>
 
 <p>Bitwise manipulations of <code>nat</code> data are made available from the standard library&#8217;s core.
@@ -1435,10 +1435,10 @@ Floats and ints can also be converted to bits.</p>
 </div>
 
 <p>Sometimes, it is useful to store arithmetic data in more compressed formats.
-The default builtin types (float, nat, int) consumed 64 bits of stoage 
+The default builtin types (float, nat, int) consumed 64 bits of storage 
 but there are some variations, namely float32, nat32, nat16, nat8, int32, int16, int8.</p>
 
-<p>The <em>std/mini.s</em> namespace provides conversions from the 64-bit to lessr bit types.
+<p>The <em>std/mini.s</em> namespace provides conversions from 64-bit to narrower types.
 To ensure semantic safety and no information loss, 
 the standard library does not provide arithmetic operations for these operations,
 and they should be converted to and from the more expressive types. Errors are created
@@ -1463,7 +1463,7 @@ when organized in a string buffer.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">buff</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">6</span>
-    <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="n">buff</span>
+    <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="n">buff</span> <span class="c1"># print the buffer type during compilation</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;hi&quot;</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;my&quot;</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;name&quot;</span>

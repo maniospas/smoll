@@ -1,17 +1,12 @@
 import "std/core.s"
 
-def enum = "A"|"B"|"C"
+def version("one") # just a literal type
+    print "version one"
 
-# bad practice to create all combinations of enums
-def Answers(enum first, enum second, nat minutes_to_answer)
-def answers(cstr first, cstr second, nat minutes_to_answer)
+def version("two")
+    print "version two"
 
 def main()
-    answers = answers("A", "A", 60)
-    if not answers is Answers 
-        fail "not a valid answer" # this will fail
-    print "answered: "
-    print answers.first
-    print answers.second
-    print ("in", " ")
-    print (answers.minutes_to_answer, " minutes\n")
+    v = type "two" # a cstr literal type
+    version v      # calls the correct version
+    print compiler::literal type "two"

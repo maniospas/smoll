@@ -12,18 +12,17 @@ _1.6._ [conditions](#conditions)<br>
 _1.7._ [recursion](#recursion) <br>
 _1.8._ [unions](#unions) <br>
 _1.9._ [literal types](#literal-types) <br>
-_1.10._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)<br>
-_1.11._ [local definitions](#local-definitions)
+_1.10._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)
 
 **Section 2. Safe Resources**<br>
 _2.1._ [buffers](#buffers)<br>
-_2.2._ [pointers](#pointers)<br>
-_2.3._ [stable references](#stable-references)<br>
-_2.4._ [substructures](#substructures)<br>
+_2.2._ [⚠ pointers](#pointers)<br>
+_2.3._ [⚠ substructures](#substructures)<br>
+_2.4._ [stable references](#stable-references)<br>
 _2.5._ [try and fail](#try-and-fail)<br>
 _2.6._ [defer](#defer)<br>
 _2.7._ [catching errors](#catching-errors)<br>
-_2.8._ [debugging tools](#debugging-tools)<br>
+_2.8._ [⚠ debugging tools](#debugging-tools)<br>
 
 **Section 3. Standard Library**<br>
 _3.1._ [lists](#lists)<br>
@@ -32,8 +31,10 @@ _3.3._ [maps](#maps)<br>
 _3.4._ [io](#io)<br>
 _3.5._ [processes](#processes)<br>
 _3.6._ [random](#random)<br>
-_3.7._ [mini and bits](#mini-and-bits)<br>
+_3.7._ [⚠ mini and bits](#mini-and-bits)<br>
 _3.8._ [vectors](#vectors)<br>
+
+⚠ Advanced functionality.
 
 </div>
 
@@ -95,6 +96,12 @@ import core::print
 def main()
     print "hello world!"
 ```
+
+
+Finally, you can have imports
+-or function definitions- be preceded by `local` to avoid exposing
+unnecessary contents. This is used for isolating which functionality
+is introduced in each file, so that it can be uniquely referenced.
 
 ## calling notation
 
@@ -399,10 +406,14 @@ adding either a float or an integer to a float. The brackets
 are used to add some C code, inside which `builtins::float` is
 injected by *smoλ* as the appropriate builtin type. 
 
-This particular functionality is not part of the standard library, because the latter
-aims to lossy conversions between numeric types. Usually, you will
-not see any unsafe C code in front of you either (unless you are contributing 
-to the standard library).
+The exemplified functionality of adding any two numbers together
+is not part of the standard library, as it introduces lossy 
+conversion between numeric types. Usually, you will
+not see any unsafe C code -introduced by brackets- either, 
+unless you are contributing to the standard library or writing 
+helpers for low-level operations. A more complete reference 
+for interweaving a superset of C that interacts with smoll
+will be added in the future.
 
 ```python
 import "builtins"
@@ -410,9 +421,14 @@ import "builtins"
 def unsafe_add(float x, float|int y)
     {builtins::float z=x+y;}
     return z
+
+def main()
+    print unsafe_add (1, 2.0)
 ```
 
 Type alternatives can also be named for reusability.
+This is called a union type in that it brings together
+several alterantives to be referenced via the same name.
 An example follows.
 
 ```python
@@ -422,6 +438,9 @@ def Number = float|int|id
 def unsafe_add(Number x, Number y)
     {builtins::float z=x+y;}
     return z
+
+def main()
+    print unsafe_add (1, 2.0)
 ```
 
 ## literal types
@@ -431,8 +450,9 @@ literal value. Or you may want to have some constant that is used everywhere
 in your code. This is done by having literal types, as in, types that
 are attached to specific values.
 
-Below is an example on using this concept to define numeric or cstr constants first. 
-Literal types evaluate to their value when used within code - nothing
+Below is an example on using this concept to define numeric or 
+cstr constants first. Literal types evaluate to their value when 
+used within code - nothing
 out of the ordinary.
 
 ```python
@@ -448,14 +468,14 @@ def main()
 ```
 
 But literal types can also specialize among which
-function to call. To do this, they must be prevented from devolving
-into values by following them with `&` (this is needed only when resolving
-values). This result is a *type value* that can be stored in variables. 
-The variable cannot change which type it refers to, but may be useful for
-conditional compilation later. Below is an example.
+function to call, like below. Doing so requires retrieving
+the literal's type by evaluating `type value`, where value
+can be a string or number literal.
 
 ```python
 import "std/core.s"
+
+def VERSION = "two"
 
 def version("one") # just a literal type
     print "version one"
@@ -464,18 +484,18 @@ def version("two")
     print "version two"
 
 def main()
-    v = "two"&
-    version v  # calls the correct version
+    v = type "two"
+    version v # calls the correct version
+    version type VERSION # calls the same version
 ```
 
 Literal types still adhere to all other type system conventions. 
-Those includes union declarations 
-and having associated arguments when used as function arguments.
-Argument values are equivalent to applying `&`.
+Those includes union declarations and having associated variables
+holding their value when used as function arguments.
 
-Follow a literal type value with `..` to get back its associated constant.
-That is, `"two"&..` is the same as writing  `"two"`, and the benefit 
-lies purely in extracting values from the type system.
+Get back the associated value with the `compiler::literal` function. 
+That is, `compiler::literal type "two"` yields `"two"`.
+The benefit lies purely in extracting values from the type system.
 An example that restricts how functions are called is presented next.
 
 ```python
@@ -483,21 +503,20 @@ import "std/core.s"
 
 def inc(nat x, blank|1|2 inc)
     if inc is blank
-        inc = 1&
-    return x+inc..
+        inc = type 1 # literal convertible
+    return x+compiler::literal inc
 
 def main()
-    print inc 0       # prints 1
-    print inc (0, 2&) # prints 2
+    print inc 0           # prints 1
+    print inc (0, type 2) # prints 2
 ```
 
-Assert that a variable belongs to a
+Check whether a variable belongs to a
 literal type by performing the `is` check to obtain
 a boolean value. Contrary to the zero-cost conditional 
 compilation of the next section when using `is` with 
 inferred types only, literal types may be resolved
-to several runtime checks. This creates a dynamic
-matching schema that checks for valid srtuctures.
+to several runtime checks.
 
 ```python
 import "std/core.s"
@@ -519,7 +538,7 @@ def main()
 
 ## conditional compilation and default arguments
 
-*Info: In conjunction with the type system, this feature creates zero-cost condition checks for consise creation of multiple definitions.*
+*Info: In conjunction with the type system, this feature creates zero-cost condition checks for concise creation of multiple definitions.*
 
 You can use the `[value] is [type]` operator to check that a value/tuple
 adheres to at least one variation of a union. When no literal types are involved
@@ -566,53 +585,30 @@ def main()
 
 Here is a much more complicated scenario, where `compiler::skip()` 
 is used to prevent certain versions of the function from being
-created (e.g. there is no `inc(float,int)`). Do note that you
-can also specialize a type `T` that could have produced
-`x` per `type T x`. In total, the compiler investigates 3*4=12
-variations and eventually keeps 6 of them. Both conditions
-are fully zero-cost abstractions. Do note that usually the
-signature would be kept simple by declaring a helper `def Number = float|int|nat`.
+created (e.g. there is no `inc(float,int)`). The example also shows 
+two type inference constructs: 
+
+- Obtain functions among alternatives `T` that could have produced value `x` (can be a tuple) per `type T->x`. This is a specialization of the `type T` syntax, which itself is a more verbose way of writing `T` but also works with literals without devolving them into values. The alternatives are needed because the language allows structural typing, meaning that there is not necessarily a unique way to infer a function from its output structure. For example, `type Num->x 1` can be used to cast the value 1 to the same number format as the variable `x` by calling one of the functions in the `Num` union that would output the same output as the variable. The same pattern could have been used to also run an appropriate string-to-number converter like `type Num->x "1"`.
+- Compare against the exact structural type of `x` (that can be an expression) use `value is type x`. This is a short-circuit for a different compilation branch and is always inferred at compile time.
+  
+In total, the compiler investigates 3*4=12
+variations and eventually keeps 6 of them. Both conditional checks in the example
+zero-cost abstractions in that they never occur during execution.
 
 ```python
 import "std/core.s"
 
-def inc(float|int|nat x, float|int|nat|blank value)
+def Num = float|int|nat
+def inc(Num x, Num|blank value) # equivalent: def inc(float|int|nat x, float|int|nat|blank value) 
     if value is blank
-        value = type float|int|nat x 1
-    if not value is type(x)
+        value = type Num->x 1 # one with the same number format as x
+    if not value is type x
         compiler::skip() # skip invalid 'inc' definitions
     return x+value
 
 def main()
     print inc 2.0  # prints 3.0
     print inc(2,2) # prints 4
-```
-
-## local definitions
-
-This is perhaps a good point to mention that you can have imports
-or function definitions be preceded by `local` to avoid exposing
-unnecessary contents.
-For example, the *range* module from the standard library imports
-the latter's core locally but never exposes it, for example to
-cover cases where different arithmetic operations need to be defined 
-in your part of the code (e.g., handling of overflows).
-
-```python
-local import "std/core.s"
-
-def range(nat|blank pos, nat to)
-    if pos is blank
-        pos = 0
-    return (mut pos, to)
-
-def next(range r, mut nat value)
-    next_pos = r.pos+1
-    if next_pos==r.to
-        return false
-    value = r.pos
-    r.pos = mut next_pos
-    return true
 ```
 
 # Section 2. Safe Resources
@@ -654,9 +650,8 @@ buffers within loops.
 A second important feature is the element access operator `buffer[pos]`,
 which can be used to extract an object stored at a specific position. 
 In general, this operator is implemented by overloading the `get` 
-function and `mutget` functions. Use `buffer[pos] = value` to copy same data 
-on a buffer's element. This is equivalent to the pointer notations
-`buffer[pos]&&<<value`, but more on pointers later.
+and `mutget` functions, though beware that details do involve pointers. 
+Use `buffer[pos] = value` to copy some data on a buffer's element.
 
 All buffer indexes are of type `nat`, which represents natural numbers 
 (non-negative integers). Here is an example of buffer usage.
@@ -685,32 +680,33 @@ Pointers reference specific memory locations in buffers. Use them
 to quickly move data around while sharing only one memory address. 
 Pointers are unstable in that, for safety, they become invalid whenever 
 any buffer is resized. Being invalid means that they can not be read 
-from or copy data to them.
+from or copy data to them. This holds true mainly for safe pointers
+used in practical use. New C resources can added using unsafe pointer
+semantics that will be covered in a future section about C extensibility.
 
 Obtain a `const` pointer from a buffer whose
 pointed memory location cannot be modified per `ptr = buf[element]&`, and
-a `mut` pointer per `ptr = buf[element]&&`. 
+a `mut` pointer per `ptr = buf[element]&&`. Constness means that pointer
+contents cannot be overwritten.
 
 `ptr..` dereferences pointers onto local objects. 
 For example, `ptr...field` gets a field from an object stored 
 in a pointer by following up the dereferenced data with field
 access notation. Move values onto pointed locations
-of mutable pointers per `ptr << value`.
+of mutable pointers per `ptr << value`. Given all these operators
+it is now possible to explain that `buffer[pos]=value` desugares 
+to the pointer notations `buffer[pos]&&<<value`.
 
-*Smoλ* makes necessary checks on pointer safety; it would be too restrictive
-to granularly impose those checks via the type system, so there is only one main rule:
+*Smoλ* makes some checks on pointer safety. As it would be too cumbersome 
+to granularly impose such safety using the type system, there is only one main rule:
 **pointers are invalidated if any memory is resized, moved, or freed**. This
 rule is introduced by the memory manipulation functions of the standard library.
 
 Mainly, the type of data stored on pointers
-is checked for consistency, and invalidated pointers (for example whose
+is checked for consistency. Invalidated pointers (for example whose
 data have moved in memory by modifying a buffer) cannot be used. 
 Functions declare pointer arguments per `any ptr`, `float ptr`, etc.
-
-There is a particular contract for pointers: unless
-they create a runtime error by remaining uninitialized, and granted that they
-remain valid, it is always
-valid to move data to their memory address. Below is an example.
+Below is an example.
 
 ```python
 import "std/core.s"
@@ -726,10 +722,46 @@ def main()
 
 If, in the above example, a new line 
 `buf.resize 2` was applied before the
-last two prints, `element` would become invalidated and would
-need to be re-obtained from the buffer.
-In general, try to work with buffers and only use pointers
+last two prints, `element` would become invalidated and the code would
+need to re-obtained it from the buffer. Use references to avoid such 
+scenarios and, in general, try to work with buffers and only use pointers
 for rapidly moving temporary data around.
+
+
+## substructures
+
+*Warning: This is an advanced feature, mainly useful for complicated data packing. You can skip it.*
+
+You can work with "horizontal" data from buffers and pointers by
+obtaining or setting to specific items. However, you can also
+work with "vertical" data by being able to obtain sub-buffers
+or sub-pointers for their fields.
+
+The method to do so is by using the `buf@field` or `ptr@field` notation, 
+where the field refers to a known field of the attached structure. This
+operator helps write very safe yet fast and memory-efficient code by
+obtaining necessary offsets within allocated memory. Below is
+an example:
+
+
+```python
+import "std/core.s"
+import "std/array.s"
+
+def Point2D(float x, float y)
+    return class(x,y)
+
+def Point3D(float x, float y, float z)
+    plane = Point2D(x,y)
+    return (plane,class(z))
+
+def main()
+    points = (mut Point3D[]).alloc(10)
+    points[0] = Point3D(1.0,2.0,3.0)
+    plane = points@plane # can move this around
+    print plane@x[0]
+    print points[0].plane.x # equivalent data path
+```
 
 ## stable references
 
@@ -795,41 +827,6 @@ def main()
     s = test()
     print s.s1
     print s.s2
-```
-
-## substructures
-
-*Warning: This is an advanced feature, mainly useful for complicated data packing. You can skip it.*
-
-You can work with "horizontal" data from buffers and pointers by
-obtaining or setting to specific items. However, you can also
-work with "vertical" data by being able to obtain sub-buffers
-or sub-pointers for their fields.
-
-The method to do so is by using the `buf@field` or `ptr@field` notation, 
-where the field refers to a known field of the attached structure. This
-operator helps write very safe yet fast and memory-efficient code by
-obtaining necessary offsets within allocated memory. Below is
-an example:
-
-
-```python
-import "std/core.s"
-import "std/array.s"
-
-def Point2D(float x, float y)
-    return class(x,y)
-
-def Point3D(float x, float y, float z)
-    plane = Point2D(x,y)
-    return (plane,class(z))
-
-def main()
-    points = (mut Point3D[]).alloc(10)
-    points[0] = Point3D(1.0,2.0,3.0)
-    plane = points@plane # can move this around
-    print plane@x[0]
-    print points[0].plane.x # equivalent data path
 ```
 
 ## try and fail
@@ -1011,12 +1008,11 @@ def main()
 
 ## debugging tools
 
-*Warning: This subsecion covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.*
+*Warning: This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.*
 
-Till now there was mention of `compiler::skip()`, 
-`compiler::catch()` and `debug::nocatch()`
-as mechanisms that let your code interface with 
-the compiler to an extend.
+So far there was mention of `compiler::skip()`, 
+`compiler::catch()`, `compiler::literal(expression)` and `debug::nocatch()`
+that let code interface with the compiler to an extend.
 
 There are some more mechanisms that help inspect
 programs or grant access to internal compilation state that
@@ -1035,8 +1031,8 @@ import "std/core.s"
 def main()
     s1 = str "s1"
     s2 = str "s2"
-    debug::print "--- main ---"& # prints '"--- main ---"&' at compile time
-    s = debug::print (s1,s2)     # prints 'const str, const str' at compile time
+    debug::print type "--- main ---" # prints '"--- main ---"' at compile time
+    s = debug::print (s1,s2)         # prints 'const str, const str' at compile time
     print s # ERROR due to undefined print, but the above still prints
 ```
 
@@ -1059,7 +1055,7 @@ def main()
     test = (a,b,c)
     if not test is test1|test2
         debug::branchless()
-        debug::print "invalid data"
+        debug::print type "invalid data" # literal type to print the message instead of 'cstr'
 ```
 
 
@@ -1069,17 +1065,19 @@ def main()
 
 Manage buffers by adding push and pop operations, as well
 as a capacity-based growth strategy. This is done by calling the 
-`list` function on a mutable buffer. List elements are accessed like 
-buffers. An example follows.
+`list` function on a mutable buffer or -preferably- on a reference 
+of a mutable buffer like the following example. List elements are accessed like 
+buffers, and there exists a `push` function that grows the list by
+one place while returning a pointer to the last element.
 
 ```python
 import "std/core.s"
 
 def main()
-    li = list mut float[]
-    0.1 >> push li
-    0.1 >> push li
-    0.1 >> push li
+    li = list ref mut float[]
+    (push li) << 0.1
+    (push li) << 0.1
+    (push li) << 0.1
 
     li[1] = 0.2
     print li[0]
@@ -1096,7 +1094,7 @@ strings.
 
 `cstr` data are trivially castable to strings. 
 Below is an example, where printing is also implemented for
-strings. Theoretically, this extract the size and first
+strings. Theoretically, this extracts the size and first
 character too, but such data are ignored if not needed.
 
 ```python
@@ -1115,15 +1113,16 @@ def main()
     print float "123"
 ```
 
-Strings can be copied on a pair of buffer and mutable used size `char[], mut nat`.
-For convenience, this structure can be initialized to start from zero position with the
-`bufpos` function, like below. 
+Strings can be copied on a pair of buffer and mutable position inside it `char[], mut nat`.
+For convenience, this structure can be initialized to start from the zero position with the
+`bufpos` (buffer-position) function, as below. This structure is used a lot when managing 
+memory directly with buffers and hence the introduction of this easier-to-read syntax sugar.
 
 ```python
 import "std/core.s"
 
 def main()
-    buf = bufpos alloc KB 4
+    buf = bufpos alloc KB 4 # equivalent to buf = (alloc KB 4, mut 0)
     s = buf.copy "hello world!"
     print s
 ```
@@ -1147,7 +1146,7 @@ def main()
 
 ## maps
 
-There are some useful hashing utilities under *std/hash.s*, whichc culminate to implementing hashmaps 
+There are some useful hashing utilities under *std/hash.s*, which culminate to implementing hashmaps 
 under *std/map.s* with string-valued and nat-valued
 keys. These two key types cover most useful scenarios, especially given that
 the standard library offers the ability can serialize data as strings or -for smaller
@@ -1291,6 +1290,8 @@ def main()
 
 ## mini and bits
 
+*Warning: This subsection covers low-level functionality that may not be immediately useful. It can be skipped.*
+
 Here are some concepts about bitwise manipulation and type size awareness.
 
 Bitwise manipulations of `nat` data are made available from the standard library's core.
@@ -1308,10 +1309,10 @@ def hash(str k, nat size)
 ```
 
 Sometimes, it is useful to store arithmetic data in more compressed formats.
-The default builtin types (float, nat, int) consumed 64 bits of stoage 
+The default builtin types (float, nat, int) consumed 64 bits of storage 
 but there are some variations, namely float32, nat32, nat16, nat8, int32, int16, int8.
 
-The *std/mini.s* namespace provides conversions from the 64-bit to lessr bit types.
+The *std/mini.s* namespace provides conversions from 64-bit to narrower types.
 To ensure semantic safety and no information loss, 
 the standard library does not provide arithmetic operations for these operations,
 and they should be converted to and from the more expressive types. Errors are created
@@ -1336,7 +1337,7 @@ def concat(mini::str[] buff)
 
 def main()
     buff = (mut mini::str[]).alloc 6
-    debug::print buff
+    debug::print buff # print the buffer type during compilation
     buff[0] = mini::str "hi"
     buff[1] = mini::str "my"
     buff[2] = mini::str "name"

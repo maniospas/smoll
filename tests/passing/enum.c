@@ -1,0 +1,203 @@
+#include "std/extern/linux.h"
+#include "std/extern/win.h"
+#include "std/extern/mac.h"
+#include "std/extern/extern.h"
+int __temp_argc;
+char** __temp_argv;
+const char* const __temp1252v="in";
+const char* const __temp1245v="B";
+const char* const __temp1253v=" ";
+const char* const __temp1246v="C";
+const char* const __temp363v="\n";
+const char* const __temp1240v="A";
+const char* const __temp1255v=" minutes\n";
+const char* const __temp1248v="answered: ";
+static const char* __temp_all_errcodes[30] = {"noerr",
+"error",
+"division by zero ",
+"modulo by zero ",
+"id subtraction would yield a negative",
+"cannot convert negative float to id",
+"cannot convert negative int to id",
+"iteration end",
+"allocation failed",
+"reallocation failed",
+"cannot resize buffers with alloc; it promises no data reallocation",
+"cannot resize an unallocated or freed buffer",
+"out of bounds",
+"string does not fit on buffer",
+"character copy does not fit on buffer",
+"string buffer out of memory",
+"slice out of string bounds",
+"user input was not an int",
+"user input was not a nat",
+"user input was not a float",
+"invalid int conversion from empty string",
+"invalid int conversion from string with only a sign",
+"invalid integer int from non-number string",
+"invalid nat conversion from empty string",
+"invalid nat conversion from non-number string",
+"invalid float conversion from empty string",
+"invalid float conversion from string with only a sign",
+"invalid float conversion from non-number string",
+"invalid float conversion from string without a value after the dot",
+"not a valid answer"
+};
+
+static inline __attribute__((always_inline)) void answers__temp1238v(const char* first, const char* second, uint64_t minutes_to_answer, const char** __temp1257v, const char** __temp1258v, uint64_t* __temp1259v) {
+  *__temp1257v=first;
+  *__temp1258v=second;
+  *__temp1259v=minutes_to_answer;
+}
+
+static inline __attribute__((always_inline)) void not__temp26v(char value, char* __temp1260v) {
+  char z=0;
+  if(!value){
+  z=1;
+  }
+  goto __temp_return;
+  __temp_return:
+  *__temp1260v=z;
+}
+
+static inline __attribute__((always_inline)) void print__temp361v(const char* value) {
+  int __temp362v=0;
+  const char* endl=0;
+  endl=__temp363v;
+  printf("%s%s",value,endl);
+}
+
+static inline __attribute__((always_inline)) void print__temp364v(const char* value, const char* endl) {
+  int __temp365v=0;
+  printf("%s%s",value,endl);
+}
+
+static inline __attribute__((always_inline)) void print__temp376v(uint64_t value, const char* endl) {
+  int __temp377v=0;
+  printf("%llu%s",value,endl);
+}
+
+static inline __attribute__((always_inline)) int main__temp1239v() {
+  uint64_t __temp1241v=0;
+  const char* __temp1242v__first=0;
+  const char* __temp1242v__second=0;
+  uint64_t __temp1242v__minutes_to_answer=0;
+  const char* answers__first=0;
+  const char* answers__second=0;
+  uint64_t answers__minutes_to_answer=0;
+  char __temp1243v=0;
+  char __temp1244v=0;
+  char __temp1247v__=0;
+  int __temp_errcode=0;
+  int __temp_complain=0;
+  __temp1241v=60;
+  answers__temp1238v(__temp1240v,__temp1240v,__temp1241v,&__temp1242v__first,&__temp1242v__second,&__temp1242v__minutes_to_answer);
+  answers__first=__temp1242v__first;
+  answers__second=__temp1242v__second;
+  answers__minutes_to_answer=__temp1242v__minutes_to_answer;
+  __temp1244v=1;
+  if(__temp1240v!=answers__first){
+  __temp1244v=0;
+  }
+  if(__temp1240v!=answers__second){
+  __temp1244v=0;
+  }
+  if(__temp1244v){
+  __temp1243v=1;
+  }
+  __temp1244v=1;
+  if(__temp1240v!=answers__first){
+  __temp1244v=0;
+  }
+  if(__temp1245v!=answers__second){
+  __temp1244v=0;
+  }
+  if(__temp1244v){
+  __temp1243v=1;
+  }
+  __temp1244v=1;
+  if(__temp1240v!=answers__first){
+  __temp1244v=0;
+  }
+  if(__temp1246v!=answers__second){
+  __temp1244v=0;
+  }
+  if(__temp1244v){
+  __temp1243v=1;
+  }
+  __temp1244v=1;
+  if(__temp1245v!=answers__first){
+  __temp1244v=0;
+  }
+  if(__temp1240v!=answers__second){
+  __temp1244v=0;
+  }
+  if(__temp1244v){
+  __temp1243v=1;
+  }
+  __temp1244v=1;
+  if(__temp1245v!=answers__first){
+  __temp1244v=0;
+  }
+  if(__temp1245v!=answers__second){
+  __temp1244v=0;
+  }
+  if(__temp1244v){
+  __temp1243v=1;
+  }
+  __temp1244v=1;
+  if(__temp1245v!=answers__first){
+  __temp1244v=0;
+  }
+  if(__temp1246v!=answers__second){
+  __temp1244v=0;
+  }
+  if(__temp1244v){
+  __temp1243v=1;
+  }
+  __temp1244v=1;
+  if(__temp1246v!=answers__first){
+  __temp1244v=0;
+  }
+  if(__temp1240v!=answers__second){
+  __temp1244v=0;
+  }
+  if(__temp1244v){
+  __temp1243v=1;
+  }
+  __temp1244v=1;
+  if(__temp1246v!=answers__first){
+  __temp1244v=0;
+  }
+  if(__temp1245v!=answers__second){
+  __temp1244v=0;
+  }
+  if(__temp1244v){
+  __temp1243v=1;
+  }
+  __temp1244v=1;
+  if(__temp1246v!=answers__first){
+  __temp1244v=0;
+  }
+  if(__temp1246v!=answers__second){
+  __temp1244v=0;
+  }
+  if(__temp1244v){
+  __temp1243v=1;
+  }
+  not__temp26v(__temp1243v,&__temp1247v__);
+  if(__temp1247v__){
+  __temp_errcode=29;
+  goto __temp_failure;
+  }
+  print__temp361v(__temp1248v);
+  print__temp361v(answers__first);
+  print__temp361v(answers__second);
+  print__temp364v(__temp1252v,__temp1253v);
+  print__temp376v(answers__minutes_to_answer,__temp1255v);
+  
+  __temp_failure:
+  return __temp_errcode;
+}
+
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1239v();return 0;}

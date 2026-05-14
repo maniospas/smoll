@@ -4,14 +4,10 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp1244v="A";
-const char* const __temp1241v="F";
-const char* const __temp1248v="answered: ";
-const char* const __temp1240v="D";
-const char* const __temp1246v="C";
-const char* const __temp364v="\n";
-const char* const __temp1245v="B";
-static const char* __temp_all_errcodes[30] = {"noerr",
+const char* const __temp1230v="version two";
+const char* const __temp1237v="two";
+const char* const __temp363v="\n";
+static const char* __temp_all_errcodes[29] = {"noerr",
 "error",
 "division by zero ",
 "modulo by zero ",
@@ -39,154 +35,23 @@ static const char* __temp_all_errcodes[30] = {"noerr",
 "invalid float conversion from empty string",
 "invalid float conversion from string with only a sign",
 "invalid float conversion from non-number string",
-"invalid float conversion from string without a value after the dot",
-"not a valid answer"
+"invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void not__temp25v(char value, char* __temp1254v) {
-  char z=0;
-  if(!value){
-  z=1;
-  }
-  goto __temp_return;
-  __temp_return:
-  *__temp1254v=z;
-}
-
-static inline __attribute__((always_inline)) void print__temp362v(const char* value) {
-  int __temp363v=0;
+static inline __attribute__((always_inline)) void print__temp361v(const char* value) {
+  int __temp362v=0;
   const char* endl=0;
-  endl=__temp364v;
+  endl=__temp363v;
   printf("%s%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void first__temp1237v(const char* first, const char* second, const char** __temp1255v) {
-  goto __temp_return;
-  __temp_return:
-  *__temp1255v=first;
+static inline __attribute__((always_inline)) void version__temp1229v() {
+  print__temp361v(__temp1230v);
 }
 
-static inline __attribute__((always_inline)) void second__temp1238v(const char* first, const char* second, const char** __temp1256v) {
-  goto __temp_return;
-  __temp_return:
-  *__temp1256v=second;
+static inline __attribute__((always_inline)) void main__temp1232v() {
+  version__temp1229v();
+  print__temp361v(__temp1237v);
 }
 
-static inline __attribute__((always_inline)) int main__temp1239v() {
-  const char* answers__temp1240v=0;
-  const char* answers__temp1241v=0;
-  char __temp1242v=0;
-  char __temp1243v=0;
-  char __temp1247v__=0;
-  const char* __temp1250v__=0;
-  const char* __temp1252v__=0;
-  int __temp_errcode=0;
-  int __temp_complain=0;
-  answers__temp1240v=__temp1240v;
-  answers__temp1241v=__temp1241v;
-  __temp1243v=1;
-  if(__temp1244v!=answers__temp1240v){
-  __temp1243v=0;
-  }
-  if(__temp1244v!=answers__temp1241v){
-  __temp1243v=0;
-  }
-  if(__temp1243v){
-  __temp1242v=1;
-  }
-  __temp1243v=1;
-  if(__temp1244v!=answers__temp1240v){
-  __temp1243v=0;
-  }
-  if(__temp1245v!=answers__temp1241v){
-  __temp1243v=0;
-  }
-  if(__temp1243v){
-  __temp1242v=1;
-  }
-  __temp1243v=1;
-  if(__temp1244v!=answers__temp1240v){
-  __temp1243v=0;
-  }
-  if(__temp1246v!=answers__temp1241v){
-  __temp1243v=0;
-  }
-  if(__temp1243v){
-  __temp1242v=1;
-  }
-  __temp1243v=1;
-  if(__temp1245v!=answers__temp1240v){
-  __temp1243v=0;
-  }
-  if(__temp1244v!=answers__temp1241v){
-  __temp1243v=0;
-  }
-  if(__temp1243v){
-  __temp1242v=1;
-  }
-  __temp1243v=1;
-  if(__temp1245v!=answers__temp1240v){
-  __temp1243v=0;
-  }
-  if(__temp1245v!=answers__temp1241v){
-  __temp1243v=0;
-  }
-  if(__temp1243v){
-  __temp1242v=1;
-  }
-  __temp1243v=1;
-  if(__temp1245v!=answers__temp1240v){
-  __temp1243v=0;
-  }
-  if(__temp1246v!=answers__temp1241v){
-  __temp1243v=0;
-  }
-  if(__temp1243v){
-  __temp1242v=1;
-  }
-  __temp1243v=1;
-  if(__temp1246v!=answers__temp1240v){
-  __temp1243v=0;
-  }
-  if(__temp1244v!=answers__temp1241v){
-  __temp1243v=0;
-  }
-  if(__temp1243v){
-  __temp1242v=1;
-  }
-  __temp1243v=1;
-  if(__temp1246v!=answers__temp1240v){
-  __temp1243v=0;
-  }
-  if(__temp1245v!=answers__temp1241v){
-  __temp1243v=0;
-  }
-  if(__temp1243v){
-  __temp1242v=1;
-  }
-  __temp1243v=1;
-  if(__temp1246v!=answers__temp1240v){
-  __temp1243v=0;
-  }
-  if(__temp1246v!=answers__temp1241v){
-  __temp1243v=0;
-  }
-  if(__temp1243v){
-  __temp1242v=1;
-  }
-  not__temp25v(__temp1242v,&__temp1247v__);
-  if(__temp1247v__){
-  __temp_errcode=29;
-  goto __temp_failure;
-  }
-  print__temp362v(__temp1248v);
-  first__temp1237v(answers__temp1240v,answers__temp1241v,&__temp1250v__);
-  print__temp362v(__temp1250v__);
-  second__temp1238v(answers__temp1240v,answers__temp1241v,&__temp1252v__);
-  print__temp362v(__temp1252v__);
-  
-  __temp_failure:
-  return __temp_errcode;
-}
-
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1239v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1232v();return 0;}

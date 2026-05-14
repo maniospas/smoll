@@ -4,8 +4,8 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp1220v="123";
-const char* const __temp364v="\n";
+const char* const __temp1221v="123";
+const char* const __temp363v="\n";
 static const char* __temp_all_errcodes[29] = {"noerr",
 "error",
 "division by zero ",
@@ -37,18 +37,18 @@ static const char* __temp_all_errcodes[29] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__temp755v(const char* x, const char* y, char* __temp1223v) {
+static inline __attribute__((always_inline)) void eq__temp756v(const char* x, const char* y, char* __temp1224v) {
   char z=0;
   z=(x==y);
   goto __temp_return;
   __temp_return:
-  *__temp1223v=z;
+  *__temp1224v=z;
 }
 
-static inline __attribute__((always_inline)) void print__temp379v(char value) {
-  int __temp380v=0;
+static inline __attribute__((always_inline)) void print__temp378v(char value) {
+  int __temp379v=0;
   const char* endl=0;
-  endl=__temp364v;
+  endl=__temp363v;
   if(value){
   printf("%s%s","true",endl);
   }
@@ -57,10 +57,10 @@ static inline __attribute__((always_inline)) void print__temp379v(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__temp1219v() {
-  char __temp1221v__=0;
-  eq__temp755v(__temp1220v,__temp1220v,&__temp1221v__);
-  print__temp379v(__temp1221v__);
+static inline __attribute__((always_inline)) void main__temp1220v() {
+  char __temp1222v__=0;
+  eq__temp756v(__temp1221v,__temp1221v,&__temp1222v__);
+  print__temp378v(__temp1222v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1219v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1220v();return 0;}

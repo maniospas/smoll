@@ -356,7 +356,7 @@ def signature_like(vars: list[Variable], impl=None):
             ret += type.name+arg_name
             i += 1
         elif type.is_literal_of: 
-            ret += type.at.text+"&"
+            ret += type.at.text
             i += len(type.rets)
         elif type.is_buffer_of: 
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
@@ -1506,6 +1506,30 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if DEBUG_TYPE in method.variations:
         if not is_lsp: print(signature_like(vars, impl))
         return vars
+    if RESOLVE_LITERAL_TYPE in method.variations and len(vars)==1 and vars[0].type.is_literal_of is not None:
+        variable = Variable(create_temp(), vars[0].type.is_literal_of)
+        literal_method = vars[0].type
+        if literal_method.is_literal_of==CSTR_TYPE:
+            current = literal_method.at.text
+            if is_lsp and error_token.file.is_main_file: print_lsp_literal(error_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
+            tmp: str|None = global_cstr2var.get(current, None)
+            variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE)
+            if tmp is None: 
+                global_cstr2var[current] = variable.name
+                global_var2cstr[variable.name] = current
+            impl.vars[variable.name] = variable
+            impl.used_globals.add(variable.name)
+            return [variable]
+        variable = Variable(create_temp(), literal_method.is_literal_of)
+        if is_lsp and error_token.file.is_main_file: print_lsp_literal(error_token, "**literal**\n\nnumber defined to be "+literal_method.at.text)
+        impl.vars[variable.name] = variable
+        impl.implementation.extend([
+            variable,
+            CODEWORD_EQUALS,
+            CodeWord(literal_method.at.text),
+            CODEWORD_SEMICOLON
+        ])
+        return [variable]
     if SIZEOF_TYPE in method.variations:
         total_size = 0
         for var in vars:
@@ -2422,34 +2446,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                         pos, rets = process_deref(file, pos, rets, impl, current_token)
                         pos += 2
                         return pos, rets
-                    if len(rets)==1 and rets[0].type.is_literal_of is not None:
-                        variable = Variable(create_temp(), rets[0].type.is_literal_of)
-                        literal_method = rets[0].type
-                        if literal_method.is_literal_of==CSTR_TYPE:
-                            current = literal_method.at.text
-                            if is_lsp and current_token.file.is_main_file: print_lsp_literal(current_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
-                            tmp: str|None = global_cstr2var.get(current, None)
-                            variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE)
-                            if tmp is None: 
-                                global_cstr2var[current] = variable.name
-                                global_var2cstr[variable.name] = current
-                            impl.vars[variable.name] = variable
-                            impl.used_globals.add(variable.name)
-                            varsret = [variable]
-                        else:
-                            variable = Variable(create_temp(), literal_method.is_literal_of)
-                            if is_lsp and current_token.file.is_main_file: print_lsp_literal(current_token, "**literal**\n\nnumber defined to be "+literal_method.at.text)
-                            impl.vars[variable.name] = variable
-                            impl.implementation.extend([
-                                variable,
-                                CODEWORD_EQUALS,
-                                CodeWord(literal_method.at.text),
-                                CODEWORD_SEMICOLON
-                            ])
-                            varsret = [variable]
-                        pos += 2
-                        return pos, varsret
-                    current_token.error("syntax", "can dereference either a pointer or a literal type back to a literal")
+                    current_token.error("syntax", "can dereference only a pointer")
                 current = longest_common_prefix([r.name for r in rets])
                 if current.endswith("__"): current=current[:-2]
                 pos -= 1
@@ -2900,69 +2897,31 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=[candidate for candidate in field_candidates]) 
         is_type_resolution = peek_text(tokens, pos)=="type"
         start_call = get(tokens,pos)
+        has_literals = False
         if is_type_resolution:
             pos, all_variations = process_linear_type(file, tokens, pos+1, reduce_to_unique_variations=False, show_lsp=True)
-            pos, typevars = process_statement(file, tokens, pos, impl, current_operator_priority, for_call=True)
-            method = UnionType(signature_like(typevars, impl)+" ", at=current_token)
-            #for union_type in file.types.values():
-            #    for variation in union_type.variations:
-            for variation in all_variations.variations:
-                matches = len(variation.rets)==len(typevars)
-                if not matches: continue
-                for rv, rt in zip(variation.rets, typevars):
-                    if variation.vars[rv].type!=rt.type: #and variation.vars[rv].type.is_literal_of!=rt.type:
-                        matches = False
-                        break
-                if matches: method.variations.append(variation)
+            if peek_text(tokens, pos)!="->": 
+                method = all_variations
+                pos -= 1
+            else:
+                pos, typevars = process_statement(file, tokens, pos+1, impl, current_operator_priority, for_call=True)
+                method = UnionType(signature_like(typevars, impl)+" ", at=current_token)
+                for variation in all_variations.variations:
+                    matches = len(variation.rets)==len(typevars)
+                    if not matches: continue
+                    for rv, rt in zip(variation.rets, typevars):
+                        if variation.vars[rv].type!=rt.type:
+                            matches = False
+                            break
+                    if matches: method.variations.append(variation)
         else:
             # then resolve to a call based on type
             pos, method = process_linear_type(file, tokens, pos)
         call_token = get(tokens, pos-1)
-        if any(variation.is_literal_of is not None for variation in method.variations):
-            # if any(variation.is_literal_of is None for variation in method.variations): call_token.error("type", "cannot mix literal and non-literal types in allowed calls")
-            # if is_type_resolution:
-            #     has_any_var = Variable(create_temp(), BOOL_TYPE)
-            #     impl.vars[has_any_var.name] = has_any_var
-            #     for literal_method in method.variations:
-            #         if literal_method.is_literal_of==CSTR_TYPE:
-            #             current = literal_method.at.text
-            #             if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
-            #             tmp: str|None = global_cstr2var.get(current, None)
-            #             variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE)
-            #             if tmp is None: 
-            #                 global_cstr2var[current] = variable.name
-            #                 global_var2cstr[variable.name] = current
-            #             impl.vars[variable.name] = variable
-            #             impl.used_globals.add(variable.name)
-            #         else:
-            #             variable = Variable(create_temp(), literal_method.is_literal_of)
-            #             if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\nnumber defined to be "+literal_method.at.text)
-            #             impl.vars[variable.name] = variable
-            #             impl.implementation.extend([
-            #                 variable,
-            #                 CODEWORD_EQUALS,
-            #                 CodeWord(literal_method.at.text),
-            #                 CODEWORD_SEMICOLON
-            #             ])
-            #         impl.implementation.extend([
-            #             CODEWORD_IF,
-            #             CODEWORD_LPAR,
-            #             variable,
-            #             CodeWord("=="),
-            #             typevars[0],
-            #             CODEWORD_RPAR,
-            #             CODEWORD_LBRACKET,
-            #             has_any_var,
-            #             CODEWORD_EQUALS,
-            #             CodeWord("1"),
-            #             CODEWORD_SEMICOLON,
-            #             CODEWORD_RBRACKET,
-            #         ])
-            #     varsret = [has_any_var]
-            # else:
+        if all(variation.is_literal_of is not None for variation in method.variations):
             if len(method.variations)!=1: call_token.error("type", "cannot have multiple literal type alternatives")
             literal_method = method.variations[0]
-            if peek_text(tokens, pos)=="&":
+            if is_type_resolution:
                 pos += 1
                 variable = Variable(create_temp(), literal_method)
                 if is_lsp and current_token.file.is_main_file: print_lsp_literal(get(tokens,pos-1), "**retrieve literal type**\n\nRetrieves the type defined to evaluate to "+literal_method.at.text)
@@ -3896,6 +3855,9 @@ CAUGHT_TYPE.doc.append("Also catches the error codes produced by defers triggere
 CAUGHT_TYPE.doc.append("Fails if there is no error code, otherwise returns and cleans the last error code.")
 # FAIL_TYPE.vars["message"] = CSTR_TYPE
 # FAIL_TYPE.args.append("message")
+
+RESOLVE_LITERAL_TYPE = ImplementedType("literal")
+
 SAME_CONTENTS_TYPE = ImplementedType("attach_type")
 SAME_CONTENTS_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
 SAME_CONTENTS_TYPE.vars["from"] = Variable("from", POINTER_TYPE)
@@ -3941,6 +3903,8 @@ fixed_namespace.types["ptr"] = UnionType("ptr", at=compiler_token).append(POINTE
 fixed_namespace.types["attach_type"] = UnionType("attach_type", at=compiler_token).append(SAME_CONTENTS_TYPE).append(SAME_CONTENTS_TYPE_CSTR)
 fixed_namespace.types["catch"] = UnionType("catch", at=compiler_token).append(CAUGHT_TYPE)
 fixed_namespace.types["size"] = UnionType("size", at=compiler_token).append(SIZEOF_TYPE)
+fixed_namespace.types["literal"] = UnionType("literal", at=compiler_token).append(RESOLVE_LITERAL_TYPE)
+
 smol_namespace.namespaces["compiler"] = fixed_namespace
 
 debug_namespace = File("debug")

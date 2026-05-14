@@ -51,9 +51,11 @@ repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as
 import "std/core.s"
 import "std/io.s"::file as file
 
+def CHUNK_SIZE = 4096 # number literal
+
 def main()
     f = file::read "README.md"
-    mem = alloc KB 4 # max 4 KB chunk size, on char[] by default
+    mem = alloc CHUNK_SIZE # allocate on char[] by default
     while try line = mem.file::line f
         print("|", "") # with custom end line
         print(line, "")

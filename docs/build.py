@@ -87,9 +87,9 @@ html = """
         font-style: normal;
     }
     .box-warning {
-        border-color: #d29922;
-        background: #fff8e6;
-        color: #6e4f00;
+        border-color: #c0392b;
+        background: #fff0f0;
+        color: #7a1a1a;
     }
     .box-info {
         border-color: #388bfd;

@@ -385,6 +385,7 @@ class ImplementedType:
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
         self.doc: list[str] = list()
         self.VM: str|None = None # an equivalent python implementation for the VM
+        self.effect_names: list[str] = list()
         self.args: list[str] = list()
         self.rets: list[str] = list()
         self.vars: dict[str, Variable] = dict()
@@ -597,7 +598,7 @@ class ImplementedType:
         if self.is_buffer_of: return "buffer of "+signature_like([self.is_buffer_of.vars[arg] for arg in self.is_buffer_of.rets], self.is_buffer_of)
         args = signature_like([self.vars[arg] for arg in self.args], impl=self)
         rets = signature_like([self.vars[arg] for arg in self.rets], impl=self)
-        return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"
+        return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" with effects "+','.join(self.effect_names) if self.effect_names else "")
 
     def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True):
         # for segment in varname.split("--"):
@@ -1440,13 +1441,24 @@ def match_structure_with(x: ImplementedType, y: ImplementedType):
         #if x.vars[rx].isprivate!=y.vars[ry].isprivate: return False
     return True
 
-def _select_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> ImplementedType:
+def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_vars: list[Variable], error_token: Token) -> ImplementedType:
     available_types: list[ImplementedType] = list()
     for variation in method.variations:
+        if len(argument_vars)<len(variation.args):
+            vars: list[Variable] = list()
+            for effect_var in variation.effect_names: 
+                for var in impl.vars.values():
+                    if var.name==effect_var or var.name.startswith(effect_var+"__"): vars.append(var)
+                if len(vars)+len(argument_vars)>=len(variation.args): break
+            vars.extend(argument_vars)
+        else: vars = argument_vars
         if len(variation.args)!=len(vars): continue
         is_available = True
         for i in range(len(vars)):
             # we can allow lowering buffers to generic any
+            if vars[i].type!=variation.vars[variation.args[i]].type and vars[i].type.is_buffer_of is None:
+                is_available = False
+                break
             if vars[i].type!=variation.vars[variation.args[i]].type and variation.vars[variation.args[i]].type.is_buffer_of!=ANY_TYPE:
                 is_available = False
                 buffer1 = vars[i].type.is_buffer_of
@@ -1545,6 +1557,14 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         ])
         return [var]
     callee = _select_call(file, impl, method, vars, error_token)
+    if len(vars)<len(callee.args):
+        gathered_vars: list[Variable] = list()
+        for effect_var in callee.effect_names:
+            for var in impl.vars.values():
+                if var.name==effect_var or var.name.startswith(effect_var+"__"): gathered_vars.append(var)
+            if len(vars)+len(gathered_vars)>=len(callee.args): break
+        gathered_vars.extend(vars)
+        vars = gathered_vars
 
     if callee==NOCATCH_TYPE:
         if impl.needs_failure_mode: error_token.error("safety", "there are potential errors that can occur up to here that have not been intercepted with `try`")
@@ -2519,7 +2539,7 @@ def process_statement_operator(file: File, tokens: list[Token], impl: Implemente
                 pos, additional_rets = process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
                 if peek_text(tokens, pos)!="]": err_token.error("syntax", "missing closing ']'")
                 pos += 1
-                get_func_name = "get" 
+                get_func_name = "get"
                 deref = True
                 also_assign = False
                 if peek_text(tokens, pos)=="&" and peek_text(tokens, pos+1)=="&":
@@ -2924,7 +2944,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
             if is_type_resolution:
                 pos += 1
                 variable = Variable(create_temp(), literal_method)
-                if is_lsp and current_token.file.is_main_file: print_lsp_literal(get(tokens,pos-1), "**retrieve literal type**\n\nRetrieves the type defined to evaluate to "+literal_method.at.text)
+                if is_lsp and get(tokens,pos-2).file.is_main_file: print_lsp_literal(get(tokens,pos-2), "**retrieve literal type**\n\nRetrieves the type defined to evaluate to "+literal_method.at.text)
                 impl.vars[variable.name] = variable
                 varsret = [variable]
             elif literal_method.is_literal_of==CSTR_TYPE:
@@ -3356,14 +3376,21 @@ def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception
     pos += 1
     if get(tokens, pos).text!="(": tokens[pos].error("syntax", "expecting opening parenthesis")
     pos += 1
+    effect_names: list[str] = list()
     while peek_text(tokens, pos)!=")":
         arg_immutability = 1
+        is_effect = False
+        if get(tokens, pos).text=="effect":
+            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "**effect argument**\nDeclares that the provided argument should be autonomously gathered from the calling context's variables.")
+            if len(effect_names)<len(abstract_arg_names): get(tokens,pos).error("type", "effects can only be declared as the first arguments")
+            pos += 1
+            is_effect = True
         if get(tokens, pos).text=="mut":
-            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "mutable argument - changes to it overwrite values at the calling site (overwritten values must also be mutable)")
+            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "**mutable argument**\nChanges to it overwrite values at the calling site (overwritten values must also be mutable).")
             pos += 1
             arg_immutability = 0
         elif get(tokens, pos).text=="const":
-            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "const argument - not only is it immutable, but also guarantees that it will allow no attached memory or other resource modifications")
+            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "**const argument**\nNot only is it immutable, but also guarantees that it will allow no attached memory or other resource modifications.")
             pos += 1
             arg_immutability = -1
         if peek_text(tokens, pos)=="ptr":
@@ -3393,6 +3420,7 @@ def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception
             abstract_arg_convert_to_ptr.append(True)
         else: abstract_arg_convert_to_ptr.append(False)
         arg_name = peek_text(tokens, pos)
+        if is_effect: effect_names.append(arg_name)
         if arg_name==")" or arg_name==",": arg_name = "__temp_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
         else: pos += 1
         arg_type_variations: list[ImplementedType] = find_unique_variations(arg_type.variations)
@@ -3408,17 +3436,18 @@ def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception
         pos += 1 # skip the comma
     if get(tokens, pos).text!=")": tokens[pos].error("syntax", "expecting closing parenthesis")
     pos += 1
-    return pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr
+    return pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr, effect_names
 
 def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception: bool, is_local: bool):
     start_token = get(tokens, pos)
-    pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr = _gather_def(file, tokens, pos, fast_return_exception, is_local)
+    pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr, effect_names = _gather_def(file, tokens, pos, fast_return_exception, is_local)
     starting_pos = pos
     greatest_pos = None
     candidates: list[ImplementedType] = list()
     for arg_types in itertools.product(*abstract_arg_types):
         pos = starting_pos
         impl = ImplementedType(name, at=start_token)
+        impl.effect_names = effect_names
         if is_local: file.localdefs.add(impl)
         impl.fast_return_exception = fast_return_exception
         try:

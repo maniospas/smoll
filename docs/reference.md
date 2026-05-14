@@ -362,9 +362,9 @@ to encode the recursion stopping conditions.
 are parsed. These now have access to the whole file's types.
 
 Importantly, the recursive function's escape hatch should occur
-first, otherwise Step 1 would result in failure; the compiler
-will point out that you are trying to perform a recursion with
-an incomplete type.
+first, otherwise Step 1 would result in failure. The compiler
+will point out that you are trying to perform a recursion without
+having returned at least once first so that the type can be determined.
 
 Before moving forward, it must be mentioned that
 smoλ's type system is deliberately
@@ -372,6 +372,9 @@ simplified so that programs *can be read sequentially*
 and *resolve types in finite time*. Recursion is too
 convenient to disallow fully, so this pattern is selected
 as a means of presenting the aforementioned properties.
+In particular, you can read up to a recursive function's first return
+and keep that in mind whenever the function is called in
+subsequent code.
 
 Below is an overengineered and thus algorithmically
 slow Fibonacci number calculator that demonstrates recursion
@@ -730,7 +733,7 @@ for rapidly moving temporary data around.
 
 ## substructures
 
-*Warning: This is an advanced feature, mainly useful for complicated data packing. You can skip it.*
+*Warning: This is an advanced feature, mainly useful for iterating through complicatedly packed data. You can skip it.*
 
 You can work with "horizontal" data from buffers and pointers by
 obtaining or setting to specific items. However, you can also
@@ -789,10 +792,18 @@ def main()
 ```
 
 References are **automatically propagated**
-by analyzing direct input-output equalities. This
-allows the compiler to re-attach valid references to
-invalidated data structures, for example that would
-have been validated by memory movements. 
+by analyzing direct input-output equalities. That is,
+it is tracked which inputs are returned directly
+by being assigned to output variables of function calls,
+and therefore references to the inputs
+become equivalent to references to the outputs.
+
+This allows the compiler to re-attach valid references to
+invalidated data structures when those change to something 
+valid. For example, resizing a buffer invalidates its original
+content address pointer, but since the value is returned 
+and assigned on the same variable, the new address is
+tracked instead.
 
 There will always be proper inference for direct equalities as
 long as these are not deliberately invalidated (e.g.,
@@ -1114,9 +1125,9 @@ def main()
 ```
 
 Strings can be copied on a pair of buffer and mutable position inside it `char[], mut nat`.
-For convenience, this structure can be initialized to start from the zero position with the
-`bufpos` (buffer-position) function, as below. This structure is used a lot when managing 
-memory directly with buffers and hence the introduction of this easier-to-read syntax sugar.
+This structure is used a lot when creating buffers for memory management.
+Thus, for more compact code, the structure can be constructed and initialized to start from the zero 
+position with the `bufpos` (buffer-position) function.
 
 ```python
 import "std/core.s"
@@ -1331,7 +1342,7 @@ def concat(mini::str[] buff)
     iter = range len buff
     start = mem.pos
     while try i=next iter
-        mem.copy mini::unpack(buff[i])
+        mem.copy mini::unpack buff[i]
         mem.copy " "
     return str(mem.buf,start,mem.pos)
 
@@ -1343,7 +1354,7 @@ def main()
     buff[2] = mini::str "name"
     buff[3] = mini::str "is"
     buff[4] = mini::str "manios"
-    buff[5] = mini::str concat(buff)
+    buff[5] = mini::str concat buff
     it = range len buff
     while try i=next it
         print (i," ")
@@ -1353,4 +1364,5 @@ def main()
 
 ## vectors
 
-*Info: This feature is still incomplete.*
+In the same way that strings are abstraction over character buffers,
+smoλ vectors are abstractions over numeric buffers. In particular

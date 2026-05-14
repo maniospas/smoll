@@ -61,9 +61,9 @@
         font-style: normal;
     }
     .box-warning {
-        border-color: #d29922;
-        background: #fff8e6;
-        color: #6e4f00;
+        border-color: #c0392b;
+        background: #fff0f0;
+        color: #7a1a1a;
     }
     .box-info {
         border-color: #388bfd;
@@ -455,16 +455,19 @@ are parsed. These now have access to the whole file&#8217;s types.</p></li>
 </ul>
 
 <p>Importantly, the recursive function&#8217;s escape hatch should occur
-first, otherwise Step 1 would result in failure; the compiler
-will point out that you are trying to perform a recursion with
-an incomplete type.</p>
+first, otherwise Step 1 would result in failure. The compiler
+will point out that you are trying to perform a recursion without
+having returned at least once first so that the type can be determined.</p>
 
 <p>Before moving forward, it must be mentioned that
 smoλ&#8217;s type system is deliberately
 simplified so that programs <em>can be read sequentially</em>
 and <em>resolve types in finite time</em>. Recursion is too
 convenient to disallow fully, so this pattern is selected
-as a means of presenting the aforementioned properties.</p>
+as a means of presenting the aforementioned properties.
+In particular, you can read up to a recursive function&#8217;s first return
+and keep that in mind whenever the function is called in
+subsequent code.</p>
 
 <p>Below is an overengineered and thus algorithmically
 slow Fibonacci number calculator that demonstrates recursion
@@ -836,7 +839,7 @@ for rapidly moving temporary data around.</p>
 
 <h2 id="substructures">substructures</h2>
 
-<div class="notice-box box-warning"><strong>Warning:</strong> This is an advanced feature, mainly useful for complicated data packing. You can skip it.</div>
+<div class="notice-box box-warning"><strong>Warning:</strong> This is an advanced feature, mainly useful for iterating through complicatedly packed data. You can skip it.</div>
 
 <p>You can work with &#8220;horizontal&#8221; data from buffers and pointers by
 obtaining or setting to specific items. However, you can also
@@ -896,10 +899,18 @@ syntax like below.</p>
 </div>
 
 <p>References are <strong>automatically propagated</strong>
-by analyzing direct input-output equalities. This
-allows the compiler to re-attach valid references to
-invalidated data structures, for example that would
-have been validated by memory movements. </p>
+by analyzing direct input-output equalities. That is,
+it is tracked which inputs are returned directly
+by being assigned to output variables of function calls,
+and therefore references to the inputs
+become equivalent to references to the outputs.</p>
+
+<p>This allows the compiler to re-attach valid references to
+invalidated data structures when those change to something 
+valid. For example, resizing a buffer invalidates its original
+content address pointer, but since the value is returned 
+and assigned on the same variable, the new address is
+tracked instead.</p>
 
 <p>There will always be proper inference for direct equalities as
 long as these are not deliberately invalidated (e.g.,
@@ -1230,9 +1241,9 @@ This creates errors on failure.</p>
 </div>
 
 <p>Strings can be copied on a pair of buffer and mutable position inside it <code>char[], mut nat</code>.
-For convenience, this structure can be initialized to start from the zero position with the
-<code>bufpos</code> (buffer-position) function, as below. This structure is used a lot when managing 
-memory directly with buffers and hence the introduction of this easier-to-read syntax sugar.</p>
+This structure is used a lot when creating buffers for memory management.
+Thus, for more compact code, the structure can be constructed and initialized to start from the zero 
+position with the <code>bufpos</code> (buffer-position) function.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1457,7 +1468,7 @@ when organized in a string buffer.</p>
     <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">pos</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="nb">iter</span>
-        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">::</span><span class="n">unpack</span><span class="p">(</span><span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">::</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot; &quot;</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">buf</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">mem</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
 
@@ -1469,7 +1480,7 @@ when organized in a string buffer.</p>
     <span class="n">buff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;name&quot;</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;is&quot;</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;manios&quot;</span>
-    <span class="n">buff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="n">concat</span><span class="p">(</span><span class="n">buff</span><span class="p">)</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="n">concat</span> <span class="n">buff</span>
     <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
         <span class="nb">print</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot; &quot;</span><span class="p">)</span>

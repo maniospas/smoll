@@ -39,6 +39,7 @@ def str(const char ptr unsafe_ptr, nat pos, nat length)
 def str(const char[] buf, strdat dat)
     doc "a string residing on a buffer"
     unsafe_ptr = buf.unsafe_ptr
+    if buf.unsafe_align!=1 fail "can only define strings on contiguous buffers"
     return str(unsafe_ptr, dat)
 
 def str(const char[] buf, nat|blank length)
@@ -67,7 +68,7 @@ def str(cstr c)
     buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler::attach_type(c)
     {if(c){builtins::nat length = strlen(c);}} # length initializes to zero
     buf.unsafe_size = length+1  # account for null termination
-    return str(const buf,0,length)
+    return str(buf,0,length)
 
 def len(str s)
     doc "string length"

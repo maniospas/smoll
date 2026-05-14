@@ -1,10 +1,29 @@
 import markdown2
-from pygments.formatters import HtmlFormatter
-from markdown.extensions.codehilite import CodeHiliteExtension
+import re
 
 with open("docs/reference.md") as file:
     text = file.read()
+
 html = markdown2.markdown(text, extras=['fenced-code-blocks', 'header-ids', 'smarty-pants', 'markdown-in-html', 'highlightpython-lang', 'cuddled-lists'])
+
+def convert_notice_boxes(html):
+    """Convert <p><em>Warning: ...</em></p> and <p><em>Info: ...</em></p> to styled boxes."""
+    def replacer(match):
+        tag_type = match.group(1).lower()  # 'warning' or 'info'
+        content = match.group(2).strip()
+        css_class = 'box-warning' if tag_type == 'warning' else 'box-info'
+        label = tag_type.capitalize()
+        return f'<div class="notice-box {css_class}"><strong>{label}:</strong> {content}</div>'
+
+    # Match <p><em>Warning: ...</em></p> or <p><em>Info: ...</em></p>
+    pattern = re.compile(
+        r'<p><em>(Warning|Info):\s*(.*?)</em></p>',
+        re.IGNORECASE | re.DOTALL
+    )
+    return pattern.sub(replacer, html)
+
+html = convert_notice_boxes(html)
+
 html = """
 <!DOCTYPE html>
 <html lang="en">
@@ -58,14 +77,41 @@ html = """
         }
     }
     html {
-    scroll-behavior: smooth;
+        scroll-behavior: smooth;
     }
-
+    .notice-box {
+        border-left: 4px solid;
+        border-radius: 4px;
+        padding: 12px 16px;
+        margin: 16px 0;
+        font-style: normal;
+    }
+    .box-warning {
+        border-color: #d29922;
+        background: #fff8e6;
+        color: #6e4f00;
+    }
+    .box-info {
+        border-color: #388bfd;
+        background: #e6f0ff;
+        color: #0a3069;
+    }
+    @media (prefers-color-scheme: dark) {
+        .box-warning {
+            background: #272115;
+            color: #e3b341;
+        }
+        .box-info {
+            background: #0d1f3c;
+            color: #79c0ff;
+        }
+    }
     </style>
 </head>
-<body>"""+html+"""
+<body>""" + html + """
 </body>
 </html>
 """
+
 with open("docs/index.html", "w") as file:
     file.write(html)

@@ -51,9 +51,35 @@
         }
     }
     html {
-    scroll-behavior: smooth;
+        scroll-behavior: smooth;
     }
-
+    .notice-box {
+        border-left: 4px solid;
+        border-radius: 4px;
+        padding: 12px 16px;
+        margin: 16px 0;
+        font-style: normal;
+    }
+    .box-warning {
+        border-color: #d29922;
+        background: #fff8e6;
+        color: #6e4f00;
+    }
+    .box-info {
+        border-color: #388bfd;
+        background: #e6f0ff;
+        color: #0a3069;
+    }
+    @media (prefers-color-scheme: dark) {
+        .box-warning {
+            background: #272115;
+            color: #e3b341;
+        }
+        .box-info {
+            background: #0d1f3c;
+            color: #79c0ff;
+        }
+    }
     </style>
 </head>
 <body><h1 id="smoλ-reference">smoλ reference</h1>
@@ -81,7 +107,7 @@
 <em>2.5.</em> <a href="#try-and-fail">try and fail</a><br>
 <em>2.6.</em> <a href="#defer">defer</a><br>
 <em>2.7.</em> <a href="#catching-errors">catching errors</a><br>
-<em>2.8.</em> <a href="#more-compiler-functions">more compiler functions</a><br></p>
+<em>2.8.</em> <a href="#debugging-tools">debugging tools</a><br></p>
 
 <p><strong>Section 3. Standard Library</strong><br>
 <em>3.1.</em> <a href="#lists">lists</a><br>
@@ -183,7 +209,8 @@ function calls). You can always refer to functions
 within namespaces.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
+<pre><span></span><code><span class="c1"># an atypical import structure for demonstration</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">core</span><span class="p">::</span><span class="nb">print</span>  <span class="c1"># import print symbol</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -593,6 +620,8 @@ matching schema that checks for valid srtuctures.</p>
 
 <h2 id="conditional-compilation-and-default-arguments">conditional compilation and default arguments</h2>
 
+<div class="notice-box box-info"><strong>Info:</strong> In conjunction with the type system, this feature creates zero-cost condition checks for consise creation of multiple definitions.</div>
+
 <p>You can use the <code>[value] is [type]</code> operator to check that a value/tuple
 adheres to at least one variation of a union. When no literal types are involved
 (and sometimes when they are), the result is not merely a boolean, 
@@ -756,6 +785,8 @@ safeguard can improve performance and bring code safety.</p>
 
 <h2 id="pointers">pointers</h2>
 
+<div class="notice-box box-warning"><strong>Warning:</strong> This subsection describes advanced functionality that is not necessary for common or introductory language usage. You can skip it.</div>
+
 <p>Pointers reference specific memory locations in buffers. Use them 
 to quickly move data around while sharing only one memory address. 
 Pointers are unstable in that, for safety, they become invalid whenever 
@@ -876,7 +907,7 @@ for strings copied onto it.</p>
 
 <h2 id="substructures">substructures</h2>
 
-<p><em>This is an advanced feature, mainly useful for complicated data packing.</em></p>
+<div class="notice-box box-warning"><strong>Warning:</strong> This is an advanced feature, mainly useful for complicated data packing. You can skip it.</div>
 
 <p>You can work with &#8220;horizontal&#8221; data from buffers and pointers by
 obtaining or setting to specific items. However, you can also
@@ -939,7 +970,7 @@ You can manually <code>fail</code> like so:</p>
 as if you were scripting, and only handle failures at places where they can be handled
 safely or where they would be critical. If it is important to ensure that 
 a function does not fail up to a certain point, place the <code>debug::nocatch()</code> 
-assertion. There are various other compiler assetions too, which are covered later.</p>
+assertion. There are various other compiler assertions too, which are covered later.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1090,9 +1121,9 @@ But, importantly, they <em>are</em> obtained from deferred statements triggered 
 </code></pre>
 </div>
 
-<h2 id="more-compiler-functions">more compiler functions</h2>
+<h2 id="debugging-tools">debugging tools</h2>
 
-<p><em>This secion covers debugging tricks and is better suited for advanced readers.</em></p>
+<div class="notice-box box-warning"><strong>Warning:</strong> This subsecion covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.</div>
 
 <p>Till now there was mention of <code>compiler::skip()</code>, 
 <code>compiler::catch()</code> and <code>debug::nocatch()</code>
@@ -1372,7 +1403,7 @@ handle the intercepted errors, use a pattern like below.</p>
 
 <h2 id="random">random</h2>
 
-<p><em>This section is under construction.</em></p>
+<div class="notice-box box-info"><strong>Info:</strong> This subsection is under construction.</div>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1432,7 +1463,7 @@ when organized in a string buffer.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">buff</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">6</span>
-    <span class="n">compiler</span><span class="p">::</span><span class="n">debug</span> <span class="n">buff</span>
+    <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="n">buff</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;hi&quot;</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;my&quot;</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;name&quot;</span>
@@ -1448,7 +1479,7 @@ when organized in a string buffer.</p>
 
 <h2 id="vectors">vectors</h2>
 
-<p><em>This feature is still incomplete.</em></p>
+<div class="notice-box box-info"><strong>Info:</strong> This feature is still incomplete.</div>
 
 </body>
 </html>

@@ -23,7 +23,7 @@ _2.4._ [substructures](#substructures)<br>
 _2.5._ [try and fail](#try-and-fail)<br>
 _2.6._ [defer](#defer)<br>
 _2.7._ [catching errors](#catching-errors)<br>
-_2.8._ [more compiler functions](#more-compiler-functions)<br>
+_2.8._ [debugging tools](#debugging-tools)<br>
 
 **Section 3. Standard Library**<br>
 _3.1._ [lists](#lists)<br>
@@ -123,6 +123,7 @@ function calls). You can always refer to functions
 within namespaces.
 
 ```python
+# an atypical import structure for demonstration
 import "std/core.s" as core
 import core::print  # import print symbol
 
@@ -518,6 +519,8 @@ def main()
 
 ## conditional compilation and default arguments
 
+*Info: In conjunction with the type system, this feature creates zero-cost condition checks for consise creation of multiple definitions.*
+
 You can use the `[value] is [type]` operator to check that a value/tuple
 adheres to at least one variation of a union. When no literal types are involved
 (and sometimes when they are), the result is not merely a boolean, 
@@ -676,6 +679,8 @@ safeguard can improve performance and bring code safety.
 
 ## pointers
 
+*Warning: This subsection describes advanced functionality that is not necessary for common or introductory language usage. You can skip it.*
+
 Pointers reference specific memory locations in buffers. Use them 
 to quickly move data around while sharing only one memory address. 
 Pointers are unstable in that, for safety, they become invalid whenever 
@@ -794,7 +799,7 @@ def main()
 
 ## substructures
 
-*This is an advanced feature, mainly useful for complicated data packing.*
+*Warning: This is an advanced feature, mainly useful for complicated data packing. You can skip it.*
 
 You can work with "horizontal" data from buffers and pointers by
 obtaining or setting to specific items. However, you can also
@@ -856,7 +861,7 @@ Propagating failures is done in the spirit of writing concise but well-controlle
 as if you were scripting, and only handle failures at places where they can be handled
 safely or where they would be critical. If it is important to ensure that 
 a function does not fail up to a certain point, place the `debug::nocatch()` 
-assertion. There are various other compiler assetions too, which are covered later.
+assertion. There are various other compiler assertions too, which are covered later.
 
 ```python
 import "std/core.s"
@@ -1004,9 +1009,9 @@ def main()
 ```
 
 
-## more compiler functions
+## debugging tools
 
-*This secion covers debugging tricks and is better suited for advanced readers.*
+*Warning: This subsecion covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.*
 
 Till now there was mention of `compiler::skip()`, 
 `compiler::catch()` and `debug::nocatch()`
@@ -1273,7 +1278,7 @@ def main()
 
 ## random
 
-*This section is under construction.*
+*Info: This subsection is under construction.*
 
 ```python
 import "std/core.s"
@@ -1331,7 +1336,7 @@ def concat(mini::str[] buff)
 
 def main()
     buff = (mut mini::str[]).alloc 6
-    compiler::debug buff
+    debug::print buff
     buff[0] = mini::str "hi"
     buff[1] = mini::str "my"
     buff[2] = mini::str "name"
@@ -1347,4 +1352,4 @@ def main()
 
 ## vectors
 
-*This feature is still incomplete.*
+*Info: This feature is still incomplete.*

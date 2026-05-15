@@ -20,7 +20,7 @@ local import "std/unsafe.s" as unsafe
 
 def exists(cstr c)
     doc "checks whether a cstr is not zero-initialized"
-    {builtins::bool z = c!=0;}
+    {builtins:bool z = c!=0;}
     return z
 
 local def strdat(nat pos, nat length, char first)
@@ -33,7 +33,7 @@ def str(const char ptr unsafe_ptr, strdat dat)
 
 def str(const char ptr unsafe_ptr, nat pos, nat length)
     doc "a string residing on a buffer"
-    {if(length){builtins::compiler::ptr first_pos = unsafe_ptr+pos;builtins::char first = *first_pos;}} # properly zero-initialized otherwise
+    {if(length){builtins:compiler:ptr first_pos = unsafe_ptr+pos;builtins:char first = *first_pos;}} # properly zero-initialized otherwise
     return str(unsafe_ptr, pos, length, first)
 
 def str(const char[] buf, strdat dat)
@@ -65,8 +65,8 @@ def str(cstr c)
     doc "Subsequent comparisons no longer use the underlying pointer value."
     buf = mut char[]  # mut to create, convert to const on return to prevent resizing
     {buf__unsafe_ptr = c;}
-    buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler::attach_type(c)
-    {if(c){builtins::nat length = strlen(c);}} # length initializes to zero
+    buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler:attach_type(c)
+    {if(c){builtins:nat length = strlen(c);}} # length initializes to zero
     buf.unsafe_size = length+1  # account for null termination
     return str(buf,0,length)
 
@@ -82,17 +82,17 @@ def char(str s)
 def char(cstr s)
     doc "treat as character"
     doc "The first character of a string is extracted, for example to write `c = char \"C\"`."
-    {if(s) {builtins::char c = *s;}}
+    {if(s) {builtins:char c = *s;}}
     return c
 
 def eq(char x, char y)
     doc "equals"
-    {builtins::bool z = (x==y);}
+    {builtins:bool z = (x==y);}
     return z
 
 def neq(char x, char y)
     doc "not equals"
-    {builtins::bool z = (x!=y);}
+    {builtins:bool z = (x!=y);}
     return z
 
 def copy(str|cstr _other)
@@ -107,7 +107,7 @@ local def copy_null_terminated(str other)
     doc "This is useful only for supporting unsafe_temporary_cstr."
     buf = alloc 1+len other
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
-    {builtins::compiler::ptr endpos = buf__unsafe_ptr+other__dat__length;}
+    {builtins:compiler:ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}
     return str(buf, 0, other.dat.length, other.dat.first)
 
@@ -123,9 +123,9 @@ def unsafe_temporary_cstr(str other)
     doc "invalidates the null termination property, so in general do not manipulate" 
     doc "strings while this is used in code; it should only be used for operating"
     doc "system calls."
-    {if(other__dat__length){builtins::compiler::ptr endpos=other__unsafe_ptr+other__dat__pos+other__dat__length;builtins::char endchar = *endpos;}builtins::bool needs_copying=endchar;}
+    {if(other__dat__length){builtins:compiler:ptr endpos=other__unsafe_ptr+other__dat__pos+other__dat__length;builtins:char endchar = *endpos;}builtins:bool needs_copying=endchar;}
     c = copy_null_terminated(other)
-    {builtins::cstr ret = c__unsafe_ptr+c__dat__pos;}
+    {builtins:cstr ret = c__unsafe_ptr+c__dat__pos;}
     defer
         # will do nothing but ties ret and c together
         if not exists ret 
@@ -215,11 +215,11 @@ def copy(charlist li, str|cstr _other)
 
 def get(str s, nat i)
     doc "a character in a string"
-    unsafe_return s.unsafe_ptr.unsafe::add(s.dat.pos+i)
+    unsafe_return s.unsafe_ptr.unsafe:add(s.dat.pos+i)
 
 def eq(cstr x, cstr y)
     doc "equals"
-    {builtins::bool z = (x==y);}
+    {builtins:bool z = (x==y);}
     return z
 
 def eq(str x, str y)
@@ -229,7 +229,7 @@ def eq(str x, str y)
         return false
     if x.dat.first!=y.dat.first
         return false
-    {builtins::bool z = !memcmp(x__unsafe_ptr+x__dat__pos, y__unsafe_ptr+y__dat__pos, n);}
+    {builtins:bool z = !memcmp(x__unsafe_ptr+x__dat__pos, y__unsafe_ptr+y__dat__pos, n);}
     return z
 
 def eq(str x, cstr y)

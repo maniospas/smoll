@@ -17,7 +17,7 @@
 local import "std/core/builtinsext.s"
 local import "std/unsafe.s" as unsafe
 
-# a convention to make pointer operations safe outside the unsafe:: namespace
+# a convention to make pointer operations safe outside the unsafe: namespace
 # is that we GUARANTEE that non-zero pointers to a memory region contain
 # at least one element of the attached type (automatically inferred for any)
 
@@ -26,7 +26,7 @@ local import "std/unsafe.s" as unsafe
 #     if buffer.unsafe_size==0
 #         return buffer
 #     buffer.unsafe_size = 0
-#     buffer.unsafe_ptr.unsafe::free()
+#     buffer.unsafe_ptr.unsafe:free()
 #     return buffer
 
 def alloc(mut any[] buffer, nat|blank size)
@@ -40,17 +40,17 @@ def alloc(mut any[] buffer, nat|blank size)
     defer
         if exists buffer.unsafe_ptr
             buffer.unsafe_size = 0
-            buffer.unsafe_ptr.unsafe::free()
+            buffer.unsafe_ptr.unsafe:free()
     if buffer.unsafe_size==size
         if size!=0
-            buffer.unsafe_ptr.unsafe::zero(0, buffer.unsafe_align*size)
+            buffer.unsafe_ptr.unsafe:zero(0, buffer.unsafe_align*size)
         return buffer
     if buffer.unsafe_size!=0
         fail "cannot resize buffers with alloc; it promises no data reallocation"
     bytes = buffer.unsafe_align*size
     buffer.unsafe_size = size
-    buffer.unsafe_ptr = unsafe_mut unsafe::alloc(bytes)
-    buffer.unsafe_ptr.unsafe::zero(0, bytes)
+    buffer.unsafe_ptr = unsafe_mut unsafe:alloc(bytes)
+    buffer.unsafe_ptr.unsafe:zero(0, bytes)
     return buffer
 
 # def new(const any[] buffer, nat size)
@@ -58,13 +58,13 @@ def alloc(mut any[] buffer, nat|blank size)
 #     ret.unsafe_align = buffer.unsafe_align
 #     bytes = ret.unsafe_align*size
 #     ret.unsafe_size = size
-#     ret.unsafe_ptr = unsafe_mut unsafe::alloc(bytes)
-#     ret.unsafe_ptr.unsafe::zero(0, bytes)
-#     ret.unsafe_ptr = unsafe_mut ret.unsafe_ptr.compiler::attach_type(buffer.unsafe_ptr)
+#     ret.unsafe_ptr = unsafe_mut unsafe:alloc(bytes)
+#     ret.unsafe_ptr.unsafe:zero(0, bytes)
+#     ret.unsafe_ptr = unsafe_mut ret.unsafe_ptr.compiler:attach_type(buffer.unsafe_ptr)
 #     defer
 #         if ret.unsafe_size!=0
 #             ret.unsafe_size = 0
-#             ret.unsafe_ptr.unsafe::free()
+#             ret.unsafe_ptr.unsafe:free()
 #     return ret
 
 def resize(mut any[] buffer, nat size)
@@ -76,37 +76,37 @@ def resize(mut any[] buffer, nat size)
         return buffer
     if size==0
         buffer.unsafe_size = 0
-        buffer.unsafe_ptr.unsafe::free()
+        buffer.unsafe_ptr.unsafe:free()
         return buffer
     if buffer.unsafe_size==0
         fail "cannot resize an unallocated or freed buffer"
     prev_bytes = buffer.unsafe_size*buffer.unsafe_align
     buffer.unsafe_size = size
     bytes = buffer.unsafe_align*size
-    buffer.unsafe_ptr = unsafe_mut buffer.unsafe_ptr.unsafe::realloc(bytes)
+    buffer.unsafe_ptr = unsafe_mut buffer.unsafe_ptr.unsafe:realloc(bytes)
     if prev_bytes<bytes
-        buffer.unsafe_ptr.unsafe::zero(prev_bytes, bytes)
+        buffer.unsafe_ptr.unsafe:zero(prev_bytes, bytes)
     return buffer
 
 def last(const any[] buffer)
     doc "get a pointer to the last buffer element"
     if 0==buffer.unsafe_size fail "out of bounds"
-    unsafe_return buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1)*buffer.unsafe_align)
+    unsafe_return buffer.unsafe_ptr.unsafe:add((buffer.unsafe_size-1)*buffer.unsafe_align)
 
 def mutlast(any[] buffer)
     doc "get a mutable pointer to the last buffer element"
     if 0==buffer.unsafe_size fail "out of bounds"
-    unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1)*buffer.unsafe_align)
+    unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe:add((buffer.unsafe_size-1)*buffer.unsafe_align)
     
 def mutget(any[] buffer, nat i)
     doc "get a mutable pointer to a buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
-    unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align)
+    unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe:add(i*buffer.unsafe_align)
     
 def get(const any[] buffer, nat i)
     doc "get a pointer to a buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
-    unsafe_return buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align)
+    unsafe_return buffer.unsafe_ptr.unsafe:add(i*buffer.unsafe_align)
 
 def len(const any[] buffer)
     doc "the number of buffer elements"

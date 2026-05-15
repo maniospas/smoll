@@ -22,7 +22,8 @@ _2.4._ [stable references](#stable-references)<br>
 _2.5._ [try and fail](#try-and-fail)<br>
 _2.6._ [defer](#defer)<br>
 _2.7._ [catching errors](#catching-errors)<br>
-_2.8._ [⚠ debugging tools](#debugging-tools)<br>
+_2.8._ [effects](#effects)<br>
+_2.9._ [⚠ debugging tools](#debugging-tools)<br>
 
 **Section 3. Standard Library**<br>
 _3.1._ [lists](#lists)<br>
@@ -73,7 +74,7 @@ def main()
 
 
 You can also import a file as a namespace to access its
-contents with the `::` notation. This is more verbose
+contents with the `:` notation. This is more verbose
 but unambiguous, like below. You can even access namespaces
 defined within the imported namespace.
 
@@ -81,17 +82,17 @@ defined within the imported namespace.
 import "std/core.s" as core
 
 def main()
-    core::print "hello world!"
+    core:print "hello world!"
 ```
 
-If you want to import something specific, use `::` within
+If you want to import something specific, use `:` within
 the import statement. You can use the path instead of the
 namespace name too, for example to bring a single function 
 from a file.
 
 ```python
 import "std/core.s" as core
-import core::print
+import core:print
 
 def main()
     print "hello world!"
@@ -132,12 +133,12 @@ within namespaces.
 ```python
 # an atypical import structure for demonstration
 import "std/core.s" as core
-import core::print  # import print symbol
+import core:print  # import print symbol
 
 def main()
     x1 = 1
-    x2 = x1.core::add 1
-    print x2.core::add 2
+    x2 = x1.core:add 1
+    print x2.core:add 2
 ```
 
 ## mutability
@@ -406,7 +407,7 @@ def main()
 Declare alternatives between types (unions) by separating them
 with `|`. Below is an example that defines a function for
 adding either a float or an integer to a float. The brackets
-are used to add some C code, inside which `builtins::float` is
+are used to add some C code, inside which `builtins:float` is
 injected by *smoλ* as the appropriate builtin type. 
 
 The exemplified functionality of adding any two numbers together
@@ -422,7 +423,7 @@ will be added in the future.
 import "builtins"
 
 def unsafe_add(float x, float|int y)
-    {builtins::float z=x+y;}
+    {builtins:float z=x+y;}
     return z
 
 def main()
@@ -437,13 +438,46 @@ An example follows.
 ```python
 import "builtins"
 
-def Number = float|int|id
+def Number = float|int|nat
 def unsafe_add(Number x, Number y)
-    {builtins::float z=x+y;}
+    {builtins:float z=x+y;}
     return z
 
 def main()
     print unsafe_add (1, 2.0)
+```
+
+In truth, *smoλ* implements a linear type system, but this
+was hidden till this point because people tend to run away
+at the mention of technical terms. Practically, it means
+that -in addition to type unions- you can also get the intersection
+of type unions with the `&` symbol. Use parantheses like normal.
+
+Here is an example where, say, we define a `float` function that returns
+something other than a builtin float number. We can get the intersection
+of all float definitions that are also numbers, or all those definitions
+that are not numbers with the '\` symbol.
+
+```python
+import "std/core.s" # defines Number
+
+def natpair(nat x, nat y)
+def float(natpair a)
+    x = float a.x
+    y = float a.y
+    return (x,y)
+
+def inc(float&Number x) # would try and fail to create it for the previous method's output
+    return 1.0+x
+
+def inc(float\Number a) # already defined for Number
+    x = 1.0+float a.x
+    y = 1.0+float a.y
+    return (x,y)
+
+def main()
+    print inc(1.0)  # print 2.0
+    print inc(4.0,4.0).x # prints 5.0
 ```
 
 ## literal types
@@ -496,8 +530,8 @@ Literal types still adhere to all other type system conventions.
 Those includes union declarations and having associated variables
 holding their value when used as function arguments.
 
-Get back the associated value with the `compiler::literal` function. 
-That is, `compiler::literal type "two"` yields `"two"`.
+Get back the associated value with the `compiler:literal` function. 
+That is, `compiler:literal type "two"` yields `"two"`.
 The benefit lies purely in extracting values from the type system.
 An example that restricts how functions are called is presented next.
 
@@ -507,7 +541,7 @@ import "std/core.s"
 def inc(nat x, blank|1|2 inc)
     if inc is blank
         inc = type 1 # literal convertible
-    return x+compiler::literal inc
+    return x+compiler:literal inc
 
 def main()
     print inc 0           # prints 1
@@ -546,7 +580,7 @@ def main()
 You can use the `[value] is [type]` operator to check that a value/tuple
 adheres to at least one variation of a union. When no literal types are involved
 (and sometimes when they are), the result is not merely a boolean, 
-but in fact of type `compile::true` or `compile::false`;
+but in fact of type `compile:true` or `compile:false`;
 these values are significant because they let *smoλ* identify 
 whether conditions will always be true or false and **eliminate code without parsing it**.
 
@@ -586,7 +620,7 @@ def main()
     print inc(2,2) # prints 4
 ```
 
-Here is a much more complicated scenario, where `compiler::skip()` 
+Here is a much more complicated scenario, where `compiler:skip()` 
 is used to prevent certain versions of the function from being
 created (e.g. there is no `inc(float,int)`). The example also shows 
 two type inference constructs: 
@@ -606,7 +640,7 @@ def inc(Num x, Num|blank value) # equivalent: def inc(float|int|nat x, float|int
     if value is blank
         value = type Num->x 1 # one with the same number format as x
     if not value is type x
-        compiler::skip() # skip invalid 'inc' definitions
+        compiler:skip() # skip invalid 'inc' definitions
     return x+value
 
 def main()
@@ -770,8 +804,10 @@ def main()
 
 You can work with data that reference other data
 in that they are updated together. This is similar
-to pointers, but comes under some scarce safety 
-restrictions that let the compiler ensure safety.
+to pointers, but comes under some safety 
+restrictions in that you cannot change where references
+point to, even with `mut`.
+
 At the same time, references are dissolved during
 returns into actual values that are not automatically
 updated together anymore - though safety checks are
@@ -840,6 +876,7 @@ def main()
     print s.s2
 ```
 
+
 ## try and fail
 
 Functions in *smoλ* can fail freely when unforeseen conditions are encountered,
@@ -868,7 +905,7 @@ Propagating failures is done in the spirit of writing concise but well-controlle
 **Don't care about failures. Unless you must.** That is, assume correct execution,
 as if you were scripting, and only handle failures at places where they can be handled
 safely or where they would be critical. If it is important to ensure that 
-a function does not fail up to a certain point, place the `debug::nocatch()` 
+a function does not fail up to a certain point, place the `debug:nocatch()` 
 assertion. There are various other compiler assertions too, which are covered later.
 
 ```python
@@ -879,7 +916,7 @@ def main()
     try x[0] = char "a" # still needs a try for buffer elements - though checks can be optimized away
     try print x[0]
     print "this must run at all costs"
-    debug::nocatch()    # error if without 'try' on all PREVIOUS calls that could fail
+    debug:nocatch()    # error if without 'try' on all PREVIOUS calls that could fail
     print x[10000]      # allowed to fail now
     print "this will never run due to out of bounds error"
 ```
@@ -961,10 +998,10 @@ open files and processes.
 
 ```python
 import "std/core.s"
-import "std/io.s"::process as process
+import "std/io.s":process as process
 
 def main()
-    proc = mut process::read "echo \"hello world!\""
+    proc = mut process:read "echo \"hello world!\""
     del proc # runs the process's defer, which waits for completion
     print "bye!"
 ```
@@ -972,7 +1009,7 @@ def main()
 
 ## catching errors
 
-The `compiler::catch()` function provides the means of retrieving
+The `compiler:catch()` function provides the means of retrieving
 an error code intercepted by `try` statements. This function creates
 an error itself if it *fails* to find an error. To avoid confusion, the
 compiler just mandates that you should wrap the catch function inside a `try` 
@@ -985,7 +1022,7 @@ import "std/io.s" as io
 
 def main()
     try print 2*3-20 # nat cannot become negative
-    if try error = compiler::catch()
+    if try error = compiler:catch()
         print "cannot substract two nat numbers and obtain a negative result"
 ```
 
@@ -1001,17 +1038,17 @@ But, importantly, they *are* obtained from deferred statements triggered by
 
 ```python
 import "std/core.s"
-import "std/io.s"::process as process
+import "std/io.s":process as process
 
 def bye_error()
     fail "bye!" 
 
 def main()
-    proc = mut process::read "echo \"hello world!\""
+    proc = mut process:read "echo \"hello world!\""
     try bye_error()
     del proc
 
-    if try error = compiler::catch()
+    if try error = compiler:catch()
         print cstr error # prints 'bye!' if no process error
         fail error       # can fail with error codes too
 ```
@@ -1021,15 +1058,15 @@ def main()
 
 *Warning: This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.*
 
-So far there was mention of `compiler::skip()`, 
-`compiler::catch()`, `compiler::literal(expression)` and `debug::nocatch()`
+So far there was mention of `compiler:skip()`, 
+`compiler:catch()`, `compiler:literal(expression)` and `debug:nocatch()`
 that let code interface with the compiler to an extend.
 
 There are some more mechanisms that help inspect
 programs or grant access to internal compilation state that
 can be analyzed for debugging.
 
-Foremost of debugging tools is `debug::print(expression)`. This 
+Foremost of debugging tools is `debug:print(expression)`. This 
 runs an expression, prints its return at compile time, 
 and returns its value. It works this way so that it can 
 be effortlessly interweaved in code. Do note that you
@@ -1042,13 +1079,13 @@ import "std/core.s"
 def main()
     s1 = str "s1"
     s2 = str "s2"
-    debug::print type "--- main ---" # prints '"--- main ---"' at compile time
-    s = debug::print (s1,s2)         # prints 'const str, const str' at compile time
+    debug:print type "--- main ---" # prints '"--- main ---"' at compile time
+    s = debug:print (s1,s2)         # prints 'const str, const str' at compile time
     print s # ERROR due to undefined print, but the above still prints
 ```
 
 Finally, assert that a specific point in a function does not lie within a loop
-or condition with the `debug::branchless()` check. This helps form sanity check within 
+or condition with the `debug:branchless()` check. This helps form sanity check within 
 conditional compilation conditions, ensuring that
 they are not accidentally evaluated at runtime. The next example uses it to verify that 
 there is no runtime overhead from a particular comparison involving enums.
@@ -1065,8 +1102,8 @@ def main()
     c = "one"
     test = (a,b,c)
     if not test is test1|test2
-        debug::branchless()
-        debug::print type "invalid data" # literal type to print the message instead of 'cstr'
+        debug:branchless()
+        debug:print type "invalid data" # literal type to print the message instead of 'cstr'
 ```
 
 
@@ -1199,12 +1236,12 @@ argument to directly read on the buffer and progress the position.
 
 ```python
 import "std/core.s"
-import "std/io.s"::file as file
+import "std/io.s":file as file
 
 def main()
-    f = file::read "README.md"
+    f = file:read "README.md"
     mem = alloc KB 4 # max 4 KB chunk size, on char[] by default
-    while try line = file::line(mem, f)
+    while try line = file:line(mem, f)
         print("|", "")
         print(line, "")
     print ""
@@ -1217,10 +1254,10 @@ import "std/core.s"
 import "std/io.s" as io
 
 def main()
-    f = io::file::write "tmp.txt"
+    f = io:file:write "tmp.txt"
     f.print "hello world"
     defer 
-        io::dir::remove "tmp.txt"
+        io:dir:remove "tmp.txt"
 ```
 
 Above was a first introduction to the `dir` namespace for directory 
@@ -1228,14 +1265,14 @@ operations. Below is how to iterate through directory contents.
 
 ```python
 import "std/core.s"
-import "std/io.s"::dir as dir
+import "std/io.s":dir as dir
 
 def main()
-    dir = mut dir::read "."
+    dir = mut dir:read "."
     buf = alloc 128
-    while try entry=dir::entry dir
+    while try entry=dir:entry dir
         print(entry, " ")
-        if dir::is_file entry
+        if dir:is_file entry
             print "file"
         else
             print "dir"
@@ -1248,7 +1285,7 @@ that fails on non-zero error code can be evoked like below.
 
 ```python
 import "std/core.s"
-import "std/io.s"::process
+import "std/io.s":process
 
 def main()
     success = try system "echo \"hello world!\""
@@ -1259,30 +1296,30 @@ One can also open and communicate with running processes.
 
 ```python
 import "std/core.s"
-import "std/io.s"::process as proc
+import "std/io.s":process as proc
 
 def main()
-    process = proc::process "ls"
+    process = proc:process "ls"
     buffer = bufpos alloc KB 4 # example with growing position
-    while try line=buffer.proc::line process
+    while try line=buffer.proc:line process
         print line
 ```
 
 Equivalently, manually release the process to wait for its conclusions.
 Recall that running processes can create errors, while resource release
 code may intercepts those errors with `try` so that
-they can be retrieved with `compiler::catch()`. 
+they can be retrieved with `compiler:catch()`. 
 To repropagate or otherwise
 handle the intercepted errors, use a pattern like below.
 
 ```python
 import "std/core.s"
-import "std/io.s"::process as proc
+import "std/io.s":process as proc
 
 def main()
-    process = proc::process "ls"
+    process = proc:process "ls"
     del process
-    if try error = compiler::catch()
+    if try error = compiler:catch()
         fail error # can fail on error codes too
 ```
 
@@ -1295,7 +1332,7 @@ import "std/core.s"
 import "std/rand.s" as rand
 
 def main()
-    rand = mut rand::Rand()
+    rand = mut rand:Rand()
     print next rand
 ```
 
@@ -1337,32 +1374,55 @@ when organized in a string buffer.
 import "std/core.s"
 import "std/mini.s" as mini
 
-def concat(mini::str[] buff)
+def concat(mini:str[] buff)
     mem = bufpos mut alloc KB 4
     iter = range len buff
     start = mem.pos
     while try i=next iter
-        mem.copy mini::unpack buff[i]
+        mem.copy mini:unpack buff[i]
         mem.copy " "
     return str(mem.buf,start,mem.pos)
 
 def main()
-    buff = (mut mini::str[]).alloc 6
-    debug::print buff # print the buffer type during compilation
-    buff[0] = mini::str "hi"
-    buff[1] = mini::str "my"
-    buff[2] = mini::str "name"
-    buff[3] = mini::str "is"
-    buff[4] = mini::str "manios"
-    buff[5] = mini::str concat buff
+    buff = (mut mini:str[]).alloc 6
+    debug:print buff # print the buffer type during compilation
+    buff[0] = mini:str "hi"
+    buff[1] = mini:str "my"
+    buff[2] = mini:str "name"
+    buff[3] = mini:str "is"
+    buff[4] = mini:str "manios"
+    buff[5] = mini:str concat buff
     it = range len buff
     while try i=next it
         print (i," ")
-        print mini::unpack buff[i]
+        print mini:unpack buff[i]
 ```
-
 
 ## vectors
 
-In the same way that strings are abstraction over character buffers,
-smoλ vectors are abstractions over numeric buffers. In particular
+*Info: This subsection is under construction.*
+
+```python
+import "std/core.s"
+import "std/vec.s"
+
+def safe_main()
+    allocator  = ref (mut float[]).alloc(200) # used by vector operation effects
+    allocator2 = ref (mut float[]).alloc(200) # useless 
+    v1 = vec 10
+    v2 = vec 10
+    v1[0] = 1.0
+    v2[0] = 2.0
+    
+    it = range 5
+    v = mut vec 10
+    while try i=next it
+        v = 2.0*(v1+v2+v)
+        #v = allocator2.mul(2.0, v1+v2+v) # THIS WOULD CREATE AN ERROR
+    print v[0]
+    
+def main()
+    try safe_main()
+    if try error=compiler:catch()
+        print cstr error
+```

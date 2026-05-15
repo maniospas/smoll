@@ -29,27 +29,27 @@ def flush(console)
 
 def int(console)
     doc "reads an integer from the console"
-    {builtins::int number=0;builtins::char ch=0;}
-    {builtins::int result=scanf("%lld%c", &number, &ch);}
-    {builtins::bool success = (result == 2 && (ch == 13 || ch == 10));}
+    {builtins:int number=0;builtins:char ch=0;}
+    {builtins:int result=scanf("%lld%c", &number, &ch);}
+    {builtins:bool success = (result == 2 && (ch == 13 || ch == 10));}
     if not success
         fail "user input was not an int" 
     return number
 
 def nat(console)
     doc "reads an unsigned integer from the console"
-    {builtins::nat number = 0; builtins::char ch = 0;}
-    {builtins::bool success = 0;}
-    {builtins::char first = getchar();}
-    {if(first != "-"[0] && first != EOF) {ungetc(first, stdin);builtins::int result = scanf("%lu%c", &number, &ch);success = (result == 2 && (ch == 13 || ch == 10));}}
+    {builtins:nat number = 0; builtins:char ch = 0;}
+    {builtins:bool success = 0;}
+    {builtins:char first = getchar();}
+    {if(first != "-"[0] && first != EOF) {ungetc(first, stdin);builtins:int result = scanf("%lu%c", &number, &ch);success = (result == 2 && (ch == 13 || ch == 10));}}
     if not success fail "user input was not a nat"
     return number
 
 def float(console)
     doc "reads a float from the console"
-    {builtins::float number = 0; builtins::char ch = 0;}
-    {builtins::int result = scanf("%lf%c", &number, &ch);}
-    {builtins::bool success = (result == 2 && (ch == 13 || ch == 10));}
+    {builtins:float number = 0; builtins:char ch = 0;}
+    {builtins:int result = scanf("%lf%c", &number, &ch);}
+    {builtins:bool success = (result == 2 && (ch == 13 || ch == 10));}
     if not success fail "user input was not a float"
     return number
 
@@ -68,7 +68,7 @@ def int(cstr|str _s)
         if i==len s fail "invalid int conversion from string with only a sign"
     while i<len s
         c = s[i]
-        {builtins::bool is_digit=c>='0' && c<='9'; builtins::int digit=c-'0';}
+        {builtins:bool is_digit=c>='0' && c<='9'; builtins:int digit=c-'0';}
         if not is_digit fail "invalid integer int from non-number string"
         number = number*int(10)+digit
         i = i+1
@@ -84,7 +84,7 @@ def nat(cstr|str _s)
     it = range len s
     while try i=next it
         c = s[i]
-        {builtins::bool is_digit=c>='0' && c<='9'; builtins::nat digit=c-'0';}
+        {builtins:bool is_digit=c>='0' && c<='9'; builtins:nat digit=c-'0';}
         if not is_digit fail "invalid nat conversion from non-number string"
         number = number*10+digit
     return const number
@@ -107,7 +107,7 @@ def float(cstr|str _s)
         if i==len s fail "invalid float conversion from string with only a sign"
     while i<len s
         c = s[i]
-        {builtins::bool is_digit=c>='0' && c<='9'; builtins::float digit=c-'0';}
+        {builtins:bool is_digit=c>='0' && c<='9'; builtins:float digit=c-'0';}
         is_dot = c==char "." 
         if is_dot
             i = i+1
@@ -120,7 +120,7 @@ def float(cstr|str _s)
         base = mut 0.1
         while i<len s
             d = s[i]
-            {builtins::bool is_decimal_digit=d>='0' && d<='9'; builtins::float decimal_digit=d-'0';}
+            {builtins:bool is_decimal_digit=d>='0' && d<='9'; builtins:float decimal_digit=d-'0';}
             if not is_decimal_digit fail "invalid float conversion from non-number string"
             number = number+decimal_digit*base
             base = base*0.1

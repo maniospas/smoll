@@ -173,7 +173,21 @@ class MemoryEmulator:
 
 
 def pretty_name(name: str):
-    return name.replace("__", ".")
+    parts = name.split("__")
+    last_good_part = 0
+    while last_good_part<len(parts):
+        if not parts[last_good_part]: break
+        last_good_part += 1
+    if last_good_part>=len(parts):
+        return ".".join(parts)
+    first_end_good_part = len(parts)
+    while first_end_good_part>last_good_part:
+        first_end_good_part -= 1
+        if not parts[first_end_good_part]: break        
+    ret = ".".join(parts[:(last_good_part+1)])+".."
+    if first_end_good_part<len(parts)-2:
+        ret += ".".join(parts[(first_end_good_part+2):])
+    return ret 
 
 temps: list[str]= list()
 def create_temp():
@@ -318,9 +332,9 @@ class Variable(CodeSegment):
     def renamed_copy(self, new_name: str): return Variable(new_name, self.type, self.immutable, self.isprivate, self._references)
     def mutable_copy(self, error_token): 
         if error_token and self.type==POINTER_TYPE and self.immutable: 
-            error_token.error("safety", "cannot make mutable an immutable pointer '"+pretty_name(self.name)+"'")
-        if error_token and self._references:
-            error_token.error("safety", "cannot make a reference mutable '"+pretty_name(self.name)+"' (perhaps try 'ref mut' instead of 'mut ret')")
+            error_token.error("safety", "cannot make mutable an immutable pointer '"+pretty_name(self.name)+"'", suggestions=["set the pointer or its data structure locally as a 'ref'; this fixes references to the original while mutating the rest", "if you know what you are doing, use 'unsafe_mut' instead to overwrite safety"])
+        if error_token and self._references: # this should not appear when 'mut' is used for both mutation and safe mutation
+            error_token.error("safety", "cannot make a reference mutable '"+pretty_name(self.name), suggestions=["use 'safe_mut' instead", "use 'ref mut' instead of 'mut ret'"])
         return Variable(self.name, self.type, False, self.isprivate, self._references)
     def immutable_copy(self): return Variable(self.name, self.type, True, False, self._references)
     def private_copy(self): return Variable(self.name, self.type, self.immutable, True, self._references)
@@ -361,7 +375,8 @@ def signature_like(vars: list[Variable], impl=None):
         elif type.is_buffer_of: 
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
             elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "const "
-            ret += type.is_buffer_of.name+"[]"+arg_name+" element size "+str(type.is_buffer_of.memory_size())
+            element_size = type.is_buffer_of.memory_size()
+            ret += type.is_buffer_of.name+"[]"+arg_name+" element size "+(str(element_size) if element_size else "?")
             i += len(type.rets)
         else:
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
@@ -633,8 +648,10 @@ class ImplementedType:
                 pass
             else: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'")
         if perform_immutability_checks and existing and existing.immutable: 
-            if not existing.type.builtin and "____" in varname: error_token.error("safety", "cannot overwrite immutable class instance '"+pretty_name(varname.split("____")[0])+"'")
-            else: error_token.error("safety", "cannot overwrite immutable variable '"+pretty_name(varname)+"'")
+            # allow overwrting a variable by itself, especially if the overwriting is a reference to the same thing
+            if (self.get_assignment(existing.stabilized_name(), [value[0].stabilized_name()]) or self.get_assignment(value[0].stabilized_name(), [existing.stabilized_name()])) or (existing.type==value[0].type and not existing.type.builtin): pass
+            elif not existing.type.builtin and "____" in varname: error_token.error("safety", "cannot overwrite immutable class instance '"+pretty_name(varname.split("____")[0])+"'")
+            else: error_token.error("safety", "cannot overwrite immutable variable '"+pretty_name(varname)+"' unless with itself or a directly equal value")
         if existing and existing._references is not None and value[0]._references!=existing._references and perform_immutability_checks:
             error_token.error("safety", "variable '"+pretty_name(existing.name.split("____")[0])+"' is an in-scope reference to '"+pretty_name(existing._references.split("____")[0])+"' and can only admit another reference to the same variable")
         if existing and not existing.immutable and value[0].immutable: 
@@ -661,10 +678,12 @@ class ImplementedType:
         accumulated_defer = self.accumulating_defers[-1].get(value[0].stabilized_name(), None)
         if accumulated_defer is not None:
             self.accumulating_defers[-1][existing.name] = accumulated_defer
-           
 
+        # TODO: this is risky but a huge optimization for code size if it can be made to work somehow (e.g., delegate to future invalidations by setting to dependent_assignments)
+        already_assigned = False#self.get_assignment(existing.stabilized_name(), [value[0].stabilized_name()])# or self.get_assignment(value[0].stabilized_name(), [existing.stabilized_name()])
+           
         self.dependent_assignments[existing.name] = value[0].stabilized_name()
-        if existing.type.builtin and (existing._references is None or not perform_immutability_checks): self.implementation.extend([existing, CODEWORD_EQUALS, value[0], CODEWORD_SEMICOLON])
+        if not already_assigned and existing.type.builtin and (existing._references is None or not perform_immutability_checks): self.implementation.extend([existing, CODEWORD_EQUALS, value[0], CODEWORD_SEMICOLON])
 
     def get_assignment(self, from_name: str, _to_name: list[str]):
         assert isinstance(from_name, str)
@@ -1561,7 +1580,10 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         gathered_vars: list[Variable] = list()
         for effect_var in callee.effect_names:
             for var in impl.vars.values():
-                if var.name==effect_var or var.name.startswith(effect_var+"__"): gathered_vars.append(var)
+                if var.name==effect_var or var.name.startswith(effect_var+"__"): 
+                    if var.stabilized_name() in impl.invalidated:
+                        error_token.error("safety", "'"+pretty_name(var.stabilized_name())+"' has been invalidated", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
+                    gathered_vars.append(var)
             if len(vars)+len(gathered_vars)>=len(callee.args): break
         gathered_vars.extend(vars)
         vars = gathered_vars
@@ -1577,7 +1599,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if not impl.used_error_codes: error_token.error("safety", "there is nothing to catch up to here")
         impl.has_caught_used_error_codes = True
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
-        if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if exists error=compiler::catch() print cstr error`")
+        if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if exists error=compiler:catch() print cstr error`")
         else: impl.is_parsing_a_try[-1] = None
         impl.implementation.extend([
             var,
@@ -1965,7 +1987,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
         # if is_lsp and type_start.file.is_main_file: print_lsp_keyword(type_start, "denotes a data literal")
         # pos += 1
     literal_tok = type_start#get(tokens, pos)
-    if literal_tok.is_string() and peek_text(tokens, pos+1)!="::":
+    if literal_tok.is_string() and peek_text(tokens, pos+1)!=":":
         if is_lsp and literal_tok.file.is_main_file: print_lsp_string(literal_tok)
         return pos+1, create_literal_type(literal_tok, CSTR_TYPE)
     if literal_tok.is_uint():
@@ -1978,7 +2000,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
         if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "a float value")
         return pos+1, create_literal_type(literal_tok, FLOAT_TYPE)
         #literal_tok.error("type", "a 'literal' definition can only be followed by a number or string literal, not an expession")
-    if peek_text(tokens, pos+1)!="::":
+    if peek_text(tokens, pos+1)!=":":
         if name in operators: tokens[pos].error("syntax", "the previous expression has ended")
         type: UnionType|None = file.types.get(name, None)
         if type is None: 
@@ -2003,31 +2025,31 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                         max_candidate_common_length = common_length
                     if common_length==max_candidate_common_length: 
                         candidates.append(variation)
-            if file==tokens[pos].file: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\"::"+k for k in file.namespaces])
+            if file==tokens[pos].file: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\":"+k for k in file.namespaces])
             
             namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
-            if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\"::"+k for k in file.namespaces])
+            if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\":"+k for k in file.namespaces])
             assert namespace is not None
-            if peek_text(tokens, pos+3)=="::":
+            if peek_text(tokens, pos+3)==":":
                 return process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations)
             return pos+1, namespace
             
-            #tokens[pos].error("type", "unknown type '\""+file.path+"\"::"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\"::"+k for k in file.namespaces])
+            #tokens[pos].error("type", "unknown type '\""+file.path+"\":"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\":"+k for k in file.namespaces])
         assert type is not None
         if peek_text(tokens, pos+1)=="[":
             at_pos = get(tokens, pos+1)
             if get(tokens, pos+2).text!="]": at_pos.error("syntax", "to denote a buffer type use '[]'")
             buffer_type: UnionType|None = buffer_types[type] if type in buffer_types else None
             if buffer_type is None:
-                buffer_type = UnionType(type.name+"__temp_buffer", at=type.at)
+                buffer_type = UnionType(type.name+"____temp_buffer", at=type.at)
                 unique_variations = find_unique_variations(type.variations) if reduce_to_unique_variations else type.variations
                 #unique_variations = type.variations
                 #if len(unique_variations)!=1: at_pos.error("safety", "it is not clear which version should be used for '"+type.name+"[]'", suggestions=[candidate.signature() for candidate in unique_variations])
                 for variation in unique_variations:
                     variation_buffer_type = buffer_types.get(type, None)
                     if variation_buffer_type is None:
-                        actual_variation = create_buffer_type(buffer_type.name+"__buffer", str(variation.memory_size()), variation, get(tokens, pos))
-                        variation_buffer_type = UnionType(buffer_type.name+"__temp_buffer", at=variation.at)
+                        actual_variation = create_buffer_type(buffer_type.name+"____buffer", str(variation.memory_size()), variation, get(tokens, pos))
+                        variation_buffer_type = UnionType(buffer_type.name+"____temp_buffer", at=variation.at)
                         variation_buffer_type.append(actual_variation)
                         buffer_types[variation] = variation_buffer_type
                     buffer_type.variations.extend(variation_buffer_type.variations)
@@ -2082,11 +2104,14 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
 
         return pos+1, type
     namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
-    if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\"::"+k for k in file.namespaces])
+    if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\":"+k for k in file.namespaces])
     assert namespace is not None
     return process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations)
 
 def process_linear_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False, reduce_to_unique_variations: bool=True) -> tuple[int, UnionType]:
+    parentheses = peek_text(tokens, pos)=="("
+    if parentheses: pos += 1
+    start_pos = pos
     prev_pos = pos
     pos, tmptype = process_type(file, tokens, pos, show_lsp, reduce_to_unique_variations=reduce_to_unique_variations)
     if not isinstance(tmptype, UnionType): tokens[prev_pos].error("type", "expecting a type instead of namespace")
@@ -2101,6 +2126,25 @@ def process_linear_type(file: File, tokens: list[Token], pos: int, show_lsp: boo
         ret.variations.extend(alternatives.variations)
         ret.variations = list(set(ret.variations))
         type = ret
+    elif peek_text(tokens, pos) == "&":
+        if is_lsp and get(tokens, pos).file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "common elements of the type unions")
+        prev_pos = pos
+        pos, alternatives = process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=reduce_to_unique_variations)
+        ret = UnionType(type.name+"&"+alternatives.name, at=get(tokens, prev_pos))
+        alternative_variations = set(alternatives.variations)
+        ret.variations = [variation for variation in type.variations if variation in alternative_variations]
+        type = ret
+    elif peek_text(tokens, pos) == "\\":
+        if is_lsp and get(tokens, pos).file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "exclude elements of the right type union from the left")
+        prev_pos = pos
+        pos, alternatives = process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=reduce_to_unique_variations)
+        ret = UnionType(type.name+"\\"+alternatives.name, at=get(tokens, prev_pos))
+        alternative_variations = set(alternatives.variations)
+        ret.variations = [variation for variation in type.variations if variation not in alternative_variations]
+        type = ret
+    if parentheses:
+        if peek_text(tokens, pos)!=")": get(tokens, start_pos-1).error("type", "unclosed type definition parenthesis")
+        pos += 1
     return pos, type
 
 def skip_statement(file: File, tokens: list[Token], pos: int):
@@ -2582,7 +2626,7 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
     current_token = get(tokens, pos)
     current = current_token.text
     if current=="fail":
-        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**fail**\n\nImmediately fail during execution with the corresponding string literal message or error code retrieved with 'compiler::catch()' from some other failure statement. Failures cascade to callers and to the callers of callers until the program exits with a corresponding error code, or a 'try' statement intercepts them.")
+        if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**fail**\n\nImmediately fail during execution with the corresponding string literal message or error code retrieved with 'compiler:catch()' from some other failure statement. Failures cascade to callers and to the callers of callers until the program exits with a corresponding error code, or a 'try' statement intercepts them.")
         pos += 1
         impl.needs_failure_mode = True
         message = get(tokens, pos)
@@ -2745,10 +2789,12 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         tmp = create_temp()
         impl.assign(tmp, ret, current_token)
         ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
-        return process_statement_operator(file, tokens, impl, pos, [r.mutable_copy(tokens[prev_pos]) for r in ret], current_operator_priority)
+        if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references define with 'ref' are skipped when adding mutation with 'mut' but the current value consists only of references")
+        mutated = [r.mutable_copy(tokens[prev_pos]) if r.stabilized_name()==r.name else r for r in ret]
+        return process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
     if current=="try":
         def process_try(pos: int):
-            if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**try**\n\nTries to execute the rest of the statement without failing. The result is a true or false boolean value, depending on whether an error occurred or not; the error's value is retrieved by the next 'compiler::caught()'. If more than one failing function calls are encountered in the expression, an error is created so that each is handled autonomously through assignment to intermediate variables.")
+            if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**try**\n\nTries to execute the rest of the statement without failing. The result is a true or false boolean value, depending on whether an error occurred or not; the error's value is retrieved by the next 'compiler:caught()'. If more than one failing function calls are encountered in the expression, an error is created so that each is handled autonomously through assignment to intermediate variables.")
             tmp = create_temp()
             var = Variable(tmp, BOOL_TYPE)
             impl.vars[tmp] = var
@@ -2785,6 +2831,12 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         # impl.assign(tmp, [r.stable_copy() for r in ret], current_token)
         # ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
         return process_statement_operator(file, tokens, impl, pos, [r.stable_copy() for r in ret], current_operator_priority)
+    # if current=="partial_mut":
+    #     if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**reference**\n\nTracks changes to the referenced value, such as buffer modifications, and makes all subsequent usage of the value (even implicit usage) use the referenced value. References are unpacked into actual independent values during returns.")
+    #     prev_pos = pos
+    #     pos, ret = process_statement(file, tokens, pos+1, impl, current_operator_priority)
+    #     ret = impl.stabilize(ret, on)
+    #     return process_statement_operator(file, tokens, impl, pos, [r.stable_copy() for r in ret], current_operator_priority)
     if current=="unsafe_mut":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**unsafe mutability**\n\nDeclares that the following value will be treated as mutable, even if that is unsafe (fields and pointer contents may modified). This does NOT create an error if the conversion to mutable is unsafe. YOU HAVE BEEN WARNED.")
         prev_pos = pos
@@ -3018,7 +3070,7 @@ def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedTyp
                     variable = Variable(varname, rets[0].type)
                     impl.vars[varname] = variable
                     impl.implementation.append(variable)
-                elif tok.text=="builtins" and peek_text(tokens, pos+1)=="::":
+                elif tok.text=="builtins" and peek_text(tokens, pos+1)==":":
                     pos += 2
                     pos, type = process_type(file_cache["builtins"], tokens, pos)
                     if not isinstance(type, UnionType): get(tokens, pos).error("type", "only builtin types can be unpacked here but found file '"+pretty_name(type.path)+"'")
@@ -3323,8 +3375,8 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         name = prev_name
         imported.path = name
     pos += 1
-    if peek_text(tokens, pos)=="::":
-        if not isinstance(imported, File): get(tokens, pos).error("import", "expecting file before '::' but got type '"+name+"'")
+    if peek_text(tokens, pos)==":":
+        if not isinstance(imported, File): get(tokens, pos).error("import", "expecting file before ':' but got type '"+name+"'")
         assert isinstance(imported, File)
         pos, imported = process_type(imported, tokens, pos - 1) # go back and process properly
     as_mode = peek_text(tokens, pos)=="as"
@@ -3526,13 +3578,15 @@ def process_union(file: File, tokens: list[Token], pos: int):
     if get(tokens,pos).text!="=": tokens[pos].error("syntax", "expecting '='")
     pos += 1
     union_type: UnionType = UnionType(union_name, at=start_token)
-    while True:
-        pos, variation = process_type(file, tokens, pos)
-        if not isinstance(variation, UnionType): break
-        union_type.variations.extend(variation.variations)
-        if peek_text(tokens, pos)!="|": break
-        if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_keyword(get(tokens, pos), "either of the types")
-        pos += 1
+    pos, linear_type = process_linear_type(file, tokens, pos, reduce_to_unique_variations=False)
+    union_type.variations.extend(linear_type.variations)
+    # while True:
+    #     pos, variation = process_type(file, tokens, pos)
+    #     if not isinstance(variation, UnionType): break
+    #     union_type.variations.extend(variation.variations)
+    #     if peek_text(tokens, pos)!="|": break
+    #     if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_keyword(get(tokens, pos), "either of the types")
+    #     pos += 1
     file.types[union_name] = union_type
     return pos
 
@@ -3966,7 +4020,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     found_error_codes: set[int] = set()
     for main_def in main_defs: found_error_codes = found_error_codes.union(main_def.gather_spawned_error_codes(visited_defs_for_error_codes))
 
-    # TODO: the following breaks due to compiler::catch() handling in _call(...)
+    # TODO: the following breaks due to compiler:catch() handling in _call(...)
     effective_err_code_list = err_code_list#[element for element in enumerate(err_code_list)]# if pos in found_error_codes else "0" for pos, element in enumerate(err_code_list)]
     effective_err_code_list_size = len(effective_err_code_list)
     while effective_err_code_list_size and effective_err_code_list[effective_err_code_list_size-1]=="0":

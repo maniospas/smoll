@@ -26,51 +26,51 @@ def is_different(Number x, Number y)
 def eq(Number x, Number y)
     doc "equal to"
     if is_different(x,y)
-        compiler::skip()
-    {builtins::bool z = x==y;}
+        compiler:skip()
+    {builtins:bool z = x==y;}
     return z
 
 def neq(Number x, Number y)
     doc "unequal to"
     if is_different(x,y)
-        compiler::skip()
-    {builtins::bool z = x!=y;}
+        compiler:skip()
+    {builtins:bool z = x!=y;}
     return z
 
-def eq(compiler::catch x, compiler::catch y)
-    {builtins::bool z=(x==y);}
+def eq(compiler:catch x, compiler:catch y)
+    {builtins:bool z=(x==y);}
     return z
 
-def neq(compiler::catch x, compiler::catch y)
-    {builtins::bool z=(x!=y);}
+def neq(compiler:catch x, compiler:catch y)
+    {builtins:bool z=(x!=y);}
     return z
 
 def eq(any ptr x, any ptr y)
-    {builtins::bool z=(x==y);}
+    {builtins:bool z=(x==y);}
     return z
 
 def neq(any ptr x, any ptr y)
-    {builtins::bool z=(x!=y);}
+    {builtins:bool z=(x!=y);}
     return z
 
 def add(Number x, Number y)
     doc "add"
     if is_different(x,y)
-        compiler::skip()
+        compiler:skip()
     {type(x) z=x+y;}
     return z
 
 def mul(Number x, Number y)
     doc "multiply with"
     if is_different(x,y)
-        compiler::skip()
+        compiler:skip()
     {type(x) z=x*y;}
     return z
 
 def div(Number x, Number y)
     doc "divide by"
     if is_different(x,y)
-        compiler::skip()
+        compiler:skip()
     {type(x) zero = 0;}
     if y==zero
         fail "division by zero "
@@ -88,35 +88,35 @@ def mod(nat x, nat y)
 def lt(Number x, Number y)
     doc "less than"
     if is_different(x,y)
-        compiler::skip()
-    {builtins::bool z = x<y;}
+        compiler:skip()
+    {builtins:bool z = x<y;}
     return z
 
 def gt(Number x, Number y)
     doc "greater than"
     if is_different(x,y)
-        compiler::skip()
-    {builtins::bool z = x>y;}
+        compiler:skip()
+    {builtins:bool z = x>y;}
     return z
 
 def le(Number x, Number y)
     doc "less than or equal to"
     if is_different(x,y)
-        compiler::skip()
-    {builtins::bool z = x<=y;}
+        compiler:skip()
+    {builtins:bool z = x<=y;}
     return z
 
 def ge(Number x, Number y)
     doc "greater than or equal to"
     if is_different(x,y)
-        compiler::skip()
-    {builtins::bool z = x>=y;}
+        compiler:skip()
+    {builtins:bool z = x>=y;}
     return z
     
 def sub(Number x, Number y)
     doc "substract by"
     if is_different(x,y) 
-        compiler::skip()
+        compiler:skip()
     if x is nat
         doc ""
     if x is nat and x<y

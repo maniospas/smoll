@@ -1,20 +1,19 @@
-import "std/core.s"
-import "std/vec.s"
+import "std/core.s" # defines Number
 
-def safe_main()
-    allocator = (mut float[]).alloc(200).bufpos()
-    v1 = new().vec 10
-    v2 = new().vec 10
-    v1[0] = 1.0
-    v2[0] = 2.0
+def natpair(nat x, nat y)
+def float(natpair a)
+    x = float a.x
+    y = float a.y
+    return (x,y)
 
-    it = range 5
-    v = vec 10
-    while try i=next it
-        v3 = (v1+v2+v)*2.0
-    print v3[0]
-    
+def inc(float&Number x) # would try and fail to create it for the previous method's output
+    return 1.0+x
+
+def inc(float\Number a) # already defined for Number
+    x = 1.0+float a.x
+    y = 1.0+float a.y
+    return (x,y)
+
 def main()
-    try safe_main()
-    if try error=compiler::catch()
-        print cstr error
+    print inc(1.0)  # print 2.0
+    print inc(4.0,4.0).x # prints 5.0

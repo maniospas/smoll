@@ -157,7 +157,7 @@ and fail to compile if these are not present.</p>
 </div>
 
 <p>You can also import a file as a namespace to access its
-contents with the <code>::</code> notation. This is more verbose
+contents with the <code>:</code> notation. This is more verbose
 but unambiguous, like below. You can even access namespaces
 defined within the imported namespace.</p>
 
@@ -165,18 +165,18 @@ defined within the imported namespace.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">core</span><span class="p">::</span><span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="n">core</span><span class="p">:</span><span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
 </code></pre>
 </div>
 
-<p>If you want to import something specific, use <code>::</code> within
+<p>If you want to import something specific, use <code>:</code> within
 the import statement. You can use the path instead of the
 namespace name too, for example to bring a single function 
 from a file.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">core</span><span class="p">::</span><span class="nb">print</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">core</span><span class="p">:</span><span class="nb">print</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
@@ -217,12 +217,12 @@ within namespaces.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="c1"># an atypical import structure for demonstration</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">core</span><span class="p">::</span><span class="nb">print</span>  <span class="c1"># import print symbol</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">core</span><span class="p">:</span><span class="nb">print</span>  <span class="c1"># import print symbol</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">x1</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">x2</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">core</span><span class="p">::</span><span class="n">add</span> <span class="mi">1</span>
-    <span class="nb">print</span> <span class="n">x2</span><span class="o">.</span><span class="n">core</span><span class="p">::</span><span class="n">add</span> <span class="mi">2</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">core</span><span class="p">:</span><span class="n">add</span> <span class="mi">1</span>
+    <span class="nb">print</span> <span class="n">x2</span><span class="o">.</span><span class="n">core</span><span class="p">:</span><span class="n">add</span> <span class="mi">2</span>
 </code></pre>
 </div>
 
@@ -500,7 +500,7 @@ as recursive.</p>
 <p>Declare alternatives between types (unions) by separating them
 with <code>|</code>. Below is an example that defines a function for
 adding either a float or an integer to a float. The brackets
-are used to add some C code, inside which <code>builtins::float</code> is
+are used to add some C code, inside which <code>builtins:float</code> is
 injected by <em>smoλ</em> as the appropriate builtin type. </p>
 
 <p>The exemplified functionality of adding any two numbers together
@@ -516,7 +516,7 @@ will be added in the future.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span> <span class="n">y</span><span class="p">)</span>
-    <span class="p">{</span><span class="n">builtins</span><span class="p">::</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
+    <span class="p">{</span><span class="n">builtins</span><span class="p">:</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
     <span class="k">return</span> <span class="n">z</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -534,7 +534,7 @@ An example follows.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Number</span> <span class="o">=</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="nb">id</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="n">Number</span> <span class="n">x</span><span class="p">,</span> <span class="n">Number</span> <span class="n">y</span><span class="p">)</span>
-    <span class="p">{</span><span class="n">builtins</span><span class="p">::</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
+    <span class="p">{</span><span class="n">builtins</span><span class="p">:</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
     <span class="k">return</span> <span class="n">z</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -594,8 +594,8 @@ can be a string or number literal.</p>
 Those includes union declarations and having associated variables
 holding their value when used as function arguments.</p>
 
-<p>Get back the associated value with the <code>compiler::literal</code> function. 
-That is, <code>compiler::literal type "two"</code> yields <code>"two"</code>.
+<p>Get back the associated value with the <code>compiler:literal</code> function. 
+That is, <code>compiler:literal type "two"</code> yields <code>"two"</code>.
 The benefit lies purely in extracting values from the type system.
 An example that restricts how functions are called is presented next.</p>
 
@@ -605,7 +605,7 @@ An example that restricts how functions are called is presented next.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">inc</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">inc</span> <span class="ow">is</span> <span class="n">blank</span>
         <span class="n">inc</span> <span class="o">=</span> <span class="nb">type</span> <span class="mi">1</span> <span class="c1"># literal convertible</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">literal</span> <span class="n">inc</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">inc</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="nb">print</span> <span class="n">inc</span> <span class="mi">0</span>           <span class="c1"># prints 1</span>
@@ -646,7 +646,7 @@ to several runtime checks.</p>
 <p>You can use the <code>[value] is [type]</code> operator to check that a value/tuple
 adheres to at least one variation of a union. When no literal types are involved
 (and sometimes when they are), the result is not merely a boolean, 
-but in fact of type <code>compile::true</code> or <code>compile::false</code>;
+but in fact of type <code>compile:true</code> or <code>compile:false</code>;
 these values are significant because they let <em>smoλ</em> identify 
 whether conditions will always be true or false and <strong>eliminate code without parsing it</strong>.</p>
 
@@ -687,7 +687,7 @@ either an increment value of one, or a value provided as second argument. </p>
 </code></pre>
 </div>
 
-<p>Here is a much more complicated scenario, where <code>compiler::skip()</code> 
+<p>Here is a much more complicated scenario, where <code>compiler:skip()</code> 
 is used to prevent certain versions of the function from being
 created (e.g. there is no <code>inc(float,int)</code>). The example also shows 
 two type inference constructs: </p>
@@ -709,7 +709,7 @@ zero-cost abstractions in that they never occur during execution.</p>
     <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">blank</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">type</span> <span class="n">Num</span><span class="o">-&gt;</span><span class="n">x</span> <span class="mi">1</span> <span class="c1"># one with the same number format as x</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">is</span> <span class="nb">type</span> <span class="n">x</span>
-        <span class="n">compiler</span><span class="p">::</span><span class="n">skip</span><span class="p">()</span> <span class="c1"># skip invalid &#39;inc&#39; definitions</span>
+        <span class="n">compiler</span><span class="p">:</span><span class="n">skip</span><span class="p">()</span> <span class="c1"># skip invalid &#39;inc&#39; definitions</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">value</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -976,7 +976,7 @@ You can manually <code>fail</code> like so:</p>
 <strong>Don&#8217;t care about failures. Unless you must.</strong> That is, assume correct execution,
 as if you were scripting, and only handle failures at places where they can be handled
 safely or where they would be critical. If it is important to ensure that 
-a function does not fail up to a certain point, place the <code>debug::nocatch()</code> 
+a function does not fail up to a certain point, place the <code>debug:nocatch()</code> 
 assertion. There are various other compiler assertions too, which are covered later.</p>
 
 <div class="codehilite">
@@ -987,7 +987,7 @@ assertion. There are various other compiler assertions too, which are covered la
     <span class="k">try</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">char</span> <span class="s2">&quot;a&quot;</span> <span class="c1"># still needs a try for buffer elements - though checks can be optimized away</span>
     <span class="k">try</span> <span class="nb">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="nb">print</span> <span class="s2">&quot;this must run at all costs&quot;</span>
-    <span class="n">debug</span><span class="p">::</span><span class="n">nocatch</span><span class="p">()</span>    <span class="c1"># error if without &#39;try&#39; on all PREVIOUS calls that could fail</span>
+    <span class="n">debug</span><span class="p">:</span><span class="n">nocatch</span><span class="p">()</span>    <span class="c1"># error if without &#39;try&#39; on all PREVIOUS calls that could fail</span>
     <span class="nb">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">10000</span><span class="p">]</span>      <span class="c1"># allowed to fail now</span>
     <span class="nb">print</span> <span class="s2">&quot;this will never run due to out of bounds error&quot;</span>
 </code></pre>
@@ -1073,10 +1073,10 @@ open files and processes.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">::</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">::</span><span class="n">read</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
     <span class="k">del</span> <span class="n">proc</span> <span class="c1"># runs the process&#39;s defer, which waits for completion</span>
     <span class="nb">print</span> <span class="s2">&quot;bye!&quot;</span>
 </code></pre>
@@ -1084,7 +1084,7 @@ open files and processes.</p>
 
 <h2 id="catching-errors">catching errors</h2>
 
-<p>The <code>compiler::catch()</code> function provides the means of retrieving
+<p>The <code>compiler:catch()</code> function provides the means of retrieving
 an error code intercepted by <code>try</code> statements. This function creates
 an error itself if it <em>fails</em> to find an error. To avoid confusion, the
 compiler just mandates that you should wrap the catch function inside a <code>try</code> 
@@ -1097,7 +1097,7 @@ simultaneously.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="k">try</span> <span class="nb">print</span> <span class="mi">2</span><span class="o">*</span><span class="mi">3</span><span class="o">-</span><span class="mi">20</span> <span class="c1"># nat cannot become negative</span>
-    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="s2">&quot;cannot substract two nat numbers and obtain a negative result&quot;</span>
 </code></pre>
 </div>
@@ -1112,17 +1112,17 @@ But, importantly, they <em>are</em> obtained from deferred statements triggered 
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">::</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">bye_error</span><span class="p">()</span>
     <span class="n">fail</span> <span class="s2">&quot;bye!&quot;</span> 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">::</span><span class="n">read</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
     <span class="k">try</span> <span class="n">bye_error</span><span class="p">()</span>
     <span class="k">del</span> <span class="n">proc</span>
 
-    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span> <span class="c1"># prints &#39;bye!&#39; if no process error</span>
         <span class="n">fail</span> <span class="n">error</span>       <span class="c1"># can fail with error codes too</span>
 </code></pre>
@@ -1132,15 +1132,15 @@ But, importantly, they <em>are</em> obtained from deferred statements triggered 
 
 <div class="notice-box box-warning"><strong>Warning:</strong> This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.</div>
 
-<p>So far there was mention of <code>compiler::skip()</code>, 
-<code>compiler::catch()</code>, <code>compiler::literal(expression)</code> and <code>debug::nocatch()</code>
+<p>So far there was mention of <code>compiler:skip()</code>, 
+<code>compiler:catch()</code>, <code>compiler:literal(expression)</code> and <code>debug:nocatch()</code>
 that let code interface with the compiler to an extend.</p>
 
 <p>There are some more mechanisms that help inspect
 programs or grant access to internal compilation state that
 can be analyzed for debugging.</p>
 
-<p>Foremost of debugging tools is <code>debug::print(expression)</code>. This 
+<p>Foremost of debugging tools is <code>debug:print(expression)</code>. This 
 runs an expression, prints its return at compile time, 
 and returns its value. It works this way so that it can 
 be effortlessly interweaved in code. Do note that you
@@ -1153,14 +1153,14 @@ For example, one pattern usable for debuggining is the following.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">s1</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s1&quot;</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s2&quot;</span>
-    <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;--- main ---&quot;</span> <span class="c1"># prints &#39;&quot;--- main ---&quot;&#39; at compile time</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>         <span class="c1"># prints &#39;const str, const str&#39; at compile time</span>
+    <span class="n">debug</span><span class="p">:</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;--- main ---&quot;</span> <span class="c1"># prints &#39;&quot;--- main ---&quot;&#39; at compile time</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">debug</span><span class="p">:</span><span class="nb">print</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>         <span class="c1"># prints &#39;const str, const str&#39; at compile time</span>
     <span class="nb">print</span> <span class="n">s</span> <span class="c1"># ERROR due to undefined print, but the above still prints</span>
 </code></pre>
 </div>
 
 <p>Finally, assert that a specific point in a function does not lie within a loop
-or condition with the <code>debug::branchless()</code> check. This helps form sanity check within 
+or condition with the <code>debug:branchless()</code> check. This helps form sanity check within 
 conditional compilation conditions, ensuring that
 they are not accidentally evaluated at runtime. The next example uses it to verify that 
 there is no runtime overhead from a particular comparison involving enums.</p>
@@ -1177,8 +1177,8 @@ there is no runtime overhead from a particular comparison involving enums.</p>
     <span class="n">c</span> <span class="o">=</span> <span class="s2">&quot;one&quot;</span>
     <span class="n">test</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">test</span> <span class="ow">is</span> <span class="n">test1</span><span class="o">|</span><span class="n">test2</span>
-        <span class="n">debug</span><span class="p">::</span><span class="n">branchless</span><span class="p">()</span>
-        <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;invalid data&quot;</span> <span class="c1"># literal type to print the message instead of &#39;cstr&#39;</span>
+        <span class="n">debug</span><span class="p">:</span><span class="n">branchless</span><span class="p">()</span>
+        <span class="n">debug</span><span class="p">:</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;invalid data&quot;</span> <span class="c1"># literal type to print the message instead of &#39;cstr&#39;</span>
 </code></pre>
 </div>
 
@@ -1317,12 +1317,12 @@ argument to directly read on the buffer and progress the position.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">::</span><span class="n">file</span> <span class="k">as</span> <span class="n">file</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">file</span> <span class="k">as</span> <span class="n">file</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">::</span><span class="n">read</span> <span class="s2">&quot;README.md&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;README.md&quot;</span>
     <span class="n">mem</span> <span class="o">=</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># max 4 KB chunk size, on char[] by default</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="p">::</span><span class="n">line</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">line</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;&quot;</span>
@@ -1336,10 +1336,10 @@ argument to directly read on the buffer and progress the position.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span> <span class="k">as</span> <span class="n">io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="p">::</span><span class="n">file</span><span class="p">::</span><span class="n">write</span> <span class="s2">&quot;tmp.txt&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="p">:</span><span class="n">file</span><span class="p">:</span><span class="n">write</span> <span class="s2">&quot;tmp.txt&quot;</span>
     <span class="n">f</span><span class="o">.</span><span class="n">print</span> <span class="s2">&quot;hello world&quot;</span>
     <span class="n">defer</span> 
-        <span class="n">io</span><span class="p">::</span><span class="nb">dir</span><span class="p">::</span><span class="n">remove</span> <span class="s2">&quot;tmp.txt&quot;</span>
+        <span class="n">io</span><span class="p">:</span><span class="nb">dir</span><span class="p">:</span><span class="n">remove</span> <span class="s2">&quot;tmp.txt&quot;</span>
 </code></pre>
 </div>
 
@@ -1348,14 +1348,14 @@ operations. Below is how to iterate through directory contents.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">::</span><span class="nb">dir</span> <span class="k">as</span> <span class="nb">dir</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="nb">dir</span> <span class="k">as</span> <span class="nb">dir</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="nb">dir</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">dir</span><span class="p">::</span><span class="n">read</span> <span class="s2">&quot;.&quot;</span>
+    <span class="nb">dir</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">dir</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;.&quot;</span>
     <span class="n">buf</span> <span class="o">=</span> <span class="n">alloc</span> <span class="mi">128</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">entry</span><span class="o">=</span><span class="nb">dir</span><span class="p">::</span><span class="n">entry</span> <span class="nb">dir</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">entry</span><span class="o">=</span><span class="nb">dir</span><span class="p">:</span><span class="n">entry</span> <span class="nb">dir</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">dir</span><span class="p">::</span><span class="n">is_file</span> <span class="n">entry</span>
+        <span class="k">if</span> <span class="nb">dir</span><span class="p">:</span><span class="n">is_file</span> <span class="n">entry</span>
             <span class="nb">print</span> <span class="s2">&quot;file&quot;</span>
         <span class="k">else</span>
             <span class="nb">print</span> <span class="s2">&quot;dir&quot;</span>
@@ -1369,7 +1369,7 @@ that fails on non-zero error code can be evoked like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">::</span><span class="n">process</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">success</span> <span class="o">=</span> <span class="k">try</span> <span class="n">system</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
@@ -1381,12 +1381,12 @@ that fails on non-zero error code can be evoked like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">::</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">::</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">:</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
     <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># example with growing position</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">line</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">proc</span><span class="p">::</span><span class="n">line</span> <span class="n">process</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">line</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">proc</span><span class="p">:</span><span class="n">line</span> <span class="n">process</span>
         <span class="nb">print</span> <span class="n">line</span>
 </code></pre>
 </div>
@@ -1394,18 +1394,18 @@ that fails on non-zero error code can be evoked like below.</p>
 <p>Equivalently, manually release the process to wait for its conclusions.
 Recall that running processes can create errors, while resource release
 code may intercepts those errors with <code>try</code> so that
-they can be retrieved with <code>compiler::catch()</code>. 
+they can be retrieved with <code>compiler:catch()</code>. 
 To repropagate or otherwise
 handle the intercepted errors, use a pattern like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">::</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">::</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">:</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
     <span class="k">del</span> <span class="n">process</span>
-    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
         <span class="n">fail</span> <span class="n">error</span> <span class="c1"># can fail on error codes too</span>
 </code></pre>
 </div>
@@ -1419,7 +1419,7 @@ handle the intercepted errors, use a pattern like below.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/rand.s&quot;</span> <span class="k">as</span> <span class="n">rand</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">rand</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">rand</span><span class="p">::</span><span class="n">Rand</span><span class="p">()</span>
+    <span class="n">rand</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">rand</span><span class="p">:</span><span class="n">Rand</span><span class="p">()</span>
     <span class="nb">print</span> <span class="nb">next</span> <span class="n">rand</span>
 </code></pre>
 </div>
@@ -1463,28 +1463,28 @@ when organized in a string buffer.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/mini.s&quot;</span> <span class="k">as</span> <span class="n">mini</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="n">mini</span><span class="p">::</span><span class="nb">str</span><span class="p">[]</span> <span class="n">buff</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[]</span> <span class="n">buff</span><span class="p">)</span>
     <span class="n">mem</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">mut</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
     <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">pos</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="nb">iter</span>
-        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">::</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot; &quot;</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">buf</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">mem</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buff</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">6</span>
-    <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="n">buff</span> <span class="c1"># print the buffer type during compilation</span>
-    <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;hi&quot;</span>
-    <span class="n">buff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;my&quot;</span>
-    <span class="n">buff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;name&quot;</span>
-    <span class="n">buff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;is&quot;</span>
-    <span class="n">buff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="s2">&quot;manios&quot;</span>
-    <span class="n">buff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">::</span><span class="nb">str</span> <span class="n">concat</span> <span class="n">buff</span>
+    <span class="n">buff</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">6</span>
+    <span class="n">debug</span><span class="p">:</span><span class="nb">print</span> <span class="n">buff</span> <span class="c1"># print the buffer type during compilation</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;hi&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;my&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;name&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;is&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;manios&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="n">concat</span> <span class="n">buff</span>
     <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
         <span class="nb">print</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
-        <span class="nb">print</span> <span class="n">mini</span><span class="p">::</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="nb">print</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 </code></pre>
 </div>
 

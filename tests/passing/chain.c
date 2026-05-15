@@ -4,9 +4,9 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp1221v="123";
+const char* const __temp1223v="123";
 const char* const __temp363v="\n";
-static const char* __temp_all_errcodes[29] = {"noerr",
+static const char* __temp_all_errcodes[30] = {"noerr",
 "error",
 "division by zero ",
 "modulo by zero ",
@@ -19,6 +19,7 @@ static const char* __temp_all_errcodes[29] = {"noerr",
 "cannot resize buffers with alloc; it promises no data reallocation",
 "cannot resize an unallocated or freed buffer",
 "out of bounds",
+"can only define strings on contiguous buffers",
 "string does not fit on buffer",
 "character copy does not fit on buffer",
 "string buffer out of memory",
@@ -37,12 +38,12 @@ static const char* __temp_all_errcodes[29] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__temp756v(const char* x, const char* y, char* __temp1224v) {
+static inline __attribute__((always_inline)) void eq__temp758v(const char* x, const char* y, char* __temp1226v) {
   char z=0;
   z=(x==y);
   goto __temp_return;
   __temp_return:
-  *__temp1224v=z;
+  *__temp1226v=z;
 }
 
 static inline __attribute__((always_inline)) void print__temp378v(char value) {
@@ -57,10 +58,10 @@ static inline __attribute__((always_inline)) void print__temp378v(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__temp1220v() {
-  char __temp1222v__=0;
-  eq__temp756v(__temp1221v,__temp1221v,&__temp1222v__);
-  print__temp378v(__temp1222v__);
+static inline __attribute__((always_inline)) void main__temp1222v() {
+  char __temp1224v__=0;
+  eq__temp758v(__temp1223v,__temp1223v,&__temp1224v__);
+  print__temp378v(__temp1224v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1220v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1222v();return 0;}

@@ -10,7 +10,7 @@ def inc(nat x, "two")
     return x+2
 
 def which(OPTIONS option)
-    print compiler::literal option
+    print compiler:literal option
 
 def main()
     lit = type "one"

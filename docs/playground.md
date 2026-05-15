@@ -78,8 +78,8 @@ function filterTraceback(lines){
 
 function __initPatch(src) {
   var PATCH_CODE = `
-async def download_with_progress(url, filepath, message):
-    from pyodide.http import pyfetch
+def download_with_progress(url, filepath, message):
+    from pyodide.http import pyxhr
     import base64, os
     cached = _js_cache_get(url)
     if cached is not None:
@@ -87,7 +87,7 @@ async def download_with_progress(url, filepath, message):
         data = base64.b64decode(cached)
     else:
         print(f"[{YELLOW}+{RESET}] {message} ...")
-        response = await pyfetch(url)
+        response = pyxhr.get(url)
         if response.status != 200:
             raise RuntimeError(f"Failed to fetch {url}: HTTP {response.status}")
         data = await response.bytes()
@@ -96,7 +96,7 @@ async def download_with_progress(url, filepath, message):
     with open(filepath, "wb") as f:
         f.write(data)
 `;
-  var idx = src.indexOf('async def download_with_progress(');
+  var idx = src.indexOf('def download_with_progress(');
   if (idx === -1) { console.warn('smoll patch: marker not found'); return src; }
   var end = src.indexOf('print()') + 7;
   return src.slice(0, idx) + PATCH_CODE + src.slice(end);

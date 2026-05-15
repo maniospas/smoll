@@ -4138,4 +4138,5 @@ def is_event_loop_running():
     except RuntimeError: return False
 if is_event_loop_running():
     asyncio.create_task(main())
-else: main()
+else:
+    asyncio.run(main())

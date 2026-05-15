@@ -4131,12 +4131,4 @@ def main():
             os._exit(0) # not in lsp case, as it inteferes with the stdout pipe
 
 # compatibility with pyodine
-def is_event_loop_running():
-    try:
-        asyncio.get_running_loop()
-        return True
-    except RuntimeError: return False
-if is_event_loop_running():
-    asyncio.create_task(main())
-else:
-    asyncio.run(main())
+main()

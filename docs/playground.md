@@ -104,12 +104,12 @@ async def download_with_progress(url, filepath, message):
 
 async function fetchSmoll() {
   try {
-    const cached = localStorage.getItem(CACHE_SMOLL);
+    /*const cached = localStorage.getItem(CACHE_SMOLL);
     if (cached) {
       smollSource = __initPatch(cached);
       toterminal('Smoll loaded from cache');
       return;
-    }
+    }*/
     const resp = await fetch(
       'https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/smoll.py'
     );

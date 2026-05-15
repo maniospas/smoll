@@ -1718,7 +1718,7 @@ when organized in a string buffer.</p>
     <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">pos</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="nb">iter</span>
-        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot; &quot;</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">buf</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">mem</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
 

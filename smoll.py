@@ -3354,7 +3354,7 @@ def process_repo(file: File, tokens: list[Token], pos: int):
     repositories[symbol] = path
     return pos
 
-async def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
+def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
     pos += 1
     name_token = get(tokens, pos)
     if not name_token.is_string(): 
@@ -3367,7 +3367,7 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         name = name_token.text
         name = name[1:len(name)-1]
         prev_name = name
-        name = await resolve_name(name, name_token)
+        name = resolve_name(name, name_token)
         if not os.path.exists(name) and name not in file_cache: name_token.error("import", "non-existent file '"+name+"'")
         if os.path.isdir(name) and name not in file_cache: name_token.error("import", "expecting file but got directory '"+name+"'")
         if name.endswith(".h") or name.endswith(".c"):
@@ -3378,7 +3378,7 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
             externals.append(new_file)
             return pos+1, new_file
         #if not name.endswith(".s") and not name.endswith(".smoll"): name_token.error("safety", "expecting a .s or .smoll (for smoll source code) or .h or .c (for C dependent source code) file extension but got '"+name+"'")
-        imported = await load(name, err_token=name_token)
+        imported = load(name, err_token=name_token)
         name = prev_name
         imported.path = name
     pos += 1
@@ -3599,7 +3599,7 @@ def process_union(file: File, tokens: list[Token], pos: int):
     file.types[union_name] = union_type
     return pos
 
-async def process(file: File, tokens: list[Token], pos: int) -> File:
+def process(file: File, tokens: list[Token], pos: int) -> File:
     # this schema assumes that imports and repos happen before defs
     # first pass: process functions only up to their first return
     has_made_def = False
@@ -3641,7 +3641,7 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
             elif tok.text=="import": 
                 if has_made_def: tok.error("safety", "can only import before the file's first definition", reason=first_def_tok, raason_message="first definition at")
                 defname = get(tokens, i+1)
-                i, imported = await process_import(file, tokens, i, is_local=is_local)
+                i, imported = process_import(file, tokens, i, is_local=is_local)
                 if is_lsp and tok.file.is_main_file:
                     print_lsp_keyword(tok, "**import**\n\nimports a namespace or function")
                     print("---")
@@ -3708,7 +3708,7 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
                 print(variation.signature())
     return file
 
-async def resolve_name(path: str, at_token: Token|None) -> str:
+def resolve_name(path: str, at_token: Token|None) -> str:
     symbol = path
     for repo, url in repositories.items():
         if path.startswith(repo):
@@ -3726,7 +3726,7 @@ async def resolve_name(path: str, at_token: Token|None) -> str:
             if os.path.exists(symbol): return symbol
         try: 
             os.makedirs(os.path.dirname(symbol), exist_ok=True)
-            await download_with_progress(path, symbol, "download     "+os.path.basename(symbol).ljust(40))
+            asyncio.run(download_with_progress, path, symbol, "download     "+os.path.basename(symbol).ljust(40))
         except Exception as e: 
             if at_token: at_token.error("download", str(e))
             print("[✗] failed:")
@@ -3852,6 +3852,14 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
         i += 1
     return file, processed_tokens
 
+
+class DownloadState:
+    def __init__(self):
+        self.done = False
+        self.error = None
+        self.downloaded = 0
+        self.total = 0
+
 async def download_with_progress(url: str, filepath: str, message: str):
     filename = os.path.basename(filepath)
     fallback: bool = False
@@ -3881,14 +3889,13 @@ async def download_with_progress(url: str, filepath: str, message: str):
     print()
 
 file_cache: dict[str, File] = dict()
-file_loading: dict[str, asyncio.Future] = dict()
-async def load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> File:
+def load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> File:
     file = file_cache.get(path, None)
     if file is None:
         # this weird sequencing here is so that we can import partially imported modules without circular overflow
         file, processed_tokens = _load(path, is_main_file, err_token)
         file_cache[path] = file
-        await process(file, processed_tokens, 0)
+        process(file, processed_tokens, 0)
     assert file is not None
     return file
 
@@ -4105,11 +4112,11 @@ if chosen_compiler == "auto":
     #else: 
     chosen_compiler = "gcc"
 
-async def main():
+def main():
     src_path = Path(args.source)
     if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); os._exit(1)
     if not is_lsp: print(f"[{YELLOW}+{RESET}] process      {src_path}")
-    file: File = await load(await resolve_name(str(src_path), None), is_main_file=True)
+    file: File = load(resolve_name(str(src_path), None), is_main_file=True)
     if not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)
         if not main_type: print(f"{RED}error{RESET}: missing main type"); os._exit(1)
@@ -4139,5 +4146,4 @@ def is_event_loop_running():
     except RuntimeError: return False
 if is_event_loop_running():
     asyncio.create_task(main())
-else:
-    asyncio.run(main())
+else: main()

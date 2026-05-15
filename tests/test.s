@@ -1,19 +1,12 @@
-import "std/core.s" # defines Number
+import "std/core.s"
 
-def natpair(nat x, nat y)
-def float(natpair a)
-    x = float a.x
-    y = float a.y
-    return (x,y)
-
-def inc(float&Number x) # would try and fail to create it for the previous method's output
-    return 1.0+x
-
-def inc(float\Number a) # already defined for Number
-    x = 1.0+float a.x
-    y = 1.0+float a.y
-    return (x,y)
+rec wooo(effect range recursion_safety, nat i)
+    next recursion_safety
+    if false return blank() # do not return anything
+    return wooo(i+1)
 
 def main()
-    print inc(1.0)  # print 2.0
-    print inc(4.0,4.0).x # prints 5.0
+    recursion_safety = range(1000)
+    try wooo 0
+    if try error = compiler:catch()
+        print cstr error

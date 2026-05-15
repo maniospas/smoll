@@ -768,7 +768,7 @@ class ImplementedType:
             self.has_returned_once = True
             raise FastReturnException
     
-    def interpret(self, values: list[int|float], memory: MemoryEmulator) -> list:
+    def interpret(self, values: list[int|float], memory: MemoryEmulator, recursion_budget) -> list:
         #if not self.can_try_interpreter: self.at.error("interpreter", "'"+self.name+"' is not interpretable")
         
         # memory is basically a list of chars
@@ -1080,7 +1080,9 @@ class ImplementedType:
                         return None
                 assert callee, candidate_name
                 #inputs = [v for v in values]
-                retcode = callee.interpret(values, memory) # may modify values
+                if recursion_budget<=1:
+                    self.at.error("interpreter", "recursion budget reached at: "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)]))
+                retcode = callee.interpret(values, memory, recursion_budget-1) # may modify values
                 #rets = ""
                 for ismut, value, k in zip(gathered_args_by_pointer, values, gathered_args):
                     if ismut: local_vars[k] = value
@@ -1090,7 +1092,7 @@ class ImplementedType:
                 #print(rets)
                 return retcode
             else:
-                self.at.error("interpreter", "failed to interpret C code: "+" ".join([impl[i].tostring() for i in range(pos,end+1)]))
+                self.at.error("interpreter", "failed to interpret C code: "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)]))
         
         def process_block(impl: list["Token"], pos: int, npos: int):
             # returns breaking variable or continue or break
@@ -2009,7 +2011,11 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
             for tokpos, tok in enumerate(tokens):
                 if tok.text=="def" and peek_text(tokens, tokpos+1)==name:
                     if peek_text(tokens, tokpos+2)=="=": tokens[pos].error("type", "type union is declared later per 'def "+name+"'")
-                    else: tokens[pos].error("type", "usage of 'def "+name+"' before its definition; perhaps declare it as 'rec'")
+                    else:
+                        if pos>tokpos: 
+                            tokens[pos].error("type", "recursive usage of 'def "+name+"' before its definition; perhaps declare it as 'rec'")
+                        else:
+                            tokens[pos].error("type", "recursive usage of 'def "+name+"' defined later, but the present function must return non-recursively before its first recursive call")
                 elif tok.text=="rec" and peek_text(tokens, tokpos+1)==name:
                     tokens[pos].error("type", "usage of 'rec "+name+"' before its definition") 
 
@@ -2129,7 +2135,7 @@ def process_linear_type(file: File, tokens: list[Token], pos: int, show_lsp: boo
     elif peek_text(tokens, pos) == "&":
         if is_lsp and get(tokens, pos).file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "common elements of the type unions")
         prev_pos = pos
-        pos, alternatives = process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=reduce_to_unique_variations)
+        pos, alternatives = process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=False)
         ret = UnionType(type.name+"&"+alternatives.name, at=get(tokens, prev_pos))
         alternative_variations = set(alternatives.variations)
         ret.variations = [variation for variation in type.variations if variation in alternative_variations]
@@ -2137,7 +2143,7 @@ def process_linear_type(file: File, tokens: list[Token], pos: int, show_lsp: boo
     elif peek_text(tokens, pos) == "\\":
         if is_lsp and get(tokens, pos).file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "exclude elements of the right type union from the left")
         prev_pos = pos
-        pos, alternatives = process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=reduce_to_unique_variations)
+        pos, alternatives = process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=False)
         ret = UnionType(type.name+"\\"+alternatives.name, at=get(tokens, prev_pos))
         alternative_variations = set(alternatives.variations)
         ret.variations = [variation for variation in type.variations if variation not in alternative_variations]
@@ -3502,6 +3508,8 @@ def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception
         impl.effect_names = effect_names
         if is_local: file.localdefs.add(impl)
         impl.fast_return_exception = fast_return_exception
+        if fast_return_exception: # if recursive, that is
+            impl.needs_failure_mode = True
         try:
             for arg_name, arg_type, immutable, convert_to_ptr in zip(abstract_arg_names, arg_types, abstract_arg_immutability, abstract_arg_convert_to_ptr):
                 if convert_to_ptr:
@@ -3578,7 +3586,7 @@ def process_union(file: File, tokens: list[Token], pos: int):
     if get(tokens,pos).text!="=": tokens[pos].error("syntax", "expecting '='")
     pos += 1
     union_type: UnionType = UnionType(union_name, at=start_token)
-    pos, linear_type = process_linear_type(file, tokens, pos, reduce_to_unique_variations=False)
+    pos, linear_type = process_linear_type(file, tokens, pos, show_lsp=True, reduce_to_unique_variations=False)
     union_type.variations.extend(linear_type.variations)
     # while True:
     #     pos, variation = process_type(file, tokens, pos)
@@ -3960,8 +3968,6 @@ SAME_CONTENTS_TYPE_CSTR.set_pointer_type(SAME_CONTENTS_TYPE_CSTR.vars["to"], CHA
 SAME_CONTENTS_TYPE_CSTR.doc.append("pointer references the same type as another")
 SAME_CONTENTS_TYPE_CSTR.doc.append("Forces the first pointer to reference a buffer of characters.")
 
-
-
 smol_namespace = File("builtins")
 builtin_token = Token("builtins", smol_namespace, 1, 1)
 smol_namespace.types["cstr"] = UnionType("cstr", at=builtin_token).append(CSTR_TYPE)
@@ -4003,7 +4009,6 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     src_path = Path(f"{output_name}.c")
     exe_path = Path(output_name)
     header = "\n".join("#include \""+k.path+"\"" for k in externals)+"\n"
-    used_globs = set(k for main_def in main_defs for k in main_def.used_globals)
 
     discovered_defs: list[ImplementedType] = list()
     already_generated: set[ImplementedType] = set()
@@ -4015,12 +4020,13 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
                 add_implementation(candidate_def)
         discovered_defs.append(next_def)
     for main_def in main_defs: add_implementation(main_def)
+    used_globs = set(k for main_def in discovered_defs for k in main_def.used_globals)
     
     visited_defs_for_error_codes: set[ImplementedType] = set()
     found_error_codes: set[int] = set()
     for main_def in main_defs: found_error_codes = found_error_codes.union(main_def.gather_spawned_error_codes(visited_defs_for_error_codes))
 
-    # TODO: the following breaks due to compiler:catch() handling in _call(...)
+    # TODO: the following commeted out expression is wrong due to compiler:catch() handling in _call(...)
     effective_err_code_list = err_code_list#[element for element in enumerate(err_code_list)]# if pos in found_error_codes else "0" for pos, element in enumerate(err_code_list)]
     effective_err_code_list_size = len(effective_err_code_list)
     while effective_err_code_list_size and effective_err_code_list[effective_err_code_list_size-1]=="0":
@@ -4110,7 +4116,7 @@ async def main():
         exe_path = src_path.with_suffix("")
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
-            main_type.variations[0].interpret([], MemoryEmulator(4096*4)) # emulate 16kb memory
+            main_type.variations[0].interpret([], MemoryEmulator(4096*4), recursion_budget=100) # emulate 16kb memory
         else:
             write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
             if not args.build and chosen_compiler!="none":

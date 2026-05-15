@@ -1,0 +1,1762 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>smoλ</title>
+        <link rel="stylesheet" href="index.css"> 
+        <style>
+        body {
+            max-width:800px;
+            margin:40px auto;
+            padding:0 10px;
+            font:18px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            color:#444;
+        }
+        h1:first-child {font-size:4rem}
+        h2,
+        h3 {
+        line-height:1.2
+        }
+        h1 {margin-top:60px}
+        @media (prefers-color-scheme: dark) {
+            body {
+                color:#c9d1d9;
+                background:#0d1117
+            }
+        }
+        a:link {
+            color:#58a6ff
+        }
+        a:visited {
+            color:#58a6ff
+        }
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 28px;
+            z-index: 2000;
+            font-size: 0.9rem;
+            justify-content: center;
+        }
+        .topbar a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #444;
+        }
+        .topbar a:hover { color: #58a6ff; }
+        .toc {
+            position:fixed;
+            padding-top:50px;
+            left:0;
+            top:0;
+            padding-left:20px;
+            width:200px;
+            border-right: 1px solid #444;height:100%;
+            background:#fafae3!important;
+            overflow-y:auto;
+            font-size:0.9rem;
+            z-index:1000;
+        }
+        @media (max-width: 1380px) {
+            body {margin:10px;}
+            .toc {
+                background:white!important;
+                position:static;
+                width:90%;
+                margin: 0;
+                border:0;
+            }
+        }
+        .console {
+            background: #1F1F1F; color:#EEEEEE;padding:0px 10px;font-size:0.8rem;border-radius: 8px;border:1px solid #444
+        }
+        .output {
+            white-space: pre-wrap;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .notice-box {
+            border-left: 4px solid;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-style: normal;
+        }
+        .box-warning {
+            border-color: #c0392b;
+            background: #fff0f0;
+            color: #7a1a1a;
+        }
+        .box-info {
+            border-color: #388bfd;
+            background: #e6f0ff;
+            color: #0a3069;
+        }
+        .button {
+            text-decoration: none;
+            font-weight: 500;
+            padding: 1rem;
+            padding-right: 1.5rem;
+            margin-right: 0.5rem;
+            border: 1px solid #444;
+            border-radius: 15px;
+            width: 200px!important;
+            font-size: 1.4rem;
+        }
+        .button:hover {
+            background: #fafae3;
+        }
+        @media (prefers-color-scheme: dark) {
+            .box-warning {
+                background: #272115;
+                color: #e3b341;
+            }
+            .box-info {
+                background: #0d1f3c;
+                color: #79c0ff;
+            }
+        }
+        </style>
+    </head>
+    <body>
+        <nav class="topbar">
+            <a href="index.html" style="position:absolute;left:20px;font-weight:500">Smoλ</a>
+            <a href="install.html" style="font-weight:500">Install</a>
+            <a href="reference.html" style="font-weight:900">Learn</a>
+            <a href="playground.html" style="font-weight:500">Playground</a>
+            <a href="https://github.com/maniospas/smoll">GitHub</a>
+        </nav>
+    <div class="toc">
+
+<p><strong>Section 1. Basic Syntax</strong><br>
+<em>1.1.</em> <a href="#import">import</a> <br>
+<em>1.2.</em> <a href="#calling-notation">calling notation</a> <br>
+<em>1.3.</em> <a href="#mutability">mutability</a> <br>
+<em>1.4.</em> <a href="#types">types</a> <br>
+<em>1.5.</em> <a href="#type-mutability">type mutability</a> <br>
+<em>1.6.</em> <a href="#conditions">conditions</a><br>
+<em>1.7.</em> <a href="#recursion">recursion</a> <br>
+<em>1.8.</em> <a href="#unions">unions</a> <br>
+<em>1.9.</em> <a href="#literal-types">literal types</a> <br>
+<em>1.10.</em> <a href="#conditional-compilation-and-default-arguments">conditional compilation and default arguments</a></p>
+
+<p><strong>Section 2. Safe Resources</strong><br>
+<em>2.1.</em> <a href="#buffers">buffers</a><br>
+<em>2.2.</em> <a href="#pointers">⚠ pointers</a><br>
+<em>2.3.</em> <a href="#substructures">⚠ substructures</a><br>
+<em>2.4.</em> <a href="#stable-references">stable references</a><br>
+<em>2.5.</em> <a href="#try-and-fail">try and fail</a><br>
+<em>2.6.</em> <a href="#defer">defer</a><br>
+<em>2.7.</em> <a href="#catching-errors">catching errors</a><br>
+<em>2.8.</em> <a href="#effects">effects</a><br>
+<em>2.9.</em> <a href="#debugging-tools">⚠ debugging tools</a><br>
+<em>2.10.</em> <a href="#bounded-compute">⚠ bounded compute</a><br></p>
+
+<p><strong>Section 3. Standard Library</strong><br>
+<em>3.1.</em> <a href="#lists">lists</a><br>
+<em>3.2.</em> <a href="#strings">strings</a><br>
+<em>3.3.</em> <a href="#maps">maps</a><br>
+<em>3.4.</em> <a href="#io">io</a><br>
+<em>3.5.</em> <a href="#processes">processes</a><br>
+<em>3.6.</em> <a href="#random">random</a><br>
+<em>3.7.</em> <a href="#mini-and-bits">⚠ mini and bits</a><br>
+<em>3.8.</em> <a href="#vectors">vectors</a><br></p>
+
+<p>⚠ Advanced functionality.</p>
+
+</div>
+
+<h1 id="section-1-basic-syntax">Section 1. Basic Syntax</h1>
+
+<h2 id="import">import</h2>
+
+<p>Here is how to import the entire contents of another source code
+file; the <code>print</code> function is imported from the core.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="c1"># this is a line comment, by the way</span>
+    <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
+</code></pre>
+</div>
+
+<p>If you are new to the language, now is a good point to mention
+that you need only the executable (and a local C compiler) to start working. Once
+you download the language&#8217;s executable, you can reference local or <strong>online</strong> directories 
+in your code. The second type are automatically downloaded. Below is an example,
+where the theoretical <em>std/</em> location is grabbed from the development repository. 
+For safety, imported files other than the one you run can only make suggestions about repos, 
+and fail to compile if these are not present.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">repo</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/&quot;</span> <span class="k">as</span> <span class="s2">&quot;std/&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="c1"># this is a line comment, by the way</span>
+    <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
+</code></pre>
+</div>
+
+<p>You can also import a file as a namespace to access its
+contents with the <code>:</code> notation. This is more verbose
+but unambiguous, like below. You can even access namespaces
+defined within the imported namespace.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">core</span><span class="p">:</span><span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
+</code></pre>
+</div>
+
+<p>If you want to import something specific, use <code>:</code> within
+the import statement. You can use the path instead of the
+namespace name too, for example to bring a single function 
+from a file.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">core</span><span class="p">:</span><span class="nb">print</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
+</code></pre>
+</div>
+
+<p>Finally, you can have imports
+-or function definitions- be preceded by <code>local</code> to avoid exposing
+unnecessary contents. This is used for isolating which functionality
+is introduced in each file, so that it can be uniquely referenced.</p>
+
+<h2 id="calling-notation">calling notation</h2>
+
+<p>Functions are followed by their arguments in parentheses,
+although you can also omit the latter if they would end 
+at the end of the line. Arguments are comma-separated,
+like below. In general, commas within parentheses designate
+tuples.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">add</span> <span class="n">p</span>
+    <span class="nb">print</span> <span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>The <code>.</code> operator can also pipe some data
+into the beginning of a function like below. This
+works as a notation for calling functions like class 
+methods. In general, do try to avoid needless parentheses,
+as the snippet below does (<code>f1 f2 ... args</code> is a chain of 
+function calls). You can always refer to functions
+within namespaces.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="c1"># an atypical import structure for demonstration</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">core</span><span class="p">:</span><span class="nb">print</span>  <span class="c1"># import print symbol</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">core</span><span class="p">:</span><span class="n">add</span> <span class="mi">1</span>
+    <span class="nb">print</span> <span class="n">x2</span><span class="o">.</span><span class="n">core</span><span class="p">:</span><span class="n">add</span> <span class="mi">2</span>
+</code></pre>
+</div>
+
+<h2 id="mutability">mutability</h2>
+
+<p>Values cannot normally be overwritten. To enable this,
+place <code>mut</code> just after the assignment. 
+You can keep overwriting mutable values.</p>
+
+<p>Below is an example, where no further
+mutations to the value are accepted after the third assignment,
+if we wanted to make sure that we are done editing it.
+Even if a value is mutable, it can only be overwritten by
+others of the same type.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">1</span>  <span class="c1"># mutable - we want to mutate it further</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">2</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">3</span>
+    <span class="nb">print</span> <span class="n">x</span>
+    <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+</code></pre>
+</div>
+
+<h2 id="types">types</h2>
+
+<p>All functions declare corresponding types via their returned values.
+That is, you can use the function&#8217;s name to refer to data with
+equivalent structure. Below is an example, where the
+<code>nat</code> type represents to natural numbers (non-negative integers). Other builtin types
+are <code>bool</code>, <code>int</code>, <code>float</code>, and <code>cstr</code> for string literals.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">toinfinity</span><span class="p">(</span><span class="n">nat</span> <span class="n">start</span><span class="p">)</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">start</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">toinfinity</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">toinfinity</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">next</span> <span class="n">r</span> <span class="c1"># proper loops later</span>
+    <span class="nb">print</span> <span class="n">r</span><span class="o">.</span><span class="n">pos</span>
+    <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="nb">print</span> <span class="n">add</span> <span class="n">r</span>
+</code></pre>
+</div>
+
+<p>The example above uses the <code>.</code> notation to obtain<br />
+a value packed in a type by name. This name is determined
+by the returned value&#8217;s name.</p>
+
+<p>Types like the above are structurally matched, as we did
+when applying <code>add</code> to the range construct. This structural
+typing is rich but can be kind of unsafe if you do not keep
+track of your data shapes. To prevent implicit structural matches, 
+use the following <code>class</code> notation to wrap the returned value.</p>
+
+<p>Further prefer class definitions when declaring types with some
+construction contract; such contracts should
+not be violated by matching with arbitrary data.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="n">Point</span> <span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">p</span><span class="o">.</span><span class="n">y</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="nb">sum</span> <span class="n">p</span> 
+</code></pre>
+</div>
+
+<p>Use <code>singleton</code> instead of <code>class</code> to further
+ensure that the function runs at most one time in your program.
+On the other hand, a shorthand for defining a structural type that would
+immediately return all its fields is to omit its body, like next.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span> <span class="c1"># structural definition needs no body</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Field</span><span class="p">(</span><span class="n">Point</span> <span class="n">a</span><span class="p">,</span> <span class="n">Point</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">f</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">f</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="c1"># prints 5.0</span>
+</code></pre>
+</div>
+
+<h2 id="type-mutability">type mutability</h2>
+
+<p>Normal mutability rules apply when overwriting whole objects. For example,
+<code>t</code> below needs to be made mutable so that it can be overwritten. This
+does not mean that field immutability can be violated. 
+That is, even if <code>t</code> is mutable, we would not
+be able to overwrite the immutable <code>t.y</code> field by itself.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Test</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">mut</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">Test</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">Test</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> 
+</code></pre>
+</div>
+
+<p>You can normally overwrite mutable fields even if you cannot overwrite 
+whole type&#8217;s instance at once. This is the default mutability mode, but
+one can also use <code>const</code> instead of <code>mut</code> to strip away any mutation
+capability.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Test</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">mut</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">Test</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">t</span><span class="o">.</span><span class="n">x</span> <span class="c1"># prints 1</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="nb">print</span> <span class="n">t</span><span class="o">.</span><span class="n">x</span> <span class="c1"># prints 0</span>
+    <span class="nb">print</span> <span class="n">t</span><span class="o">.</span><span class="n">y</span> <span class="c1"># prints 2</span>
+</code></pre>
+</div>
+
+<p>The same rules hold for function arguments. Below is an example.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Test</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">mut</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">(</span><span class="n">const</span> <span class="n">Test</span> <span class="n">t</span><span class="p">)</span>
+    <span class="c1"># t.x = 10 # disallowed</span>
+    <span class="nb">print</span> <span class="n">t</span><span class="o">.</span><span class="n">x</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">Test</span><span class="p">()</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">test</span> <span class="n">t</span>
+</code></pre>
+</div>
+
+<h2 id="conditions">conditions</h2>
+
+<p>As you have likely noticed so far, <em>smoλ</em> code blocks
+are distinguished by indentation. The same holds true
+for code blocks of <code>if-else</code> conditions and <code>while</code> loops.
+Both behave like how you would expect, and loops can also
+be prematurely terminated with <code>break</code> or skipped with
+<code>continue</code>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mi">0</span>
+        <span class="nb">print</span> <span class="s2">&quot;x is negative</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;done</span><span class="se">\n</span><span class="s2">&quot;</span>
+</code></pre>
+</div>
+
+<p>You can have one-liners for conditions and loops,
+like the following versions.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mf">0.0</span> <span class="nb">print</span> <span class="s2">&quot;x is negative</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mf">0.0</span> <span class="nb">print</span> <span class="s2">&quot;x is zero</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">else</span> <span class="nb">print</span> <span class="s2">&quot;x is positive</span><span class="se">\n</span><span class="s2">&quot;</span>
+</code></pre>
+</div>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mf">0.0</span> <span class="n">sgn</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span> <span class="k">else</span> <span class="n">sgn</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;sign is: &quot;</span>
+    <span class="nb">print</span> <span class="n">sgn</span>
+    <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+</code></pre>
+</div>
+
+<p>Loops are similar to condition, only they execute multiple
+times until a condition is true or false. You can use <code>continue</code> 
+to skip the rest of the current loop and <code>break</code> to halt the
+current loop. Here is a silly example. Please do not write code like this.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">true</span> <span class="c1"># overengineered</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">5</span> 
+            <span class="k">break</span> <span class="c1"># stop this way</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">3</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># skip printing in </span>
+            <span class="k">continue</span> 
+        <span class="nb">print</span> <span class="n">i</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+</code></pre>
+</div>
+
+<p>A more efficient way to write loops, which will be fully
+understood later, is via iterators that have the means to
+obtain the next element. The <code>range</code> iterator, for example, 
+takes an end number or a pair of start and end numbers and allows
+calling <code>next</code> to retrieve the next value until the end
+is reached (non-inclusively). The retrieval may fail, which
+is checked by guarding the expression with a <code>try</code> instruction.
+These are all <a href="#try-and-fail">error code semantics</a>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">10</span> <span class="c1"># equivalent to it = range(0,10)</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
+        <span class="nb">print</span> <span class="n">i</span>   <span class="c1"># prints 0,1,2...,9</span>
+</code></pre>
+</div>
+
+<h2 id="recursion">recursion</h2>
+
+<p>Sometimes, it is convenient for functions to call each 
+other. Normally, functions can see only previous ones,
+but you can use <code>rec</code> instead of <code>def</code> to allow recursion
+within the current file. </p>
+
+<p>A file with recursive functions works like this:</p>
+
+<ul>
+<li><p><strong>Step 1.</strong> All functions are parsed, where recursive ones stop at their 
+first return statement. Up to that point, everything
+can only see previous functions, which means that you need
+to encode the recursion stopping conditions.</p></li>
+<li><p><strong>Step 2.</strong> The rest of the recursive definitions
+are parsed. These now have access to the whole file&#8217;s types.</p></li>
+</ul>
+
+<p>Importantly, the recursive function&#8217;s escape hatch should occur
+first, otherwise Step 1 would result in failure. The compiler
+will point out that you are trying to perform a recursion without
+having returned at least once first so that the type can be determined.</p>
+
+<p>For example, consider the following malformed program; type theory would
+be able to determine a type for this case&#8230; but <em>smoλ</em> disagrees because 
+doing so in more complicated cases means that reading the program sequentially
+does not work; the programmer needs to reason about unbounded problems.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">wooo</span><span class="p">()</span> <span class="c1"># CREATES AN ERROR - should have been &#39;rec&#39;</span>
+    <span class="nb">print</span> <span class="s2">&quot;wooo&quot;</span>
+    <span class="k">return</span> <span class="n">wooo</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">wooo</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<div class="console">
+<code class="output">
+[<span style="color:orange">+</span>] process      tests/test.s
+<span style="color:#F056AC">type error: recursive usage of 'def wooo' before its definition; perhaps declare it as 'rec'</span>
+at tests/test.s line 5 column 12
+    return wooo()
+           <span style="color:red">^^^^</span>
+</code>
+</div>
+
+<p>Before moving forward, it must be mentioned that
+smoλ&#8217;s type system is deliberately
+simplified so that programs <em>can be read sequentially</em>
+and <em>resolve types in finite time</em>. Recursion is too
+convenient to disallow fully, so explicit recursive declarations
+are selected
+as a means of presenting the aforementioned properties.
+In particular, you can read up to a recursive function&#8217;s first return
+and keep that in mind whenever the function is called in
+subsequent code. </p>
+
+<p>Below is an overengineered and thus algorithmically
+slow Fibonacci number calculator that demonstrates recursion
+concepts. The function <code>call_fib</code> is completely passthrough and hence useless. :-)</p>
+
+<p>Recall that recursive functions can call both
+themselves and others that appear <em>later</em>. But normal functions
+can still only see previous declarations. Thus, only
+one function in a chain of multiple ones needs to be declared
+as recursive.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="n">rec</span> <span class="n">fib</span><span class="p">(</span><span class="n">nat</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">call_fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">call_fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">call_fib</span><span class="p">(</span><span class="n">nat</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">fib</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>A simple trick to declare return types without affecting your logic is
+to guard them within false conditions, like below. Why this is not 
+meaningless is discussed much later in the advanced section about
+<a href="#bounded-compute">bounded compute</a>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="n">rec</span> <span class="n">wooo</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">false</span> <span class="k">return</span> <span class="n">blank</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="s2">&quot;wooo&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">wooo</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h2 id="unions">unions</h2>
+
+<p>Declare alternatives between types (unions) by separating them
+with <code>|</code>. Below is an example that defines a function for
+adding either a float or an integer to a float. The brackets
+are used to add some C code, inside which <code>builtins:float</code> is
+injected by <em>smoλ</em> as the appropriate builtin type. </p>
+
+<p>The exemplified functionality of adding any two numbers together
+is not part of the standard library, as it introduces lossy 
+conversion between numeric types. Usually, you will
+not see any unsafe C code -introduced by brackets- either, 
+unless you are contributing to the standard library or writing 
+helpers for low-level operations. A more complete reference 
+for interweaving a superset of C that interacts with smoll
+will be added in the future.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span> <span class="n">y</span><span class="p">)</span>
+    <span class="p">{</span><span class="n">builtins</span><span class="p">:</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">unsafe_add</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Type alternatives can also be named for reusability.
+This is called a union type in that it brings together
+several alterantives to be referenced via the same name.
+An example follows.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Number</span> <span class="o">=</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="n">Number</span> <span class="n">x</span><span class="p">,</span> <span class="n">Number</span> <span class="n">y</span><span class="p">)</span>
+    <span class="p">{</span><span class="n">builtins</span><span class="p">:</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">unsafe_add</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>In truth, <em>smoλ</em> implements a linear type system, but this
+was hidden till this point because people tend to shy away
+from reading technical terms. Practically, it means
+that -in addition to type unions- you can also get the intersection
+of type unions with the <code>&amp;</code> symbol. Use parantheses like normal.</p>
+
+<p>Here is an example where, say, we define a <code>float</code> function that returns
+something other than a builtin float number. We can get the intersection
+of all float definitions that are also numbers, or all those definitions
+that are not numbers with the &#8216;` symbol.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="c1"># defines Number like above</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">natpair</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">float</span><span class="p">(</span><span class="n">natpair</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">numeric_float</span> <span class="o">=</span> <span class="nb">float</span><span class="o">&amp;</span><span class="n">Number</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">numeric_float</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mf">1.0</span><span class="o">+</span><span class="n">x</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="nb">float</span>\<span class="n">Number</span> <span class="n">a</span><span class="p">)</span> <span class="c1"># define for float definitions that are not in Number</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">+</span><span class="nb">float</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">+</span><span class="nb">float</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">inc</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># print 2.0</span>
+    <span class="nb">print</span> <span class="n">inc</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span><span class="mf">4.0</span><span class="p">)</span><span class="o">.</span><span class="n">x</span> <span class="c1"># prints 5.0</span>
+</code></pre>
+</div>
+
+<h2 id="literal-types">literal types</h2>
+
+<p>Often there is a need to distinguish functionality based on some exact
+literal value. Or you may want to have some constant that is used everywhere
+in your code. This is done by having literal types, as in, types that
+are attached to specific values.</p>
+
+<p>Below is an example on using this concept to define numeric or 
+cstr constants first. Literal types evaluate to their value when 
+used within code - nothing
+out of the ordinary.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">INCREMENT</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">INCREMENT</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="mi">0</span>  <span class="c1"># prints 1</span>
+</code></pre>
+</div>
+
+<p>But literal types can also specialize among which
+function to call, like below. Doing so requires retrieving
+the literal&#8217;s type by evaluating <code>type value</code>, where value
+can be a string or number literal.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">VERSION</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="s2">&quot;one&quot;</span><span class="p">)</span> <span class="c1"># just a literal type</span>
+    <span class="nb">print</span> <span class="s2">&quot;version one&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s2">&quot;version two&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="nb">type</span> <span class="s2">&quot;two&quot;</span>
+    <span class="n">version</span> <span class="n">v</span> <span class="c1"># calls the correct version</span>
+    <span class="n">version</span> <span class="nb">type</span> <span class="n">VERSION</span> <span class="c1"># calls the same version</span>
+</code></pre>
+</div>
+
+<p>Literal types still adhere to all other type system conventions. 
+Those includes union declarations and having associated variables
+holding their value when used as function arguments.</p>
+
+<p>Get back the associated value with the <code>compiler:literal</code> function. 
+That is, <code>compiler:literal type "two"</code> yields <code>"two"</code>.
+The benefit lies purely in extracting values from the type system.
+An example that restricts how functions are called is presented next.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">inc</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inc</span> <span class="ow">is</span> <span class="n">blank</span>  <span class="c1"># check if exists - see next section</span>
+        <span class="n">inc</span> <span class="o">=</span> <span class="nb">type</span> <span class="mi">1</span> <span class="c1"># literal convertible</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">inc</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="mi">0</span>           <span class="c1"># prints 1</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">type</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># prints 2</span>
+</code></pre>
+</div>
+
+<p>Check whether a variable belongs to a
+literal type by performing the <code>is</code> check to obtain
+a boolean value. Contrary to the zero-cost conditional 
+compilation of the next section when using <code>is</code> with 
+inferred types only, literal types may be resolved
+to several runtime checks.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">enum</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">|</span><span class="s2">&quot;B&quot;</span><span class="o">|</span><span class="s2">&quot;C&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">answer_schemas</span><span class="p">(</span><span class="n">enum</span> <span class="n">first</span><span class="p">,</span> <span class="n">enum</span> <span class="n">second</span><span class="p">,</span> <span class="n">nat</span> <span class="n">minutes_to_answer</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">answers</span><span class="p">(</span><span class="n">cstr</span> <span class="n">first</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">second</span><span class="p">,</span> <span class="n">nat</span> <span class="n">minutes_to_answer</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">answers</span> <span class="o">=</span> <span class="n">answers</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">answers</span> <span class="ow">is</span> <span class="n">answer_schemas</span> 
+        <span class="n">fail</span> <span class="s2">&quot;not a valid answer&quot;</span> <span class="c1"># this will fail</span>
+    <span class="nb">print</span> <span class="s2">&quot;answered: &quot;</span>
+    <span class="nb">print</span> <span class="n">answers</span><span class="o">.</span><span class="n">first</span>
+    <span class="nb">print</span> <span class="n">answers</span><span class="o">.</span><span class="n">second</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;in&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="n">answers</span><span class="o">.</span><span class="n">minutes_to_answer</span><span class="p">,</span> <span class="s2">&quot; minutes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h2 id="conditional-compilation-and-default-arguments">conditional compilation and default arguments</h2>
+
+<div class="notice-box box-info"><strong>Info:</strong> In conjunction with the type system, this feature creates zero-cost condition checks for concise creation of multiple definitions.</div>
+
+<p>You can use the <code>[value] is [type]</code> operator to check that a value/tuple
+adheres to at least one variation of a union. When no literal types are involved
+(and sometimes when they are), the result is not merely a boolean, 
+but in fact of type <code>compile:true</code> or <code>compile:false</code>;
+these values are significant because they let <em>smoλ</em> identify 
+whether conditions will always be true or false and <strong>eliminate code without parsing it</strong>.</p>
+
+<p>In other words, you can make <code>is</code> checks to determine conditionally which code
+segment to compile. This incurs <em>zero</em> runtime overhead. 
+At the same time, you can mingle them together with other condition checking,
+as the standard library&#8217;s core. Below is an example of a conditional check.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">typed_print</span><span class="p">(</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="o">|</span><span class="n">cstr</span> <span class="n">value</span><span class="p">)</span> 
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="nb">int</span><span class="o">|</span><span class="nb">float</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this is a number:&quot;</span><span class="p">)</span>
+    <span class="k">else</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this is a string:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>The same mechanism can be used to create optional arguments
+using the <code>blank</code> builtin type; that has no contents and therefore
+skips respective variable definition. Conversely, non-existing
+variables are considered blank, so that blank arguments can typecheck
+to their type correctly. In the end, you define <strong>optional arguments</strong>
+and their fallback values. In the next example, the defined function uses 
+either an increment value of one, or a value provided as second argument. </p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span><span class="o">|</span><span class="n">blank</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">blank</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">value</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="mi">2</span>    <span class="c1"># prints 3</span>
+    <span class="nb">print</span> <span class="n">inc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># prints 4</span>
+</code></pre>
+</div>
+
+<p>Here is a much more complicated scenario, where <code>compiler:skip()</code> 
+prevents certain versions of the function from being
+created (e.g. there is no <code>inc(float,int)</code>). The example also shows 
+two type inference constructs: </p>
+
+<ul>
+<li>Obtain functions among alternatives <code>T</code> that could have produced value <code>x</code> (can be a tuple) per <code>type T-&gt;x</code>. This is a specialization of the <code>type T</code> syntax, which itself is a more verbose way of writing <code>T</code> but also works with literals without devolving them into values. The alternatives are needed because the language allows structural typing, meaning that there is not necessarily a unique way to infer a function from its output structure. For example, <code>type Num-&gt;x 1</code> can be used to cast the value 1 to the same number format as the variable <code>x</code> by calling one of the functions in the <code>Num</code> union that would output the same output as the variable. The same pattern could have been used to also run an appropriate string-to-number converter like <code>type Num-&gt;x "1"</code>.</li>
+<li>Compare against the exact structural type of <code>x</code> (that can be an expression) use <code>value is type x</code>. This is a short-circuit for a different compilation branch and is always inferred at compile time.</li>
+</ul>
+
+<p>In total, the compiler investigates 3*4=12
+variations and eventually keeps 6 of them. Both conditional checks in the example
+zero-cost abstractions in that they never occur during execution.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Num</span> <span class="o">=</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">Num</span> <span class="n">x</span><span class="p">,</span> <span class="n">Num</span><span class="o">|</span><span class="n">blank</span> <span class="n">value</span><span class="p">)</span> <span class="c1"># equivalent: def inc(float|int|nat x, float|int|nat|blank value) </span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">blank</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">type</span> <span class="n">Num</span><span class="o">-&gt;</span><span class="n">x</span> <span class="mi">1</span> <span class="c1"># one with the same number format as x</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">is</span> <span class="nb">type</span> <span class="n">x</span>
+        <span class="n">compiler</span><span class="p">:</span><span class="n">skip</span><span class="p">()</span> <span class="c1"># skip invalid &#39;inc&#39; definitions</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">value</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="mf">2.0</span>  <span class="c1"># prints 3.0</span>
+    <span class="nb">print</span> <span class="n">inc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># prints 4</span>
+</code></pre>
+</div>
+
+<h1 id="section-2-safe-resources">Section 2. Safe Resources</h1>
+
+<h2 id="buffers">buffers</h2>
+
+<p>Buffers are memory-allocated collections of items.
+They can be declared with the following syntax to hold 
+any type&#8217;s items:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="nb">any</span><span class="p">[]</span> <span class="n">buffer</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span> <span class="n">buffer</span><span class="p">,</span> <span class="s2">&quot; elements in buffer</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Most buffer features are implemented in the standard library&#8217;s core
+we will see next how to work with abstract buffers.
+One of the most important features is the <code>alloc</code> function to
+allocate and zero-initialize a specific number of elements. 
+This returns the buffer itself to enable initialization per patterns like
+<code>buf = (mut float[]).alloc 4</code>. Allocate a buffer of chars
+by not providing the mutable buffer declaration per <code>buf = alloc 4</code>.
+Make use of the <code>KB</code>, <code>MB</code>, <code>GB</code> functions to quickly size allocations.</p>
+
+<p>Allocation will create an error if it tries to change the number of
+elements from a non-zero number to something different.
+In those cases, use <code>resize</code> instead. 
+You can also set the size to zero. If the
+allocation is the same in size as before, the buffer&#8217;s elements
+are still zero-initialized. This is helpful when reusing the same
+buffers within loops. </p>
+
+<p>A second important feature is the element access operator <code>buffer[pos]</code>,
+which can be used to extract an object stored at a specific position. 
+In general, this operator is implemented by overloading the <code>get</code> 
+and <code>mutget</code> functions, though beware that details do involve pointers. 
+Use <code>buffer[pos] = value</code> to copy some data on a buffer&#8217;s element.</p>
+
+<p>All buffer indexes are of type <code>nat</code>, which represents natural numbers 
+(non-negative integers). Here is an example of buffer usage.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
+    <span class="n">buf</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># prints 0, as buffers are zero-initialized</span>
+    <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<p>Declare a buffer as <code>const</code> to disallow any modifications to its
+contents. Normally, buffers merely prevent resizing or allocation
+(unless they are <code>mut</code>), but &#8220;locking&#8221; them underneath a constant
+safeguard can improve performance and bring code safety.</p>
+
+<h2 id="pointers">pointers</h2>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This subsection describes advanced functionality that is not necessary for common or introductory language usage. You can skip it.</div>
+
+<p>Pointers reference specific memory locations in buffers. Use them 
+to quickly move data around while sharing only one memory address. 
+Pointers are unstable in that, for safety, they become invalid whenever 
+any buffer is resized. Being invalid means that they can not be read 
+from or copy data to them. This holds true mainly for safe pointers
+used in practical use. New C resources can added using unsafe pointer
+semantics that will be covered in a future section about C extensibility.</p>
+
+<p>Obtain a <code>const</code> pointer from a buffer whose
+pointed memory location cannot be modified per <code>ptr = buf[element]&amp;</code>, and
+a <code>mut</code> pointer per <code>ptr = buf[element]&amp;&amp;</code>. Constness means that pointer
+contents cannot be overwritten.</p>
+
+<p><code>ptr..</code> dereferences pointers onto local objects. 
+For example, <code>ptr...field</code> gets a field from an object stored 
+in a pointer by following up the dereferenced data with field
+access notation. Move values onto pointed locations
+of mutable pointers per <code>ptr &lt;&lt; value</code>. Given all these operators
+it is now possible to explain that <code>buffer[pos]=value</code> desugares 
+to the pointer notations <code>buffer[pos]&amp;&amp;&lt;&lt;value</code>.</p>
+
+<p><em>Smoλ</em> makes some checks on pointer safety. As it would be too cumbersome 
+to granularly impose such safety using the type system, there is only one main rule:
+<strong>pointers are invalidated if any memory is resized, moved, or freed</strong>. This
+rule is introduced by the memory manipulation functions of the standard library.</p>
+
+<p>Mainly, the type of data stored on pointers
+is checked for consistency. Invalidated pointers (for example whose
+data have moved in memory by modifying a buffer) cannot be used. 
+Functions declare pointer arguments per <code>any ptr</code>, <code>float ptr</code>, etc.
+Below is an example.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">1</span>
+    <span class="n">element</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&amp;&amp;</span>
+    <span class="nb">print</span> <span class="n">element</span><span class="o">..</span> <span class="c1"># prints 0 as buffers are zero-initialized</span>
+    <span class="n">element</span> <span class="o">&lt;&lt;</span> <span class="mf">1.0</span>
+    <span class="nb">print</span> <span class="n">element</span><span class="o">..</span> <span class="c1"># prints 1 by dereferencing</span>
+    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="c1"># prints 1 from the same memory </span>
+</code></pre>
+</div>
+
+<p>If, in the above example, a new line 
+<code>buf.resize 2</code> was applied before the
+last two prints, <code>element</code> would become invalidated and the code would
+need to re-obtained it from the buffer. Use references to avoid such 
+scenarios and, in general, try to work with buffers and only use pointers
+for rapidly moving temporary data around.</p>
+
+<h2 id="substructures">substructures</h2>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This is an advanced feature, mainly useful for iterating through complicatedly packed data. You can skip it.</div>
+
+<p>You can work with &#8220;horizontal&#8221; data from buffers and pointers by
+obtaining or setting to specific items. However, you can also
+work with &#8220;vertical&#8221; data by being able to obtain sub-buffers
+or sub-pointers for their fields.</p>
+
+<p>The method to do so is by using the <code>buf@field</code> or <code>ptr@field</code> notation, 
+where the field refers to a known field of the attached structure. This
+operator helps write very safe yet fast and memory-efficient code by
+obtaining necessary offsets within allocated memory. Below is
+an example:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/array.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Point2D</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Point3D</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">,</span> <span class="nb">float</span> <span class="n">z</span><span class="p">)</span>
+    <span class="n">plane</span> <span class="o">=</span> <span class="n">Point2D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">plane</span><span class="p">,</span><span class="n">class</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">Point3D</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">)</span>
+    <span class="n">plane</span> <span class="o">=</span> <span class="n">points</span><span class="nd">@plane</span> <span class="c1"># can move this around</span>
+    <span class="nb">print</span> <span class="n">plane</span><span class="nd">@x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">x</span> <span class="c1"># equivalent data path</span>
+</code></pre>
+</div>
+
+<h2 id="stable-references">stable references</h2>
+
+<p>You can work with data that reference other data
+in that they are updated together. This is similar
+to pointers, but comes under some safety 
+restrictions in that you cannot change where references
+point to, even with <code>mut</code>.</p>
+
+<p>At the same time, references are dissolved during
+returns into actual values that are not automatically
+updated together anymore - though safety checks are
+still performed.</p>
+
+<p>To convert some data to a reference use the <code>ref value</code>
+syntax like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">ref</span> <span class="n">x</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">ref</span> <span class="n">x</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="nb">print</span> <span class="n">y</span><span class="o">+</span><span class="n">z</span> <span class="c1"># prints 4</span>
+</code></pre>
+</div>
+
+<p>References are <strong>automatically propagated</strong>
+by analyzing direct input-output equalities. That is,
+it is tracked which inputs are returned directly
+by being assigned to output variables of function calls,
+and therefore references to the inputs
+become equivalent to references to the outputs.</p>
+
+<p>This allows the compiler to re-attach valid references to
+invalidated data structures when those change to something 
+valid. For example, resizing a buffer invalidates its original
+content address pointer, but since the value is returned 
+and assigned on the same variable, the new address is
+tracked instead.</p>
+
+<p>There will always be proper inference for direct equalities as
+long as these are not deliberately invalidated (e.g.,
+by adding zero) and do not pass through unsafe C sections.
+The compiler also always creates error messages instead of 
+triggering unsafe behavior.</p>
+
+<p>Notably, references are not types but just some
+property attached to local variables to indicate
+that the compiler should enforce safe usage. 
+Below is an example, where a list is used
+to dynamically manage a buffer and resize it as needed.</p>
+
+<p>Without <code>ref</code>, the compiler would complain that the 
+potential resizing of the second copy could 
+(in this case: would) invalidate the buffer version
+that the string <code>s1</code> know about. However, thanks to 
+the stable reference, the buffer is automatically updated
+for strings copied onto it.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">()</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">ref</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;123&quot;</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;456&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">test</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">s</span><span class="o">.</span><span class="n">s1</span>
+    <span class="nb">print</span> <span class="n">s</span><span class="o">.</span><span class="n">s2</span>
+</code></pre>
+</div>
+
+<h2 id="try-and-fail">try and fail</h2>
+
+<p>Functions in <em>smoλ</em> can fail freely when unforeseen conditions are encountered,
+for example when running out of memory. When failing functions are called by
+others, the failure cascades until the whole program terminates.</p>
+
+<p>Failure means that all resources are released and return values become zero.
+Often there will be no opportunity to do anything with those zero values,
+however, as failures cascade and cause the caller to fail and then the caller&#8217;s
+caller and so on. Mutable arguments are left unaffected on failure too. 
+You can manually <code>fail</code> like so:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">always_fail</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="s2">&quot;we are failing&quot;</span>
+    <span class="n">fail</span> <span class="s2">&quot;we failed!&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">always_fail</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="s2">&quot;this line is never printed&quot;</span>
+</code></pre>
+</div>
+
+<p>Propagating failures is done in the spirit of writing concise but well-controlled code.
+<strong>Don&#8217;t care about failures. Unless you must.</strong> That is, assume correct execution,
+as if you were scripting, and only handle failures at places where they can be handled
+safely or where they would be critical. If it is important to ensure that 
+a function does not fail up to a certain point, place the <code>debug:nocatch()</code> 
+assertion. There are various other compiler assertions too, which are covered later.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="k">try</span> <span class="n">x</span> <span class="o">=</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>  <span class="c1"># buffer of chars</span>
+    <span class="k">try</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">char</span> <span class="s2">&quot;a&quot;</span> <span class="c1"># still needs a try for buffer elements - though checks can be optimized away</span>
+    <span class="k">try</span> <span class="nb">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="s2">&quot;this must run at all costs&quot;</span>
+    <span class="n">debug</span><span class="p">:</span><span class="n">nocatch</span><span class="p">()</span>    <span class="c1"># error if without &#39;try&#39; on all PREVIOUS calls that could fail</span>
+    <span class="nb">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">10000</span><span class="p">]</span>      <span class="c1"># allowed to fail now</span>
+    <span class="nb">print</span> <span class="s2">&quot;this will never run due to out of bounds error&quot;</span>
+</code></pre>
+</div>
+
+<p>There are certain places in code where you may want to recover from call failures,
+for example by calling the same code again for improved user input, or by
+falling back to some secondary functionality. This is achieved with the
+<code>try</code> keyword. That parses an expression without stopping at the first failing functions, 
+if any. Stressing again: this intercepts the
+first error of an <em>expression</em> not a whole block of code. </p>
+
+<p>You can fail only once within a try
+and the compiler will complain for multiple failures. This is done so that each prospective
+failure is split among multiple declarations to avoid ambiguity of how error handling takes
+place. For example, you can handle each error differently.
+Create and call helper methods to compartmentalize error-prone code chunks and handle
+their failure all at once. See later for how to reconstruct and handle specific error codes.</p>
+
+<p>Finally, returns from failing
+functions are just zero-initialized, but <code>try</code> has a boolean outcome that shows whether
+an error is intercepted. Below is an example that safeguards against failing allocation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/array.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">vector</span><span class="p">(</span><span class="n">nat</span> <span class="n">size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="n">size</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="k">try</span> <span class="n">v</span> <span class="o">=</span> <span class="n">vector</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="s2">&quot;failed to allocate&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span> <span class="n">v</span><span class="p">,</span> <span class="s2">&quot; numbers allocated</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Since failure is a fast abstraction in <em>smoλ</em>, it is also the preferred syntax for 
+iterators reaching their end. Below is an example, where all standard library iterators
+follow the same pattern for terminating loops and you should try to reuse in your code.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">5</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
+        <span class="nb">print</span> <span class="n">i</span>
+</code></pre>
+</div>
+
+<h2 id="defer">defer</h2>
+
+<p>You can defer code blocks to run later. The &#8220;later&#8221; part is
+ideally the end of the current function, but <em>smoλ</em> may
+postpone it further to accommodate resources (e.g., buffers) 
+that are still in use. That is, defers are returned alongside
+function data they are refer to, and are called at the calling
+site. The compiler complains if some but not all variables 
+involved in a defer block are returned.</p>
+
+<p>Defer blocks cannot have any return statements or unhandled
+errors; explicitly wrap all potentially erroneous function calls 
+in <code>try</code>. Conversely, their eventual execution is guaranteed,
+even if errors are created in the interim.
+Below is a simple example.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">defer</span>
+        <span class="nb">print</span> <span class="s2">&quot;third&quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;first&quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;second&quot;</span>
+</code></pre>
+</div>
+
+<p>Defers can be forcefully executed while invalidating a
+structure. This is done with the <code>del</code> keyword. For
+example, this is typically used to close resources like
+open files and processes.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+    <span class="k">del</span> <span class="n">proc</span> <span class="c1"># runs the process&#39;s defer, which waits for completion</span>
+    <span class="nb">print</span> <span class="s2">&quot;bye!&quot;</span>
+</code></pre>
+</div>
+
+<h2 id="catching-errors">catching errors</h2>
+
+<p>The <code>compiler:catch()</code> function provides the means of retrieving
+an error code intercepted by <code>try</code> statements. This function creates
+an error itself if it <em>fails</em> to find an error. To avoid confusion, the
+compiler just mandates that you should wrap the catch function inside a <code>try</code> 
+of its own. This way, you can obtain the error and check that it exists
+simultaneously.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span> <span class="k">as</span> <span class="n">io</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="k">try</span> <span class="nb">print</span> <span class="mi">2</span><span class="o">*</span><span class="mi">3</span><span class="o">-</span><span class="mi">20</span> <span class="c1"># nat cannot become negative</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="s2">&quot;cannot substract two nat numbers and obtain a negative result&quot;</span>
+</code></pre>
+</div>
+
+<p>The same function also clears the intercepted error code so that the next call 
+captures only subsequent messages. Caught errors can be compared for equality and
+converted to strings per <code>cstr error</code>.</p>
+
+<p>Errors are not retrieved when intercepted within called functions.
+But, importantly, they <em>are</em> obtained from deferred statements triggered by 
+<code>del</code>. The next snippet demonstrates how to clear errors and check on them.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">bye_error</span><span class="p">()</span>
+    <span class="n">fail</span> <span class="s2">&quot;bye!&quot;</span> 
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+    <span class="k">try</span> <span class="n">bye_error</span><span class="p">()</span>
+    <span class="k">del</span> <span class="n">proc</span>
+
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span> <span class="c1"># prints &#39;bye!&#39; if no process error</span>
+        <span class="n">fail</span> <span class="n">error</span>       <span class="c1"># can fail with error codes too</span>
+</code></pre>
+</div>
+
+<h2 id="effects">effects</h2>
+
+<p>No, don&#8217;t run!</p>
+
+<p><em>Smoλ</em> deliberately avoids a complicated effect system; it just presents the ability to pass
+some arguments implicitly from the calling scope. In the standard library later, this mechanism
+is mainly used for passing memory allocators around. </p>
+
+<p>Basically, you can have the <code>effect</code> keyword before an argument in a function&#8217;s signature to
+declare an effect. There is no other difference in how you would write or call the function.
+You only get one additional benefit; the compiler will try to pull variables with the same name 
+from the calling scope. Effects can only be placed at the start of funtion, and gathered
+scope variables will be placed there too. </p>
+
+<p>Below is an example. Do avoid using effects when not needed for clarity, as they introduce calling complexity.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">effect</span> <span class="n">nat</span> <span class="n">increment</span><span class="p">,</span> <span class="n">effect</span> <span class="n">mut</span> <span class="n">nat</span> <span class="n">counter</span><span class="p">,</span> <span class="n">nat</span> <span class="n">number</span><span class="p">)</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="n">counter</span><span class="o">+</span><span class="mi">1</span>
+    <span class="k">return</span> <span class="n">number</span><span class="o">+</span><span class="n">increment</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
+    <span class="n">increment</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="n">inc</span> <span class="n">inc</span> <span class="mi">9</span>  <span class="c1"># prints 12</span>
+    <span class="nb">print</span> <span class="n">counter</span>        <span class="c1"># prints 3 (&#39;inc&#39; was called three times)</span>
+</code></pre>
+</div>
+
+<h2 id="debugging-tools">debugging tools</h2>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.</div>
+
+<p>So far there was mention of <code>compiler:skip()</code>, 
+<code>compiler:catch()</code>, <code>compiler:literal(expression)</code> and <code>debug:nocatch()</code>
+that let code interface with the compiler to an extend.</p>
+
+<p>There are some more mechanisms that help inspect
+programs or grant access to internal compilation state that
+can be analyzed for debugging.</p>
+
+<p>Foremost of debugging tools is <code>debug:print(expression)</code>. This 
+runs an expression, prints its return at compile time, 
+and returns its value. It works this way so that it can 
+be effortlessly interweaved in code. Do note that you
+can use it with literal types to print messages too.
+For example, one pattern usable for debuggining is the following.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s1&quot;</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s2&quot;</span>
+    <span class="n">debug</span><span class="p">:</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;--- main ---&quot;</span> <span class="c1"># prints &#39;&quot;--- main ---&quot;&#39; at compile time</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">debug</span><span class="p">:</span><span class="nb">print</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>         <span class="c1"># prints &#39;const str, const str&#39; at compile time</span>
+    <span class="nb">print</span> <span class="n">s</span> <span class="c1"># ERROR due to undefined print, but the above still prints</span>
+</code></pre>
+</div>
+
+<p>Finally, assert that a specific point in a function does not lie within a loop
+or condition with the <code>debug:branchless()</code> check. This helps form sanity check within 
+conditional compilation conditions, ensuring that
+they are not accidentally evaluated at runtime. The next example uses it to verify that 
+there is no runtime overhead from a particular comparison involving enums.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test1</span><span class="p">(</span><span class="n">nat</span> <span class="n">a</span><span class="p">,</span> <span class="n">nat</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="o">|</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test2</span><span class="p">(</span><span class="nb">float</span> <span class="n">a</span><span class="p">,</span> <span class="nb">float</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="o">|</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="s2">&quot;one&quot;</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">test</span> <span class="ow">is</span> <span class="n">test1</span><span class="o">|</span><span class="n">test2</span>
+        <span class="n">debug</span><span class="p">:</span><span class="n">branchless</span><span class="p">()</span>
+        <span class="n">debug</span><span class="p">:</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;invalid data&quot;</span> <span class="c1"># literal type to print the message instead of &#39;cstr&#39;</span>
+</code></pre>
+</div>
+
+<h2 id="bounded-compute">bounded compute</h2>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This subsection touches on the theory of bounded computations and will be expanded upon once some alternate language runtimes are introduced.</div>
+
+<p>Much much earlier in this document, recursive functions were discussed.
+With full knowledge of <em>smoλ</em>&#8217;s abilities, it can now be asserted that
+it is not meaningless to guarantee a return statement type.</p>
+
+<p>Even infinite recursive loops might be merely <em>unbounded</em> due to some termination
+failure. In fact, it can be argued that all such loops would be bounded by compute
+resources and available running time, given that they run on finite computers.</p>
+
+<p>The snippet exemplifies this by adding a recursion safety
+mechanism as an effect. This mechanism is still rough, but the language marks 
+all recursive functions as potentially failing. This way, future versions can have 
+platform-dependent error codes for unbounded recursion that exceeds system resource limits.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">effect</span> <span class="nb">range</span> <span class="n">recursion_safety</span><span class="p">,</span> <span class="n">nat</span> <span class="n">i</span><span class="p">)</span>
+    <span class="nb">next</span> <span class="n">recursion_safety</span>
+    <span class="k">if</span> <span class="n">false</span> <span class="k">return</span> <span class="n">blank</span><span class="p">()</span> <span class="c1"># do not return anything</span>
+    <span class="k">return</span> <span class="n">wooo</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">recursion_safety</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+    <span class="k">try</span> <span class="n">wooo</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span> <span class="c1"># prints &#39;iteration end&#39;</span>
+</code></pre>
+</div>
+
+<h1 id="section-3-standard-library">Section 3. Standard Library</h1>
+
+<h2 id="lists">lists</h2>
+
+<p>Manage buffers by adding push and pop operations, as well
+as a capacity-based growth strategy. This is done by calling the 
+<code>list</code> function on a mutable buffer or -preferably- on a reference 
+of a mutable buffer like the following example. List elements are accessed like 
+buffers, and there exists a <code>push</code> function that grows the list by
+one place while returning a pointer to the last element.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">li</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">ref</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
+    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
+    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
+    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
+
+    <span class="n">li</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="nb">print</span> <span class="n">li</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="n">li</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<h2 id="strings">strings</h2>
+
+<p>The standard library provides the <code>str</code> structural type for representing
+strings by combining character buffers (at least their addresses), 
+an offset within the buffer where the string starts (more stable than using a pointer), 
+its length, and its first character for fast cache-friendly comparisons; that is <code>\0</code> for empty
+strings.</p>
+
+<p><code>cstr</code> data are trivially castable to strings. 
+Below is an example, where printing is also implemented for
+strings. Theoretically, this extracts the size and first
+character too, but such data are ignored if not needed.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="nb">str</span> <span class="s2">&quot;hello world!&quot;</span>
+</code></pre>
+</div>
+
+<p>You can convert string contents to numeric types. 
+This creates errors on failure.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="nb">float</span> <span class="s2">&quot;123&quot;</span>
+</code></pre>
+</div>
+
+<p>Strings can be copied on a pair of buffer and mutable position inside it <code>char[], mut nat</code>.
+This structure is used a lot when creating buffers for memory management.
+Thus, for more compact code, the structure can be constructed and initialized to start from the zero 
+position with the <code>bufpos</code> (buffer-position) function.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># equivalent to buf = (alloc KB 4, mut 0)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="nb">print</span> <span class="n">s</span>
+</code></pre>
+</div>
+
+<p>Also copy strings on buffers managed by lists.
+DO use <code>ref</code> for stability, as potential list resizing
+could invalidate the pointer where the string thinks the buffer starts,
+and the compiler would correctly point that out and refuse to progress
+on an erroneous program.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">ref</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span> <span class="c1"># would have been invalidated if we did not use `ref`</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="nb">print</span> <span class="n">s1</span>
+    <span class="nb">print</span> <span class="n">s2</span>
+</code></pre>
+</div>
+
+<h2 id="maps">maps</h2>
+
+<p>There are some useful hashing utilities under <em>std/hash.s</em>, which culminate to implementing hashmaps 
+under <em>std/map.s</em> with string-valued and nat-valued
+keys. These two key types cover most useful scenarios, especially given that
+the standard library offers the ability can serialize data as strings or -for smaller
+structures- as bits. Map values can reside on any buffer.</p>
+
+<p>The empty string or zero are stored in the first positions of maps and are considered
+always-presented. For now, map size is fixed. Place contents and iterate through map keys 
+like below. Map initialization takes any allocated buffer and creates a similarly-sized map.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="n">alloc</span><span class="p">(</span><span class="n">mut</span> <span class="nb">str</span><span class="p">[],</span> <span class="mi">128</span><span class="p">)</span>
+    <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
+    <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span>
+
+    <span class="n">it</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="nb">map</span><span class="o">.</span><span class="n">keys</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">key</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
+        <span class="nb">print</span> <span class="n">key</span>
+</code></pre>
+</div>
+
+<h2 id="io">io</h2>
+
+<p>There are several means for textual input and output through the console
+and the file system. Examples below mostly use <code>cstr</code> arguments, but <code>str</code>
+arguments are fine too. In the last case, if strings are not null-terminated
+and the buffer holding them does not have a trailing null character to
+pretend that they are null-terminated, a copy may be made.</p>
+
+<p>Read a file by opening it and iterating line by
+line, like below. This needs a <code>char[]</code> buffer on which to store (temporary) lines,
+although you can save yourself a <code>copy</code> and pass a mutable position as a second 
+argument to directly read on the buffer and progress the position.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">file</span> <span class="k">as</span> <span class="n">file</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;README.md&quot;</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># max 4 KB chunk size, on char[] by default</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">line</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s2">&quot;&quot;</span>
+</code></pre>
+</div>
+
+<p>Similarly, create a file for writing like below. Can also delete it.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span> <span class="k">as</span> <span class="n">io</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="p">:</span><span class="n">file</span><span class="p">:</span><span class="n">write</span> <span class="s2">&quot;tmp.txt&quot;</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">print</span> <span class="s2">&quot;hello world&quot;</span>
+    <span class="n">defer</span> 
+        <span class="n">io</span><span class="p">:</span><span class="nb">dir</span><span class="p">:</span><span class="n">remove</span> <span class="s2">&quot;tmp.txt&quot;</span>
+</code></pre>
+</div>
+
+<p>Above was a first introduction to the <code>dir</code> namespace for directory 
+operations. Below is how to iterate through directory contents.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="nb">dir</span> <span class="k">as</span> <span class="nb">dir</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">dir</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">dir</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;.&quot;</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">alloc</span> <span class="mi">128</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">entry</span><span class="o">=</span><span class="nb">dir</span><span class="p">:</span><span class="n">entry</span> <span class="nb">dir</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">dir</span><span class="p">:</span><span class="n">is_file</span> <span class="n">entry</span>
+            <span class="nb">print</span> <span class="s2">&quot;file&quot;</span>
+        <span class="k">else</span>
+            <span class="nb">print</span> <span class="s2">&quot;dir&quot;</span>
+</code></pre>
+</div>
+
+<h2 id="processes">processes</h2>
+
+<p>Processes can also be read similarly to files. To begin with, a blocking system process
+that fails on non-zero error code can be evoked like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">success</span> <span class="o">=</span> <span class="k">try</span> <span class="n">system</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+    <span class="nb">print</span> <span class="n">success</span>
+</code></pre>
+</div>
+
+<p>One can also open and communicate with running processes.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">:</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># example with growing position</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">line</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">proc</span><span class="p">:</span><span class="n">line</span> <span class="n">process</span>
+        <span class="nb">print</span> <span class="n">line</span>
+</code></pre>
+</div>
+
+<p>Equivalently, manually release the process to wait for its conclusions.
+Recall that running processes can create errors, while resource release
+code may intercepts those errors with <code>try</code> so that
+they can be retrieved with <code>compiler:catch()</code>. 
+To repropagate or otherwise
+handle the intercepted errors, use a pattern like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">:</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
+    <span class="k">del</span> <span class="n">process</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
+        <span class="n">fail</span> <span class="n">error</span> <span class="c1"># can fail on error codes too</span>
+</code></pre>
+</div>
+
+<h2 id="random">random</h2>
+
+<div class="notice-box box-info"><strong>Info:</strong> This subsection is under construction.</div>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/rand.s&quot;</span> <span class="k">as</span> <span class="n">rand</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">rand</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">rand</span><span class="p">:</span><span class="n">Rand</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="nb">next</span> <span class="n">rand</span>
+</code></pre>
+</div>
+
+<h2 id="mini-and-bits">mini and bits</h2>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This subsection covers low-level functionality that may not be immediately useful. It can be skipped.</div>
+
+<p>Here are some concepts about bitwise manipulation and type size awareness.</p>
+
+<p>Bitwise manipulations of <code>nat</code> data are made available from the standard library&#8217;s core.
+To ensure that semantics are not mistaken, you need to convert to and from a <code>bits</code> data
+structure. For example, here is a (non-cryptographically-secure but usable) hash function for strings.
+Floats and ints can also be converted to bits.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hash</span><span class="p">(</span><span class="nb">str</span> <span class="n">k</span><span class="p">,</span> <span class="n">nat</span> <span class="n">size</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">5381</span>
+    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">k</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">iter</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">bits</span><span class="p">()</span><span class="o">.</span><span class="n">lshift</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">nat</span><span class="p">()</span> <span class="o">+</span> <span class="n">h</span> <span class="o">+</span> <span class="n">nat</span> <span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">mod</span> <span class="n">size</span>
+</code></pre>
+</div>
+
+<p>Sometimes, it is useful to store arithmetic data in more compressed formats.
+The default builtin types (float, nat, int) consumed 64 bits of storage 
+but there are some variations, namely float32, nat32, nat16, nat8, int32, int16, int8.</p>
+
+<p>The <em>std/mini.s</em> namespace provides conversions from 64-bit to narrower types.
+To ensure semantic safety and no information loss, 
+the standard library does not provide arithmetic operations for these operations,
+and they should be converted to and from the more expressive types. Errors are created
+if the conversion would overflow in number magnitude.</p>
+
+<p>The same namespace also provides a string variation that is stored in buffers of up
+to <code>65535</code> length and elements, hereby consuming 12 instead of 25 bytes per element
+when organized in a string buffer.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/mini.s&quot;</span> <span class="k">as</span> <span class="n">mini</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[]</span> <span class="n">buff</span><span class="p">)</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">pos</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="nb">iter</span>
+        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot; &quot;</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">buf</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">mem</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">buff</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">6</span>
+    <span class="n">debug</span><span class="p">:</span><span class="nb">print</span> <span class="n">buff</span> <span class="c1"># print the buffer type during compilation</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;hi&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;my&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;name&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;is&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;manios&quot;</span>
+    <span class="n">buff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="n">concat</span> <span class="n">buff</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<h2 id="vectors">vectors</h2>
+
+<div class="notice-box box-info"><strong>Info:</strong> This subsection is under construction.</div>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/vec.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">safe_main</span><span class="p">()</span>
+    <span class="n">allocator</span>  <span class="o">=</span> <span class="n">ref</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span> <span class="c1"># used by vector operation effects</span>
+    <span class="n">allocator2</span> <span class="o">=</span> <span class="n">ref</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span> <span class="c1"># useless </span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">vec</span> <span class="mi">10</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">vec</span> <span class="mi">10</span>
+    <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">v2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+
+    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">5</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">vec</span> <span class="mi">10</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="p">(</span><span class="n">v1</span><span class="o">+</span><span class="n">v2</span><span class="o">+</span><span class="n">v</span><span class="p">)</span>
+        <span class="c1">#v = allocator2.mul(2.0, v1+v2+v) # THIS WOULD CREATE AN ERROR</span>
+    <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="k">try</span> <span class="n">safe_main</span><span class="p">()</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span><span class="o">=</span><span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span>
+</code></pre>
+</div>
+
+    </body>
+    </html>
+    

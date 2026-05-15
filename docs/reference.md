@@ -1,5 +1,3 @@
-# smoλ reference
-
 <div class="toc" markdown="1">
 
 **Section 1. Basic Syntax**<br>
@@ -24,6 +22,7 @@ _2.6._ [defer](#defer)<br>
 _2.7._ [catching errors](#catching-errors)<br>
 _2.8._ [effects](#effects)<br>
 _2.9._ [⚠ debugging tools](#debugging-tools)<br>
+_2.10._ [⚠ bounded compute](#bounded-compute)<br>
 
 **Section 3. Standard Library**<br>
 _3.1._ [lists](#lists)<br>
@@ -177,21 +176,19 @@ are `bool`, `int`, `float`, and `cstr` for string literals.
 ```python
 import "std/core.s"
 
-def range(nat start, nat end)
+def toinfinity(nat start)
     pos = mut start
-    return (pos, end)
+    return (start, pos)
 
-def next(mut range r)
-    r.pos = mut r.pos+1
-    return r
+def next(toinfinity r)
+    r.pos = r.pos+1
 
 def main()
-    r = mut range(0,10)
-    r = r.next()  # see proper loops below (parenthesis needed to designate empty tuple)
+    r = toinfinity(0)
+    next r # proper loops later
     print r.pos
     print "\n"
-    print add r # pos+end
-    print "\n"
+    print add r
 ```
 
 The example above uses the `.` notation to obtain  
@@ -199,11 +196,12 @@ a value packed in a type by name. This name is determined
 by the returned value's name.
 
 Types like the above are structurally matched, as we did
-when applying `add` to the range construct. If you
-want to prevent implicit structural matches, 
+when applying `add` to the range construct. This structural
+typing is rich but can be kind of unsafe if you do not keep
+track of your data shapes. To prevent implicit structural matches, 
 use the following `class` notation to wrap the returned value.
 
-Prefer class definitions when declaring types with some
+Further prefer class definitions when declaring types with some
 construction contract; such contracts should
 not be violated by matching with arbitrary data.
 
@@ -230,7 +228,7 @@ immediately return all its fields is to omit its body, like next.
 ```python
 import "std/core.s"
 
-def Point(float x, float y)
+def Point(float x, float y) # structural definition needs no body
 def Field(Point a, Point b)
 
 def main()
@@ -345,6 +343,45 @@ def main()
     print "\n"
 ```
 
+Loops are similar to condition, only they execute multiple
+times until a condition is true or false. You can use `continue` 
+to skip the rest of the current loop and `break` to halt the
+current loop. Here is a silly example. Please do not write code like this.
+
+```python
+import "std/core.s"
+
+def main()
+    i = mut 0
+    while true # overengineered
+        if i==5 
+            break # stop this way
+        if i==3
+            i = i+1 # skip printing in 
+            continue 
+        print i
+        i = i+1
+```
+
+A more efficient way to write loops, which will be fully
+understood later, is via iterators that have the means to
+obtain the next element. The `range` iterator, for example, 
+takes an end number or a pair of start and end numbers and allows
+calling `next` to retrieve the next value until the end
+is reached (non-inclusively). The retrieval may fail, which
+is checked by guarding the expression with a `try` instruction.
+These are all [error code semantics](#try-and-fail).
+
+
+```python
+import "std/core.s"
+
+def main()
+    it = range 10 # equivalent to it = range(0,10)
+    while try i=next it
+        print i   # prints 0,1,2...,9
+```
+
 ## recursion
 
 Sometimes, it is convenient for functions to call each 
@@ -367,23 +404,51 @@ first, otherwise Step 1 would result in failure. The compiler
 will point out that you are trying to perform a recursion without
 having returned at least once first so that the type can be determined.
 
+For example, consider the following malformed program; type theory would
+be able to determine a type for this case... but *smoλ* disagrees because 
+doing so in more complicated cases means that reading the program sequentially
+does not work; the programmer needs to reason about unbounded problems.
+
+```python
+import "std/core.s"
+
+def wooo() # CREATES AN ERROR - should have been 'rec'
+    print "wooo"
+    return wooo()
+
+def main()
+    wooo()
+```
+
+<div class="console">
+<code class="output">
+[<span style="color:orange">+</span>] process      tests/test.s
+<span style="color:#F056AC">type error: recursive usage of 'def wooo' before its definition; perhaps declare it as 'rec'</span>
+at tests/test.s line 5 column 12
+    return wooo()
+           <span style="color:red">^^^^</span>
+</code>
+</div>
+
 Before moving forward, it must be mentioned that
 smoλ's type system is deliberately
 simplified so that programs *can be read sequentially*
 and *resolve types in finite time*. Recursion is too
-convenient to disallow fully, so this pattern is selected
+convenient to disallow fully, so explicit recursive declarations
+are selected
 as a means of presenting the aforementioned properties.
 In particular, you can read up to a recursive function's first return
 and keep that in mind whenever the function is called in
-subsequent code.
+subsequent code. 
+
 
 Below is an overengineered and thus algorithmically
 slow Fibonacci number calculator that demonstrates recursion
-concepts. The function `call_fib` is completely useless too. :-)
+concepts. The function `call_fib` is completely passthrough and hence useless. :-)
 
 Recall that recursive functions can call both
 themselves and others that appear *later*. But normal functions
-can still only see previous declarations. Do note that only
+can still only see previous declarations. Thus, only
 one function in a chain of multiple ones needs to be declared
 as recursive.
 
@@ -400,6 +465,23 @@ def call_fib(nat n)
 
 def main()
     print fib(42)
+```
+
+
+A simple trick to declare return types without affecting your logic is
+to guard them within false conditions, like below. Why this is not 
+meaningless is discussed much later in the advanced section about
+[bounded compute](#bounded-compute).
+
+```python
+import "std/core.s"
+
+rec wooo()
+    if false return blank()
+    print "wooo"
+
+def main()
+    wooo()
 ```
 
 ## unions
@@ -448,8 +530,8 @@ def main()
 ```
 
 In truth, *smoλ* implements a linear type system, but this
-was hidden till this point because people tend to run away
-at the mention of technical terms. Practically, it means
+was hidden till this point because people tend to shy away
+from reading technical terms. Practically, it means
 that -in addition to type unions- you can also get the intersection
 of type unions with the `&` symbol. Use parantheses like normal.
 
@@ -459,7 +541,7 @@ of all float definitions that are also numbers, or all those definitions
 that are not numbers with the '\` symbol.
 
 ```python
-import "std/core.s" # defines Number
+import "std/core.s" # defines Number like above
 
 def natpair(nat x, nat y)
 def float(natpair a)
@@ -467,10 +549,11 @@ def float(natpair a)
     y = float a.y
     return (x,y)
 
-def inc(float&Number x) # would try and fail to create it for the previous method's output
+def numeric_float = float&Number
+def inc(numeric_float x)
     return 1.0+x
 
-def inc(float\Number a) # already defined for Number
+def inc(float\Number a) # define for float definitions that are not in Number
     x = 1.0+float a.x
     y = 1.0+float a.y
     return (x,y)
@@ -539,7 +622,7 @@ An example that restricts how functions are called is presented next.
 import "std/core.s"
 
 def inc(nat x, blank|1|2 inc)
-    if inc is blank
+    if inc is blank  # check if exists - see next section
         inc = type 1 # literal convertible
     return x+compiler:literal inc
 
@@ -621,7 +704,7 @@ def main()
 ```
 
 Here is a much more complicated scenario, where `compiler:skip()` 
-is used to prevent certain versions of the function from being
+prevents certain versions of the function from being
 created (e.g. there is no `inc(float,int)`). The example also shows 
 two type inference constructs: 
 
@@ -1054,6 +1137,37 @@ def main()
 ```
 
 
+## effects
+
+No, don't run!
+
+*Smoλ* deliberately avoids a complicated effect system; it just presents the ability to pass
+some arguments implicitly from the calling scope. In the standard library later, this mechanism
+is mainly used for passing memory allocators around. 
+
+Basically, you can have the `effect` keyword before an argument in a function's signature to
+declare an effect. There is no other difference in how you would write or call the function.
+You only get one additional benefit; the compiler will try to pull variables with the same name 
+from the calling scope. Effects can only be placed at the start of funtion, and gathered
+scope variables will be placed there too. 
+
+Below is an example. Do avoid using effects when not needed for clarity, as they introduce calling complexity.
+
+```python
+import "std/core.s"
+
+def inc(effect nat increment, effect mut nat counter, nat number)
+    counter = counter+1
+    return number+increment
+
+def main()
+    counter = mut 0
+    increment = 1
+    print inc inc inc 9  # prints 12
+    print counter        # prints 3 ('inc' was called three times)
+```
+
+
 ## debugging tools
 
 *Warning: This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.*
@@ -1105,6 +1219,40 @@ def main()
         debug:branchless()
         debug:print type "invalid data" # literal type to print the message instead of 'cstr'
 ```
+
+## bounded compute
+
+*Warning: This subsection touches on the theory of bounded computations and will be expanded upon once some alternate language runtimes are introduced.*
+
+Much much earlier in this document, recursive functions were discussed.
+With full knowledge of *smoλ*'s abilities, it can now be asserted that
+it is not meaningless to guarantee a return statement type.
+
+Even infinite recursive loops might be merely *unbounded* due to some termination
+failure. In fact, it can be argued that all such loops would be bounded by compute
+resources and available running time, given that they run on finite computers.
+
+The snippet exemplifies this by adding a recursion safety
+mechanism as an effect. This mechanism is still rough, but the language marks 
+all recursive functions as potentially failing. This way, future versions can have 
+platform-dependent error codes for unbounded recursion that exceeds system resource limits.
+
+```python
+import "std/core.s"
+
+rec wooo(effect range recursion_safety, nat i)
+    next recursion_safety
+    if false return blank() # do not return anything
+    return wooo(i+1)
+
+def main()
+    recursion_safety = range(1000)
+    try wooo 0
+    if try error = compiler:catch()
+        print cstr error # prints 'iteration end'
+```
+
+
 
 
 # Section 3. Standard Library
@@ -1375,7 +1523,7 @@ import "std/core.s"
 import "std/mini.s" as mini
 
 def concat(mini:str[] buff)
-    mem = bufpos mut alloc KB 4
+    mem = bufpos alloc KB 4
     iter = range len buff
     start = mem.pos
     while try i=next iter

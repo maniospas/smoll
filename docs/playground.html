@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>smoll IDE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#1e1e1e;overflow:hidden}
+
+#ide{font-family:'Cascadia Code','Fira Code','JetBrains Mono',monospace;background:#1e1e1e;color:#d4d4d4;display:flex;flex-direction:column;height:100vh}
+
+/* ── titlebar ── */
+#titlebar{background:#2d2d2d;border-bottom:1px solid #111;display:flex;align-items:center;gap:8px;padding:0 12px;height:38px;flex-shrink:0}
+#toolbar{display:flex;align-items:center;gap:6px;margin-left:auto}
+.tbtn{display:flex;align-items:center;gap:5px;border:none;border-radius:3px;font-size:11px;font-family:inherit;padding:4px 11px;cursor:pointer;transition:background .15s}
+.tbtn svg{flex-shrink:0}
+#btn-transpile{background:#2a2a2a;color:#888;border:1px solid #444}
+#btn-transpile:hover{background:#333;color:#aaa}
+#btn-run{background:#1a7f3c;color:#d4f7e0;font-size:12px;padding:5px 16px;font-weight:600;box-shadow:0 0 0 1px #2fa85a44}
+#btn-run:hover{background:#20a050;box-shadow:0 0 8px #1a7f3c88}
+#btn-stop{background:#5a1a1a;color:#ffaaaa;display:none}
+#btn-stop:hover{background:#7a2a2a}
+.tbtn:disabled{opacity:.4;cursor:default}
+#py-status{display:flex;align-items:center;gap:5px;font-size:11px;color:#666;margin-left:8px}
+.sdot{width:7px;height:7px;border-radius:50%;background:#888;flex-shrink:0}
+.sdot.loading{background:#e5c07b;animation:pulse 1s infinite}
+.sdot.ready{background:#98c379}
+.sdot.error{background:#f44747}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── main layout ── */
+#main{display:flex;flex:1;overflow:hidden}
+
+/* ── editor pane ── */
+#pane-editor{display:flex;flex-direction:column;flex:1;min-width:0;border-right:1px solid #111;position:relative}
+.pane-hdr{background:#252526;border-bottom:1px solid #111;font-size:11px;color:#666;padding:0 12px;height:28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;user-select:none}
+.pane-tab{color:#888;padding:0 12px;height:28px;display:flex;align-items:center;border-bottom:2px solid transparent;cursor:pointer;font-size:11px;transition:color .15s}
+.pane-tab.active{color:#ccc;border-bottom-color:#007acc}
+.editor-wrap{position:relative;flex:1;overflow:hidden}
+#lnums{position:absolute;top:0;left:0;padding:10px 0 10px 6px;color:#444;font-size:13px;line-height:1.65;user-select:none;pointer-events:none;width:36px;text-align:right}
+#editor{position:absolute;inset:0;background:transparent;color:#d4d4d4;font-family:inherit;font-size:13px;line-height:1.65;border:none;outline:none;resize:none;padding:10px 10px 10px 46px;tab-size:2;white-space:pre;overflow:auto;caret-color:#fff}
+
+/* ── C output overlay ── */
+#pane-c{display:none;flex-direction:column;flex:1;min-width:0;border-right:1px solid #111;background:#1e1e1e}
+#pane-c.visible{display:flex}
+#c-close{background:none;border:none;color:#666;cursor:pointer;font-size:14px;padding:0 4px;line-height:1;margin-left:auto}
+#c-close:hover{color:#ccc}
+#c-out{flex:1;overflow:auto;padding:10px 14px;font-size:12.5px;line-height:1.65;white-space:pre}
+
+/* ── terminal pane ── */
+#pane-terminal{display:flex;flex-direction:column;width:50%;flex-shrink:0;background:#1a1a1a;border-left:1px solid #111}
+#terminal-hdr{background:#252526;border-bottom:1px solid #111;padding:0 12px;height:28px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+#term-label{font-size:11px;color:#666;letter-spacing:.5px;text-transform:uppercase}
+#run-time{font-size:10px;color:#555;margin-left:auto}
+#console-out{flex:1;overflow-y:auto;padding:10px 12px;font-family:inherit;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+#term-input-row{display:flex;align-items:center;border-top:1px solid #111;padding:5px 10px;gap:6px;flex-shrink:0;background:#1e1e1e}
+#term-prompt{color:#4ec9b0;font-size:12px;flex-shrink:0}
+#term-input{flex:1;background:none;border:none;outline:none;color:#d4d4d4;font-family:inherit;font-size:12px;caret-color:#fff}
+
+/* ── statusbar ── */
+#statusbar{background:#007acc;color:#fff;font-size:11px;padding:2px 12px;display:flex;gap:12px;flex-shrink:0}
+#cursor-pos{margin-left:auto}
+
+/* ── C syntax ── */
+.kw{color:#569cd6}.ty{color:#4ec9b0}.str{color:#ce9178}.cmt{color:#6a9955;font-style:italic}.pp{color:#c586c0}.num{color:#b5cea8}.fn{color:#dcdcaa}
+
+/* ── input popup ── */
+#input-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center}
+#input-overlay.show{display:flex}
+#input-box{background:#2d2d2d;border:1px solid #007acc;border-radius:6px;padding:20px 24px;min-width:320px;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+#input-box label{font-size:12px;color:#aaa}
+#input-box input{background:#1e1e1e;border:1px solid #444;border-radius:3px;color:#d4d4d4;font-family:inherit;font-size:13px;padding:6px 10px;outline:none}
+#input-box input:focus{border-color:#007acc}
+#input-box-btns{display:flex;gap:8px;justify-content:flex-end}
+#input-ok{background:#0e639c;color:#fff;border:none;border-radius:3px;padding:5px 14px;font-family:inherit;font-size:12px;cursor:pointer}
+#input-ok:hover{background:#1177bb}
+</style>
+</head>
+<body>
+<div id="ide">
+
+  <!-- titlebar -->
+  <div id="titlebar">
+    <a href="https://github.com/maniospas/smoll" target="_blank" style="color:#888;font-size:12px;text-decoration:none;letter-spacing:.5px;font-family:inherit;margin-right:8px;font-size:1rem" onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#888'">github.com/maniospas/smoll</a>
+    <div id="toolbar">
+      <div id="py-status"><div class="sdot loading" id="sdot"></div><span id="stxt">Loading…</span></div>
+      <button class="tbtn" id="btn-run" disabled>
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 4-8 4V2z" fill="currentColor"/></svg>
+        Run
+      </button>
+      <button class="tbtn" id="btn-transpile" disabled>
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 4-8 4V2z" fill="currentColor"/></svg>
+        Transpile
+      </button>
+      <button class="tbtn" id="btn-stop">
+        <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" rx="1" fill="currentColor"/></svg>
+        Stop
+      </button>
+    </div>
+  </div>
+
+  <!-- main -->
+  <div id="main">
+
+    <!-- editor -->
+    <div id="pane-editor">
+      <div class="pane-hdr">
+        <div class="pane-tab active">program.s</div>
+        <span id="cursor-pos-hdr" style="font-size:11px;color:#555">Ln 1, Col 1</span>
+      </div>
+      <div class="editor-wrap">
+        <div id="lnums"></div>
+        <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+      </div>
+    </div>
+
+    <!-- C output (hidden until transpile) -->
+    <div id="pane-c">
+      <div class="pane-hdr">
+        <div class="pane-tab active">program.c</div>
+        <span id="c-lines" style="font-size:10px;color:#555"></span>
+        <button id="c-close" title="Close">✕</button>
+      </div>
+      <div id="c-out"><span style="color:#555">Transpile a program to see C output here.</span></div>
+    </div>
+
+    <!-- terminal (always visible) -->
+    <div id="pane-terminal">
+      <div id="terminal-hdr">
+        <span id="term-label">terminal</span>
+        <span id="run-time"></span>
+      </div>
+      <div id="console-out"></div>
+      <div id="term-input-row" style="display:none">
+        <span id="term-prompt">▶</span>
+        <input id="term-input" type="text" autocomplete="off" spellcheck="false" placeholder="stdin…">
+      </div>
+    </div>
+
+  </div>
+
+  <div id="statusbar">
+    <span id="status-label">smoll IDE</span>
+    <span id="cursor-pos">Ln 1, Col 1</span>
+  </div>
+</div>
+
+<!-- input popup (fallback / explicit) -->
+<div id="input-overlay">
+  <div id="input-box">
+    <label id="input-prompt-label">Input required:</label>
+    <input id="input-field" type="text">
+    <div id="input-box-btns"><button id="input-ok">OK</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+const editor      = document.getElementById('editor');
+const cOut        = document.getElementById('c-out');
+const paneC       = document.getElementById('pane-c');
+const cClose      = document.getElementById('c-close');
+const conOut      = document.getElementById('console-out');
+const sdot        = document.getElementById('sdot');
+const stxt        = document.getElementById('stxt');
+const btnTranspile= document.getElementById('btn-transpile');
+const btnRun      = document.getElementById('btn-run');
+const btnStop     = document.getElementById('btn-stop');
+const lnums       = document.getElementById('lnums');
+const cursorPos   = document.getElementById('cursor-pos');
+const cursorPosHdr= document.getElementById('cursor-pos-hdr');
+const runTime     = document.getElementById('run-time');
+const cLines      = document.getElementById('c-lines');
+const statusLabel = document.getElementById('status-label');
+const termInputRow= document.getElementById('term-input-row');
+const termInput   = document.getElementById('term-input');
+const inputOverlay= document.getElementById('input-overlay');
+const inputField  = document.getElementById('input-field');
+const inputOk     = document.getElementById('input-ok');
+const inputLabel  = document.getElementById('input-prompt-label');
+
+let pyodide = null, smollSource = null, pyodideReady = false;
+let running = false;
+
+// ── default program ──
+editor.value = 'repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"\nimport "std/core.s"\n\ndef main()\n\tprint "Hello world!"\n';
+updateLnums();
+
+// ── editor helpers ──
+function updateLnums(){
+  lnums.innerHTML = editor.value.split('\n').map((_,i)=>`<div>${i+1}</div>`).join('');
+}
+editor.addEventListener('input', updateLnums);
+editor.addEventListener('scroll', ()=>{ lnums.style.marginTop = (-editor.scrollTop)+'px'; });
+editor.addEventListener('keydown', e=>{
+  if(e.key==='Tab'){
+    e.preventDefault();
+    const s=editor.selectionStart;
+    editor.value=editor.value.substring(0,s)+'  '+editor.value.substring(editor.selectionEnd);
+    editor.selectionStart=editor.selectionEnd=s+2;
+    updateLnums();
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); runTranspile(); }
+  if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='Enter'){ e.preventDefault(); runVM(); }
+});
+editor.addEventListener('keyup', updateCursor);
+editor.addEventListener('click', updateCursor);
+function updateCursor(){
+  const v=editor.value.substring(0,editor.selectionStart).split('\n');
+  const pos=`Ln ${v.length}, Col ${v[v.length-1].length+1}`;
+  cursorPos.textContent=pos;
+  cursorPosHdr.textContent=pos;
+}
+
+cClose.onclick = ()=>{ paneC.classList.remove('visible'); };
+
+// ── ANSI renderer ──
+const ANSI_FG={30:'#1e1e1e',31:'#f44747',32:'#98c379',33:'#e5c07b',34:'#569cd6',35:'#c586c0',36:'#4ec9b0',37:'#d4d4d4',90:'#555555',91:'#ff6b6b',92:'#b5f0a0',93:'#ffd080',94:'#82baff',95:'#e0a0ff',96:'#80ffe0',97:'#ffffff'};
+const ANSI_BG={40:'#1e1e1e',41:'#5a1a1a',42:'#1a3a1a',43:'#3a3a1a',44:'#1a1a5a',45:'#3a1a3a',46:'#1a3a3a',47:'#3a3a3a',100:'#333',101:'#7a2a2a',102:'#2a5a2a',103:'#5a5a2a',104:'#2a2a7a',105:'#5a2a5a',106:'#2a5a5a',107:'#5a5a5a'};
+function ansiToHtml(raw){
+  let s=raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let result='',openSpan=false;
+  let state={bold:false,dim:false,fg:null,bg:null};
+  const close=()=>{if(openSpan){result+='</span>';openSpan=false;}};
+  const open=()=>{
+    const styles=[];
+    if(state.fg)styles.push(`color:${state.fg}`);
+    if(state.bg)styles.push(`background:${state.bg}`);
+    if(state.bold)styles.push('font-weight:500');
+    if(state.dim)styles.push('opacity:0.6');
+    if(styles.length){result+=`<span style="${styles.join(';')}">`;openSpan=true;}
+  };
+  const parts=s.split(/\x1b\[([0-9;]*)m/);
+  for(let i=0;i<parts.length;i++){
+    if(i%2===0){result+=parts[i];}
+    else{
+      close();
+      const codes=parts[i]===''?[0]:parts[i].split(';').map(Number);
+      for(const c of codes){
+        if(c===0)state={bold:false,dim:false,fg:null,bg:null};
+        else if(c===1)state.bold=true;
+        else if(c===2)state.dim=true;
+        else if(c===22){state.bold=false;state.dim=false;}
+        else if(ANSI_FG[c])state.fg=ANSI_FG[c];
+        else if(c===39)state.fg=null;
+        else if(ANSI_BG[c])state.bg=ANSI_BG[c];
+        else if(c===49)state.bg=null;
+      }
+      open();
+    }
+  }
+  close();
+  return result;
+}
+function clog(raw,color){
+  const d=document.createElement('div');
+  if(color&&!raw.includes('\x1b[')){
+    const esc=raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    d.innerHTML=`<span style="color:${color}">${esc}</span>`;
+  } else {
+    d.innerHTML=ansiToHtml(raw);
+  }
+  conOut.appendChild(d);
+  conOut.scrollTop=conOut.scrollHeight;
+}
+
+function filterTraceback(lines){
+  const result=[];let inTB=false;
+  for(const line of lines){
+    const s=line.replace(/\x1b\[[0-9;]*m/g,'');
+    if(s.startsWith('Traceback (most recent call last):')){inTB=true;continue;}
+    if(inTB){
+      // end of traceback block — swallow exit lines, stop filtering on others
+      if(s.startsWith('SystemExit')||s.startsWith('_SmollExit')||s.startsWith('smoll exited')){inTB=false;continue;}
+      if(s.startsWith('RuntimeError: smoll exited')){inTB=false;continue;}
+      continue;
+    }
+    // also suppress stray exit lines that appear without a traceback header
+    if(s.startsWith('SystemExit')||s.startsWith('_SmollExit')||s.startsWith('smoll exited with code 0'))continue;
+    result.push(line);
+  }
+  return result;
+}
+
+// ── C syntax highlight ──
+function highlightC(code){
+  let s=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const segs=[];let last=0;
+  const re=/(\/\/[^\n]*)|(\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g;
+  let m;
+  while((m=re.exec(s))!==null){
+    if(m.index>last)segs.push({t:'code',v:s.slice(last,m.index)});
+    segs.push({t:'lit',cls:(m[0][0]==='"'||m[0][0]==="'")?'str':'cmt',v:m[0]});
+    last=m.index+m[0].length;
+  }
+  if(last<s.length)segs.push({t:'code',v:s.slice(last)});
+  return segs.map(seg=>{
+    if(seg.t==='lit')return`<span class="${seg.cls}">${seg.v}</span>`;
+    let v=seg.v;
+    v=v.replace(/^(#\s*\w+.*)/gm,'<span class="pp">$1</span>');
+    v=v.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g,'<span class="fn">$1</span>');
+    v=v.replace(/\b(if|else|for|while|do|return|break|continue|switch|case|default|struct|typedef|sizeof|void|static|const|extern|inline|goto|enum|union)\b/g,'<span class="kw">$1</span>');
+    v=v.replace(/\b(int|char|float|double|long|short|unsigned|signed|size_t|FILE|NULL|bool)\b/g,'<span class="ty">$1</span>');
+    v=v.replace(/\b(\d+\.?\d*)\b/g,'<span class="num">$1</span>');
+    return v;
+  }).join('');
+}
+
+// ── stdin popup promise ──
+let inputResolve = null;
+function askInput(prompt){
+  return new Promise(resolve=>{
+    inputResolve=resolve;
+    inputLabel.textContent = prompt || 'Input required:';
+    inputField.value='';
+    inputOverlay.classList.add('show');
+    setTimeout(()=>inputField.focus(),50);
+  });
+}
+function submitInput(){
+  const val=inputField.value;
+  inputOverlay.classList.remove('show');
+  if(inputResolve){inputResolve(val);inputResolve=null;}
+}
+inputOk.onclick=submitInput;
+inputField.addEventListener('keydown',e=>{ if(e.key==='Enter')submitInput(); });
+
+// ── URL→pyfetch patch ──
+const PATCH_MARKER = 'async def download_with_progress(';
+const PATCH_CODE = `
+async def download_with_progress(url: str, filepath: str, message: str):
+    from pyodide.http import pyfetch
+    print(f"[{YELLOW}+{RESET}] {message} ...")
+    response = await pyfetch(url)
+    if response.status != 200:
+        raise RuntimeError(f"Failed to fetch {url}: HTTP {response.status}")
+    data = await response.bytes()
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, "wb") as f:
+        f.write(data)
+`;
+function patchSmoll(src){
+  const idx=src.indexOf(PATCH_MARKER);
+  if(idx===-1){console.warn('smoll patch: marker not found');return src;}
+  let end=src.indexOf('print()')+7;
+  return src.slice(0,idx)+PATCH_CODE+src.slice(end);
+}
+
+// ── Fetch smoll.py ──
+async function fetchSmoll(){
+  try{
+    const resp=await fetch('https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/smoll.py');
+    if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+    const raw=await resp.text();
+    smollSource=patchSmoll(raw);
+    return true;
+  }catch(err){
+    console.error('Failed to fetch smoll.py: '+err.message);
+    return false;
+  }
+}
+
+// ── Pyodide init ──
+async function initPyodide(){
+  try{
+    pyodide=await loadPyodide();
+    pyodideReady=true;
+    sdot.className='sdot ready';
+    stxt.textContent='Ready';
+  }catch(err){
+    sdot.className='sdot error';
+    stxt.textContent='Error';
+    console.error('Pyodide error: '+err.message);
+  }
+}
+
+async function waitForNewFile(path,timeout=8000){
+  const start=performance.now();
+  while(performance.now()-start<timeout){
+    try{
+      pyodide.FS.stat(path);
+      const content=pyodide.FS.readFile(path,{encoding:'utf8'});
+      if(content&&content.length>0)return content;
+    }catch(_){}
+    await new Promise(r=>setTimeout(r,20));
+  }
+  return null;
+}
+
+// ── shared pre-run setup ──
+function preRun(){
+  conOut.innerHTML='';
+  runTime.textContent='';
+  running=true;
+  btnTranspile.disabled=true;
+  btnRun.disabled=true;
+  btnStop.style.display='';
+  statusLabel.textContent='Running…';
+}
+function postRun(elapsed){
+  running=false;
+  btnTranspile.disabled=false;
+  btnRun.disabled=false;
+  btnStop.style.display='none';
+  runTime.textContent=`${elapsed}s`;
+  statusLabel.textContent='smoll IDE';
+}
+
+// ── TRANSPILE ──
+async function runTranspile(){
+  if(!pyodideReady||!smollSource||running)return;
+  preRun();
+  const t0=performance.now();
+  const captured=[];
+  pyodide.setStdout({batched:s=>captured.push(s)});
+  pyodide.setStderr({batched:s=>captured.push(s)});
+
+  let cCode=null;
+  try{
+    await pyodide.FS.writeFile('/program.s',editor.value);
+    await pyodide.FS.writeFile('/smoll_src.py',smollSource);
+    await pyodide.FS.writeFile('/program.c','');
+    await pyodide.runPythonAsync(`
+import sys, types, os
+class _SmollExit(Exception):
+    def __init__(self,code): self.code=code
+os._exit=lambda code:(_ for _ in ()).throw(_SmollExit(code))
+sys.argv=['smoll','/program.s','--back','none']
+_mod=types.ModuleType('smoll')
+_mod.__file__='/smoll_src.py'
+sys.modules['smoll']=_mod
+_mod.__name__='__main__'
+try:
+    exec(compile(open('/smoll_src.py').read(),'/smoll_src.py','exec'),_mod.__dict__)
+except _SmollExit as e:
+    if e.code!=0: raise RuntimeError(f"smoll exited with code {e.code}")
+except SystemExit as e:
+    if str(e) not in ('0','None'): raise RuntimeError(f"smoll exited: {e}")
+`);
+    const ok=await waitForNewFile('/program.c',8000);
+    if(ok)cCode=pyodide.FS.readFile('/program.c',{encoding:'utf8'});
+  }catch(err){
+    const msg=err.message||String(err);
+    if(!isExitError(msg))captured.push(msg);
+  }
+
+  const elapsed=((performance.now()-t0)/1000).toFixed(3);
+  postRun(elapsed);
+
+  const allLines=[];
+  for(const s of captured)s.split('\n').forEach(l=>allLines.push(l));
+  filterTraceback(allLines).forEach(line=>{if(line.trim()||line==='')clog(line);});
+
+  if(cCode){
+    const lineCount=cCode.split('\n').length;
+    cOut.innerHTML=highlightC(cCode);
+    cLines.textContent=`${lineCount} lines`;
+    paneC.classList.add('visible');
+  }
+}
+
+function isExitError(msg){
+  return msg.includes('SystemExit: 0') || msg.includes('SystemExit: None') ||
+         msg.includes('_SmollExit') || msg.includes('smoll exited with code 0');
+}
+
+// ── RUN (VM) ──
+async function runVM(){
+  if(!pyodideReady||!smollSource||running)return;
+  preRun();
+  const t0=performance.now();
+  const stderrBuf=[];
+  pyodide.setStdout({batched:s=>{s.split('\n').forEach(l=>clog(l));}});
+  pyodide.setStderr({batched:s=>stderrBuf.push(s)});
+
+  // Expose JS callbacks to Python
+  pyodide.globals.set('_js_print', (msg)=>{ clog(String(msg)); });
+  pyodide.globals.set('_js_input', async (prompt)=>{
+    const result = await askInput(String(prompt||'Input:'));
+    clog((prompt?String(prompt):'')+(result||''), '#aaa');
+    return result;
+  });
+
+  try{
+    await pyodide.FS.writeFile('/program.s',editor.value);
+    await pyodide.FS.writeFile('/smoll_src.py',smollSource);
+    await pyodide.runPythonAsync(`
+import sys, types, os, asyncio
+from pyodide.ffi import to_js
+
+class _SmollExit(Exception):
+    def __init__(self,code): self.code=code
+os._exit=lambda code:(_ for _ in ()).throw(_SmollExit(code))
+sys.argv=['smoll','/program.s','--back','vm']
+
+# Patch builtins so the VM sees our JS-backed versions
+import builtins as _bt
+_orig_print = _bt.print
+_orig_input = _bt.input
+
+def _patched_print(*args, **kwargs):
+    import io
+    buf = io.StringIO()
+    kwargs2 = {k:v for k,v in kwargs.items() if k not in ('file',)}
+    _orig_print(*args, file=buf, **kwargs2)
+    _js_print(buf.getvalue().rstrip('\\n'))
+
+async def _patched_input_async(prompt=''):
+    result = await _js_input(str(prompt))
+    return result if result is not None else ''
+
+def _patched_input(prompt=''):
+    # Run async input inside a new event loop step
+    import asyncio
+    loop = asyncio.get_event_loop()
+    fut = asyncio.ensure_future(_patched_input_async(prompt))
+    return asyncio.get_event_loop().run_until_complete(fut) if not loop.is_running() else ''
+
+_bt.print = _patched_print
+_bt.input = _patched_input
+
+_mod = types.ModuleType('smoll')
+_mod.__file__ = '/smoll_src.py'
+sys.modules['smoll'] = _mod
+_mod.__name__ = '__main__'
+
+try:
+    exec(compile(open('/smoll_src.py').read(),'/smoll_src.py','exec'),_mod.__dict__)
+except _SmollExit as e:
+    if e.code!=0: raise RuntimeError(f"smoll exited with code {e.code}")
+except SystemExit as e:
+    if str(e) not in ('0','None'): raise RuntimeError(f"smoll exited: {e}")
+finally:
+    _bt.print = _orig_print
+    _bt.input = _orig_input
+`);
+  }catch(err){
+    const msg=err.message||String(err);
+    if(!isExitError(msg)) stderrBuf.push(msg);
+  }
+
+  // flush stderr through traceback filter
+  const errLines=[];
+  for(const s of stderrBuf)s.split('\n').forEach(l=>errLines.push(l));
+  filterTraceback(errLines).forEach(line=>{if(line.trim()||line==='')clog(line,'#f44747');});
+
+  const elapsed=((performance.now()-t0)/1000).toFixed(3);
+  postRun(elapsed);
+}
+
+btnStop.onclick=()=>{
+  postRun('—');
+};
+
+btnTranspile.onclick=runTranspile;
+btnRun.onclick=runVM;
+
+// ── init ──
+const pyScript=document.createElement('script');
+pyScript.src='https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js';
+pyScript.onload=()=>{
+  Promise.all([initPyodide(),fetchSmoll()]).then(()=>{
+    if(pyodideReady&&smollSource){
+      sdot.style.display='none';stxt.style.display='none';
+      btnTranspile.disabled=false;btnRun.disabled=false;
+      statusLabel.textContent='smoll IDE — ready';
+    }
+  });
+};
+pyScript.onerror=()=>{sdot.className='sdot error';stxt.textContent='CDN error';};
+document.head.appendChild(pyScript);
+})();
+</script>
+</body>
+</html>

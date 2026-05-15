@@ -21,15 +21,16 @@ the compiler stops you from doing unsafe stuff.
 - Function returns as type declarations
 - Predictable tuple-based type system (reads sequentially, resolves in finite time)
 - Function and type overloading
-- Safe yet permissive
+- Script into zero-cost abstractions and minimized memory indirections
 - Immutability by default (can still define mutables)
 - Can opt in to constness for memory contents
 - C integration
-- Zero-cost abstractions everywhere
 
 ## 🔗 Material
 
-[Reference guide](https://maniospas.github.io/smoll/)<br>
+[Index](https://maniospas.github.io/smoll/index.html)<br>
+[Install](https://maniospas.github.io/smoll/install.html)<br>
+[Learn](https://maniospas.github.io/smoll/reference.html)<br>
 [Web playground](https://maniospas.github.io/smoll/smoll_ide.html)
 
 *Use the smoll lsp, or Python keyword and comment highlighting works pretty well.*

@@ -31,7 +31,7 @@ the compiler stops you from doing unsafe stuff.
 [Index](https://maniospas.github.io/smoll/index.html)<br>
 [Install](https://maniospas.github.io/smoll/install.html)<br>
 [Learn](https://maniospas.github.io/smoll/reference.html)<br>
-[Web playground](https://maniospas.github.io/smoll/smoll_ide.html)
+[Playground](https://maniospas.github.io/smoll/playground.html)
 
 *Use the smoll lsp, or Python keyword and comment highlighting works pretty well.*
 

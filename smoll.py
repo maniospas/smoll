@@ -3726,7 +3726,7 @@ def resolve_name(path: str, at_token: Token|None) -> str:
             if os.path.exists(symbol): return symbol
         try: 
             os.makedirs(os.path.dirname(symbol), exist_ok=True)
-            asyncio.run(download_with_progress(path, symbol, "download     "+os.path.basename(symbol).ljust(40)))
+            run_async(download_with_progress(path, symbol, "download     "+os.path.basename(symbol).ljust(40)))
         except Exception as e: 
             if at_token: at_token.error("download", str(e))
             print("[✗] failed:")
@@ -3851,6 +3851,30 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
         processed_tokens.append(token)
         i += 1
     return file, processed_tokens
+
+
+import threading
+
+def run_async(coro):
+    result = None
+    error = None
+
+    def runner():
+        nonlocal result, error
+        try:
+            result = asyncio.run(coro)
+        except Exception as e:
+            error = e
+
+    t = threading.Thread(target=runner)
+    t.start()
+    t.join()
+
+    if error:
+        raise error
+
+    return result
+
 
 async def download_with_progress(url: str, filepath: str, message: str):
     filename = os.path.basename(filepath)

@@ -3855,18 +3855,17 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
     return file, processed_tokens
 
 
-def run_async(async_fn, *args, **kwargs):
-    result = None
-    error = None
-    def runner():
-        nonlocal result, error
-        try: result = asyncio.run(async_fn(*args, **kwargs))
-        except Exception as e: error = e
-    t = threading.Thread(target=runner)
-    t.start()
-    t.join()
-    if error: raise error
-    return result
+_loop = None
+def _start_background_loop():
+    global _loop
+    loop = asyncio.new_event_loop()
+    _loop = loop
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+threading.Thread(target=_start_background_loop, daemon=True).start()
+def run_async(coro):
+    future = asyncio.run_coroutine_threadsafe(coro, _loop)
+    return future.result()
 
 
 async def download_with_progress(url: str, filepath: str, message: str):

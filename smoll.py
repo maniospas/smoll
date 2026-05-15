@@ -33,8 +33,6 @@ import urllib.parse
 from pathlib import Path
 from collections import deque
 from typing import Optional
-import threading
-
 #import gc
 #gc.set_threshold(150000)
 
@@ -3728,7 +3726,7 @@ def resolve_name(path: str, at_token: Token|None) -> str:
             if os.path.exists(symbol): return symbol
         try: 
             os.makedirs(os.path.dirname(symbol), exist_ok=True)
-            run_async(download_with_progress, path, symbol, "download     "+os.path.basename(symbol).ljust(40))
+            download_with_progress(path, symbol, "download     "+os.path.basename(symbol).ljust(40))
         except Exception as e: 
             if at_token: at_token.error("download", str(e))
             print("[✗] failed:")
@@ -3854,21 +3852,7 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
         i += 1
     return file, processed_tokens
 
-
-_loop = None
-def _start_background_loop():
-    global _loop
-    loop = asyncio.new_event_loop()
-    _loop = loop
-    asyncio.set_event_loop(loop)
-    loop.run_forever()
-threading.Thread(target=_start_background_loop, daemon=True).start()
-def run_async(coro, *args):
-    future = asyncio.run_coroutine_threadsafe(coro(*args), _loop)
-    return future.result()
-
-
-async def download_with_progress(url: str, filepath: str, message: str):
+def download_with_progress(url: str, filepath: str, message: str):
     filename = os.path.basename(filepath)
     fallback: bool = False
     try:

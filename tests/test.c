@@ -4,20 +4,20 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp1295v="manios";
-const char* const __temp1279v="hi";
-const char* const __temp363v="\n";
-const char* const __temp1268v=" ";
-const char* const __temp1287v="name";
 const char* const __temp1283v="my";
 const char* const __temp1291v="is";
+const char* const __temp1295v="manios";
+const char* const __temp365v="\n";
+const char* const __temp1268v=" ";
+const char* const __temp1287v="name";
+const char* const __temp1279v="hi";
 static const char* __temp_all_errcodes[32] = {"noerr",
 "error",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
-"cannot convert negative int to id",
 "cannot convert negative float to id",
+"cannot convert negative int to id",
 "iteration end",
 "allocation failed",
 "reallocation failed",
@@ -986,15 +986,15 @@ static inline __attribute__((always_inline)) int concat__temp1254v(char** __temp
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) void print__temp376v(uint64_t value, const char* endl) {
-  int __temp377v=0;
+static inline __attribute__((always_inline)) void print__temp374v(uint64_t value, const char* endl) {
+  int __temp375v=0;
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void print__temp716v(char* s__unsafe_ptr, uint64_t s__dat__pos, uint64_t s__dat__length, char s__dat__first) {
-  int __temp717v=0;
+static inline __attribute__((always_inline)) void print__temp718v(char* s__unsafe_ptr, uint64_t s__dat__pos, uint64_t s__dat__length, char s__dat__first) {
+  int __temp719v=0;
   const char* endl=0;
-  endl=__temp363v;
+  endl=__temp365v;
   printf("%.*s%s",s__dat__length,s__dat__pos+s__unsafe_ptr,endl);
 }
 
@@ -1221,7 +1221,7 @@ static inline __attribute__((always_inline)) int main__temp1271v() {
   if(!__temp1304v){
   break;
   }
-  print__temp376v(i,__temp1268v);
+  print__temp374v(i,__temp1268v);
   __temp_errcode=get__temp533v(buff__unsafe_ptr,buff__unsafe_size,buff__unsafe_align,i,&__temp1307v__);
   if(__temp_errcode){
   goto __temp_failure;
@@ -1239,7 +1239,7 @@ static inline __attribute__((always_inline)) int main__temp1271v() {
   }
   memcpy(&__temp1308v__dat__length,__temp1307v__+10,2);
   unpack__temp1239v(__temp1308v__unsafe_ptr,__temp1308v__dat__pos,__temp1308v__dat__length,&__temp1309v__unsafe_ptr,&__temp1309v__dat__pos,&__temp1309v__dat__length,&__temp1309v__dat__first);
-  print__temp716v(__temp1309v__unsafe_ptr,__temp1309v__dat__pos,__temp1309v__dat__length,__temp1309v__dat__first);
+  print__temp718v(__temp1309v__unsafe_ptr,__temp1309v__dat__pos,__temp1309v__dat__length,__temp1309v__dat__first);
   }
   
   __temp_failure:exists__temp412v(__temp1299v__unsafe_ptr,&__temp1300v____temp1258v____temp544v____temp469v__);

@@ -2,7 +2,7 @@
 
 
 <style>
-    .step {border: 1px solid #444; padding-left:20px; border-radius: 15px;background: #f0faff;margin-bottom:2rem;}
+    .step {border: 1px solid #444; padding-left:20px; border-radius: 15px;background: #fafafa;margin-bottom:2rem;}
     .button {background: white;}
 </style>
 
@@ -43,6 +43,7 @@ by searching for the extension within vscode, or visit its page in the vscode ma
 
 Create a new folder and download the executable matching to your platform without changing its name. Then, open
 vscode in that folder.
+
 <br><br>
 <a href="https://github.com/maniospas/smoll/releases/download/main/smoll.exe" class="button">➔ Windows (smoll.exe)</a>
 <a href="https://github.com/maniospas/smoll/releases/download/main/smoll" class="button">➔ Linux (smoll)</a>
@@ -52,9 +53,57 @@ In <b>linux</b>, also run <code>chmod +x smoll</code> to grant the download perm
 <br><div style="margin-top:-10px">&nbsp;</div>
 </div>
 
-You are now ready! Create a `main.s` file like the one below. To run it, open a 
+<div class="step">
+<h2>4. Get a C compiler or interpret</h2>
+
+<i>Smoλ</i> requires an assisting C compiler to produce a final executable,
+It is recommended to install the
+GCC compiler in your system, which the language tries to use by default. Otherwise
+the languge can act as an interpreter for its own intermediate C code
+outcome by adding <code>--back vm</code> by employing the virtual machine that is
+also used for constant expression fold. 
+This is how the language runs in the web playground too.
+<br>
+<br>
+In <b>windows</b> install GCC by installing msys2 first and then running:
+
+<pre>
+pacman -S mingw-w64-ucrt-x86_64-gcc
+</pre>
+<div style="margin-top:-10px">&nbsp;</div>
+<a href="https://www.msys2.org/" class="button">➔ msys2 for Windows</a>
+<br><br>
+
+In <b>linux</b> install GCC per:
+
+<pre>
+sudo apt update
+sudo apt install build-essential
+</pre>
+
+<details><summary>Expand this to look at other supported compiler backends.</summary>
+You can use the exemplary 
+<a href="https://codeberg.org/lsof/antcc">antcc</a> compiler (and add a star to it)
+for WSL or linux. This is faster than GCC with roughly comparable optimization speeds for smoλ code.
+A fork of that has been tailored to work well for us. Download
+the precompiled executable (or compile it from scratch), and place it in your project directory.
+Then add <code>--back antcc</code> to smoll runs.
+
+<br><br>
+<a href="https://github.com/maniospas/smoll/raw/refs/heads/main/antcc" class="button">➔ antcc binary</a>
+<br><br>
+
+</details>
+
+
+<br><div style="margin-top:-10px">&nbsp;</div>
+</div>
+
+You are now ready! Create a `main.s` file like the one below. To compile and run the outcome, open a 
 terminal in that folder (or use your editor's integrated
 one) and run <code>./smoll main.s</code>, where <i>main.s</i> is the name of your main file.
+The following will be printed in the console. Add <code>--build</code> to the command if the goals
+it to only to produce the executable.
 
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
@@ -63,6 +112,17 @@ import "std/core.s"
 def main()
     print "hello world!"
 ```
+
+<div class="console">
+<code class="output">
+[<span style="color:orange">+</span>] process      tests/test.s
+[<span style="color:orange">+</span>] transpile    tests/test.c
+[<span style="color:orange">+</span>] compile      gcc -O3 tests/test.c -o tests/test -I.
+[<span style="color:orange">+</span>] run          ./tests/test
+hello world!
+
+</code>
+</div>
 
 <i style="font-size:0.9em">Note: a <i>.cache</i> folder caches web downloads;
 only downloads permitted by the main file are allowed.</i>

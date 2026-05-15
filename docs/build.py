@@ -10,15 +10,12 @@ def export(path, target):
     html = markdown2.markdown(text, extras=['fenced-code-blocks', 'header-ids', 'smarty-pants', 'markdown-in-html', 'highlightpython-lang', 'cuddled-lists'])
 
     def convert_notice_boxes(html):
-        """Convert <p><em>Warning: ...</em></p> and <p><em>Info: ...</em></p> to styled boxes."""
         def replacer(match):
-            tag_type = match.group(1).lower()  # 'warning' or 'info'
+            tag_type = match.group(1).lower()
             content = match.group(2).strip()
             css_class = 'box-warning' if tag_type == 'warning' else 'box-info'
             label = tag_type.capitalize()
             return f'<div class="notice-box {css_class}"><strong>{label}:</strong> {content}</div>'
-
-        # Match <p><em>Warning: ...</em></p> or <p><em>Info: ...</em></p>
         pattern = re.compile(
             r'<p><em>(Warning|Info):\s*(.*?)</em></p>',
             re.IGNORECASE | re.DOTALL
@@ -26,6 +23,27 @@ def export(path, target):
         return pattern.sub(replacer, html)
 
     html = convert_notice_boxes(html)
+
+    run_button_script = "" if "playground" in target else """
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("pre").forEach(pre => {
+            pre.style.position = "relative";
+            const btn = document.createElement("a");
+            btn.textContent = "▶ try it";
+            btn.className = "runbutton";
+            btn.style.cssText = "position:absolute;bottom:8px;right:8px;cursor:pointer;";
+            btn.addEventListener("click", () => {
+                const code = pre.querySelector("code")?.innerText ?? pre.innerText;
+                const encoded = btoa(unescape(encodeURIComponent(code)));
+                window.location.href = "playground.html?contents=" + encoded;
+            });
+            pre.appendChild(btn);
+        });
+    });
+    </script>
+    """
+
     html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -89,7 +107,7 @@ def export(path, target):
             padding-left:20px;
             width:200px;
             border-right: 1px solid #444;height:100%;
-            background:#fafae3!important;
+            background:#fafafa!important;
             overflow-y:auto;
             font-size:0.9rem;
             z-index:1000;
@@ -144,6 +162,17 @@ def export(path, target):
         .button:hover {
             background: #fafae3;
         }
+        .runbutton {
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border: 1px solid #444;
+            border-radius: 5px;
+        }
+        .runbutton:hover {
+            background: #fafafa;
+            color: #58a6ff;
+        }
         @media (prefers-color-scheme: dark) {
             .box-warning {
                 background: #272115;
@@ -164,7 +193,7 @@ def export(path, target):
             <a href="playground.html" style="font-weight:{'900' if 'playground' in target else '500'}">Playground</a>
             <a href="https://github.com/maniospas/smoll">GitHub</a>
         </nav>
-    """ + html + """
+    """ + html + run_button_script + """
     </body>
     </html>
     """
@@ -177,3 +206,4 @@ export("docs/index.md", "docs/index.html")
 export("docs/install.md", "docs/install.html")
 export("docs/tutorial.md", "docs/tutorial.html")
 export("docs/reference.md", "docs/reference.html")
+export("docs/playground.md", "docs/playground.html")

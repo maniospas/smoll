@@ -3343,8 +3343,10 @@ def process_repo(file: File, tokens: list[Token], pos: int):
     pos += 1
     symbol = local_token.text[1:len(local_token.text)-1]
     path = url_token.text[1:len(url_token.text)-1]
+    if repositories.get(symbol)==path: return pos
     for repo in repositories:
-        if repo.startswith(symbol) or symbol.startswith(repo): local_token.error("syntax", "cannot have specialization between new and old repos '"+symbol+"' and '"+repo+"'")
+        if repo.startswith(symbol) or symbol.startswith(repo): 
+            local_token.error("syntax", "cannot have differences between repos '"+symbol+"' and '"+repo+"'")
     if not file.is_main_file:
         if symbol not in repositories:
             tokens[pos-4].error("safety", "for safety, repos can only be defined for the first time in the main file\nFile '"+file.path+"' requires that you add this repo declaration to your main file")

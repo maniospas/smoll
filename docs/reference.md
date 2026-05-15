@@ -90,8 +90,7 @@ namespace name too, for example to bring a single function
 from a file.
 
 ```python
-import "std/core.s" as core
-import core:print
+import "std/core.s":print
 
 def main()
     print "hello world!"
@@ -132,12 +131,11 @@ within namespaces.
 ```python
 # an atypical import structure for demonstration
 import "std/core.s" as core
-import core:print  # import print symbol
 
 def main()
     x1 = 1
     x2 = x1.core:add 1
-    print x2.core:add 2
+    core:print x2.core:add 2
 ```
 
 ## mutability
@@ -248,9 +246,9 @@ be able to overwrite the immutable `t.y` field by itself.
 import "std/core.s"
 
 def Test()
-    x = 1
+    x = mut 1
     y = 2
-    return class(mut x, y)
+    return class(x, y)
 
 def main()
     t = mut Test()
@@ -267,9 +265,9 @@ capability.
 import "std/core.s"
 
 def Test()
-    x = 1
+    x = mut 1
     y = 2
-    return class(mut x, y)
+    return class(x, y)
 
 def main()
     t = Test()
@@ -285,9 +283,9 @@ The same rules hold for function arguments. Below is an example.
 import "std/core.s"
 
 def Test()
-    x = 1
+    x = mut 1
     y = 2
-    return class(mut x, y)
+    return class(x, y)
 
 def test(const Test t)
     # t.x = 10 # disallowed
@@ -648,6 +646,7 @@ def answers(cstr first, cstr second, nat minutes_to_answer)
 def main()
     answers = answers("A", "F", 60)
     if not answers is answer_schemas 
+        print "not a valid answer" 
         fail "not a valid answer" # this will fail
     print "answered: "
     print answers.first

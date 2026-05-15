@@ -3863,8 +3863,8 @@ def _start_background_loop():
     asyncio.set_event_loop(loop)
     loop.run_forever()
 threading.Thread(target=_start_background_loop, daemon=True).start()
-def run_async(coro):
-    future = asyncio.run_coroutine_threadsafe(coro, _loop)
+def run_async(coro, *args):
+    future = asyncio.run_coroutine_threadsafe(coro(*args), _loop)
     return future.result()
 
 

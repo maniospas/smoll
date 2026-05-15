@@ -11,3 +11,4 @@ def main()
     it = bufpos map.keys
     while try key=next it
         print key
+    

@@ -5,20 +5,20 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp1257v=" minutes\n";
-const char* const __temp1247v="B";
+const char* const __temp1247v="C";
 const char* const __temp1242v="A";
 const char* const __temp1254v="in";
 const char* const __temp363v="\n";
 const char* const __temp1250v="answered: ";
 const char* const __temp1255v=" ";
-const char* const __temp1248v="C";
+const char* const __temp1248v="B";
 static const char* __temp_all_errcodes[31] = {"noerr",
 "error",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
-"cannot convert negative float to id",
 "cannot convert negative int to id",
+"cannot convert negative float to id",
 "iteration end",
 "allocation failed",
 "reallocation failed",
@@ -97,30 +97,10 @@ static inline __attribute__((always_inline)) int main__temp1241v() {
   answers__second=__temp1244v__second;
   answers__minutes_to_answer=__temp1244v__minutes_to_answer;
   __temp1246v=1;
-  if(__temp1242v!=answers__first){
-  __temp1246v=0;
-  }
-  if(__temp1242v!=answers__second){
-  __temp1246v=0;
-  }
-  if(__temp1246v){
-  __temp1245v=1;
-  }
-  __temp1246v=1;
-  if(__temp1242v!=answers__first){
+  if(__temp1247v!=answers__first){
   __temp1246v=0;
   }
   if(__temp1247v!=answers__second){
-  __temp1246v=0;
-  }
-  if(__temp1246v){
-  __temp1245v=1;
-  }
-  __temp1246v=1;
-  if(__temp1242v!=answers__first){
-  __temp1246v=0;
-  }
-  if(__temp1248v!=answers__second){
   __temp1246v=0;
   }
   if(__temp1246v){
@@ -131,16 +111,6 @@ static inline __attribute__((always_inline)) int main__temp1241v() {
   __temp1246v=0;
   }
   if(__temp1242v!=answers__second){
-  __temp1246v=0;
-  }
-  if(__temp1246v){
-  __temp1245v=1;
-  }
-  __temp1246v=1;
-  if(__temp1247v!=answers__first){
-  __temp1246v=0;
-  }
-  if(__temp1247v!=answers__second){
   __temp1246v=0;
   }
   if(__temp1246v){
@@ -157,10 +127,30 @@ static inline __attribute__((always_inline)) int main__temp1241v() {
   __temp1245v=1;
   }
   __temp1246v=1;
-  if(__temp1248v!=answers__first){
+  if(__temp1242v!=answers__first){
+  __temp1246v=0;
+  }
+  if(__temp1247v!=answers__second){
+  __temp1246v=0;
+  }
+  if(__temp1246v){
+  __temp1245v=1;
+  }
+  __temp1246v=1;
+  if(__temp1242v!=answers__first){
   __temp1246v=0;
   }
   if(__temp1242v!=answers__second){
+  __temp1246v=0;
+  }
+  if(__temp1246v){
+  __temp1245v=1;
+  }
+  __temp1246v=1;
+  if(__temp1242v!=answers__first){
+  __temp1246v=0;
+  }
+  if(__temp1248v!=answers__second){
   __temp1246v=0;
   }
   if(__temp1246v){
@@ -171,6 +161,16 @@ static inline __attribute__((always_inline)) int main__temp1241v() {
   __temp1246v=0;
   }
   if(__temp1247v!=answers__second){
+  __temp1246v=0;
+  }
+  if(__temp1246v){
+  __temp1245v=1;
+  }
+  __temp1246v=1;
+  if(__temp1248v!=answers__first){
+  __temp1246v=0;
+  }
+  if(__temp1242v!=answers__second){
   __temp1246v=0;
   }
   if(__temp1246v){

@@ -10,8 +10,8 @@ static const char* __temp_all_errcodes[30] = {"noerr",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
-"cannot convert negative float to id",
 "cannot convert negative int to id",
+"cannot convert negative float to id",
 "iteration end",
 "allocation failed",
 "reallocation failed",
@@ -66,29 +66,29 @@ static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0,
   *__temp1235v=__temp36v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp1236v) {
-  int __temp94v=0;
-  int __temp95v__=0;
-  not__temp35v(__temp94v,&__temp95v__);
+static inline __attribute__((always_inline)) void is_different__temp81v(uint64_t x, uint64_t y, int* __temp1236v) {
+  int __temp82v=0;
+  int __temp83v__=0;
+  not__temp35v(__temp82v,&__temp83v__);
   goto __temp_return;
   __temp_return:
-  *__temp1236v=__temp95v__;
+  *__temp1236v=__temp83v__;
 }
 
-static inline __attribute__((always_inline)) void ge__temp319v(uint64_t x, uint64_t y, char* __temp1237v) {
-  int __temp320v__=0;
+static inline __attribute__((always_inline)) void ge__temp308v(uint64_t x, uint64_t y, char* __temp1237v) {
+  int __temp309v__=0;
   char z=0;
-  is_different__temp93v(x,y,&__temp320v__);
+  is_different__temp81v(x,y,&__temp309v__);
   z=x>=y;
   goto __temp_return;
   __temp_return:
   *__temp1237v=z;
 }
 
-static inline __attribute__((always_inline)) void add__temp170v(uint64_t x, uint64_t y, uint64_t* __temp1238v) {
-  int __temp171v__=0;
+static inline __attribute__((always_inline)) void add__temp159v(uint64_t x, uint64_t y, uint64_t* __temp1238v) {
+  int __temp160v__=0;
   uint64_t z=0;
-  is_different__temp93v(x,y,&__temp171v__);
+  is_different__temp81v(x,y,&__temp160v__);
   z=x+y;
   goto __temp_return;
   __temp_return:
@@ -103,14 +103,14 @@ static inline __attribute__((always_inline)) int next__temp439v(uint64_t* __temp
   uint64_t __temp442v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  ge__temp319v(r__from,r__to,&__temp440v__);
+  ge__temp308v(r__from,r__to,&__temp440v__);
   if(__temp440v__){
   __temp_errcode=7;
   goto __temp_failure;
   }
   ret=r__from;
   __temp441v=1;
-  add__temp170v(ret,__temp441v,&__temp442v__);
+  add__temp159v(ret,__temp441v,&__temp442v__);
   r__from=__temp442v__;
   goto __temp_return;
   
@@ -157,7 +157,7 @@ static inline __attribute__((always_inline)) void main__temp1222v() {
   print__temp374v(value);
   }
   __temp1229v=1;
-  add__temp170v(value,__temp1229v,&__temp1230v__);
+  add__temp159v(value,__temp1229v,&__temp1230v__);
   value=__temp1230v__;
   print__temp374v(value);
 }

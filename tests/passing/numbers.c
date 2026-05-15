@@ -37,7 +37,7 @@ static const char* __temp_all_errcodes[30] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void float__temp392v(uint64_t x, double* __temp1233v) {
+static inline __attribute__((always_inline)) void float__temp390v(uint64_t x, double* __temp1233v) {
   double z=0;
   z=x;
   goto __temp_return;
@@ -58,29 +58,29 @@ static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0,
   *__temp1235v=__temp36v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp69v(double x, double y, int* __temp1236v) {
-  int __temp70v=0;
-  int __temp71v__=0;
-  not__temp35v(__temp70v,&__temp71v__);
+static inline __attribute__((always_inline)) void is_different__temp81v(double x, double y, int* __temp1236v) {
+  int __temp82v=0;
+  int __temp83v__=0;
+  not__temp35v(__temp82v,&__temp83v__);
   goto __temp_return;
   __temp_return:
-  *__temp1236v=__temp71v__;
+  *__temp1236v=__temp83v__;
 }
 
-static inline __attribute__((always_inline)) void mul__temp172v(double x, double y, double* __temp1237v) {
-  int __temp173v__=0;
+static inline __attribute__((always_inline)) void mul__temp183v(double x, double y, double* __temp1237v) {
+  int __temp184v__=0;
   double z=0;
-  is_different__temp69v(x,y,&__temp173v__);
+  is_different__temp81v(x,y,&__temp184v__);
   z=x*y;
   goto __temp_return;
   __temp_return:
   *__temp1237v=z;
 }
 
-static inline __attribute__((always_inline)) void add__temp148v(double x, double y, double* __temp1238v) {
-  int __temp149v__=0;
+static inline __attribute__((always_inline)) void add__temp159v(double x, double y, double* __temp1238v) {
+  int __temp160v__=0;
   double z=0;
-  is_different__temp69v(x,y,&__temp149v__);
+  is_different__temp81v(x,y,&__temp160v__);
   z=x+y;
   goto __temp_return;
   __temp_return:
@@ -108,13 +108,13 @@ static inline __attribute__((always_inline)) void main__temp1222v() {
   __temp1223v=1.0;
   x=__temp1223v;
   __temp1224v=1;
-  float__temp392v(__temp1224v,&__temp1225v__);
+  float__temp390v(__temp1224v,&__temp1225v__);
   __temp1226v=2;
-  float__temp392v(__temp1226v,&__temp1227v__);
+  float__temp390v(__temp1226v,&__temp1227v__);
   __temp1228v=2.0;
-  mul__temp172v(__temp1227v__,__temp1228v,&__temp1229v__);
-  add__temp148v(__temp1225v__,__temp1229v__,&__temp1230v__);
-  add__temp148v(x,__temp1230v__,&__temp1231v__);
+  mul__temp183v(__temp1227v__,__temp1228v,&__temp1229v__);
+  add__temp159v(__temp1225v__,__temp1229v__,&__temp1230v__);
+  add__temp159v(x,__temp1230v__,&__temp1231v__);
   print__temp366v(__temp1231v__);
 }
 

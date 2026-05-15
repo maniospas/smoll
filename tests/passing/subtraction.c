@@ -11,8 +11,8 @@ static const char* __temp_all_errcodes[8] = {"noerr",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
-"cannot convert negative float to id",
 "cannot convert negative int to id",
+"cannot convert negative float to id",
 "iteration end"
 };
 
@@ -36,46 +36,46 @@ static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0,
   *__temp461v=__temp36v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp462v) {
-  int __temp94v=0;
-  int __temp95v__=0;
-  not__temp35v(__temp94v,&__temp95v__);
+static inline __attribute__((always_inline)) void is_different__temp81v(uint64_t x, uint64_t y, int* __temp462v) {
+  int __temp82v=0;
+  int __temp83v__=0;
+  not__temp35v(__temp82v,&__temp83v__);
   goto __temp_return;
   __temp_return:
-  *__temp462v=__temp95v__;
+  *__temp462v=__temp83v__;
 }
 
-static inline __attribute__((always_inline)) void mul__temp194v(uint64_t x, uint64_t y, uint64_t* __temp463v) {
-  int __temp195v__=0;
+static inline __attribute__((always_inline)) void mul__temp183v(uint64_t x, uint64_t y, uint64_t* __temp463v) {
+  int __temp184v__=0;
   uint64_t z=0;
-  is_different__temp93v(x,y,&__temp195v__);
+  is_different__temp81v(x,y,&__temp184v__);
   z=x*y;
   goto __temp_return;
   __temp_return:
   *__temp463v=z;
 }
 
-static inline __attribute__((always_inline)) void lt__temp247v(uint64_t x, uint64_t y, char* __temp464v) {
-  int __temp248v__=0;
+static inline __attribute__((always_inline)) void lt__temp236v(uint64_t x, uint64_t y, char* __temp464v) {
+  int __temp237v__=0;
   char z=0;
-  is_different__temp93v(x,y,&__temp248v__);
+  is_different__temp81v(x,y,&__temp237v__);
   z=x<y;
   goto __temp_return;
   __temp_return:
   *__temp464v=z;
 }
 
-static inline __attribute__((always_inline)) int sub__temp347v(uint64_t x, uint64_t y, uint64_t* __temp465v) {
-  int __temp348v__=0;
-  int __temp349v=0;
-  int __temp350v=0;
-  char __temp351v__=0;
+static inline __attribute__((always_inline)) int sub__temp334v(uint64_t x, uint64_t y, uint64_t* __temp465v) {
+  int __temp335v__=0;
+  int __temp336v=0;
+  int __temp337v=0;
+  char __temp338v__=0;
   uint64_t z=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  is_different__temp93v(x,y,&__temp348v__);
-  lt__temp247v(x,y,&__temp351v__);
-  if(__temp351v__){
+  is_different__temp81v(x,y,&__temp335v__);
+  lt__temp236v(x,y,&__temp338v__);
+  if(__temp338v__){
   __temp_errcode=4;
   goto __temp_failure;
   }
@@ -120,9 +120,9 @@ static inline __attribute__((always_inline)) void main__temp446v() {
   print__temp361v(__temp447v);
   __temp450v=2;
   __temp451v=3;
-  mul__temp194v(__temp450v,__temp451v,&__temp452v__);
+  mul__temp183v(__temp450v,__temp451v,&__temp452v__);
   __temp453v=20;
-  __temp_complain=sub__temp347v(__temp452v__,__temp453v,&__temp454v__);
+  __temp_complain=sub__temp334v(__temp452v__,__temp453v,&__temp454v__);
   __temp449v=__temp_complain;
   print__temp374v(__temp454v__);
   __temp449v=__temp449v==0;

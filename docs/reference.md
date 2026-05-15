@@ -780,8 +780,9 @@ import "std/core.s"
 
 def main()
     buf = mut float[]
-    buf.resize(10)
+    buf.alloc(10)
     print buf[0]  # prints 0, as buffers are zero-initialized
+    buf.resize(10)
     buf[1] = 1.0
     print buf[1]
 ```
@@ -1554,8 +1555,8 @@ import "std/core.s"
 import "std/vec.s"
 
 def safe_main()
-    allocator  = ref (mut float[]).alloc(200) # used by vector operation effects
-    allocator2 = ref (mut float[]).alloc(200) # useless 
+    allocator  = ref (mut float[]).alloc(200).circular() # used by vector operation effects
+    allocator2 = ref (mut float[]).alloc(200).circular() # useless 
     v1 = vec 10
     v2 = vec 10
     v1[0] = 1.0

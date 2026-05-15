@@ -2892,7 +2892,6 @@ def process_statement(file: File, tokens: list[Token], pos: int, impl: Implement
         impl.vars[tmp] = var_class
         return process_statement_operator(file, tokens, impl, pos, [var_class]+[r.private_copy() if r.immutable else r for r in ret], current_operator_priority)
 
-
     if current == "(":
         ret = list()
         while True:
@@ -3346,7 +3345,7 @@ def process_repo(file: File, tokens: list[Token], pos: int):
     if repositories.get(symbol)==path: return pos
     for repo in repositories:
         if repo.startswith(symbol) or symbol.startswith(repo): 
-            local_token.error("syntax", "cannot have differences between repos '"+symbol+"' and '"+repo+"'")
+            local_token.error("syntax", "cannot have overlap between new and old repos '"+symbol+"' and '"+repo+"'")
     if not file.is_main_file:
         if symbol not in repositories:
             tokens[pos-4].error("safety", "for safety, repos can only be defined for the first time in the main file\nFile '"+file.path+"' requires that you add this repo declaration to your main file")
@@ -3882,6 +3881,7 @@ async def download_with_progress(url: str, filepath: str, message: str):
     print()
 
 file_cache: dict[str, File] = dict()
+file_loading: dict[str, asyncio.Future] = dict()
 async def load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> File:
     file = file_cache.get(path, None)
     if file is None:

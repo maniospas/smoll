@@ -952,8 +952,9 @@ Use <code>buffer[pos] = value</code> to copy some data on a buffer&#8217;s eleme
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">buf</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
-    <span class="n">buf</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">buf</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># prints 0, as buffers are zero-initialized</span>
+    <span class="n">buf</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
     <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 </code></pre>
@@ -1717,7 +1718,7 @@ when organized in a string buffer.</p>
     <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">pos</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="nb">iter</span>
-        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot; &quot;</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">buf</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">mem</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
 
@@ -1746,8 +1747,8 @@ when organized in a string buffer.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/vec.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">safe_main</span><span class="p">()</span>
-    <span class="n">allocator</span>  <span class="o">=</span> <span class="n">ref</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span> <span class="c1"># used by vector operation effects</span>
-    <span class="n">allocator2</span> <span class="o">=</span> <span class="n">ref</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span> <span class="c1"># useless </span>
+    <span class="n">allocator</span>  <span class="o">=</span> <span class="n">ref</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="o">.</span><span class="n">circular</span><span class="p">()</span> <span class="c1"># used by vector operation effects</span>
+    <span class="n">allocator2</span> <span class="o">=</span> <span class="n">ref</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="o">.</span><span class="n">circular</span><span class="p">()</span> <span class="c1"># useless </span>
     <span class="n">v1</span> <span class="o">=</span> <span class="n">vec</span> <span class="mi">10</span>
     <span class="n">v2</span> <span class="o">=</span> <span class="n">vec</span> <span class="mi">10</span>
     <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>

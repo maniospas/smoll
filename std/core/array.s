@@ -130,12 +130,12 @@ def get(list l, nat pos)
     if pos>=l.length fail "out of bounds"
     unsafe_return get(l.buffer,pos)
 
-def mutget(list l, nat pos)
+def mutget(mut list l, nat pos)
     doc "get a mutable list element pointer"
     if pos>=l.length fail "out of bounds"
     unsafe_return l.buffer.mutget pos
 
-def push(list l)
+def push(mut list l)
     doc "get a mutable pointer to a new list element"
     doc "Grows the list and returns a mutable pointer to the newlly created last element."
     prev_length = l.length

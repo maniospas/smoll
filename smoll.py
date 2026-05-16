@@ -4130,9 +4130,11 @@ def errexit():
     if ia_pyodide: raise SystemExit(1)
     else: os._exit(1)
 
+
 def main():
     src_path = Path(args.source)
     if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); errexit()
+    if is_pyodide and not is_lsp: print(f"[{YELLOW}+{RESET}] pyodide mode")
     if not is_lsp: print(f"[{YELLOW}+{RESET}] process      {src_path}")
     file: File = load(resolve_name(str(src_path), None), is_main_file=True)
     if not is_lsp:

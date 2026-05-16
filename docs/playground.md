@@ -90,7 +90,7 @@ async function fetchSmoll() {
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const raw = await resp.text();
     try { localStorage.setItem(CACHE_SMOLL, raw); } catch (_) {}
-    smollSource = __initPatch(raw);
+    smollSource = raw;
     toterminal('Smoll fetched');
   } catch (err) { toterminal(err.message); }
 }

@@ -99,38 +99,38 @@ async function runVM(){
 import sys, types, os, asyncio
 from pyodide.ffi import to_js
 sys.argv=['smoll','/program.s']
-
 import builtins as _bt
 _orig_print = _bt.print
 _orig_input = _bt.input
-
 def _patched_print(*args, **kwargs):
     import io
     buf = io.StringIO()
     kwargs2 = {k:v for k,v in kwargs.items() if k not in ('file',)}
     _orig_print(*args, file=buf, **kwargs2)
     _js_print(buf.getvalue().rstrip('\\n'))
-
 async def _patched_input_async(prompt=''):
     result = await _js_input(str(prompt))
     return result if result is not None else ''
-
 def _patched_input(prompt=''):
     import asyncio
     loop = asyncio.get_event_loop()
     fut = asyncio.ensure_future(_patched_input_async(prompt))
     return asyncio.get_event_loop().run_until_complete(fut) if not loop.is_running() else ''
-
 _bt.print = _patched_print
 _bt.input = _patched_input
-
 _mod = types.ModuleType('smoll')
 _mod.__file__ = '/smoll_src.py'
 sys.modules['smoll'] = _mod
 _mod.__name__ = '__main__'
 _mod.__dict__['_js_cache_get'] = _js_cache_get
 _mod.__dict__['_js_cache_set'] = _js_cache_set
-try: exec(compile(open('/smoll_src.py').read(),'/smoll_src.py','exec'),_mod.__dict__)
+try:
+    _src = open('/smoll_src.py').read().replace('if is_pyodide: main()', 'if is_pyodide: pass')
+    _code = compile(_src, '/smoll_src.py', 'exec')
+    _ns = _mod.__dict__
+    exec(_code, _ns)
+    if asyncio.iscoroutinefunction(_ns.get('main')):
+        await _ns['main']()
 except SystemExit as e: pass
 finally:
     _bt.print = _orig_print

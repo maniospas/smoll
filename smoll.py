@@ -3861,11 +3861,12 @@ async def download_with_progress(url: str, filepath: str, message: str):
         if cached is not None:
             print(f"[{YELLOW}={RESET}] {message} (cached)")
             data = base64.b64decode(cached)
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            with open(filepath, "wb") as f: f.write(data)
             return
         print(f"[{YELLOW}+{RESET}] {message} ...")
         response = await pyfetch(url)
-        if response.status != 200:
-            raise RuntimeError( f"Failed to fetch {url}: HTTP {response.status}")
+        if response.status != 200: raise RuntimeError( f"Failed to fetch {url}: HTTP {response.status}")
         data = await response.bytes()
 
         _js_cache_set(url, base64.b64encode(data).decode())

@@ -2548,8 +2548,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
                         assert isinstance(type, UnionType)
                         pos -= 1
-                        op_priority = -0.5
-                        pos, additional_rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority, for_call=True)
+                        pos, additional_rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0, for_call=True)
                         rets = resolve_call(file, impl, type, rets+additional_rets, call_token)
                         return pos, rets
                     if rets or peek_text(tokens, pos+1)=="is": return pos, rets
@@ -3904,7 +3903,6 @@ file_cache_complete: set[str] = set()
 
 async def load(path, is_main_file=False, err_token=None):
     file = file_cache.get(path, None)
-    from time import sleep
     if file is None:
         file, processed_tokens = _load(path, is_main_file, err_token)
         file_cache[path] = file

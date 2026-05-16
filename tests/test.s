@@ -1,3 +1,4 @@
+repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import "std/core.s"
 import "std/mini.s" as mini
 
@@ -6,7 +7,7 @@ def concat(mini:str[] buff)
     iter = range len buff
     start = mem.pos
     while try i=next iter
-        mem.copy(mini:unpack buff[i])
+        mem.copy mini:unpack buff[i]
         mem.copy " "
     return str(mem.buf,start,mem.pos)
 

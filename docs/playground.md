@@ -76,37 +76,11 @@ function filterTraceback(lines){
   return result;
 }
 
-function __initPatch(src) {
-  var PATCH_CODE = `
-def download_with_progress(url, filepath, message):
-    from pyodide.http import pyxhr
-    import base64, os
-    cached = _js_cache_get(url)
-    if cached is not None:
-        print(f"[{YELLOW}={RESET}] {message} (cached)")
-        data = base64.b64decode(cached)
-    else:
-        print(f"[{YELLOW}+{RESET}] {message} ...")
-        response = pyxhr.get(url)
-        if response.status != 200:
-            raise RuntimeError(f"Failed to fetch {url}: HTTP {response.status}")
-        data = await response.bytes()
-        _js_cache_set(url, base64.b64encode(data).decode())
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    with open(filepath, "wb") as f:
-        f.write(data)
-`;
-  var idx = src.indexOf('def download_with_progress(');
-  if (idx === -1) { console.warn('smoll patch: marker not found'); return src; }
-  var end = src.indexOf('print()') + 7;
-  return src.slice(0, idx) + PATCH_CODE + src.slice(end);
-}
-
 async function fetchSmoll() {
   try {
     /*const cached = localStorage.getItem(CACHE_SMOLL);
     if (cached) {
-      smollSource = __initPatch(cached);
+      smollSource = cached;
       toterminal('Smoll loaded from cache');
       return;
     }*/

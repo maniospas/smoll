@@ -198,6 +198,11 @@ def export(path, target):
     </html>
     """
 
+    # repl = """const resp = await fetch('https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/smoll.py');if (!resp.ok) throw new Error('HTTP ' + resp.status);const raw = await resp.text();"""
+    # if repl in html:
+    #     with open("smoll.py") as src: src = src.read()
+    #     html = html.replace(repl, "const raw = `"+src.replace("\\","\\\\").replace("`", "\`").replace("{", "\{")+"`;")
+
     with open(target, "w") as file:
         file.write(html)
     print("created: "+target)

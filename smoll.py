@@ -1409,7 +1409,7 @@ class Token:
                         break
                 else: source_line = ""
         except OSError as exc:
-            os._exit(1)
+            errexit()
         token_len = max(len(self.text), 1)
         location = f"{self.file.resolved_path} line {self.row} column {self.col}"
         print(f"{RED}at{RESET} {location}")
@@ -1425,7 +1425,7 @@ class Token:
                             break
                     else: source_line = ""
             except OSError as exc:
-                os._exit(1)
+                errexit()
             token_len = max(len(reason.text), 1)
             pointer = " " * (reason.col - 1) + "^" * token_len
             location = f"{reason.file.resolved_path} line {reason.row} column {reason.col}"
@@ -1436,7 +1436,7 @@ class Token:
             print(prefix+source_line)
             print(prefix+f"{RED}{pointer}{RESET}")
 
-        os._exit(1)
+        errexit()
 
 def get(tokens: list[Token], pos: int) -> Token:
     if pos>=len(tokens): tokens[len(tokens)-1].error("syntax", "unexpected end of file")
@@ -3726,12 +3726,16 @@ def resolve_name(path: str, at_token: Token|None) -> str:
             if os.path.exists(symbol): return symbol
         try: 
             os.makedirs(os.path.dirname(symbol), exist_ok=True)
-            download_with_progress(path, symbol, "download     "+os.path.basename(symbol).ljust(40))
+            downloading = download_with_progress(path, symbol, "download     "+os.path.basename(symbol).ljust(40))
+            if is_pyodide:
+                from pyodide.ffi import run_sync
+                run_sync(downloading)
+            else: asyncio.run(downloading)
         except Exception as e: 
             if at_token: at_token.error("download", str(e))
             print("[✗] failed:")
             print(str(e))
-            os._exit(1)
+            errexit()
     else: symbol = path
     return symbol
 
@@ -3833,7 +3837,7 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
         print(f"[{RED}✗{RESET}] {PURPLE}file read error{RESET} {err}")
         location = f"{path} line {row+1}"
         print(f"{RED}at{RESET} {location}")
-        os._exit(1)
+        errexit()
 
     processed_tokens = list()
     len_tokens = len(tokens)
@@ -3852,14 +3856,32 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
         i += 1
     return file, processed_tokens
 
-def download_with_progress(url: str, filepath: str, message: str):
+async def download_with_progress(url: str, filepath: str, message: str):
+    if is_pyodide:
+        import asyncio
+        from pyodide.http import pyfetch
+        import base64, os
+        cached = _js_cache_get(url)
+        if cached is not None:
+            print(f"[{YELLOW}={RESET}] {message} (cached)")
+            data = base64.b64decode(cached)
+            return
+        print(f"[{YELLOW}+{RESET}] {message} ...")
+        response = await pyfetch(url)
+        if response.status != 200:
+            raise RuntimeError( f"Failed to fetch {url}: HTTP {response.status}")
+        data = await response.bytes()
+
+        _js_cache_set(url, base64.b64encode(data).decode())
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, "wb") as f: f.write(data)
+        return
     filename = os.path.basename(filepath)
     fallback: bool = False
     try:
         response = urllib.request.urlopen(url)
         total_size = int(response.getheader('Content-Length').strip())
-    except Exception as e:
-        fallback = True
+    except Exception as e: fallback = True
     if fallback:
         print(f"\r[{YELLOW}+{RESET}] {message} ... (unknown size)")
         urllib.request.urlretrieve(url, filepath)
@@ -4080,13 +4102,13 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     }.get(chosen_compiler, None)
     if gcc_cmd is None:
         print("[✗] "+chosen_compiler+" not found")
-        os._exit(1)
+        errexit()
     print(f"[{YELLOW}+{RESET}] compile     ", " ".join(gcc_cmd))
     result = subprocess.run(gcc_cmd, capture_output=True, text=True)
     if result.returncode != 0:
         print("[✗] "+chosen_compiler+" failed:")
         print(result.stderr)
-        os._exit(1)
+        errexit()
 
 # ---- MAIN
 parser = argparse.ArgumentParser(description="Compile a .s file and optionally run the result.")
@@ -4099,21 +4121,25 @@ args, extra_args = parser.parse_known_args()
 debug_mode = args.debug
 chosen_compiler = args.back or "auto"
 is_lsp = args.lsp
+ia_pyodide = sys.platform == "emscripten"
 if chosen_compiler == "auto":
-    #if os.path.exists("antcc"): chosen_compiler = "antcc"
-    #else: 
-    chosen_compiler = "gcc"
+    if ia_pyodide: chosen_compiler = "vm"
+    else: chosen_compiler = "gcc"
+
+def errexit():
+    if ia_pyodide: raise SystemExit(1)
+    else: os._exit(1)
 
 def main():
     src_path = Path(args.source)
-    if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); os._exit(1)
+    if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); errexit()
     if not is_lsp: print(f"[{YELLOW}+{RESET}] process      {src_path}")
     file: File = load(resolve_name(str(src_path), None), is_main_file=True)
     if not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)
-        if not main_type: print(f"{RED}error{RESET}: missing main type"); os._exit(1)
-        if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); os._exit(1)
-        if main_type.variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); os._exit(1)
+        if not main_type: print(f"{RED}error{RESET}: missing main type"); errexit()
+        if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); errexit()
+        if main_type.variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); errexit()
         exe_path = src_path.with_suffix("")
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
@@ -4123,12 +4149,10 @@ def main():
             if not args.build and chosen_compiler!="none":
                 extra_args_str = " ".join(extra_args)
                 if extra_args_str: extra_args_str = " "+extra_args_str
-                if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); os._exit(1)
+                if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); errexit()
                 print(f"[{YELLOW}+{RESET}] run          ./{exe_path}{extra_args_str}")
                 result = subprocess.run("./"+str(exe_path)+extra_args_str, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
                 if result.returncode != 0: os._exit(result.returncode)
-            
-            os._exit(0) # not in lsp case, as it inteferes with the stdout pipe
+            os._exit(0) # not in lsp or pyodide case, as it inteferes with the stdout pipe
 
-# compatibility with pyodine
 main()

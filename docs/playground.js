@@ -132,6 +132,9 @@ _mod.__dict__['_js_cache_get'] = _js_cache_get
 _mod.__dict__['_js_cache_set'] = _js_cache_set
 try: exec(compile(open('/smoll_src.py').read(),'/smoll_src.py','exec'),_mod.__dict__)
 except SystemExit as e: pass
+finally:
+    _bt.print = _orig_print
+    _bt.input = _orig_input
 `);
   }catch(err){
     var msg=err.message||String(err);

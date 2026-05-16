@@ -4121,13 +4121,13 @@ args, extra_args = parser.parse_known_args()
 debug_mode = args.debug
 chosen_compiler = args.back or "auto"
 is_lsp = args.lsp
-ia_pyodide = sys.platform == "emscripten"
+is_pyodide = sys.platform == "emscripten"
 if chosen_compiler == "auto":
-    if ia_pyodide: chosen_compiler = "vm"
+    if is_pyodide: chosen_compiler = "vm"
     else: chosen_compiler = "gcc"
 
 def errexit():
-    if ia_pyodide: raise SystemExit(1)
+    if is_pyodide: raise SystemExit(1)
     else: os._exit(1)
 
 

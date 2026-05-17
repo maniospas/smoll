@@ -47,7 +47,7 @@ def main()
 <div class="smoll-features">
   <div class="smoll-feature"><h3>Safe</h3><p>Automatically apply and guard resources. Opt into unsafe C only explicitly.</p></div>
   <div class="smoll-feature"><h3>Finite</h3><p>Tuple-based type system reads sequentially. Less wading through magic.</p></div>
-  <div class="smoll-feature"><h3>Ergonomic</h3><p>Easy function calling (see below). Interceptable errors get out of the way.</p></div>
+  <div class="smoll-feature"><h3>Ergonomic</h3><p>Easy function calling (see above). Interceptable errors get out of the way.</p></div>
   <div class="smoll-feature"><h3>Fast</h3><p>Scripting abstractions yet minimal memory indirection.</p></div>
   <div class="smoll-feature"><h3>Duck and linear types</h3><p>Functions define types. Interact with those with zero runtime overhead.</p></div>
   <div class="smoll-feature"><h3>Supported</h3><p>Compiler, LSP, interpreter to test unsafe code, web import, web playground.</p></div>

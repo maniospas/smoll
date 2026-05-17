@@ -1109,7 +1109,7 @@ class ImplementedType:
                         return None
                 assert callee, candidate_name
                 #inputs = [v for v in values]
-                if recursion_budget<=1:
+                if recursion_budget<=1 and self.force_not_inline:
                     self.at.error("interpreter", "recursion budget reached at: "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)]))
                 retcode = callee.interpret(values, memory, recursion_budget-1 if self.force_not_inline else recursion_budget) # may modify values
                 #rets = ""
@@ -4149,11 +4149,15 @@ parser.add_argument("--lsp", action="store_true", help="No compilation, and outp
 parser.add_argument("--build", action="store_true", help="Build without running.",)
 parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
 parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang, none (the last option only creates a C file).",)
+parser.add_argument("--vmkb", action="store", type=int, default=16, help="VM memory in kilobytes.",)
+parser.add_argument("--vmrec", action="store", type=int, default=16, help="VM recursion budget.",)
 args, extra_args = parser.parse_known_args()
 debug_mode = args.debug
 chosen_compiler = args.back or "auto"
 is_lsp = args.lsp
 is_pyodide = sys.platform == "emscripten"
+vm_memory_kb = args.vmkb
+vm_recursion_budget = args.vmrec
 if chosen_compiler == "auto":
     if is_pyodide: chosen_compiler = "vm"
     else: chosen_compiler = "gcc"
@@ -4177,7 +4181,7 @@ async def main():
         exe_path = src_path.with_suffix("")
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
-            main_type.variations[0].interpret([], MemoryEmulator(4096*4), recursion_budget=16) # emulate 16kb memory
+            main_type.variations[0].interpret([], MemoryEmulator(1024*vm_memory_kb), recursion_budget=vm_recursion_budget) # emulate 16kb memory
         else:
             write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
             if not args.build and chosen_compiler!="none":

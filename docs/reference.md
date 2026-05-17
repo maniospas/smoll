@@ -462,7 +462,7 @@ def call_fib(nat n)
     return fib(n)
 
 def main()
-    print fib(42)
+    print fib(10)
 ```
 
 

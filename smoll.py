@@ -1111,7 +1111,7 @@ class ImplementedType:
                 #inputs = [v for v in values]
                 if recursion_budget<=1:
                     self.at.error("interpreter", "recursion budget reached at: "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)]))
-                retcode = callee.interpret(values, memory, recursion_budget-1) # may modify values
+                retcode = callee.interpret(values, memory, recursion_budget-1 if self.force_not_inline else recursion_budget) # may modify values
                 #rets = ""
                 for ismut, value, k in zip(gathered_args_by_pointer, values, gathered_args):
                     if ismut: local_vars[k] = value
@@ -4177,7 +4177,7 @@ async def main():
         exe_path = src_path.with_suffix("")
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
-            main_type.variations[0].interpret([], MemoryEmulator(4096*4), recursion_budget=100) # emulate 16kb memory
+            main_type.variations[0].interpret([], MemoryEmulator(4096*4), recursion_budget=16) # emulate 16kb memory
         else:
             write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
             if not args.build and chosen_compiler!="none":

@@ -4,15 +4,15 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
+const char* const __temp365v="\n";
 const char* const __temp1223v="123";
-const char* const __temp363v="\n";
 static const char* __temp_all_errcodes[30] = {"noerr",
 "error",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
-"cannot convert negative int to id",
 "cannot convert negative float to id",
+"cannot convert negative int to id",
 "iteration end",
 "allocation failed",
 "reallocation failed",
@@ -46,10 +46,10 @@ static inline __attribute__((always_inline)) void eq__temp758v(const char* x, co
   *__temp1226v=z;
 }
 
-static inline __attribute__((always_inline)) void print__temp378v(char value) {
-  int __temp379v=0;
+static inline __attribute__((always_inline)) void print__temp380v(char value) {
+  int __temp381v=0;
   const char* endl=0;
-  endl=__temp363v;
+  endl=__temp365v;
   if(value){
   printf("%s%s","true",endl);
   }
@@ -61,7 +61,7 @@ static inline __attribute__((always_inline)) void print__temp378v(char value) {
 static inline __attribute__((always_inline)) void main__temp1222v() {
   char __temp1224v__=0;
   eq__temp758v(__temp1223v,__temp1223v,&__temp1224v__);
-  print__temp378v(__temp1224v__);
+  print__temp380v(__temp1224v__);
 }
 
 int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1222v();return 0;}

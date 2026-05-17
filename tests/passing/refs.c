@@ -4,7 +4,7 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp363v="\n";
+const char* const __temp365v="\n";
 static const char* __temp_all_errcodes[30] = {"noerr",
 "error",
 "division by zero ",
@@ -50,29 +50,29 @@ static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0,
   *__temp1229v=__temp36v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp69v(uint64_t x, uint64_t y, int* __temp1230v) {
-  int __temp70v=0;
-  int __temp71v__=0;
-  not__temp35v(__temp70v,&__temp71v__);
+static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp1230v) {
+  int __temp94v=0;
+  int __temp95v__=0;
+  not__temp35v(__temp94v,&__temp95v__);
   goto __temp_return;
   __temp_return:
-  *__temp1230v=__temp71v__;
+  *__temp1230v=__temp95v__;
 }
 
-static inline __attribute__((always_inline)) void add__temp148v(uint64_t x, uint64_t y, uint64_t* __temp1231v) {
-  int __temp149v__=0;
+static inline __attribute__((always_inline)) void add__temp170v(uint64_t x, uint64_t y, uint64_t* __temp1231v) {
+  int __temp171v__=0;
   uint64_t z=0;
-  is_different__temp69v(x,y,&__temp149v__);
+  is_different__temp93v(x,y,&__temp171v__);
   z=x+y;
   goto __temp_return;
   __temp_return:
   *__temp1231v=z;
 }
 
-static inline __attribute__((always_inline)) void print__temp374v(uint64_t value) {
-  int __temp375v=0;
+static inline __attribute__((always_inline)) void print__temp376v(uint64_t value) {
+  int __temp377v=0;
   const char* endl=0;
-  endl=__temp363v;
+  endl=__temp365v;
   printf("%llu%s",value,endl);
 }
 
@@ -89,8 +89,8 @@ static inline __attribute__((always_inline)) void main__temp1222v() {
   x=__temp1224v;
   __temp1225v=2;
   x=__temp1225v;
-  add__temp148v(x,x,&__temp1226v__);
-  print__temp374v(__temp1226v__);
+  add__temp170v(x,x,&__temp1226v__);
+  print__temp376v(__temp1226v__);
 }
 
 int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1222v();return 0;}

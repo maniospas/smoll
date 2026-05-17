@@ -5,20 +5,20 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp1257v=" minutes\n";
-const char* const __temp1247v="C";
+const char* const __temp1247v="B";
 const char* const __temp1242v="A";
 const char* const __temp1254v="in";
-const char* const __temp363v="\n";
+const char* const __temp365v="\n";
 const char* const __temp1250v="answered: ";
 const char* const __temp1255v=" ";
-const char* const __temp1248v="B";
+const char* const __temp1248v="C";
 static const char* __temp_all_errcodes[31] = {"noerr",
 "error",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
-"cannot convert negative int to id",
 "cannot convert negative float to id",
+"cannot convert negative int to id",
 "iteration end",
 "allocation failed",
 "reallocation failed",
@@ -61,20 +61,20 @@ static inline __attribute__((always_inline)) void not__temp26v(char value, char*
   *__temp1262v=z;
 }
 
-static inline __attribute__((always_inline)) void print__temp361v(const char* value) {
-  int __temp362v=0;
+static inline __attribute__((always_inline)) void print__temp363v(const char* value) {
+  int __temp364v=0;
   const char* endl=0;
-  endl=__temp363v;
+  endl=__temp365v;
   printf("%s%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void print__temp364v(const char* value, const char* endl) {
-  int __temp365v=0;
+static inline __attribute__((always_inline)) void print__temp361v(const char* value, const char* endl) {
+  int __temp362v=0;
   printf("%s%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void print__temp376v(uint64_t value, const char* endl) {
-  int __temp377v=0;
+static inline __attribute__((always_inline)) void print__temp374v(uint64_t value, const char* endl) {
+  int __temp375v=0;
   printf("%llu%s",value,endl);
 }
 
@@ -97,30 +97,10 @@ static inline __attribute__((always_inline)) int main__temp1241v() {
   answers__second=__temp1244v__second;
   answers__minutes_to_answer=__temp1244v__minutes_to_answer;
   __temp1246v=1;
-  if(__temp1247v!=answers__first){
-  __temp1246v=0;
-  }
-  if(__temp1247v!=answers__second){
-  __temp1246v=0;
-  }
-  if(__temp1246v){
-  __temp1245v=1;
-  }
-  __temp1246v=1;
-  if(__temp1247v!=answers__first){
+  if(__temp1242v!=answers__first){
   __temp1246v=0;
   }
   if(__temp1242v!=answers__second){
-  __temp1246v=0;
-  }
-  if(__temp1246v){
-  __temp1245v=1;
-  }
-  __temp1246v=1;
-  if(__temp1247v!=answers__first){
-  __temp1246v=0;
-  }
-  if(__temp1248v!=answers__second){
   __temp1246v=0;
   }
   if(__temp1246v){
@@ -131,16 +111,6 @@ static inline __attribute__((always_inline)) int main__temp1241v() {
   __temp1246v=0;
   }
   if(__temp1247v!=answers__second){
-  __temp1246v=0;
-  }
-  if(__temp1246v){
-  __temp1245v=1;
-  }
-  __temp1246v=1;
-  if(__temp1242v!=answers__first){
-  __temp1246v=0;
-  }
-  if(__temp1242v!=answers__second){
   __temp1246v=0;
   }
   if(__temp1246v){
@@ -157,10 +127,30 @@ static inline __attribute__((always_inline)) int main__temp1241v() {
   __temp1245v=1;
   }
   __temp1246v=1;
-  if(__temp1248v!=answers__first){
+  if(__temp1247v!=answers__first){
+  __temp1246v=0;
+  }
+  if(__temp1242v!=answers__second){
+  __temp1246v=0;
+  }
+  if(__temp1246v){
+  __temp1245v=1;
+  }
+  __temp1246v=1;
+  if(__temp1247v!=answers__first){
   __temp1246v=0;
   }
   if(__temp1247v!=answers__second){
+  __temp1246v=0;
+  }
+  if(__temp1246v){
+  __temp1245v=1;
+  }
+  __temp1246v=1;
+  if(__temp1247v!=answers__first){
+  __temp1246v=0;
+  }
+  if(__temp1248v!=answers__second){
   __temp1246v=0;
   }
   if(__temp1246v){
@@ -171,6 +161,16 @@ static inline __attribute__((always_inline)) int main__temp1241v() {
   __temp1246v=0;
   }
   if(__temp1242v!=answers__second){
+  __temp1246v=0;
+  }
+  if(__temp1246v){
+  __temp1245v=1;
+  }
+  __temp1246v=1;
+  if(__temp1248v!=answers__first){
+  __temp1246v=0;
+  }
+  if(__temp1247v!=answers__second){
   __temp1246v=0;
   }
   if(__temp1246v){
@@ -191,11 +191,11 @@ static inline __attribute__((always_inline)) int main__temp1241v() {
   __temp_errcode=30;
   goto __temp_failure;
   }
-  print__temp361v(__temp1250v);
-  print__temp361v(answers__first);
-  print__temp361v(answers__second);
-  print__temp364v(__temp1254v,__temp1255v);
-  print__temp376v(answers__minutes_to_answer,__temp1257v);
+  print__temp363v(__temp1250v);
+  print__temp363v(answers__first);
+  print__temp363v(answers__second);
+  print__temp361v(__temp1254v,__temp1255v);
+  print__temp374v(answers__minutes_to_answer,__temp1257v);
   
   __temp_failure:
   return __temp_errcode;

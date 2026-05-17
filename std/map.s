@@ -15,7 +15,7 @@ def natmap(any[] values)
     keys = alloc(mut hash:robinhood_nat_entry[], len values) 
     unsafe_return (keys, values)
 
-def get(const hash:robinhood_str_entry[] keys, any[] values, cstr|str key)
+def get(const hash:robinhood_str_entry[] keys, const any[] values, cstr|str key)
     doc "get a hash map entry"
     doc "Implemented for string or cstr keys but buffer of any values."
     unsafe_return values[keys.hash:find hash:raw key]&
@@ -25,7 +25,7 @@ def mutget(hash:robinhood_str_entry[] keys, any[] values, cstr|str key)
     doc "Implemented for string or cstr keys but buffer of any values."
     unsafe_return values[keys.hash:at str key]&&
 
-def get(const hash:robinhood_nat_entry[] keys, any[] values, nat key)
+def get(const hash:robinhood_nat_entry[] keys, const any[] values, nat key)
     doc "get a hash map entry"
     doc "Implemented for string or cstr keys but buffer of any values."
     unsafe_return values[keys.hash:find key]&

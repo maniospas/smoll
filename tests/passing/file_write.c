@@ -11,8 +11,8 @@ static const char* __temp_all_errcodes[47] = {"noerr",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
-"cannot convert negative int to id",
 "cannot convert negative float to id",
+"cannot convert negative int to id",
 "iteration end",
 "allocation failed",
 "reallocation failed",
@@ -106,15 +106,15 @@ static inline __attribute__((always_inline)) int write__temp1349v(const char* _p
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int print__temp1617v(char** __temp1680v, const char* text) {
+static inline __attribute__((always_inline)) int print__temp1620v(char** __temp1680v, const char* text) {
   char* f__unsafe_ptr=*__temp1680v;
-  char __temp1618v__=0;
-  char __temp1619v__=0;
+  char __temp1621v__=0;
+  char __temp1622v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  exists__temp412v(f__unsafe_ptr,&__temp1618v__);
-  not__temp26v(__temp1618v__,&__temp1619v__);
-  if(__temp1619v__){
+  exists__temp412v(f__unsafe_ptr,&__temp1621v__);
+  not__temp26v(__temp1621v__,&__temp1622v__);
+  if(__temp1622v__){
   __temp_errcode=41;
   goto __temp_failure;
   }
@@ -135,7 +135,7 @@ static inline __attribute__((always_inline)) int main__temp1670v() {
   goto __temp_failure;
   }
   f__unsafe_ptr=__temp1672v__unsafe_ptr;
-  __temp_errcode=print__temp1617v(&f__unsafe_ptr,__temp1674v);
+  __temp_errcode=print__temp1620v(&f__unsafe_ptr,__temp1674v);
   if(__temp_errcode){
   goto __temp_failure;
   }

@@ -368,6 +368,9 @@ def signature_like(vars: list[Variable], impl=None):
                 if pointer_type is None: ret += "any "
                 else: ret += pointer_type.name+" "
             ret += type.name+arg_name
+            if type==POINTER_TYPE and impl:
+                dependency = impl.follow_pointer_dependency(vars[i])
+                if dependency and dependency!=vars[i]: ret += " {follows "+(impl.get_pointer_type(dependency) if impl.get_pointer_type(dependency) else ANY_TYPE).name+" ptr "+pretty_name(dependency.name)+"}"
             i += 1
         elif type.is_literal_of: 
             ret += type.at.text
@@ -376,7 +379,10 @@ def signature_like(vars: list[Variable], impl=None):
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
             elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "const "
             element_size = type.is_buffer_of.memory_size()
-            ret += type.is_buffer_of.name+"[]"+arg_name+" element size "+(str(element_size) if element_size else "?")
+            ret += type.is_buffer_of.name+"[]"+arg_name+" {element size "+(str(element_size) if element_size else "?")+"}"
+            if impl:
+                dependency = impl.follow_pointer_dependency(vars[i+1])
+                if dependency and dependency!=vars[i+1]: ret += " {follows "+(impl.get_pointer_type(dependency) if impl.get_pointer_type(dependency) else ANY_TYPE).name+" ptr "+pretty_name(dependency.name)+"}"
             i += len(type.rets)
         else:
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
@@ -399,6 +405,7 @@ class ImplementedType:
         self.has_retrieved_singleton: Optional["Token"] = None
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
         self.doc: list[str] = list()
+        self.required_accompany: dist[str,str] = dict()
         self.VM: str|None = None # an equivalent python implementation for the VM
         self.effect_names: list[str] = list()
         self.args: list[str] = list()
@@ -444,6 +451,16 @@ class ImplementedType:
         # this is used to throw a FastReturnException the first time the function returns
         self.fast_return_exception = False
         self.has_been_completed = False
+
+    def get_required_accompany(self, var: Variable):
+        assert isinstance(var, Variable)
+        return [self.vars[acc] for acc in self.required_accompany.get(var.name, [])]
+
+    def add_required_accompany(self, var: Variable, requirement: Variable):
+        assert isinstance(var, Variable)
+        assert isinstance(requirement, Variable)
+        if var.name not in self.required_accompany: self.required_accompany[var.name] = list()
+        self.required_accompany[var.name].append(requirement.name)
 
     def gather_spawned_error_codes(self, discovered: set["ImplementedType"]):
         ret = set()
@@ -571,6 +588,7 @@ class ImplementedType:
         visited: set[str] = set()
         while varname in self._pointer_type_dependencies:
             varname = self._pointer_type_dependencies.get(varname, "")
+            if varname in self.args: return self.vars[varname]
             if varname in visited: return None
             visited.add(varname)
         return self.vars[varname]
@@ -592,8 +610,9 @@ class ImplementedType:
         assert isinstance(var, Variable)
         assert isinstance(depends_on, Variable)
         assert var not in self._pointer_type_dependencies
-        assert not self.get_pointer_type(var)
-        #assert self.get_pointer_type(depends_on), "Need to have pointer type for "+depends_on.name+" in "+self.name
+        existing_dependency = self.get_pointer_type(var)
+        assert not existing_dependency
+        #assert var.name!=depends_on.name
         self._pointer_type_dependencies[var.name] = depends_on.name
 
     def memory_size(self):
@@ -668,8 +687,7 @@ class ImplementedType:
             if existing_pointer_type is not None:
                 if existing_pointer_type!=other_pointer_type and (other_pointer_type is None or not match_structure_with(existing_pointer_type, other_pointer_type)):
                     error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
-            else:
-                self.set_pointer_depedency(existing, value[0])
+            else: self.set_pointer_depedency(existing, value[0])
 
         accumulated_defer = self.accumulating_defers[-1].get(existing.name, None)
         if accumulated_defer is not None: # important to do this before setting dependent_assignments
@@ -684,6 +702,12 @@ class ImplementedType:
            
         self.dependent_assignments[existing.name] = value[0].stabilized_name()
         if not already_assigned and existing.type.builtin and (existing._references is None or not perform_immutability_checks): self.implementation.extend([existing, CODEWORD_EQUALS, value[0], CODEWORD_SEMICOLON])
+        # if self.name=="push" and existing.type.builtin:
+        #     self.set_pointer_depedency(existing, value[0])
+        #     print(self.follow_pointer_dependency(existing).name)
+        #     print(signature_like([existing], self), " = ", signature_like([value[0]], self), value[0].name)
+        #     print(self.follow_pointer_dependency(value[0]))
+
 
     def get_assignment(self, from_name: str, _to_name: list[str]):
         assert isinstance(from_name, str)
@@ -718,8 +742,13 @@ class ImplementedType:
 
         if is_safe:
             for v in value: 
-                if v.type.invalidated_by==POINTER_TYPE and not v.stabilized_name().endswith("__unsafe_ptr") and v.stabilized_name()!="unsafe_ptr":
-                    error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' is a pointer and hence cannot be returned - name it 'unsafe_ptr' to permit this but consider that the pointed resource may not exist anymore")
+                if v.type.invalidated_by==POINTER_TYPE:
+                    is_pointer_unsafe = True
+                    # for accompanying in self.get_required_accompany(v):
+                    #     if not self.get_assignment(accompanying.stabilized_name(), self.rets):
+                    #         is_pointer_unsafe = True
+                    if is_pointer_unsafe and not v.stabilized_name().endswith("__unsafe_ptr") and v.stabilized_name()!="unsafe_ptr":
+                        error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' is a pointer and hence cannot be returned", suggestions=["name it 'unsafe_ptr' to permit this but consider that the pointed resource may not exist anymore", "can also return it with 'unsafe_return' but the same caveat applies"])
                 if v.stabilized_name() in self.invalidated:
                     error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' has been invalidated", reason=self.invalidated[v.stabilized_name()])
         
@@ -1731,12 +1760,14 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         original_pointer_type = callee.get_pointer_type(original)
         if original_pointer_type is None or original_pointer_type==ANY_TYPE:
             original_pointer_dependency: Variable|None = callee.follow_pointer_dependency(original)
-            if original_pointer_dependency is None: original_pointer_dependency = original
+            if original_pointer_dependency is None or original_pointer_dependency==original: original_pointer_dependency = original
             if callee==SAME_CONTENTS_TYPE: assert original_pointer_dependency
             if original_pointer_dependency is not None:
                 for varpos, varname in enumerate(callee.args):
                     if varname!=original_pointer_dependency.name: continue
                     impl.set_pointer_depedency(variable, vars[varpos])
+                    # if impl.name=="push":
+                    #     print(variable.name, " ~ ", vars[varpos].name)
                     pointer_type: ImplementedType|None = impl.get_pointer_type(vars[varpos])
                     if pointer_type and pointer_type!=ANY_TYPE and ret_pos and rets[ret_pos-1].type.is_buffer_of==ANY_TYPE:
                         rets[ret_pos-1].type = buffer_types[pointer_type].variations[0]

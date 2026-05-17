@@ -4,7 +4,7 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp363v="\n";
+const char* const __temp365v="\n";
 static const char* __temp_all_errcodes[30] = {"noerr",
 "error",
 "division by zero ",
@@ -158,10 +158,10 @@ static inline __attribute__((always_inline)) void next__temp1253v(uint64_t* __te
   *__temp1273v=value;
 }
 
-static inline __attribute__((always_inline)) void print__temp366v(double value) {
-  int __temp367v=0;
+static inline __attribute__((always_inline)) void print__temp368v(double value) {
+  int __temp369v=0;
   const char* endl=0;
-  endl=__temp363v;
+  endl=__temp365v;
   printf("%.6f%s",value,endl);
 }
 
@@ -189,7 +189,7 @@ static inline __attribute__((always_inline)) void main__temp1256v() {
   rand__s2=__temp1258v__s2;
   rand__s3=__temp1258v__s3;
   next__temp1253v(&rand__s0,&rand__s1,&rand__s2,&rand__s3,&__temp1259v__);
-  print__temp366v(__temp1259v__);
+  print__temp368v(__temp1259v__);
 }
 
 int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1256v();return 0;}

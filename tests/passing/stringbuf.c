@@ -4,11 +4,11 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp1225v="-------------------";
-const char* const __temp1252v="mario";
 const char* const __temp797v="";
 const char* const __temp365v="\n";
+const char* const __temp1225v="-------------------";
 const char* const __temp1230v="surnname  ";
+const char* const __temp1252v="mario";
 const char* const __temp1250v="it's a me";
 const char* const __temp1227v="name      ";
 static const char* __temp_all_errcodes[30] = {"noerr",
@@ -788,33 +788,12 @@ static inline __attribute__((always_inline)) int test__temp1234v(char** __temp13
   goto __temp_failure;
   }
   memcpy(&__temp1257v__name__unsafe_ptr,__temp1256v__,8);
-  if(!__temp1256v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1257v__name__dat__pos,__temp1256v__+8,8);
-  if(!__temp1256v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1257v__name__dat__length,__temp1256v__+16,8);
-  if(!__temp1256v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1257v__name__dat__first,__temp1256v__+24,1);
-  if(!__temp1256v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1257v__surname__unsafe_ptr,__temp1256v__+25,8);
-  if(!__temp1256v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1257v__surname__dat__pos,__temp1256v__+33,8);
-  if(!__temp1256v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1257v__surname__dat__length,__temp1256v__+41,8);
-  if(!__temp1256v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1257v__surname__dat__first,__temp1256v__+49,1);
   print__temp1224v(__temp1257v__name__unsafe_ptr,__temp1257v__name__dat__pos,__temp1257v__name__dat__length,__temp1257v__name__dat__first,__temp1257v__surname__unsafe_ptr,__temp1257v__surname__dat__pos,__temp1257v__surname__dat__length,__temp1257v__surname__dat__first);
   __temp1259v__unsafe_ptr=people__unsafe_ptr+0;
@@ -900,13 +879,7 @@ static inline __attribute__((always_inline)) int main__temp1267v() {
   goto __temp_failure;
   }
   memcpy(&__temp1272v__pos,__temp1271v__,8);
-  if(!__temp1271v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1272v__length,__temp1271v__+8,8);
-  if(!__temp1271v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1272v__first,__temp1271v__+16,1);
   __temp_errcode=str__temp579v(t__buf__buf__unsafe_ptr,t__buf__buf__unsafe_size,t__buf__buf__unsafe_align,__temp1272v__pos,__temp1272v__length,__temp1272v__first,&__temp1273v__unsafe_ptr,&__temp1273v__dat__pos,&__temp1273v__dat__length,&__temp1273v__dat__first);
   if(__temp_errcode){

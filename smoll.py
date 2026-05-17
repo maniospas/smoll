@@ -45,7 +45,7 @@ symbols = "=\\/+-*@<>!%&#!(){}[]:.',;|^"
 END_TOKEN = "...]" # impossible for something else to be tokenized as this
 START_TOKEN = "[..." # impossible for something else to be tokenized as this
 err_code_table: dict[str,int] = dict()
-err_code_list = ["\"noerr\"", "\"error\""]
+err_code_list = ["\"noerr\"", "\"error\"", "\"null pointer\""]
 err_code_table["noerr"] = 0
 err_code_table["error"] = 1
 debug_mode = True
@@ -422,7 +422,7 @@ class ImplementedType:
         self.at = at
         self.nesting: list[str] = list()
         self.has_returned_once = False
-        self.needs_failure_mode = False
+        self.needs_failure_mode: Optional["Token"] = None
         self.has_any_complaint = False
         self.is_buffer_of: ImplementedType|None = None
         self.used_globals: set[str] = set()
@@ -1620,7 +1620,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         vars = gathered_vars
 
     if callee==NOCATCH_TYPE:
-        if impl.needs_failure_mode: error_token.error("safety", "there are potential errors that can occur up to here that have not been intercepted with `try`")
+        if impl.needs_failure_mode: error_token.error("safety", "there are potential errors that can occur up to here that have not been intercepted with `try`", reason=impl.needs_failure_mode, raason_message="due to")
         #return [TRUE_TYPE if impl.needs_failure_mode else FALSE_TYPE]
 
     if callee==CAUGHT_TYPE:
@@ -1629,9 +1629,10 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.vars[tmp] = var
         if not impl.used_error_codes: error_token.error("safety", "there is nothing to catch up to here")
         impl.has_caught_used_error_codes = True
+        if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if exists error=compiler:catch() print cstr error`")
-        else: impl.is_parsing_a_try[-1] = None
+        #else: impl.is_parsing_a_try[-1] = None
         impl.implementation.extend([
             var,
             CODEWORD_EQUALS,
@@ -1681,6 +1682,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     tmp = create_temp()
     rets = list()
     if callee.needs_failure_mode:
+        if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is not None:
             impl.has_any_complaint = True
@@ -1781,6 +1783,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     impl.implementation.append(CODEWORD_SEMICOLON)
 
     if callee.needs_failure_mode:
+        if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is not None:
             impl.implementation.extend([
@@ -1792,7 +1795,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
 
     if callee.needs_failure_mode and impl.is_parsing_a_try:
         if impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the 'try' mechanism has already matched one function call")
-        impl.is_parsing_a_try[-1] = None
+        #impl.is_parsing_a_try[-1] = None
     if callee.needs_failure_mode and not impl.is_parsing_a_try:
         if impl.is_parsing_a_defer: error_token.error("safety", "cannot call a function with unhandled failure within 'defer'", reason=callee.at)
         impl.implementation.extend([
@@ -1898,21 +1901,31 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     prefix = create_temp()+"__"
     progress = 0
     skip = 0
-    for ret_name in pointer_type.rets:
-        r_var = pointer_type.vars[ret_name].renamed_copy(prefix+ret_name)
-        new_vars.append(r_var)
-        mem_size = r_var.type.memory_size() if r_var.type.builtin else 0
-        impl.vars[r_var.name] = r_var
-        if not mem_size: continue
-        # non-allocation check is mandatory unfortunately
+    # non-allocation check is mandatory unfortunately
+    impl.implementation.extend([
+        CODEWORD_IF,
+        CODEWORD_LPAR,
+        CodeWord("!"),
+        ret[0],
+        CODEWORD_RPAR,
+        CODEWORD_LBRACKET,
+    ])
+    if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: current_token.error("safety", "the matching 'try' has already handled a different failure")
+    try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
+    if try_var is not None:
+        impl.has_any_complaint = True
         impl.implementation.extend([
-            CODEWORD_IF,
-            CODEWORD_LPAR,
-            CodeWord("!"),
-            ret[0],
-            CODEWORD_RPAR,
-            CODEWORD_LBRACKET,
+            CodeWord("__temp_complain"),
+            CODEWORD_EQUALS,
+            CodeWord("2"),
+            CODEWORD_SEMICOLON,
+            CODEWORD_RBRACKET,
+            CodeWord("else"),
+            CODEWORD_LBRACKET
         ])
+        impl.spawned_error_codes.add(2)
+        #impl.is_parsing_a_try[-1] = None
+    else:
         if debug_mode:
             text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
             text += "\\033[31mat\\033[0m "+current_token.file.path.replace('"','\\"')+" line "+str(current_token.row)+" column "+str(current_token.col)+"\\n"
@@ -1924,12 +1937,25 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
                 CODEWORD_SEMICOLON,
             ])
         impl.implementation.extend([
+            CodeWord("__temp_errcode"),
+            CODEWORD_EQUALS,
+            CodeWord("2"),
+            CODEWORD_SEMICOLON
+        ])
+        impl.spawned_error_codes.add(2)
+        impl.implementation.extend([
             CODEWORD_GOTO,
             CodeWord("__temp_failure"),
             CODEWORD_SEMICOLON,
             CODEWORD_RBRACKET
         ])
-        impl.needs_failure_mode = True
+        impl.needs_failure_mode = current_token
+    for ret_name in pointer_type.rets:
+        r_var = pointer_type.vars[ret_name].renamed_copy(prefix+ret_name)
+        new_vars.append(r_var)
+        mem_size = r_var.type.memory_size() if r_var.type.builtin else 0
+        impl.vars[r_var.name] = r_var
+        if not mem_size: continue
         impl.implementation.extend(
             [CodeWord(w) for w in "memcpy (".split(" ")]
             + [CODEWORD_AMP]
@@ -1943,6 +1969,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
             + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
         )
         progress += mem_size
+    if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
     return pos, new_vars
 
 buffer_types: dict[UnionType|ImplementedType, UnionType] = dict()
@@ -2265,19 +2292,31 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             for pr, r in zip(pointer_type.rets, ret):
                 if pointer_type.vars[pr].type != r.type: err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")
             # we now have a contract that we can place our data on the pointer
-            progress = 0
-            for r in ret:
-                mem_size = r.type.memory_size() if r.type.builtin else 0
-                if not mem_size: continue
-                # non-allocation check is mandatory unfortunately
+            impl.implementation.extend([
+                CODEWORD_IF,
+                CODEWORD_LPAR,
+                CodeWord("!"),
+                var,
+                CODEWORD_RPAR,
+                CODEWORD_LBRACKET,
+            ])
+            if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: current_token.error("safety", "the matching 'try' has already handled a different failure")
+            try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
+            if try_var is not None:
+                impl.has_any_complaint = True
                 impl.implementation.extend([
-                    CODEWORD_IF,
-                    CODEWORD_LPAR,
-                    CodeWord("!"),
-                    var,
-                    CODEWORD_RPAR,
-                    CODEWORD_LBRACKET,
+                    CodeWord("__temp_complain"),
+                    CODEWORD_EQUALS,
+                    CodeWord("2"),
+                    CODEWORD_SEMICOLON,
+                    CODEWORD_RBRACKET,
+                    CodeWord("else"),
+                    CODEWORD_LBRACKET
                 ])
+                impl.spawned_error_codes.add(2)
+                #impl.is_parsing_a_try[-1] = None
+            else:
+                # non-allocation check is mandatory unfortunately
                 if debug_mode:
                     text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
                     text += "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
@@ -2289,12 +2328,24 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         CODEWORD_SEMICOLON,
                     ])
                 impl.implementation.extend([
+                    CodeWord("__temp_errcode"),
+                    CODEWORD_EQUALS,
+                    CodeWord("2"),
+                    CODEWORD_SEMICOLON
+                ])
+                impl.spawned_error_codes.add(2)
+                impl.implementation.extend([
                     CODEWORD_GOTO,
                     CodeWord("__temp_failure"),
                     CODEWORD_SEMICOLON,
                     CODEWORD_RBRACKET
                 ])
-                impl.needs_failure_mode = True
+                impl.needs_failure_mode = op_token
+
+            progress = 0
+            for r in ret:
+                mem_size = r.type.memory_size() if r.type.builtin else 0
+                if not mem_size: continue
                 impl.implementation.extend(
                     [CodeWord("memcpy"), CODEWORD_LPAR]
                     +[var]
@@ -2305,6 +2356,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
                 )
                 progress += mem_size
+            impl.implementation.append(CODEWORD_RBRACKET)
             prev_ret = ret
             continue
         
@@ -2664,7 +2716,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
     if current=="fail":
         if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**fail**\n\nImmediately fail during execution with the corresponding string literal message or error code retrieved with 'compiler:catch()' from some other failure statement. Failures cascade to callers and to the callers of callers until the program exits with a corresponding error code, or a 'try' statement intercepts them.")
         pos += 1
-        impl.needs_failure_mode = True
+        impl.needs_failure_mode = current_token
         message = get(tokens, pos)
         if not message.is_string(): 
             pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
@@ -2681,6 +2733,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     CODEWORD_RPAR,
                     CODEWORD_SEMICOLON,
                 ])
+            if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: current_token.error("safety", "the matching 'try' has already handled a different failure")
             try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
             if try_var is not None:
                 impl.has_any_complaint = True
@@ -2690,7 +2743,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     ret[0],
                     CODEWORD_SEMICOLON
                 ])
-                impl.is_parsing_a_try[-1] = None
+                #impl.is_parsing_a_try[-1] = None
             else:
                 if impl.is_parsing_a_defer: current_token.error("safety", "cannot fail within a 'defer' statement unless within a 'try'")
                 impl.implementation.extend([
@@ -2722,6 +2775,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
+        if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: current_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is not None:
             impl.has_any_complaint = True
@@ -2731,7 +2785,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 CodeWord(str(err_code)),
                 CODEWORD_SEMICOLON
             ])
-            impl.is_parsing_a_try[-1] = None
+            #impl.is_parsing_a_try[-1] = None
         else:
             if impl.is_parsing_a_defer: current_token.error("safety", "cannot fail within a 'defer' statement unless within a 'try'")
             impl.implementation.extend([
@@ -2837,7 +2891,14 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             impl.is_parsing_a_try.append(var)
             pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
             pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
-            if impl.is_parsing_a_try[-1] is not None: current_token.error("safety", "this 'try' statement does not guard against anything")
+            backward = len(impl.implementation)-1
+            found = False
+            while backward>0:
+                if impl.implementation[backward-1]==var and impl.implementation[backward].tostring()=="=":
+                    found = True
+                    break
+                backward -= 1
+            if not found: current_token.error("safety", "this 'try' statement does not guard against anything")
             impl.is_parsing_a_try.pop()
             impl.implementation.extend([
                 var,
@@ -3540,7 +3601,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
         if is_local: file.localdefs.add(impl)
         impl.fast_return_exception = fast_return_exception
         if fast_return_exception: # if recursive, that is
-            impl.needs_failure_mode = True
+            impl.needs_failure_mode = start_token
         try:
             for arg_name, arg_type, immutable, convert_to_ptr in zip(abstract_arg_names, arg_types, abstract_arg_immutability, abstract_arg_convert_to_ptr):
                 if convert_to_ptr:

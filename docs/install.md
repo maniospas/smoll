@@ -100,8 +100,8 @@ Then add <code>--back antcc</code> to smoll runs.
 You are now ready! Create a `main.s` file like the one below. To compile and run the outcome, open a 
 terminal in that folder (or use your editor's integrated
 one) and run <code>./smoll main.s</code>, where <i>main.s</i> is the name of your main file.
-The following will be printed in the console. Add <code>--build</code> to the command if the goals
-it to only to produce the executable.
+The following will be printed in the console. Add <code>--build</code> to the command for only 
+producing the executable.
 
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"

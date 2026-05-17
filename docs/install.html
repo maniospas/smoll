@@ -186,8 +186,8 @@ by searching for the extension within vscode, or visit its page in the vscode ma
 <div class="step">
 <h2>3. Create a new project</h2>
 
-Create a new folder and download the executable matching to your platform without changing its name. Then, open
-vscode in that folder.
+Create a new folder. Place within it the executable matching your platform without changing its name. Then, open
+vscode or your editor of choice in that folder.
 
 <br><br>
 <a href="https://github.com/maniospas/smoll/releases/download/main/smoll.exe" class="button">➔ Windows (smoll.exe)</a>
@@ -204,15 +204,13 @@ In <b>linux</b>, also run <code>chmod +x smoll</code> to grant the download perm
 <i>Smoλ</i> requires an assisting C compiler to produce a final executable,
 It is recommended to install the
 GCC compiler in your system, which the language tries to use by default. Otherwise
-the languge can act as an interpreter for its own intermediate C code
-outcome by adding <code>--back vm</code> by employing the virtual machine that is
-also used for constant expression fold. 
-This is how the language runs in the web playground too.
+<i>smoλ</i> can act as an interpreter for its own intermediate C code
+by adding <code>--back vm</code>. This is how the language runs in the web playground too.
 <br>
 <br>
 In <b>windows</b> install GCC by installing msys2 first and then running:
 
-<pre>
+<pre class="skiptry">
 pacman -S mingw-w64-ucrt-x86_64-gcc
 </pre>
 <div style="margin-top:-10px">&nbsp;</div>
@@ -221,7 +219,7 @@ pacman -S mingw-w64-ucrt-x86_64-gcc
 
 In <b>linux</b> install GCC per:
 
-<pre>
+<pre class="skiptry">
 sudo apt update
 sudo apt install build-essential
 </pre>
@@ -276,6 +274,7 @@ only downloads permitted by the main file are allowed.</i></p>
     <script>
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll("pre").forEach(pre => {
+            if(pre.className==="skiptry") return;
             pre.style.position = "relative";
             const btn = document.createElement("a");
             btn.textContent = "▶ try it";

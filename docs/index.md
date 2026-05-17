@@ -22,7 +22,7 @@
   <h1 class="smoll-name">smo<span>λ</span></h1>
   <p class="smoll-tagline">Script ergonomics and safety at wire speed.</p>
   <a href="install.html" class="button">➔ Install</a>
-  <a href="tutorial.html" class="button">📚 Learn</a>
+  <a href="reference.html" class="button">📚 Learn</a>
 </div>
 
 <p class="smoll-section-label">Quickstart</p>

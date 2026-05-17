@@ -288,6 +288,7 @@ use instead of the line break character, you can do the following.</p>
     <script>
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll("pre").forEach(pre => {
+            if(pre.className==="skiptry") return;
             pre.style.position = "relative";
             const btn = document.createElement("a");
             btn.textContent = "▶ try it";

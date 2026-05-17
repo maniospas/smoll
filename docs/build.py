@@ -28,6 +28,7 @@ def export(path, target):
     <script>
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll("pre").forEach(pre => {
+            if(pre.className==="skiptry") return;
             pre.style.position = "relative";
             const btn = document.createElement("a");
             btn.textContent = "▶ try it";

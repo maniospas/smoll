@@ -1075,7 +1075,7 @@ class ImplementedType:
                                 result.append(f"{float(val):.{prec}f}")
                             else:
                                 print("".join(result), end="", flush=True)  # flush what we have before raising
-                                self.at.error("interpreter", f"unimplemented printf specifier {spec}")
+                                self.at.error("interpreter", f"unimplemented printf specifier '{spec}'")
                         print("".join(result), end="", flush=True)
                         return None
                 assert callee, candidate_name

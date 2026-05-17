@@ -89,7 +89,12 @@ async function runVM(){
   var stderrBuf=[];
   pyodide.setStdout({batched:function(s){s.split('\n').forEach(function(l){clog(l);});}});
   pyodide.setStderr({batched:function(s){stderrBuf.push(s);}});
-  pyodide.globals.set('_js_print',function(msg){clog(String(msg));});
+  pyodide.globals.set('_js_print',function(msg, end){
+    var span=document.createElement('span');
+    span.innerHTML=ansiToHtml(String(msg+end));
+    d.appendChild(span);
+    d.parentElement.scrollTop=d.parentElement.scrollHeight;
+  });
   pyodide.globals.set('_js_input',async function(prompt){return '';});
 
   try{
@@ -105,9 +110,10 @@ _orig_input = _bt.input
 def _patched_print(*args, **kwargs):
     import io
     buf = io.StringIO()
-    kwargs2 = {k:v for k,v in kwargs.items() if k not in ('file',)}
-    _orig_print(*args, file=buf, **kwargs2)
-    _js_print(buf.getvalue().rstrip('\\n'))
+    kwargs2 = {k:v for k,v in kwargs.items() if k not in ('file','end')}
+    _orig_print(*args, file=buf, end='',**kwargs2)
+    if 'end' in kwargs: _js_print(buf.getvalue(), kwargs['end'])
+    else: _js_print(buf.getvalue(), '\\n')
 async def _patched_input_async(prompt=''):
     result = await _js_input(str(prompt))
     return result if result is not None else ''

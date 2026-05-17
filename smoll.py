@@ -2884,7 +2884,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
     if current=="try":
         async def process_try(pos: int):
-            if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**try**\n\nTries to execute the rest of the statement without failing. The result is a true or false boolean value, depending on whether an error occurred or not; the error's value is retrieved by the next 'compiler:caught()'. If more than one failing function calls are encountered in the expression, an error is created so that each is handled autonomously through assignment to intermediate variables.")
+            if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**try**\n\nTries to execute the rest of the statement without failing. The result is a true or false boolean value, depending on whether an error occurred or not; the error's value is retrieved by the next 'compiler:caught()'.")
             tmp = create_temp()
             var = Variable(tmp, BOOL_TYPE)
             impl.vars[tmp] = var

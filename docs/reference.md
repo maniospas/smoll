@@ -198,6 +198,9 @@ when applying `add` to the range construct. This structural
 typing is rich but can be kind of unsafe if you do not keep
 track of your data shapes. To prevent implicit structural matches, 
 use the following `class` notation to wrap the returned value.
+You will mainly want to do so when the relations between class
+field values (e.g., a character buffer and its used size) is
+important to safeguard.
 
 Further prefer class definitions when declaring types with some
 construction contract; such contracts should
@@ -1009,14 +1012,7 @@ for example by calling the same code again for improved user input, or by
 falling back to some secondary functionality. This is achieved with the
 `try` keyword. That parses an expression without stopping at the first failing functions, 
 if any. Stressing again: this intercepts the
-first error of an *expression* not a whole block of code. 
-
-You can fail only once within a try
-and the compiler will complain for multiple failures. This is done so that each prospective
-failure is split among multiple declarations to avoid ambiguity of how error handling takes
-place. For example, you can handle each error differently.
-Create and call helper methods to compartmentalize error-prone code chunks and handle
-their failure all at once. See later for how to reconstruct and handle specific error codes.
+first error of an *expression* not a whole block of code.
 
 Finally, returns from failing
 functions are just zero-initialized, but `try` has a boolean outcome that shows whether

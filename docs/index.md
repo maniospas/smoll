@@ -34,15 +34,15 @@ import "std/io.s":web as web
 import "std/io.s":file as file
 
 def CHUNK_SIZE = 4096
+def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 
 def main()
     mem = alloc CHUNK_SIZE
-    f = file:read web:get "https://www.google.com/" # save to .tmp with system curl and read it
+    f = file:read web:get README # save to .tmp with system curl and read it
     size = mut 0
     while try line=mem.file:line f
         size = size+len line
     print(size, " bytes downloaded\n")
-
 ```
 
 <p class="smoll-section-label">Features</p>

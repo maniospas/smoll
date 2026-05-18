@@ -17,17 +17,24 @@
 local import "std/core.s"
 local import "std/unsafe.s" as unsafe
 
-def is_dir(str|cstr _path)
-    doc "checks whether a cstr path points to an existing directory"
-    path = unsafe_temporary_cstr _path
+def is_dir(cstr path)
+    doc "checks whether a path points to an existing directory"
+    VM "[os.path.is_dir($path)]"
     {builtins:bool exists = __smo_is_dir(path);}
     return exists
 
-def create_dir(str|cstr _path)
-    path = unsafe_temporary_cstr _path
+def is_dir(str|cstr path)
+    doc "checks whether a path points to an existing directory"
+    return is_dir unsafe_temporary_cstr path
+
+def create_dir(cstr path)
     doc "creates a directory at a cstr path, fails if it already exists or cannot be created"
+    VM "[os.path.mkdir($path)]"
     {builtins:bool result = __smo_create_dir(path);}
     if not result fail "failed to create directory"
+
+def create_dir(str path)
+    create_dir unsafe_temporary_cstr path
 
 def is_file(str|cstr _path)
     doc "checks whether a cstr path points to an existing file"
@@ -41,23 +48,34 @@ def remove(str|cstr _path)
     {builtins:bool result = __smo_remove_file(path);}
     if not result fail "failed to remove file"
 
-def read(str|cstr _path)
+local def closedir(any ptr unsafe_ptr) # super unsafe to expose
+    VM "memory.get_foreign($unsafe_ptr).close() or memory.close_foreign($unsafe_ptr)"
+    {if(unsafe_ptr) {closedir((DIR*)unsafe_ptr); unsafe_ptr=0;}}
+
+def read(cstr path)
     doc "loads a cstr path as a readable directory"
-    path = unsafe_temporary_cstr _path
+    VM "[memory.register_foreign(os.scandir($path), 'dir '+$path)]"
     {builtins:compiler:ptr unsafe_ptr = (char*)opendir(path);}
     defer
-        {if(unsafe_ptr) {closedir((DIR*)unsafe_ptr); unsafe_ptr=0;}}
+        closedir unsafe_ptr
     if not exists unsafe_ptr fail "failed to open file"
     return class(unsafe_mut unsafe_ptr)
 
-def entry(read f)
-    doc "the next entry of an open dictionary"
-    doc "This value is modified as you continue reading"
-    doc "from the same directory."
+def read(str path)
+    return read unsafe_temporary_cstr path
+
+local def raw_entry(read f) # this function returns a content pointer, but this does not allow safe comparisons
+    VM "[safeguard(lambda memory=memory: memory.write_cstr(next(memory.get_foreign($f__unsafe_ptr)).name), ExpectedException('end of dir'))]"
     if not exists f.unsafe_ptr
         fail "not open dir"
     {builtins:compiler:ptr de = (char*)readdir((DIR*)f__unsafe_ptr);}
     if not exists de
         fail "end of dir"
     {builtins:cstr dirname=((struct dirent*)de)->d_name;}
-    return str dirname
+    return dirname
+
+def entry(read f)
+    doc "the next entry of an open dir"
+    doc "This value is modified as you continue reading"
+    doc "from the same directory."
+    return str raw_entry f

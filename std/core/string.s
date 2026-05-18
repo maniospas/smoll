@@ -181,7 +181,8 @@ def copy_null_terminated(char[] buf, mut nat pos, str|cstr _other)
     if next_pos>len buf
         fail "string buffer out of memory"
     {memcpy(buf__unsafe_ptr+pos, other__unsafe_ptr+other__dat__pos, other__dat__length);}
-    {buf__unsafe_ptr[null_pos]=0;}
+    {builtins:compiler:ptr endpos = buf__unsafe_ptr+null_pos;}
+    {*endpos=0;}
     prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)

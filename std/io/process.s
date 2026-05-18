@@ -16,18 +16,32 @@ def args()
     {ret__unsafe_size=__temp_argc;}
     return ret
 
-def read(str|cstr _cmd)
-    doc "create a readable system process"
-    cmd = unsafe_temporary_cstr _cmd
+local def pclose(any ptr unsafe_ptr)
+    VM "[(lambda proc=memory.get_foreign($unsafe_ptr),memory=memory:not memory.close_foreign($unsafe_ptr) or proc.wait() or proc.returncode)()]"
+    {char buf[1024]; while(fread(buf, 1, sizeof(buf), (FILE*)unsafe_ptr)) {}}
+    {builtins:int status = pclose((FILE*)unsafe_ptr);}
+    return status
+
+local def popen(cstr cmd)
+    VM "[memory.register_foreign(subprocess.Popen($cmd.split(),stdout=subprocess.PIPE,stderr=subprocess.PIPE), 'process '+$cmd)]"
     {builtins:compiler:ptr unsafe_ptr = (void*)popen((const char*)cmd, "r");}
+    return unsafe_ptr
+
+def read(cstr cmd)
+    doc "create a readable system process"
+    unsafe_ptr = unsafe_mut popen cmd
     if not exists unsafe_ptr fail "failed to start process"
     defer
         if exists unsafe_ptr
-            {char buf[1024]; while(fread(buf, 1, sizeof(buf), (FILE*)unsafe_ptr)) {}}
-            {builtins:int status = pclose((FILE*)unsafe_ptr); unsafe_ptr = 0;}
-        if status!=int 0
-            try fail "process terminated with unhandled non-zero exit code"
-    return class(unsafe_mut unsafe_ptr)
+            status = pclose unsafe_ptr
+            {unsafe_ptr = 0;}
+            if status!=int 0
+                try fail "process terminated with unhandled non-zero exit code"
+    return class(unsafe_ptr)
+
+def read(str cmd)
+    doc "create a readable system process"
+    return read unsafe_temporary_cstr cmd
 
 def chunk(char[] buf, mut nat|blank pos, read f)
     if pos is blank
@@ -45,8 +59,8 @@ def line(char[] buf, mut nat|blank pos, read f)
         pos = mut 0
     unsafe_ptr = unsafe:add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos
-    {builtins:bool success = f__unsafe_ptr?fgets(unsafe_ptr, size, (FILE*)f__unsafe_ptr)!=0:0;}
-    if not success fail "end of file"
+    {if(f__unsafe_ptr){builtins:compiler:ptr obtained = fgets(unsafe_ptr, size, (FILE*)f__unsafe_ptr);}}
+    if not exists obtained fail "end of file"
     {builtins:nat bytes_read = strlen(unsafe_ptr);}
     prev_pos = const pos
     pos = pos+bytes_read

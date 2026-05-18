@@ -53,6 +53,10 @@ debug_mode = True
 repositories: dict[str, str] = dict()
 externals: list["File"] = list()
 
+def safeguard(fn, exc): 
+    try: return fn()
+    except Exception: raise exc
+
 def strip_quotes(text: str) -> str:
     if len(text)>=2 and text[0]=="\"" and text[-1]=="\"": return text[1:-1]
     return text
@@ -60,6 +64,7 @@ def strip_quotes(text: str) -> str:
 class CompfailException(Exception): pass
 class FastReturnException(Exception): pass
 class FatalException(Exception): pass
+class ExpectedException(Exception): pass # for interpreter
 class ImportError(Exception): 
     def __init__(self):
         super().__init__(self)
@@ -72,6 +77,23 @@ class MemoryEmulator:
         self.named_locs: dict[str,int] = dict()
         self.alloc_sizes: dict[int,int] = dict() 
         self.foreign_objects: dict[int, tuple[Any, str]] = dict() # foreign_id->(obj,description)
+        self.temporary_space = self.alloc(256)
+
+    def write_temp_cstr(self, text: str) -> int:
+        encoded = text.encode('utf-8')
+        addr = self.temporary_space if self.temporary_space and len(text)<256 else self.alloc(len(encoded) + 1)
+        if addr == 0: return 0
+        self.contents[addr:addr + len(encoded)] = encoded
+        self.contents[addr + len(encoded)] = 0
+        return addr
+
+    def write_cstr(self, text: str) -> int:
+        encoded = text.encode('utf-8')
+        addr = self.alloc(len(encoded) + 1)
+        if addr == 0: return 0
+        self.contents[addr:addr + len(encoded)] = encoded
+        self.contents[addr + len(encoded)] = 0
+        return addr
 
     def alloc(self, size: int):
         if self.consumed+size>self.size: return 0
@@ -81,7 +103,7 @@ class MemoryEmulator:
         return ret
 
     def register_foreign(self, obj: any, description: str):
-        foreign_object_id = len(self.foreign_objects)
+        foreign_object_id = len(self.foreign_objects)+1 # reserve zero id for failing starts
         self.foreign_objects[foreign_object_id] = (obj,description)
         addr = self.alloc(8)
         self.write_int64(addr, foreign_object_id)
@@ -913,6 +935,7 @@ class ImplementedType:
                 if k in self.vars: 
                     if self.vars[k].type==FLOAT_TYPE: return 0.0
                     return 0
+                if k == "__temp_complain": return 0 # may not be a var yet
                 return self.at.error("interpreter", "failed to parse '"+k+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
             elif impl[pos+1].tostring()=="=":
                 varname = impl[pos].tostring()
@@ -1290,9 +1313,13 @@ class ImplementedType:
                     elif self.vars[arg].type==FLOAT_TYPE: value = str(float(values[pos]))
                     else: value = str(int(values[pos]))
                     call_text = call_text.replace("$"+arg, value)
-            evaluated = eval(call_text)
-            if inspect.isawaitable(evaluated):
-                evaluated = await evaluated
+            try:
+                evaluated = eval(call_text)
+                if inspect.isawaitable(evaluated):
+                    evaluated = await evaluated
+            except ExpectedException as e:
+                err_code = err_code_table.get("\""+str(e)+"\"", 1)
+                return err_code
             if not isinstance(evaluated, list): evaluated = []
             if len(evaluated)!=len(args)-input_args:
                 self.at.error("interpreter", "the VM command returned a different number of values than the original")
@@ -4305,7 +4332,7 @@ parser.add_argument("--lsp", action="store_true", help="No compilation, and outp
 parser.add_argument("--build", action="store_true", help="Build without running.",)
 parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
 parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang, none (the last option only creates a C file).",)
-parser.add_argument("--vmkb", action="store", type=int, default=16, help="VM memory in kilobytes.",)
+parser.add_argument("--vmkb", action="store", type=int, default=256, help="VM memory in kilobytes.",)
 parser.add_argument("--vmrec", action="store", type=int, default=16, help="VM recursion budget.",)
 args, extra_args = parser.parse_known_args()
 debug_mode = args.debug

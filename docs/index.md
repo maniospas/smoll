@@ -30,17 +30,19 @@
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import "std/core.s"
+import "std/io.s":web as web
 import "std/io.s":file as file
 
 def CHUNK_SIZE = 4096
 
 def main()
-    f = file:read "README.md"
     mem = alloc CHUNK_SIZE
-    while try line = mem.file:line f
-        print("|", "")
-        print(line, "")
-    print ""
+    f = file:read web:get "https://www.google.com/" # save to .tmp with system curl and read it
+    size = mut 0
+    while try line=mem.file:line f
+        size = size+len line
+    print(size, " bytes downloaded\n")
+
 ```
 
 <p class="smoll-section-label">Features</p>

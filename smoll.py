@@ -69,7 +69,8 @@ class MemoryEmulator:
         self.consumed = 1
         self.size = size
         self.named_locs: dict[str,int] = dict()
-        self.alloc_sizes: dict[int,int] = dict()
+        self.alloc_sizes: dict[int,int] = dict() 
+        self.foreign_objects: dict[int, tuple[Any, str]] = dict() # foreign_id->(obj,description)
 
     def alloc(self, size: int):
         if self.consumed+size>self.size: return 0
@@ -77,6 +78,26 @@ class MemoryEmulator:
         self.consumed += size
         self.alloc_sizes[ret] = size
         return ret
+
+    def register_foreign(self, obj: any, description: str):
+        foreign_object_id = len(self.foreign_objects)
+        self.foreign_objects[foreign_object_id] = (obj,description)
+        addr = self.alloc(8)
+        self.write_int64(addr, foreign_object_id)
+        return addr
+
+    def get_foreign(self, addr: int):
+        foreign_object_id = self.read_int64(addr)
+        ret = self.foreign_objects.get(foreign_object_id)  # .get() instead of ()
+        if ret is None: return None
+        return ret[0]
+
+    def close_foreign(self, addr: int):
+        foreign_object_id = self.read_int64(addr)
+        ret = self.foreign_objects.get(foreign_object_id)
+        if ret is None: return False
+        del self.foreign_objects[foreign_object_id]
+        return True
 
     def realloc(self, original: int, size: int):
         # TODO: for now we just alloc again and disuse the previous location
@@ -814,8 +835,12 @@ class ImplementedType:
 
         def process_expression(impl: list["Token"], pos: int, end: int):
             if pos>end: return
+            if impl[pos].tostring()=="(" and pos<end-3 and impl[pos+2].tostring()=="*" and impl[pos+3].tostring()==")":
+                pos += 4 # skip pointer casts
+            if pos>end: return
             if impl[pos].tostring()=="(" and impl[end].tostring()==")":
                 return process_expression(impl,pos+1,end-1)
+            expr_pos = pos
             if impl[pos].tostring()=="!":
                 condition = process_expression(impl,pos+1,end)
                 return 0 if condition else 1
@@ -932,7 +957,7 @@ class ImplementedType:
                         if candidate.monomorphic_name==candidate_name:
                             callee = candidate
                             break
-                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy", "strlen", "memcmp"]:
+                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy", "strlen", "memcmp", "fopen", "fclose", "fgets"]:
                     self.at.error("interpreter", "failed to interpret C function '"+candidate_name+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                 gathered_args: list[str] = list()
                 gathered_args_by_pointer: list[bool] = list()
@@ -941,10 +966,11 @@ class ImplementedType:
                 last_arg_name: str = ""
                 by_pointer: bool = False
                 values: list[int|float] = list()
+                depth = 0
                 while pos<=end:
                     # TODO: this skips operations within memcpy
                     tok = impl[pos]
-                    if tok.tostring()=="," or tok.tostring()==")":
+                    if (tok.tostring()=="," or tok.tostring()==")") and depth==0:
                         if last_arg_name:
                             gathered_args.append(last_arg_name)
                             gathered_args_by_pointer.append(by_pointer)
@@ -957,16 +983,19 @@ class ImplementedType:
                         else: values.append(processed)
                         prev_pos = pos+1
                         if tok.tostring()==")": break
-                    elif tok.tostring() == "&":
+                    elif tok.tostring() == "&" and depth==0:
                         by_pointer = True
                         prev_pos = pos+1
-                    elif tok.tostring()[0] in "([":
-                        self.at.error("interpreter", "the C interpreter does not allow complicated function arguments '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+                    # elif tok.tostring()[0] in "([":
+                    #     self.at.error("interpreter", "the C interpreter does not allow complicated function arguments '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                     else:
-                        #assert not last_arg_name
-                        last_arg_name = tok.tostring()
+                        if tok.tostring()=="(": depth += 1
+                        elif tok.tostring()==")" and depth: depth -= 1
+                        else: 
+                            if by_pointer: assert not last_arg_name
+                            last_arg_name = tok.tostring()
                     pos += 1
-                if pos!=end: self.at.error("malformed smollC", "call parenthesis closed prematurely for '"+candidate_name+"' at"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+                if pos!=end: self.at.error("malformed smollC", "call parenthesis closed prematurely for '"+candidate_name+"' at "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)])+"'")
                 if callee is None: # in case we have overlapping names
                     if candidate_name == "malloc":
                         if len(values)!=1: self.at.error("malformed smollC", "'malloc' requires one argument")
@@ -1054,6 +1083,47 @@ class ImplementedType:
                         if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
                         if not isinstance(values[2], int): self.at.error("malformed smollC", "non-integer argument to 'ptr_memzero'")
                         return memory.memset(values[0]+values[1], 0, values[2]-values[1])
+
+                    if candidate_name == "fopen":
+                        if len(values)!=2 and len(values)!=1: self.at.error("malformed smollC", "'fopen' requires one or two arguments")
+                        if not isinstance(values[0], int): self.at.error("malformed smollC", "non-cstr argument to 'fopen'")
+                        if len(values)!=1 and not isinstance(values[1], int): self.at.error("malformed smollC", "non-cstr argument to 'fopen'")
+                        true_args = [memory.as_cstr(val) for val in values]
+                        return memory.register_foreign(open(*true_args), "file "+true_args[0])
+                    
+                    if candidate_name == "fclose":
+                        if len(values)!=1: self.at.error("malformed smollC", "'fclose' requires one argument")
+                        if not isinstance(values[0], int): self.at.error("malformed smollC", "non-int argument to 'fclose'")
+                        ret = memory.close_foreign(values[0])
+                        if not ret: self.at.error("interpreter", "'fclose' tried to close non-allocated or already freed resource")
+                        return None
+
+                    if candidate_name == "fgets":
+                        if len(values) != 3: self.at.error("malformed smollC", "'fgets' requires three arguments")
+                        if not isinstance(values[0], int): self.at.error("malformed smollC", "non-integer buffer argument to 'fgets'")
+                        if not isinstance(values[1], int): self.at.error("malformed smollC", "non-integer size argument to 'fgets'")
+                        if not isinstance(values[2], int): self.at.error("malformed smollC", "non-integer stream argument to 'fgets'")
+                        buf_addr = values[0]
+                        n = values[1]
+                        file_addr = values[2]
+                        if buf_addr == 0: self.at.error("interpreter", "undefined behavior: 'fgets' buffer is a null pointer")
+                        if n <= 0: self.at.error("interpreter", "undefined behavior: 'fgets' called with n <= 0")
+                        if file_addr == 0: self.at.error("interpreter", "undefined behavior: 'fgets' stream is a null pointer")
+                        f = memory.get_foreign(file_addr)
+                        if f is None: self.at.error("interpreter", "'fgets' called with invalid or already-closed stream")
+                        chars = []
+                        for _ in range(n - 1):
+                            ch = f.read(1)
+                            if not ch: break # EOF
+                            chars.append(ch)
+                            if ch == '\n': break # stop after newline, keeping it
+                        if not chars: return 0 # EOF
+                        encoded = ''.join(chars).encode('utf-8')
+                        if buf_addr + len(encoded) + 1 > memory.size:
+                            self.at.error("interpreter", "'fgets' would write past the end of emulated memory")
+                        memory.contents[buf_addr : buf_addr + len(encoded)] = encoded
+                        memory.contents[buf_addr + len(encoded)] = 0   # null terminator
+                        return buf_addr
 
                     if candidate_name == "printf":
                         if not values: return None
@@ -1143,7 +1213,7 @@ class ImplementedType:
                     cond_end = endpos-1
                     pos = endpos+1
                     if pos>npos: self.at.error("malformed smollC", "Missing 'while' code body.")
-                    if impl[pos].tostring()!="{": self.at.error("malformed smollC", "The use of brackets is mandatory in conditions.")
+                    if impl[pos].tostring()!="{": self.at.error("malformed smollC", "The use of brackets is mandatory in conditions at "+" ".join([impl[i].tostring() for i in range(pos, npos+1)])+"'")
                     depth = 1
                     endpos = pos
                     while depth:
@@ -1173,7 +1243,7 @@ class ImplementedType:
                     assert condition is not None
                     pos = endpos+1
                     if pos>npos: self.at.error("malformed smollC", "Missing 'if' code body.")
-                    if impl[pos].tostring()!="{": self.at.error("malformed smollC", "The use of brackets is mandatory in conditions.")
+                    if impl[pos].tostring()!="{": self.at.error("malformed smollC", "The use of brackets is mandatory in conditions at "+" ".join([impl[i].tostring() for i in range(pos, npos+1)])+"'")
                     depth = 1
                     endpos = pos
                     while depth:
@@ -1220,8 +1290,9 @@ class ImplementedType:
                     else: value = str(int(values[pos]))
                     call_text = call_text.replace("$"+arg, value)
             evaluated = eval(call_text)
-            assert isinstance(evaluated, list)
-            assert len(evaluated)==len(args)-input_args
+            if not isinstance(evaluated, list): evaluated = []
+            if len(evaluated)!=len(args)-input_args:
+                self.at.error("interpreter", "the VM command returned a different number of values than the original")
             values[input_args:] = evaluated
             ret = None
         else: 

@@ -18,11 +18,11 @@ local import "std/core.s"
 local import "std/unsafe.s" as unsafe
 
 def read(str|cstr _path)
-    path = unsafe_temporary_cstr _path
     doc "loads a cstr path as a readable file"
+    path = unsafe_temporary_cstr _path
     {builtins:compiler:ptr unsafe_ptr = (char*)fopen(path, "r");}
     defer
-        {if(unsafe_ptr) fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}
+        {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
     if not exists unsafe_ptr fail "failed to open file"
     return class(unsafe_mut unsafe_ptr)
 
@@ -74,10 +74,10 @@ def line(char[] buf, mut nat|blank pos, File f)
         fail "not open file"
     contents = unsafe:add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos
-    {builtins:bool success = f__unsafe_ptr?fgets((char*)contents, size, (FILE*)f__unsafe_ptr)!=0:0;}
-    if not success
+    {if(f__unsafe_ptr){builtins:compiler:ptr obtained = fgets(contents, size, (FILE*)f__unsafe_ptr);}}
+    if not exists obtained
         fail "end of file"
-    {builtins:nat bytes_read = strlen((char*)contents);}
+    {builtins:nat bytes_read = strlen(contents);}
     prev_pos = const pos
     pos = pos+bytes_read
     return str(buf, prev_pos, bytes_read)

@@ -1,10 +1,13 @@
 import "std/core.s"
+import "std/io.s":web as web
+import "std/io.s":file as file
+
+def CHUNK_SIZE = 4096
 
 def main()
-    try x = alloc KB 4  # buffer of chars
-    try x[0] = char "a" # still needs a try for buffer elements - though checks can be optimized away
-    try print x[0]
-    print "this must run at all costs"
-    debug:nocatch()     # error if without 'try' on all PREVIOUS calls that could fail
-    print x[10000]      # allowed to fail now
-    print "this will never run due to out of bounds error"
+    mem = alloc CHUNK_SIZE
+    f = file:read web:get "https://www.google.com/" # save to tmp file and read it
+    size = mut 0
+    while try line=mem.file:line f
+        size = size+len line
+    print(size, " bytes downloaded\n")

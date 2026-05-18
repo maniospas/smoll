@@ -12,3 +12,4 @@ build/
 src/
 .mypy_cache/
 tmp.txt
+.tmp

@@ -24,10 +24,11 @@ def nat(nat32 x)
     {builtins:nat value = x;}
     return value
 
-def nat(nat16 x)
-    doc "retrieved unsigned number from 16 bits"
-    {builtins:nat value = x;}
-    return value
+# imported from array
+# def nat(nat16 x)
+#     doc "retrieved unsigned number from 16 bits"
+#     {builtins:nat value = x;}
+#     return value
 
 local def strdat(nat _pos, nat _length)
     pos = nat16 _pos

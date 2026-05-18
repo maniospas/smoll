@@ -5,8 +5,8 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp365v="\n";
-const char* const __temp1223v="123";
-static const char* __temp_all_errcodes[31] = {"noerr",
+const char* const __temp1248v="123";
+static const char* __temp_all_errcodes[34] = {"noerr",
 "error",
 "null pointer",
 "division by zero ",
@@ -19,8 +19,11 @@ static const char* __temp_all_errcodes[31] = {"noerr",
 "reallocation failed",
 "cannot resize buffers with alloc; it promises no data reallocation",
 "cannot resize an unallocated or freed buffer",
+"cannot resize a buffer offset",
+"cannot resize a buffer with spacing",
 "out of bounds",
 "can only define strings on contiguous buffers",
+"can only define strings on non-offset buffers",
 "string does not fit on buffer",
 "character copy does not fit on buffer",
 "string buffer out of memory",
@@ -39,12 +42,12 @@ static const char* __temp_all_errcodes[31] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__temp758v(const char* x, const char* y, char* __temp1226v) {
+static inline __attribute__((always_inline)) void eq__temp783v(const char* x, const char* y, char* __temp1251v) {
   char z=0;
   z=(x==y);
   goto __temp_return;
   __temp_return:
-  *__temp1226v=z;
+  *__temp1251v=z;
 }
 
 static inline __attribute__((always_inline)) void print__temp380v(char value) {
@@ -59,10 +62,10 @@ static inline __attribute__((always_inline)) void print__temp380v(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__temp1222v() {
-  char __temp1224v__=0;
-  eq__temp758v(__temp1223v,__temp1223v,&__temp1224v__);
-  print__temp380v(__temp1224v__);
+static inline __attribute__((always_inline)) void main__temp1247v() {
+  char __temp1249v__=0;
+  eq__temp783v(__temp1248v,__temp1248v,&__temp1249v__);
+  print__temp380v(__temp1249v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1222v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1247v();return 0;}

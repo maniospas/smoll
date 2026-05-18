@@ -41,7 +41,7 @@ def read(cstr cmd)
 
 def read(str cmd)
     doc "create a readable system process"
-    return read unsafe_temporary_cstr cmd
+    return read temporary_cstr(cmd).cstr
 
 def chunk(char[] buf, mut nat|blank pos, read f)
     if pos is blank
@@ -76,7 +76,6 @@ def safe(cstr cmd)
     doc "If it is unsanitized by containing shell characters, this fails."
     doc "Otherwise, the command is just returned."
     {builtins:bool unsafe_chars = 0;}
-    {const char* p = (const char*)cmd;}
     #{while(*p && !unsafe_chars) { char c=*p++; if(c==';'||c=='|'||c=='&'||c=='`'||c=='$'||c=='('||c==')'||c=='<'||c=='>'||c=='\n'||c=='\r'||c=='\\') unsafe_chars=1; }}
     if unsafe_chars fail "unsanitized command: shell metacharacter detected"
     return cmd
@@ -85,5 +84,5 @@ def system(cstr|str _cmd)
     doc "system command"
     doc "Runs a system command and waits until that completes."
     doc "Fails if the return code is non-zero, but does not expose that code."
-    result = system_return safe unsafe_temporary_cstr _cmd
+    result = system_return safe temporary_cstr(_cmd).cstr
     if result!=int 0 fail "system call failed"

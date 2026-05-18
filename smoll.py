@@ -845,7 +845,7 @@ class ImplementedType:
                 for pos, segment in enumerate(defer):
                     if pos<len(defer)-1 and defer[pos+1].tostring()=="=" and not segment in has_not_assigned: has_assigned.add(segment)
                     has_not_assigned.add(segment)
-                    if isinstance(segment, Variable) and segment.name not in global_var2cstr and not segment.is_temp() and not any(segment.tostring()==v.name for v in value) and not segment in has_assigned:
+                    if isinstance(segment, Variable) and segment.name not in global_var2cstr and not segment.is_temp() and not segment in has_assigned and not any(segment.tostring()==v.name for v in value):
                         if not segment in value: error_token.error("safety", "cannot return a partial 'defer'\nThis return statement does not explicitly return '"+pretty_name(segment.tostring())+"'. However, a value from that is used within a 'defer' that also contains returned values; the latter would be delegated for later calling without knowing the missing return value.", suggestions=["return '"+pretty_name(segment.tostring())+"' too, or any structure it resides in", "do not return variables within the same 'defer'"])
                 self.returned_defers.append(defer)
                 to_remove.append(orignal_defer)
@@ -2136,7 +2136,8 @@ def create_buffer_type(name, memory_size, variation, error_token):
     actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=True, isprivate=False)
     actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
     actual_variation.vars["unsafe_size"] = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
-    actual_variation.vars["unsafe_align"] = Variable("unsafe_align", UINT_TYPE, immutable=False, isprivate=False)
+    actual_variation.vars["unsafe_offset"] = Variable("unsafe_offset", UINT16_TYPE, immutable=False, isprivate=False)
+    actual_variation.vars["unsafe_align"] = Variable("unsafe_align", UINT16_TYPE, immutable=False, isprivate=False)
     actual_variation.set_pointer_type(actual_variation.vars["unsafe_ptr"], variation)
     actual_variation.implementation.extend([
         actual_variation.vars["unsafe_align"],
@@ -2147,6 +2148,7 @@ def create_buffer_type(name, memory_size, variation, error_token):
     actual_variation.rets.append(type_arg)
     actual_variation.rets.append("unsafe_ptr")
     actual_variation.rets.append("unsafe_size")
+    actual_variation.rets.append("unsafe_offset")
     actual_variation.rets.append("unsafe_align")
     return actual_variation
 
@@ -2698,13 +2700,17 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         impl.implementation.extend([
                             new_var,
                             CODEWORD_EQUALS,
-                            #CODEWORD_LPAR,
-                            #CODEWORD_LPAR,
-                            #CodeWord("char"),
-                            #CODEWORD_MUL,
-                            #CODEWORD_RPAR,
                             var,
-                            #CODEWORD_RPAR,
+                            CODEWORD_SEMICOLON
+                        ])
+                        impl.dependent_assignments[new_name] = prev_name
+                    elif var.name.endswith("__unsafe_offset"):
+                        new_var = var.renamed_copy(new_name)
+                        impl.vars[new_var.name] = new_var
+                        impl.implementation.extend([
+                            new_var,
+                            CODEWORD_EQUALS,
+                            var,
                             CODEWORD_ADD,
                             CodeWord(str(offset)),
                             CODEWORD_SEMICOLON
@@ -2712,8 +2718,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     else:
                         impl.assign(new_name, [var], field_token, False, False)
                         new_var = impl.vars[new_name]
+                        impl.dependent_assignments[new_name] = prev_name # transfer this but not the offset
                     new_rets.append(new_var)
-                    impl.dependent_assignments[new_name] = prev_name
                 rets = new_rets
                 return pos, new_rets
             pos, rets = process_substructure(pos, rets)
@@ -3344,6 +3350,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
         #     continue
         if name.text=="del":
             if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "invalidates the subsequent value, potentially calling deferred destructors")
+            if impl.is_parsing_a_defer: name.error("safety", "cannot call 'del' within a 'defer', as this would at most delay the latter")
             async def process_del(pos: int):
                 # if impl.has_returned_once: name.error("safety", "cannot 'del' if you have already returned")
                 # if impl.nesting: name.error("safety", "cannot 'del' within conditions or loops")
@@ -4389,7 +4396,9 @@ async def main():
             memory = MemoryEmulator(1024*vm_memory_kb)
             await main_type.variations[0].interpret([], memory, recursion_budget=vm_recursion_budget) # emulate 16kb memory
             for pos in memory.must_free:
-                if pos in memory.alloc_sizes: print(("non-freed memory at "+str(pos)+":\t ").ljust(15)+memory.as_cstr(pos))
+                if pos in memory.alloc_sizes: 
+                    try: print(("non-freed memory at "+str(pos)+":\t ").ljust(15)+memory.as_cstr(pos))
+                    except: print(("non-freed memory at "+str(pos)+":\t ").ljust(15)+str(memory.read_int64(pos)))
             for k,v in memory.foreign_objects.items(): print("non-freed foreign object"+v[1])
         else:
             write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)

@@ -39,7 +39,8 @@ def str(const char ptr unsafe_ptr, nat pos, nat length)
 def str(const char[] buf, strdat dat)
     doc "a string residing on a buffer"
     unsafe_ptr = buf.unsafe_ptr
-    if buf.unsafe_align!=1 fail "can only define strings on contiguous buffers"
+    if buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
+    if buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
     return str(unsafe_ptr, dat)
 
 def str(const char[] buf, nat|blank length)
@@ -102,16 +103,16 @@ def copy(str|cstr _other)
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     return str(buf, 0, other.dat.length, other.dat.first)
 
-local def copy_null_terminated(str other)
+def copy_null_terminated(str other)
     doc "copy a string to a new buffer while ensuring null termination"
-    doc "This is useful only for supporting unsafe_temporary_cstr."
+    doc "This is useful only for supporting temporary_cstr."
     buf = alloc 1+len other
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     {builtins:compiler:ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}
     return str(buf, 0, other.dat.length, other.dat.first)
 
-def unsafe_temporary_cstr(str other)
+def temporary_cstr(str other)
     doc "convert a string to a temporary cstr"
     doc "This function's return is meant to be passed to operating system calls,"
     doc "and will become invalid once the calling site ends."
@@ -123,18 +124,15 @@ def unsafe_temporary_cstr(str other)
     doc "invalidates the null termination property, so in general do not manipulate" 
     doc "strings while this is used in code; it should only be used for operating"
     doc "system calls."
-    {if(other__dat__length){builtins:compiler:ptr endpos=other__unsafe_ptr+other__dat__pos+other__dat__length;builtins:char endchar = *endpos;}builtins:bool needs_copying=endchar;}
-    c = copy_null_terminated(other)
-    {builtins:cstr ret = c__unsafe_ptr+c__dat__pos;}
-    defer
-        # will do nothing but ties ret and c together
-        if not exists ret 
-            del c
-    return ret
+    str = copy_null_terminated(other)
+    _ret = str.unsafe_ptr+str.dat.pos
+    {builtins:cstr cstr = _ret;}
+    return (cstr, str)
 
-def unsafe_temporary_cstr(cstr other)
+def temporary_cstr(cstr cstr)
     doc "tautology function for cstr, simplified pattern of converting str|cstr to cstr"
-    return other
+    str = str cstr
+    return (cstr, str)
 
 def bufpos(any[] buf)
     doc "a buffer and mutable position pair"

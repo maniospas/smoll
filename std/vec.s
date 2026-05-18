@@ -33,7 +33,8 @@ def vec(effect new allocator, nat length)
 def vec(effect vecpos allocator, nat length)
     doc "vector on an existing buffer"
     doc "Has the provided length. Can grab the buffer and mutable position allocator as an effect, so that only the length is provided."
-    if allocator.buf.unsafe_align!=8 fail "can only place vectors on contiguous buffers"
+    if allocator.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
+    if allocator.buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
     if allocator.pos+length>len allocator.buf fail "vector exceeeds buffer limits"
     start = const allocator.pos
     allocator.pos = allocator.pos+length
@@ -42,7 +43,8 @@ def vec(effect vecpos allocator, nat length)
 def vec(effect vec_allocator&circular allocator, nat length)
     doc "vector on an existing buffer"
     doc "Has the provided length. Can grab a circular buffer allocator as an effect, so that only the length is provided."
-    if allocator.buf.unsafe_align!=8 fail "can only place vectors on contiguous buffers"
+    if allocator.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
+    if allocator.buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
     if length>len allocator.buf fail "vector exceeeds buffer limits"
     start = mut allocator.pos
     allocator.pos = allocator.pos+length

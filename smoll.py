@@ -4045,13 +4045,13 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
 
 async def download(url: str, filepath: str):
     if is_pyodide:
-        import asyncio
         from pyodide.http import pyfetch
         import base64, os
         cached = _js_cache_get(url)
         if cached is not None:
             data = base64.b64decode(cached)
-            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            dirpath = os.path.dirname(filepath)
+            if dirpath: os.makedirs(dirpath, exist_ok=True)
             with open(filepath, "wb") as f: f.write(data)
             return
         response = await pyfetch(url)
@@ -4067,7 +4067,6 @@ async def download(url: str, filepath: str):
 
 async def download_with_progress(url: str, filepath: str, message: str):
     if is_pyodide:
-        import asyncio
         from pyodide.http import pyfetch
         import base64, os
         cached = _js_cache_get(url)

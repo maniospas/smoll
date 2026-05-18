@@ -22,3 +22,4 @@ def test()
 def main()
   t = test()
   print str(t.buf.buf, t.dat[0])
+

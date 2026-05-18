@@ -66,7 +66,6 @@ def log_async_calls(func):
             raise
     return wrapper
 
-
 def safeguard(fn, exc): 
     try: return fn()
     except Exception: raise exc
@@ -91,6 +90,7 @@ class MemoryEmulator:
         self.named_locs: dict[str,int] = dict()
         self.alloc_sizes: dict[int,int] = dict() 
         self.foreign_objects: dict[int, tuple[Any, str]] = dict() # foreign_id->(obj,description)
+        self.must_free: list[int] = list()
         self.temporary_space = self.alloc(256)
 
     def write_temp_cstr(self, text: str) -> int:
@@ -1038,7 +1038,9 @@ class ImplementedType:
                     if candidate_name == "malloc":
                         if len(values)!=1: self.at.error("malformed smollC", "'malloc' requires one argument")
                         if not isinstance(values[0],int): self.at.error("malformed smollC", "'malloc' requires an integer argument")
-                        return memory.alloc(values[0])
+                        ret = memory.alloc(values[0])
+                        memory.must_free.append(ret)
+                        return ret
 
                     if candidate_name == "free":
                         if len(values)!=1: self.at.error("malformed smollC", "'free' requires one argument")
@@ -1051,7 +1053,9 @@ class ImplementedType:
                         if len(values)!=2: self.at.error("malformed smollC", "'realloc' requires two arguments")
                         if not isinstance(values[0],int): self.at.error("malformed smollC", "'realloc' requires an integer argument")
                         if not isinstance(values[1],int): self.at.error("malformed smollC", "'realloc' requires an integer argument")
-                        return memory.realloc(values[0], values[1])
+                        ret = memory.realloc(values[0], values[1])
+                        memory.must_free.append(ret)
+                        return ret
                     
                     if candidate_name == "strlen":
                         if len(values)!=1: self.at.error("malformed smollC", "'strlen' requires one argument")
@@ -1343,6 +1347,12 @@ class ImplementedType:
             ret = await process_block(self.implementation, 0, len(self.implementation)-1)
             if ret=="failure":
                 for defer in reversed(self.returned_defers): await process_block(defer, 0, len(defer)-1)
+                values = _arg_values
+                for pos in range(input_args, len(values)):
+                    if self.vars[args[pos]].type==FLOAT_TYPE: 
+                        values[pos] = 0.0
+                        continue
+                    values[pos] = 0
             elif ret=="return" or not ret:
                 values = _arg_values
                 for pos in range(len(values)):
@@ -2998,7 +3008,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         tmp = create_temp()
         impl.assign(tmp, ret, current_token)
         ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
-        if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references define with 'ref' are skipped when adding mutation with 'mut' but the current value consists only of references")
+        if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'mut' but the current value consists only of references")
         mutated = [r.mutable_copy(tokens[prev_pos]) if r.stabilized_name()==r.name else r for r in ret]
         return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
     if current=="try":
@@ -4376,7 +4386,11 @@ async def main():
         exe_path = src_path.with_suffix("")
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
-            await main_type.variations[0].interpret([], MemoryEmulator(1024*vm_memory_kb), recursion_budget=vm_recursion_budget) # emulate 16kb memory
+            memory = MemoryEmulator(1024*vm_memory_kb)
+            await main_type.variations[0].interpret([], memory, recursion_budget=vm_recursion_budget) # emulate 16kb memory
+            for pos in memory.must_free:
+                if pos in memory.alloc_sizes: print(("non-freed memory at "+str(pos)+":\t ").ljust(15)+memory.as_cstr(pos))
+            for k,v in memory.foreign_objects.items(): print("non-freed foreign object"+v[1])
         else:
             write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
             if not args.build and chosen_compiler!="none":

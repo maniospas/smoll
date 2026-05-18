@@ -183,10 +183,11 @@
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">file</span> <span class="k">as</span> <span class="n">file</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">4096</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">README</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">mem</span> <span class="o">=</span> <span class="n">alloc</span> <span class="n">CHUNK_SIZE</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="s2">&quot;https://www.google.com/&quot;</span> <span class="c1"># save to .tmp with system curl and read it</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span> <span class="c1"># save to .tmp with system curl and read it</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">line</span><span class="o">=</span><span class="n">mem</span><span class="o">.</span><span class="n">file</span><span class="p">:</span><span class="n">line</span> <span class="n">f</span>
         <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">+</span><span class="nb">len</span> <span class="n">line</span>

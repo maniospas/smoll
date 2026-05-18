@@ -141,6 +141,9 @@ def bufpos(any[] buf)
     pos = mut 0
     return (buf, pos)
 
+def strbufpos(char[] buf)
+    return bufpos buf
+
 def copy(char[] buf, mut nat pos, char character, nat|blank by)
     if by is blank
         by = 1
@@ -161,8 +164,7 @@ def copy(char[] buf, mut nat pos, str|cstr _other)
     doc "This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead."
     other = str _other
     next_pos = pos+len other
-    if next_pos>len buf
-        fail "string buffer out of memory"
+    if next_pos>len buf fail "string buffer out of memory"
     {memcpy(buf__unsafe_ptr+pos, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
     pos = next_pos

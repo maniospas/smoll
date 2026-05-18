@@ -752,9 +752,7 @@ def main()
     print(x)
 ```
 
-Most buffer features are implemented in the standard library's core
-we will see next how to work with abstract buffers.
-One of the most important features is the `alloc` function to
+One of the most important buffer features is the `alloc` function to
 allocate and zero-initialize a specific number of elements. 
 This returns the buffer itself to enable initialization per patterns like
 `buf = (mut float[]).alloc 4`. Allocate a buffer of chars
@@ -1449,11 +1447,9 @@ def main()
         print line
 ```
 
-Equivalently, manually release the process to wait for its conclusions.
-Recall that running processes can create errors, while resource release
-code may intercepts those errors with `try` so that
-they can be retrieved with `compiler:catch()`. 
-To repropagate or otherwise
+Equivalently, manually release the process to wait for its conclusion.
+As resource release code intercepts erroneous termination with `try`,
+check on this with `compiler:catch()`.  To propagate or otherwise
 handle the intercepted errors, use a pattern like below.
 
 ```python

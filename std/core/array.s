@@ -83,8 +83,7 @@ def resize(mut any[] buffer, nat size)
         buffer.unsafe_ptr.unsafe:free()
         return buffer
     if buffer.unsafe_size==0 fail "cannot resize an unallocated or freed buffer"
-    if buffer.unsafe_offset.nat()!=0 fail "cannot resize a buffer offset"
-    if buffer.unsafe_align.nat()!=1 fail "cannot resize a buffer with spacing"
+    if buffer.unsafe_offset.nat()!=0 fail "cannot resize a buffer with offset"
     prev_bytes = buffer.unsafe_size*buffer.unsafe_align.nat()
     buffer.unsafe_size = size
     bytes = buffer.unsafe_align.nat()*size

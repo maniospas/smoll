@@ -1268,7 +1268,7 @@ class ImplementedType:
                         if not condition: break
                         ret = await process_block(impl, pos+1, endpos-1)
                         if ret=="break": break
-                        if ret=="return" or ret=="failure": return
+                        if ret=="return" or ret=="failure": return ret
                     pos = endpos+1
                     prev_pos = pos
                     continue
@@ -2096,7 +2096,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
             + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
         )
         progress += mem_size
-    if try_var is not None: mpl.implementation.append(CODEWORD_RBRACKET)
+    if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
     return pos, new_vars
 
 buffer_types: dict[UnionType|ImplementedType, UnionType] = dict()
@@ -2429,7 +2429,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 CODEWORD_RPAR,
                 CODEWORD_LBRACKET,
             ])
-            if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: current_token.error("safety", "the matching 'try' has already handled a different failure")
+            if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: op_token.error("safety", "the matching 'try' has already handled a different failure")
             try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
             if try_var is not None:
                 impl.has_any_complaint = True
@@ -2888,7 +2888,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     CodeWord("__temp_failure"),
                     CODEWORD_SEMICOLON
                 ])
-                impl.needs_failure_mode = op_token
+                impl.needs_failure_mode = current_token
             return await process_statement_operator(file, tokens, impl, pos, [], current_operator_priority)
         if is_lsp and message.file.is_main_file: print_lsp_string(message)
         text = message.text

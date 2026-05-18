@@ -15,7 +15,7 @@ But the steps below apply to any setup:
 
 Get vscode from its official site. You can also use your editor of choice, or visit the language's own web playground for tinkering with and running one file in your browser.
 <br><br>
-<a href="https://code.visualstudio.com/" class="button">➔ Get vscode</a><a href="smoll_ide.html" class="button">➔ Web playground</a>
+<a href="https://code.visualstudio.com/" class="button">➔ Get vscode</a><a href="playground.html" class="button">➔ Web playground</a>
 <br><br>
 </div>
 

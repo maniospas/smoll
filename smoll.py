@@ -53,6 +53,20 @@ debug_mode = True
 repositories: dict[str, str] = dict()
 externals: list["File"] = list()
 
+def log_async_calls(func):
+    async def wrapper(*args, **kwargs):
+        task_name = f"{func.__name__} {id(asyncio.current_task())} {str(args)}"
+        print(f"Starting {task_name}")
+        try:
+            result = await func(*args, **kwargs)
+            print(f"Completed {task_name}")
+            return result
+        except Exception as e:
+            print(f"Failed {task_name}: {str(e)}")
+            raise
+    return wrapper
+
+
 def safeguard(fn, exc): 
     try: return fn()
     except Exception: raise exc
@@ -4110,22 +4124,37 @@ async def download_with_progress(url: str, filepath: str, message: str):
             sys.stdout.write(f"\r[{YELLOW}+{RESET}] {message} {GREEN}[{bar}]{RESET} {percent:.1f}% | {YELLOW}{downloaded // 1024 // 1024}MB{RESET} / {total_size // 1024 // 1024}MB")
             sys.stdout.flush()
     print()
-
-file_cache: dict[str, File] = dict()
-file_cache_complete: set[str] = set()
+file_cache: dict[str, File] = {}
+loading_tasks: dict[str, asyncio.Task] = {}
 
 async def load(path, is_main_file=False, err_token=None):
-    file = file_cache.get(path, None)
-    if file is None:
+    # already fully loaded
+    existing = file_cache.get(path)
+    if existing is not None:
+        return existing
+
+    # another task is currently loading it
+    existing_task = loading_tasks.get(path)
+    if existing_task is not None:
+        return await existing_task
+
+    async def do_load():
         file, processed_tokens = _load(path, is_main_file, err_token)
+
+        # publish early if you need circular import visibility
         file_cache[path] = file
+
         await process(file, processed_tokens, 0)
-        file_cache_complete.add(path)
-    elif path=="builtins": pass
-    elif path not in file_cache_complete:
-        # genuine circular import, file is still being processed
-        err_token.error("import", "circular import detected for '"+path+"'")
-    return file
+        return file
+
+    task = asyncio.create_task(do_load())
+    loading_tasks[path] = task
+
+    try:
+        result = await task
+        return result
+    finally:
+        loading_tasks.pop(path, None)
 
 POINTER_TYPE = ImplementedType("ptr", "char*", memory_size=8)
 POINTER_TYPE.vars[POINTER_TYPE.rets[0]].immutable = False

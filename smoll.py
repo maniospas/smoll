@@ -1842,8 +1842,10 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             if callee_arg.immutable:
                 impl.implementation.extend([var, CODEWORD_COMMA])
                 continue
+            #if impl.name=="mutget":
+            #    print(var.name, var.isprivate, var.immutable)
             if var.isprivate: error_token.error("safety", "an immutable class field '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
-            #elif not var.immutable: error_token.error("type", "an immutable variable '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
+            elif var.immutable: error_token.error("type", "an immutable variable '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
             impl.implementation.extend([CODEWORD_AMP, var, CODEWORD_COMMA])
 
     if callee.defers and callee.invalidate_types_on_defer:

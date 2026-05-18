@@ -503,14 +503,14 @@ for interweaving a superset of C that interacts with smoll
 will be added in the future.
 
 ```python
-import "builtins"
+import "std/core.s"
 
 def unsafe_add(float x, float|int y)
     {builtins:float z=x+y;}
     return z
 
 def main()
-    print unsafe_add (1, 2.0)
+    print unsafe_add (1.0, int 2)
 ```
 
 Type alternatives can also be named for reusability.
@@ -527,7 +527,7 @@ def unsafe_add(Number x, Number y)
     return z
 
 def main()
-    print unsafe_add (1, 2.0)
+    print unsafe_add (1.0, 2)
 ```
 
 In truth, *smoλ* implements a linear type system, but this
@@ -675,12 +675,19 @@ At the same time, you can mingle them together with other condition checking,
 as the standard library's core. Below is an example of a conditional check.
 
 ```python
-def typed_print(int|float|cstr value) 
-    if value is int|float
+import "std/core.s"
+
+def typed_print(nat|int|float|cstr value) 
+    if value is nat|int|float
         print("this is a number:")
     else
         print("this is a string:")
     print(value)
+
+def main()
+    typed_print 1
+    typed_print 2.0
+    typed_print "test"
 ```
 
 

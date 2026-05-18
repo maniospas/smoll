@@ -5,8 +5,8 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp365v="\n";
-const char* const __temp1248v="123";
-static const char* __temp_all_errcodes[34] = {"noerr",
+const char* const __temp1247v="123";
+static const char* __temp_all_errcodes[33] = {"noerr",
 "error",
 "null pointer",
 "division by zero ",
@@ -19,8 +19,7 @@ static const char* __temp_all_errcodes[34] = {"noerr",
 "reallocation failed",
 "cannot resize buffers with alloc; it promises no data reallocation",
 "cannot resize an unallocated or freed buffer",
-"cannot resize a buffer offset",
-"cannot resize a buffer with spacing",
+"cannot resize a buffer with offset",
 "out of bounds",
 "can only define strings on contiguous buffers",
 "can only define strings on non-offset buffers",
@@ -42,12 +41,12 @@ static const char* __temp_all_errcodes[34] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__temp783v(const char* x, const char* y, char* __temp1251v) {
+static inline __attribute__((always_inline)) void eq__temp782v(const char* x, const char* y, char* __temp1250v) {
   char z=0;
   z=(x==y);
   goto __temp_return;
   __temp_return:
-  *__temp1251v=z;
+  *__temp1250v=z;
 }
 
 static inline __attribute__((always_inline)) void print__temp380v(char value) {
@@ -62,10 +61,10 @@ static inline __attribute__((always_inline)) void print__temp380v(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__temp1247v() {
-  char __temp1249v__=0;
-  eq__temp783v(__temp1248v,__temp1248v,&__temp1249v__);
-  print__temp380v(__temp1249v__);
+static inline __attribute__((always_inline)) void main__temp1246v() {
+  char __temp1248v__=0;
+  eq__temp782v(__temp1247v,__temp1247v,&__temp1248v__);
+  print__temp380v(__temp1248v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1247v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1246v();return 0;}

@@ -5,7 +5,7 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp365v="\n";
-static const char* __temp_all_errcodes[34] = {"noerr",
+static const char* __temp_all_errcodes[33] = {"noerr",
 "error",
 "null pointer",
 "division by zero ",
@@ -18,8 +18,7 @@ static const char* __temp_all_errcodes[34] = {"noerr",
 "reallocation failed",
 "cannot resize buffers with alloc; it promises no data reallocation",
 "cannot resize an unallocated or freed buffer",
-"cannot resize a buffer offset",
-"cannot resize a buffer with spacing",
+"cannot resize a buffer with offset",
 "out of bounds",
 "can only define strings on contiguous buffers",
 "can only define strings on non-offset buffers",
@@ -41,100 +40,100 @@ static const char* __temp_all_errcodes[34] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void float____temp_buffer____buffer__temp1248v(char** __temp1277v, uint64_t* __temp1278v, uint16_t* __temp1279v, uint16_t* __temp1280v) {
+static inline __attribute__((always_inline)) void float____temp_buffer____buffer__temp1247v(char** __temp1276v, uint64_t* __temp1277v, uint16_t* __temp1278v, uint16_t* __temp1279v) {
   char* unsafe_ptr=0;
   uint64_t unsafe_size=0;
   uint16_t unsafe_offset=0;
   uint16_t unsafe_align=0;
   unsafe_align=8;
-  *__temp1277v=unsafe_ptr;
-  *__temp1278v=unsafe_size;
-  *__temp1279v=unsafe_offset;
-  *__temp1280v=unsafe_align;
+  *__temp1276v=unsafe_ptr;
+  *__temp1277v=unsafe_size;
+  *__temp1278v=unsafe_offset;
+  *__temp1279v=unsafe_align;
 }
 
-static inline __attribute__((always_inline)) void exists__temp412v(char* x, char* __temp1281v) {
+static inline __attribute__((always_inline)) void exists__temp412v(char* x, char* __temp1280v) {
   char z=0;
   z=x!=0;
   goto __temp_return;
   __temp_return:
-  *__temp1281v=z;
+  *__temp1280v=z;
 }
 
-static inline __attribute__((always_inline)) void free__temp461v(char** __temp1282v) {
-  char* allocated=*__temp1282v;
+static inline __attribute__((always_inline)) void free__temp461v(char** __temp1281v) {
+  char* allocated=*__temp1281v;
   if(allocated){
   free(allocated);
   }
   allocated=0;
-  *__temp1282v=allocated;
+  *__temp1281v=allocated;
 }
 
-static inline __attribute__((always_inline)) void false__temp10v(int* __temp1283v) {
+static inline __attribute__((always_inline)) void false__temp10v(int* __temp1282v) {
   int value=0;
-  *__temp1283v=value;
+  *__temp1282v=value;
 }
 
-static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0, int* __temp1284v) {
+static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0, int* __temp1283v) {
   int __temp36v__=0;
   false__temp10v(&__temp36v__);
   goto __temp_return;
   __temp_return:
-  *__temp1284v=__temp36v__;
+  *__temp1283v=__temp36v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp1285v) {
+static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp1284v) {
   int __temp94v=0;
   int __temp95v__=0;
   not__temp35v(__temp94v,&__temp95v__);
   goto __temp_return;
   __temp_return:
-  *__temp1285v=__temp95v__;
+  *__temp1284v=__temp95v__;
 }
 
-static inline __attribute__((always_inline)) void eq__temp118v(uint64_t x, uint64_t y, char* __temp1286v) {
+static inline __attribute__((always_inline)) void eq__temp118v(uint64_t x, uint64_t y, char* __temp1285v) {
   int __temp119v__=0;
   char z=0;
   is_different__temp93v(x,y,&__temp119v__);
   z=x==y;
   goto __temp_return;
   __temp_return:
-  *__temp1286v=z;
+  *__temp1285v=z;
 }
 
-static inline __attribute__((always_inline)) void neq__temp142v(uint64_t x, uint64_t y, char* __temp1287v) {
+static inline __attribute__((always_inline)) void neq__temp142v(uint64_t x, uint64_t y, char* __temp1286v) {
   int __temp143v__=0;
   char z=0;
   is_different__temp93v(x,y,&__temp143v__);
   z=x!=y;
   goto __temp_return;
   __temp_return:
-  *__temp1287v=z;
+  *__temp1286v=z;
 }
 
-static inline __attribute__((always_inline)) void nat__temp465v(uint16_t x, uint64_t* __temp1288v) {
+static inline __attribute__((always_inline)) void nat__temp465v(uint16_t x, uint64_t* __temp1287v) {
   uint64_t value=0;
   value=x;
   goto __temp_return;
   __temp_return:
-  *__temp1288v=value;
+  *__temp1287v=value;
 }
 
-static inline __attribute__((always_inline)) void mul__temp194v(uint64_t x, uint64_t y, uint64_t* __temp1289v) {
+static inline __attribute__((always_inline)) void mul__temp194v(uint64_t x, uint64_t y, uint64_t* __temp1288v) {
   int __temp195v__=0;
   uint64_t z=0;
   is_different__temp93v(x,y,&__temp195v__);
   z=x*y;
   goto __temp_return;
   __temp_return:
-  *__temp1289v=z;
+  *__temp1288v=z;
 }
 
 static inline __attribute__((always_inline)) void zero__temp462v(char* allocated, uint64_t from, uint64_t to) {
   ptr_memzero(allocated,from,to);
 }
 
-static inline __attribute__((always_inline)) int alloc__temp458v(uint64_t bytes, char** __temp1290v) {
+static inline __attribute__((always_inline)) int alloc__temp458v(uint64_t bytes, char** __temp1289v) {
   char* unsafe_ptr=0;
   char failed=0;
   int __temp_errcode=0;
@@ -148,16 +147,16 @@ static inline __attribute__((always_inline)) int alloc__temp458v(uint64_t bytes,
   goto __temp_return;
   
   __temp_failure:__temp_return:
-  *__temp1290v=unsafe_ptr;
+  *__temp1289v=unsafe_ptr;
   
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int alloc__temp468v(char** __temp1291v, uint64_t* __temp1292v, uint16_t* __temp1293v, uint16_t* __temp1294v, uint64_t size, char** __temp1295v, uint64_t* __temp1296v, uint16_t* __temp1297v, uint16_t* __temp1298v) {
-  char* buffer__unsafe_ptr=*__temp1291v;
-  uint64_t buffer__unsafe_size=*__temp1292v;
-  uint16_t buffer__unsafe_offset=*__temp1293v;
-  uint16_t buffer__unsafe_align=*__temp1294v;
+static inline __attribute__((always_inline)) int alloc__temp468v(char** __temp1290v, uint64_t* __temp1291v, uint16_t* __temp1292v, uint16_t* __temp1293v, uint64_t size, char** __temp1294v, uint64_t* __temp1295v, uint16_t* __temp1296v, uint16_t* __temp1297v) {
+  char* buffer__unsafe_ptr=*__temp1290v;
+  uint64_t buffer__unsafe_size=*__temp1291v;
+  uint16_t buffer__unsafe_offset=*__temp1292v;
+  uint16_t buffer__unsafe_align=*__temp1293v;
   int __temp469v=0;
   char __temp470v__=0;
   uint64_t __temp471v=0;
@@ -218,167 +217,167 @@ static inline __attribute__((always_inline)) int alloc__temp468v(char** __temp12
   free__temp461v(&buffer__unsafe_ptr);
   }
   __temp_return:
-  *__temp1291v=buffer__unsafe_ptr;
-  *__temp1292v=buffer__unsafe_size;
-  *__temp1293v=buffer__unsafe_offset;
-  *__temp1294v=buffer__unsafe_align;
-  *__temp1295v=buffer__unsafe_ptr;
-  *__temp1296v=buffer__unsafe_size;
-  *__temp1297v=buffer__unsafe_offset;
-  *__temp1298v=buffer__unsafe_align;
+  *__temp1290v=buffer__unsafe_ptr;
+  *__temp1291v=buffer__unsafe_size;
+  *__temp1292v=buffer__unsafe_offset;
+  *__temp1293v=buffer__unsafe_align;
+  *__temp1294v=buffer__unsafe_ptr;
+  *__temp1295v=buffer__unsafe_size;
+  *__temp1296v=buffer__unsafe_offset;
+  *__temp1297v=buffer__unsafe_align;
   
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) void ge__temp319v(uint64_t x, uint64_t y, char* __temp1299v) {
+static inline __attribute__((always_inline)) void ge__temp319v(uint64_t x, uint64_t y, char* __temp1298v) {
   int __temp320v__=0;
   char z=0;
   is_different__temp93v(x,y,&__temp320v__);
   z=x>=y;
   goto __temp_return;
   __temp_return:
-  *__temp1299v=z;
+  *__temp1298v=z;
 }
 
-static inline __attribute__((always_inline)) void add__temp170v(uint64_t x, uint64_t y, uint64_t* __temp1300v) {
+static inline __attribute__((always_inline)) void add__temp170v(uint64_t x, uint64_t y, uint64_t* __temp1299v) {
   int __temp171v__=0;
   uint64_t z=0;
   is_different__temp93v(x,y,&__temp171v__);
   z=x+y;
   goto __temp_return;
   __temp_return:
-  *__temp1300v=z;
+  *__temp1299v=z;
 }
 
-static inline __attribute__((always_inline)) void attach_type__temp20v(char* to, char* from, char** __temp1301v) {
-  *__temp1301v=to;
+static inline __attribute__((always_inline)) void attach_type__temp20v(char* to, char* from, char** __temp1300v) {
+  *__temp1300v=to;
 }
 
-static inline __attribute__((always_inline)) void add__temp463v(char* allocated, uint64_t offset, char** __temp1302v) {
+static inline __attribute__((always_inline)) void add__temp463v(char* allocated, uint64_t offset, char** __temp1301v) {
   char* element=0;
   char* __temp464v__=0;
   element=allocated+offset;
   attach_type__temp20v(element,allocated,&__temp464v__);
   goto __temp_return;
   __temp_return:
-  *__temp1302v=__temp464v__;
+  *__temp1301v=__temp464v__;
 }
 
-static inline __attribute__((always_inline)) int mutget__temp544v(char** __temp1303v, uint64_t* __temp1304v, uint16_t* __temp1305v, uint16_t* __temp1306v, uint64_t i, char** __temp1307v) {
-  char* buffer__unsafe_ptr=*__temp1303v;
-  uint64_t buffer__unsafe_size=*__temp1304v;
-  uint16_t buffer__unsafe_offset=*__temp1305v;
-  uint16_t buffer__unsafe_align=*__temp1306v;
-  char __temp545v__=0;
+static inline __attribute__((always_inline)) int mutget__temp541v(char** __temp1302v, uint64_t* __temp1303v, uint16_t* __temp1304v, uint16_t* __temp1305v, uint64_t i, char** __temp1306v) {
+  char* buffer__unsafe_ptr=*__temp1302v;
+  uint64_t buffer__unsafe_size=*__temp1303v;
+  uint16_t buffer__unsafe_offset=*__temp1304v;
+  uint16_t buffer__unsafe_align=*__temp1305v;
+  char __temp542v__=0;
+  uint64_t __temp543v__=0;
+  uint64_t __temp544v__=0;
+  uint64_t __temp545v__=0;
   uint64_t __temp546v__=0;
-  uint64_t __temp547v__=0;
-  uint64_t __temp548v__=0;
-  uint64_t __temp549v__=0;
-  char* __temp550v__=0;
+  char* __temp547v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  ge__temp319v(i,buffer__unsafe_size,&__temp545v__);
-  if(__temp545v__){
-  __temp_errcode=14;
+  ge__temp319v(i,buffer__unsafe_size,&__temp542v__);
+  if(__temp542v__){
+  __temp_errcode=13;
   goto __temp_failure;
   }
-  nat__temp465v(buffer__unsafe_align,&__temp546v__);
-  mul__temp194v(i,__temp546v__,&__temp547v__);
-  nat__temp465v(buffer__unsafe_offset,&__temp548v__);
-  add__temp170v(__temp547v__,__temp548v__,&__temp549v__);
-  add__temp463v(buffer__unsafe_ptr,__temp549v__,&__temp550v__);
+  nat__temp465v(buffer__unsafe_align,&__temp543v__);
+  mul__temp194v(i,__temp543v__,&__temp544v__);
+  nat__temp465v(buffer__unsafe_offset,&__temp545v__);
+  add__temp170v(__temp544v__,__temp545v__,&__temp546v__);
+  add__temp463v(buffer__unsafe_ptr,__temp546v__,&__temp547v__);
   goto __temp_return;
   
   __temp_failure:__temp_return:
-  *__temp1303v=buffer__unsafe_ptr;
-  *__temp1304v=buffer__unsafe_size;
-  *__temp1305v=buffer__unsafe_offset;
-  *__temp1306v=buffer__unsafe_align;
-  *__temp1307v=__temp550v__;
+  *__temp1302v=buffer__unsafe_ptr;
+  *__temp1303v=buffer__unsafe_size;
+  *__temp1304v=buffer__unsafe_offset;
+  *__temp1305v=buffer__unsafe_align;
+  *__temp1306v=__temp547v__;
   
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int test1__temp1247v(char** __temp1308v, uint64_t* __temp1309v, uint16_t* __temp1310v, uint16_t* __temp1311v) {
+static inline __attribute__((always_inline)) int test1__temp1246v(char** __temp1307v, uint64_t* __temp1308v, uint16_t* __temp1309v, uint16_t* __temp1310v) {
+  char* __temp1249v__unsafe_ptr=0;
+  uint64_t __temp1249v__unsafe_size=0;
+  uint16_t __temp1249v__unsafe_offset=0;
+  uint16_t __temp1249v__unsafe_align=0;
   char* __temp1250v__unsafe_ptr=0;
   uint64_t __temp1250v__unsafe_size=0;
   uint16_t __temp1250v__unsafe_offset=0;
   uint16_t __temp1250v__unsafe_align=0;
-  char* __temp1251v__unsafe_ptr=0;
-  uint64_t __temp1251v__unsafe_size=0;
-  uint16_t __temp1251v__unsafe_offset=0;
-  uint16_t __temp1251v__unsafe_align=0;
-  uint64_t __temp1252v=0;
-  char* __temp1253v__unsafe_ptr=0;
-  uint64_t __temp1253v__unsafe_size=0;
-  uint16_t __temp1253v__unsafe_offset=0;
-  uint16_t __temp1253v__unsafe_align=0;
-  char __temp1254v____temp470v__=0;
+  uint64_t __temp1251v=0;
+  char* __temp1252v__unsafe_ptr=0;
+  uint64_t __temp1252v__unsafe_size=0;
+  uint16_t __temp1252v__unsafe_offset=0;
+  uint16_t __temp1252v__unsafe_align=0;
+  char __temp1253v____temp470v__=0;
   char* x__unsafe_ptr=0;
   uint64_t x__unsafe_size=0;
   uint16_t x__unsafe_offset=0;
   uint16_t x__unsafe_align=0;
-  uint64_t __temp1255v=0;
-  char* __temp1256v__=0;
-  double __temp1257v=0;
-  char* __temp1258v__unsafe_ptr=0;
-  uint64_t __temp1258v__unsafe_size=0;
-  uint16_t __temp1258v__unsafe_offset=0;
-  uint16_t __temp1258v__unsafe_align=0;
+  uint64_t __temp1254v=0;
+  char* __temp1255v__=0;
+  double __temp1256v=0;
+  char* __temp1257v__unsafe_ptr=0;
+  uint64_t __temp1257v__unsafe_size=0;
+  uint16_t __temp1257v__unsafe_offset=0;
+  uint16_t __temp1257v__unsafe_align=0;
   char* y__unsafe_ptr=0;
   uint64_t y__unsafe_size=0;
   uint16_t y__unsafe_offset=0;
   uint16_t y__unsafe_align=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  float____temp_buffer____buffer__temp1248v(&__temp1250v__unsafe_ptr,&__temp1250v__unsafe_size,&__temp1250v__unsafe_offset,&__temp1250v__unsafe_align);
-  __temp1251v__unsafe_ptr=__temp1250v__unsafe_ptr;
-  __temp1251v__unsafe_size=__temp1250v__unsafe_size;
-  __temp1251v__unsafe_offset=__temp1250v__unsafe_offset;
-  __temp1251v__unsafe_align=__temp1250v__unsafe_align;
-  __temp1252v=1;
-  __temp_errcode=alloc__temp468v(&__temp1251v__unsafe_ptr,&__temp1251v__unsafe_size,&__temp1251v__unsafe_offset,&__temp1251v__unsafe_align,__temp1252v,&__temp1253v__unsafe_ptr,&__temp1253v__unsafe_size,&__temp1253v__unsafe_offset,&__temp1253v__unsafe_align);
+  float____temp_buffer____buffer__temp1247v(&__temp1249v__unsafe_ptr,&__temp1249v__unsafe_size,&__temp1249v__unsafe_offset,&__temp1249v__unsafe_align);
+  __temp1250v__unsafe_ptr=__temp1249v__unsafe_ptr;
+  __temp1250v__unsafe_size=__temp1249v__unsafe_size;
+  __temp1250v__unsafe_offset=__temp1249v__unsafe_offset;
+  __temp1250v__unsafe_align=__temp1249v__unsafe_align;
+  __temp1251v=1;
+  __temp_errcode=alloc__temp468v(&__temp1250v__unsafe_ptr,&__temp1250v__unsafe_size,&__temp1250v__unsafe_offset,&__temp1250v__unsafe_align,__temp1251v,&__temp1252v__unsafe_ptr,&__temp1252v__unsafe_size,&__temp1252v__unsafe_offset,&__temp1252v__unsafe_align);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  x__unsafe_ptr=__temp1253v__unsafe_ptr;
-  x__unsafe_size=__temp1253v__unsafe_size;
-  x__unsafe_offset=__temp1253v__unsafe_offset;
-  x__unsafe_align=__temp1253v__unsafe_align;
-  __temp1255v=0;
-  __temp_errcode=mutget__temp544v(&x__unsafe_ptr,&x__unsafe_size,&x__unsafe_offset,&x__unsafe_align,__temp1255v,&__temp1256v__);
+  x__unsafe_ptr=__temp1252v__unsafe_ptr;
+  x__unsafe_size=__temp1252v__unsafe_size;
+  x__unsafe_offset=__temp1252v__unsafe_offset;
+  x__unsafe_align=__temp1252v__unsafe_align;
+  __temp1254v=0;
+  __temp_errcode=mutget__temp541v(&x__unsafe_ptr,&x__unsafe_size,&x__unsafe_offset,&x__unsafe_align,__temp1254v,&__temp1255v__);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  __temp1257v=1.0;
-  if(!__temp1256v__){
+  __temp1256v=1.0;
+  if(!__temp1255v__){
   __temp_errcode=2;
   goto __temp_failure;
   }
-  memcpy(__temp1256v__,&__temp1257v,8);
-  float____temp_buffer____buffer__temp1248v(&__temp1258v__unsafe_ptr,&__temp1258v__unsafe_size,&__temp1258v__unsafe_offset,&__temp1258v__unsafe_align);
-  y__unsafe_ptr=__temp1258v__unsafe_ptr;
-  y__unsafe_size=__temp1258v__unsafe_size;
-  y__unsafe_offset=__temp1258v__unsafe_offset;
-  y__unsafe_align=__temp1258v__unsafe_align;
+  memcpy(__temp1255v__,&__temp1256v,8);
+  float____temp_buffer____buffer__temp1247v(&__temp1257v__unsafe_ptr,&__temp1257v__unsafe_size,&__temp1257v__unsafe_offset,&__temp1257v__unsafe_align);
+  y__unsafe_ptr=__temp1257v__unsafe_ptr;
+  y__unsafe_size=__temp1257v__unsafe_size;
+  y__unsafe_offset=__temp1257v__unsafe_offset;
+  y__unsafe_align=__temp1257v__unsafe_align;
   goto __temp_return;
   
-  __temp_failure:exists__temp412v(x__unsafe_ptr,&__temp1254v____temp470v__);
-  if(__temp1254v____temp470v__){
+  __temp_failure:exists__temp412v(x__unsafe_ptr,&__temp1253v____temp470v__);
+  if(__temp1253v____temp470v__){
   x__unsafe_size=0;
   x__unsafe_size=x__unsafe_size;
   free__temp461v(&x__unsafe_ptr);
   }
   __temp_return:
-  *__temp1308v=x__unsafe_ptr;
-  *__temp1309v=x__unsafe_size;
-  *__temp1310v=x__unsafe_offset;
-  *__temp1311v=x__unsafe_align;
+  *__temp1307v=x__unsafe_ptr;
+  *__temp1308v=x__unsafe_size;
+  *__temp1309v=x__unsafe_offset;
+  *__temp1310v=x__unsafe_align;
   
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int realloc__temp459v(char* allocated__unsafe_ptr, uint64_t bytes, char** __temp1312v) {
+static inline __attribute__((always_inline)) int realloc__temp459v(char* allocated__unsafe_ptr, uint64_t bytes, char** __temp1311v) {
   char* new_allocated=0;
   char failed=0;
   char* __temp460v__=0;
@@ -399,26 +398,26 @@ static inline __attribute__((always_inline)) int realloc__temp459v(char* allocat
   goto __temp_return;
   
   __temp_failure:__temp_return:
-  *__temp1312v=__temp460v__;
+  *__temp1311v=__temp460v__;
   
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) void lt__temp247v(uint64_t x, uint64_t y, char* __temp1313v) {
+static inline __attribute__((always_inline)) void lt__temp247v(uint64_t x, uint64_t y, char* __temp1312v) {
   int __temp248v__=0;
   char z=0;
   is_different__temp93v(x,y,&__temp248v__);
   z=x<y;
   goto __temp_return;
   __temp_return:
-  *__temp1313v=z;
+  *__temp1312v=z;
 }
 
-static inline __attribute__((always_inline)) int resize__temp507v(char** __temp1314v, uint64_t* __temp1315v, uint16_t* __temp1316v, uint16_t* __temp1317v, uint64_t size, char** __temp1318v, uint64_t* __temp1319v, uint16_t* __temp1320v, uint16_t* __temp1321v) {
-  char* buffer__unsafe_ptr=*__temp1314v;
-  uint64_t buffer__unsafe_size=*__temp1315v;
-  uint16_t buffer__unsafe_offset=*__temp1316v;
-  uint16_t buffer__unsafe_align=*__temp1317v;
+static inline __attribute__((always_inline)) int resize__temp507v(char** __temp1313v, uint64_t* __temp1314v, uint16_t* __temp1315v, uint16_t* __temp1316v, uint64_t size, char** __temp1317v, uint64_t* __temp1318v, uint16_t* __temp1319v, uint16_t* __temp1320v) {
+  char* buffer__unsafe_ptr=*__temp1313v;
+  uint64_t buffer__unsafe_size=*__temp1314v;
+  uint16_t buffer__unsafe_offset=*__temp1315v;
+  uint16_t buffer__unsafe_align=*__temp1316v;
   char __temp508v__=0;
   uint64_t __temp509v=0;
   char __temp510v__=0;
@@ -429,16 +428,13 @@ static inline __attribute__((always_inline)) int resize__temp507v(char** __temp1
   uint64_t __temp516v=0;
   char __temp517v__=0;
   uint64_t __temp518v__=0;
-  uint64_t __temp519v=0;
-  char __temp520v__=0;
-  uint64_t __temp521v__=0;
-  uint64_t __temp522v__=0;
+  uint64_t __temp519v__=0;
   uint64_t prev_bytes=0;
-  uint64_t __temp523v__=0;
-  uint64_t __temp524v__=0;
+  uint64_t __temp520v__=0;
+  uint64_t __temp521v__=0;
   uint64_t bytes=0;
-  char* __temp525v__=0;
-  char __temp526v__=0;
+  char* __temp522v__=0;
+  char __temp523v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
   ge__temp319v(buffer__unsafe_size,size,&__temp508v__);
@@ -471,26 +467,19 @@ static inline __attribute__((always_inline)) int resize__temp507v(char** __temp1
   goto __temp_failure;
   }
   nat__temp465v(buffer__unsafe_align,&__temp518v__);
-  __temp519v=1;
-  neq__temp142v(__temp518v__,__temp519v,&__temp520v__);
-  if(__temp520v__){
-  __temp_errcode=13;
-  goto __temp_failure;
-  }
-  nat__temp465v(buffer__unsafe_align,&__temp521v__);
-  mul__temp194v(buffer__unsafe_size,__temp521v__,&__temp522v__);
-  prev_bytes=__temp522v__;
+  mul__temp194v(buffer__unsafe_size,__temp518v__,&__temp519v__);
+  prev_bytes=__temp519v__;
   buffer__unsafe_size=size;
-  nat__temp465v(buffer__unsafe_align,&__temp523v__);
-  mul__temp194v(__temp523v__,size,&__temp524v__);
-  bytes=__temp524v__;
-  __temp_errcode=realloc__temp459v(buffer__unsafe_ptr,bytes,&__temp525v__);
+  nat__temp465v(buffer__unsafe_align,&__temp520v__);
+  mul__temp194v(__temp520v__,size,&__temp521v__);
+  bytes=__temp521v__;
+  __temp_errcode=realloc__temp459v(buffer__unsafe_ptr,bytes,&__temp522v__);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  buffer__unsafe_ptr=__temp525v__;
-  lt__temp247v(prev_bytes,bytes,&__temp526v__);
-  if(__temp526v__){
+  buffer__unsafe_ptr=__temp522v__;
+  lt__temp247v(prev_bytes,bytes,&__temp523v__);
+  if(__temp523v__){
   zero__temp462v(buffer__unsafe_ptr,prev_bytes,bytes);
   }
   buffer__unsafe_ptr=buffer__unsafe_ptr;
@@ -500,19 +489,19 @@ static inline __attribute__((always_inline)) int resize__temp507v(char** __temp1
   goto __temp_return;
   
   __temp_failure:__temp_return:
-  *__temp1314v=buffer__unsafe_ptr;
-  *__temp1315v=buffer__unsafe_size;
-  *__temp1316v=buffer__unsafe_offset;
-  *__temp1317v=buffer__unsafe_align;
-  *__temp1318v=buffer__unsafe_ptr;
-  *__temp1319v=buffer__unsafe_size;
-  *__temp1320v=buffer__unsafe_offset;
-  *__temp1321v=buffer__unsafe_align;
+  *__temp1313v=buffer__unsafe_ptr;
+  *__temp1314v=buffer__unsafe_size;
+  *__temp1315v=buffer__unsafe_offset;
+  *__temp1316v=buffer__unsafe_align;
+  *__temp1317v=buffer__unsafe_ptr;
+  *__temp1318v=buffer__unsafe_size;
+  *__temp1319v=buffer__unsafe_offset;
+  *__temp1320v=buffer__unsafe_align;
   
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int sub__temp347v(uint64_t x, uint64_t y, uint64_t* __temp1322v) {
+static inline __attribute__((always_inline)) int sub__temp347v(uint64_t x, uint64_t y, uint64_t* __temp1321v) {
   int __temp348v__=0;
   int __temp349v=0;
   int __temp350v=0;
@@ -530,135 +519,135 @@ static inline __attribute__((always_inline)) int sub__temp347v(uint64_t x, uint6
   goto __temp_return;
   
   __temp_failure:__temp_return:
-  *__temp1322v=z;
+  *__temp1321v=z;
   
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int mutlast__temp536v(char** __temp1323v, uint64_t* __temp1324v, uint16_t* __temp1325v, uint16_t* __temp1326v, char** __temp1327v) {
-  char* buffer__unsafe_ptr=*__temp1323v;
-  uint64_t buffer__unsafe_size=*__temp1324v;
-  uint16_t buffer__unsafe_offset=*__temp1325v;
-  uint16_t buffer__unsafe_align=*__temp1326v;
-  uint64_t __temp537v=0;
-  char __temp538v__=0;
-  uint64_t __temp539v=0;
-  uint64_t __temp540v__=0;
-  uint64_t __temp541v__=0;
-  uint64_t __temp542v__=0;
-  char* __temp543v__=0;
+static inline __attribute__((always_inline)) int mutlast__temp533v(char** __temp1322v, uint64_t* __temp1323v, uint16_t* __temp1324v, uint16_t* __temp1325v, char** __temp1326v) {
+  char* buffer__unsafe_ptr=*__temp1322v;
+  uint64_t buffer__unsafe_size=*__temp1323v;
+  uint16_t buffer__unsafe_offset=*__temp1324v;
+  uint16_t buffer__unsafe_align=*__temp1325v;
+  uint64_t __temp534v=0;
+  char __temp535v__=0;
+  uint64_t __temp536v=0;
+  uint64_t __temp537v__=0;
+  uint64_t __temp538v__=0;
+  uint64_t __temp539v__=0;
+  char* __temp540v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  __temp537v=0;
-  eq__temp118v(__temp537v,buffer__unsafe_size,&__temp538v__);
-  if(__temp538v__){
-  __temp_errcode=14;
+  __temp534v=0;
+  eq__temp118v(__temp534v,buffer__unsafe_size,&__temp535v__);
+  if(__temp535v__){
+  __temp_errcode=13;
   goto __temp_failure;
   }
-  __temp539v=1;
-  __temp_errcode=sub__temp347v(buffer__unsafe_size,__temp539v,&__temp540v__);
+  __temp536v=1;
+  __temp_errcode=sub__temp347v(buffer__unsafe_size,__temp536v,&__temp537v__);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  nat__temp465v(buffer__unsafe_align,&__temp541v__);
-  mul__temp194v(__temp540v__,__temp541v__,&__temp542v__);
-  add__temp463v(buffer__unsafe_ptr,__temp542v__,&__temp543v__);
+  nat__temp465v(buffer__unsafe_align,&__temp538v__);
+  mul__temp194v(__temp537v__,__temp538v__,&__temp539v__);
+  add__temp463v(buffer__unsafe_ptr,__temp539v__,&__temp540v__);
   goto __temp_return;
   
   __temp_failure:__temp_return:
-  *__temp1323v=buffer__unsafe_ptr;
-  *__temp1324v=buffer__unsafe_size;
-  *__temp1325v=buffer__unsafe_offset;
-  *__temp1326v=buffer__unsafe_align;
-  *__temp1327v=__temp543v__;
+  *__temp1322v=buffer__unsafe_ptr;
+  *__temp1323v=buffer__unsafe_size;
+  *__temp1324v=buffer__unsafe_offset;
+  *__temp1325v=buffer__unsafe_align;
+  *__temp1326v=__temp540v__;
   
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int test2__temp1259v(char** __temp1328v, uint64_t* __temp1329v, uint16_t* __temp1330v, uint16_t* __temp1331v) {
-  char* x__unsafe_ptr=*__temp1328v;
-  uint64_t x__unsafe_size=*__temp1329v;
-  uint16_t x__unsafe_offset=*__temp1330v;
-  uint16_t x__unsafe_align=*__temp1331v;
-  uint64_t __temp1260v=0;
-  char* __temp1261v__unsafe_ptr=0;
-  uint64_t __temp1261v__unsafe_size=0;
-  uint16_t __temp1261v__unsafe_offset=0;
-  uint16_t __temp1261v__unsafe_align=0;
-  char* __temp1262v__=0;
-  double __temp1263v=0;
-  char* __temp1264v=0;
+static inline __attribute__((always_inline)) int test2__temp1258v(char** __temp1327v, uint64_t* __temp1328v, uint16_t* __temp1329v, uint16_t* __temp1330v) {
+  char* x__unsafe_ptr=*__temp1327v;
+  uint64_t x__unsafe_size=*__temp1328v;
+  uint16_t x__unsafe_offset=*__temp1329v;
+  uint16_t x__unsafe_align=*__temp1330v;
+  uint64_t __temp1259v=0;
+  char* __temp1260v__unsafe_ptr=0;
+  uint64_t __temp1260v__unsafe_size=0;
+  uint16_t __temp1260v__unsafe_offset=0;
+  uint16_t __temp1260v__unsafe_align=0;
+  char* __temp1261v__=0;
+  double __temp1262v=0;
+  char* __temp1263v=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  __temp1260v=2;
-  __temp_errcode=resize__temp507v(&x__unsafe_ptr,&x__unsafe_size,&x__unsafe_offset,&x__unsafe_align,__temp1260v,&__temp1261v__unsafe_ptr,&__temp1261v__unsafe_size,&__temp1261v__unsafe_offset,&__temp1261v__unsafe_align);
+  __temp1259v=2;
+  __temp_errcode=resize__temp507v(&x__unsafe_ptr,&x__unsafe_size,&x__unsafe_offset,&x__unsafe_align,__temp1259v,&__temp1260v__unsafe_ptr,&__temp1260v__unsafe_size,&__temp1260v__unsafe_offset,&__temp1260v__unsafe_align);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  __temp_errcode=mutlast__temp536v(&__temp1261v__unsafe_ptr,&__temp1261v__unsafe_size,&__temp1261v__unsafe_offset,&__temp1261v__unsafe_align,&__temp1262v__);
+  __temp_errcode=mutlast__temp533v(&__temp1260v__unsafe_ptr,&__temp1260v__unsafe_size,&__temp1260v__unsafe_offset,&__temp1260v__unsafe_align,&__temp1261v__);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  __temp1263v=2.0;
-  if(!__temp1262v__){
+  __temp1262v=2.0;
+  if(!__temp1261v__){
   __temp_errcode=2;
   goto __temp_failure;
   }
-  memcpy(__temp1262v__,&__temp1263v,8);
-  __temp1264v=__temp1262v__;
+  memcpy(__temp1261v__,&__temp1262v,8);
+  __temp1263v=__temp1261v__;
   
-  __temp_failure:*__temp1328v=x__unsafe_ptr;
-  *__temp1329v=x__unsafe_size;
-  *__temp1330v=x__unsafe_offset;
-  *__temp1331v=x__unsafe_align;
+  __temp_failure:*__temp1327v=x__unsafe_ptr;
+  *__temp1328v=x__unsafe_size;
+  *__temp1329v=x__unsafe_offset;
+  *__temp1330v=x__unsafe_align;
   
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) int get__temp551v(char* buffer__unsafe_ptr, uint64_t buffer__unsafe_size, uint16_t buffer__unsafe_offset, uint16_t buffer__unsafe_align, uint64_t i, char** __temp1332v) {
-  char __temp552v__=0;
+static inline __attribute__((always_inline)) int get__temp548v(char* buffer__unsafe_ptr, uint64_t buffer__unsafe_size, uint16_t buffer__unsafe_offset, uint16_t buffer__unsafe_align, uint64_t i, char** __temp1331v) {
+  char __temp549v__=0;
+  uint64_t __temp550v__=0;
+  uint64_t __temp551v__=0;
+  uint64_t __temp552v__=0;
   uint64_t __temp553v__=0;
-  uint64_t __temp554v__=0;
-  uint64_t __temp555v__=0;
-  uint64_t __temp556v__=0;
-  char* __temp557v__=0;
+  char* __temp554v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  ge__temp319v(i,buffer__unsafe_size,&__temp552v__);
-  if(__temp552v__){
-  __temp_errcode=14;
+  ge__temp319v(i,buffer__unsafe_size,&__temp549v__);
+  if(__temp549v__){
+  __temp_errcode=13;
   goto __temp_failure;
   }
-  nat__temp465v(buffer__unsafe_align,&__temp553v__);
-  mul__temp194v(i,__temp553v__,&__temp554v__);
-  nat__temp465v(buffer__unsafe_offset,&__temp555v__);
-  add__temp170v(__temp554v__,__temp555v__,&__temp556v__);
-  add__temp463v(buffer__unsafe_ptr,__temp556v__,&__temp557v__);
+  nat__temp465v(buffer__unsafe_align,&__temp550v__);
+  mul__temp194v(i,__temp550v__,&__temp551v__);
+  nat__temp465v(buffer__unsafe_offset,&__temp552v__);
+  add__temp170v(__temp551v__,__temp552v__,&__temp553v__);
+  add__temp463v(buffer__unsafe_ptr,__temp553v__,&__temp554v__);
   goto __temp_return;
   
   __temp_failure:__temp_return:
-  *__temp1332v=__temp557v__;
+  *__temp1331v=__temp554v__;
   
   return __temp_errcode;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp69v(double x, double y, int* __temp1333v) {
+static inline __attribute__((always_inline)) void is_different__temp69v(double x, double y, int* __temp1332v) {
   int __temp70v=0;
   int __temp71v__=0;
   not__temp35v(__temp70v,&__temp71v__);
   goto __temp_return;
   __temp_return:
-  *__temp1333v=__temp71v__;
+  *__temp1332v=__temp71v__;
 }
 
-static inline __attribute__((always_inline)) void add__temp148v(double x, double y, double* __temp1334v) {
+static inline __attribute__((always_inline)) void add__temp148v(double x, double y, double* __temp1333v) {
   int __temp149v__=0;
   double z=0;
   is_different__temp69v(x,y,&__temp149v__);
   z=x+y;
   goto __temp_return;
   __temp_return:
-  *__temp1334v=z;
+  *__temp1333v=z;
 }
 
 static inline __attribute__((always_inline)) void print__temp368v(double value) {
@@ -668,68 +657,68 @@ static inline __attribute__((always_inline)) void print__temp368v(double value) 
   printf("%.6f%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) int main__temp1265v() {
-  char* __temp1266v__unsafe_ptr=0;
-  uint64_t __temp1266v__unsafe_size=0;
-  uint16_t __temp1266v__unsafe_offset=0;
-  uint16_t __temp1266v__unsafe_align=0;
-  char __temp1267v____temp1254v____temp470v__=0;
+static inline __attribute__((always_inline)) int main__temp1264v() {
+  char* __temp1265v__unsafe_ptr=0;
+  uint64_t __temp1265v__unsafe_size=0;
+  uint16_t __temp1265v__unsafe_offset=0;
+  uint16_t __temp1265v__unsafe_align=0;
+  char __temp1266v____temp1253v____temp470v__=0;
   char* x__unsafe_ptr=0;
   uint64_t x__unsafe_size=0;
   uint16_t x__unsafe_offset=0;
   uint16_t x__unsafe_align=0;
-  uint64_t __temp1269v=0;
-  char* __temp1270v__=0;
-  double __temp1271v__value=0;
-  uint64_t __temp1272v=0;
-  char* __temp1273v__=0;
-  double __temp1274v__value=0;
-  double __temp1275v__=0;
+  uint64_t __temp1268v=0;
+  char* __temp1269v__=0;
+  double __temp1270v__value=0;
+  uint64_t __temp1271v=0;
+  char* __temp1272v__=0;
+  double __temp1273v__value=0;
+  double __temp1274v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
-  __temp_errcode=test1__temp1247v(&__temp1266v__unsafe_ptr,&__temp1266v__unsafe_size,&__temp1266v__unsafe_offset,&__temp1266v__unsafe_align);
+  __temp_errcode=test1__temp1246v(&__temp1265v__unsafe_ptr,&__temp1265v__unsafe_size,&__temp1265v__unsafe_offset,&__temp1265v__unsafe_align);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  x__unsafe_ptr=__temp1266v__unsafe_ptr;
-  x__unsafe_size=__temp1266v__unsafe_size;
-  x__unsafe_offset=__temp1266v__unsafe_offset;
-  x__unsafe_align=__temp1266v__unsafe_align;
-  __temp_errcode=test2__temp1259v(&x__unsafe_ptr,&x__unsafe_size,&x__unsafe_offset,&x__unsafe_align);
+  x__unsafe_ptr=__temp1265v__unsafe_ptr;
+  x__unsafe_size=__temp1265v__unsafe_size;
+  x__unsafe_offset=__temp1265v__unsafe_offset;
+  x__unsafe_align=__temp1265v__unsafe_align;
+  __temp_errcode=test2__temp1258v(&x__unsafe_ptr,&x__unsafe_size,&x__unsafe_offset,&x__unsafe_align);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  __temp1269v=0;
-  __temp_errcode=get__temp551v(x__unsafe_ptr,x__unsafe_size,x__unsafe_offset,x__unsafe_align,__temp1269v,&__temp1270v__);
+  __temp1268v=0;
+  __temp_errcode=get__temp548v(x__unsafe_ptr,x__unsafe_size,x__unsafe_offset,x__unsafe_align,__temp1268v,&__temp1269v__);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  if(!__temp1270v__){
+  if(!__temp1269v__){
   __temp_errcode=2;
   goto __temp_failure;
   }
-  memcpy(&__temp1271v__value,__temp1270v__,8);
-  __temp1272v=1;
-  __temp_errcode=get__temp551v(x__unsafe_ptr,x__unsafe_size,x__unsafe_offset,x__unsafe_align,__temp1272v,&__temp1273v__);
+  memcpy(&__temp1270v__value,__temp1269v__,8);
+  __temp1271v=1;
+  __temp_errcode=get__temp548v(x__unsafe_ptr,x__unsafe_size,x__unsafe_offset,x__unsafe_align,__temp1271v,&__temp1272v__);
   if(__temp_errcode){
   goto __temp_failure;
   }
-  if(!__temp1273v__){
+  if(!__temp1272v__){
   __temp_errcode=2;
   goto __temp_failure;
   }
-  memcpy(&__temp1274v__value,__temp1273v__,8);
-  add__temp148v(__temp1271v__value,__temp1274v__value,&__temp1275v__);
-  print__temp368v(__temp1275v__);
+  memcpy(&__temp1273v__value,__temp1272v__,8);
+  add__temp148v(__temp1270v__value,__temp1273v__value,&__temp1274v__);
+  print__temp368v(__temp1274v__);
   
-  __temp_failure:exists__temp412v(__temp1266v__unsafe_ptr,&__temp1267v____temp1254v____temp470v__);
-  if(__temp1267v____temp1254v____temp470v__){
-  __temp1266v__unsafe_size=0;
-  __temp1266v__unsafe_size=__temp1266v__unsafe_size;
-  free__temp461v(&__temp1266v__unsafe_ptr);
+  __temp_failure:exists__temp412v(__temp1265v__unsafe_ptr,&__temp1266v____temp1253v____temp470v__);
+  if(__temp1266v____temp1253v____temp470v__){
+  __temp1265v__unsafe_size=0;
+  __temp1265v__unsafe_size=__temp1265v__unsafe_size;
+  free__temp461v(&__temp1265v__unsafe_ptr);
   }
   
   return __temp_errcode;
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1265v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1264v();return 0;}

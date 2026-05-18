@@ -663,14 +663,14 @@ for interweaving a superset of C that interacts with smoll
 will be added in the future.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span> <span class="n">y</span><span class="p">)</span>
     <span class="p">{</span><span class="n">builtins</span><span class="p">:</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
     <span class="k">return</span> <span class="n">z</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="nb">print</span> <span class="n">unsafe_add</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">unsafe_add</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">int</span> <span class="mi">2</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -688,7 +688,7 @@ An example follows.</p>
     <span class="k">return</span> <span class="n">z</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="nb">print</span> <span class="n">unsafe_add</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">unsafe_add</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -842,12 +842,19 @@ At the same time, you can mingle them together with other condition checking,
 as the standard library&#8217;s core. Below is an example of a conditional check.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">typed_print</span><span class="p">(</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="o">|</span><span class="n">cstr</span> <span class="n">value</span><span class="p">)</span> 
-    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="nb">int</span><span class="o">|</span><span class="nb">float</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">typed_print</span><span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="o">|</span><span class="n">cstr</span> <span class="n">value</span><span class="p">)</span> 
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">nat</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this is a number:&quot;</span><span class="p">)</span>
     <span class="k">else</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this is a string:&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">typed_print</span> <span class="mi">1</span>
+    <span class="n">typed_print</span> <span class="mf">2.0</span>
+    <span class="n">typed_print</span> <span class="s2">&quot;test&quot;</span>
 </code></pre>
 </div>
 
@@ -924,9 +931,7 @@ any type&#8217;s items:</p>
 </code></pre>
 </div>
 
-<p>Most buffer features are implemented in the standard library&#8217;s core
-we will see next how to work with abstract buffers.
-One of the most important features is the <code>alloc</code> function to
+<p>One of the most important buffer features is the <code>alloc</code> function to
 allocate and zero-initialize a specific number of elements. 
 This returns the buffer itself to enable initialization per patterns like
 <code>buf = (mut float[]).alloc 4</code>. Allocate a buffer of chars
@@ -1637,11 +1642,9 @@ that fails on non-zero error code can be evoked like below.</p>
 </code></pre>
 </div>
 
-<p>Equivalently, manually release the process to wait for its conclusions.
-Recall that running processes can create errors, while resource release
-code may intercepts those errors with <code>try</code> so that
-they can be retrieved with <code>compiler:catch()</code>. 
-To repropagate or otherwise
+<p>Equivalently, manually release the process to wait for its conclusion.
+As resource release code intercepts erroneous termination with <code>try</code>,
+check on this with <code>compiler:catch()</code>.  To propagate or otherwise
 handle the intercepted errors, use a pattern like below.</p>
 
 <div class="codehilite">

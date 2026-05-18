@@ -4062,17 +4062,16 @@ async def download(url: str, filepath: str):
         from pyodide.http import pyfetch
         import base64, os
         cached = _js_cache_get(url)
+        dirpath = os.path.dirname(filepath)
+        if dirpath: os.makedirs(dirpath, exist_ok=True)
         if cached is not None:
             data = base64.b64decode(cached)
-            dirpath = os.path.dirname(filepath)
-            if dirpath: os.makedirs(dirpath, exist_ok=True)
             with open(filepath, "wb") as f: f.write(data)
             return
         response = await pyfetch(url)
         if response.status != 200: raise RuntimeError( f"Failed to fetch {url}: HTTP {response.status}")
         data = await response.bytes()
         _js_cache_set(url, base64.b64encode(data).decode())
-        os.makedirs(os.path.dirname(filepath), exist_ok=True)
         with open(filepath, "wb") as f: f.write(data)
         return
     urllib.request.urlretrieve(url, filepath)
@@ -4124,37 +4123,22 @@ async def download_with_progress(url: str, filepath: str, message: str):
             sys.stdout.write(f"\r[{YELLOW}+{RESET}] {message} {GREEN}[{bar}]{RESET} {percent:.1f}% | {YELLOW}{downloaded // 1024 // 1024}MB{RESET} / {total_size // 1024 // 1024}MB")
             sys.stdout.flush()
     print()
-file_cache: dict[str, File] = {}
-loading_tasks: dict[str, asyncio.Task] = {}
+
+file_cache: dict[str, File] = dict()
+file_cache_complete: set[str] = set()
 
 async def load(path, is_main_file=False, err_token=None):
-    # already fully loaded
-    existing = file_cache.get(path)
-    if existing is not None:
-        return existing
-
-    # another task is currently loading it
-    existing_task = loading_tasks.get(path)
-    if existing_task is not None:
-        return await existing_task
-
-    async def do_load():
+    file = file_cache.get(path, None)
+    if file is None:
         file, processed_tokens = _load(path, is_main_file, err_token)
-
-        # publish early if you need circular import visibility
         file_cache[path] = file
-
         await process(file, processed_tokens, 0)
-        return file
-
-    task = asyncio.create_task(do_load())
-    loading_tasks[path] = task
-
-    try:
-        result = await task
-        return result
-    finally:
-        loading_tasks.pop(path, None)
+        file_cache_complete.add(path)
+    elif path=="builtins": pass
+    elif path not in file_cache_complete:
+        if err_token: err_token.error("import", "circular import detected for '"+path+"'")
+        else: print("circular import detected for '"+path+"'")
+    return file
 
 POINTER_TYPE = ImplementedType("ptr", "char*", memory_size=8)
 POINTER_TYPE.vars[POINTER_TYPE.rets[0]].immutable = False

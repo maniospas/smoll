@@ -5,8 +5,9 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp365v="\n";
-static const char* __temp_all_errcodes[30] = {"noerr",
+static const char* __temp_all_errcodes[31] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
@@ -304,6 +305,7 @@ static inline __attribute__((always_inline)) int test1__temp1222v(char** __temp1
   }
   __temp1232v=1.0;
   if(!__temp1231v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1231v__,&__temp1232v,8);
@@ -515,6 +517,7 @@ static inline __attribute__((always_inline)) int test2__temp1234v(char** __temp1
   }
   __temp1238v=2.0;
   if(!__temp1237v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1237v__,&__temp1238v,8);
@@ -584,10 +587,10 @@ static inline __attribute__((always_inline)) int main__temp1240v() {
   uint64_t x__unsafe_align=0;
   uint64_t __temp1244v=0;
   char* __temp1245v__=0;
-  double __temp1246v__number=0;
+  double __temp1246v__value=0;
   uint64_t __temp1247v=0;
   char* __temp1248v__=0;
-  double __temp1249v__number=0;
+  double __temp1249v__value=0;
   double __temp1250v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
@@ -608,19 +611,21 @@ static inline __attribute__((always_inline)) int main__temp1240v() {
   goto __temp_failure;
   }
   if(!__temp1245v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
-  memcpy(&__temp1246v__number,__temp1245v__,8);
+  memcpy(&__temp1246v__value,__temp1245v__,8);
   __temp1247v=1;
   __temp_errcode=get__temp533v(x__unsafe_ptr,x__unsafe_size,x__unsafe_align,__temp1247v,&__temp1248v__);
   if(__temp_errcode){
   goto __temp_failure;
   }
   if(!__temp1248v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
-  memcpy(&__temp1249v__number,__temp1248v__,8);
-  add__temp148v(__temp1246v__number,__temp1249v__number,&__temp1250v__);
+  memcpy(&__temp1249v__value,__temp1248v__,8);
+  add__temp148v(__temp1246v__value,__temp1249v__value,&__temp1250v__);
   print__temp368v(__temp1250v__);
   
   __temp_failure:exists__temp412v(__temp1241v__unsafe_ptr,&__temp1242v____temp1229v____temp469v__);

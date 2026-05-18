@@ -9,8 +9,9 @@ const char* const __temp1692v="./smoll ";
 const char* const __temp1703v=".s";
 const char* const __temp797v="";
 const char* const __temp365v="\n";
-static const char* __temp_all_errcodes[47] = {"noerr",
+static const char* __temp_all_errcodes[48] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
@@ -404,6 +405,7 @@ static inline __attribute__((always_inline)) int str__temp607v(char* buf__unsafe
   goto __temp_failure;
   }
   if(!__temp610v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp611v__value,__temp610v__,1);
@@ -781,6 +783,7 @@ int slice__temp794v(char* _s__unsafe_ptr, uint64_t _s__dat__pos, uint64_t _s__da
   if(__temp804v__){
   get__temp755v(s__unsafe_ptr,s__dat__pos,s__dat__length,s__dat__first,from,&__temp805v__);
   if(!__temp805v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp806v__value,__temp805v__,1);
@@ -1044,6 +1047,7 @@ static inline __attribute__((always_inline)) int str__temp583v(char* buf__unsafe
   goto __temp_failure;
   }
   if(!__temp591v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp592v__value,__temp591v__,1);

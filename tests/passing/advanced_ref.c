@@ -7,8 +7,9 @@ char** __temp_argv;
 const char* const __temp365v="\n";
 const char* const __temp1231v="123";
 const char* const __temp1233v="456";
-static const char* __temp_all_errcodes[30] = {"noerr",
+static const char* __temp_all_errcodes[31] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
@@ -501,6 +502,7 @@ static inline __attribute__((always_inline)) int str__temp607v(char* buf__unsafe
   goto __temp_failure;
   }
   if(!__temp610v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp611v__value,__temp610v__,1);

@@ -4,15 +4,16 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
+const char* const __temp1225v="-------------------";
+const char* const __temp1252v="mario";
 const char* const __temp797v="";
 const char* const __temp365v="\n";
-const char* const __temp1225v="-------------------";
 const char* const __temp1230v="surnname  ";
-const char* const __temp1252v="mario";
 const char* const __temp1250v="it's a me";
 const char* const __temp1227v="name      ";
-static const char* __temp_all_errcodes[30] = {"noerr",
+static const char* __temp_all_errcodes[31] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
@@ -436,6 +437,7 @@ static inline __attribute__((always_inline)) int str__temp607v(char* buf__unsafe
   goto __temp_failure;
   }
   if(!__temp610v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp611v__value,__temp610v__,1);
@@ -748,36 +750,16 @@ static inline __attribute__((always_inline)) int test__temp1234v(char** __temp13
   }
   Person__temp1222v(__temp1249v,__temp1251v__unsafe_ptr,__temp1251v__dat__pos,__temp1251v__dat__length,__temp1251v__dat__first,__temp1253v__unsafe_ptr,__temp1253v__dat__pos,__temp1253v__dat__length,__temp1253v__dat__first,&__temp1254v__name__unsafe_ptr,&__temp1254v__name__dat__pos,&__temp1254v__name__dat__length,&__temp1254v__name__dat__first,&__temp1254v__surname__unsafe_ptr,&__temp1254v__surname__dat__pos,&__temp1254v__surname__dat__length,&__temp1254v__surname__dat__first);
   if(!__temp1248v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1248v__,&__temp1254v__name__unsafe_ptr,8);
-  if(!__temp1248v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1248v__+8,&__temp1254v__name__dat__pos,8);
-  if(!__temp1248v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1248v__+16,&__temp1254v__name__dat__length,8);
-  if(!__temp1248v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1248v__+24,&__temp1254v__name__dat__first,1);
-  if(!__temp1248v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1248v__+25,&__temp1254v__surname__unsafe_ptr,8);
-  if(!__temp1248v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1248v__+33,&__temp1254v__surname__dat__pos,8);
-  if(!__temp1248v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1248v__+41,&__temp1254v__surname__dat__length,8);
-  if(!__temp1248v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1248v__+49,&__temp1254v__surname__dat__first,1);
   __temp1255v=0;
   __temp_errcode=get__temp533v(people__unsafe_ptr,people__unsafe_size,people__unsafe_align,__temp1255v,&__temp1256v__);
@@ -785,6 +767,7 @@ static inline __attribute__((always_inline)) int test__temp1234v(char** __temp13
   goto __temp_failure;
   }
   if(!__temp1256v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1257v__name__unsafe_ptr,__temp1256v__,8);
@@ -876,6 +859,7 @@ static inline __attribute__((always_inline)) int main__temp1267v() {
   goto __temp_failure;
   }
   if(!__temp1271v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1272v__pos,__temp1271v__,8);

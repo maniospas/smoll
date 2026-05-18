@@ -7,8 +7,9 @@ char** __temp_argv;
 const char* const __temp365v="\n";
 const char* const __temp1240v="going to deallocate of size: ";
 const char* const __temp797v="";
-static const char* __temp_all_errcodes[30] = {"noerr",
+static const char* __temp_all_errcodes[31] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
@@ -330,7 +331,7 @@ static inline __attribute__((always_inline)) int test1__temp1222v(char** __temp1
   double __temp1235v=0;
   uint64_t __temp1236v=0;
   char* __temp1237v__=0;
-  double __temp1238v__number=0;
+  double __temp1238v__value=0;
   uint64_t __temp1242v__=0;
   int __temp_errcode=0;
   int __temp_complain=0;
@@ -353,6 +354,7 @@ static inline __attribute__((always_inline)) int test1__temp1222v(char** __temp1
   }
   __temp1232v=1.0;
   if(!__temp1231v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1231v__,&__temp1232v,8);
@@ -363,6 +365,7 @@ static inline __attribute__((always_inline)) int test1__temp1222v(char** __temp1
   }
   __temp1235v=2.0;
   if(!__temp1234v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1234v__,&__temp1235v,8);
@@ -372,10 +375,11 @@ static inline __attribute__((always_inline)) int test1__temp1222v(char** __temp1
   goto __temp_failure;
   }
   if(!__temp1237v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
-  memcpy(&__temp1238v__number,__temp1237v__,8);
-  print__temp368v(__temp1238v__number);
+  memcpy(&__temp1238v__value,__temp1237v__,8);
+  print__temp368v(__temp1238v__value);
   goto __temp_return;
   
   __temp_failure:print__temp361v(__temp1240v,__temp797v);
@@ -498,7 +502,7 @@ static inline __attribute__((always_inline)) int main__temp1252v() {
   uint64_t t__k__unsafe_align=0;
   uint64_t __temp1255v=0;
   char* __temp1256v__=0;
-  double __temp1257v__number=0;
+  double __temp1257v__value=0;
   int __temp_errcode=0;
   int __temp_complain=0;
   __temp_errcode=test2__temp1244v(&__temp1253v__t__unsafe_ptr,&__temp1253v__t__unsafe_size,&__temp1253v__t__unsafe_align,&__temp1253v__j__unsafe_ptr,&__temp1253v__j__unsafe_size,&__temp1253v__j__unsafe_align,&__temp1253v__k__unsafe_ptr,&__temp1253v__k__unsafe_size,&__temp1253v__k__unsafe_align);
@@ -520,10 +524,11 @@ static inline __attribute__((always_inline)) int main__temp1252v() {
   goto __temp_failure;
   }
   if(!__temp1256v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
-  memcpy(&__temp1257v__number,__temp1256v__,8);
-  print__temp368v(__temp1257v__number);
+  memcpy(&__temp1257v__value,__temp1256v__,8);
+  print__temp368v(__temp1257v__value);
   
   __temp_failure:exists__temp412v(__temp1253v__k__unsafe_ptr,&__temp1254v____temp1251v____temp469v__);
   if(__temp1254v____temp1251v____temp469v__){

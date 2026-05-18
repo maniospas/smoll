@@ -6,8 +6,9 @@ int __temp_argc;
 char** __temp_argv;
 const char* const __temp1671v="tmp.txt";
 const char* const __temp1674v="hello world";
-static const char* __temp_all_errcodes[47] = {"noerr",
+static const char* __temp_all_errcodes[48] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",

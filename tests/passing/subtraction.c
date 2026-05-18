@@ -6,8 +6,9 @@ int __temp_argc;
 char** __temp_argv;
 const char* const __temp365v="\n";
 const char* const __temp447v="hello world";
-static const char* __temp_all_errcodes[8] = {"noerr",
+static const char* __temp_all_errcodes[9] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",

@@ -5,8 +5,9 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp365v="\n";
-static const char* __temp_all_errcodes[30] = {"noerr",
+static const char* __temp_all_errcodes[31] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
@@ -434,7 +435,7 @@ static inline __attribute__((always_inline)) int main__temp1222v() {
   uint64_t __temp1237v__=0;
   uint64_t __temp1239v=0;
   char* __temp1240v__=0;
-  double __temp1241v__number=0;
+  double __temp1241v__value=0;
   int __temp_errcode=0;
   int __temp_complain=0;
   float____temp_buffer____buffer__temp1223v(&__temp1225v__unsafe_ptr,&__temp1225v__unsafe_size,&__temp1225v__unsafe_align);
@@ -464,6 +465,7 @@ static inline __attribute__((always_inline)) int main__temp1222v() {
   }
   __temp1234v=1.0;
   if(!__temp1233v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1233v__,&__temp1234v,8);
@@ -477,10 +479,11 @@ static inline __attribute__((always_inline)) int main__temp1222v() {
   goto __temp_failure;
   }
   if(!__temp1240v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
-  memcpy(&__temp1241v__number,__temp1240v__,8);
-  print__temp368v(__temp1241v__number);
+  memcpy(&__temp1241v__value,__temp1240v__,8);
+  print__temp368v(__temp1241v__value);
   
   __temp_failure:exists__temp412v(__temp1228v__unsafe_ptr,&__temp1229v____temp469v__);
   if(__temp1229v____temp469v__){

@@ -12,8 +12,9 @@ const char* const __temp365v="\n";
 const char* const __temp1250v="answered: ";
 const char* const __temp1255v=" ";
 const char* const __temp1248v="C";
-static const char* __temp_all_errcodes[31] = {"noerr",
+static const char* __temp_all_errcodes[32] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",

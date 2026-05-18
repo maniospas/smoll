@@ -9,8 +9,9 @@ const char* const __temp1766v="manio";
 const char* const __temp1761v="hello";
 const char* const __temp1763v="hello world!";
 const char* const __temp1768v="it's a me, manio.";
-static const char* __temp_all_errcodes[32] = {"noerr",
+static const char* __temp_all_errcodes[33] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
@@ -479,6 +480,7 @@ static inline __attribute__((always_inline)) int str__temp607v(char* buf__unsafe
   goto __temp_failure;
   }
   if(!__temp610v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp611v__value,__temp610v__,1);
@@ -737,6 +739,7 @@ static inline __attribute__((always_inline)) int hash__temp1222v(char* k__unsafe
   add__temp170v(__temp1232v__,h,&__temp1233v__);
   get__temp755v(k__unsafe_ptr,k__dat__pos,k__dat__length,k__dat__first,i,&__temp1234v__);
   if(!__temp1234v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1235v__value,__temp1234v__,1);
@@ -965,24 +968,13 @@ int at__temp1553v(char** __temp1883v, uint64_t* __temp1884v, uint64_t* __temp188
   goto __temp_failure;
   }
   if(!__temp1558v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1559v__s__unsafe_ptr,__temp1558v__,8);
-  if(!__temp1558v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1559v__s__dat__pos,__temp1558v__+8,8);
-  if(!__temp1558v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1559v__s__dat__length,__temp1558v__+16,8);
-  if(!__temp1558v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1559v__s__dat__first,__temp1558v__+24,1);
-  if(!__temp1558v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1559v__cost,__temp1558v__+25,8);
   raw__temp1271v(__temp1559v__s__unsafe_ptr,__temp1559v__s__dat__pos,__temp1559v__s__dat__length,__temp1559v__s__dat__first,__temp1559v__cost,&__temp1560v__unsafe_ptr,&__temp1560v__dat__pos,&__temp1560v__dat__length,&__temp1560v__dat__first);
   not__temp35v(__temp1561v,&__temp1562v__);
@@ -1025,24 +1017,13 @@ int at__temp1553v(char** __temp1883v, uint64_t* __temp1884v, uint64_t* __temp188
   goto __temp_failure;
   }
   if(!__temp1574v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1575v__s__unsafe_ptr,__temp1574v__,8);
-  if(!__temp1574v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1575v__s__dat__pos,__temp1574v__+8,8);
-  if(!__temp1574v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1575v__s__dat__length,__temp1574v__+16,8);
-  if(!__temp1574v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1575v__s__dat__first,__temp1574v__+24,1);
-  if(!__temp1574v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1575v__cost,__temp1574v__+25,8);
   entry__s__unsafe_ptr=__temp1575v__s__unsafe_ptr;
   entry__s__dat__pos=__temp1575v__s__dat__pos;
@@ -1057,24 +1038,13 @@ int at__temp1553v(char** __temp1883v, uint64_t* __temp1884v, uint64_t* __temp188
   goto __temp_failure;
   }
   if(!__temp1578v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1578v__,&k__unsafe_ptr,8);
-  if(!__temp1578v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1578v__+8,&k__dat__pos,8);
-  if(!__temp1578v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1578v__+16,&k__dat__length,8);
-  if(!__temp1578v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1578v__+24,&k__dat__first,1);
-  if(!__temp1578v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1578v__+25,&i,8);
   __temp1556v=idx;
   goto __temp_return;
@@ -1096,24 +1066,13 @@ int at__temp1553v(char** __temp1883v, uint64_t* __temp1884v, uint64_t* __temp188
   goto __temp_failure;
   }
   if(!__temp1582v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1583v__s__unsafe_ptr,__temp1582v__,8);
-  if(!__temp1582v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1583v__s__dat__pos,__temp1582v__+8,8);
-  if(!__temp1582v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1583v__s__dat__length,__temp1582v__+16,8);
-  if(!__temp1582v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1583v__s__dat__first,__temp1582v__+24,1);
-  if(!__temp1582v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1583v__cost,__temp1582v__+25,8);
   raw__temp1271v(__temp1583v__s__unsafe_ptr,__temp1583v__s__dat__pos,__temp1583v__s__dat__length,__temp1583v__s__dat__first,__temp1583v__cost,&__temp1584v__unsafe_ptr,&__temp1584v__dat__pos,&__temp1584v__dat__length,&__temp1584v__dat__first);
   k__unsafe_ptr=__temp1584v__unsafe_ptr;
@@ -1125,24 +1084,13 @@ int at__temp1553v(char** __temp1883v, uint64_t* __temp1884v, uint64_t* __temp188
   goto __temp_failure;
   }
   if(!__temp1585v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1585v__,&tmp__unsafe_ptr,8);
-  if(!__temp1585v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1585v__+8,&tmp__dat__pos,8);
-  if(!__temp1585v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1585v__+16,&tmp__dat__length,8);
-  if(!__temp1585v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1585v__+24,&tmp__dat__first,1);
-  if(!__temp1585v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1585v__+25,&i,8);
   }
   }
@@ -1337,24 +1285,13 @@ static inline __attribute__((always_inline)) int next__temp1696v(char* keys__uns
   goto __temp_failure;
   }
   if(!__temp1702v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1703v__s__unsafe_ptr,__temp1702v__,8);
-  if(!__temp1702v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1703v__s__dat__pos,__temp1702v__+8,8);
-  if(!__temp1702v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1703v__s__dat__length,__temp1702v__+16,8);
-  if(!__temp1702v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1703v__s__dat__first,__temp1702v__+24,1);
-  if(!__temp1702v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1703v__cost,__temp1702v__+25,8);
   raw__temp1271v(__temp1703v__s__unsafe_ptr,__temp1703v__s__dat__pos,__temp1703v__s__dat__length,__temp1703v__s__dat__first,__temp1703v__cost,&__temp1704v__unsafe_ptr,&__temp1704v__dat__pos,&__temp1704v__dat__length,&__temp1704v__dat__first);
   goto __temp_return;
@@ -1364,24 +1301,13 @@ static inline __attribute__((always_inline)) int next__temp1696v(char* keys__uns
   goto __temp_failure;
   }
   if(!__temp1705v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1706v__s__unsafe_ptr,__temp1705v__,8);
-  if(!__temp1705v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1706v__s__dat__pos,__temp1705v__+8,8);
-  if(!__temp1705v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1706v__s__dat__length,__temp1705v__+16,8);
-  if(!__temp1705v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1706v__s__dat__first,__temp1705v__+24,1);
-  if(!__temp1705v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1706v__cost,__temp1705v__+25,8);
   raw__temp1271v(__temp1706v__s__unsafe_ptr,__temp1706v__s__dat__pos,__temp1706v__s__dat__length,__temp1706v__s__dat__first,__temp1706v__cost,&__temp1707v__unsafe_ptr,&__temp1707v__dat__pos,&__temp1707v__dat__length,&__temp1707v__dat__first);
   ret__unsafe_ptr=__temp1707v__unsafe_ptr;
@@ -1402,24 +1328,13 @@ static inline __attribute__((always_inline)) int next__temp1696v(char* keys__uns
   goto __temp_failure;
   }
   if(!__temp1712v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1713v__s__unsafe_ptr,__temp1712v__,8);
-  if(!__temp1712v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1713v__s__dat__pos,__temp1712v__+8,8);
-  if(!__temp1712v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1713v__s__dat__length,__temp1712v__+16,8);
-  if(!__temp1712v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1713v__s__dat__first,__temp1712v__+24,1);
-  if(!__temp1712v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1713v__cost,__temp1712v__+25,8);
   raw__temp1271v(__temp1713v__s__unsafe_ptr,__temp1713v__s__dat__pos,__temp1713v__s__dat__length,__temp1713v__s__dat__first,__temp1713v__cost,&__temp1714v__unsafe_ptr,&__temp1714v__dat__pos,&__temp1714v__dat__length,&__temp1714v__dat__first);
   ret__unsafe_ptr=__temp1714v__unsafe_ptr;
@@ -1584,20 +1499,12 @@ static inline __attribute__((always_inline)) int test__temp1747v(char** __temp19
   goto __temp_failure;
   }
   if(!__temp1762v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1762v__,&__temp1765v__unsafe_ptr,8);
-  if(!__temp1762v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1762v__+8,&__temp1765v__dat__pos,8);
-  if(!__temp1762v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1762v__+16,&__temp1765v__dat__length,8);
-  if(!__temp1762v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1762v__+24,&__temp1765v__dat__first,1);
   __temp_errcode=mutget__temp1678v(&map__keys__unsafe_ptr,&map__keys__unsafe_size,&map__keys__unsafe_align,&map__values__unsafe_ptr,&map__values__unsafe_size,&map__values__unsafe_align,__temp1766v,&__temp1767v__);
   if(__temp_errcode){
@@ -1612,20 +1519,12 @@ static inline __attribute__((always_inline)) int test__temp1747v(char** __temp19
   goto __temp_failure;
   }
   if(!__temp1767v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1767v__,&__temp1770v__unsafe_ptr,8);
-  if(!__temp1767v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1767v__+8,&__temp1770v__dat__pos,8);
-  if(!__temp1767v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1767v__+16,&__temp1770v__dat__length,8);
-  if(!__temp1767v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1767v__+24,&__temp1770v__dat__first,1);
   bufpos__temp654v(&map__keys__unsafe_ptr,&map__keys__unsafe_size,&map__keys__unsafe_align,&__temp1771v__buf__unsafe_ptr,&__temp1771v__buf__unsafe_size,&__temp1771v__buf__unsafe_align,&__temp1771v__pos);
   it__buf__unsafe_ptr=__temp1771v__buf__unsafe_ptr;
@@ -1783,24 +1682,13 @@ int find__temp1319v(char* data__unsafe_ptr, uint64_t data__unsafe_size, uint64_t
   goto __temp_failure;
   }
   if(!__temp1324v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1325v__s__unsafe_ptr,__temp1324v__,8);
-  if(!__temp1324v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1325v__s__dat__pos,__temp1324v__+8,8);
-  if(!__temp1324v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1325v__s__dat__length,__temp1324v__+16,8);
-  if(!__temp1324v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1325v__s__dat__first,__temp1324v__+24,1);
-  if(!__temp1324v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1325v__cost,__temp1324v__+25,8);
   raw__temp1271v(__temp1325v__s__unsafe_ptr,__temp1325v__s__dat__pos,__temp1325v__s__dat__length,__temp1325v__s__dat__first,__temp1325v__cost,&__temp1326v__unsafe_ptr,&__temp1326v__dat__pos,&__temp1326v__dat__length,&__temp1326v__dat__first);
   not__temp35v(__temp1327v,&__temp1328v__);
@@ -1843,24 +1731,13 @@ int find__temp1319v(char* data__unsafe_ptr, uint64_t data__unsafe_size, uint64_t
   goto __temp_failure;
   }
   if(!__temp1340v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1341v__s__unsafe_ptr,__temp1340v__,8);
-  if(!__temp1340v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1341v__s__dat__pos,__temp1340v__+8,8);
-  if(!__temp1340v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1341v__s__dat__length,__temp1340v__+16,8);
-  if(!__temp1340v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1341v__s__dat__first,__temp1340v__+24,1);
-  if(!__temp1340v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1341v__cost,__temp1340v__+25,8);
   entry__s__unsafe_ptr=__temp1341v__s__unsafe_ptr;
   entry__s__dat__pos=__temp1341v__s__dat__pos;
@@ -1935,20 +1812,12 @@ static inline __attribute__((always_inline)) int print__temp1775v(char* map__key
   goto __temp_failure;
   }
   if(!__temp1776v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1777v__unsafe_ptr,__temp1776v__,8);
-  if(!__temp1776v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1777v__dat__pos,__temp1776v__+8,8);
-  if(!__temp1776v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1777v__dat__length,__temp1776v__+16,8);
-  if(!__temp1776v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1777v__dat__first,__temp1776v__+24,1);
   print__temp718v(__temp1777v__unsafe_ptr,__temp1777v__dat__pos,__temp1777v__dat__length,__temp1777v__dat__first);
   __temp_errcode=get__temp1670v(map__keys__unsafe_ptr,map__keys__unsafe_size,map__keys__unsafe_align,map__values__unsafe_ptr,map__values__unsafe_size,map__values__unsafe_align,__temp1766v,&__temp1779v__);
@@ -1956,20 +1825,12 @@ static inline __attribute__((always_inline)) int print__temp1775v(char* map__key
   goto __temp_failure;
   }
   if(!__temp1779v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1780v__unsafe_ptr,__temp1779v__,8);
-  if(!__temp1779v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1780v__dat__pos,__temp1779v__+8,8);
-  if(!__temp1779v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1780v__dat__length,__temp1779v__+16,8);
-  if(!__temp1779v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1780v__dat__first,__temp1779v__+24,1);
   print__temp718v(__temp1780v__unsafe_ptr,__temp1780v__dat__pos,__temp1780v__dat__length,__temp1780v__dat__first);
   

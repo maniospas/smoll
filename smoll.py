@@ -438,6 +438,7 @@ class ImplementedType:
         self.accumulating_defers: list[dict[str, Token]] = [dict()] # for the top level we defer at the end of code block, but track loop defers here
         self.is_parsing_a_defer = False
         self.is_parsing_a_try: list[Variable|None] = list() # list of variables that hold try results
+        self.count_handled_tries: list[int] = list() # equivalent list that hold whether the try blocks where handled
         self.can_try_interpreter: bool = True
         if self.builtin is not None:
             self.vars["value"] = Variable("value", self)
@@ -1632,7 +1633,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if exists error=compiler:catch() print cstr error`")
-        #else: impl.is_parsing_a_try[-1] = None
+        else: impl.count_handled_tries[-1] += 1
         impl.implementation.extend([
             var,
             CODEWORD_EQUALS,
@@ -1699,6 +1700,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 CallPointer(callee),#CodeWord(callee.monomorphic_name),
                 CODEWORD_LPAR,
             ])
+            impl.needs_failure_mode = error_token
     else:
         impl.implementation.extend([
             CallPointer(callee),#CodeWord(callee.monomorphic_name),
@@ -1795,7 +1797,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
 
     if callee.needs_failure_mode and impl.is_parsing_a_try:
         if impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the 'try' mechanism has already matched one function call")
-        #impl.is_parsing_a_try[-1] = None
+        impl.count_handled_tries[-1] += 1
     if callee.needs_failure_mode and not impl.is_parsing_a_try:
         if impl.is_parsing_a_defer: error_token.error("safety", "cannot call a function with unhandled failure within 'defer'", reason=callee.at)
         impl.implementation.extend([
@@ -1821,7 +1823,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             CODEWORD_SEMICOLON,
             CODEWORD_RBRACKET
         ])
-        impl.needs_failure_mode = True
+        impl.needs_failure_mode = error_token
 
     # transfer dependent assignments from inputs to outputs on callee
     for ret in callee.rets:
@@ -1924,7 +1926,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
             CODEWORD_LBRACKET
         ])
         impl.spawned_error_codes.add(2)
-        #impl.is_parsing_a_try[-1] = None
+        impl.count_handled_tries[-1] += 1
     else:
         if debug_mode:
             text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
@@ -1969,7 +1971,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
             + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
         )
         progress += mem_size
-    if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
+    if try_var is not None: mpl.implementation.append(CODEWORD_RBRACKET)
     return pos, new_vars
 
 buffer_types: dict[UnionType|ImplementedType, UnionType] = dict()
@@ -2314,7 +2316,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     CODEWORD_LBRACKET
                 ])
                 impl.spawned_error_codes.add(2)
-                #impl.is_parsing_a_try[-1] = None
+                impl.count_handled_tries[-1] += 1
             else:
                 # non-allocation check is mandatory unfortunately
                 if debug_mode:
@@ -2356,7 +2358,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
                 )
                 progress += mem_size
-            impl.implementation.append(CODEWORD_RBRACKET)
+            if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
             prev_ret = ret
             continue
         
@@ -2743,7 +2745,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     ret[0],
                     CODEWORD_SEMICOLON
                 ])
-                #impl.is_parsing_a_try[-1] = None
+                impl.count_handled_tries[-1] += 1
             else:
                 if impl.is_parsing_a_defer: current_token.error("safety", "cannot fail within a 'defer' statement unless within a 'try'")
                 impl.implementation.extend([
@@ -2755,6 +2757,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     CodeWord("__temp_failure"),
                     CODEWORD_SEMICOLON
                 ])
+                impl.needs_failure_mode = op_token
             return await process_statement_operator(file, tokens, impl, pos, [], current_operator_priority)
         if is_lsp and message.file.is_main_file: print_lsp_string(message)
         text = message.text
@@ -2785,7 +2788,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 CodeWord(str(err_code)),
                 CODEWORD_SEMICOLON
             ])
-            #impl.is_parsing_a_try[-1] = None
+            impl.count_handled_tries[-1] += 1
         else:
             if impl.is_parsing_a_defer: current_token.error("safety", "cannot fail within a 'defer' statement unless within a 'try'")
             impl.implementation.extend([
@@ -2797,6 +2800,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 CodeWord("__temp_failure"),
                 CODEWORD_SEMICOLON
             ])
+            impl.needs_failure_mode = current_token
         return await process_statement_operator(file, tokens, impl, pos+1, [], current_operator_priority)
     if current=="true":
         tmp = create_temp()
@@ -2889,16 +2893,11 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             var = Variable(tmp, BOOL_TYPE)
             impl.vars[tmp] = var
             impl.is_parsing_a_try.append(var)
+            impl.count_handled_tries.append(0)
             pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
             pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
-            backward = len(impl.implementation)-1
-            found = False
-            while backward>0:
-                if impl.implementation[backward-1]==var and impl.implementation[backward].tostring()=="=":
-                    found = True
-                    break
-                backward -= 1
-            if not found: current_token.error("safety", "this 'try' statement does not guard against anything")
+            if impl.count_handled_tries[-1]==0: current_token.error("safety", "this 'try' statement does not guard against anything")
+            impl.count_handled_tries.pop()
             impl.is_parsing_a_try.pop()
             impl.implementation.extend([
                 var,

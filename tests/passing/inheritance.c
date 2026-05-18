@@ -5,8 +5,9 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp365v="\n";
-static const char* __temp_all_errcodes[30] = {"noerr",
+static const char* __temp_all_errcodes[31] = {"noerr",
 "error",
+"null pointer",
 "division by zero ",
 "modulo by zero ",
 "id subtraction would yield a negative",
@@ -394,12 +395,10 @@ static inline __attribute__((always_inline)) int sum__temp1225v(char** __temp131
   goto __temp_failure;
   }
   if(!__temp1234v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1235v__x,__temp1234v__,8);
-  if(!__temp1234v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1235v__y,__temp1234v__+8,8);
   add__temp148v(x,__temp1235v__x,&__temp1236v__);
   x=__temp1236v__;
@@ -408,12 +407,10 @@ static inline __attribute__((always_inline)) int sum__temp1225v(char** __temp131
   goto __temp_failure;
   }
   if(!__temp1237v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(&__temp1238v__x,__temp1237v__,8);
-  if(!__temp1237v__){
-  goto __temp_failure;
-  }
   memcpy(&__temp1238v__y,__temp1237v__+8,8);
   add__temp148v(y,__temp1238v__y,&__temp1239v__);
   y=__temp1239v__;
@@ -511,16 +508,11 @@ static inline __attribute__((always_inline)) int main__temp1245v() {
   __temp1260v=__temp1259v;
   Point3D__temp1242v(__temp1256v,__temp1258v,__temp1260v,&__temp1261v__plane__x,&__temp1261v__plane__y,&__temp1261v__z);
   if(!__temp1254v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1254v__,&__temp1261v__plane__x,8);
-  if(!__temp1254v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1254v__+8,&__temp1261v__plane__y,8);
-  if(!__temp1254v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1254v__+16,&__temp1261v__z,8);
   __temp1262v=1;
   __temp_errcode=mutget__temp529v(&points__unsafe_ptr,&points__unsafe_size,&points__unsafe_align,__temp1262v,&__temp1263v__);
@@ -535,16 +527,11 @@ static inline __attribute__((always_inline)) int main__temp1245v() {
   __temp1269v=__temp1268v;
   Point3D__temp1242v(__temp1265v,__temp1267v,__temp1269v,&__temp1270v__plane__x,&__temp1270v__plane__y,&__temp1270v__z);
   if(!__temp1263v__){
+  __temp_errcode=2;
   goto __temp_failure;
   }
   memcpy(__temp1263v__,&__temp1270v__plane__x,8);
-  if(!__temp1263v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1263v__+8,&__temp1270v__plane__y,8);
-  if(!__temp1263v__){
-  goto __temp_failure;
-  }
   memcpy(__temp1263v__+16,&__temp1270v__z,8);
   __temp1271v__unsafe_ptr=points__unsafe_ptr+0;
   __temp1271v__unsafe_size=points__unsafe_size;

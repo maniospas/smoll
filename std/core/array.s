@@ -114,6 +114,10 @@ def len(const any[] buffer)
 
 def alloc(nat size)
     doc "allocates a `char[]` buffer of given size"
+    doc "The allocation creates a failure if the operating system decides"
+    doc "that it would run out of memory. HOWEVER many operating system"
+    doc "allow allocation of virtual address space that is not available"
+    doc "and only terminate the program if it tries to access that."
     return alloc(mut char[], size)
 
 def list(mut any[] buffer)

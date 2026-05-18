@@ -4,10 +4,10 @@
 #include "std/extern/extern.h"
 int __temp_argc;
 char** __temp_argv;
-const char* const __temp1750v="https://www.google.com/";
-const char* const __temp1684v="curl -s -X GET \"";
 const char* const __temp1760v=" bytes downloaded\n";
+const char* const __temp1750v="https://www.google.com/";
 const char* const __temp1685v="\" -o ";
+const char* const __temp1684v="curl -s -X GET \"";
 const char* const __temp1720v=".tmp";
 static const char* __temp_all_errcodes[49] = {"noerr",
 "error",

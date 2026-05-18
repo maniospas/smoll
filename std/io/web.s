@@ -2,7 +2,7 @@ local import "std/core.s"
 local import "std/io/process.s" as process
 
 local def raw_get(str url, str path)
-    VM "open(memory.as_str($path__unsafe_ptr+$path__dat__pos, $path__dat__length), 'w').write(urllib.request.urlopen(urllib.request.Request(memory.as_str($url__unsafe_ptr+$url__dat__pos, $url__dat__length))).read().decode('utf-8'))"
+    VM "download(memory.as_str($url__unsafe_ptr+$url__dat__pos, $url__dat__length), memory.as_str($path__unsafe_ptr+$path__dat__pos, $path__dat__length))"
     prefix = "curl -s -X GET \""
     postfix = "\" -o "
     buf = bufpos alloc len(url)+len(path)+len(str prefix)+len(str postfix)+1

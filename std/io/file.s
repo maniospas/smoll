@@ -18,7 +18,8 @@ local import "std/core.s"
 local import "std/unsafe.s" as unsafe
 
 def read(str|cstr _path)
-    doc "loads a cstr path as a readable file"
+    doc "loads a path as a readable file"
+    doc "The file name is not maintained and must be tracked externally, if needed."
     path = unsafe_temporary_cstr _path
     {builtins:compiler:ptr unsafe_ptr = (char*)fopen(path, "r");}
     defer

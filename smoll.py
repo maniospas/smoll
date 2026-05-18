@@ -20,6 +20,7 @@
 
 
 import time
+import inspect
 import asyncio
 import os
 import sys
@@ -819,7 +820,7 @@ class ImplementedType:
             self.has_returned_once = True
             raise FastReturnException
     
-    def interpret(self, values: list[int|float], memory: MemoryEmulator, recursion_budget) -> list:
+    async def interpret(self, values: list[int|float], memory: MemoryEmulator, recursion_budget) -> list:
         #if not self.can_try_interpreter: self.at.error("interpreter", "'"+self.name+"' is not interpretable")
         
         # memory is basically a list of chars
@@ -833,21 +834,21 @@ class ImplementedType:
         #print(self.name, values)
         self.can_try_interpreter = False
 
-        def process_expression(impl: list["Token"], pos: int, end: int):
+        async def process_expression(impl: list["Token"], pos: int, end: int):
             if pos>end: return
             if impl[pos].tostring()=="(" and pos<end-3 and impl[pos+2].tostring()=="*" and impl[pos+3].tostring()==")":
                 pos += 4 # skip pointer casts
             if pos>end: return
             if impl[pos].tostring()=="(" and impl[end].tostring()==")":
-                return process_expression(impl,pos+1,end-1)
+                return await process_expression(impl,pos+1,end-1)
             expr_pos = pos
             if impl[pos].tostring()=="!":
-                condition = process_expression(impl,pos+1,end)
+                condition = await process_expression(impl,pos+1,end)
                 return 0 if condition else 1
             if impl[pos].tostring()=="*":
                 if pos<=end-3 and impl[pos+2].tostring()=="=":
-                    index = process_expression(impl, pos+1, pos+1)
-                    value = process_expression(impl, pos+3, end)
+                    index = await process_expression(impl, pos+1, pos+1)
+                    value = await process_expression(impl, pos+3, end)
                     # determine the pointee type to know write width
                     ptr_var = impl[pos+1].tostring()
                     if ptr_var in self.vars:
@@ -865,7 +866,7 @@ class ImplementedType:
                     return None
                 else:
                     ptr_var = impl[pos+1].tostring()
-                    index = process_expression(impl, pos+1, end)
+                    index = await process_expression(impl, pos+1, end)
                     if ptr_var in self.vars:
                         pointee_type = self.get_pointer_type(self.vars[ptr_var])
                         #if pointee_type is None or pointee_type==ANY_TYPE:
@@ -884,7 +885,7 @@ class ImplementedType:
             if impl[pos].tostring()=="__temp_all_errcodes":
                 assert impl[pos+1].tostring()=="["
                 assert impl[pos+3].tostring()=="]"
-                value = process_expression(impl, pos+2,pos+2)
+                value = await process_expression(impl, pos+2,pos+2)
                 assert isinstance(value, int)
                 k = err_code_list[value]
                 return memory.named_alloc_value(k, k[1:-1])
@@ -915,7 +916,7 @@ class ImplementedType:
                 return self.at.error("interpreter", "failed to parse '"+k+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
             elif impl[pos+1].tostring()=="=":
                 varname = impl[pos].tostring()
-                parsed_value: float|int = process_expression(impl, pos+2,end)
+                parsed_value: float|int = await process_expression(impl, pos+2,end)
                 if parsed_value is None: 
                     self.at.error("interpreter", "failed to parse right hand side at '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                 if varname in self.vars and self.vars[varname].type==FLOAT_TYPE: parsed_value = float(parsed_value)
@@ -923,8 +924,8 @@ class ImplementedType:
                 local_vars[varname] = parsed_value
             elif impl[pos+1].tostring()[0] in "+-*/<>=!^|&%":
                 op = impl[pos+1].tostring()
-                v1 = process_expression(impl,pos,pos)
-                v2 = process_expression(impl,pos+2,pos+2)
+                v1 = await process_expression(impl,pos,pos)
+                v2 = await process_expression(impl,pos+2,pos+2)
                 if op=="+": return v1+v2
                 if op=="-": return v1-v2
                 if op=="*": return v1*v2
@@ -976,7 +977,7 @@ class ImplementedType:
                             gathered_args_by_pointer.append(by_pointer)
                             last_arg_name = ""
                             by_pointer = False
-                        processed = process_expression(impl, prev_pos, pos-1)
+                        processed = await process_expression(impl, prev_pos, pos-1)
                         if processed is None:
                             if gathered_args: del gathered_args[-1]
                             if gathered_args_by_pointer: del gathered_args_by_pointer[-1]
@@ -1182,7 +1183,7 @@ class ImplementedType:
                 #inputs = [v for v in values]
                 if recursion_budget<=1 and self.force_not_inline:
                     self.at.error("interpreter", "recursion budget reached at: "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)]))
-                retcode = callee.interpret(values, memory, recursion_budget-1 if self.force_not_inline else recursion_budget) # may modify values
+                retcode = await callee.interpret(values, memory, recursion_budget-1 if self.force_not_inline else recursion_budget) # may modify values
                 #rets = ""
                 for ismut, value, k in zip(gathered_args_by_pointer, values, gathered_args):
                     if ismut: local_vars[k] = value
@@ -1194,7 +1195,7 @@ class ImplementedType:
             else:
                 self.at.error("interpreter", "failed to interpret C code: "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)]))
         
-        def process_block(impl: list["Token"], pos: int, npos: int):
+        async def process_block(impl: list["Token"], pos: int, npos: int):
             # returns breaking variable or continue or break
             prev_pos: int = pos
             while pos<=npos:
@@ -1222,9 +1223,9 @@ class ImplementedType:
                         if impl[endpos].tostring()=="{": depth += 1
                         if impl[endpos].tostring()=="}": depth -= 1
                     while True:
-                        condition = process_expression(impl, cond_start, cond_end)
+                        condition = await process_expression(impl, cond_start, cond_end)
                         if not condition: break
-                        ret = process_block(impl, pos+1, endpos-1)
+                        ret = await process_block(impl, pos+1, endpos-1)
                         if ret=="break": break
                         if ret=="return" or ret=="failure": return
                     pos = endpos+1
@@ -1239,7 +1240,7 @@ class ImplementedType:
                         if endpos>npos: self.at.error("malformed smollC", "Unclosed if condition.")
                         if impl[endpos].tostring()=="(": depth += 1
                         if impl[endpos].tostring()==")": depth -= 1
-                    condition = process_expression(impl, pos+2, endpos-1)
+                    condition = await process_expression(impl, pos+2, endpos-1)
                     assert condition is not None
                     pos = endpos+1
                     if pos>npos: self.at.error("malformed smollC", "Missing 'if' code body.")
@@ -1252,7 +1253,7 @@ class ImplementedType:
                         if impl[endpos].tostring()=="{": depth += 1
                         if impl[endpos].tostring()=="}": depth -= 1
                     if condition:
-                        ret = process_block(impl, pos+1, endpos-1)
+                        ret = await process_block(impl, pos+1, endpos-1)
                         if ret: return ret
                     pos = endpos+1
                     if endpos<npos and impl[pos].tostring()=="else":
@@ -1267,7 +1268,7 @@ class ImplementedType:
                             if impl[endpos].tostring()=="{": depth += 1
                             if impl[endpos].tostring()=="}": depth -= 1
                         if not condition:
-                            ret = process_block(impl, pos+1, endpos-1)
+                            ret = await process_block(impl, pos+1, endpos-1)
                             if ret: return ret
                         pos = endpos+1
                     prev_pos = pos
@@ -1277,7 +1278,7 @@ class ImplementedType:
                         if impl[pos-1].tostring() in "__temp_return": return "return"
                         if impl[pos-1].tostring() == "__temp_failure":  return "failure"
                         self.at.error("interpreter", "cannot goto arbitrary C position 'goto "+impl[pos-1].tostring()+"'")
-                    process_expression(impl, prev_pos, pos-1)
+                    await process_expression(impl, prev_pos, pos-1)
                     prev_pos = pos+1
                 pos += 1
 
@@ -1290,15 +1291,17 @@ class ImplementedType:
                     else: value = str(int(values[pos]))
                     call_text = call_text.replace("$"+arg, value)
             evaluated = eval(call_text)
+            if inspect.isawaitable(evaluated):
+                evaluated = await evaluated
             if not isinstance(evaluated, list): evaluated = []
             if len(evaluated)!=len(args)-input_args:
                 self.at.error("interpreter", "the VM command returned a different number of values than the original")
             values[input_args:] = evaluated
             ret = None
         else: 
-            ret = process_block(self.implementation, 0, len(self.implementation)-1)
+            ret = await process_block(self.implementation, 0, len(self.implementation)-1)
             if ret=="failure":
-                for defer in reversed(self.returned_defers): process_block(defer, 0, len(defer)-1)
+                for defer in reversed(self.returned_defers): await process_block(defer, 0, len(defer)-1)
             elif ret=="return" or not ret:
                 values = _arg_values
                 for pos in range(len(values)):
@@ -1312,7 +1315,7 @@ class ImplementedType:
                             test_value = memory.named_alloc_value(args[pos], cstr_global[1:-1])
                         else: test_value = 0
                     values[pos] = test_value
-            for defer in reversed(self.defers): process_block(defer, 0, len(defer)-1)
+            for defer in reversed(self.defers): await process_block(defer, 0, len(defer)-1)
         self.can_try_interpreter = True
         return local_vars.get("__temp_errcode", 0)
             
@@ -4013,6 +4016,28 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
         i += 1
     return file, processed_tokens
 
+async def download(url: str, filepath: str):
+    if is_pyodide:
+        import asyncio
+        from pyodide.http import pyfetch
+        import base64, os
+        cached = _js_cache_get(url)
+        if cached is not None:
+            data = base64.b64decode(cached)
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            with open(filepath, "wb") as f: f.write(data)
+            return
+        response = await pyfetch(url)
+        if response.status != 200: raise RuntimeError( f"Failed to fetch {url}: HTTP {response.status}")
+        data = await response.bytes()
+        _js_cache_set(url, base64.b64encode(data).decode())
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, "wb") as f: f.write(data)
+        return
+    urllib.request.urlretrieve(url, filepath)
+    return
+
+
 async def download_with_progress(url: str, filepath: str, message: str):
     if is_pyodide:
         import asyncio
@@ -4312,7 +4337,7 @@ async def main():
         exe_path = src_path.with_suffix("")
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
-            main_type.variations[0].interpret([], MemoryEmulator(1024*vm_memory_kb), recursion_budget=vm_recursion_budget) # emulate 16kb memory
+            await main_type.variations[0].interpret([], MemoryEmulator(1024*vm_memory_kb), recursion_budget=vm_recursion_budget) # emulate 16kb memory
         else:
             write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
             if not args.build and chosen_compiler!="none":

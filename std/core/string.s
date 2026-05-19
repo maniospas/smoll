@@ -27,23 +27,23 @@ local def strdat(nat pos, nat length, char first)
     doc "string data without the buffer storage"
     return (pos, length, first)
 
-def str(const char ptr unsafe_ptr, strdat dat)
+def str(char ptr unsafe_ptr, strdat dat)
     doc "a string residing on a buffer"
     return class(unsafe_ptr, dat)
 
-def str(const char ptr unsafe_ptr, nat pos, nat length)
+def str(char ptr unsafe_ptr, nat pos, nat length)
     doc "a string residing on a buffer"
     {if(length){builtins:compiler:ptr first_pos = unsafe_ptr+pos;builtins:char first = *first_pos;}} # properly zero-initialized otherwise
     return str(unsafe_ptr, pos, length, first)
 
-def str(const char[] buf, strdat dat)
+def str(char[] buf, strdat dat)
     doc "a string residing on a buffer"
     unsafe_ptr = buf.unsafe_ptr
     if buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
     if buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
     return str(unsafe_ptr, dat)
 
-def str(const char[] buf, nat|blank length)
+def str(char[] buf, nat|blank length)
     doc "a string residing on the full breadth of a buffer"
     if length is blank
         length = len buf
@@ -55,7 +55,7 @@ def str(str other)
     doc "tautology function for strings"
     return other
 
-def str(const char[] buf, nat pos, nat length)
+def str(char[] buf, nat pos, nat length)
     doc "a string residing on a buffer that automatically detects the first character"
     if length!=0 first = buf[pos]  # properly zero-initialized otherwise
     return str(buf, pos, length, first)
@@ -134,17 +134,17 @@ def temporary_cstr(cstr cstr)
     str = str cstr
     return (cstr, str)
 
-def bufpos(any[] buf)
+def bufpos(edit any[] buf)
     doc "a buffer and mutable position pair"
     doc "The position starts from 0. This structure is often used in leau of pointers"
     doc "to maintain stable references within specified storage buffers."
     pos = mut 0
     return (buf, pos)
 
-def strbufpos(char[] buf)
+def strbufpos(edit char[] buf)
     return bufpos buf
 
-def copy(char[] buf, mut nat pos, char character, nat|blank by)
+def copy(edit char[] buf, mut nat pos, char character, nat|blank by)
     if by is blank
         by = 1
     if pos+by>len buf fail "character copy does not fit on buffer"
@@ -157,7 +157,7 @@ def endpos(const str s)
     doc "the end position of a string in its buffer"
     return s.dat.pos+s.dat.length
 
-def copy(ref char[] buf, mut nat pos, str|cstr _other)
+def copy(edit char[] buf, mut nat pos, str|cstr _other)
     doc "copy a string"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -170,7 +170,7 @@ def copy(ref char[] buf, mut nat pos, str|cstr _other)
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)
 
-def copy_null_terminated(ref char[] buf, mut nat pos, str|cstr _other)
+def copy_null_terminated(edit char[] buf, mut nat pos, str|cstr _other)
     doc "copy a string while adding null termination"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -201,7 +201,7 @@ def str(charlist li)
     doc "declare a string on a list's char[] buffer"
     return str li.buffer
 
-def copy(charlist li, str|cstr _other)
+def copy(edit charlist li, str|cstr _other)
     doc "copy a string"
     doc "Constructs the copy on a buffer managed by a list."
     doc "The list may automatically resize its managed buffer to fit the new string."

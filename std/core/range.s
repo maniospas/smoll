@@ -24,7 +24,7 @@ def range(nat|blank _from, nat to)
     from = mut _from
     return (from, to)
 
-def next(range r)
+def next(edit range r)
     if r.from>=r.to
         fail "iteration end"
     ret = const r.from

@@ -12,7 +12,7 @@ def print(Person p)
   print "-------------------"
 
 def test()
-  people = (mut Person[]).alloc 4
+  people = Person[].alloc 4
   buf = bufpos char[].alloc KB 4
   people[0] = Person(0, buf.copy "it's a me", buf.copy "mario")
   print people[0]

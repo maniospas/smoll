@@ -8,7 +8,7 @@ def circular(any[] buf, mut nat pos, nat length)
 local def vecpos(float[] buf, mut nat pos)
 local def vec_allocator = new|vecpos|circular
 
-def circular(float[] buf, mut nat|blank pos, nat|blank length)
+def circular(mut float[] buf, mut nat|blank pos, nat|blank length)
     doc "circular buffer"
     doc "Is used as allocator"
     if pos is nat and length is nat
@@ -24,13 +24,13 @@ def circular(float[] buf, mut nat|blank pos, nat|blank length)
 local def vec(float ptr unsafe_ptr, nat pos, nat length)
     return class(unsafe_ptr, pos, length)
 
-def vec(effect new allocator, nat length)
+def vec(effect edit new allocator, nat length)
     doc "vector on a new buffer"
     doc "Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer."
-    buf = (mut float[]).alloc(length)
+    buf = float[].alloc length
     return vec(buf.unsafe_ptr, 0, length)
 
-def vec(effect vecpos allocator, nat length)
+def vec(effect edit vecpos allocator, nat length)
     doc "vector on an existing buffer"
     doc "Has the provided length. Can grab the buffer and mutable position allocator as an effect, so that only the length is provided."
     if allocator.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
@@ -40,7 +40,7 @@ def vec(effect vecpos allocator, nat length)
     allocator.pos = allocator.pos+length
     return vec(allocator.buf.unsafe_ptr, start, length)
 
-def vec(effect vec_allocator&circular allocator, nat length)
+def vec(effect edit vec_allocator&circular allocator, nat length)
     doc "vector on an existing buffer"
     doc "Has the provided length. Can grab a circular buffer allocator as an effect, so that only the length is provided."
     if allocator.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
@@ -49,7 +49,7 @@ def vec(effect vec_allocator&circular allocator, nat length)
     start = mut allocator.pos
     allocator.pos = allocator.pos+length
     if allocator.pos>=allocator.length
-        allocator.pos = length
+        allocator.pos = length+0
         start = 0
     return vec(allocator.buf.unsafe_ptr, start, length)
 
@@ -65,7 +65,7 @@ def len(vec v)
     doc "vectot length"
     return v.length
 
-def mutget(ref vec v, nat i)
+def mutget(vec v, nat i)
     doc "modify a vector element at given position"
     unsafe_return unsafe_mut v.unsafe_ptr+8*(i+v.pos)
 
@@ -79,7 +79,7 @@ local def at(float number, nat i)
 local def at(vec v, nat i)
     return v[i]
 
-def add(effect vec_allocator allocator, vec v1, vec|float v2)
+def add(effect edit vec_allocator allocator, vec v1, vec|float v2)
     doc "vector addition"
     doc "Grabs an allocator for the result as an effect."
     if v2 is vec and v1.length!=v2.length
@@ -91,12 +91,12 @@ def add(effect vec_allocator allocator, vec v1, vec|float v2)
         v[i] = v1[i]+v2.at i
     return v
 
-def add(effect vec_allocator allocator, float v1, vec v2)
+def add(effect edit vec_allocator allocator, float v1, vec v2)
     doc "vector addition"
     doc "Grabs an allocator for the result as an effect."
     return v2+v1
 
-def sub(effect vec_allocator allocator, vec v1, vec|float v2)
+def sub(effect edit vec_allocator allocator, vec v1, vec|float v2)
     doc "vector substraction"
     doc "Grabs an allocator for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
@@ -107,7 +107,7 @@ def sub(effect vec_allocator allocator, vec v1, vec|float v2)
         v[i] = v1[i]-v2.at i
     return v
 
-def sub(effect vec_allocator allocator, float v1, vec v2)
+def sub(effect edit vec_allocator allocator, float v1, vec v2)
     doc "vector substraction"
     doc "Grabs an allocator for the result as an effect."
     v = vec v2.length
@@ -116,7 +116,7 @@ def sub(effect vec_allocator allocator, float v1, vec v2)
         v[i] = v1-v2[i]
     return v
 
-def mul(effect vec_allocator allocator, vec v1, vec|float v2)
+def mul(effect edit vec_allocator allocator, vec v1, vec|float v2)
     doc "vector multiplication"
     doc "Grabs an allocator for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
@@ -127,12 +127,12 @@ def mul(effect vec_allocator allocator, vec v1, vec|float v2)
         v[i] = v1[i]*v2.at i
     return v
 
-def mul(effect vec_allocator allocator, float v1, vec v2)
+def mul(effect edit vec_allocator allocator, float v1, vec v2)
     doc "vector multiplication"
     doc "Grabs an allocator for the result as an effect."
     return v2*v1
 
-def div(effect vec_allocator allocator, vec v1, vec|float v2)
+def div(effect edit vec_allocator allocator, vec v1, vec|float v2)
     doc "vector division"
     doc "Grabs an allocator for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
@@ -144,7 +144,7 @@ def div(effect vec_allocator allocator, vec v1, vec|float v2)
         v[i] = v1[i]/v2.at i
     return v
 
-def div(effect vec_allocator allocator, float v1, vec v2)
+def div(effect edit vec_allocator allocator, float v1, vec v2)
     doc "vector division"
     doc "Grabs an allocator for the result as an effect."
     v = vec v2.length

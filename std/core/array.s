@@ -33,8 +33,7 @@ def nat(nat16 x)
     {builtins:nat value = x;}
     return value
 
-
-def alloc(any[] buffer, nat|blank size)
+def alloc(edit any[] buffer, nat|blank size)
     doc "allocates a buffer"
     doc "Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,"
     doc "as it never reallocates an allocation. For convenience for usage within loops, allocation"
@@ -45,7 +44,7 @@ def alloc(any[] buffer, nat|blank size)
         doc "This version allocates a buffer of ONE element, which can be used for stable indirection."
         size = 1
     defer
-        if exists buffer.unsafe_ptr
+        if buffer.unsafe_size!=0
             buffer.unsafe_size = 0
             ptr = buffer.unsafe_ptr
             buffer.unsafe_ptr.unsafe:free()
@@ -61,17 +60,13 @@ def alloc(any[] buffer, nat|blank size)
     buffer.unsafe_ptr.unsafe:zero(0, bytes)
     return mut buffer
 
-def malloc(mut any[] buffer, nat size)
-    buffer = alloc(buffer,size)
-    return buffer
-
 def resize(mut any[] buffer, nat size)
     doc "resize the buffer"
     doc "This does nothing if the previous size is the same or less, frees the buffer if new size is zero."
     doc "If old size was zero, an error is created instead of allocating so that this does not leak"
     doc "resources."
     if buffer.unsafe_size>=size 
-        unsafe_return buffer
+        return buffer
     if buffer.unsafe_size==0 fail "cannot resize an unallocated or freed buffer"
     #if buffer.unsafe_offset.nat()!=0 fail "cannot resize a buffer with offset"
     prev_bytes = buffer.unsafe_size*buffer.unsafe_align.nat()
@@ -80,38 +75,37 @@ def resize(mut any[] buffer, nat size)
     buffer.unsafe_ptr = unsafe_mut buffer.unsafe_ptr.unsafe:realloc(bytes)#.compiler:attach_type(_buffer__unsafe_ptr)
     if prev_bytes<bytes
         buffer.unsafe_ptr.unsafe:zero(prev_bytes, bytes)
-    unsafe_return buffer
+    return buffer
 
-def last(const any[] buffer)
+def last(any[] buffer)
     doc "get a pointer to the last buffer element"
     if 0==buffer.unsafe_size fail "out of bounds"
     unsafe_return buffer.unsafe_ptr.unsafe:add((buffer.unsafe_size-1)*buffer.unsafe_align.nat())
 
-def mutlast(ref any[] buffer)
+def mutlast(edit any[] buffer)
     doc "get a mutable pointer to the last buffer element"
     if 0==buffer.unsafe_size fail "out of bounds"
     unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe:add((buffer.unsafe_size-1)*buffer.unsafe_align.nat())
     
-def mutget(ref any[] buffer, nat i)
+def mutget(edit any[] buffer, nat i)
     doc "get a mutable pointer to a buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
     unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe:add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
     
-def get(const any[] buffer, nat i)
+def get(any[] buffer, nat i)
     doc "get a pointer to a buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
     unsafe_return buffer.unsafe_ptr.unsafe:add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
 
-def len(const any[] buffer)
+def len(any[] buffer)
     doc "the number of buffer elements"
     return buffer.unsafe_size
 
-def list(any[] buffer)
+def list(edit any[] _buffer)
     doc "list of buffer"
     doc "List defined over a mutable buffer that is automatically managed and resized."
     doc "A capacity is maintained so that resizes are not performed too frequently."
-    if 0==len buffer
-        buffer = buffer.alloc 1
+    buffer = _buffer.alloc 1
     length = mut len buffer
     return class(buffer, length)
 
@@ -120,13 +114,13 @@ def get(list l, nat pos)
     if pos>=l.length fail "out of bounds"
     unsafe_return get(l.buffer,pos)
 
-def mutget(ref list l, nat pos)
+def mutget(edit list l, nat pos)
     doc "get a mutable list element pointer"
     if pos>=l.length fail "out of bounds"
     ret = l.buffer.mutget pos
     unsafe_return ret
 
-def push(list l)
+def push(edit list l)
     doc "get a mutable pointer to a new list element"
     doc "Grows the list and returns a mutable pointer to the newlly created last element."
     prev_length = l.length

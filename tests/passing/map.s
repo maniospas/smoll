@@ -4,7 +4,7 @@ import "std/map.s"
 def strstrmap(nat size)
     return strmap alloc(mut str[], size)
 
-def test(ref strbufpos buf)
+def test(edit strbufpos buf)
     map = ref strmap alloc(mut str[], 128)
     map["hello"] = buf.copy str "hello world!"
     map["manio"] = buf.copy str "it's a me, manio."

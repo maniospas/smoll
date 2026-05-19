@@ -2,7 +2,7 @@ import "std/core.s"
 import "std/mini.s" as mini
 
 
-def concat(ref mini:str[] buff)
+def concat(mini:str[] buff)
   mem = bufpos ref char[].alloc KB 4
   iter = range len buff
   start = mem.pos

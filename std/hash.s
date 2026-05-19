@@ -51,7 +51,7 @@ def is_zero(str k)
 def is_zero(nat k)
     return 0==k
 
-def find(const robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
+def find(robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
     k = raw _k
     if is_zero k
         return 0
@@ -70,7 +70,7 @@ def find(const robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
             return idx
     fail "index not found"
 
-def at(robinhood_entry[] data, cstr|str|nat _k)
+def at(edit robinhood_entry[] data, cstr|str|nat _k)
     k = unsafe_mut raw _k
     if is_zero k
         return 0

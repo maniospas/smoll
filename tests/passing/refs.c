@@ -40,36 +40,36 @@ static const char* __temp_all_errcodes[33] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void false__temp10v(int* __temp1254v) {
+static inline __attribute__((always_inline)) void false__temp10v(int* __temp1253v) {
   int value=0;
-  *__temp1254v=value;
+  *__temp1253v=value;
 }
 
-static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0, int* __temp1255v) {
+static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0, int* __temp1254v) {
   int __temp36v__=0;
   false__temp10v(&__temp36v__);
   goto __temp_return;
   __temp_return:
-  *__temp1255v=__temp36v__;
+  *__temp1254v=__temp36v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp1256v) {
+static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp1255v) {
   int __temp94v=0;
   int __temp95v__=0;
   not__temp35v(__temp94v,&__temp95v__);
   goto __temp_return;
   __temp_return:
-  *__temp1256v=__temp95v__;
+  *__temp1255v=__temp95v__;
 }
 
-static inline __attribute__((always_inline)) void add__temp170v(uint64_t x, uint64_t y, uint64_t* __temp1257v) {
+static inline __attribute__((always_inline)) void add__temp170v(uint64_t x, uint64_t y, uint64_t* __temp1256v) {
   int __temp171v__=0;
   uint64_t z=0;
   is_different__temp93v(x,y,&__temp171v__);
   z=x+y;
   goto __temp_return;
   __temp_return:
-  *__temp1257v=z;
+  *__temp1256v=z;
 }
 
 static inline __attribute__((always_inline)) void print__temp376v(uint64_t value) {
@@ -79,21 +79,21 @@ static inline __attribute__((always_inline)) void print__temp376v(uint64_t value
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__temp1248v() {
+static inline __attribute__((always_inline)) void main__temp1247v() {
+  uint64_t __temp1248v=0;
   uint64_t __temp1249v=0;
-  uint64_t __temp1250v=0;
   uint64_t x=0;
   uint64_t y=0;
   uint64_t z=0;
-  uint64_t __temp1251v=0;
-  uint64_t __temp1252v__=0;
-  __temp1249v=1;
-  __temp1250v=__temp1249v;
+  uint64_t __temp1250v=0;
+  uint64_t __temp1251v__=0;
+  __temp1248v=1;
+  __temp1249v=__temp1248v;
+  x=__temp1249v;
+  __temp1250v=2;
   x=__temp1250v;
-  __temp1251v=2;
-  x=__temp1251v;
-  add__temp170v(x,x,&__temp1252v__);
-  print__temp376v(__temp1252v__);
+  add__temp170v(x,x,&__temp1251v__);
+  print__temp376v(__temp1251v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1248v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1247v();return 0;}

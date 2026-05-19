@@ -441,6 +441,7 @@ def signature_like(vars: list[Variable], impl=None):
         elif type.is_buffer_of: 
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
             elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "const "
+            elif any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "edit "
             element_size = type.is_buffer_of.memory_size()
             ret += type.is_buffer_of.name+"[]"+arg_name+" {element size "+(str(element_size) if element_size else "?")+"}"
             if impl:
@@ -767,7 +768,9 @@ class ImplementedType:
         
         if value[0].stabilized_name() in self.required_accompany: self.required_accompany[existing.stabilized_name()] = self.required_accompany[value[0].stabilized_name()]
         self.dependent_assignments[existing.name] = value[0].stabilized_name()
-        if not already_assigned and existing.type.builtin and (existing._references is None or not perform_immutability_checks): self.implementation.extend([existing, CODEWORD_EQUALS, value[0], CODEWORD_SEMICOLON])
+        if not already_assigned and existing.type.builtin and (existing._references is None or not perform_immutability_checks): 
+            if existing.name in self.refargs: self.refargs.remove(existing.name)
+            self.implementation.extend([existing, CODEWORD_EQUALS, value[0], CODEWORD_SEMICOLON])
         # if self.name=="push" and existing.type.builtin:
         #     self.set_pointer_depedency(existing, value[0])
         #     print(self.follow_pointer_dependency(existing).name)
@@ -3751,7 +3754,7 @@ def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception
     pos += 1
     effect_names: list[str] = list()
     while peek_text(tokens, pos)!=")":
-        arg_immutability = 1
+        arg_immutability = -1
         is_effect = False
         if get(tokens, pos).text=="effect":
             if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "**effect argument**\n\nDeclares that the provided argument should be autonomously gathered from the calling context's variables.")
@@ -3766,6 +3769,10 @@ def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception
             if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "**const argument**\n\nNot only is it immutable, but also guarantees that it will allow no attached memory or other resource modifications.")
             pos += 1
             arg_immutability = -1
+        elif get(tokens, pos).text=="edit":
+            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "**edit**\n\nCan edit mutable fields ONLY of the argument - less permissive than 'mut'.")
+            pos += 1
+            arg_immutability = 1
         elif get(tokens, pos).text=="ref":
             if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_decorator(get(tokens,pos), "**reference argument**\n\nIt allows attached memory or other resource modifications, but promises to not change which resource instance it points to.")
             pos += 1
@@ -3849,7 +3856,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                     elif immutable==-1: impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
                     elif immutable==-2:
                         impl.vars[ret_name] = impl.vars[ret_name].stable_copy()
-                        impl.refargs.append(ret_name)
+                    impl.refargs.append(ret_name) # start with everything as refarg and we will remove during assignment
                     impl.args.append(ret_name)
                     if impl.vars[ret_name].type==POINTER_TYPE:
                         found_ptr_type = arg_type.get_pointer_type(arg_type.vars[ret])

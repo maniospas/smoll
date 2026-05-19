@@ -3,7 +3,7 @@ import "std/core.s"
 def Point2D(float x, float y)
     return (x,y)
 
-def sum(ref Point2D[] v)
+def sum(Point2D[] v)
     x = mut 0.0
     y = mut 0.0
     i = mut 0 
@@ -18,7 +18,7 @@ def Point3D(float x, float y, float z)
     return (plane,class(z))
 
 def main()
-    points = (mut Point3D[]).alloc 10
+    points = Point3D[].alloc 10
     points[0] = Point3D(mut 1.0,mut 2.0,mut 3.0)
     points[1] = Point3D(mut 1.0,mut 2.0,mut 3.0)
     sums = sum points@plane

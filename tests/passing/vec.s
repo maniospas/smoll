@@ -2,8 +2,8 @@ import "std/core.s"
 import "std/vec.s"
 
 def safe_main()
-    allocator  = ref (mut float[]).alloc(200).circular() # effects can grab it by name
-    allocator2 = ref (mut float[]).alloc(200).circular() # useless 
+    allocator  = ref float[].alloc(200).circular() # effects can grab it by name
+    allocator2 = ref float[].alloc(200).circular() # useless 
     v1 = new().vec 10 # force our own allocator
     v2 = new().vec 10
     v1[0] = 1.0

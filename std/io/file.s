@@ -32,7 +32,7 @@ def write(str|cstr _path)
     doc "creates a new file at cstr path as a writable object, fails if it already exists"
     {builtins:compiler:ptr unsafe_ptr = (char*)fopen(path, "wx+");}
     defer
-        {if(unsafe_ptr) fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}
+        {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
     if not exists unsafe_ptr fail "failed to create file"
     return class(unsafe_mut unsafe_ptr)
 
@@ -48,15 +48,15 @@ def terminal()
 
 def File = read|write|terminal
 
-def to_start(File f)
+def to_start(edit File f)
     if not exists f.unsafe_ptr fail "failed to move to start of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_SET);}
 
-def to_end(File f)
+def to_end(edit File f)
     if not exists f.unsafe_ptr fail "failed to move to end of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_END);}
 
-def chunk(ref char[] buf, mut nat|blank pos, ref File f)
+def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     if pos is blank
         pos = mut 0
     if not exists buf.unsafe_ptr fail "not open file"
@@ -68,7 +68,7 @@ def chunk(ref char[] buf, mut nat|blank pos, ref File f)
     pos = pos+bytes_read
     return str(buf, prev_pos, bytes_read)
     
-def line(ref char[] buf, mut nat|blank pos, ref File f)
+def line(edit char[] buf, mut nat|blank pos, edit File f)
     if pos is blank
         pos = mut 0
     if not exists buf.unsafe_ptr
@@ -83,13 +83,13 @@ def line(ref char[] buf, mut nat|blank pos, ref File f)
     pos = pos+bytes_read
     return str(buf, prev_pos, bytes_read)
 
-def print(terminal|write f, str text)
+def print(edit terminal|write f, str text)
     doc "writes a string to a write file"
     if not exists f.unsafe_ptr fail "failed to write to closed file"
     {builtins:nat bytes_written = fwrite((char*)text__unsafe_ptr, 1, text__unsafe_size, (FILE*)f__unsafe_ptr);}
     if bytes_written!=len text fail "failed to write to file"
 
-def print(ref terminal|write f, cstr text)
+def print(edit terminal|write f, cstr text)
     doc "writes a cstr to a write file"
     if not exists f.unsafe_ptr fail "failed to write to closed file"
     {fwrite(text, 1, strlen(text), (FILE*)f__unsafe_ptr);}

@@ -13,7 +13,7 @@ def print(Person p)
 
 def test()
   people = (mut Person[]).alloc 4
-  buf = bufpos alloc KB 4
+  buf = bufpos char[].alloc KB 4
   people[0] = Person(0, buf.copy "it's a me", buf.copy "mario")
   print people[0]
   dat = people@name@dat # only the data segments of strings

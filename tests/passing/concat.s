@@ -3,7 +3,7 @@ import "std/mini.s" as mini
 
 
 def concat(ref mini:str[] buff)
-  mem = bufpos ref alloc KB 4
+  mem = bufpos ref char[].alloc KB 4
   iter = range len buff
   start = mem.pos
   while try i=next iter

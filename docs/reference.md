@@ -755,15 +755,15 @@ def print(any[] buffer)
     print(len buffer, " elements in buffer\n")
 
 def main()
-    x = mut float[]
+    x = float[]
     print(x)
 ```
 
 One of the most important buffer features is the `alloc` function to
 allocate and zero-initialize a specific number of elements. 
-This returns the buffer itself to enable initialization per patterns like
-`buf = (mut float[]).alloc 4`. Allocate a buffer of chars
-by not providing the mutable buffer declaration per `buf = alloc 4`.
+This returns the buffer itself as a mutable to enable initialization 
+per patterns like `buf = float[].alloc 4`. Buffer internals are mutable,
+which means that allocation modifies the original empty buffer too (see below).
 Make use of the `KB`, `MB`, `GB` functions to quickly size allocations.
 
 Allocation will create an error if it tries to change the number of
@@ -774,7 +774,8 @@ this is covered in [stable references](#stable-references).
 A second important feature is the element access operator `buffer[pos]`,
 which can be used to extract an object stored at a specific position. 
 In general, this operator is implemented by overloading the `get` 
-and `mutget` functions, though beware that details do involve pointers. 
+and `mutget` functions, though beware that details do involve pointers
+and tackled in the next section. 
 Use `buffer[pos] = value` to copy some data on a buffer's element.
 
 All buffer indexes are of type `nat`, which represents natural numbers 
@@ -784,17 +785,15 @@ All buffer indexes are of type `nat`, which represents natural numbers
 import "std/core.s"
 
 def main()
-    buf = mut float[]
-    buf.alloc(10) # allocate 10 elements
-    print buf[0]  # prints 0, as buffers are zero-initialized
+    buf = float[]
+    buf.alloc 10 # allocate 10 elements
+    print buf[0] # prints 0, as buffers are zero-initialized
     buf[1] = 1.0
     print buf[1]
 ```
 
 Declare a buffer as `const` to disallow any modifications to its
-contents. Normally, buffers merely prevent resizing or allocation
-(unless they are `mut`) by "locking" them underneath a constant
-safeguard.
+contents. This further prevents resizing or reallocation.
 
 ## pointers
 
@@ -836,7 +835,7 @@ Below is an example.
 import "std/core.s"
 
 def main()
-    buf = (mut float[]).alloc 1
+    buf = float[].alloc 1
     element = buf[0]&&
     print element.. # prints 0 as buffers are zero-initialized
     element << 1.0
@@ -870,7 +869,6 @@ an example:
 
 ```python
 import "std/core.s"
-import "std/array.s"
 
 def Point2D(float x, float y)
     return class(x,y)
@@ -880,7 +878,7 @@ def Point3D(float x, float y, float z)
     return (plane,class(z))
 
 def main()
-    points = (mut Point3D[]).alloc(10)
+    points = Point3D[].alloc 10
     points[0] = Point3D(1.0,2.0,3.0)
     plane = points@plane # can move this around
     print plane@x[0]
@@ -1040,10 +1038,9 @@ an error is intercepted. Below is an example that safeguards against failing all
 
 ```python
 import "std/core.s"
-import "std/array.s"
 
 def vector(nat size)
-    return (mut float[]).alloc size
+    return float[].alloc size
 
 def main()
     if not try v = vector pow(1024,6)
@@ -1262,7 +1259,7 @@ rec wooo(effect range recursion_safety, nat i)
     return wooo(i+1)
 
 def main()
-    recursion_safety = range(1000)
+    recursion_safety = range 14 # recursive depth limit in playground
     try wooo 0
     if try error = compiler:catch()
         print cstr error # prints 'iteration end'
@@ -1286,7 +1283,7 @@ one place while returning a pointer to the last element.
 import "std/core.s"
 
 def main()
-    li = list ref mut float[]
+    li = ref list mut float[]
     (push li) << 0.1
     (push li) << 0.1
     (push li) << 0.1
@@ -1349,7 +1346,7 @@ on an erroneous program.
 import "std/core.s"
 
 def main()
-    buf = list ref mut char[]
+    buf = ref list mut char[]
     s1 = buf.copy "hello world!" # would have been invalidated if we did not use `ref`
     s2 = buf.copy "hello world!"
     print s1
@@ -1373,7 +1370,7 @@ import "std/core.s"
 import "std/map.s"
 
 def main()
-    map = strmap alloc(mut str[], 128)
+    map = strmap str[].alloc 128
     map["hello"] = str "hello world!"
     map["manio"] = str "it's a me, manio."
     print map["hello"]
@@ -1404,7 +1401,7 @@ import "std/io.s":file as file
 
 def main()
     f = file:read "README.md"
-    mem = alloc KB 4 # max 4 KB chunk size, on char[] by default
+    mem = char[].alloc KB 4 # max 4 KB chunk size, on char[] by default
     while try line = file:line(mem, f)
         print("|", "")
         print(line, "")
@@ -1433,7 +1430,7 @@ import "std/io.s":dir as dir
 
 def main()
     dir = mut dir:read "."
-    buf = alloc 128
+    buf = char[].alloc 128
     while try entry=dir:entry dir
         print(entry, " ")
         if dir:is_file entry
@@ -1464,7 +1461,7 @@ import "std/io.s":process as proc
 
 def main()
     process = proc:process "ls"
-    buffer = bufpos alloc KB 4 # example with growing position
+    buffer = bufpos char[].alloc KB 4 # example with growing position
     while try line=buffer.proc:line process
         print line
 ```
@@ -1537,7 +1534,7 @@ import "std/core.s"
 import "std/mini.s" as mini
 
 def concat(mini:str[] buff)
-    mem = bufpos alloc KB 4
+    mem = bufpos char[].alloc KB 4
     iter = range len buff
     start = mem.pos
     while try i=next iter
@@ -1546,7 +1543,7 @@ def concat(mini:str[] buff)
     return str(mem.buf,start,mem.pos)
 
 def main()
-    buff = (mut mini:str[]).alloc 6
+    buff = mini:str[].alloc 6
     debug:print buff # print the buffer type during compilation
     buff[0] = mini:str "hi"
     buff[1] = mini:str "my"
@@ -1569,8 +1566,8 @@ import "std/core.s"
 import "std/vec.s"
 
 def safe_main()
-    allocator  = ref (mut float[]).alloc(200).circular() # used by vector operation effects
-    allocator2 = ref (mut float[]).alloc(200).circular() # useless 
+    allocator  = ref circular float[].alloc 200 # used by vector operation effects
+    allocator2 = ref circular float[].alloc 200 # useless 
     v1 = vec 10
     v2 = vec 10
     v1[0] = 1.0

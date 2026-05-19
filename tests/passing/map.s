@@ -14,7 +14,7 @@ def test(ref strbufpos buf)
     return map
 
 def test2()
-    buf = bufpos alloc KB 4
+    buf = bufpos char[].alloc KB 4
     map = test(buf)
     return (map, buf)
 

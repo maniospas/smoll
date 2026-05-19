@@ -10,11 +10,11 @@ def run(cstr|str command)
 
 def main()
     path = "./tests/passing/"
-    bp = bufpos alloc 256 # buffer and mutable position pair
+    bp = bufpos char[].alloc 256 # buffer and mutable position pair
     bp.copy "./smoll "
     bp.copy path
     test_dir = dir:read path
-    proc_buf = alloc KB 4
+    proc_buf = char[].alloc KB 4
     while try entry = dir:entry test_dir # do not move the position
         if not entry.ends_with ".s"
             continue

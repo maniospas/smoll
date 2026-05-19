@@ -33,6 +33,7 @@ def nat(nat16 x)
     {builtins:nat value = x;}
     return value
 
+
 def alloc(any[] buffer, nat|blank size)
     doc "allocates a buffer"
     doc "Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,"
@@ -59,6 +60,10 @@ def alloc(any[] buffer, nat|blank size)
     buffer.unsafe_ptr = unsafe_mut unsafe:alloc(bytes)
     buffer.unsafe_ptr.unsafe:zero(0, bytes)
     return mut buffer
+
+def malloc(mut any[] buffer, nat size)
+    buffer = alloc(buffer,size)
+    return buffer
 
 def resize(mut any[] buffer, nat size)
     doc "resize the buffer"
@@ -101,15 +106,7 @@ def len(const any[] buffer)
     doc "the number of buffer elements"
     return buffer.unsafe_size
 
-def alloc(nat size)
-    doc "allocates a `char[]` buffer of given size"
-    doc "The allocation creates a failure if the operating system decides"
-    doc "that it would run out of memory. HOWEVER many operating system"
-    doc "allow allocation of virtual address space that is not available"
-    doc "and only terminate the program if it tries to access that."
-    return alloc(mut char[], size)
-
-def list(mut any[] buffer)
+def list(any[] buffer)
     doc "list of buffer"
     doc "List defined over a mutable buffer that is automatically managed and resized."
     doc "A capacity is maintained so that resizes are not performed too frequently."

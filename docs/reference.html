@@ -926,30 +926,28 @@ any type&#8217;s items:</p>
     <span class="nb">print</span><span class="p">(</span><span class="nb">len</span> <span class="n">buffer</span><span class="p">,</span> <span class="s2">&quot; elements in buffer</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">[]</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>One of the most important buffer features is the <code>alloc</code> function to
 allocate and zero-initialize a specific number of elements. 
-This returns the buffer itself to enable initialization per patterns like
-<code>buf = (mut float[]).alloc 4</code>. Allocate a buffer of chars
-by not providing the mutable buffer declaration per <code>buf = alloc 4</code>.
+This returns the buffer itself as a mutable to enable initialization 
+per patterns like <code>buf = float[].alloc 4</code>. Buffer internals are mutable,
+which means that allocation modifies the original empty buffer too (see below).
 Make use of the <code>KB</code>, <code>MB</code>, <code>GB</code> functions to quickly size allocations.</p>
 
 <p>Allocation will create an error if it tries to change the number of
 elements from a non-zero number to something different.
-In those cases, use <code>resize</code> instead. 
-You can also set the size to zero. If the
-allocation is the same in size as before, the buffer&#8217;s elements
-are still zero-initialized. This is helpful when reusing the same
-buffers within loops. </p>
+In those cases, use <code>resize</code> instead, though the exact usage of
+this is covered in <a href="#stable-references">stable references</a>.</p>
 
 <p>A second important feature is the element access operator <code>buffer[pos]</code>,
 which can be used to extract an object stored at a specific position. 
 In general, this operator is implemented by overloading the <code>get</code> 
-and <code>mutget</code> functions, though beware that details do involve pointers. 
+and <code>mutget</code> functions, though beware that details do involve pointers
+and tackled in the next section. 
 Use <code>buffer[pos] = value</code> to copy some data on a buffer&#8217;s element.</p>
 
 <p>All buffer indexes are of type <code>nat</code>, which represents natural numbers 
@@ -959,19 +957,16 @@ Use <code>buffer[pos] = value</code> to copy some data on a buffer&#8217;s eleme
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
-    <span class="n">buf</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># prints 0, as buffers are zero-initialized</span>
-    <span class="n">buf</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="nb">float</span><span class="p">[]</span>
+    <span class="n">buf</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">10</span> <span class="c1"># allocate 10 elements</span>
+    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># prints 0, as buffers are zero-initialized</span>
     <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 </code></pre>
 </div>
 
 <p>Declare a buffer as <code>const</code> to disallow any modifications to its
-contents. Normally, buffers merely prevent resizing or allocation
-(unless they are <code>mut</code>), but &#8220;locking&#8221; them underneath a constant
-safeguard can improve performance and bring code safety.</p>
+contents. This further prevents resizing or reallocation.</p>
 
 <h2 id="pointers">pointers</h2>
 
@@ -1013,7 +1008,7 @@ Below is an example.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">1</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">1</span>
     <span class="n">element</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&amp;&amp;</span>
     <span class="nb">print</span> <span class="n">element</span><span class="o">..</span> <span class="c1"># prints 0 as buffers are zero-initialized</span>
     <span class="n">element</span> <span class="o">&lt;&lt;</span> <span class="mf">1.0</span>
@@ -1046,7 +1041,6 @@ an example:</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/array.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Point2D</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
@@ -1056,7 +1050,7 @@ an example:</p>
     <span class="k">return</span> <span class="p">(</span><span class="n">plane</span><span class="p">,</span><span class="n">class</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">points</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">Point3D</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">10</span>
     <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">)</span>
     <span class="n">plane</span> <span class="o">=</span> <span class="n">points</span><span class="nd">@plane</span> <span class="c1"># can move this around</span>
     <span class="nb">print</span> <span class="n">plane</span><span class="nd">@x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1068,8 +1062,8 @@ an example:</p>
 
 <p>You can work with data that reference other data
 in that they are updated together. This is similar
-to pointers, but comes under some safety 
-restrictions in that you cannot change where references
+to pointers, but comes under the safety 
+restriction that you cannot change where references
 point to, even with <code>mut</code>.</p>
 
 <p>At the same time, references are dissolved during
@@ -1112,10 +1106,23 @@ by adding zero) and do not pass through unsafe C sections.
 The compiler also always creates error messages instead of 
 triggering unsafe behavior.</p>
 
-<p>Notably, references are not types but just some
-property attached to local variables to indicate
-that the compiler should enforce safe usage. 
-Below is an example, where a list is used
+<p>References <em>are not types</em> but just some
+property attached to local variables. Below is an 
+example where a buffer needs to be resized and
+this requires stable handling through <code>ref</code>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">ref</span> <span class="n">alloc</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[],</span> <span class="mi">10</span><span class="p">)</span> <span class="c1"># &#39;ref&#39; is mandatory to resize later</span>
+    <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">buf</span><span class="o">.</span><span class="n">resize</span> <span class="mi">20</span>
+    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<p>Below is a more complicated example, where a list is used
 to dynamically manage a buffer and resize it as needed.</p>
 
 <p>Without <code>ref</code>, the compiler would complain that the 
@@ -1140,6 +1147,12 @@ for strings copied onto it.</p>
     <span class="nb">print</span> <span class="n">s</span><span class="o">.</span><span class="n">s2</span>
 </code></pre>
 </div>
+
+<p>You can -and often should- mark the arguments of functions
+with <code>ref</code> instead of <code>mut</code> or <code>const</code> to indicate that the
+<em>contents</em> of memory pointers or other resources might change
+but that their internals are safeguarded. This is not usually
+needed.</p>
 
 <h2 id="try-and-fail">try and fail</h2>
 
@@ -1200,10 +1213,9 @@ an error is intercepted. Below is an example that safeguards against failing all
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/array.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">vector</span><span class="p">(</span><span class="n">nat</span> <span class="n">size</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="n">size</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">size</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="k">try</span> <span class="n">v</span> <span class="o">=</span> <span class="n">vector</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
@@ -1426,7 +1438,7 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
     <span class="k">return</span> <span class="n">wooo</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">recursion_safety</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+    <span class="n">recursion_safety</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">14</span> <span class="c1"># recursive depth limit in playground</span>
     <span class="k">try</span> <span class="n">wooo</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span> <span class="c1"># prints &#39;iteration end&#39;</span>
@@ -1448,7 +1460,7 @@ one place while returning a pointer to the last element.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">li</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">ref</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
+    <span class="n">li</span> <span class="o">=</span> <span class="n">ref</span> <span class="nb">list</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
     <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
     <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
     <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
@@ -1516,7 +1528,7 @@ on an erroneous program.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">ref</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">ref</span> <span class="nb">list</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span>
     <span class="n">s1</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span> <span class="c1"># would have been invalidated if we did not use `ref`</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">print</span> <span class="n">s1</span>
@@ -1541,7 +1553,7 @@ like below. Map initialization takes any allocated buffer and creates a similarl
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="n">alloc</span><span class="p">(</span><span class="n">mut</span> <span class="nb">str</span><span class="p">[],</span> <span class="mi">128</span><span class="p">)</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
     <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span>
@@ -1572,7 +1584,7 @@ argument to directly read on the buffer and progress the position.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;README.md&quot;</span>
-    <span class="n">mem</span> <span class="o">=</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># max 4 KB chunk size, on char[] by default</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># max 4 KB chunk size, on char[] by default</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">line</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -1603,7 +1615,7 @@ operations. Below is how to iterate through directory contents.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="nb">dir</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">dir</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;.&quot;</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">alloc</span> <span class="mi">128</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">entry</span><span class="o">=</span><span class="nb">dir</span><span class="p">:</span><span class="n">entry</span> <span class="nb">dir</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">dir</span><span class="p">:</span><span class="n">is_file</span> <span class="n">entry</span>
@@ -1636,7 +1648,7 @@ that fails on non-zero error code can be evoked like below.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">:</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
-    <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># example with growing position</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># example with growing position</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">line</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">proc</span><span class="p">:</span><span class="n">line</span> <span class="n">process</span>
         <span class="nb">print</span> <span class="n">line</span>
 </code></pre>
@@ -1713,7 +1725,7 @@ when organized in a string buffer.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/mini.s&quot;</span> <span class="k">as</span> <span class="n">mini</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[]</span> <span class="n">buff</span><span class="p">)</span>
-    <span class="n">mem</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
     <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">pos</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="nb">iter</span>
@@ -1722,7 +1734,7 @@ when organized in a string buffer.</p>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">buf</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">mem</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buff</span> <span class="o">=</span> <span class="p">(</span><span class="n">mut</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">6</span>
+    <span class="n">buff</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">6</span>
     <span class="n">debug</span><span class="p">:</span><span class="nb">print</span> <span class="n">buff</span> <span class="c1"># print the buffer type during compilation</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;hi&quot;</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;my&quot;</span>
@@ -1746,8 +1758,8 @@ when organized in a string buffer.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/vec.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">safe_main</span><span class="p">()</span>
-    <span class="n">allocator</span>  <span class="o">=</span> <span class="n">ref</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="o">.</span><span class="n">circular</span><span class="p">()</span> <span class="c1"># used by vector operation effects</span>
-    <span class="n">allocator2</span> <span class="o">=</span> <span class="n">ref</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[])</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="o">.</span><span class="n">circular</span><span class="p">()</span> <span class="c1"># useless </span>
+    <span class="n">allocator</span>  <span class="o">=</span> <span class="n">ref</span> <span class="n">circular</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">200</span> <span class="c1"># used by vector operation effects</span>
+    <span class="n">allocator2</span> <span class="o">=</span> <span class="n">ref</span> <span class="n">circular</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">200</span> <span class="c1"># useless </span>
     <span class="n">v1</span> <span class="o">=</span> <span class="n">vec</span> <span class="mi">10</span>
     <span class="n">v2</span> <span class="o">=</span> <span class="n">vec</span> <span class="mi">10</span>
     <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>

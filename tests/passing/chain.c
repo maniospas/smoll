@@ -5,7 +5,7 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp365v="\n";
-const char* const __temp1251v="123";
+const char* const __temp1249v="123";
 static const char* __temp_all_errcodes[33] = {"noerr",
 "error",
 "null pointer",
@@ -41,12 +41,12 @@ static const char* __temp_all_errcodes[33] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__temp786v(const char* x, const char* y, char* __temp1254v) {
+static inline __attribute__((always_inline)) void eq__temp784v(const char* x, const char* y, char* __temp1252v) {
   char z=0;
   z=(x==y);
   goto __temp_return;
   __temp_return:
-  *__temp1254v=z;
+  *__temp1252v=z;
 }
 
 static inline __attribute__((always_inline)) void print__temp380v(char value) {
@@ -61,10 +61,10 @@ static inline __attribute__((always_inline)) void print__temp380v(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__temp1250v() {
-  char __temp1252v__=0;
-  eq__temp786v(__temp1251v,__temp1251v,&__temp1252v__);
-  print__temp380v(__temp1252v__);
+static inline __attribute__((always_inline)) void main__temp1248v() {
+  char __temp1250v__=0;
+  eq__temp784v(__temp1249v,__temp1249v,&__temp1250v__);
+  print__temp380v(__temp1250v__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1250v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1248v();return 0;}

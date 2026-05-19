@@ -99,14 +99,14 @@ def neq(char x, char y)
 def copy(str|cstr _other)
     doc "copy a string to a new buffer"
     other = str _other
-    buf = alloc len other
+    buf = char[].alloc len other
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     return str(buf, 0, other.dat.length, other.dat.first)
 
 def copy_null_terminated(str other)
     doc "copy a string to a new buffer while ensuring null termination"
     doc "This is useful only for supporting temporary_cstr."
-    buf = alloc 1+len other
+    buf = char[].alloc 1+len other
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     {builtins:compiler:ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}

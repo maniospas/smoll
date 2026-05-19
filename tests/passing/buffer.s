@@ -10,6 +10,6 @@ def test2(mut float[] x)
     mut x.resize(2).mutlast() << 2.0
 
 def main()
-    x = test1()
+    x = ref test1()
     test2(x)
     print x[0]+x[1]

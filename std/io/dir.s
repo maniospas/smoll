@@ -64,7 +64,7 @@ def read(cstr path)
 def read(str path)
     return read temporary_cstr(path).cstr
 
-local def raw_entry(read f) # this function returns a content pointer, but this does not allow safe comparisons
+local def raw_entry(ref read f) # this function returns a content pointer, but this does not allow safe comparisons
     VM "[safeguard(lambda memory=memory: memory.write_cstr(next(memory.get_foreign($f__unsafe_ptr)).name), ExpectedException('end of dir'))]"
     if not exists f.unsafe_ptr
         fail "not open dir"
@@ -74,7 +74,7 @@ local def raw_entry(read f) # this function returns a content pointer, but this 
     {builtins:cstr dirname=((struct dirent*)de)->d_name;}
     return dirname
 
-def entry(read f)
+def entry(ref read f)
     doc "the next entry of an open dir"
     doc "This value is modified as you continue reading"
     doc "from the same directory."

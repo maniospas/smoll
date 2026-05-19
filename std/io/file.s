@@ -56,7 +56,7 @@ def to_end(File f)
     if not exists f.unsafe_ptr fail "failed to move to end of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_END);}
 
-def chunk(char[] buf, mut nat|blank pos, File f)
+def chunk(ref char[] buf, mut nat|blank pos, ref File f)
     if pos is blank
         pos = mut 0
     if not exists buf.unsafe_ptr fail "not open file"
@@ -68,7 +68,7 @@ def chunk(char[] buf, mut nat|blank pos, File f)
     pos = pos+bytes_read
     return str(buf, prev_pos, bytes_read)
     
-def line(char[] buf, mut nat|blank pos, File f)
+def line(ref char[] buf, mut nat|blank pos, ref File f)
     if pos is blank
         pos = mut 0
     if not exists buf.unsafe_ptr
@@ -89,7 +89,7 @@ def print(terminal|write f, str text)
     {builtins:nat bytes_written = fwrite((char*)text__unsafe_ptr, 1, text__unsafe_size, (FILE*)f__unsafe_ptr);}
     if bytes_written!=len text fail "failed to write to file"
 
-def print(terminal|write f, cstr text)
+def print(ref terminal|write f, cstr text)
     doc "writes a cstr to a write file"
     if not exists f.unsafe_ptr fail "failed to write to closed file"
     {fwrite(text, 1, strlen(text), (FILE*)f__unsafe_ptr);}

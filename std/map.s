@@ -20,20 +20,20 @@ def get(const hash:robinhood_str_entry[] keys, const any[] values, cstr|str key)
     doc "Implemented for string or cstr keys but buffer of any values."
     unsafe_return values[keys.hash:find hash:raw key]&
 
-def mutget(hash:robinhood_str_entry[] keys, any[] values, cstr|str key)
+def mutget(ref hash:robinhood_str_entry[] keys, ref any[] values, cstr|str key)
     doc "get a mutable hash map entry"
     doc "Implemented for string or cstr keys but buffer of any values."
-    unsafe_return values[keys.hash:at str key]&&
+    return values[keys.hash:at str key]&&
 
 def get(const hash:robinhood_nat_entry[] keys, const any[] values, nat key)
     doc "get a hash map entry"
     doc "Implemented for string or cstr keys but buffer of any values."
-    unsafe_return values[keys.hash:find key]&
+    return values[keys.hash:find key]&
 
-def mutget(hash:robinhood_nat_entry[] keys, any[] values, nat key)
+def mutget(ref hash:robinhood_nat_entry[] keys, ref any[] values, nat key)
     doc "get a mutable hash map entry"
     doc "Implemented for string or cstr keys but buffer of any values."
-    unsafe_return values[keys.hash:at key]&&
+    return values[keys.hash:at key]&&
 
 def next(const hash:robinhood_entry[] keys, mut nat pos)
     if pos==0

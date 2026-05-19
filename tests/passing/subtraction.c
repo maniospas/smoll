@@ -5,7 +5,7 @@
 int __temp_argc;
 char** __temp_argv;
 const char* const __temp365v="\n";
-const char* const __temp447v="hello world";
+const char* const __temp448v="hello world";
 static const char* __temp_all_errcodes[9] = {"noerr",
 "error",
 "null pointer",
@@ -24,49 +24,49 @@ static inline __attribute__((always_inline)) void print__temp363v(const char* va
   printf("%s%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void false__temp10v(int* __temp460v) {
+static inline __attribute__((always_inline)) void false__temp10v(int* __temp461v) {
   int value=0;
-  *__temp460v=value;
+  *__temp461v=value;
 }
 
-static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0, int* __temp461v) {
+static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0, int* __temp462v) {
   int __temp36v__=0;
   false__temp10v(&__temp36v__);
   goto __temp_return;
   __temp_return:
-  *__temp461v=__temp36v__;
+  *__temp462v=__temp36v__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp462v) {
+static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp463v) {
   int __temp94v=0;
   int __temp95v__=0;
   not__temp35v(__temp94v,&__temp95v__);
   goto __temp_return;
   __temp_return:
-  *__temp462v=__temp95v__;
+  *__temp463v=__temp95v__;
 }
 
-static inline __attribute__((always_inline)) void mul__temp194v(uint64_t x, uint64_t y, uint64_t* __temp463v) {
+static inline __attribute__((always_inline)) void mul__temp194v(uint64_t x, uint64_t y, uint64_t* __temp464v) {
   int __temp195v__=0;
   uint64_t z=0;
   is_different__temp93v(x,y,&__temp195v__);
   z=x*y;
   goto __temp_return;
   __temp_return:
-  *__temp463v=z;
+  *__temp464v=z;
 }
 
-static inline __attribute__((always_inline)) void lt__temp247v(uint64_t x, uint64_t y, char* __temp464v) {
+static inline __attribute__((always_inline)) void lt__temp247v(uint64_t x, uint64_t y, char* __temp465v) {
   int __temp248v__=0;
   char z=0;
   is_different__temp93v(x,y,&__temp248v__);
   z=x<y;
   goto __temp_return;
   __temp_return:
-  *__temp464v=z;
+  *__temp465v=z;
 }
 
-static inline __attribute__((always_inline)) int sub__temp347v(uint64_t x, uint64_t y, uint64_t* __temp465v) {
+static inline __attribute__((always_inline)) int sub__temp347v(uint64_t x, uint64_t y, uint64_t* __temp466v) {
   int __temp348v__=0;
   int __temp349v=0;
   int __temp350v=0;
@@ -84,7 +84,7 @@ static inline __attribute__((always_inline)) int sub__temp347v(uint64_t x, uint6
   goto __temp_return;
   
   __temp_failure:__temp_return:
-  *__temp465v=z;
+  *__temp466v=z;
   
   return __temp_errcode;
 }
@@ -96,43 +96,43 @@ static inline __attribute__((always_inline)) void print__temp376v(uint64_t value
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void cstr__temp443v(int64_t value, const char** __temp466v) {
-  int __temp444v=0;
+static inline __attribute__((always_inline)) void cstr__temp444v(int64_t value, const char** __temp467v) {
+  int __temp445v=0;
   const char* endl=0;
   const char* ret=0;
   endl=__temp365v;
   ret=__temp_all_errcodes[value];
   goto __temp_return;
   __temp_return:
-  *__temp466v=ret;
+  *__temp467v=ret;
 }
 
-static inline __attribute__((always_inline)) void main__temp446v() {
-  char __temp449v=0;
-  uint64_t __temp450v=0;
+static inline __attribute__((always_inline)) void main__temp447v() {
+  char __temp450v=0;
   uint64_t __temp451v=0;
-  uint64_t __temp452v__=0;
-  uint64_t __temp453v=0;
-  uint64_t __temp454v__=0;
-  char __temp456v=0;
-  int64_t __temp457v=0;
-  const char* __temp458v__=0;
+  uint64_t __temp452v=0;
+  uint64_t __temp453v__=0;
+  uint64_t __temp454v=0;
+  uint64_t __temp455v__=0;
+  char __temp457v=0;
+  int64_t __temp458v=0;
+  const char* __temp459v__=0;
   int __temp_complain=0;
-  print__temp363v(__temp447v);
-  __temp450v=2;
-  __temp451v=3;
-  mul__temp194v(__temp450v,__temp451v,&__temp452v__);
-  __temp453v=20;
-  __temp_complain=sub__temp347v(__temp452v__,__temp453v,&__temp454v__);
-  __temp449v=__temp_complain;
-  print__temp376v(__temp454v__);
-  __temp449v=__temp449v==0;
-  __temp457v=__temp_complain;
-  __temp456v=(__temp_complain==0);
+  print__temp363v(__temp448v);
+  __temp451v=2;
+  __temp452v=3;
+  mul__temp194v(__temp451v,__temp452v,&__temp453v__);
+  __temp454v=20;
+  __temp_complain=sub__temp347v(__temp453v__,__temp454v,&__temp455v__);
+  __temp450v=__temp_complain;
+  print__temp376v(__temp455v__);
+  __temp450v=__temp450v==0;
+  __temp458v=__temp_complain;
+  __temp457v=(__temp_complain==0);
   __temp_complain=0;
-  cstr__temp443v(__temp457v,&__temp458v__);
-  print__temp363v(__temp458v__);
-  __temp456v=__temp456v==0;
+  cstr__temp444v(__temp458v,&__temp459v__);
+  print__temp363v(__temp459v__);
+  __temp457v=__temp457v==0;
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp446v();return 0;}
+int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp447v();return 0;}

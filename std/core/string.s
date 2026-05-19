@@ -157,7 +157,7 @@ def endpos(const str s)
     doc "the end position of a string in its buffer"
     return s.dat.pos+s.dat.length
 
-def copy(char[] buf, mut nat pos, str|cstr _other)
+def copy(ref char[] buf, mut nat pos, str|cstr _other)
     doc "copy a string"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -170,7 +170,7 @@ def copy(char[] buf, mut nat pos, str|cstr _other)
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)
 
-def copy_null_terminated(char[] buf, mut nat pos, str|cstr _other)
+def copy_null_terminated(ref char[] buf, mut nat pos, str|cstr _other)
     doc "copy a string while adding null termination"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -209,14 +209,15 @@ def copy(charlist li, str|cstr _other)
     other = str _other
     prev_prev_length = mut li.length
     prev_length = li.length + len other
+    if other.unsafe_ptr==li.buffer.unsafe_ptr fail "cannot copy onto the same buffer"
     if prev_length >= len li.buffer
         li.buffer = li.buffer.resize(prev_length+prev_length/2+1)
     li.length = prev_length
-    return copy(li.buffer, prev_prev_length, other)
+    return copy(li.buffer, prev_prev_length, unsafe_valid other)
 
 def get(str s, nat i)
     doc "a character in a string"
-    unsafe_return s.unsafe_ptr.unsafe:add(s.dat.pos+i)
+    return s.unsafe_ptr.unsafe:add(s.dat.pos+i)
 
 def eq(cstr x, cstr y)
     doc "equals"

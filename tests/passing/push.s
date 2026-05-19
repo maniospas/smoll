@@ -1,11 +1,9 @@
 import "std/core.s"
 
 def main()
-    li = list ref mut float[]
-    (push li) << 0.1
-    (push li) << 0.1
-    (push li) << 0.1
+    li = ref mut float[]
+    li = li.alloc 10
+    li[0] = 1.0
 
-    li[1] = 0.2
+    li.resize 20
     print li[0]
-    print li[1]

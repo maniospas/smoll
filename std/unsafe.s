@@ -17,30 +17,23 @@
 local import "std/core/builtinsext.s" 
 
 def alloc(nat bytes)
-    {builtins:compiler:ptr unsafe_ptr = malloc(bytes);builtins:bool failed=unsafe_ptr==0;}
-    if failed fail "allocation failed"
-    # allow content modifications afterwards
-    return unsafe_ptr 
+    {builtins:compiler:ptr allocated = malloc(bytes);}
+    if not exists allocated fail "allocation failed"
+    return allocated
 
-def realloc(any ptr allocated__unsafe_ptr, nat bytes) 
-    # the __unsafe_ptr suffix is needed to skip invalidation internally
-    INVALIDATE compiler:ptr
-    {if(allocated__unsafe_ptr){builtins:compiler:ptr new_allocated = realloc(allocated__unsafe_ptr, bytes);}}
+def realloc(any ptr allocated, nat bytes)
+    {if(allocated){builtins:compiler:ptr new_allocated = realloc(allocated, bytes);}}
     {else{new_allocated=malloc(bytes);}}
-    {builtins:bool failed=new_allocated==0;}
-    if failed fail "reallocation failed"
-    unsafe_return new_allocated.compiler:attach_type(allocated__unsafe_ptr)
+    if not exists new_allocated fail "reallocation failed"
+    {allocated=new_allocated;}
+    return new_allocated.compiler:attach_type(allocated)
 
 def free(mut any ptr allocated)
     {if(allocated){free(allocated);}}
-    # automatically sets to zero address because it's a returned invalidated variable
-    INVALIDATE compiler:ptr
 
 def zero(any ptr allocated, nat from, nat to)
-    # memzero is an abstraction over memset to ensure that the interpreter can understand it
     {ptr_memzero(allocated, from, to);}
 
 def add(any ptr allocated, nat offset)
-    # ptr_add is an abstraction over char cast and addition to ensure that the interpreter can understand it
     {builtins:compiler:ptr element = allocated + offset;}
-    unsafe_return element.compiler:attach_type(allocated)
+    return element.compiler:attach_type(allocated)

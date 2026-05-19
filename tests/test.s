@@ -1,11 +1,16 @@
-import "std/core.s"
+import "std/core.s" # this file demonstrates that the compile just does not allow a pathological pattern
+
+def add(ref str[] values)
+    buf = bufpos alloc 128
+    x = buf.copy str "123"
+    print x
+    values[0] = x
+    return x
 
 def main()
-    li = list ref mut float[]
-    (push li) << 0.1
-    (push li) << 0.1
-    (push li) << 0.1
-
-    li[1] = 0.2
-    print li[0]
-    print li[1]
+    values = alloc (mut str[], 5)
+    i = mut 0
+    while i<3
+        del add values
+        i = i+1
+    print values[0]

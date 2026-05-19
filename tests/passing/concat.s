@@ -2,8 +2,8 @@ import "std/core.s"
 import "std/mini.s" as mini
 
 
-def concat(mini:str[] buff)
-  mem = bufpos mut alloc KB 4
+def concat(ref mini:str[] buff)
+  mem = bufpos ref alloc KB 4
   iter = range len buff
   start = mem.pos
   while try i=next iter

@@ -65,7 +65,7 @@ def len(vec v)
     doc "vectot length"
     return v.length
 
-def mutget(vec v, nat i)
+def mutget(ref vec v, nat i)
     doc "modify a vector element at given position"
     unsafe_return unsafe_mut v.unsafe_ptr+8*(i+v.pos)
 

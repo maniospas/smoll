@@ -59,7 +59,7 @@ def bits(float x)
     return bits z
 
 def nat(bits x)
-    return x.value
+    return nat x.value
 
 def int(bits x)
     {builtins:int z=x__value;}

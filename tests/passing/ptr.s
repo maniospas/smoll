@@ -13,7 +13,7 @@ def print(Field ptr f)
     print(f...b.y)
 
 def main()
-    f = (mut float[]).alloc 1  // preffer alloc than resizing empty buffers (no pointer invalidation)
+    f = ref (mut float[]).alloc 1  // preffer alloc than resizing empty buffers (no pointer invalidation)
     f[0] = 1.0 // move data to pointer
     print f[0]
     f0 = f[0]&&

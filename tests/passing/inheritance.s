@@ -3,7 +3,7 @@ import "std/core.s"
 def Point2D(float x, float y)
     return (x,y)
 
-def sum(Point2D[] v)
+def sum(ref Point2D[] v)
     x = mut 0.0
     y = mut 0.0
     i = mut 0 

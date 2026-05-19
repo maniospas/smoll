@@ -1,16 +1,19 @@
 import "std/core.s" # this file demonstrates that the compile just does not allow a pathological pattern
 
-def add(ref str[] values)
+def add(str[] values)
     buf = bufpos alloc 128
     x = buf.copy str "123"
     print x
     values[0] = x
-    return x
+    #del x  # compiler says: affects inputs
+    return x # compiler says: return this because you did stuff on values
 
 def main()
-    values = alloc (mut str[], 5)
+    values = ref str[].alloc 5
     i = mut 0
     while i<3
-        del add values
+        x = add values 
+        print values[0] # this is fine
+        del x # compiler says: needed to not leak resources 
         i = i+1
-    print values[0]
+    #print values[0] # compiler says: it has been invalided by 'del'

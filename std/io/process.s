@@ -39,7 +39,7 @@ def read(cstr cmd)
                 try fail "process terminated with unhandled non-zero exit code"
     return class(unsafe_ptr)
 
-def read(str cmd)
+def read(ref str cmd)
     doc "create a readable system process"
     return read temporary_cstr(cmd).cstr
 

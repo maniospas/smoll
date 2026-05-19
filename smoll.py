@@ -1944,11 +1944,16 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     all_args = vars+all_rets
     callee_all_args = callee.args+callee.rets
     for a, ac in zip(all_args, callee_all_args):
-        if a.type==POINTER_TYPE:
-            for r, rc in zip(all_args, callee_all_args):
-                if r.type==POINTER_TYPE:
-                    #if callee.vars[ac] in callee.get_required_accompany(callee.vars[rc]):
-                    impl.add_required_accompany(r, a)
+        if a.type!=POINTER_TYPE: continue
+        if callee.vars[ac].immutable and ac in callee.args and ac not in callee.rets: continue
+        for r, rc in zip(all_args, callee_all_args):
+            if r.type!=POINTER_TYPE: continue
+            if callee.vars[rc].immutable and rc in callee.args and rc not in callee.rets: continue
+            # t1 = impl.get_pointer_type(a)
+            # t2 = impl.get_pointer_type(r)
+            # if t1 is None or t2 is None or t1==ANY_TYPE or t2==ANY_TYPE or t1==t2 or t1==POINTER_TYPE or t2==POINTER_TYPE:
+            #if callee.vars[ac] in callee.get_required_accompany(callee.vars[rc]):
+            impl.add_required_accompany(r, a)
 
     for var in add_to_invalidators:
         if not val.immutable:
@@ -2880,10 +2885,10 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     pos, rets = process_deref(file, pos, rets, impl, err_token)
                 else:
                     for a in args:
-                        if a.type==POINTER_TYPE:
-                            for r in rets:
-                                if r.type==POINTER_TYPE:
-                                    impl.add_required_accompany(r, a)
+                        if a.type!=POINTER_TYPE: continue
+                        for r in rets:
+                            if r.type!=POINTER_TYPE: continue
+                            impl.add_required_accompany(r, a)
                 return pos, rets
             pos, rets = await process_get(pos, rets)
             continue
@@ -3433,19 +3438,30 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                     if impl.get_assignment(varname, rets):
                         invalidated.add(val)
                         impl.invalidated[varname] = name
-                    elif any(val in impl.get_required_accompany(impl.vars[r]) for r in rets):
-                        invalidated.add(val)
-                        impl.invalidated[varname] = name
-
+                        # if varname in impl.args: name.error("safety", "cannot invalidate the associated function argument '"+pretty_name(varname)+"'")
+                        # for r in impl.args:
+                        #     if val in impl.get_required_accompany(impl.vars[r]):
+                        #         name.error("safety", "would invalidate associated function argument '"+pretty_name(val.name)+"'")
+                    # elif any(val in impl.get_required_accompany(impl.vars[r]) for r in rets):
+                    #     invalidated.add(val)
+                    #     impl.invalidated[varname] = name
+                        # if varname in impl.args: name.error("safety", "would invalidate the associated function argument '"+pretty_name(varname)+"'")
+                        # for r in impl.args:
+                        #     if val in impl.get_required_accompany(impl.vars[r]):
+                        #         name.error("safety", "would invalidate associated function argument '"+pretty_name(val.name)+"'")
 
                 for invalid_type in impl.invalidate_types_on_defer: # TODO: track defers for each variable to be deleted
                     for varname, val in impl.vars.items():
                         if val.type.invalidated_by == invalid_type:# and not varname.endswith("__unsafe_ptr"):
                             impl.invalidated[val.stabilized_name()] = name
+                            if var.name in impl.args: name.error("safety", "cannot invalidate associated argument '"+pretty_name(varname)+"'")
 
                 to_remove = list()
                 for defer in impl.defers:
                     if not any(v in defer for v in invalidated): continue
+                    for v in defer:
+                        if isinstance(v, Variable) and any(impl.get_assignment(arg, [v]) or impl.get_required_accompany(impl.vars[arg]) for arg in impl.args): 
+                            name.error("safety", "this 'del' would evoke a defer that would invalidate an argument '"+pretty_name(v.name)+"'")
                     impl.implementation.extend(defer)
                     to_remove.append(defer)
                 if not to_remove:

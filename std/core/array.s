@@ -33,7 +33,7 @@ def nat(nat16 x)
     {builtins:nat value = x;}
     return value
 
-def alloc(mut any[] buffer, nat|blank size)
+def alloc(any[] buffer, nat|blank size)
     doc "allocates a buffer"
     doc "Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,"
     doc "as it never reallocates an allocation. For convenience for usage within loops, allocation"
@@ -51,14 +51,14 @@ def alloc(mut any[] buffer, nat|blank size)
     if buffer.unsafe_size==size
         if size!=0
             buffer.unsafe_ptr.unsafe:zero(0, buffer.unsafe_align.nat()*size)
-        unsafe_return buffer
+        return mut buffer
     if buffer.unsafe_size!=0
         fail "cannot resize buffers with alloc; it promises no data reallocation"
     bytes = buffer.unsafe_align.nat()*size
     buffer.unsafe_size = size
     buffer.unsafe_ptr = unsafe_mut unsafe:alloc(bytes)
     buffer.unsafe_ptr.unsafe:zero(0, bytes)
-    unsafe_return buffer
+    return mut buffer
 
 def resize(mut any[] buffer, nat size)
     doc "resize the buffer"

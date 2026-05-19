@@ -4,7 +4,6 @@ import "std/io.s":process as process
 
 def run(cstr|str command)
     proc = mut process:read command
-    mem = alloc KB 4
     del proc
     if try error = compiler:catch()
         print cstr error

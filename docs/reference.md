@@ -768,11 +768,8 @@ Make use of the `KB`, `MB`, `GB` functions to quickly size allocations.
 
 Allocation will create an error if it tries to change the number of
 elements from a non-zero number to something different.
-In those cases, use `resize` instead. 
-You can also set the size to zero. If the
-allocation is the same in size as before, the buffer's elements
-are still zero-initialized. This is helpful when reusing the same
-buffers within loops. 
+In those cases, use `resize` instead, though the exact usage of
+this is covered in [stable references](#stable-references).
 
 A second important feature is the element access operator `buffer[pos]`,
 which can be used to extract an object stored at a specific position. 
@@ -788,17 +785,16 @@ import "std/core.s"
 
 def main()
     buf = mut float[]
-    buf.alloc(10)
+    buf.alloc(10) # allocate 10 elements
     print buf[0]  # prints 0, as buffers are zero-initialized
-    buf.resize(10)
     buf[1] = 1.0
     print buf[1]
 ```
 
 Declare a buffer as `const` to disallow any modifications to its
 contents. Normally, buffers merely prevent resizing or allocation
-(unless they are `mut`), but "locking" them underneath a constant
-safeguard can improve performance and bring code safety.
+(unless they are `mut`) by "locking" them underneath a constant
+safeguard.
 
 ## pointers
 
@@ -895,8 +891,8 @@ def main()
 
 You can work with data that reference other data
 in that they are updated together. This is similar
-to pointers, but comes under some safety 
-restrictions in that you cannot change where references
+to pointers, but comes under the safety 
+restriction that you cannot change where references
 point to, even with `mut`.
 
 At the same time, references are dissolved during
@@ -938,10 +934,23 @@ by adding zero) and do not pass through unsafe C sections.
 The compiler also always creates error messages instead of 
 triggering unsafe behavior.
 
-Notably, references are not types but just some
-property attached to local variables to indicate
-that the compiler should enforce safe usage. 
-Below is an example, where a list is used
+References *are not types* but just some
+property attached to local variables. Below is an 
+example where a buffer needs to be resized and
+this requires stable handling through `ref`.
+
+```python
+import "std/core.s"
+
+def main()
+    buf = ref alloc (mut float[], 10) # 'ref' is mandatory to resize later
+    buf[1] = 1.0
+    buf.resize 20
+    print buf[1]
+```
+
+
+Below is a more complicated example, where a list is used
 to dynamically manage a buffer and resize it as needed.
 
 Without `ref`, the compiler would complain that the 
@@ -966,6 +975,12 @@ def main()
     print s.s1
     print s.s2
 ```
+
+You can -and often should- mark the arguments of functions
+with `ref` instead of `mut` or `const` to indicate that the
+*contents* of memory pointers or other resources might change
+but that their internals are safeguarded. This is not usually
+needed.
 
 
 ## try and fail

@@ -13,11 +13,11 @@ def print(Field ptr f)
     print(f...b.y)
 
 def main()
-    f = ref (mut float[]).alloc 1  // preffer alloc than resizing empty buffers (no pointer invalidation)
-    f[0] = 1.0 // move data to pointer
+    f = ref float[].alloc 1  # preffer alloc than resizing empty buffers (no pointer invalidation)
+    f[0] = 1.0 # move data to pointer
     print f[0]
     f0 = f[0]&&
-    f0.. >> mutlast resize(f,2) # TODO: the LSP finds this but somehow the compiler allows it???? (and then the VM properly complains)
+    f0.. >> mutlast f.resize 2 # TODO: the LSP finds this but somehow the compiler allows it???? (and then the VM properly complains)
 
 
     p = (mut Field[]).alloc 1

@@ -29,28 +29,42 @@ def flush(console)
 
 def int(console)
     doc "reads an integer from the console"
-    {builtins:int number=0;builtins:char ch=0;}
-    {builtins:int result=scanf("%lld%c", &number, &ch);}
-    {builtins:bool success = (result == 2 && (ch == 13 || ch == 10));}
+    SPACE = char " "
+    {builtins:int _c; while((_c=getchar())==SPACE||_c=='\t');}
+    {builtins:bool _neg=(_c=='-'); if(_neg||_c=='+') _c=getchar();}
+    {builtins:int number=0; builtins:bool _has=0;}
+    {while(_c>='0'&&_c<='9'){number=number*10+(_c-'0');_has=1;_c=getchar();}}
+    {if(_neg) number=-number;}
+    {builtins:bool success=_has&&(_c=='\n'||_c=='\r'||_c==EOF);}
     if not success
-        fail "user input was not an int" 
+        {while(_c!='\n'&&_c!='\r'&&_c!=EOF)_c=getchar();}
+        fail "user input was not an int"
     return number
 
 def nat(console)
     doc "reads an unsigned integer from the console"
-    {builtins:nat number = 0; builtins:char ch = 0;}
-    {builtins:bool success = 0;}
-    {builtins:char first = getchar();}
-    {if(first != "-"[0] && first != EOF) {ungetc(first, stdin);builtins:int result = scanf("%lu%c", &number, &ch);success = (result == 2 && (ch == 13 || ch == 10));}}
-    if not success fail "user input was not a nat"
+    SPACE = char " "
+    {builtins:int _c; while((_c=getchar())==SPACE||_c=='\t');}
+    {builtins:nat number=0; builtins:bool _has=0; builtins:bool success=0;}
+    {if(_c!='-'){if(_c=='+')_c=getchar(); while(_c>='0'&&_c<='9'){number=number*10+(_c-'0');_has=1;_c=getchar();} success=_has&&(_c=='\n'||_c=='\r'||_c==EOF);}}
+    if not success
+        {while(_c!='\n'&&_c!='\r'&&_c!=EOF)_c=getchar();}
+        fail "user input was not a nat"
     return number
 
 def float(console)
     doc "reads a float from the console"
-    {builtins:float number = 0; builtins:char ch = 0;}
-    {builtins:int result = scanf("%lf%c", &number, &ch);}
-    {builtins:bool success = (result == 2 && (ch == 13 || ch == 10));}
-    if not success fail "user input was not a float"
+    SPACE = char " "
+    {builtins:int _c; while((_c=getchar())==SPACE||_c=='\t');}
+    {builtins:bool _neg=(_c=='-'); if(_neg||_c=='+') _c=getchar();}
+    {builtins:float number=0.0; builtins:bool _has=0;}
+    {while(_c>='0'&&_c<='9'){number=number*10.0+(_c-'0');_has=1;_c=getchar();}}
+    {if(_c=='.'){_c=getchar(); builtins:float _base=0.1; while(_c>='0'&&_c<='9'){number+=(_c-'0')*_base;_base*=0.1;_has=1;_c=getchar();}}}
+    {if(_neg) number=-number;}
+    {builtins:bool success=_has&&(_c=='\n'||_c=='\r'||_c==EOF);}
+    if not success
+        {while(_c!='\n'&&_c!='\r'&&_c!=EOF)_c=getchar();}
+        fail "user input was not a float"
     return number
 
 def int(cstr|str _s)
@@ -95,8 +109,7 @@ def float(cstr|str _s)
     if 0==len s fail "invalid float conversion from empty string"
     number = mut 0.0
     i = mut 0
-    if 0==len s
-        fail "invalid float conversion from empty string"
+    if 0==len s fail "invalid float conversion from empty string"
     i = mut 0
     negative = s[0]==char "-"
     if negative

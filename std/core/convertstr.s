@@ -18,6 +18,7 @@ local import "std/core/builtinsext.s"
 local import "std/core/convert.s"
 local import "std/core/range.s"
 local import "std/core/string.s"
+local import "std/core/array.s"
 
 def console()
     doc "references the system console"
@@ -66,6 +67,19 @@ def float(console)
         {while(_c!='\n'&&_c!='\r'&&_c!=EOF)_c=getchar();}
         fail "user input was not a float"
     return number
+
+def str(edit char[] buf, mut nat pos, console console)
+    doc "reads a string from the console into buf at pos, returns the read slice"
+    if buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
+    if buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
+    start = const pos
+    while true
+        {builtins:int _c = getchar();}
+        {if(_c=='\n'||_c=='\r'||_c==EOF){break;}}
+        if pos>=buf.unsafe_size fail "read string does not fit on buffer"
+        {buf__unsafe_ptr[pos]=_c;}
+        pos = pos+1
+    return str(buf, start, pos-start)
 
 def int(cstr|str _s)
     doc "converts a string to an integer"

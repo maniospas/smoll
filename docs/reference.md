@@ -1267,7 +1267,7 @@ is declared as `add(effect edit vec_allocator allocator, vec v1, vec v2)`.
 
 ```python
 import "std/core.s"
-import "std/vec.s"
+import "std/sci.s"
 
 def main()
     allocator  = bufpos float[].alloc 128
@@ -1660,11 +1660,33 @@ def main()
 
 ## vectors
 
-*Info: This subsection is under construction.*
+The standard library provides the means of conducting scientific computations
+via matrix and vector arithmetics. Everything is stored in underlying `float[]`
+buffers that can be set *allocator* effects and imported from the *std/sci.s* 
+file. Let us start with a quick preview of a vector. Vector elements can be
+set and read as if working on buffers, but additional operations are provided.
 
 ```python
 import "std/core.s"
-import "std/vec.s"
+import "std/sci.s"
+
+def main()
+    v = vec float[].alloc 5 # allocate a buffer and treat it as a vector
+    v[0] = 1.0
+    v[1] = 2.0
+    print ("(sum, mean, std) = (", "")
+    print (sum v, ", ")
+    print (mean v, ", ")
+    print (std v, ")\n")
+```
+
+Vectors can be placed on `bufpos` buffer-position pairs, as well as
+on circular buffer constructs that restart from the starting position 
+after the end.
+
+```python
+import "std/core.s"
+import "std/sci.s"
 
 def safe_main()
     allocator  = ref circular float[].alloc 200 # used by vector operation effects

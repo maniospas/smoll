@@ -1,4 +1,5 @@
 local import "std/core.s"
+local import "std/sci/math.s"
 
 def new()
     return class()
@@ -29,6 +30,12 @@ def vec(effect edit new allocator, nat length)
     doc "Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer."
     buf = float[].alloc length
     return vec(buf.unsafe_ptr, 0, length)
+
+def vec(edit float[] buf)
+    doc "treat a float buffer as a vector"
+    if buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
+    if buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
+    return vec(buf.unsafe_ptr, 0, len buf)
 
 def vec(effect edit vecpos allocator, nat length)
     doc "vector on an existing buffer"
@@ -67,11 +74,13 @@ def len(vec v)
 
 def mutget(vec v, nat i)
     doc "modify a vector element at given position"
-    unsafe_return unsafe_mut v.unsafe_ptr+8*(i+v.pos)
+    if i>=v.length fail "out of bounds"
+    return unsafe_mut v.unsafe_ptr+8*(i+v.pos)
 
 def get(const vec v, nat i)
     doc "get a vector element at given position"
-    unsafe_return v.unsafe_ptr+8*(i+v.pos)
+    if i>=v.length fail "out of bounds"
+    return v.unsafe_ptr+8*(i+v.pos)
 
 local def at(float number, nat i)
     return number
@@ -152,3 +161,40 @@ def div(effect edit vec_allocator allocator, float v1, vec v2)
     while try i=next it
         v[i] = v1/v2[i]
     return v
+    
+def reduce(vec v, "add"|"mul" reduction, blank|"sqr" transform)
+    if reduction is "add"
+        ret = mut 0.0
+    if reduction is "mul"
+        ret = mut 1.0
+    it = range len v
+    while try i=next it
+        value = mut v[i]
+        if transform is "sqr"
+            value = value*value
+        if reduction is "add"
+            ret = ret+value
+        if reduction is "mul"
+            ret = ret*value
+    return const ret
+
+def sum(vec v)
+    return v.reduce(type "add")
+
+def mean(vec v)
+    return v.reduce(type "add")/float len v
+
+def var(vec v)
+    sumsqr = mut 0.0
+    sum = mut 0.0
+    it = range len v
+    while try i=next it
+        value = v[i]
+        sum = sum+value
+        sumsqr = sumsqr+value*value
+    n = float len v
+    sum = sum/n
+    return sumsqr/n-sum*sum
+
+def std(vec v)
+    return sqrt var v

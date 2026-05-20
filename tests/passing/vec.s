@@ -1,5 +1,5 @@
 import "std/core.s"
-import "std/vec.s"
+import "std/sci.s"
 
 def safe_main()
     allocator  = ref float[].alloc(200).circular() # effects can grab it by name

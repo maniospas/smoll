@@ -700,7 +700,7 @@ class ImplementedType:
     def set_pointer_type(self, var: Variable, type: "ImplementedType"):
         assert var.type == POINTER_TYPE
         assert var.name not in self._pointer_type_dependencies
-        assert not self.get_pointer_type(var)
+        #assert not self.get_pointer_type(var)
         self._pointer_types[var.name] = type
 
     def follow_pointer_dependency(self, var: Variable) -> Variable|None:
@@ -2960,6 +2960,9 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             async def process_get(pos: int, rets: list[Variable]):
                 err_token = tokens[pos]
                 pos, additional_rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
+                while peek_text(tokens, pos)==",":
+                    pos, comma_rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
+                    additional_rets += comma_rets
                 if peek_text(tokens, pos)!="]": err_token.error("syntax", "missing closing ']'")
                 pos += 1
                 get_func_name = "get"
@@ -3170,6 +3173,73 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if is_lsp and next_token.file.is_main_file: print_lsp_string(next_token)
         impl.VM = next_token.text
         return pos+1,[]
+    if current=="args":
+        pos += 1
+        if peek_text(tokens, pos)!="[": get(tokens, pos).error("syntax", "expecting '[' after 'args'")
+        variables_sets: list[list[Variable]] = list()
+        pos, buffer_element = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
+        variables_sets.append(buffer_element)
+        if not any(element.type.builtin for element in buffer_element): 
+            current_token.error("type", "cannot create a buffer on empty data - it would not perform any allocation")
+        # find temp type for data on the buffer
+        temp_type = ImplementedType(create_temp())
+        total_name = ""
+        for j, element in enumerate(buffer_element):
+            new_name = "__"+str(j)
+            temp_type.rets.append(new_name)
+            temp_type.vars[new_name] = element.renamed_copy(new_name)
+            if total_name: total_name += ","
+            total_name += element.type.name
+        temp_type.name = total_name
+        buffer_type = create_buffer_type(temp_type.name+"____buffer", str(temp_type.memory_size()), temp_type, current_token)
+        buffer_type_method = UnionType(temp_type.name+"____t_buffer", at=current_token)
+        buffer_type_method.variations.append(buffer_type)
+        buffer_types[temp_type] = buffer_type_method
+        while get(tokens, pos).text==",":
+            pos += 1
+            pos, buffer_element = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
+            variables_sets.append(buffer_element)
+            if len(temp_type.rets)!=len(buffer_element): get(tokens, pos).error("type", "mismatching buffer contents")
+            for rx,ry in zip(buffer_element, temp_type.rets):
+                if rx.type!=temp_type.vars[ry].type: get(tokens, pos).error("type", "mismatching buffer contents")
+                if rx.immutable and not temp_type.vars[ry].immutable: get(tokens, pos).error("type", "mismatching buffer contents")
+        if peek_text(tokens, pos)!="]": get(tokens, pos).error("syntax", "expecting closing ']' for 'args' here")
+        created_buffer = resolve_call(file, impl, buffer_type_method, [], current_token)
+        #total_size = temp_type.memory_size()*len(variables_sets)
+
+        alloc_type = file.types.get("alloc", None)
+        if alloc_type is None: get(tokens, pos).error("syntax", "no valid 'alloc' allocator for buffer")
+        size_var = Variable(create_temp(), UINT_TYPE)
+        impl.vars[size_var.name] = size_var
+        impl.implementation.extend([
+            size_var,
+            CODEWORD_EQUALS,
+            CodeWord(str(len(variables_sets))),
+            CODEWORD_SEMICOLON,
+        ])
+        impl.set_pointer_type(created_buffer[1], temp_type)
+        resolve_call(file, impl, alloc_type, created_buffer+[size_var], current_token)
+
+        progress = 0
+        for buffer_element in variables_sets:
+            for r_var in buffer_element:
+                mem_size = r_var.type.memory_size() if r_var.type.builtin else 0
+                impl.vars[r_var.name] = r_var
+                if not mem_size: continue
+                impl.implementation.extend(
+                    [CodeWord(w) for w in "memcpy (".split(" ")]
+                    + [created_buffer[1]]
+                    + ([CODEWORD_ADD, CodeWord(str(progress))] if progress else [])
+                    + [CODEWORD_COMMA]
+                    + [CODEWORD_AMP]
+                    + [r_var]
+                    + [CODEWORD_COMMA, CodeWord(str(mem_size))]
+                    + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
+                )
+                progress += mem_size
+        return await process_statement_operator(file, tokens, impl, pos+1, created_buffer, current_operator_priority)
+
+
     if current=="mut":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable. This means that variables, fields and pointer contents may modified. This creates an error if mutable treatment is unsafe.")
         prev_pos = pos
@@ -4182,6 +4252,8 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
     row = 0
     has_tabs = False
     has_spaces = False
+    bracket_depth = 0
+    bracket_indent_stack = []
     try:
         with open(path, "r") as f:
             for line in f:
@@ -4203,15 +4275,24 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
                     if has_tabs: 
                         Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you are using spaces for this line's indentation, but previous lines used tabs")
                     has_spaces = True
-                while count_spaces < prev_nesting_level:
-                    tokens.append(Token(END_TOKEN, file, row, prev_nesting_level+1))
-                    error_nesting_level = prev_nesting_level
-                    nesting_levels.pop() # pop from back
-                    prev_nesting_level = nesting_levels[len(nesting_levels)-1]
-                    if count_spaces > prev_nesting_level: Token(" "*count_spaces, file, row, 1).error("syntax", f"misaligned indentation - expecting this line to start {error_nesting_level} {'tab' if has_tabs else 'space'}{'s' if error_nesting_level!=1 else 0} deep but it starts at {prev_nesting_level+1}")
-                if count_spaces > prev_nesting_level:
-                    tokens.append(Token(START_TOKEN, file, row, count_spaces+1))
-                    nesting_levels.append(count_spaces)
+                if bracket_depth == 0 or (line.startswith("]") or line.startswith(")")):
+                    while count_spaces < prev_nesting_level:
+                        tokens.append(Token(END_TOKEN, file, row, prev_nesting_level+1))
+                        error_nesting_level = prev_nesting_level
+                        nesting_levels.pop() # pop from back
+                        prev_nesting_level = nesting_levels[len(nesting_levels)-1]
+                        if count_spaces > prev_nesting_level: Token(" "*count_spaces, file, row, 1).error("syntax", f"misaligned indentation - expecting this line to start {error_nesting_level} {'tab' if has_tabs else 'space'}{'s' if error_nesting_level!=1 else 0} deep but it starts at {prev_nesting_level+1}")
+                    if count_spaces > prev_nesting_level:
+                        tokens.append(Token(START_TOKEN, file, row, count_spaces+1))
+                        nesting_levels.append(count_spaces)
+                else: 
+                    required = bracket_indent_stack[-1]
+                    if count_spaces <= required:
+                        Token(" "*count_spaces, file, row, 1).error(
+                            "syntax",
+                            f"continuation line inside brackets must be indented more than the opening line "
+                            f"(expected more than {required} {'tab' if has_tabs else 'space'}{'s' if required != 1 else ''}, got {count_spaces})"
+                        )
                 col = 0
                 token_start = 0
                 while col < len(line):
@@ -4244,6 +4325,10 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
                         while True:
                             col += 1
                             if col==len(line): break
+                            if c in "([": bracket_depth += 1; bracket_indent_stack.append(count_spaces)
+                            if c in ")]": 
+                                bracket_depth -= 1
+                                if bracket_indent_stack: bracket_indent_stack.pop()
                             if c in "(){}[];&|.": break
                             c = line[col]
                             if c not in symbols or c in "(){}[];&|": break

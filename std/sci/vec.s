@@ -6,8 +6,8 @@ def new()
 
 def circular(any[] buf, mut nat pos, nat length)
     return (buf, pos, length)
-local def vecpos(float[] buf, mut nat pos)
-local def vec_allocator = new|vecpos|circular
+def vecpos(float[] buf, mut nat pos)
+def vec_allocator = new|vecpos|circular
 
 def circular(mut float[] buf, mut nat|blank pos, nat|blank length)
     doc "circular buffer"
@@ -22,7 +22,7 @@ def circular(mut float[] buf, mut nat|blank pos, nat|blank length)
     pos = pos+length
     return circular(buf, start, length)
 
-local def vec(float ptr unsafe_ptr, nat pos, nat length)
+def vec(float ptr unsafe_ptr, nat pos, nat length)
     return class(unsafe_ptr, pos, length)
 
 def vec(effect edit new allocator, nat length)
@@ -198,3 +198,27 @@ def var(vec v)
 
 def std(vec v)
     return sqrt var v
+
+def print(vec v, cstr|blank endl)
+    doc "print a vector as a row: [ 1.0  2.0  3.0 ]"
+    if endl is blank
+        endl = "\n"
+    print ("[ ", "")
+    it = range v.length
+    while try i=next it
+        print (v[i], "")
+        if i<v.length-1
+            print ("  ", "")
+    print (" ]", endl)
+
+# def print(vec v, "row"|"col" orientation)
+#     doc "print a vector as a row or column"
+#     if orientation is "row"
+#         print v
+#         print ("\n", "")
+#     if orientation is "col"
+#         it = range v.length
+#         while try i=next it
+#             print ("[ ", "")
+#             print (v[i], "")
+#             print (" ]\n", "")

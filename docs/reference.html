@@ -19,16 +19,11 @@
         line-height:1.2
         }
         h1 {margin-top:60px}
-        @media (prefers-color-scheme: dark) {
-            body {
-                color:#c9d1d9;
-                background:#0d1117
-            }
+        a {
+            color:#888;
+            text-decoration: none;
         }
-        a:link {
-            color:#58a6ff
-        }
-        a:visited {
+        a:hover {
             color:#58a6ff
         }
         .topbar {
@@ -60,11 +55,33 @@
             top:0;
             padding-left:20px;
             width:200px;
-            border-right: 1px solid #444;height:100%;
-            background:#fafafa!important;
             overflow-y:auto;
             font-size:0.9rem;
             z-index:1000;
+        }
+        .toc i {color: #888}
+        pre {
+            color: #2f2f2f;
+        }
+        @media (prefers-color-scheme: dark) {
+            a {
+                color:#aaa;
+            }
+            body {
+                color:#eeeeee;
+                background:#1f1f1f;
+            }
+            .topbar {
+                color:#eeeeee;
+                background:#1f1f1f;
+                border-bottom: 1px solid #444;
+            }
+            .topbar a {color:#dddddd;}
+            .toc {
+                color:#eeeeee;
+                background:#1f1f1f;
+            }
+            
         }
         @media (max-width: 1380px) {
             body {margin:10px;}
@@ -108,7 +125,7 @@
             padding: 1rem;
             padding-right: 1.5rem;
             margin-right: 0.5rem;
-            border: 1px solid #444;
+            border: 1px solid #aaa;
             border-radius: 15px;
             width: 200px!important;
             font-size: 1.4rem;
@@ -127,6 +144,8 @@
             background: #fafafa;
             color: #58a6ff;
         }
+        .step {border: 1px solid #444; padding-left:20px; border-radius: 15px;background: #fafafa;margin-bottom:2rem;}
+        .button {background: white;color:#58a6ff}
         @media (prefers-color-scheme: dark) {
             .box-warning {
                 background: #272115;
@@ -136,6 +155,8 @@
                 background: #0d1f3c;
                 color: #79c0ff;
             }
+            .step {background: #2f2f2f;border: 1px solid #444;}
+            .button {background: #fafae3;color:black}
         }
         </style>
     </head>
@@ -163,15 +184,15 @@
 
 <p><strong>Section 2. Safe Resources</strong><br>
 <em>2.1.</em> <a href="#buffers">buffers</a><br>
-<em>2.2.</em> <a href="#pointers">⚠ pointers</a><br>
-<em>2.3.</em> <a href="#substructures">⚠ substructures</a><br>
+<em>2.2.</em> <a href="#pointers">{pointers}</a><br>
+<em>2.3.</em> <a href="#substructures">{substructures}</a><br>
 <em>2.4.</em> <a href="#stable-references">stable references</a><br>
 <em>2.5.</em> <a href="#try-and-fail">try and fail</a><br>
 <em>2.6.</em> <a href="#defer">defer</a><br>
 <em>2.7.</em> <a href="#catching-errors">catching errors</a><br>
 <em>2.8.</em> <a href="#effects">effects</a><br>
-<em>2.9.</em> <a href="#debugging-tools">⚠ debugging tools</a><br>
-<em>2.10.</em> <a href="#bounded-compute">⚠ bounded compute</a><br></p>
+<em>2.9.</em> <a href="#debugging-tools">{debugging tools}</a><br>
+<em>2.10.</em> <a href="#bounded-compute">{bounded compute}</a><br></p>
 
 <p><strong>Section 3. Standard Library</strong><br>
 <em>3.1.</em> <a href="#lists">lists</a><br>
@@ -180,10 +201,10 @@
 <em>3.4.</em> <a href="#io">io</a><br>
 <em>3.5.</em> <a href="#processes">processes</a><br>
 <em>3.6.</em> <a href="#random">random</a><br>
-<em>3.7.</em> <a href="#mini-and-bits">⚠ mini and bits</a><br>
+<em>3.7.</em> <a href="#mini-and-bits">{mini and bits}</a><br>
 <em>3.8.</em> <a href="#vectors">vectors</a><br></p>
 
-<p>⚠ Advanced functionality.</p>
+<p>{&#8230;} are advanced functionality</p>
 
 </div>
 
@@ -412,10 +433,7 @@ be able to overwrite the immutable <code>t.y</code> field by itself.</p>
 </code></pre>
 </div>
 
-<p>You can normally overwrite mutable fields even if you cannot overwrite 
-whole type&#8217;s instance at once. This is the default mutability mode, but
-one can also use <code>const</code> instead of <code>mut</code> to strip away any mutation
-capability.</p>
+<p>You can strip away any mutation capabilities by use <code>const</code> like <code>mut</code>.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -434,7 +452,9 @@ capability.</p>
 </code></pre>
 </div>
 
-<p>The same rules hold for function arguments. Below is an example.</p>
+<p>All function arguments are considered <code>const</code>.
+If you want to preserve their type&#8217;s mutable fields
+without allowing a full rewrite use <code>edit</code>.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -444,8 +464,8 @@ capability.</p>
     <span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">(</span><span class="n">const</span> <span class="n">Test</span> <span class="n">t</span><span class="p">)</span>
-    <span class="c1"># t.x = 10 # disallowed</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">(</span><span class="n">edit</span> <span class="n">Test</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1"># allowed only thanks to &#39;edit&#39;</span>
     <span class="nb">print</span> <span class="n">t</span><span class="o">.</span><span class="n">x</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -701,7 +721,8 @@ of type unions with the <code>&amp;</code> symbol. Use parantheses like normal.<
 <p>Here is an example where, say, we define a <code>float</code> function that returns
 something other than a builtin float number. We can get the intersection
 of all float definitions that are also numbers, or all those definitions
-that are not numbers with the &#8216;` symbol.</p>
+that are not numbers with the &#8216;` symbol, which is the mathematical 
+symbol for set differces.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="c1"># defines Number like above</span>
@@ -892,7 +913,7 @@ two type inference constructs: </p>
 
 <p>In total, the compiler investigates 3*4=12
 variations and eventually keeps 6 of them. Both conditional checks in the example
-zero-cost abstractions in that they never occur during execution.</p>
+occur only during compilation and do not affect running time.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -915,9 +936,91 @@ zero-cost abstractions in that they never occur during execution.</p>
 
 <h2 id="buffers">buffers</h2>
 
-<p>Buffers are memory-allocated collections of items.
-They can be declared with the following syntax to hold 
-any type&#8217;s items:</p>
+<p>Buffers are memory-allocated collections of items
+and can be declared as <code>T[]</code>, where <em>T</em> is a type.
+Create and allocate a buffer per <code>buf = float[].alloc 4</code>. 
+Buffer internals are mutable,
+which means that allocation would modify the original empty buffer,
+if that was stored in a variable (see below).</p>
+
+<p>Allocation will create an error if it tries to change the number of
+elements from a non-zero number to something different.
+In those cases, use <code>resize</code> instead, though the exact usage of
+this is covered in <a href="#stable-references">stable references</a>.</p>
+
+<p>A second important feature is the element access operator <code>buffer[pos]</code>,
+which can be used to extract an object stored at a specific position. 
+In general, this operator is implemented by overloading the <code>get</code> 
+and <code>mutget</code> functions; beware that details involve pointers
+tackled in the next section. 
+Use <code>buffer[pos] = value</code> to copy some data on a buffer&#8217;s element.</p>
+
+<p>All buffer indexes are of type <code>nat</code>, which represents natural numbers 
+(non-negative integers) and avoids a whole area of logic bugs associated
+with negative indexing. Next is an example of buffer usage.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">10</span> <span class="c1"># allocate 10 elements</span>
+    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># prints 0, as buffers are zero-initialized</span>
+    <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<p>The outcome of allocation is a mutable buffer. Declare this as 
+as <code>const</code> to disallow content modifications or any resizing. 
+Below is any example of how the compiler enforces this constraint.
+The compiler does show some additional information like element size
+in bytes and, importantly, if there are dependent buffers from which
+the type is inferred. The imporant part to look out for is that
+<code>mutget</code> is being called for mutable element access -so as to modify
+an element- and that requires edit permissions 
+when a buffer is an argument (<code>edit any[]</code>) but the local buffer
+is <code>const float[]</code>. You might be tempted to promote the buffer <em>buf</em> to
+being mutable, but elevating buffer or -more generally- pointer pemissions
+from constant to mutable is not allowed for safety.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">()</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">2</span>
+    <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="k">return</span> <span class="n">const</span> <span class="n">buf</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">create</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="c1"># CREATES AN ERROR</span>
+</code></pre>
+</div>
+
+<div class="console">
+<code class="output">
+[<span style="color:orange">+</span>] process      tests/test.s
+<span style="color:#F056AC">type error: could not resolve any call for 'mutget(const float[] {element size 8} {follows float ptr ..unsafe_ptr}, nat) -> any'</span>
+    alternatives
+    - mutget(edit any[] {element size ?}, nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
+    - mutget(list, nat pos) -> (mut any ptr ret {follows any ptr l.buffer.unsafe_ptr})
+at tests/test.s line 5 column 12
+    buf[1] = 1.0 # CREATES AN ERROR
+       <span style="color:red">^</span>
+</code>
+</div>
+
+<p>Use <code>any</code> as the type to mark functions with type-agnostic
+operations. The original type cannot be retrieved back while
+those functions are running, but this operation is useful for writing
+generic code. If you run a 
+function with such generic typing, the compiler identifies
+the correct output types for buffers of pointers. For example,
+the abovedescribed allocation mechanism is implemented
+for generic buffers and automatically converted back into
+the input buffer type.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -931,42 +1034,31 @@ any type&#8217;s items:</p>
 </code></pre>
 </div>
 
-<p>One of the most important buffer features is the <code>alloc</code> function to
-allocate and zero-initialize a specific number of elements. 
-This returns the buffer itself as a mutable to enable initialization 
-per patterns like <code>buf = float[].alloc 4</code>. Buffer internals are mutable,
-which means that allocation modifies the original empty buffer too (see below).
-Make use of the <code>KB</code>, <code>MB</code>, <code>GB</code> functions to quickly size allocations.</p>
-
-<p>Allocation will create an error if it tries to change the number of
-elements from a non-zero number to something different.
-In those cases, use <code>resize</code> instead, though the exact usage of
-this is covered in <a href="#stable-references">stable references</a>.</p>
-
-<p>A second important feature is the element access operator <code>buffer[pos]</code>,
-which can be used to extract an object stored at a specific position. 
-In general, this operator is implemented by overloading the <code>get</code> 
-and <code>mutget</code> functions, though beware that details do involve pointers
-and tackled in the next section. 
-Use <code>buffer[pos] = value</code> to copy some data on a buffer&#8217;s element.</p>
-
-<p>All buffer indexes are of type <code>nat</code>, which represents natural numbers 
-(non-negative integers). Here is an example of buffer usage.</p>
+<p>For function arguments that need to be spacialized
+on a buffer type, declare an intermediate
+type like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
+<span class="k">def</span><span class="w"> </span><span class="nf">named_buffer</span><span class="p">(</span><span class="nb">str</span> <span class="n">name</span><span class="p">,</span> <span class="n">edit</span> <span class="nb">any</span><span class="p">[]</span> <span class="n">buf</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">buf</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">named_strbuffer</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">named_buffer</span><span class="p">(</span><span class="nb">str</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">[])</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">populate</span><span class="p">(</span><span class="n">edit</span> <span class="n">named_strbuffer</span> <span class="n">named</span><span class="p">)</span> <span class="c1"># for str[] only</span>
+    <span class="n">named</span><span class="o">.</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;hello&quot;</span>
+    <span class="n">named</span><span class="o">.</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;world&quot;</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="nb">float</span><span class="p">[]</span>
-    <span class="n">buf</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">10</span> <span class="c1"># allocate 10 elements</span>
-    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># prints 0, as buffers are zero-initialized</span>
-    <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">elements</span> <span class="o">=</span> <span class="n">named_buffer</span><span class="p">(</span><span class="nb">str</span> <span class="s2">&quot;greeting&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">[])</span>
+    <span class="n">elements</span><span class="o">.</span><span class="n">buf</span> <span class="o">=</span> <span class="n">elements</span><span class="o">.</span><span class="n">buf</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">2</span>
+    <span class="n">populate</span> <span class="n">elements</span>
+    <span class="nb">print</span> <span class="n">elements</span><span class="o">.</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="n">elements</span><span class="o">.</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 </code></pre>
 </div>
-
-<p>Declare a buffer as <code>const</code> to disallow any modifications to its
-contents. This further prevents resizing or reallocation.</p>
 
 <h2 id="pointers">pointers</h2>
 
@@ -993,15 +1085,17 @@ of mutable pointers per <code>ptr &lt;&lt; value</code>. Given all these operato
 it is now possible to explain that <code>buffer[pos]=value</code> desugares 
 to the pointer notations <code>buffer[pos]&amp;&amp;&lt;&lt;value</code>.</p>
 
-<p><em>Smoλ</em> makes some checks on pointer safety. As it would be too cumbersome 
-to granularly impose such safety using the type system, there is only one main rule:
-<strong>pointers are invalidated if any memory is resized, moved, or freed</strong>. This
-rule is introduced by the memory manipulation functions of the standard library.</p>
+<p><em>Smoλ</em>&#8217;s compiler checks on pointer safety and creates error if
+it cannot prove safe behavior. By not relying on programmatic
+semantics, a wide breadth of programs is allowed. It will mainly
+ask you to return together all values whose internal pointers may
+have become tangled due to function calling and returning. For example,
+if you allocate a character buffer to place strings inside that you store on 
+a second buffer of strings, the compiler requires that the two buffers
+are returned together.
+Or you may be asked to not invalidate with <code>del</code> memory that is used elsewhere.</p>
 
-<p>Mainly, the type of data stored on pointers
-is checked for consistency. Invalidated pointers (for example whose
-data have moved in memory by modifying a buffer) cannot be used. 
-Functions declare pointer arguments per <code>any ptr</code>, <code>float ptr</code>, etc.
+<p>Functions declare pointer arguments per <code>any ptr</code>, <code>float ptr</code>, etc.
 Below is an example.</p>
 
 <div class="codehilite">
@@ -1341,7 +1435,11 @@ You only get one additional benefit; the compiler will try to pull variables wit
 from the calling scope. Effects can only be placed at the start of funtion, and gathered
 scope variables will be placed there too. </p>
 
-<p>Below is an example. Do avoid using effects when not needed for clarity, as they introduce calling complexity.</p>
+<p>Below is an example. Avoid using effects when not needed for clarity, as they introduce 
+calling complexity in that you are not explicitly passing arguments around
+That said, you can explicitly pass all function arguments,
+in which case functions are called normally and nothing is gathered; this prevents 
+accidental implicit behavior.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1353,8 +1451,34 @@ scope variables will be placed there too. </p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">counter</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
     <span class="n">increment</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="nb">print</span> <span class="n">inc</span> <span class="n">inc</span> <span class="n">inc</span> <span class="mi">9</span>  <span class="c1"># prints 12</span>
-    <span class="nb">print</span> <span class="n">counter</span>        <span class="c1"># prints 3 (&#39;inc&#39; was called three times)</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="n">inc</span> <span class="n">inc</span> <span class="mi">9</span>      <span class="c1"># prints 12</span>
+    <span class="nb">print</span> <span class="n">inc</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">counter</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="c1"># prints 7</span>
+    <span class="nb">print</span> <span class="n">counter</span>            <span class="c1"># prints 4 (&#39;inc&#39; was called four times)</span>
+</code></pre>
+</div>
+
+<p>Where effects are the most useful is overloading operations that require
+external resources. The next example demonstrates this using vectors
+from the corresponding standard library <a href="#vectors">section</a>, where
+the <em>allocator</em> effect is used to pass a shared preallocated memory buffer
+to all needed vector construction. Effects do not propagate outwards,
+so you can only look at function signatures to know which effects can
+be declared. For example, one of the possible
+additions involving vectors, which is used by the <code>+</code> operator,
+is declared as <code>add(effect edit vec_allocator allocator, vec v1, vec v2)</code>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/vec.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">allocator</span>  <span class="o">=</span> <span class="n">bufpos</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">vec</span> <span class="mi">10</span> <span class="c1"># vector of 10 elements</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">vec</span> <span class="mi">10</span>
+    <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">v2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">v1</span><span class="o">+</span><span class="n">v2</span>
+    <span class="nb">print</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre>
 </div>
 
@@ -1390,10 +1514,12 @@ For example, one pattern usable for debuggining is the following.</p>
 </div>
 
 <p>Finally, assert that a specific point in a function does not lie within a loop
-or condition with the <code>debug:branchless()</code> check. This helps form sanity check within 
-conditional compilation conditions, ensuring that
-they are not accidentally evaluated at runtime. The next example uses it to verify that 
-there is no runtime overhead from a particular comparison involving enums.</p>
+or condition with the <code>debug:branchless()</code> check. This asserts that there is no 
+conditional compilation going on, with the compiler creating an error otherwis, 
+and can be used to ensure that conditions not accidentally evaluated at runtime. 
+The next example uses it to verify that  there is no runtime overhead from a particularly
+complicated comparison - this is skipped because the difference in the types of <em>a</em> and <em>b</em>&#8217;
+suffices to make a judgement, even if enums usually require runtime checking.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>

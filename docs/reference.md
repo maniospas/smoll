@@ -14,15 +14,15 @@ _1.10._ [conditional compilation and default arguments](#conditional-compilation
 
 **Section 2. Safe Resources**<br>
 _2.1._ [buffers](#buffers)<br>
-_2.2._ [⚠ pointers](#pointers)<br>
-_2.3._ [⚠ substructures](#substructures)<br>
+_2.2._ [{pointers}](#pointers)<br>
+_2.3._ [{substructures}](#substructures)<br>
 _2.4._ [stable references](#stable-references)<br>
 _2.5._ [try and fail](#try-and-fail)<br>
 _2.6._ [defer](#defer)<br>
 _2.7._ [catching errors](#catching-errors)<br>
 _2.8._ [effects](#effects)<br>
-_2.9._ [⚠ debugging tools](#debugging-tools)<br>
-_2.10._ [⚠ bounded compute](#bounded-compute)<br>
+_2.9._ [{debugging tools}](#debugging-tools)<br>
+_2.10._ [{bounded compute}](#bounded-compute)<br>
 
 **Section 3. Standard Library**<br>
 _3.1._ [lists](#lists)<br>
@@ -31,10 +31,10 @@ _3.3._ [maps](#maps)<br>
 _3.4._ [io](#io)<br>
 _3.5._ [processes](#processes)<br>
 _3.6._ [random](#random)<br>
-_3.7._ [⚠ mini and bits](#mini-and-bits)<br>
+_3.7._ [{mini and bits}](#mini-and-bits)<br>
 _3.8._ [vectors](#vectors)<br>
 
-⚠ Advanced functionality.
+{...} are advanced functionality
 
 </div>
 
@@ -259,11 +259,7 @@ def main()
     print(t.x) 
 ```
 
-You can normally overwrite mutable fields even if you cannot overwrite 
-whole type's instance at once. This is the default mutability mode, but
-one can also use `const` instead of `mut` to strip away any mutation
-capability.
-
+You can strip away any mutation capabilities by use `const` like `mut`.
 ```python
 import "std/core.s"
 
@@ -280,7 +276,9 @@ def main()
     print t.y # prints 2
 ```
 
-The same rules hold for function arguments. Below is an example.
+All function arguments are considered `const`.
+If you want to preserve their type's mutable fields
+without allowing a full rewrite use `edit`.
 
 ```python
 import "std/core.s"
@@ -290,8 +288,8 @@ def Test()
     y = 2
     return class(x, y)
 
-def test(const Test t)
-    # t.x = 10 # disallowed
+def test(edit Test t)
+    t.x = 10 # allowed only thanks to 'edit'
     print t.x
 
 def main()
@@ -539,7 +537,8 @@ of type unions with the `&` symbol. Use parantheses like normal.
 Here is an example where, say, we define a `float` function that returns
 something other than a builtin float number. We can get the intersection
 of all float definitions that are also numbers, or all those definitions
-that are not numbers with the '\` symbol.
+that are not numbers with the '\` symbol, which is the mathematical 
+symbol for set differces.
 
 ```python
 import "std/core.s" # defines Number like above
@@ -722,7 +721,7 @@ two type inference constructs:
   
 In total, the compiler investigates 3*4=12
 variations and eventually keeps 6 of them. Both conditional checks in the example
-zero-cost abstractions in that they never occur during execution.
+occur only during compilation and do not affect running time.
 
 ```python
 import "std/core.s"
@@ -744,9 +743,89 @@ def main()
 
 ## buffers
 
-Buffers are memory-allocated collections of items.
-They can be declared with the following syntax to hold 
-any type's items:
+Buffers are memory-allocated collections of items
+and can be declared as `T[]`, where *T* is a type.
+Create and allocate a buffer per `buf = float[].alloc 4`. 
+Buffer internals are mutable,
+which means that allocation would modify the original empty buffer,
+if that was stored in a variable (see below).
+
+Allocation will create an error if it tries to change the number of
+elements from a non-zero number to something different.
+In those cases, use `resize` instead, though the exact usage of
+this is covered in [stable references](#stable-references).
+
+A second important feature is the element access operator `buffer[pos]`,
+which can be used to extract an object stored at a specific position. 
+In general, this operator is implemented by overloading the `get` 
+and `mutget` functions; beware that details involve pointers
+tackled in the next section. 
+Use `buffer[pos] = value` to copy some data on a buffer's element.
+
+All buffer indexes are of type `nat`, which represents natural numbers 
+(non-negative integers) and avoids a whole area of logic bugs associated
+with negative indexing. Next is an example of buffer usage.
+
+```python
+import "std/core.s"
+
+def main()
+    buf = float[].alloc 10 # allocate 10 elements
+    print buf[0] # prints 0, as buffers are zero-initialized
+    buf[1] = 1.0
+    print buf[1]
+```
+
+The outcome of allocation is a mutable buffer. Declare this as 
+as `const` to disallow content modifications or any resizing. 
+Below is any example of how the compiler enforces this constraint.
+The compiler does show some additional information like element size
+in bytes and, importantly, if there are dependent buffers from which
+the type is inferred. The imporant part to look out for is that
+`mutget` is being called for mutable element access -so as to modify
+an element- and that requires edit permissions 
+when a buffer is an argument (`edit any[]`) but the local buffer
+is `const float[]`. You might be tempted to promote the buffer *buf* to
+being mutable, but elevating buffer or -more generally- pointer pemissions
+from constant to mutable is not allowed for safety.
+
+```python
+import "std/core.s"
+
+def create()
+    buf = float[].alloc 2
+    buf[0] = 1.0
+    buf[1] = 2.0
+    return const buf
+
+def main()
+    buf = create()
+    print buf[0]
+    buf[1] = 1.0 # CREATES AN ERROR
+```
+
+<div class="console">
+<code class="output">
+[<span style="color:orange">+</span>] process      tests/test.s
+<span style="color:#F056AC">type error: could not resolve any call for 'mutget(const float[] {element size 8} {follows float ptr ..unsafe_ptr}, nat) -> any'</span>
+    alternatives
+    - mutget(edit any[] {element size ?}, nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
+    - mutget(list, nat pos) -> (mut any ptr ret {follows any ptr l.buffer.unsafe_ptr})
+at tests/test.s line 5 column 12
+    buf[1] = 1.0 # CREATES AN ERROR
+       <span style="color:red">^</span>
+</code>
+</div>
+
+Use `any` as the type to mark functions with type-agnostic
+operations. The original type cannot be retrieved back while
+those functions are running, but this operation is useful for writing
+generic code. If you run a 
+function with such generic typing, the compiler identifies
+the correct output types for buffers of pointers. For example,
+the abovedescribed allocation mechanism is implemented
+for generic buffers and automatically converted back into
+the input buffer type.
 
 ```python
 import "std/core.s"
@@ -759,41 +838,30 @@ def main()
     print(x)
 ```
 
-One of the most important buffer features is the `alloc` function to
-allocate and zero-initialize a specific number of elements. 
-This returns the buffer itself as a mutable to enable initialization 
-per patterns like `buf = float[].alloc 4`. Buffer internals are mutable,
-which means that allocation modifies the original empty buffer too (see below).
-Make use of the `KB`, `MB`, `GB` functions to quickly size allocations.
-
-Allocation will create an error if it tries to change the number of
-elements from a non-zero number to something different.
-In those cases, use `resize` instead, though the exact usage of
-this is covered in [stable references](#stable-references).
-
-A second important feature is the element access operator `buffer[pos]`,
-which can be used to extract an object stored at a specific position. 
-In general, this operator is implemented by overloading the `get` 
-and `mutget` functions, though beware that details do involve pointers
-and tackled in the next section. 
-Use `buffer[pos] = value` to copy some data on a buffer's element.
-
-All buffer indexes are of type `nat`, which represents natural numbers 
-(non-negative integers). Here is an example of buffer usage.
+For function arguments that need to be spacialized
+on a buffer type, declare an intermediate
+type like below.
 
 ```python
 import "std/core.s"
 
-def main()
-    buf = float[]
-    buf.alloc 10 # allocate 10 elements
-    print buf[0] # prints 0, as buffers are zero-initialized
-    buf[1] = 1.0
-    print buf[1]
-```
+def named_buffer(str name, edit any[] buf)
+    return class(name, buf)
 
-Declare a buffer as `const` to disallow any modifications to its
-contents. This further prevents resizing or reallocation.
+def named_strbuffer()
+    return named_buffer(str "", str[])
+
+def populate(edit named_strbuffer named) # for str[] only
+    named.buf[0] = str "hello"
+    named.buf[1] = str "world"
+
+def main()
+    elements = named_buffer(str "greeting", str[])
+    elements.buf = elements.buf.alloc 2
+    populate elements
+    print elements.buf[0]
+    print elements.buf[1]
+```
 
 ## pointers
 
@@ -820,14 +888,16 @@ of mutable pointers per `ptr << value`. Given all these operators
 it is now possible to explain that `buffer[pos]=value` desugares 
 to the pointer notations `buffer[pos]&&<<value`.
 
-*Smoλ* makes some checks on pointer safety. As it would be too cumbersome 
-to granularly impose such safety using the type system, there is only one main rule:
-**pointers are invalidated if any memory is resized, moved, or freed**. This
-rule is introduced by the memory manipulation functions of the standard library.
+*Smoλ*'s compiler checks on pointer safety and creates error if
+it cannot prove safe behavior. By not relying on programmatic
+semantics, a wide breadth of programs is allowed. It will mainly
+ask you to return together all values whose internal pointers may
+have become tangled due to function calling and returning. For example,
+if you allocate a character buffer to place strings inside that you store on 
+a second buffer of strings, the compiler requires that the two buffers
+are returned together.
+Or you may be asked to not invalidate with `del` memory that is used elsewhere.
 
-Mainly, the type of data stored on pointers
-is checked for consistency. Invalidated pointers (for example whose
-data have moved in memory by modifying a buffer) cannot be used. 
 Functions declare pointer arguments per `any ptr`, `float ptr`, etc.
 Below is an example.
 
@@ -1164,7 +1234,11 @@ You only get one additional benefit; the compiler will try to pull variables wit
 from the calling scope. Effects can only be placed at the start of funtion, and gathered
 scope variables will be placed there too. 
 
-Below is an example. Do avoid using effects when not needed for clarity, as they introduce calling complexity.
+Below is an example. Avoid using effects when not needed for clarity, as they introduce 
+calling complexity in that you are not explicitly passing arguments around
+That said, you can explicitly pass all function arguments,
+in which case functions are called normally and nothing is gathered; this prevents 
+accidental implicit behavior.
 
 ```python
 import "std/core.s"
@@ -1176,8 +1250,33 @@ def inc(effect nat increment, effect mut nat counter, nat number)
 def main()
     counter = mut 0
     increment = 1
-    print inc inc inc 9  # prints 12
-    print counter        # prints 3 ('inc' was called three times)
+    print inc inc inc 9      # prints 12
+    print inc(3, counter, 4) # prints 7
+    print counter            # prints 4 ('inc' was called four times)
+```
+
+Where effects are the most useful is overloading operations that require
+external resources. The next example demonstrates this using vectors
+from the corresponding standard library [section](#vectors), where
+the *allocator* effect is used to pass a shared preallocated memory buffer
+to all needed vector construction. Effects do not propagate outwards,
+so you can only look at function signatures to know which effects can
+be declared. For example, one of the possible
+additions involving vectors, which is used by the `+` operator,
+is declared as `add(effect edit vec_allocator allocator, vec v1, vec v2)`.
+
+```python
+import "std/core.s"
+import "std/vec.s"
+
+def main()
+    allocator  = bufpos float[].alloc 128
+    v1 = vec 10 # vector of 10 elements
+    v2 = vec 10
+    v1[0] = 1.0
+    v2[0] = 2.0
+    result = v1+v2
+    print result[0]
 ```
 
 
@@ -1212,10 +1311,12 @@ def main()
 ```
 
 Finally, assert that a specific point in a function does not lie within a loop
-or condition with the `debug:branchless()` check. This helps form sanity check within 
-conditional compilation conditions, ensuring that
-they are not accidentally evaluated at runtime. The next example uses it to verify that 
-there is no runtime overhead from a particular comparison involving enums.
+or condition with the `debug:branchless()` check. This asserts that there is no 
+conditional compilation going on, with the compiler creating an error otherwis, 
+and can be used to ensure that conditions not accidentally evaluated at runtime. 
+The next example uses it to verify that  there is no runtime overhead from a particularly
+complicated comparison - this is skipped because the difference in the types of *a* and *b*'
+suffices to make a judgement, even if enums usually require runtime checking.
 
 ```python
 import "std/core.s"

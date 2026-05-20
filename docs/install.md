@@ -1,12 +1,5 @@
 # Install smoλ
 
-
-<style>
-    .step {border: 1px solid #444; padding-left:20px; border-radius: 15px;background: #fafafa;margin-bottom:2rem;}
-    .button {background: white;}
-</style>
-
-
 The recommended way to use *smoλ* is through vscode, a popular and rather lightweight code editor.
 But the steps below apply to any setup:
 

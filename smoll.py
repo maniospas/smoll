@@ -397,8 +397,14 @@ class Variable(CodeSegment):
         if error_token and self.type==POINTER_TYPE and self.immutable: 
             error_token.error("safety", "cannot make mutable an immutable pointer '"+pretty_name(self.name)+"'", suggestions=["set the pointer or its data structure locally as a 'ref'; this fixes references to the original while mutating the rest", "if you know what you are doing, use 'unsafe_mut' instead to overwrite safety"])
         if error_token and self._references: # this should not appear when 'mut' is used for both mutation and safe mutation
-            error_token.error("safety", "cannot make a reference mutable '"+pretty_name(self.name), suggestions=["use 'safe_mut' instead", "use 'ref mut' instead of 'mut ret'"])
+            error_token.error("safety", "cannot make a reference mutable '"+pretty_name(self.name), suggestions=["use 'safe_mut' instead", "use 'ref mut' instead of 'mut ref'"])
         return Variable(self.name, self.type, False, self.isprivate, self._references, error_token if error_token else self.token)
+    def editable_copy(self):
+        if self.type==POINTER_TYPE and self.immutable: 
+            return self
+        if self._references:
+            return self
+        return Variable(self.name, self.type, self.immutable and not self.isprivate, self.isprivate, self._references, self.token)
     def immutable_copy(self): return Variable(self.name, self.type, True, False, self._references, self.token)
     def private_copy(self): return Variable(self.name, self.type, self.immutable, True, self._references, self.token)
     def is_same(self, other: "Variable"):
@@ -3086,6 +3092,19 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'mut' but the current value consists only of references")
         mutated = [r.mutable_copy(tokens[prev_pos]) if r.stabilized_name()==r.name else r for r in ret]
         return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
+    if current=="edit":
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable. This means that variables, fields and pointer contents may modified. This creates an error if mutable treatment is unsafe.")
+        prev_pos = pos
+        pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
+        if len(ret)==0:
+            current_token.error("safety", "next value is blank")
+        tmp = create_temp()
+        impl.assign(tmp, ret, current_token)
+        ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
+        if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'edit' but the current value consists only of references")
+        mutated = [r.editable_copy() if r.stabilized_name()==r.name else r for r in ret]
+        return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
+    
     if current=="try":
         async def process_try(pos: int):
             if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**try**\n\nTries to execute the rest of the statement without failing. The result is a true or false boolean value, depending on whether an error occurred or not; the error's value is retrieved by the next 'compiler:caught()'.")

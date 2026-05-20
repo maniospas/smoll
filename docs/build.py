@@ -66,16 +66,11 @@ def export(path, target):
         line-height:1.2
         }
         h1 {margin-top:60px}
-        @media (prefers-color-scheme: dark) {
-            body {
-                color:#c9d1d9;
-                background:#0d1117
-            }
+        a {
+            color:#888;
+            text-decoration: none;
         }
-        a:link {
-            color:#58a6ff
-        }
-        a:visited {
+        a:hover {
             color:#58a6ff
         }
         .topbar {
@@ -107,11 +102,33 @@ def export(path, target):
             top:0;
             padding-left:20px;
             width:200px;
-            border-right: 1px solid #444;height:100%;
-            background:#fafafa!important;
             overflow-y:auto;
             font-size:0.9rem;
             z-index:1000;
+        }
+        .toc i {color: #888}
+        pre {
+            color: #2f2f2f;
+        }
+        @media (prefers-color-scheme: dark) {
+            a {
+                color:#aaa;
+            }
+            body {
+                color:#eeeeee;
+                background:#1f1f1f;
+            }
+            .topbar {
+                color:#eeeeee;
+                background:#1f1f1f;
+                border-bottom: 1px solid #444;
+            }
+            .topbar a {color:#dddddd;}
+            .toc {
+                color:#eeeeee;
+                background:#1f1f1f;
+            }
+            
         }
         @media (max-width: 1380px) {
             body {margin:10px;}
@@ -155,7 +172,7 @@ def export(path, target):
             padding: 1rem;
             padding-right: 1.5rem;
             margin-right: 0.5rem;
-            border: 1px solid #444;
+            border: 1px solid #aaa;
             border-radius: 15px;
             width: 200px!important;
             font-size: 1.4rem;
@@ -174,6 +191,8 @@ def export(path, target):
             background: #fafafa;
             color: #58a6ff;
         }
+        .step {border: 1px solid #444; padding-left:20px; border-radius: 15px;background: #fafafa;margin-bottom:2rem;}
+        .button {background: white;color:#58a6ff}
         @media (prefers-color-scheme: dark) {
             .box-warning {
                 background: #272115;
@@ -183,6 +202,8 @@ def export(path, target):
                 background: #0d1f3c;
                 color: #79c0ff;
             }
+            .step {background: #2f2f2f;border: 1px solid #444;}
+            .button {background: #fafae3;color:black}
         }
         </style>
     </head>"""+f"""

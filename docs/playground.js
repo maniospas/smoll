@@ -205,13 +205,14 @@ function ansiToHtml(raw){
   return result;
 }
 
-btnClearCache.addEventListener('click', function() {
+btnClearCache.addEventListener('click', async function() {
   var removed = 0;
   //localStorage.removeItem(CACHE_SMOLL); removed++;
   Object.keys(localStorage)
     .filter(function(k) { return k.startsWith(CACHE_DL_PFX); })
     .forEach(function(k) { localStorage.removeItem(k); removed++; });
   clog('Cache cleared (' + removed + ' entries)');
+  await initPyodide();
 });
 
 })();

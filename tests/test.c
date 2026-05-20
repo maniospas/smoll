@@ -5,9 +5,9 @@
 #include "std/extern/math.h"
 int __temp_argc;
 char** __temp_argv;
+const char* const __temp1863v="(sum, mean, std) = (";
 const char* const __temp822v="";
 const char* const __temp1871v=")\n";
-const char* const __temp1863v="(sum, mean, std) = (";
 const char* const __temp1866v=", ";
 static const char* __temp_all_errcodes[38] = {"noerr",
 "error",

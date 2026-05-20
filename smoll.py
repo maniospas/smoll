@@ -29,6 +29,7 @@ import argparse
 import itertools
 import subprocess
 import platform
+import math
 import urllib.request
 import urllib.parse
 from pathlib import Path
@@ -1014,7 +1015,7 @@ class ImplementedType:
                         if candidate.monomorphic_name==candidate_name:
                             callee = candidate
                             break
-                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy", "strlen", "memcmp", "fopen", "fclose", "fgets"]:
+                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy", "strlen", "memcmp", "fopen", "fclose", "fgets", "sqrt", "sin", "cos", "pos", "exp", "tan", "atan", "pow"]:
                     self.at.error("interpreter", "failed to interpret C function '"+candidate_name+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                 gathered_args: list[str] = list()
                 gathered_args_by_pointer: list[bool] = list()
@@ -1186,6 +1187,42 @@ class ImplementedType:
                         memory.contents[buf_addr + len(encoded)] = 0   # null terminator
                         return buf_addr
 
+                    if candidate_name == "sqrt":
+                        if len(values) != 1: self.at.error("malformed smollC", "'sqrt' requires one argument")
+                        if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'sqrt'")
+                        return values[0]**0.5
+
+                    if candidate_name == "pow":
+                        if len(values) != 2: self.at.error("malformed smollC", "'pow' requires two arguments")
+                        if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'pow'")
+                        if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'pow'")
+                        return values[0]**value[1]
+
+                    if candidate_name == "cos":
+                        if len(values) != 1: self.at.error("malformed smollC", "'cos' requires one argument")
+                        if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'cos'")
+                        return math.cos(values[0])
+
+                    if candidate_name == "sin":
+                        if len(values) != 1: self.at.error("malformed smollC", "'sin' requires one argument")
+                        if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'sin'")
+                        return math.sin(values[0])
+
+                    if candidate_name == "tan":
+                        if len(values) != 1: self.at.error("malformed smollC", "'tan' requires one argument")
+                        if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'tan'")
+                        return math.tan(values[0])
+
+                    if candidate_name == "asin":
+                        if len(values) != 1: self.at.error("malformed smollC", "'asin' requires one argument")
+                        if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'asin'")
+                        return math.asin(values[0])
+
+                    if candidate_name == "acos":
+                        if len(values) != 1: self.at.error("malformed smollC", "'acos' requires one argument")
+                        if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'acos'")
+                        return math.acos(values[0])
+
                     if candidate_name == "printf":
                         if not values: return None
                         fmt_arg = values[0]
@@ -1239,7 +1276,10 @@ class ImplementedType:
                                 self.at.error("interpreter", f"unimplemented printf specifier '{spec}'")
                         print("".join(result), end="", flush=True)
                         return None
-                assert callee, candidate_name
+                
+
+                if not callee:
+                    self.at.error("interpreter", "failed to interpret C function '"+candidate_name+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                 #inputs = [v for v in values]
                 if recursion_budget<=1 and self.force_not_inline:
                     self.at.error("interpreter", "recursion budget reached at: "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)]))

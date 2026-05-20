@@ -21,7 +21,7 @@ def cstr(compiler:catch value)
     if endl is blank
         doc "automatically ends the line too"
         endl = "\n"
-    {builtins:cstr ret = __temp_all_errcodes[value];}
+    {builtins:cstr ret = __t_all_errcodes[value];}
     return ret
 
 def exists(compiler:catch value)

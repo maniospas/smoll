@@ -250,7 +250,7 @@ def pretty_name(name: str):
 
 temps: list[str]= list()
 def create_temp():
-    temp = "__temp"+str(len(temps))+"v"
+    temp = "__t"+str(len(temps))+"t" # important to end at a sentinel character because we sometimes check the start of strings
     temps.append(temp)
     return temp
 
@@ -268,7 +268,7 @@ def longest_common_prefix(strings: list[str]) -> str:
             found = i+1
         i += 1
     prefix = first[:found]
-    if "____temp" in prefix: prefix = prefix[:prefix.rfind("____temp")+2]
+    if "____t" in prefix: prefix = prefix[:prefix.rfind("____t")+2]
     return prefix
 #from mypy_extensions import mypyc_attr
 
@@ -414,7 +414,7 @@ class Variable(CodeSegment):
         if self.isprivate!=other.isprivate: return False
         #if self.type.builtin and self.name!=other.name: return False # skip name matching
         return True
-    def is_temp(self): return self.name.startswith("__temp")
+    def is_temp(self): return self.name.startswith("__t")
     def stable_copy(self):
         return Variable(self.name, self.type, self.immutable, self.isprivate, self.name, self.token)
     def stabilized_name(self) -> str:
@@ -429,7 +429,7 @@ def signature_like(vars: list[Variable], impl=None):
         if ret: ret += ", "
         type = vars[i].type
         arg_name = vars[i].name
-        if arg_name.startswith("__temp") or "____" in arg_name: arg_name = ""
+        if arg_name.startswith("__t") or "____" in arg_name: arg_name = ""
         else: arg_name = " "+arg_name.replace("__", ".")
         if type.builtin: 
             if not vars[i].immutable: ret += "mut "
@@ -465,6 +465,14 @@ def signature_like(vars: list[Variable], impl=None):
 
 global_cstr2var: dict[str,str] = dict() # from literal to variable name
 global_var2cstr: dict[str,str] = dict() # from variable name to literal
+
+
+def rename(seq: list, substitute: dict[str, Variable], others: dict[str, CodeWord]=dict()) -> list:
+    result = []
+    for seg in seq:
+        if isinstance(seg, Variable): result.append(substitute.get(seg.name, seg))
+        else: result.append(others.get(seg.tostring(), seg))
+    return result
 
 class ImplementedType:
     def __init__(self, name: str, builtin:str|None=None, at:Optional["Token"]=None, memory_size=0):
@@ -548,106 +556,146 @@ class ImplementedType:
         return [self.vars[ret._references] if ret._references else ret for ret in rets]
 
     def simplify(self) -> None:
-        label_usage: dict[str, int] = dict()
+        impl = self.implementation
+
+        if (len(impl) >= 3
+                and impl[-3].tostring() == "goto"
+                and impl[-2].tostring() == "__t_return"
+                and impl[-1].tostring() == ";") and not self.needs_failure_mode:
+            self.implementation = impl[:-3]
+            impl = self.implementation
+
+        # ── 2. count assignments with loop awareness ──────────────────────
+        # Variables assigned inside a while body get weight 2, making them
+        # ineligible for substitution. Without this, a temp written once per
+        # iteration looks "set once" in a flat scan and gets substituted away,
+        # deleting the call that produced it.
         variable_sets: dict[str, int] = dict()
 
-        # remove final return goto
-        if len(self.implementation)>=3 and self.implementation[-3].tostring()=="goto" and self.implementation[-2].tostring()=="__temp_return":
-            assert self.implementation[-1].tostring()==";"
-            self.implementation = self.implementation[:-3]
+        # First pass: find which token positions are inside a while body.
+        loop_positions: set[int] = set()
+        brace_depth = 0
+        loop_brace_depths: list[int] = []  # stack: brace depths that open a loop
+        pending_loop = False               # saw 'while', waiting for the opening '{'
+        for i, tok in enumerate(impl):
+            t = tok.tostring()
+            if t == "while":
+                pending_loop = True
+            elif t == "{":
+                brace_depth += 1
+                if pending_loop:
+                    loop_brace_depths.append(brace_depth)
+                pending_loop = False
+            elif t == "}":
+                if loop_brace_depths and loop_brace_depths[-1] == brace_depth:
+                    loop_brace_depths.pop()
+                brace_depth -= 1
+            else:
+                if t not in ("(", ")"):   # '(' and ')' are part of while(cond)
+                    pending_loop = False  # anything else resets (shouldn't happen)
+            if loop_brace_depths:
+                loop_positions.add(i)
 
-        # remove goto next label, otherwise count label usage, and count variable modifications
-        new_implementation = list()
-        pos = -1
-        while pos<len(self.implementation)-1:
+        # Second pass: count, weighting loop-body assignments so they are ≥ 2.
+        for pos, tok in enumerate(impl):
+            t = tok.tostring()
+            if t in ("=", "&") and pos > 0:
+                var = impl[pos - 1].tostring()
+                weight = 2 if pos in loop_positions else 1
+                variable_sets[var] = variable_sets.get(var, 0) + weight
+
+        # ── 3. remove "goto L ; L :" (jump to the immediately following label) ─
+        new_impl: list = []
+        pos = 0
+        while pos < len(impl):
+            if (impl[pos].tostring() == "goto"
+                    and pos + 4 < len(impl)
+                    and impl[pos + 2].tostring() == ";"
+                    and impl[pos + 3].tostring() == impl[pos + 1].tostring()
+                    and impl[pos + 4].tostring() == ":"):
+                pos += 3  # skip "goto L ;" — the "L :" stays so other gotos land
+                continue
+            new_impl.append(impl[pos])
             pos += 1
-            v = self.implementation[pos]
-            text = v.tostring()
-            if text in ["=", "&"] and pos:
-                var = self.implementation[pos-1].tostring()
-                variable_sets[var] = variable_sets.get(var, 0)+1
-            if text=="goto" and pos<len(self.implementation)-2:
-                label = self.implementation[pos+1].tostring()
-                assert self.implementation[pos+2].tostring()==";"
-                if pos<len(self.implementation)-4 and self.implementation[pos+3].tostring()==label:
-                    assert self.implementation[pos+4].tostring()==":"
-                    pos += 1 # skip the goto statement
+        self.implementation = new_impl
+        impl = self.implementation
+
+        # ── 4. pin rets, args, and defer-referenced vars ──────────────────
+        for var in self.rets:
+            variable_sets[var] = variable_sets.get(var, 0) + 2
+        for var in self.args:
+            variable_sets[var] = variable_sets.get(var, 0) + 2
+        for defer in self.returned_defers:
+            for seg in defer:
+                if isinstance(seg, Variable):
+                    variable_sets[seg.name] = variable_sets.get(seg.name, 0) + 2
+
+        # ── 5. build substitution map ─────────────────────────────────────
+        # Pattern: "lhs = rhs ;" where lhs is a __t set exactly once.
+        # rhs must also be a Variable in scope so we know its type is valid.
+        # Chain-follow: if rhs itself is already substituted, track through it.
+        substitute: dict[str, Variable] = dict()
+        pos = 0
+        while pos < len(impl):
+            if (impl[pos].tostring() == "="
+                    and pos > 0
+                    and pos + 2 < len(impl)
+                    and isinstance(impl[pos - 1], Variable)
+                    and isinstance(impl[pos + 1], Variable)
+                    and impl[pos + 2].tostring() == ";"):
+                lhs: str = impl[pos - 1].tostring()
+                rhs_seg: Variable = impl[pos + 1]
+                rhs_name: str = rhs_seg.tostring()
+                if (variable_sets.get(lhs, 0) == 1
+                        and lhs not in self.args
+                        and lhs not in self.rets
+                        and rhs_name in self.vars):
+                    substitute[lhs] = substitute.get(rhs_name, rhs_seg)
+            pos += 1
+
+        # ── 6. rename mangled temp-field vars to clean temps ─────────────
+        # e.g. __t3v____field → __tNv  (cosmetic, but shrinks C output)
+        for var in list(self.vars.keys()):
+            if (var.startswith("__t") and "____" in var
+                    and var not in substitute
+                    and var not in self.args
+                    and var not in self.rets):
+                new_val = self.vars[var].renamed_copy(create_temp())
+                substitute[var] = new_val
+                self.vars[new_val.name] = new_val
+
+        # ── 7. apply substitutions everywhere ────────────────────────────
+        self.implementation = rename(self.implementation, substitute)
+        self.defers = [rename(d, substitute) for d in self.defers]
+        self.returned_defers = [rename(d, substitute) for d in self.returned_defers]
+
+        # ── 8. remove no-op assignments "x = x ;" ────────────────────────
+        def remove_noop(seq: list) -> list:
+            result = []
+            pos = 0
+            while pos < len(seq):
+                if (pos + 3 < len(seq)
+                        and seq[pos + 1].tostring() == "="
+                        and seq[pos].tostring() == seq[pos + 2].tostring()
+                        and seq[pos + 3].tostring() == ";"):
+                    pos += 4
                     continue
-                label_usage[label] = label_usage.get(label,0)+1
-            new_implementation.append(v)
-        self.implementation = new_implementation
-
-        # remove variables that are set only once, unless those are args or returned
-        for var in self.rets: variable_sets[var] = variable_sets.get(var, 0)+2
-        for var in self.args: variable_sets[var] = variable_sets.get(var, 0)+2
-        for var in self.returned_defers:
-            if isinstance(var, Variable): variable_sets[var.name] = variable_sets.get(var.name, 0)+2
-        substitute: dict[str,Variable] = dict()
-
-        for var, val in list(self.vars.items()):
-            if var.startswith("__temp") and "____" in var and var not in substitute and var not in self.args and var not in self.rets:
-                val = val.renamed_copy(create_temp())
-                substitute[var] = val
-                self.vars[val.name] = val
-
-        def count(impl):
-            pos = -1
-            while pos<len(impl)-1:
+                result.append(seq[pos])
                 pos += 1
-                v = impl[pos]
-                text = v.tostring() 
-                if text=="=" and pos and pos<len(self.implementation)-2 and impl[pos+2]==";":
-                    var = impl[-1].tostring()
-                    rhs = impl[1].tostring()
-                    if variable_sets.get(var,0)==1 and rhs in self.vars:
-                        substitute[var] = substitute.get(rhs, impl[1])
-        count(self.implementation)
-        
-        def rename(impl):
-            new_implementation = list()
-            pos = -1
-            while pos<len(impl)-1:
-                pos += 1
-                v = impl[pos]
-                text = v.tostring() 
-                new_implementation.append(substitute.get(text, v))
-            return new_implementation
-
-        self.implementation = rename(self.implementation)
-        self.defers = [rename(defer) for defer in self.defers]
-        self.returned_defers = [rename(defer) for defer in self.returned_defers]
-
-        def remove_noop(impl):
-            new_implementation = list()
-            pos = -1
-            while pos<len(impl)-1:
-                pos += 1
-                if pos<len(impl)-3 and impl[pos+1].tostring()=="=" and impl[pos].tostring()==impl[pos+2].tostring() and impl[pos+3].tostring()==";":
-                    pos += 3
-                    continue
-                new_implementation.append(impl[pos])
-            return new_implementation
+            return result
 
         self.implementation = remove_noop(self.implementation)
-        self.defers = [remove_noop(defer) for defer in self.defers]
-        self.returned_defers = [remove_noop(defer) for defer in self.returned_defers]
+        self.defers = [remove_noop(d) for d in self.defers]
+        self.returned_defers = [remove_noop(d) for d in self.returned_defers]
 
-
-        # clean up the set of used variables
-
-        varset: set[str] = set()
-        for vs in self.args: varset.add(vs)
-        for vs in self.rets: varset.add(vs)
-        for v in self.implementation:
-            if isinstance(v, Variable): varset.add(v.name)
-        for defer in self.defers:
-            for v in defer:
-                if isinstance(v, Variable): varset.add(v.name)
-        for defer in self.returned_defers:
-            for v in defer:
-                if isinstance(v, Variable): varset.add(v.name)
-        self.vars = {k:v for k,v in self.vars.items() if k in varset}
-
+        # ── 9. prune vars dict to only live names ────────────────────────
+        varset: set[str] = set(self.args) | set(self.rets)
+        for seq in [self.implementation] + self.defers + self.returned_defers:
+            for seg in seq:
+                if isinstance(seg, Variable):
+                    varset.add(seg.name)
+        self.vars = {k: v for k, v in self.vars.items() if k in varset}
+        
 
     def set_pointer_type(self, var: Variable, type: "ImplementedType"):
         assert var.type == POINTER_TYPE
@@ -717,7 +765,7 @@ class ImplementedType:
         if len(value)>1:
             common_prefix = longest_common_prefix([var.name for var in value])
             len_common_prefix = len(common_prefix)
-            if top_entry and "__" in varname and not varname.startswith("__temp"):
+            if top_entry and "__" in varname and not varname.startswith("__t"):
                 if not any(v.startswith(varname) for v in self.vars.keys()):
                     error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'")
             for var in value: self.assign(varname+"__"+var.name[len_common_prefix:], [var], error_token, perform_immutability_checks, False)
@@ -725,7 +773,7 @@ class ImplementedType:
             error_token.error("type", "cannot assign more than one values to variable '"+varname+"'")
         existing = self.vars.get(varname, None)
         if not existing:
-            if top_entry and "__" in varname and not varname.startswith("__temp"):
+            if top_entry and "__" in varname and not varname.startswith("__t"):
                 if not any(v.startswith(varname) for v in self.vars.keys()):
                     error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'")
             current_prefix = varname+"__"
@@ -819,7 +867,7 @@ class ImplementedType:
         if self.has_returned_once and len(self.rets)!=len(value):
             error_token.error("type", "this value returned here is a different type than previous returns '"+signature_like([self.vars[ret] for ret in self.rets])+"' vs '"+signature_like(value)+"'")
         for pos, arg in enumerate(value):
-            if not arg.name.startswith("__temp"): self.return_names[arg.name] = pos
+            if not arg.name.startswith("__t"): self.return_names[arg.name] = pos
             if self.has_returned_once: 
                 self.assign(self.rets[pos], [arg], error_token, perform_immutability_checks=False, top_entry=False) # TODO: do not use assign but a manual setting to allow overwriting (or make mutable)
             else:
@@ -938,7 +986,7 @@ class ImplementedType:
                         else:  # 64-bit int or pointer
                             return memory.read_int64(index)
                     return int(memory.contents[index])  # fallback
-            if impl[pos].tostring()=="__temp_all_errcodes":
+            if impl[pos].tostring()=="__t_all_errcodes":
                 assert impl[pos+1].tostring()=="["
                 assert impl[pos+3].tostring()=="]"
                 value = await process_expression(impl, pos+2,pos+2)
@@ -969,7 +1017,7 @@ class ImplementedType:
                 if k in self.vars: 
                     if self.vars[k].type==FLOAT_TYPE: return 0.0
                     return 0
-                if k == "__temp_complain": return 0 # may not be a var yet
+                if k == "__t_complain": return 0 # may not be a var yet
                 return self.at.error("interpreter", "failed to parse '"+k+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
             elif impl[pos+1].tostring()=="=":
                 varname = impl[pos].tostring()
@@ -1375,8 +1423,8 @@ class ImplementedType:
                     continue
                 if impl[pos].tostring()==";":
                     if pos==prev_pos+2 and impl[prev_pos].tostring()=="goto":
-                        if impl[pos-1].tostring() in "__temp_return": return "return"
-                        if impl[pos-1].tostring() == "__temp_failure":  return "failure"
+                        if impl[pos-1].tostring() in "__t_return": return "return"
+                        if impl[pos-1].tostring() == "__t_failure":  return "failure"
                         self.at.error("interpreter", "cannot goto arbitrary C position 'goto "+impl[pos-1].tostring()+"'")
                     await process_expression(impl, prev_pos, pos-1)
                     prev_pos = pos+1
@@ -1427,31 +1475,31 @@ class ImplementedType:
                     values[pos] = test_value
             for defer in reversed(self.defers): await process_block(defer, 0, len(defer)-1)
         self.can_try_interpreter = True
-        return local_vars.get("__temp_errcode", 0)
+        return local_vars.get("__t_errcode", 0)
             
-    def transpile(self) -> str:
+    def transpile(self, for_inlining=False) -> str:
         #print(self.signature())
         #for k,v in self.dependent_assignments.items():
         #    print("  ", v, "->", k)
         #print(len(self.defers))
         #print(len(self.returned_defers))
         #self.simplify()
+
         ret_body_start = ""
         ret_body_end = ""
         arg_code = ""
-        for arg in self.args:
-            arg_type_builtin = self.vars[arg].type.builtin
-            if arg_type_builtin: 
-                if arg_code: arg_code += ", "
-                if self.vars[arg].immutable: arg_code += arg_type_builtin+" "+arg
-                else: 
-                    tmp = create_temp()
-                    arg_code += arg_type_builtin+"* "+tmp
-                    ret_body_start += arg_type_builtin+" "+arg+"=*"+tmp+";\n  "
-                    ret_body_end += "*"+tmp+"="+arg+";\n  "
-
-            # other args are just class alignment
-            # else: raise Exception("cannot handle non-builtin arguments: '"+arg+"'")
+        if not for_inlining:
+            for arg in self.args:
+                # other args are just class alignment
+                arg_type_builtin = self.vars[arg].type.builtin
+                if arg_type_builtin: 
+                    if arg_code: arg_code += ", "
+                    if self.vars[arg].immutable: arg_code += arg_type_builtin+" "+arg
+                    else: 
+                        tmp = create_temp()
+                        arg_code += arg_type_builtin+"* "+tmp
+                        ret_body_start += arg_type_builtin+" "+arg+"=*"+tmp+";\n  "
+                        ret_body_end += "*"+tmp+"="+arg+";\n  "
         ret_code = ""
         for arg in self.rets:
             arg_type_builtin = self.vars[arg].type.builtin
@@ -1466,14 +1514,15 @@ class ImplementedType:
         arg_code += ret_code
         doinline = (self.complexity<500 or self.num_calls<=1) and not self.force_not_inline
 
-        ret = ("static inline __attribute__((always_inline)) " if doinline else "")+("int " if self.needs_failure_mode else "void ")+self.monomorphic_name+"("+arg_code+") {\n  "
-        ret += ret_body_start
+        if not for_inlining:
+            ret = ("static inline __attribute__((always_inline)) " if doinline else "")+("int " if self.needs_failure_mode else "void ")+self.monomorphic_name+"("+arg_code+") {\n  "
+            ret += ret_body_start
         for var, val in self.vars.items():
             if var in self.args: continue
             if val.type.builtin and not val.name in self.used_globals: ret += val.type.builtin+" "+var+"=0;\n  "
             # non-built-ins are theoretical constructs only
-        if self.needs_failure_mode: ret += "int __temp_errcode=0;\n  "
-        if self.has_any_complaint or self.needs_failure_mode: ret += "int __temp_complain=0;\n  "
+        if self.needs_failure_mode: ret += "int __t_errcode=0;\n  "
+        if self.has_any_complaint or self.needs_failure_mode: ret += "int __t_complain=0;\n  "
         prev = ";"
         for token in self.implementation:
             tok = token.tostring()
@@ -1484,8 +1533,8 @@ class ImplementedType:
             elif tok=="}": ret += "}\n  "
             else: ret += tok
         if self.needs_failure_mode:
-            #ret += "\n  goto __temp_final;" # skip failure handling
-            ret += "\n  __temp_failure:"
+            #ret += "\n  goto __t_final;" # skip failure handling
+            ret += "\n  __t_failure:"
             # apply defers that are applied on failure
             defer_ret = ""
             for defer in reversed(self.returned_defers):
@@ -1499,8 +1548,8 @@ class ImplementedType:
                     elif tok=="}": defer_ret += "}\n  "
                     else: defer_ret += tok
             ret += defer_ret
-            if any(token.tostring()=="__temp_return" for token in self.implementation):
-                ret += "__temp_return:\n  "
+            if any(token.tostring()=="__t_return" for token in self.implementation):
+                ret += "__t_return:\n  "
             # set return values if needed
             ret += ret_body_end
             # apply defers that are applied on success
@@ -1516,10 +1565,11 @@ class ImplementedType:
                     elif tok=="}": defer_ret += "}\n  "
                     else: defer_ret += tok
             ret += defer_ret
-            ret += "\n  return __temp_errcode;\n}"
+            if not for_inlining:
+                ret += "\n  return __t_errcode;\n}"
         else:
-            if any(token.tostring()=="__temp_return" for token in self.implementation):
-                ret += "__temp_return:\n  "
+            if any(token.tostring()=="__t_return" for token in self.implementation):
+                ret += "__t_return:\n  "
             # set return values if needed
             ret += ret_body_end
             # apply defers that are applied on success
@@ -1821,7 +1871,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.implementation.extend([
             var,
             CODEWORD_EQUALS,
-            CodeWord("__temp_complain"),
+            CodeWord("__t_complain"),
             CODEWORD_SEMICOLON,
         ])
         impl.has_any_complaint = True
@@ -1829,14 +1879,14 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             try_var,
             CODEWORD_EQUALS,
             CODEWORD_LPAR,
-            CodeWord("__temp_complain"),
+            CodeWord("__t_complain"),
             CodeWord("=="),
             CodeWord("0"),
             CODEWORD_RPAR,
             CODEWORD_SEMICOLON,
         ])
         impl.implementation.extend([
-            CodeWord("__temp_complain"),
+            CodeWord("__t_complain"),
             CODEWORD_EQUALS,
             CodeWord("0"),
             CODEWORD_SEMICOLON,
@@ -1887,14 +1937,14 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if try_var is not None:
             impl.has_any_complaint = True
             impl.implementation.extend([
-                CodeWord("__temp_complain"),
+                CodeWord("__t_complain"),
                 CODEWORD_EQUALS,
                 CallPointer(callee),#CodeWord(callee.monomorphic_name),
                 CODEWORD_LPAR,
             ])
         else:
             impl.implementation.extend([
-                CodeWord("__temp_errcode"),
+                CodeWord("__t_errcode"),
                 CODEWORD_EQUALS,
                 CallPointer(callee),#CodeWord(callee.monomorphic_name),
                 CODEWORD_LPAR,
@@ -1908,7 +1958,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     impl.used_error_codes.add(callee)
     for defer in callee.returned_defers:
         for i in range(len(defer)-3):
-            if defer[i].tostring()=="__temp_errcode" and defer[i+1].tostring()=="=" and defer[i+3].tostring()==";":
+            if defer[i].tostring()=="__t_errcode" and defer[i+1].tostring()=="=" and defer[i+3].tostring()==";":
                 impl.spawned_error_codes.add(int(defer[i+2].tostring()))
     for varpos, var in enumerate(vars):
         if var.type.builtin: 
@@ -2020,7 +2070,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             impl.implementation.extend([
                 try_var,
                 CODEWORD_EQUALS,
-                CodeWord("__temp_complain"),
+                CodeWord("__t_complain"),
                 CODEWORD_SEMICOLON,
             ])
 
@@ -2032,7 +2082,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.implementation.extend([
             CODEWORD_IF,
             CODEWORD_LPAR,
-            CodeWord("__temp_errcode"),
+            CodeWord("__t_errcode"),
             CODEWORD_RPAR,
             CODEWORD_LBRACKET,
         ])
@@ -2048,7 +2098,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             ])
         impl.implementation.extend([
             CODEWORD_GOTO,
-            CodeWord("__temp_failure"),
+            CodeWord("__t_failure"),
             CODEWORD_SEMICOLON,
             CODEWORD_RBRACKET
         ])
@@ -2146,7 +2196,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     if try_var is not None:
         impl.has_any_complaint = True
         impl.implementation.extend([
-            CodeWord("__temp_complain"),
+            CodeWord("__t_complain"),
             CODEWORD_EQUALS,
             CodeWord("2"),
             CODEWORD_SEMICOLON,
@@ -2168,7 +2218,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
                 CODEWORD_SEMICOLON,
             ])
         impl.implementation.extend([
-            CodeWord("__temp_errcode"),
+            CodeWord("__t_errcode"),
             CODEWORD_EQUALS,
             CodeWord("2"),
             CODEWORD_SEMICOLON
@@ -2176,7 +2226,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
         impl.spawned_error_codes.add(2)
         impl.implementation.extend([
             CODEWORD_GOTO,
-            CodeWord("__temp_failure"),
+            CodeWord("__t_failure"),
             CODEWORD_SEMICOLON,
             CODEWORD_RBRACKET
         ])
@@ -2315,7 +2365,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
             max_candidate_common_length = 0
             for type in file.types.values():
                 for variation in type.variations:
-                    if "__temp" in variation.name: continue
+                    if "__t" in variation.name: continue
                     common_length = len(longest_common_prefix([variation.name, name]))
                     if common_length>max_candidate_common_length: 
                         candidates = list()
@@ -2338,7 +2388,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
             if get(tokens, pos+2).text!="]": at_pos.error("syntax", "to denote a buffer type use '[]'")
             buffer_type: UnionType|None = buffer_types[type] if type in buffer_types else None
             if buffer_type is None:
-                buffer_type = UnionType(type.name+"____temp_buffer", at=type.at)
+                buffer_type = UnionType(type.name+"____t_buffer", at=type.at)
                 unique_variations = find_unique_variations(type.variations) if reduce_to_unique_variations else type.variations
                 #unique_variations = type.variations
                 #if len(unique_variations)!=1: at_pos.error("safety", "it is not clear which version should be used for '"+type.name+"[]'", suggestions=[candidate.signature() for candidate in unique_variations])
@@ -2346,7 +2396,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
                     variation_buffer_type = buffer_types.get(type, None)
                     if variation_buffer_type is None:
                         actual_variation = create_buffer_type(buffer_type.name+"____buffer", str(variation.memory_size()), variation, get(tokens, pos))
-                        variation_buffer_type = UnionType(buffer_type.name+"____temp_buffer", at=variation.at)
+                        variation_buffer_type = UnionType(buffer_type.name+"____t_buffer", at=variation.at)
                         variation_buffer_type.append(actual_variation)
                         buffer_types[variation] = variation_buffer_type
                     buffer_type.variations.extend(variation_buffer_type.variations)
@@ -2538,7 +2588,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             if try_var is not None:
                 impl.has_any_complaint = True
                 impl.implementation.extend([
-                    CodeWord("__temp_complain"),
+                    CodeWord("__t_complain"),
                     CODEWORD_EQUALS,
                     CodeWord("2"),
                     CODEWORD_SEMICOLON,
@@ -2561,7 +2611,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         CODEWORD_SEMICOLON,
                     ])
                 impl.implementation.extend([
-                    CodeWord("__temp_errcode"),
+                    CodeWord("__t_errcode"),
                     CODEWORD_EQUALS,
                     CodeWord("2"),
                     CODEWORD_SEMICOLON
@@ -2569,7 +2619,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 impl.spawned_error_codes.add(2)
                 impl.implementation.extend([
                     CODEWORD_GOTO,
-                    CodeWord("__temp_failure"),
+                    CodeWord("__t_failure"),
                     CODEWORD_SEMICOLON,
                     CODEWORD_RBRACKET
                 ])
@@ -2879,7 +2929,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     candidates: list[ImplementedType] = list()
                     max_candidate_common_length = 0
                     for varname in impl.vars:
-                        if varname.startswith("__temp") or "____temp" in varname: continue
+                        if varname.startswith("__t") or "____t" in varname: continue
                         common_length = len(longest_common_prefix([varname, current]))
                         if common_length>max_candidate_common_length: 
                             candidates = list()
@@ -2986,7 +3036,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             if try_var is not None:
                 impl.has_any_complaint = True
                 impl.implementation.extend([
-                    CodeWord("__temp_complain"),
+                    CodeWord("__t_complain"),
                     CODEWORD_EQUALS,
                     ret[0],
                     CODEWORD_SEMICOLON
@@ -2995,12 +3045,12 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             else:
                 if impl.is_parsing_a_defer: current_token.error("safety", "cannot fail within a 'defer' statement unless within a 'try'")
                 impl.implementation.extend([
-                    CodeWord("__temp_errcode"),
+                    CodeWord("__t_errcode"),
                     CODEWORD_EQUALS,
                     ret[0],
                     CODEWORD_SEMICOLON,
                     CODEWORD_GOTO,
-                    CodeWord("__temp_failure"),
+                    CodeWord("__t_failure"),
                     CODEWORD_SEMICOLON
                 ])
                 impl.needs_failure_mode = current_token
@@ -3029,7 +3079,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if try_var is not None:
             impl.has_any_complaint = True
             impl.implementation.extend([
-                CodeWord("__temp_complain"),
+                CodeWord("__t_complain"),
                 CODEWORD_EQUALS,
                 CodeWord(str(err_code)),
                 CODEWORD_SEMICOLON
@@ -3038,12 +3088,12 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         else:
             if impl.is_parsing_a_defer: current_token.error("safety", "cannot fail within a 'defer' statement unless within a 'try'")
             impl.implementation.extend([
-                CodeWord("__temp_errcode"),
+                CodeWord("__t_errcode"),
                 CODEWORD_EQUALS,
                 CodeWord(str(err_code)),
                 CODEWORD_SEMICOLON,
                 CODEWORD_GOTO,
-                CodeWord("__temp_failure"),
+                CodeWord("__t_failure"),
                 CODEWORD_SEMICOLON
             ])
             impl.needs_failure_mode = current_token
@@ -3171,7 +3221,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
     if current=="local":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**local**\n\nCreates an anonymized version of the next variable. Anonymization prevents mutable modidications from affecting the original, although it does not safeguard memory contents.")
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
-        if len(ret)==0:# or all(r.name.startswith("__temp") or "____temp" in r.name for r in ret):
+        if len(ret)==0:# or all(r.name.startswith("__t") or "____t" in r.name for r in ret):
             current_token.error("safety", "next value is blank")
         tmp = create_temp()
         impl.assign(tmp, ret, current_token)
@@ -3321,7 +3371,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             field_candidates: list[str] = list()
             max_candidate_common_length = 0
             for varname in impl.vars:
-                if varname.startswith("__temp") or "____temp" in varname: continue
+                if varname.startswith("__t") or "____t" in varname: continue
                 common_length = len(longest_common_prefix([varname, current]))
                 if common_length>max_candidate_common_length: 
                     field_candidates = list()
@@ -3467,7 +3517,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 impl.returns(ret, name, name.text=="return")
                 #if not ret: impl.implementation.extend([CodeWord("return"), CODEWORD_SEMICOLON])
                 #else: 
-                impl.implementation.extend([CODEWORD_GOTO, CodeWord("__temp_return"), CODEWORD_SEMICOLON])
+                impl.implementation.extend([CODEWORD_GOTO, CodeWord("__t_return"), CODEWORD_SEMICOLON])
                 return pos, ret
             pos, ret = await process_return(pos)
             continue
@@ -3864,7 +3914,7 @@ def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception
         else: abstract_arg_convert_to_ptr.append(False)
         arg_name = peek_text(tokens, pos)
         if is_effect: effect_names.append(arg_name)
-        if arg_name==")" or arg_name==",": arg_name = "__temp_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
+        if arg_name==")" or arg_name==",": arg_name = "__t_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
         else: pos += 1
         arg_type_variations: list[ImplementedType] = find_unique_variations(arg_type.variations)
         abstract_arg_types.append(arg_type_variations)
@@ -4466,7 +4516,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     while effective_err_code_list_size and effective_err_code_list[effective_err_code_list_size-1]=="0":
         effective_err_code_list_size -= 1
     define_errors = ""
-    set_errcodes = "static const char* __temp_all_errcodes["+str(effective_err_code_list_size)+"] = {"
+    set_errcodes = "static const char* __t_all_errcodes["+str(effective_err_code_list_size)+"] = {"
     for i, err_msg in enumerate(effective_err_code_list):
         if i>=effective_err_code_list_size: break
         if i: set_errcodes += ",\n"
@@ -4474,7 +4524,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
             err_var = global_cstr2var.get(err_msg, None)
             if err_var is not None and err_var in used_globs:
                 used_globs.remove(err_var)
-                define_errors += "#define "+err_var+" (__temp_all_errcodes["+str(i)+"])\n"
+                define_errors += "#define "+err_var+" (__t_all_errcodes["+str(i)+"])\n"
         set_errcodes += err_msg
     set_errcodes += "\n};\n"
     globs = "\n".join("const char* const "+k+"="+global_var2cstr[k]+";" for k in used_globs)+"\n"
@@ -4487,8 +4537,8 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
         generated_c_funcs.append(transpiled)
     if entry_point: 
-        header += "int __temp_argc;\nchar** __temp_argv;\n"
-        generated_c_funcs.append(f"""int main(int argc, char** argv) {{__temp_argc = argc;__temp_argv = argv;{entry_point}();return 0;}}""")
+        header += "int __t_argc;\nchar** __t_argv;\n"
+        generated_c_funcs.append(f"""int main(int argc, char** argv) {{__t_argc = argc;__t_argv = argv;{entry_point}();return 0;}}""")
     body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
     src_path.write_text(header + globs + set_errcodes + define_errors + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")

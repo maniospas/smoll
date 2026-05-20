@@ -2,11 +2,11 @@
 #include "std/extern/win.h"
 #include "std/extern/mac.h"
 #include "std/extern/extern.h"
-int __temp_argc;
-char** __temp_argv;
-const char* const __temp365v="\n";
-const char* const __temp1787v="one";
-static const char* __temp_all_errcodes[35] = {"noerr",
+int __t_argc;
+char** __t_argv;
+const char* const __t1806t="one";
+const char* const __t365t="\n";
+static const char* __t_all_errcodes[36] = {"noerr",
 "error",
 "null pointer",
 "division by zero ",
@@ -30,6 +30,7 @@ static const char* __temp_all_errcodes[35] = {"noerr",
 "user input was not an int",
 "user input was not a nat",
 "user input was not a float",
+"read string does not fit on buffer",
 "invalid int conversion from empty string",
 "invalid int conversion from string with only a sign",
 "invalid integer int from non-number string",
@@ -43,103 +44,103 @@ static const char* __temp_all_errcodes[35] = {"noerr",
 "string buffer is full"
 };
 
-static inline __attribute__((always_inline)) void print__temp363v(const char* value) {
-  int __temp364v=0;
+static inline __attribute__((always_inline)) void print__t363t(const char* value) {
+  int __t364t=0;
   const char* endl=0;
-  endl=__temp365v;
+  endl=__t365t;
   printf("%s%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void which__temp1785v() {
-  print__temp363v(__temp1787v);
+static inline __attribute__((always_inline)) void which__t1804t() {
+  print__t363t(__t1806t);
 }
 
-static inline __attribute__((always_inline)) void false__temp10v(int* __temp1806v) {
+static inline __attribute__((always_inline)) void false__t10t(int* __t1825t) {
   int value=0;
-  *__temp1806v=value;
+  *__t1825t=value;
 }
 
-static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0, int* __temp1807v) {
-  int __temp36v__=0;
-  false__temp10v(&__temp36v__);
-  goto __temp_return;
-  __temp_return:
-  *__temp1807v=__temp36v__;
+static inline __attribute__((always_inline)) void not__t35t(int __t_anon0, int* __t1826t) {
+  int __t36t__=0;
+  false__t10t(&__t36t__);
+  goto __t_return;
+  __t_return:
+  *__t1826t=__t36t__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp1808v) {
-  int __temp94v=0;
-  int __temp95v__=0;
-  not__temp35v(__temp94v,&__temp95v__);
-  goto __temp_return;
-  __temp_return:
-  *__temp1808v=__temp95v__;
+static inline __attribute__((always_inline)) void is_different__t93t(uint64_t x, uint64_t y, int* __t1827t) {
+  int __t94t=0;
+  int __t95t__=0;
+  not__t35t(__t94t,&__t95t__);
+  goto __t_return;
+  __t_return:
+  *__t1827t=__t95t__;
 }
 
-static inline __attribute__((always_inline)) void add__temp170v(uint64_t x, uint64_t y, uint64_t* __temp1809v) {
-  int __temp171v__=0;
+static inline __attribute__((always_inline)) void add__t170t(uint64_t x, uint64_t y, uint64_t* __t1828t) {
+  int __t171t__=0;
   uint64_t z=0;
-  is_different__temp93v(x,y,&__temp171v__);
+  is_different__t93t(x,y,&__t171t__);
   z=x+y;
-  goto __temp_return;
-  __temp_return:
-  *__temp1809v=z;
+  goto __t_return;
+  __t_return:
+  *__t1828t=z;
 }
 
-static inline __attribute__((always_inline)) void inc__temp1772v(uint64_t x, uint64_t* __temp1810v) {
-  uint64_t __temp1773v=0;
-  uint64_t __temp1774v__=0;
-  __temp1773v=1;
-  add__temp170v(x,__temp1773v,&__temp1774v__);
-  goto __temp_return;
-  __temp_return:
-  *__temp1810v=__temp1774v__;
+static inline __attribute__((always_inline)) void inc__t1791t(uint64_t x, uint64_t* __t1829t) {
+  uint64_t __t1792t=0;
+  uint64_t __t1793t__=0;
+  __t1792t=1;
+  add__t170t(x,__t1792t,&__t1793t__);
+  goto __t_return;
+  __t_return:
+  *__t1829t=__t1793t__;
 }
 
-static inline __attribute__((always_inline)) void print__temp376v(uint64_t value) {
-  int __temp377v=0;
+static inline __attribute__((always_inline)) void print__t376t(uint64_t value) {
+  int __t377t=0;
   const char* endl=0;
-  endl=__temp365v;
+  endl=__t365t;
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void inc__temp1775v(uint64_t x, uint64_t* __temp1811v) {
-  uint64_t __temp1776v=0;
-  uint64_t __temp1777v__=0;
-  __temp1776v=1;
-  add__temp170v(x,__temp1776v,&__temp1777v__);
-  goto __temp_return;
-  __temp_return:
-  *__temp1811v=__temp1777v__;
+static inline __attribute__((always_inline)) void inc__t1794t(uint64_t x, uint64_t* __t1830t) {
+  uint64_t __t1795t=0;
+  uint64_t __t1796t__=0;
+  __t1795t=1;
+  add__t170t(x,__t1795t,&__t1796t__);
+  goto __t_return;
+  __t_return:
+  *__t1830t=__t1796t__;
 }
 
-static inline __attribute__((always_inline)) void inc__temp1778v(uint64_t x, uint64_t* __temp1812v) {
-  uint64_t __temp1779v=0;
-  uint64_t __temp1780v__=0;
-  __temp1779v=2;
-  add__temp170v(x,__temp1779v,&__temp1780v__);
-  goto __temp_return;
-  __temp_return:
-  *__temp1812v=__temp1780v__;
+static inline __attribute__((always_inline)) void inc__t1797t(uint64_t x, uint64_t* __t1831t) {
+  uint64_t __t1798t=0;
+  uint64_t __t1799t__=0;
+  __t1798t=2;
+  add__t170t(x,__t1798t,&__t1799t__);
+  goto __t_return;
+  __t_return:
+  *__t1831t=__t1799t__;
 }
 
-static inline __attribute__((always_inline)) void main__temp1793v() {
-  uint64_t __temp1796v=0;
-  uint64_t __temp1797v__=0;
-  uint64_t __temp1799v=0;
-  uint64_t __temp1800v__=0;
-  uint64_t __temp1802v=0;
-  uint64_t __temp1804v__=0;
-  which__temp1785v();
-  __temp1796v=0;
-  inc__temp1772v(__temp1796v,&__temp1797v__);
-  print__temp376v(__temp1797v__);
-  __temp1799v=0;
-  inc__temp1775v(__temp1799v,&__temp1800v__);
-  print__temp376v(__temp1800v__);
-  __temp1802v=0;
-  inc__temp1778v(__temp1802v,&__temp1804v__);
-  print__temp376v(__temp1804v__);
+static inline __attribute__((always_inline)) void main__t1812t() {
+  uint64_t __t1815t=0;
+  uint64_t __t1816t__=0;
+  uint64_t __t1818t=0;
+  uint64_t __t1819t__=0;
+  uint64_t __t1821t=0;
+  uint64_t __t1823t__=0;
+  which__t1804t();
+  __t1815t=0;
+  inc__t1791t(__t1815t,&__t1816t__);
+  print__t376t(__t1816t__);
+  __t1818t=0;
+  inc__t1794t(__t1818t,&__t1819t__);
+  print__t376t(__t1819t__);
+  __t1821t=0;
+  inc__t1797t(__t1821t,&__t1823t__);
+  print__t376t(__t1823t__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1793v();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1812t();return 0;}

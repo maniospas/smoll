@@ -2,10 +2,10 @@
 #include "std/extern/win.h"
 #include "std/extern/mac.h"
 #include "std/extern/extern.h"
-int __temp_argc;
-char** __temp_argv;
-const char* const __temp365v="\n";
-static const char* __temp_all_errcodes[33] = {"noerr",
+int __t_argc;
+char** __t_argv;
+const char* const __t365t="\n";
+static const char* __t_all_errcodes[34] = {"noerr",
 "error",
 "null pointer",
 "division by zero ",
@@ -29,6 +29,7 @@ static const char* __temp_all_errcodes[33] = {"noerr",
 "user input was not an int",
 "user input was not a nat",
 "user input was not a float",
+"read string does not fit on buffer",
 "invalid int conversion from empty string",
 "invalid int conversion from string with only a sign",
 "invalid integer int from non-number string",
@@ -40,60 +41,60 @@ static const char* __temp_all_errcodes[33] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void false__temp10v(int* __temp1253v) {
+static inline __attribute__((always_inline)) void false__t10t(int* __t1272t) {
   int value=0;
-  *__temp1253v=value;
+  *__t1272t=value;
 }
 
-static inline __attribute__((always_inline)) void not__temp35v(int __temp_anon0, int* __temp1254v) {
-  int __temp36v__=0;
-  false__temp10v(&__temp36v__);
-  goto __temp_return;
-  __temp_return:
-  *__temp1254v=__temp36v__;
+static inline __attribute__((always_inline)) void not__t35t(int __t_anon0, int* __t1273t) {
+  int __t36t__=0;
+  false__t10t(&__t36t__);
+  goto __t_return;
+  __t_return:
+  *__t1273t=__t36t__;
 }
 
-static inline __attribute__((always_inline)) void is_different__temp93v(uint64_t x, uint64_t y, int* __temp1255v) {
-  int __temp94v=0;
-  int __temp95v__=0;
-  not__temp35v(__temp94v,&__temp95v__);
-  goto __temp_return;
-  __temp_return:
-  *__temp1255v=__temp95v__;
+static inline __attribute__((always_inline)) void is_different__t93t(uint64_t x, uint64_t y, int* __t1274t) {
+  int __t94t=0;
+  int __t95t__=0;
+  not__t35t(__t94t,&__t95t__);
+  goto __t_return;
+  __t_return:
+  *__t1274t=__t95t__;
 }
 
-static inline __attribute__((always_inline)) void add__temp170v(uint64_t x, uint64_t y, uint64_t* __temp1256v) {
-  int __temp171v__=0;
+static inline __attribute__((always_inline)) void add__t170t(uint64_t x, uint64_t y, uint64_t* __t1275t) {
+  int __t171t__=0;
   uint64_t z=0;
-  is_different__temp93v(x,y,&__temp171v__);
+  is_different__t93t(x,y,&__t171t__);
   z=x+y;
-  goto __temp_return;
-  __temp_return:
-  *__temp1256v=z;
+  goto __t_return;
+  __t_return:
+  *__t1275t=z;
 }
 
-static inline __attribute__((always_inline)) void print__temp376v(uint64_t value) {
-  int __temp377v=0;
+static inline __attribute__((always_inline)) void print__t376t(uint64_t value) {
+  int __t377t=0;
   const char* endl=0;
-  endl=__temp365v;
+  endl=__t365t;
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__temp1247v() {
-  uint64_t __temp1248v=0;
-  uint64_t __temp1249v=0;
+static inline __attribute__((always_inline)) void main__t1266t() {
+  uint64_t __t1267t=0;
+  uint64_t __t1268t=0;
   uint64_t x=0;
   uint64_t y=0;
   uint64_t z=0;
-  uint64_t __temp1250v=0;
-  uint64_t __temp1251v__=0;
-  __temp1248v=1;
-  __temp1249v=__temp1248v;
-  x=__temp1249v;
-  __temp1250v=2;
-  x=__temp1250v;
-  add__temp170v(x,x,&__temp1251v__);
-  print__temp376v(__temp1251v__);
+  uint64_t __t1269t=0;
+  uint64_t __t1270t__=0;
+  __t1267t=1;
+  __t1268t=__t1267t;
+  x=__t1268t;
+  __t1269t=2;
+  x=__t1269t;
+  add__t170t(x,x,&__t1270t__);
+  print__t376t(__t1270t__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1247v();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1266t();return 0;}

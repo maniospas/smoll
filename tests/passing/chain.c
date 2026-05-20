@@ -2,11 +2,11 @@
 #include "std/extern/win.h"
 #include "std/extern/mac.h"
 #include "std/extern/extern.h"
-int __temp_argc;
-char** __temp_argv;
-const char* const __temp365v="\n";
-const char* const __temp1248v="123";
-static const char* __temp_all_errcodes[33] = {"noerr",
+int __t_argc;
+char** __t_argv;
+const char* const __t1267t="123";
+const char* const __t365t="\n";
+static const char* __t_all_errcodes[34] = {"noerr",
 "error",
 "null pointer",
 "division by zero ",
@@ -30,6 +30,7 @@ static const char* __temp_all_errcodes[33] = {"noerr",
 "user input was not an int",
 "user input was not a nat",
 "user input was not a float",
+"read string does not fit on buffer",
 "invalid int conversion from empty string",
 "invalid int conversion from string with only a sign",
 "invalid integer int from non-number string",
@@ -41,18 +42,18 @@ static const char* __temp_all_errcodes[33] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__temp783v(const char* x, const char* y, char* __temp1251v) {
+static inline __attribute__((always_inline)) void eq__t783t(const char* x, const char* y, char* __t1270t) {
   char z=0;
   z=(x==y);
-  goto __temp_return;
-  __temp_return:
-  *__temp1251v=z;
+  goto __t_return;
+  __t_return:
+  *__t1270t=z;
 }
 
-static inline __attribute__((always_inline)) void print__temp380v(char value) {
-  int __temp381v=0;
+static inline __attribute__((always_inline)) void print__t380t(char value) {
+  int __t381t=0;
   const char* endl=0;
-  endl=__temp365v;
+  endl=__t365t;
   if(value){
   printf("%s%s","true",endl);
   }
@@ -61,10 +62,10 @@ static inline __attribute__((always_inline)) void print__temp380v(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__temp1247v() {
-  char __temp1249v__=0;
-  eq__temp783v(__temp1248v,__temp1248v,&__temp1249v__);
-  print__temp380v(__temp1249v__);
+static inline __attribute__((always_inline)) void main__t1266t() {
+  char __t1268t__=0;
+  eq__t783t(__t1267t,__t1267t,&__t1268t__);
+  print__t380t(__t1268t__);
 }
 
-int main(int argc, char** argv) {__temp_argc = argc;__temp_argv = argv;main__temp1247v();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1266t();return 0;}

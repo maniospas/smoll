@@ -70,7 +70,7 @@ def vec(mat m)
     return vec(m.unsafe_ptr, m.pos, m.rows*m.cols)
 
 def row(mat m, nat i)
-    doc "view row i as a vector on the same memory (always zero-copy in row-major)"
+    doc "view matrix row as a vector"
     if i>=m.rows fail "row out of bounds"
     return vec(m.unsafe_ptr, m.pos+i*m.stride, m.cols)
 

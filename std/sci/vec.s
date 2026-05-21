@@ -96,7 +96,7 @@ def add(effect edit vec_allocator allocator, float v1, vec v2)
     return v2+v1
 
 def sub(effect edit vec_allocator allocator, vec v1, vec|float v2)
-    doc "vector substraction"
+    doc "vector subtraction"
     doc "Grabs an allocator for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
@@ -107,7 +107,7 @@ def sub(effect edit vec_allocator allocator, vec v1, vec|float v2)
     return v
 
 def sub(effect edit vec_allocator allocator, float v1, vec v2)
-    doc "vector substraction"
+    doc "vector subtraction"
     doc "Grabs an allocator for the result as an effect."
     v = vec v2.length
     it = range v2.length
@@ -204,7 +204,8 @@ def nn(vec value)
     return (value, "")
 
 def print(vec v, cstr|blank endl)
-    doc "print a vector as a row: [ 1.0  2.0  3.0 ]"
+    doc "print a vector"
+    doc "Prints as a row, such as [ 1.0  2.0  3.0 ]"
     if endl is blank
         endl = "\n"
     print nn "[ "

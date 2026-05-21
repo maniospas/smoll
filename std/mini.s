@@ -7,7 +7,7 @@ def nat16(nat x)
     doc "convert unsigned number to 16 bits"
     doc "The conversion checks whether the previous value fits in the new one."
     doc "If it does not, this operation can fail."
-    if x>65535 fail "'nat' value too large to pack in 'nat16'"
+    if x>65535 fail "nat value too large to pack in nat16"
     {builtins:nat16 value = x;}
     return value
 
@@ -15,7 +15,7 @@ def nat32(nat x)
     doc "convert unsigned number to 32 bits"
     doc "The conversion checks whether the previous value fits in the new one."
     doc "If it does not, this operation can fail."
-    if x>4294967295 fail "'nat' value too large to pack in 'nat32'"
+    if x>4294967295 fail "nat value too large to pack in nat32"
     {builtins:nat32 value = x;}
     return value
     

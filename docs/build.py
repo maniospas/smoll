@@ -24,7 +24,7 @@ def export(path, target):
 
     html = convert_notice_boxes(html)
 
-    run_button_script = "" if "playground" in target else """
+    run_button_script = "" if "playground" in target or "std" in target else """
     <script>
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll("pre").forEach(pre => {
@@ -213,6 +213,7 @@ def export(path, target):
             <a href="install.html" style="font-weight:{'900' if 'install' in target else '500'}">Install</a>
             <a href="reference.html" style="font-weight:{'900' if 'reference' in target else '500'}">Learn</a>
             <a href="playground.html" style="font-weight:{'900' if 'playground' in target else '500'}">Playground</a>
+            <a href="std.html" style="font-weight:{'900' if 'std' in target else '500'}">Standard library</a>
             <a href="https://github.com/maniospas/smoll">GitHub</a>
         </nav>
     """ + html + run_button_script + """
@@ -234,3 +235,4 @@ export("docs/install.md", "docs/install.html")
 export("docs/tutorial.md", "docs/tutorial.html")
 export("docs/reference.md", "docs/reference.html")
 export("docs/playground.md", "docs/playground.html")
+export("docs/std.md", "docs/std.html")

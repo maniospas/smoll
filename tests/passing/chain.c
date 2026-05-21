@@ -4,9 +4,9 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t1267t="123";
-const char* const __t365t="\n";
-static const char* __t_all_errcodes[34] = {"noerr",
+const char* const __t1310t="123";
+const char* const __t370t="\n";
+static const char* __t_all_errcodes[36] = {"noerr",
 "error",
 "null pointer",
 "division by zero ",
@@ -15,9 +15,11 @@ static const char* __t_all_errcodes[34] = {"noerr",
 "cannot convert negative float to id",
 "cannot convert negative int to id",
 "iteration end",
+"iterator range",
 "allocation failed",
 "reallocation failed",
 "cannot resize buffers with alloc; it promises no data reallocation",
+"cannot allocate a buffer of unsized type",
 "cannot resize an unallocated or freed buffer",
 "out of bounds",
 "can only define strings on contiguous buffers",
@@ -42,18 +44,18 @@ static const char* __t_all_errcodes[34] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__t783t(const char* x, const char* y, char* __t1270t) {
+static inline __attribute__((always_inline)) void eq__t826t(const char* x, const char* y, char* __t1313t) {
   char z=0;
   z=(x==y);
   goto __t_return;
   __t_return:
-  *__t1270t=z;
+  *__t1313t=z;
 }
 
-static inline __attribute__((always_inline)) void print__t380t(char value) {
-  int __t381t=0;
+static inline __attribute__((always_inline)) void print__t385t(char value) {
+  int __t386t=0;
   const char* endl=0;
-  endl=__t365t;
+  endl=__t370t;
   if(value){
   printf("%s%s","true",endl);
   }
@@ -62,10 +64,10 @@ static inline __attribute__((always_inline)) void print__t380t(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__t1266t() {
-  char __t1268t__=0;
-  eq__t783t(__t1267t,__t1267t,&__t1268t__);
-  print__t380t(__t1268t__);
+static inline __attribute__((always_inline)) void main__t1309t() {
+  char __t1311t__=0;
+  eq__t826t(__t1310t,__t1310t,&__t1311t__);
+  print__t385t(__t1311t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1266t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1309t();return 0;}

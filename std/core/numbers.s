@@ -46,10 +46,14 @@ def neq(compiler:catch x, compiler:catch y)
     return z
 
 def eq(any ptr x, any ptr y)
+    doc "equal to"
+    doc "Compares the address of two pointers."
     {builtins:bool z=(x==y);}
     return z
 
 def neq(any ptr x, any ptr y)
+    doc "not equal to"
+    doc "Compares the address of two pointers."
     {builtins:bool z=(x!=y);}
     return z
 
@@ -114,7 +118,7 @@ def ge(Number x, Number y)
     return z
     
 def sub(Number x, Number y)
-    doc "substract by"
+    doc "subtract by"
     if is_different(x,y) 
         compiler:skip()
     if x is nat

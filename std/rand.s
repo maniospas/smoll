@@ -31,6 +31,7 @@ local def rotl(nat x, nat k)
     return z
 
 def splitmix64(mut nat x)
+    doc "next random number"
     doc "Computes the next random number of a splitmix64 sequence using the mutable "
     doc "unsigned int argument as state to be updated. This is NOT cryptographically "
     doc "secure and also has small period of 2^64 so usage is not recommended for "
@@ -52,6 +53,7 @@ def splitmix64(mut nat x)
     return mut z
 
 def splitmix64()
+    doc "time seed"
     doc "Computes the seed of a splitmix64 sequence using the clock"
     doc "as the source of entropy."
     VM "[time.time_ns()]"
@@ -61,6 +63,7 @@ def splitmix64()
     return seed
 
 def Rand(nat|blank seed)
+    doc "random number generator"
     doc "Xoshiro256plus random numbers from https://prng.di.unimi.it/"
     doc "These and are NOT cryptographically secure."
     doc "This a structural type for storing the progress of random number generators "

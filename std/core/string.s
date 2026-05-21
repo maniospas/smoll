@@ -56,7 +56,10 @@ def str(str other)
     return other
 
 def str(char[] buf, nat pos, nat length)
-    doc "a string residing on a buffer that automatically detects the first character"
+    doc "a string residing on a buffer"
+    doc "The string automatically detects the first character,"
+    doc "which is generally tracked for fewer negative indirections"
+    doc "on negative comparisons."
     if length!=0 first = buf[pos]  # properly zero-initialized otherwise
     return str(buf, pos, length, first)
 
@@ -77,12 +80,14 @@ def len(str s)
 
 def char(str s)
     doc "treat as character"
-    doc "The first character of a string is extracted, for example to write `c = char str \"C\"`."
+    doc "The first character of a string is extracted,"
+    doc "for example to write `c = char str \"C\"`."
     return s.dat.first
 
 def char(cstr s)
     doc "treat as character"
-    doc "The first character of a string is extracted, for example to write `c = char \"C\"`."
+    doc "The first character of a string is extracted,"
+    doc "for example to write `c = char \"C\"`."
     {if(s) {builtins:char c = *s;}}
     return c
 
@@ -104,8 +109,9 @@ def copy(str|cstr _other)
     return str(buf, 0, other.dat.length, other.dat.first)
 
 def copy_null_terminated(str other)
-    doc "copy a string to a new buffer while ensuring null termination"
-    doc "This is useful only for supporting temporary_cstr."
+    doc "create null terminated string"
+    doc "Copies a string to a new buffer while ensuring null termination."
+    doc "This is mainly useful for supporting 'temporary_cstr'."
     buf = char[].alloc 1+len other
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     {builtins:compiler:ptr endpos = buf__unsafe_ptr+other__dat__length;}
@@ -130,7 +136,8 @@ def temporary_cstr(str other)
     return (cstr, str)
 
 def temporary_cstr(cstr cstr)
-    doc "tautology function for cstr, simplified pattern of converting str|cstr to cstr"
+    doc "tautology function for cstr"
+    doc "This is mainly used as a stt-input counterpart for converting str|cstr to cstr."
     str = str cstr
     return (cstr, str)
 
@@ -142,19 +149,28 @@ def bufpos(edit any[] buf)
     return (buf, pos)
 
 def strbufpos(edit char[] buf)
+    doc "bufpos specialized for char[] buffers"
+    doc "This is used to indicate a pair of a character buffer and a mutable position."
+    doc "It is used as a string allocator so that they new ones can be created or copied"
+    doc "at the buffer at the given position and the position then progresses to accomodate"
+    doc "further string additions."
     return bufpos buf
 
-def copy(edit char[] buf, mut nat pos, char character, nat|blank by)
-    if by is blank
-        by = 1
-    if pos+by>len buf fail "character copy does not fit on buffer"
-    if not character is blank
-        doc "Also sets a specified character to all new positions."
-        {memset(buf__unsafe_ptr+pos, character, by);}
-    return str(buf, pos, by)
+def copy(edit char[] buf, mut nat pos, char character, nat|blank repeat)
+    doc "copies a character as a string"
+    doc "Copies a new character at a given buffer a number of times"
+    doc "Then, returns a string corresponding to the copied region."
+    if repeat is blank
+        doc "The character is automatically set to be repeated one time."
+        repeat = 1
+    if pos+repeat>len buf fail "character copy does not fit on buffer"
+    {memset(buf__unsafe_ptr+pos, character, repeat);}
+    return str(buf, pos, repeat)
 
 def endpos(const str s)
-    doc "the end position of a string in its buffer"
+    doc "the end position of a string"
+    doc "This position is computed relative to its start in its"
+    doc "enclosing buffer."
     return s.dat.pos+s.dat.length
 
 def copy(edit char[] buf, mut nat pos, str|cstr _other)

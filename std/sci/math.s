@@ -27,25 +27,25 @@ def floor(float x)
     return z
 
 def asin(float x)
-    {builtins:int z = asin(x);}
+    {builtins:float z = asin(x);}
     return z
 
 def acos(float x)
-    {builtins:int z = acos(x);}
+    {builtins:float z = acos(x);}
     return z
 
 def atan(float x)
-    {builtins:int z = atan(x);}
+    {builtins:float z = atan(x);}
     return z
 
 def atan(float x, float y)
-    {builtins:int z = atan2(x, y);}
+    {builtins:float z = atan2(x, y);}
     return z
 
 def exp(float x)
-    {builtins:int z = exp(x);}
+    {builtins:float z = exp(x);}
     return z
 
 def pow(float x, float y)
-    {builtins:int z = pow(x, y);}
+    {builtins:float z = pow(x, y);}
     return z

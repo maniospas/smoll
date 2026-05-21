@@ -1,0 +1,8 @@
+import "std/core.s"
+import "std/io.s"
+import "std/rand.s"
+import "std/hash.s"
+import "std/map.s"
+import "std/mini.s"
+import "std/sci.s"
+import "std/unsafe.s"

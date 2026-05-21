@@ -49,10 +49,10 @@ def splitmix64(mut nat x)
     {z = z * 0x94D049BB133111EBULL;}
     {rot = z >> 31;}
     {z = z ^ rot;}
-    return z
+    return mut z
 
 def splitmix64()
-    doc "Computes the first random number of a splitmix64 sequence using the clock"
+    doc "Computes the seed of a splitmix64 sequence using the clock"
     doc "as the source of entropy."
     VM "[time.time_ns()]"
     {builtins:compiler:ptr ts = alloca(sizeof(struct timespec));}

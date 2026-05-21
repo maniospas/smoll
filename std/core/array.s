@@ -55,10 +55,15 @@ def alloc(edit any[] buffer, nat|blank size)
     if buffer.unsafe_size!=0
         fail "cannot resize buffers with alloc; it promises no data reallocation"
     bytes = buffer.unsafe_align.nat()*size
+    if bytes==0
+        fail "cannot allocate a buffer of unsized type"
     buffer.unsafe_size = size
     buffer.unsafe_ptr = unsafe_mut unsafe:alloc(bytes)
     buffer.unsafe_ptr.unsafe:zero(0, bytes)
     return mut buffer
+
+def alloc(nat size)
+    return char[].alloc size
 
 def resize(mut any[] buffer, nat size)
     doc "resize the buffer"

@@ -50,16 +50,17 @@ Cheat sheet:
 # test.s
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import "std/core.s"
-import "std/io.s":file as file
+import "std/io.s"
 
 def CHUNK_SIZE = 4096 # number literal
 
 def main()
     f = file:read "README.md"
-    mem = alloc CHUNK_SIZE # allocate on char[] by default
-    while try line = mem.file:line f
-        print("|", "") # with custom end line
-        print(line, "")
+    mem = char[].alloc CHUNK_SIZE
+    for line in (mem, f)
+        # nn adds an empty new line to the print instead of default '\n'
+        print nn "| "
+        print nn line
     print ""
 ```
 

@@ -188,11 +188,12 @@
 <em>2.3.</em> <a href="#substructures">{substructures}</a><br>
 <em>2.4.</em> <a href="#stable-references">stable references</a><br>
 <em>2.5.</em> <a href="#try-and-fail">try and fail</a><br>
-<em>2.6.</em> <a href="#defer">defer</a><br>
-<em>2.7.</em> <a href="#catching-errors">catching errors</a><br>
-<em>2.8.</em> <a href="#effects">effects</a><br>
-<em>2.9.</em> <a href="#debugging-tools">{debugging tools}</a><br>
-<em>2.10.</em> <a href="#bounded-compute">{bounded compute}</a><br></p>
+<em>2.6.</em> <a href="#iterators">{iterators}</a><br>
+<em>2.7.</em> <a href="#defer">{defer}</a><br>
+<em>2.8.</em> <a href="#catching-errors">catching errors</a><br>
+<em>2.9.</em> <a href="#effects">effects</a><br>
+<em>2.10.</em> <a href="#debugging-tools">{debugging tools}</a><br>
+<em>2.11.</em> <a href="#bounded-compute">{bounded compute}</a><br></p>
 
 <p><strong>Section 3. Standard Library</strong><br>
 <em>3.1.</em> <a href="#lists">lists</a><br>
@@ -244,8 +245,8 @@ and fail to compile if these are not present.</p>
 
 <p>You can also import a file as a namespace to access its
 contents with the <code>:</code> notation. This is more verbose
-but unambiguous, like below. You can even access namespaces
-defined within the imported namespace.</p>
+but unambiguous, like below. You can even access child
+namespaces defined within the imported onne.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
@@ -294,9 +295,7 @@ tuples.</p>
 <p>The <code>.</code> operator can also pipe some data
 into the beginning of a function like below. This
 works as a notation for calling functions like class 
-methods. In general, do try to avoid needless parentheses,
-as the snippet below does (<code>f1 f2 ... args</code> is a chain of 
-function calls). You can always refer to functions
+methods. You can always refer to functions
 within namespaces.</p>
 
 <div class="codehilite">
@@ -307,6 +306,25 @@ within namespaces.</p>
     <span class="n">x1</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">x2</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">core</span><span class="p">:</span><span class="n">add</span> <span class="mi">1</span>
     <span class="n">core</span><span class="p">:</span><span class="nb">print</span> <span class="n">x2</span><span class="o">.</span><span class="n">core</span><span class="p">:</span><span class="n">add</span> <span class="mi">2</span>
+</code></pre>
+</div>
+
+<p>In general, avoid needless parentheses,
+as the snippet below does (<code>f1 f2 ... args</code> is a chain of 
+function calls). One particularly useful function
+from the standard library&#8217;s core is <code>nn</code>, standing
+for <em>no \n</em> that basically takes numbers or strings
+as inputs and outputs a tuple of the same value accompanied 
+by <em>""</em>. This is passed into the <code>print</code> function, 
+whose optional second argument determines the line ending; <em>"\n"</em> 
+by default but this time we prevent that to no end the line.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;hello &quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;world!&quot;</span> 
 </code></pre>
 </div>
 
@@ -339,8 +357,11 @@ others of the same type.</p>
 <p>All functions declare corresponding types via their returned values.
 That is, you can use the function&#8217;s name to refer to data with
 equivalent structure. Below is an example, where the
-<code>nat</code> type represents to natural numbers (non-negative integers). Other builtin types
-are <code>bool</code>, <code>int</code>, <code>float</code>, and <code>cstr</code> for string literals.</p>
+<code>nat</code> type represents to natural numbers/non-negative integers.
+ Other builtin types are <code>bool</code>, <code>int</code>, <code>float</code>, and <code>cstr</code> for
+string literals. It bears stressing that, when you see integer
+numbers in the code, these are always natural numbers. This is 
+a deliberate choise to enforce memory safety later.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -368,7 +389,13 @@ by the returned value&#8217;s name.</p>
 <p>Types like the above are structurally matched, as we did
 when applying <code>add</code> to the range construct. This structural
 typing is rich but can be kind of unsafe if you do not keep
-track of your data shapes. To prevent implicit structural matches, 
+track of your data shapes in that you may accidentally allow
+applying the same functions to unforeseen data structures. This
+weakness is also its stronges theoretical benefit, though; it
+becomes a determine only for structures that also require some
+relational invariant between values.</p>
+
+<p>To prevent implicit structural matches, 
 use the following <code>class</code> notation to wrap the returned value.
 You will mainly want to do so when the relations between class
 field values (e.g., a character buffer and its used size) is
@@ -521,10 +548,10 @@ like the following versions.</p>
 </code></pre>
 </div>
 
-<p>Loops are similar to condition, only they execute multiple
-times until a condition is true or false. You can use <code>continue</code> 
-to skip the rest of the current loop and <code>break</code> to halt the
-current loop. Here is a silly example. Please do not write code like this.</p>
+<p>Loops are similar to conditions, but execute multiple
+times until they check to false. You can use <code>continue</code> 
+to skip the rest of the current loop and <code>break</code> to halt it. 
+Here is a simple example. Please do not write code like this.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -542,22 +569,22 @@ current loop. Here is a silly example. Please do not write code like this.</p>
 </code></pre>
 </div>
 
-<p>A more efficient way to write loops, which will be fully
-understood later, is via iterators that have the means to
+<p>A more efficient way to write loops, is with the <code>for variable in iterator</code>
+pattern, which uses iterators that have the means to
 obtain the next element. The <code>range</code> iterator, for example, 
 takes an end number or a pair of start and end numbers and allows
 calling <code>next</code> to retrieve the next value until the end
-is reached (non-inclusively). The retrieval may fail, which
-is checked by guarding the expression with a <code>try</code> instruction.
-These are all <a href="#try-and-fail">error code semantics</a>.</p>
+is reached (non-inclusively). Iterators safely try to keep producting new
+elements until they fail to do so (any kind of failure stops them).
+Underneath, they desugar to <a href="#try-and-fail">error code semantics</a>.
+More on iterators later.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">10</span> <span class="c1"># equivalent to it = range(0,10)</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
-        <span class="nb">print</span> <span class="n">i</span>   <span class="c1"># prints 0,1,2...,9</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="mi">10</span>
+        <span class="nb">print</span> <span class="n">i</span>
 </code></pre>
 </div>
 
@@ -938,13 +965,13 @@ occur only during compilation and do not affect running time.</p>
 
 <p>Buffers are memory-allocated collections of items
 and can be declared as <code>T[]</code>, where <em>T</em> is a type.
-Create and allocate a buffer per <code>buf = float[].alloc 4</code>. 
-Buffer internals are mutable,
-which means that allocation would modify the original empty buffer,
-if that was stored in a variable (see below).</p>
+Create and allocate a buffer with a pattern that looks likt this:
+<code>buf = float[].alloc 4</code>. This creates a new buffer storing float nubmers
+(has type <code>float[]</code>) that contains four numbers.</p>
 
-<p>Allocation will create an error if it tries to change the number of
-elements from a non-zero number to something different.
+<p>Allocation will create an error if it is called on an existing
+buffer to change its number of
+elements from non-zero to something different.
 In those cases, use <code>resize</code> instead, though the exact usage of
 this is covered in <a href="#stable-references">stable references</a>.</p>
 
@@ -955,9 +982,10 @@ and <code>mutget</code> functions; beware that details involve pointers
 tackled in the next section. 
 Use <code>buffer[pos] = value</code> to copy some data on a buffer&#8217;s element.</p>
 
-<p>All buffer indexes are of type <code>nat</code>, which represents natural numbers 
-(non-negative integers) and avoids a whole area of logic bugs associated
-with negative indexing. Next is an example of buffer usage.</p>
+<p>All buffer indexes are referenced by <code>nat</code> numbers, that is, natural 
+numbers/non-negative integers. This is the default integer type, assumed
+when writing numbers like <code>1</code> to avoid a whole area of logic bugs associated 
+with negative indexes. Next is an example of buffer usage.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1057,6 +1085,24 @@ type like below.</p>
     <span class="n">populate</span> <span class="n">elements</span>
     <span class="nb">print</span> <span class="n">elements</span><span class="o">.</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="nb">print</span> <span class="n">elements</span><span class="o">.</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<p>Below is a convenient shorthand for creating and populating
+a buffer with comma-separated contents by placing those within
+<code>[...]</code>. Do note that buffer types use no contents in the brackets
+normally. Under the hood, the currently available <code>alloc</code> function 
+is used to make the allocation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">cstr</span><span class="p">[]</span> <span class="n">sentences</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span>
+        <span class="nb">print</span> <span class="n">sentence</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="p">[</span><span class="s2">&quot;hello world!&quot;</span><span class="p">,</span> <span class="s2">&quot;... and goodbye for now.&quot;</span><span class="p">]</span>
 </code></pre>
 </div>
 
@@ -1318,9 +1364,9 @@ an error is intercepted. Below is an example that safeguards against failing all
 </code></pre>
 </div>
 
-<p>Since failure is a fast abstraction in <em>smoλ</em>, it is also the preferred syntax for 
-iterators reaching their end. Below is an example, where all standard library iterators
-follow the same pattern for terminating loops and you should try to reuse in your code.</p>
+<p>Since failure is a fast abstraction in <em>smoλ</em>, it is also the implementation
+mechanism for trying to produce next values. Below is an example, 
+where <code>for</code> loops are syntactic desugar to something similar.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1332,7 +1378,87 @@ follow the same pattern for terminating loops and you should try to reuse in you
 </code></pre>
 </div>
 
+<h2 id="iterators">iterators</h2>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This subsection is about creating your own iterators and can be skipped in the first reading.</div>
+
+<p>We can now full grasp the concept of iterating across 
+some data structure. Recall that this is done like
+below. The expression after <code>in</code> is evaluated first
+and forms the iterator that we are traversing, whose
+values are assigned to <code>i</code>. This is equivalent to 
+the previous section&#8217;s last example; the <code>for</code> loop
+is converted into a <code>while try</code>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="mi">10</span>
+        <span class="nb">print</span> <span class="n">i</span>   <span class="c1"># prints 0,1,2...,9</span>
+</code></pre>
+</div>
+
+<p>However, iterators do not apply arbitary functions
+but instead employ the <code>get(data, nat index)</code> function 
+that overloads the <code>data[index]</code> operator for indexes
+that are natural numbers. In truth, the range ieration
+examples is equivalent like the next tone.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">iterator</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">10</span>
+    <span class="n">hidden_index</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="n">iterator</span><span class="p">[</span><span class="n">hidden_index</span><span class="p">]</span>
+        <span class="n">hidden_index</span> <span class="o">=</span> <span class="n">hidden_index</span><span class="o">+</span><span class="mi">1</span>
+        <span class="nb">print</span> <span class="n">i</span>   <span class="c1"># prints 0,1,2...,9</span>
+</code></pre>
+</div>
+
+<p>If the outcome of the <code>get</code> is a pointer, it automatically
+dereferenced so that you can readily iterate across buffers,
+like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+        <span class="nb">print</span> <span class="n">i</span>
+</code></pre>
+</div>
+
+<p>The hidden index can be mutated and used to keep track 
+of the iteration state, even when the iterator itself
+is constant. But you can always skip it. For example,
+next is a program that keeps the iteration state inside
+the data.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">solution</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">mut</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">edit</span> <span class="n">solution</span> <span class="n">s</span><span class="p">,</span> <span class="n">nat</span><span class="p">)</span> <span class="c1"># skip the iteration index argument</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="n">s</span><span class="o">.</span><span class="n">y</span> <span class="n">fail</span> <span class="s2">&quot;converged&quot;</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">x</span><span class="o">&gt;</span><span class="n">s</span><span class="o">.</span><span class="n">y</span> <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">x</span><span class="o">-</span><span class="n">s</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">s</span><span class="o">.</span><span class="n">x</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">solution</span><span class="p">(</span><span class="n">mut</span> <span class="mi">32</span><span class="p">,</span> <span class="n">mut</span> <span class="mi">19</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">diff</span> <span class="ow">in</span> <span class="n">sol</span> 
+        <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;difference &quot;</span>
+        <span class="nb">print</span> <span class="n">diff</span>
+    <span class="nb">print</span> <span class="n">sol</span><span class="o">.</span><span class="n">x</span>
+</code></pre>
+</div>
+
 <h2 id="defer">defer</h2>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> Deferred execution is mainly useful for safe resource handling when unsafely creating new types of resources. This can be skipped.</div>
 
 <p>You can defer code blocks to run later. The &#8220;later&#8221; part is
 ideally the end of the current function, but <em>smoλ</em> may
@@ -1700,49 +1826,52 @@ and the buffer holding them does not have a trailing null character to
 pretend that they are null-terminated, a copy may be made.</p>
 
 <p>Read a file by opening it and iterating line by
-line, like below. This needs a <code>char[]</code> buffer on which to store (temporary) lines,
-although you can save yourself a <code>copy</code> and pass a mutable position as a second 
-argument to directly read on the buffer and progress the position.</p>
+line, like below. This needs a <code>char[]</code> buffer 
+-or a <code>bufpos</code> on that charcater buffer- on which to 
+store lines.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">file</span> <span class="k">as</span> <span class="n">file</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;README.md&quot;</span>
     <span class="n">mem</span> <span class="o">=</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># max 4 KB chunk size, on char[] by default</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">line</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;&quot;</span>
 </code></pre>
 </div>
 
-<p>Similarly, create a file for writing like below. Can also delete it.</p>
+<p>Similarly, create a file for writing like below. Can also delete it,
+or even defer its deletion to when the file is no longer in use.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span> <span class="k">as</span> <span class="n">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="p">:</span><span class="n">file</span><span class="p">:</span><span class="n">write</span> <span class="s2">&quot;tmp.txt&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">write</span> <span class="s2">&quot;tmp.txt&quot;</span>
     <span class="n">f</span><span class="o">.</span><span class="n">print</span> <span class="s2">&quot;hello world&quot;</span>
     <span class="n">defer</span> 
-        <span class="n">io</span><span class="p">:</span><span class="nb">dir</span><span class="p">:</span><span class="n">remove</span> <span class="s2">&quot;tmp.txt&quot;</span>
+        <span class="nb">dir</span><span class="p">:</span><span class="n">remove</span> <span class="s2">&quot;tmp.txt&quot;</span>
 </code></pre>
 </div>
 
 <p>Above was a first introduction to the <code>dir</code> namespace for directory 
-operations. Below is how to iterate through directory contents.</p>
+operations. Below is how to iterate through directory contents. This
+yields temporarily available strings. Availability means that the
+contents of those strings may be corrupted even if they remain memory
+safe.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="nb">dir</span> <span class="k">as</span> <span class="nb">dir</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="nb">dir</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">dir</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;.&quot;</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">entry</span><span class="o">=</span><span class="nb">dir</span><span class="p">:</span><span class="n">entry</span> <span class="nb">dir</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">dir</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">dir</span><span class="p">:</span><span class="n">is_file</span> <span class="n">entry</span>
             <span class="nb">print</span> <span class="s2">&quot;file&quot;</span>
@@ -1758,7 +1887,7 @@ that fails on non-zero error code can be evoked like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">success</span> <span class="o">=</span> <span class="k">try</span> <span class="n">system</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">hello world!</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
@@ -1766,7 +1895,8 @@ that fails on non-zero error code can be evoked like below.</p>
 </code></pre>
 </div>
 
-<p>One can also open and communicate with running processes.</p>
+<p>One can also open and communicate with running processes
+similarly to files.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1774,8 +1904,8 @@ that fails on non-zero error code can be evoked like below.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">:</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
-    <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># example with growing position</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">line</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">proc</span><span class="p">:</span><span class="n">line</span> <span class="n">process</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># example with growing position</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">process</span><span class="p">)</span>
         <span class="nb">print</span> <span class="n">line</span>
 </code></pre>
 </div>
@@ -1799,14 +1929,39 @@ handle the intercepted errors, use a pattern like below.</p>
 
 <h2 id="random">random</h2>
 
-<div class="notice-box box-info"><strong>Info:</strong> This subsection is under construction.</div>
+<p>Retrieving random numbers can be done from the namesake standard library module.
+There are two types of random numbers available out-of-the-box: <em>splitmix64</em> for
+faster computations with only 64-bit random state and <em>Xoshiro256plus</em> for 256-bit
+random state that is better for longer random sequences. 
+<strong>Neither of these is cryptographically secure.</strong></p>
+
+<p>The <code>splitmix64</code> function acts on a mutable <code>nat</code> state to produce a next
+random <code>nat</code> number, or -if no argument is provided- creates a mutable seed that uses the
+system clock as a source of entropy. Here is an example.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/rand.s&quot;</span> <span class="k">as</span> <span class="n">rand</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/rand.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">rand</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">rand</span><span class="p">:</span><span class="n">Rand</span><span class="p">()</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">splitmix64</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">splitmix64</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">splitmix64</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><em>Xoshiro256plus</em> is meant to compute random numbers in the range [0,1] and is recommended
+for long-running programs. Use this unless you know what you are doing, or need cryptographically
+secure random numbers (these are NOT sscure). Initialize it per <code>Rand()</code> and call <code>next</code> to
+retrieve next random values.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/rand.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">rand</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">Rand</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="nb">next</span> <span class="n">rand</span>
     <span class="nb">print</span> <span class="nb">next</span> <span class="n">rand</span>
 </code></pre>
 </div>
@@ -1879,7 +2034,7 @@ when organized in a string buffer.</p>
 
 <p>The standard library provides the means of conducting scientific computations
 via matrix and vector arithmetics. Everything is stored in underlying <code>float[]</code>
-buffers that can be set <em>allocator</em> effects and imported from the <em>std/sci.s</em> 
+buffers that can be set as <em>allocator</em> effects and imported from the <em>std/sci.s</em> 
 file. Let us start with a quick preview of a vector. Vector elements can be
 set and read as if working on buffers, but additional operations are provided.</p>
 
@@ -1888,9 +2043,7 @@ set and read as if working on buffers, but additional operations are provided.</
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">v</span> <span class="o">=</span> <span class="n">vec</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">5</span> <span class="c1"># allocate a buffer and treat it as a vector</span>
-    <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">vec</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
     <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;(sum, mean, std) = (&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="nb">print</span> <span class="p">(</span><span class="nb">sum</span> <span class="n">v</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="p">)</span>
     <span class="nb">print</span> <span class="p">(</span><span class="n">mean</span> <span class="n">v</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="p">)</span>
@@ -1914,9 +2067,8 @@ after the end.</p>
     <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="n">v2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
 
-    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">5</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">vec</span> <span class="mi">10</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="mi">5</span>
         <span class="n">v</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="p">(</span><span class="n">v1</span><span class="o">+</span><span class="n">v2</span><span class="o">+</span><span class="n">v</span><span class="p">)</span>
         <span class="c1">#v = allocator2.mul(2.0, v1+v2+v) # THIS WOULD CREATE AN ERROR</span>
     <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1925,6 +2077,45 @@ after the end.</p>
     <span class="k">try</span> <span class="n">safe_main</span><span class="p">()</span>
     <span class="k">if</span> <span class="k">try</span> <span class="n">error</span><span class="o">=</span><span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span>
+</code></pre>
+</div>
+
+<p>An extension of vectors are matrices. These are defined
+with similar patterns, including the one below that consumes 
+the a whole <code>float[]</code> buffer alongside a declared number of rows.
+Matrix multiplication and matrix-vector multiplication are also
+implemented.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">allocator</span> <span class="o">=</span> <span class="n">new</span><span class="p">()</span> <span class="c1"># allocate to new memory whenever needed</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">mat</span> <span class="p">[</span>
+        <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">any</span> <span class="mi">2</span> <span class="c1"># create a tuple of the (data,2) without parentheses</span>
+
+    <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="mf">1.0</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">vec</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;a*x&quot;</span>
+    <span class="nb">print</span> <span class="n">a</span><span class="o">*</span><span class="n">x</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">vec</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;u*a&quot;</span>
+    <span class="nb">print</span> <span class="n">u</span><span class="o">*</span><span class="n">a</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="n">mat</span> <span class="p">[</span>
+        <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span>
+        <span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">any</span> <span class="mi">3</span>
+
+    <span class="nb">print</span> <span class="s2">&quot;a*b&quot;</span>
+    <span class="nb">print</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span>
 </code></pre>
 </div>
 

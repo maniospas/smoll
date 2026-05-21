@@ -1,8 +1,7 @@
 local import "std/core.s"
 local import "std/sci/vec.s"
+local import "std/sci/unsafe.s"
 
-local def mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride)
-    return class(unsafe_ptr, pos, rows, cols, stride)
 
 def rows(mat m)
     doc "number of rows"
@@ -17,7 +16,6 @@ def mat(effect edit new allocator, nat rows, nat cols)
     buf = float[].alloc rows*cols
     return mat(buf.unsafe_ptr, 0, rows, cols, cols)
 
-
 def mat(effect edit vecpos allocator, nat rows, nat cols)
     doc "matrix on an existing vecpos"
     if allocator.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
@@ -30,7 +28,7 @@ def mat(effect edit vecpos allocator, nat rows, nat cols)
 def mat(edit float[] buf, nat rows)
     doc "matrix on an existing float[] buffer"
     cols = len(buf)/rows
-    if cols*rows!=len buf fail "cannot exactly buffer size by vector rows"
+    if cols*rows!=len buf fail "buffer size not divisible by vector rows"
     return mat(buf, mut 0, rows, cols)
 
 def mat(effect edit vec_allocator&circular allocator, nat rows, nat cols)
@@ -45,21 +43,22 @@ def mat(effect edit vec_allocator&circular allocator, nat rows, nat cols)
         start = 0
     return mat(allocator.buf.unsafe_ptr, start, rows, cols, cols)
 
-def mutget(mat m, nat i, nat j)
-    doc "mutable reference to element (i,j)"
+def mutget(edit mat m, nat i, nat j)
+    doc "mutable reference to matrix element (i,j)"
     if i>=m.rows fail "row out of bounds"
     if j>=m.cols fail "column out of bounds"
     return unsafe_mut m.unsafe_ptr+8*(m.pos+i*m.stride+j)
 
-def get(const mat m, nat i, nat j)
-    doc "read element (i,j)"
+def get(mat m, nat i, nat j)
+    doc "reference to matrix element (i,j)"
     if i>=m.rows fail "row out of bounds"
     if j>=m.cols fail "column out of bounds"
     return m.unsafe_ptr+8*(m.pos+i*m.stride+j)
 
 def mat(vec v, "row"|"col" orientation)
     doc "view a vector as a matrix on the same memory"
-    doc "'row' → 1×n matrix, 'col' → n×1 matrix"
+    doc "A 'type \"row\"' or 'type \"col\"' marker is needed"
+    doc "to indicate the new matrix's orientation."
     if orientation is "row"
         return mat(v.unsafe_ptr, v.pos, 1, v.length, v.length)
     if orientation is "col"
@@ -67,18 +66,8 @@ def mat(vec v, "row"|"col" orientation)
         return mat(v.unsafe_ptr, v.pos, v.length, 1, 1)
 
 def vec(mat m)
-    doc "view a matrix as a vector on the same memory (zero-copy)"
-    doc "Requires the data to be contiguous:"
-    doc "  1×n matrix → vec of length n"
-    doc "  n×1 matrix with stride==1 → vec of length n"
-    doc "  any m×n matrix with stride==cols → vec of length m*n"
-    if m.rows==1
-        return vec(m.unsafe_ptr, m.pos, m.cols)
-    if m.cols==1 and m.stride==1
-        return vec(m.unsafe_ptr, m.pos, m.rows)
-    if m.stride==m.cols
-        return vec(m.unsafe_ptr, m.pos, m.rows*m.cols)
-    fail "cannot view non-contiguous matrix as vector without copying"
+    doc "view a matrix as a vector"
+    return vec(m.unsafe_ptr, m.pos, m.rows*m.cols)
 
 def row(mat m, nat i)
     doc "view row i as a vector on the same memory (always zero-copy in row-major)"
@@ -86,7 +75,7 @@ def row(mat m, nat i)
     return vec(m.unsafe_ptr, m.pos+i*m.stride, m.cols)
 
 def mul(effect edit vec_allocator allocator, mat m, vec v)
-    doc "matrix-vector multiplication  (m×n) · (n) → (m)"
+    doc "matrix-vector multiplication"
     doc "Grabs an allocator for the result as an effect."
     if m.cols!=v.length fail "matrix columns must match vector length"
     result = vec m.rows
@@ -100,7 +89,7 @@ def mul(effect edit vec_allocator allocator, mat m, vec v)
     return result
 
 def mul(effect edit vec_allocator allocator, vec v, mat m)
-    doc "vector-matrix multiplication  (n) · (n×p) → (p)"
+    doc "vector-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
     if v.length!=m.rows fail "vector length must match matrix rows"
     result = vec m.cols
@@ -114,7 +103,7 @@ def mul(effect edit vec_allocator allocator, vec v, mat m)
     return result
 
 def mul(effect edit vec_allocator allocator, mat m1, mat m2)
-    doc "matrix-matrix multiplication  (m×k) · (k×n) → (m×n)"
+    doc "matrix-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
     if m1.cols!=m2.rows fail "inner dimensions must agree"
     result = mat(m1.rows, m2.cols)
@@ -137,25 +126,16 @@ def print(mat m, cstr|blank endl)
         endl = "\n"
     it_i = range m.rows
     while try i=next it_i
-        if m.rows==1
-            print ("[ ", "")
-        if m.rows>1 and i==0
-            print ("⎡ ", "")
-        if m.rows>1 and i>0 and i<m.rows-1
-            print ("⎢ ", "")
-        if m.rows>1 and i==m.rows-1
-            print ("⎣ ", "")
+        if m.rows==1  print ("[ ", "")
+        if m.rows>1 and i==0 print ("⎡ ", "")
+        if m.rows>1 and i>0 and i<m.rows-1 print ("⎢ ", "")
+        if m.rows>1 and i==m.rows-1 print ("⎣ ", "")
         it_j = range m.cols
         while try j=next it_j
             print (m[i,j], "")
-            if j<m.cols-1
-                print ("  ", "")
-        if m.rows==1
-            print (" ]", "")
-        if m.rows>1 and i==0
-            print (" ⎤", "")
-        if m.rows>1 and i>0 and i<m.rows-1
-            print (" ⎥", "")
-        if m.rows>1 and i==m.rows-1
-            print (" ⎦", "")
+            if j<m.cols-1 print ("  ", "")
+        if m.rows==1 print (" ]", "")
+        if m.rows>1 and i==0 print (" ⎤", "")
+        if m.rows>1 and i>0 and i<m.rows-1 print (" ⎥", "")
+        if m.rows>1 and i==m.rows-1 print (" ⎦", "")
         print ("", endl)

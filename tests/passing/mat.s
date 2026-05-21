@@ -4,20 +4,22 @@ import "std/sci.s"
 def main()
     allocator = new() # allocate to new memory whenever needed
 
-    a = mat args[
+    a = mat [
         1.0, 0.0, 2.0,
         0.0, 3.0, 1.0
     ].any 2
 
-    x = vec args[1.0, 2.0, 3.0]
-    print "a*x"
+    a[0,0]=1.0
+
+    x = vec [1.0, 2.0, 3.0]
+    print nn "a*x"
     print a*x
 
-    u = vec args[1.0, 2.0]
-    print "u*a"
+    u = vec [1.0, 2.0]
+    print nn "u*a"
     print u*a
 
-    b = mat args[
+    b = mat [
         1.0, 2.0,
         3.0, 4.0,
         5.0, 6.0

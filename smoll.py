@@ -50,6 +50,7 @@ err_code_table: dict[str,int] = dict()
 err_code_list = ["\"noerr\"", "\"error\"", "\"null pointer\""]
 err_code_table["noerr"] = 0
 err_code_table["error"] = 1
+err_code_table["null pointer"] = 2
 debug_mode = True
 repositories: dict[str, str] = dict()
 externals: list["File"] = list()
@@ -548,7 +549,8 @@ class ImplementedType:
         if self in discovered: return ret
         discovered.add(self)
         ret = ret.union(self.spawned_error_codes)
-        if not self.has_caught_used_error_codes: return ret
+        # if we have no errors (have tried with everything) but have not caught anything (to print it) then don't add propagating errors
+        if not self.has_caught_used_error_codes and not self.needs_failure_mode: return ret 
         for other in self.used_error_codes: ret = ret.union(other.gather_spawned_error_codes(discovered))
         return ret
 
@@ -1795,6 +1797,11 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
         if len(callee.doc)>1: print("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:]))
         print("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+        spawned_error_codes = callee.gather_spawned_error_codes(set())
+        if len(spawned_error_codes): 
+            if callee.needs_failure_mode: print("Potential errors:\n")
+            else: print("No failing errors, but can catch these intercepted ones:\n")
+        for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
     return callee
 
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
@@ -2169,10 +2176,14 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.defers.append(new_defer)
     return rets
 
-def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token):
+def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token, explicit: bool=True):
     ret = impl.stabilize(ret)
-    if len(ret)!=1: current_token.error("type", "can only deref a 'ptr' but got '"+signature_like(ret)+"'")
-    if ret[0].type!=POINTER_TYPE: current_token.error("type", "can only deref a 'ptr' but got '"+signature_like(ret)+"'")
+    if len(ret)!=1: 
+        if not explicit: return pos, ret
+        current_token.error("type", "can only deref a 'ptr' but got '"+signature_like(ret)+"'")
+    if ret[0].type!=POINTER_TYPE:
+        if not explicit: return pos, ret
+        current_token.error("type", "can only deref a 'ptr' but got '"+signature_like(ret)+"'")
     if ret[0].stabilized_name() in impl.invalidated: current_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[ret[0].stabilized_name()])
     pointer_type = impl.get_pointer_type(ret[0])
     if pointer_type is None: current_token.error("type", "there is no known type attached to the pointer to deref at this point")
@@ -2385,7 +2396,7 @@ def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False
         assert type is not None
         if peek_text(tokens, pos+1)=="[":
             at_pos = get(tokens, pos+1)
-            if get(tokens, pos+2).text!="]": at_pos.error("syntax", "to denote a buffer type use '[]'")
+            if get(tokens, pos+2).text!="]": return pos+1, type#at_pos.error("syntax", "to denote a buffer type use '[]'")
             buffer_type: UnionType|None = buffer_types[type] if type in buffer_types else None
             if buffer_type is None:
                 buffer_type = UnionType(type.name+"____t_buffer", at=type.at)
@@ -2984,7 +2995,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 args = rets+additional_rets
                 rets = resolve_call(file, impl, type, args, err_token)
                 if deref:
-                    pos, rets = process_deref(file, pos, rets, impl, err_token)
+                    pos, rets = process_deref(file, pos, rets, impl, err_token, explicit=False)
                 else:
                     for a in args:
                         if a.type!=POINTER_TYPE: continue
@@ -3173,8 +3184,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if is_lsp and next_token.file.is_main_file: print_lsp_string(next_token)
         impl.VM = next_token.text
         return pos+1,[]
-    if current=="args":
-        pos += 1
+    if peek_text(tokens, pos)=="[":
         if peek_text(tokens, pos)!="[": get(tokens, pos).error("syntax", "expecting '[' after 'args'")
         variables_sets: list[list[Variable]] = list()
         pos, buffer_element = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
@@ -3686,6 +3696,104 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 else: print_lsp_keyword(name, "stops the current loop immediately")
             impl.implementation.extend([CodeWord(name.text), CODEWORD_SEMICOLON])
             continue
+        if name.text=="for":
+            if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**for**\n\nLoop that automatically retrieves index-indexed items. 'for var in iterator ...' is equivalent to 'index =0 while try var=iterator[index] ... index=index+1'")
+            impl.nesting.append("while")
+            if_pos = pos-1
+            if peek_text(tokens, pos+1)!="in": get(tokens, pos+1).error("syntax", "'in' expected; for syntax should be 'for var in iterable'")
+            in_pos = pos+1
+            varname = peek_text(tokens,pos)
+            indexor = Variable(create_temp(), UINT_TYPE, immutable=False)
+            impl.vars[indexor.name] = indexor
+            pos, iterator_object = await process_statement(file, tokens, pos+2, impl, current_operator_priority=0)
+            impl.accumulating_defers.append(dict())
+
+            impl.implementation.extend([
+                indexor,
+                CODEWORD_EQUALS,
+                CodeWord("0"),
+                CODEWORD_SEMICOLON
+            ])
+            
+            impl.implementation.extend([
+                CodeWord("while"),
+                CODEWORD_LPAR,
+                CodeWord("1"),
+                CODEWORD_RPAR,
+                CODEWORD_LBRACKET,
+            ])
+            current_token = name
+            async def process_for_get(pos: int):
+                tmp = create_temp()
+                var = Variable(tmp, BOOL_TYPE, token=current_token)
+                impl.vars[tmp] = var
+                impl.is_parsing_a_try.append(var)
+                impl.count_handled_tries.append(0)
+                
+                type = file.types.get("get", None)
+                if type is None: err_token.error("type", "missing implementation for 'get'")
+                ret = resolve_call(file, impl, type, iterator_object+[indexor], get(tokens, in_pos)) 
+                _, ret = process_deref(file, pos, ret, impl, get(tokens, in_pos), explicit=False)
+                impl.assign(varname, ret, current_token)
+                if impl.count_handled_tries[-1]==0: current_token.error("safety", "this 'try' statement does not guard against anything")
+                impl.count_handled_tries.pop()
+                impl.is_parsing_a_try.pop()
+                impl.implementation.extend([
+                    var,
+                    CODEWORD_EQUALS,
+                    var,
+                    CodeWord("=="),
+                    CodeWord("0"),
+                    CODEWORD_SEMICOLON
+                ])
+                return pos, [var]
+            pos, ret = await process_for_get(pos)
+            impl.implementation.extend([
+                indexor,
+                CODEWORD_EQUALS,
+                indexor,
+                CODEWORD_ADD,
+                CodeWord("1"),
+                CODEWORD_SEMICOLON
+            ])
+            if ret[0].type!=BOOL_TYPE: get(tokens, in_pos).error("type", "internal error - conditions can only evaluate to 'bool' or be constantly true/false")
+            if ret[0].type==TRUE_TYPE:
+                if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
+                else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)    
+            elif ret[0].type==FALSE_TYPE:
+                if peek_text(tokens, pos)!=START_TOKEN: pos = skip_statement(file, tokens, pos)
+                else:
+                    depth = 1
+                    pos += 1
+                    while depth:
+                        next_token = get_skip(tokens, pos).text
+                        if next_token==START_TOKEN: depth += 1
+                        elif next_token==END_TOKEN: depth -= 1
+                        pos += 1
+            else:
+                impl.implementation.extend([
+                        CODEWORD_IF, 
+                        CODEWORD_LPAR,
+                        CodeWord("!"),
+                        ret[0],
+                        CODEWORD_RPAR,
+                        CODEWORD_LBRACKET,
+                        CodeWord("break"),
+                        CODEWORD_SEMICOLON,
+                        CODEWORD_RBRACKET,
+                    ])
+                if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
+                else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
+
+            for should_invalid in impl.accumulating_defers[-1]:
+                if impl.invalidated.get(should_invalid) is None:
+                    impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
+
+            impl.implementation.append(CODEWORD_RBRACKET)
+            impl.nesting.pop()
+            impl.accumulating_defers.pop()
+            continue
+        
         if name.text=="while":
             if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**while**\n\nLoop that runs while the condition is true.")
             impl.nesting.append("while")
@@ -3697,8 +3805,8 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 CODEWORD_RPAR,
                 CODEWORD_LBRACKET,
             ])
-            pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
             impl.accumulating_defers.append(dict())
+            pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
             if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool' but found '"+signature_like(ret)+"'")
             if ret[0].type==TRUE_TYPE:
                 if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
@@ -4003,6 +4111,7 @@ def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception
 
 async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception: bool, is_local: bool):
     start_token = get(tokens, pos)
+    name_token = get(tokens, pos+1)
     pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr, effect_names = _gather_def(file, tokens, pos, fast_return_exception, is_local)
     starting_pos = pos
     greatest_pos = None
@@ -4068,6 +4177,29 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                     pos = await process_body(file, tokens, pos, impl)
                     if not impl.has_returned_once: 
                         impl.returns([], start_token, True)
+                    
+                    if is_lsp and name_token.file.is_main_file:
+                        callee = impl
+                        print("---")
+                        # position in processed file
+                        print("function")
+                        print(os.path.abspath(name_token.file.resolved_path))
+                        print(name_token.row)
+                        print(name_token.col)
+                        print(len(name_token.text))
+                        # defined at
+                        print(os.path.abspath(name_token.file.resolved_path))
+                        print(name_token.row)
+                        print(name_token.col)
+                        # message (may span multiple lines))
+                        if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
+                        if len(callee.doc)>1: print("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:]))
+                        print("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+                        spawned_error_codes = callee.gather_spawned_error_codes(set())
+                        if len(spawned_error_codes):
+                            if callee.needs_failure_mode: print("Potential errors:\n")
+                            else: print("No failing errors, but can catch these intercepted ones:\n")
+                        for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
             except FastReturnException: 
                 assert fast_return_exception
             #if not impl.force_not_inline and fast_return_exception: continue # register only forcefully RECURSIVE variations
@@ -4329,7 +4461,7 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
                             if c in ")]": 
                                 bracket_depth -= 1
                                 if bracket_indent_stack: bracket_indent_stack.pop()
-                            if c in "(){}[];&|.": break
+                            if c in "(){}[];&|.:": break
                             c = line[col]
                             if c not in symbols or c in "(){}[];&|": break
                         if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))

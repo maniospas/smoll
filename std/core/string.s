@@ -294,3 +294,10 @@ def contains(cstr|str _stack, cstr|str _needle)
             return true
         i = i+1
     return false
+
+def nn(str value)
+    doc "no new line"
+    doc "Given a value, creates a tuple of (value, \"\")."
+    doc "This enables the pattern 'print nn value'"
+    doc "to print without a new line."
+    return (value, "")

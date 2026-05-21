@@ -17,6 +17,13 @@
 import "builtins"
 import "std/extern.s"
 
+def nn(cstr|float|int|nat value)
+    doc "no new line"
+    doc "Given a value, creates a tuple of (value, \"\")."
+    doc "This enables the pattern 'print nn value'"
+    doc "to print without automatically adding a new line."
+    return (value, "")
+
 def print(cstr value, cstr|blank endl)
     doc "prints a cstr"
     if endl is blank 

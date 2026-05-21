@@ -1,6 +1,6 @@
 import "std/core.s"
-import "std/io.s":dir as dir
-import "std/io.s":process as process
+import "std/io.s"
+
 
 def run(cstr|str command)
     proc = mut process:read command
@@ -15,10 +15,8 @@ def main()
     bp.copy path
     test_dir = dir:read path
     proc_buf = char[].alloc KB 4
-    while try entry = dir:entry test_dir # do not move the position
-        if not entry.ends_with ".s"
-            continue
+    for entry in test_dir # do not move the position
+        if not entry.ends_with ".s" continue
         command = bp.buf.str((local bp).copy_null_terminated(str entry).endpos())
         print command
         run command
-    

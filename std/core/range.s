@@ -22,7 +22,7 @@ def range(nat|blank _from, nat to)
         doc "the range's start is assumed to be zero"
         _from = 0
     from = mut _from
-    return (from, to)
+    return class(from, to)
 
 def next(edit range r)
     if r.from>=r.to
@@ -30,3 +30,10 @@ def next(edit range r)
     ret = const r.from
     r.from = ret+1
     return ret
+
+def get(range r, nat pos)
+    if pos>=r.to
+        fail "iteration end"
+    if pos<r.from
+        fail "iterator range"
+    return pos

@@ -12,17 +12,19 @@ _1.8._ [unions](#unions) <br>
 _1.9._ [literal types](#literal-types) <br>
 _1.10._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)
 
+
 **Section 2. Safe Resources**<br>
 _2.1._ [buffers](#buffers)<br>
 _2.2._ [{pointers}](#pointers)<br>
 _2.3._ [{substructures}](#substructures)<br>
 _2.4._ [stable references](#stable-references)<br>
 _2.5._ [try and fail](#try-and-fail)<br>
-_2.6._ [defer](#defer)<br>
-_2.7._ [catching errors](#catching-errors)<br>
-_2.8._ [effects](#effects)<br>
-_2.9._ [{debugging tools}](#debugging-tools)<br>
-_2.10._ [{bounded compute}](#bounded-compute)<br>
+_2.6._ [{iterators}](#iterators)<br>
+_2.7._ [{defer}](#defer)<br>
+_2.8._ [catching errors](#catching-errors)<br>
+_2.9._ [effects](#effects)<br>
+_2.10._ [{debugging tools}](#debugging-tools)<br>
+_2.11._ [{bounded compute}](#bounded-compute)<br>
 
 **Section 3. Standard Library**<br>
 _3.1._ [lists](#lists)<br>
@@ -71,11 +73,10 @@ def main()
 ```
 
 
-
 You can also import a file as a namespace to access its
 contents with the `:` notation. This is more verbose
-but unambiguous, like below. You can even access namespaces
-defined within the imported namespace.
+but unambiguous, like below. You can even access child
+namespaces defined within the imported onne.
 
 ```python
 import "std/core.s" as core
@@ -123,9 +124,7 @@ def main()
 The `.` operator can also pipe some data
 into the beginning of a function like below. This
 works as a notation for calling functions like class 
-methods. In general, do try to avoid needless parentheses,
-as the snippet below does (`f1 f2 ... args` is a chain of 
-function calls). You can always refer to functions
+methods. You can always refer to functions
 within namespaces.
 
 ```python
@@ -137,6 +136,25 @@ def main()
     x2 = x1.core:add 1
     core:print x2.core:add 2
 ```
+
+In general, avoid needless parentheses,
+as the snippet below does (`f1 f2 ... args` is a chain of 
+function calls). One particularly useful function
+from the standard library's core is `nn`, standing
+for *no \n* that basically takes numbers or strings
+as inputs and outputs a tuple of the same value accompanied 
+by *""*. This is passed into the `print` function, 
+whose optional second argument determines the line ending; *"\n"* 
+by default but this time we prevent that to no end the line.
+
+```python
+import "std/core.s"
+
+def main()
+    print nn "hello "
+    print "world!" 
+```
+
 
 ## mutability
 
@@ -168,8 +186,11 @@ def main()
 All functions declare corresponding types via their returned values.
 That is, you can use the function's name to refer to data with
 equivalent structure. Below is an example, where the
-`nat` type represents to natural numbers (non-negative integers). Other builtin types
-are `bool`, `int`, `float`, and `cstr` for string literals.
+`nat` type represents to natural numbers/non-negative integers.
+ Other builtin types are `bool`, `int`, `float`, and `cstr` for
+string literals. It bears stressing that, when you see integer
+numbers in the code, these are always natural numbers. This is 
+a deliberate choise to enforce memory safety later.
 
 ```python
 import "std/core.s"
@@ -196,7 +217,13 @@ by the returned value's name.
 Types like the above are structurally matched, as we did
 when applying `add` to the range construct. This structural
 typing is rich but can be kind of unsafe if you do not keep
-track of your data shapes. To prevent implicit structural matches, 
+track of your data shapes in that you may accidentally allow
+applying the same functions to unforeseen data structures. This
+weakness is also its stronges theoretical benefit, though; it
+becomes a determine only for structures that also require some
+relational invariant between values.
+
+To prevent implicit structural matches, 
 use the following `class` notation to wrap the returned value.
 You will mainly want to do so when the relations between class
 field values (e.g., a character buffer and its used size) is
@@ -342,10 +369,10 @@ def main()
     print "\n"
 ```
 
-Loops are similar to condition, only they execute multiple
-times until a condition is true or false. You can use `continue` 
-to skip the rest of the current loop and `break` to halt the
-current loop. Here is a silly example. Please do not write code like this.
+Loops are similar to conditions, but execute multiple
+times until they check to false. You can use `continue` 
+to skip the rest of the current loop and `break` to halt it. 
+Here is a simple example. Please do not write code like this.
 
 ```python
 import "std/core.s"
@@ -362,23 +389,22 @@ def main()
         i = i+1
 ```
 
-A more efficient way to write loops, which will be fully
-understood later, is via iterators that have the means to
+A more efficient way to write loops, is with the `for variable in iterator`
+pattern, which uses iterators that have the means to
 obtain the next element. The `range` iterator, for example, 
 takes an end number or a pair of start and end numbers and allows
 calling `next` to retrieve the next value until the end
-is reached (non-inclusively). The retrieval may fail, which
-is checked by guarding the expression with a `try` instruction.
-These are all [error code semantics](#try-and-fail).
-
+is reached (non-inclusively). Iterators safely try to keep producting new
+elements until they fail to do so (any kind of failure stops them).
+Underneath, they desugar to [error code semantics](#try-and-fail).
+More on iterators later.
 
 ```python
 import "std/core.s"
 
 def main()
-    it = range 10 # equivalent to it = range(0,10)
-    while try i=next it
-        print i   # prints 0,1,2...,9
+    for i in range 10
+        print i
 ```
 
 ## recursion
@@ -745,13 +771,13 @@ def main()
 
 Buffers are memory-allocated collections of items
 and can be declared as `T[]`, where *T* is a type.
-Create and allocate a buffer per `buf = float[].alloc 4`. 
-Buffer internals are mutable,
-which means that allocation would modify the original empty buffer,
-if that was stored in a variable (see below).
+Create and allocate a buffer with a pattern that looks likt this:
+`buf = float[].alloc 4`. This creates a new buffer storing float nubmers
+(has type `float[]`) that contains four numbers.
 
-Allocation will create an error if it tries to change the number of
-elements from a non-zero number to something different.
+Allocation will create an error if it is called on an existing
+buffer to change its number of
+elements from non-zero to something different.
 In those cases, use `resize` instead, though the exact usage of
 this is covered in [stable references](#stable-references).
 
@@ -762,9 +788,10 @@ and `mutget` functions; beware that details involve pointers
 tackled in the next section. 
 Use `buffer[pos] = value` to copy some data on a buffer's element.
 
-All buffer indexes are of type `nat`, which represents natural numbers 
-(non-negative integers) and avoids a whole area of logic bugs associated
-with negative indexing. Next is an example of buffer usage.
+All buffer indexes are referenced by `nat` numbers, that is, natural 
+numbers/non-negative integers. This is the default integer type, assumed
+when writing numbers like `1` to avoid a whole area of logic bugs associated 
+with negative indexes. Next is an example of buffer usage.
 
 ```python
 import "std/core.s"
@@ -861,6 +888,23 @@ def main()
     populate elements
     print elements.buf[0]
     print elements.buf[1]
+```
+
+Below is a convenient shorthand for creating and populating
+a buffer with comma-separated contents by placing those within
+`[...]`. Do note that buffer types use no contents in the brackets
+normally. Under the hood, the currently available `alloc` function 
+is used to make the allocation.
+
+```python
+import "std/core.s"
+
+def print(cstr[] sentences)
+    for sentence in sentences
+        print sentence
+
+def main()
+    print ["hello world!", "... and goodbye for now."]
 ```
 
 ## pointers
@@ -1017,7 +1061,6 @@ def main()
     print buf[1]
 ```
 
-
 Below is a more complicated example, where a list is used
 to dynamically manage a buffer and resize it as needed.
 
@@ -1027,7 +1070,6 @@ potential resizing of the second copy could
 that the string `s1` know about. However, thanks to 
 the stable reference, the buffer is automatically updated
 for strings copied onto it.
-
 
 ```python
 import "std/core.s"
@@ -1118,9 +1160,9 @@ def main()
     print(len v, " numbers allocated\n")
 ```
 
-Since failure is a fast abstraction in *smoλ*, it is also the preferred syntax for 
-iterators reaching their end. Below is an example, where all standard library iterators
-follow the same pattern for terminating loops and you should try to reuse in your code.
+Since failure is a fast abstraction in *smoλ*, it is also the implementation
+mechanism for trying to produce next values. Below is an example, 
+where `for` loops are syntactic desugar to something similar.
 
 ```python
 import "std/core.s"
@@ -1131,7 +1173,83 @@ def main()
         print i
 ```
 
+## iterators
+
+*Warning: This subsection is about creating your own iterators and can be skipped in the first reading.*
+
+We can now full grasp the concept of iterating across 
+some data structure. Recall that this is done like
+below. The expression after `in` is evaluated first
+and forms the iterator that we are traversing, whose
+values are assigned to `i`. This is equivalent to 
+the previous section's last example; the `for` loop
+is converted into a `while try`.
+
+```python
+import "std/core.s"
+
+def main()
+    for i in range 10
+        print i   # prints 0,1,2...,9
+```
+
+However, iterators do not apply arbitary functions
+but instead employ the `get(data, nat index)` function 
+that overloads the `data[index]` operator for indexes
+that are natural numbers. In truth, the range ieration
+examples is equivalent like the next tone.
+
+```python
+import "std/core.s"
+
+def main()
+    iterator = range 10
+    hidden_index = mut 0
+    while try i=iterator[hidden_index]
+        hidden_index = hidden_index+1
+        print i   # prints 0,1,2...,9
+```
+
+If the outcome of the `get` is a pointer, it automatically
+dereferenced so that you can readily iterate across buffers,
+like below.
+
+```python
+import "std/core.s"
+
+def main()
+    for i in [1,2,3]
+        print i
+```
+
+The hidden index can be mutated and used to keep track 
+of the iteration state, even when the iterator itself
+is constant. But you can always skip it. For example,
+next is a program that keeps the iteration state inside
+the data.
+
+```python
+import "std/core.s"
+
+def solution(mut nat x, mut nat y)
+def get(edit solution s, nat) # skip the iteration index argument
+    s.x = (s.x+1)/2
+    s.y = (s.y+1)/2
+    if s.x==s.y fail "converged"
+    if s.x>s.y return s.x-s.y
+    return s.y-s.x
+
+def main()
+    sol = solution(mut 32, mut 19)
+    for diff in sol 
+        print nn "difference "
+        print diff
+    print sol.x
+```
+
 ## defer
+
+*Warning: Deferred execution is mainly useful for safe resource handling when unsafely creating new types of resources. This can be skipped.*
 
 You can defer code blocks to run later. The "later" part is
 ideally the end of the current function, but *smoλ* may
@@ -1492,47 +1610,50 @@ and the buffer holding them does not have a trailing null character to
 pretend that they are null-terminated, a copy may be made.
 
 Read a file by opening it and iterating line by
-line, like below. This needs a `char[]` buffer on which to store (temporary) lines,
-although you can save yourself a `copy` and pass a mutable position as a second 
-argument to directly read on the buffer and progress the position.
+line, like below. This needs a `char[]` buffer 
+-or a `bufpos` on that charcater buffer- on which to 
+store lines.
 
 ```python
 import "std/core.s"
-import "std/io.s":file as file
+import "std/io.s"
 
 def main()
     f = file:read "README.md"
     mem = char[].alloc KB 4 # max 4 KB chunk size, on char[] by default
-    while try line = file:line(mem, f)
+    for line in (mem, f)
         print("|", "")
         print(line, "")
     print ""
 ```
 
-Similarly, create a file for writing like below. Can also delete it.
+Similarly, create a file for writing like below. Can also delete it,
+or even defer its deletion to when the file is no longer in use.
 
 ```python
 import "std/core.s"
-import "std/io.s" as io
+import "std/io.s"
 
 def main()
-    f = io:file:write "tmp.txt"
+    f = file:write "tmp.txt"
     f.print "hello world"
     defer 
-        io:dir:remove "tmp.txt"
+        dir:remove "tmp.txt"
 ```
 
 Above was a first introduction to the `dir` namespace for directory 
-operations. Below is how to iterate through directory contents.
+operations. Below is how to iterate through directory contents. This
+yields temporarily available strings. Availability means that the
+contents of those strings may be corrupted even if they remain memory
+safe.
 
 ```python
 import "std/core.s"
-import "std/io.s":dir as dir
+import "std/io.s"
 
 def main()
     dir = mut dir:read "."
-    buf = char[].alloc 128
-    while try entry=dir:entry dir
+    for entry in dir
         print(entry, " ")
         if dir:is_file entry
             print "file"
@@ -1547,14 +1668,15 @@ that fails on non-zero error code can be evoked like below.
 
 ```python
 import "std/core.s"
-import "std/io.s":process
+import "std/io.s"
 
 def main()
     success = try system "echo \"hello world!\""
     print success
 ```
 
-One can also open and communicate with running processes.
+One can also open and communicate with running processes
+similarly to files.
 
 ```python
 import "std/core.s"
@@ -1562,8 +1684,8 @@ import "std/io.s":process as proc
 
 def main()
     process = proc:process "ls"
-    buffer = bufpos char[].alloc KB 4 # example with growing position
-    while try line=buffer.proc:line process
+    buf = bufpos char[].alloc KB 4 # example with growing position
+    for line in (buf, process)
         print line
 ```
 
@@ -1585,14 +1707,38 @@ def main()
 
 ## random
 
-*Info: This subsection is under construction.*
+Retrieving random numbers can be done from the namesake standard library module.
+There are two types of random numbers available out-of-the-box: *splitmix64* for
+faster computations with only 64-bit random state and *Xoshiro256plus* for 256-bit
+random state that is better for longer random sequences. 
+**Neither of these is cryptographically secure.**
+
+The `splitmix64` function acts on a mutable `nat` state to produce a next
+random `nat` number, or -if no argument is provided- creates a mutable seed that uses the
+system clock as a source of entropy. Here is an example.
 
 ```python
 import "std/core.s"
-import "std/rand.s" as rand
+import "std/rand.s"
 
 def main()
-    rand = mut rand:Rand()
+    seed = mut splitmix64()
+    print splitmix64(seed)
+    print splitmix64(seed)
+```
+
+*Xoshiro256plus* is meant to compute random numbers in the range [0,1] and is recommended
+for long-running programs. Use this unless you know what you are doing, or need cryptographically
+secure random numbers (these are NOT sscure). Initialize it per `Rand()` and call `next` to
+retrieve next random values.
+
+```python
+import "std/core.s"
+import "std/rand.s"
+
+def main()
+    rand = mut Rand()
+    print next rand
     print next rand
 ```
 
@@ -1662,7 +1808,7 @@ def main()
 
 The standard library provides the means of conducting scientific computations
 via matrix and vector arithmetics. Everything is stored in underlying `float[]`
-buffers that can be set *allocator* effects and imported from the *std/sci.s* 
+buffers that can be set as *allocator* effects and imported from the *std/sci.s* 
 file. Let us start with a quick preview of a vector. Vector elements can be
 set and read as if working on buffers, but additional operations are provided.
 
@@ -1671,9 +1817,7 @@ import "std/core.s"
 import "std/sci.s"
 
 def main()
-    v = vec float[].alloc 5 # allocate a buffer and treat it as a vector
-    v[0] = 1.0
-    v[1] = 2.0
+    v = vec [1.0, 2.0, 0.0, 0.0, 0.0]
     print ("(sum, mean, std) = (", "")
     print (sum v, ", ")
     print (mean v, ", ")
@@ -1695,10 +1839,9 @@ def safe_main()
     v2 = vec 10
     v1[0] = 1.0
     v2[0] = 2.0
-    
-    it = range 5
+
     v = mut vec 10
-    while try i=next it
+    for i in range 5
         v = 2.0*(v1+v2+v)
         #v = allocator2.mul(2.0, v1+v2+v) # THIS WOULD CREATE AN ERROR
     print v[0]
@@ -1707,4 +1850,42 @@ def main()
     try safe_main()
     if try error=compiler:catch()
         print cstr error
+```
+
+An extension of vectors are matrices. These are defined
+with similar patterns, including the one below that consumes 
+the a whole `float[]` buffer alongside a declared number of rows.
+Matrix multiplication and matrix-vector multiplication are also
+implemented.
+
+```python
+import "std/core.s"
+import "std/sci.s"
+
+def main()
+    allocator = new() # allocate to new memory whenever needed
+
+    a = mat [
+        1.0, 0.0, 2.0,
+        0.0, 3.0, 1.0
+    ].any 2 # create a tuple of the (data,2) without parentheses
+
+    a[0,0]=1.0
+
+    x = vec [1.0, 2.0, 3.0]
+    print nn "a*x"
+    print a*x
+
+    u = vec [1.0, 2.0]
+    print nn "u*a"
+    print u*a
+
+    b = mat [
+        1.0, 2.0,
+        3.0, 4.0,
+        5.0, 6.0
+    ].any 3
+
+    print "a*b"
+    print a*b
 ```

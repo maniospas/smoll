@@ -276,7 +276,9 @@
 <a href="#free">free</a> 
 <a href="#zero">zero</a> </p>
 
-</div># cstr
+</div>
+
+<h1 id="cstr">cstr</h1>
 
 <h3 id="cstr-constant-string">cstr - constant string</h3>
 
@@ -844,16 +846,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <h1 id="eq">eq</h1>
 
-<h3 id="eq-equal-to">eq - equal to</h3>
-
-<p><em>Defined in: std/core/bool.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="eq-equal-to-2">eq - equal to</h3>
+<h3 id="eq-equals">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
@@ -862,16 +855,29 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-2">eq</h3>
+<h3 id="eq-equals-2">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="eq-eqqual-to">eq - eqqual to</h3>
+
+<p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Compares two error messages. This comparison is
+used only for comparing error messages produced
+by the same running program.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">catch</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">catch</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
-<h3 id="eq-equal-to-3">eq - equal to</h3>
+<h3 id="eq-equals-3">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
@@ -882,16 +888,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equal-to-4">eq - equal to</h3>
-
-<p><em>Defined in: std/core/numbers.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="eq-equal-to-5">eq - equal to</h3>
+<h3 id="eq-equals-4">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
@@ -900,7 +897,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equal-to-6">eq - equal to</h3>
+<h3 id="eq-equals-5">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -909,7 +906,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equal-to-7">eq - equal to</h3>
+<h3 id="eq-equals-6">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -918,7 +915,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equal-to-8">eq - equal to</h3>
+<h3 id="eq-equals-7">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -927,7 +924,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equal-to-9">eq - equal to</h3>
+<h3 id="eq-equals-8">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -936,16 +933,29 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equal-to-10">eq - equal to</h3>
+<h3 id="eq-equals-9">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
+
+<p>This is a compile-time operations that does not evoke any runtime booleans.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
 </code></pre>
 </div>
 
-<h3 id="eq-equal-to-11">eq - equal to</h3>
+<h3 id="eq-equals-10">eq - equals</h3>
+
+<p><em>Defined in: std/core/bool.s</em></p>
+
+<p>This is a compile-time operations that does not evoke any runtime booleans.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="eq-equals-11">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -954,25 +964,29 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equal-to-12">eq - equal to</h3>
+<h3 id="eq-equals-12">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
+
+<p>This is a compile-time operations that does not evoke any runtime booleans.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
 </code></pre>
 </div>
 
-<h3 id="eq-equal-to-13">eq - equal to</h3>
+<h3 id="eq-equals-13">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
+<p>This is a compile-time operations that does not evoke any runtime booleans.</p>
+
 <div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
 </code></pre>
 </div>
 
-<h3 id="eq-equals">eq - equals</h3>
+<h3 id="eq-equals-14">eq - equals</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
@@ -990,7 +1004,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="eq-equals-2">eq - equals</h3>
+<h3 id="eq-equals-15">eq - equals</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
@@ -1008,7 +1022,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="eq-equals-3">eq - equals</h3>
+<h3 id="eq-equals-16">eq - equals</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
@@ -1017,7 +1031,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equals-4">eq - equals</h3>
+<h3 id="eq-equals-17">eq - equals</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
@@ -1026,7 +1040,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equals-5">eq - equals</h3>
+<h3 id="eq-equals-18">eq - equals</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
@@ -1037,43 +1051,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <h1 id="neq">neq</h1>
 
-<h3 id="neq-unequal-to">neq - unequal to</h3>
-
-<p><em>Defined in: std/core/numbers.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="neq-unequal-to-2">neq - unequal to</h3>
-
-<p><em>Defined in: std/core/numbers.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="neq-unequal-to-3">neq - unequal to</h3>
-
-<p><em>Defined in: std/core/numbers.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="neq-2">neq</h3>
-
-<p><em>Defined in: std/core/numbers.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">catch</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">catch</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="neq-not-equal-to">neq - not equal to</h3>
+<h3 id="neq-not-equal">neq - not equal</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
@@ -1084,7 +1062,47 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="neq-not-equal-to-2">neq - not equal to</h3>
+<h3 id="neq-not-equal-2">neq - not equal</h3>
+
+<p><em>Defined in: std/core/numbers.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="neq-not-equal-3">neq - not equal</h3>
+
+<p><em>Defined in: std/core/numbers.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="neq-not-equal-4">neq - not equal</h3>
+
+<p><em>Defined in: std/core/numbers.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="neq-not-equal-5">neq - not equal</h3>
+
+<p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Compares two error messages. This comparison is
+used only for comparing error messages produced
+by the same running program.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">catch</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">catch</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="neq-not-equal-6">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -1093,7 +1111,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="neq-not-equal-to-3">neq - not equal to</h3>
+<h3 id="neq-not-equal-7">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -1102,7 +1120,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="neq-not-equal-to-4">neq - not equal to</h3>
+<h3 id="neq-not-equal-8">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -1111,7 +1129,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="neq-not-equal-to-5">neq - not equal to</h3>
+<h3 id="neq-not-equal-9">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -1120,7 +1138,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="neq-not-equal-to-6">neq - not equal to</h3>
+<h3 id="neq-not-equal-10">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -1129,7 +1147,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="neq-not-equal-to-7">neq - not equal to</h3>
+<h3 id="neq-not-equal-11">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -1138,7 +1156,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="neq-not-equal-to-8">neq - not equal to</h3>
+<h3 id="neq-not-equal-12">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -1147,7 +1165,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="neq-not-equal-to-9">neq - not equal to</h3>
+<h3 id="neq-not-equal-13">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -1156,7 +1174,7 @@ for example to write <code>c = char str \"C\"</code>.</p>
 </code></pre>
 </div>
 
-<h3 id="neq-not-equal-to-10">neq - not equal to</h3>
+<h3 id="neq-not-equal-14">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -1234,8 +1252,10 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
+<p>This operates on boolean values at runtime.</p>
+
 <div class="codehilite">
-<pre><span></span><code><span class="n">not</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+<pre><span></span><code><span class="n">not</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1243,8 +1263,10 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
+<p>This is a compile-time operations on the compiler:false type rather than a runtime boolean.</p>
+
 <div class="codehilite">
-<pre><span></span><code><span class="n">not</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<pre><span></span><code><span class="n">not</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1252,8 +1274,10 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
+<p>This is a compile-time operations on the compiler:true type rather than a runtime boolean.</p>
+
 <div class="codehilite">
-<pre><span></span><code><span class="n">not</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">not</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1379,6 +1403,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Adds two numbers of the same type. This is an overload for the + operator.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -1388,6 +1414,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Adds two numbers of the same type. This is an overload for the + operator.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -1396,6 +1424,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <h3 id="add-add-3">add - add</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Adds two numbers of the same type. This is an overload for the + operator.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
@@ -1622,6 +1652,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Multiplies two numbers of the same type. This is an overload for the * operator.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -1631,6 +1663,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Multiplies two numbers of the same type. This is an overload for the * operator.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -1639,6 +1673,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <h3 id="mul-multiply-with-3">mul - multiply with</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Multiplies two numbers of the same type. This is an overload for the * operator.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
@@ -2074,6 +2110,9 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Divides two numbers of the same type. This is an overload for the / operator.
+Safeguards against division by zero.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -2089,6 +2128,9 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Divides two numbers of the same type. This is an overload for the / operator.
+Safeguards against division by zero.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -2103,6 +2145,9 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <h3 id="div-divide-by-3">div - divide by</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Divides two numbers of the same type. This is an overload for the / operator.
+Safeguards against division by zero.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
@@ -2224,11 +2269,11 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <li>null pointer</li>
 <li>division by zero </li>
 <li>iteration end</li>
+<li>out of bounds</li>
 <li>can only place vectors on contiguous buffers</li>
 <li>cannot place vectors on buffer offsets</li>
 <li>vector exceeeds buffer limits</li>
 <li>different vector sizes</li>
-<li>out of bounds</li>
 </ol>
 
 <h3 id="div-vector-division-6">div - vector division</h3>
@@ -2271,11 +2316,11 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <li>null pointer</li>
 <li>division by zero </li>
 <li>iteration end</li>
+<li>out of bounds</li>
 <li>can only place vectors on contiguous buffers</li>
 <li>cannot place vectors on buffer offsets</li>
 <li>vector exceeeds buffer limits</li>
 <li>different vector sizes</li>
-<li>out of bounds</li>
 </ol>
 
 <h3 id="div-vector-division-8">div - vector division</h3>
@@ -2317,12 +2362,12 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <ol start="2">
 <li>null pointer</li>
 <li>division by zero </li>
-<li>cannot allocate a buffer of unsized type</li>
 <li>iteration end</li>
 <li>allocation failed</li>
 <li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>different vector sizes</li>
+<li>cannot allocate a buffer of unsized type</li>
 <li>out of bounds</li>
+<li>different vector sizes</li>
 </ol>
 
 <h1 id="mod">mod</h1>
@@ -2330,6 +2375,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <h3 id="mod-modulo-by">mod - modulo by</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Computes the modulo between two natural numbers. This is an overload for the % operator.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="k">mod</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
@@ -2348,6 +2395,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Compares two numbers of the same type. This is an overload for the &lt; operator.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">lt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -2356,6 +2405,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <h3 id="lt-less-than-2">lt - less than</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Compares two numbers of the same type. This is an overload for the &lt; operator.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">lt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
@@ -2366,6 +2417,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Compares two numbers of the same type. This is an overload for the &lt; operator.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">lt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -2373,30 +2426,36 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <h1 id="gt">gt</h1>
 
-<h3 id="gt-greater-than">gt - greater than</h3>
+<h3 id="gt-compares-two-numbers-of-the-same-type-this-is-an-overload-for-the-operator">gt - Compares two numbers of the same type. This is an overload for the &gt; operator.</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
-<div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="gt-greater-than-2">gt - greater than</h3>
-
-<p><em>Defined in: std/core/numbers.s</em></p>
+<p>greater than</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
-<h3 id="gt-greater-than-3">gt - greater than</h3>
+<h3 id="gt-compares-two-numbers-of-the-same-type-this-is-an-overload-for-the-operator-2">gt - Compares two numbers of the same type. This is an overload for the &gt; operator.</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>greater than</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="gt-compares-two-numbers-of-the-same-type-this-is-an-overload-for-the-operator-3">gt - Compares two numbers of the same type. This is an overload for the &gt; operator.</h3>
+
+<p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>greater than</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2406,8 +2465,10 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Compares two numbers of the same type. This is an overload for the &lt;= operator.</p>
+
 <div class="codehilite">
-<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2415,8 +2476,10 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Compares two numbers of the same type. This is an overload for the &lt;= operator.</p>
+
 <div class="codehilite">
-<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2424,8 +2487,10 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Compares two numbers of the same type. This is an overload for the &lt;= operator.</p>
+
 <div class="codehilite">
-<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2434,6 +2499,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <h3 id="ge-greater-than-or-equal-to">ge - greater than or equal to</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Compares two numbers of the same type. This is an overload for the &gt;= operator.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
@@ -2444,6 +2511,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Compares two numbers of the same type. This is an overload for the &gt;= operator.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -2452,6 +2521,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <h3 id="ge-greater-than-or-equal-to-3">ge - greater than or equal to</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Compares two numbers of the same type. This is an overload for the &gt;= operator.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
@@ -2464,6 +2535,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Subtracts two numbers of the same type. This is an overload for the - operator.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -2473,6 +2546,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Subtracts two numbers of the same type. This is an overload for the - operator.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
@@ -2481,6 +2556,9 @@ for example to write <code>c = char str \"C\"</code>.</p>
 <h3 id="sub-subtract-by-3">sub - subtract by</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Subtracts two numbers of the same type. This is an overload for the - operator.
+Natural numbers are safeguarded against acquiring negative results, which would overflow.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
@@ -2700,6 +2778,8 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Exponentiates a natural number by another.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="n">pow</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ret</span><span class="p">)</span>
 </code></pre>
@@ -2725,7 +2805,7 @@ This enables the pattern &#8216;print nn value&#8217;
 to print without automatically adding a new line.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">nn</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="p">)</span>
+<pre><span></span><code><span class="n">nn</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2738,7 +2818,7 @@ This enables the pattern &#8216;print nn value&#8217;
 to print without automatically adding a new line.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">nn</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="p">)</span>
+<pre><span></span><code><span class="n">nn</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2751,7 +2831,7 @@ This enables the pattern &#8216;print nn value&#8217;
 to print without automatically adding a new line.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">nn</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="p">)</span>
+<pre><span></span><code><span class="n">nn</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2764,7 +2844,7 @@ This enables the pattern &#8216;print nn value&#8217;
 to print without automatically adding a new line.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">nn</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="p">)</span>
+<pre><span></span><code><span class="n">nn</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2795,35 +2875,6 @@ to print without a new line.</p>
 </div>
 
 <h1 id="print">print</h1>
-
-<h3 id="print-prints-an-unsigned-integer">print - prints an unsigned integer</h3>
-
-<p><em>Defined in: std/core/print.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="print-prints-an-integer">print - prints an integer</h3>
-
-<p><em>Defined in: std/core/print.s</em></p>
-
-<p>Automatically ends the line too.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="print-prints-an-integer-2">print - prints an integer</h3>
-
-<p><em>Defined in: std/core/print.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
 
 <h3 id="print-prints-a-float">print - prints a float</h3>
 
@@ -2968,7 +3019,7 @@ Automatically ends the line too.</p>
 </code></pre>
 </div>
 
-<h3 id="print-prints-an-unsigned-integer-2">print - prints an unsigned integer</h3>
+<h3 id="print-prints-an-unsigned-integer">print - prints an unsigned integer</h3>
 
 <p><em>Defined in: std/core/print.s</em></p>
 
@@ -2976,6 +3027,35 @@ Automatically ends the line too.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="print-prints-an-unsigned-integer-2">print - prints an unsigned integer</h3>
+
+<p><em>Defined in: std/core/print.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="print-prints-an-integer">print - prints an integer</h3>
+
+<p><em>Defined in: std/core/print.s</em></p>
+
+<p>Automatically ends the line too.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="print-prints-an-integer-2">print - prints an integer</h3>
+
+<p><em>Defined in: std/core/print.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
 </code></pre>
 </div>
 
@@ -5194,9 +5274,9 @@ A capacity is maintained so that resizes are not performed too frequently.</p>
 
 <p>Potential errors:</p>
 
-<ol start="11">
-<li>reallocation failed</li>
+<ol start="3">
 <li>division by zero </li>
+<li>reallocation failed</li>
 <li>cannot resize an unallocated or freed buffer</li>
 <li>out of bounds</li>
 </ol>

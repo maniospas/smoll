@@ -30,8 +30,7 @@
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import "std/core.s"
-import "std/io.s":web as web
-import "std/io.s":file as file
+import "std/io.s"
 
 def CHUNK_SIZE = 4096
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
@@ -40,7 +39,7 @@ def main()
     mem = char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
     f = file:read web:get README  # save to .tmp with system curl and read it
     size = mut 0
-    while try line=mem.file:line f
+    for line in (mem, f) # iterator defined over a (memory buffer, file) tuple
         size = size+len line
     print(size, " bytes downloaded\n")
 ```

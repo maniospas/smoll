@@ -24,41 +24,50 @@ def is_different(Number x, Number y)
     return not x is type(y)
 
 def eq(Number x, Number y)
-    doc "equal to"
+    doc "equals"
     if is_different(x,y)
         compiler:skip()
     {builtins:bool z = x==y;}
     return z
 
 def neq(Number x, Number y)
-    doc "unequal to"
+    doc "not equal"
     if is_different(x,y)
         compiler:skip()
     {builtins:bool z = x!=y;}
     return z
 
 def eq(compiler:catch x, compiler:catch y)
+    doc "eqqual to"
+    doc "Compares two error messages. This comparison is"
+    doc "used only for comparing error messages produced"
+    doc "by the same running program."
     {builtins:bool z=(x==y);}
     return z
 
 def neq(compiler:catch x, compiler:catch y)
+    doc "not equal"
+    doc "Compares two error messages. This comparison is"
+    doc "used only for comparing error messages produced"
+    doc "by the same running program."
     {builtins:bool z=(x!=y);}
     return z
 
 def eq(any ptr x, any ptr y)
-    doc "equal to"
+    doc "equals"
     doc "Compares the address of two pointers."
     {builtins:bool z=(x==y);}
     return z
 
 def neq(any ptr x, any ptr y)
-    doc "not equal to"
+    doc "not equal"
     doc "Compares the address of two pointers."
     {builtins:bool z=(x!=y);}
     return z
 
 def add(Number x, Number y)
     doc "add"
+    doc "Adds two numbers of the same type. This is an overload for the + operator."
     if is_different(x,y)
         compiler:skip()
     {type(x) z=x+y;}
@@ -66,6 +75,7 @@ def add(Number x, Number y)
 
 def mul(Number x, Number y)
     doc "multiply with"
+    doc "Multiplies two numbers of the same type. This is an overload for the * operator."
     if is_different(x,y)
         compiler:skip()
     {type(x) z=x*y;}
@@ -73,16 +83,19 @@ def mul(Number x, Number y)
 
 def div(Number x, Number y)
     doc "divide by"
+    doc "Divides two numbers of the same type. This is an overload for the / operator."
     if is_different(x,y)
         compiler:skip()
     {type(x) zero = 0;}
     if y==zero
+        doc "Safeguards against division by zero."
         fail "division by zero "
     {type(x) z=x/y;}
     return z
 
 def mod(nat x, nat y)
     doc "modulo by"
+    doc "Computes the modulo between two natural numbers. This is an overload for the % operator."
     {type(x) zero = 0;}
     if y==zero
         fail "modulo by zero "
@@ -91,12 +104,14 @@ def mod(nat x, nat y)
 
 def lt(Number x, Number y)
     doc "less than"
+    doc "Compares two numbers of the same type. This is an overload for the < operator."
     if is_different(x,y)
         compiler:skip()
     {builtins:bool z = x<y;}
     return z
 
 def gt(Number x, Number y)
+    doc "Compares two numbers of the same type. This is an overload for the > operator."
     doc "greater than"
     if is_different(x,y)
         compiler:skip()
@@ -105,6 +120,7 @@ def gt(Number x, Number y)
 
 def le(Number x, Number y)
     doc "less than or equal to"
+    doc "Compares two numbers of the same type. This is an overload for the <= operator."
     if is_different(x,y)
         compiler:skip()
     {builtins:bool z = x<=y;}
@@ -112,6 +128,7 @@ def le(Number x, Number y)
 
 def ge(Number x, Number y)
     doc "greater than or equal to"
+    doc "Compares two numbers of the same type. This is an overload for the >= operator."
     if is_different(x,y)
         compiler:skip()
     {builtins:bool z = x>=y;}
@@ -119,10 +136,11 @@ def ge(Number x, Number y)
     
 def sub(Number x, Number y)
     doc "subtract by"
+    doc "Subtracts two numbers of the same type. This is an overload for the - operator."
     if is_different(x,y) 
         compiler:skip()
     if x is nat
-        doc ""
+        doc "Natural numbers are safeguarded against acquiring negative results, which would overflow."
     if x is nat and x<y
         fail "id subtraction would yield a negative"
     {type(x) z=x-y;}
@@ -130,6 +148,7 @@ def sub(Number x, Number y)
 
 def pow(nat x, nat y) 
     doc "exponentiate by"
+    doc "Exponentiates a natural number by another."
     i = mut 0
     ret = mut 1
     while i<y

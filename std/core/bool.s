@@ -18,68 +18,75 @@ local import "builtins"
 local import "std/extern.s"
 
 def eq(bool x, bool y)
-    doc "equal to"
+    doc "equals"
     {builtins:bool z = x==y;}
     return z
 
 def neq(bool x, bool y)
-    doc "not equal to"
+    doc "not equal"
     {builtins:bool z = x!=y;}
     return z
 
 def not(bool value)
     doc "logical inverse"
+    doc "This operates on boolean values at runtime."
     {if(!value){builtins:bool z = 1;}}
     return z
 
 def eq(compiler:true, compiler:true) 
-    doc "equal to"
+    doc "equals"
+    doc "This is a compile-time operations that does not evoke any runtime booleans."
     return compiler:true()
 
 def eq(compiler:false, compiler:false) 
-    doc "equal to"
+    doc "equals"
+    doc "This is a compile-time operations that does not evoke any runtime booleans."
     return compiler:true()
 
 def eq(compiler:true, compiler:false) 
-    doc "equal to"
+    doc "equals"
+    doc "This is a compile-time operations that does not evoke any runtime booleans."
     return compiler:false()
 
 def eq(compiler:false, compiler:true) 
-    doc "equal to"
+    doc "equals"
+    doc "This is a compile-time operations that does not evoke any runtime booleans."
     return compiler:false()
 
 def not(compiler:true)
     doc "logical inverse"
+    doc "This is a compile-time operations on the compiler:true type rather than a runtime boolean."
     return compiler:false()
 
 def not(compiler:false)
     doc "logical inverse"
+    doc "This is a compile-time operations on the compiler:false type rather than a runtime boolean."
     return compiler:true()
 
 def neq(compiler:true|compiler:false x, compiler:true|compiler:false y)
-    doc "not equal to"
+    doc "not equal"
     return not x==y
 
 def eq(compiler:true, bool value)
-    doc "equal to"
+    doc "equals"
     return value
 
 def eq(bool value, compiler:true)
-    doc "equal to"
+    doc "equals"
     return value
 
 def eq(compiler:false, bool value)
-    doc "equal to"
+    doc "equals"
     return not value
 
 def eq(bool value, compiler:false)
-    doc "equal to"
+    doc "equals"
     return not value
 
 def neq(compiler:true|compiler:false x, bool y)
-    doc "not equal to"
+    doc "not equal"
     return not eq(x, y)
 
 def neq(bool x, compiler:true|compiler:false y)
-    doc "not equal to"
+    doc "not equal"
     return not eq(x, y)

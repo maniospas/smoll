@@ -102,7 +102,9 @@
 [realloc](#realloc) 
 [free](#free) 
 [zero](#zero) 
-</div># cstr
+</div>
+
+# cstr
 ### cstr - constant string
 *Defined by the compiler*
 
@@ -536,28 +538,32 @@ any() -> ()
 ```
 
 # eq
-### eq - equal to
-*Defined in: std/core/bool.s*
-
-```rust
-eq(true, true) -> (true)
-```
-
-### eq - equal to
+### eq - equals
 *Defined in: std/core/numbers.s*
 
 ```rust
 eq(nat x, nat y) -> (bool z)
 ```
 
-### eq
+### eq - equals
 *Defined in: std/core/numbers.s*
+
+```rust
+eq(int x, int y) -> (bool z)
+```
+
+### eq - eqqual to
+*Defined in: std/core/numbers.s*
+
+Compares two error messages. This comparison is
+used only for comparing error messages produced
+by the same running program.
 
 ```rust
 eq(catch x, catch y) -> (bool z)
 ```
 
-### eq - equal to
+### eq - equals
 *Defined in: std/core/numbers.s*
 
 Compares the address of two pointers.
@@ -566,74 +572,82 @@ Compares the address of two pointers.
 eq(any ptr x, any ptr y) -> (bool z)
 ```
 
-### eq - equal to
-*Defined in: std/core/numbers.s*
-
-```rust
-eq(int x, int y) -> (bool z)
-```
-
-### eq - equal to
+### eq - equals
 *Defined in: std/core/numbers.s*
 
 ```rust
 eq(float x, float y) -> (bool z)
 ```
 
-### eq - equal to
+### eq - equals
 *Defined in: std/core/bool.s*
 
 ```rust
 eq(bool value, false) -> (bool)
 ```
 
-### eq - equal to
+### eq - equals
 *Defined in: std/core/bool.s*
 
 ```rust
 eq(false, bool value) -> (bool)
 ```
 
-### eq - equal to
+### eq - equals
 *Defined in: std/core/bool.s*
 
 ```rust
 eq(bool value, true) -> (bool value)
 ```
 
-### eq - equal to
+### eq - equals
 *Defined in: std/core/bool.s*
 
 ```rust
 eq(true, bool value) -> (bool value)
 ```
 
-### eq - equal to
+### eq - equals
 *Defined in: std/core/bool.s*
+
+This is a compile-time operations that does not evoke any runtime booleans.
 
 ```rust
 eq(false, true) -> (false)
 ```
 
-### eq - equal to
+### eq - equals
+*Defined in: std/core/bool.s*
+
+This is a compile-time operations that does not evoke any runtime booleans.
+
+```rust
+eq(true, false) -> (false)
+```
+
+### eq - equals
 *Defined in: std/core/bool.s*
 
 ```rust
 eq(bool x, bool y) -> (bool z)
 ```
 
-### eq - equal to
+### eq - equals
 *Defined in: std/core/bool.s*
+
+This is a compile-time operations that does not evoke any runtime booleans.
 
 ```rust
 eq(false, false) -> (true)
 ```
 
-### eq - equal to
+### eq - equals
 *Defined in: std/core/bool.s*
 
+This is a compile-time operations that does not evoke any runtime booleans.
+
 ```rust
-eq(true, false) -> (false)
+eq(true, true) -> (true)
 ```
 
 ### eq - equals
@@ -684,35 +698,7 @@ eq(char x, char y) -> (bool z)
 ```
 
 # neq
-### neq - unequal to
-*Defined in: std/core/numbers.s*
-
-```rust
-neq(int x, int y) -> (bool z)
-```
-
-### neq - unequal to
-*Defined in: std/core/numbers.s*
-
-```rust
-neq(nat x, nat y) -> (bool z)
-```
-
-### neq - unequal to
-*Defined in: std/core/numbers.s*
-
-```rust
-neq(float x, float y) -> (bool z)
-```
-
-### neq
-*Defined in: std/core/numbers.s*
-
-```rust
-neq(catch x, catch y) -> (bool z)
-```
-
-### neq - not equal to
+### neq - not equal
 *Defined in: std/core/numbers.s*
 
 Compares the address of two pointers.
@@ -721,63 +707,95 @@ Compares the address of two pointers.
 neq(any ptr x, any ptr y) -> (bool z)
 ```
 
-### neq - not equal to
+### neq - not equal
+*Defined in: std/core/numbers.s*
+
+```rust
+neq(int x, int y) -> (bool z)
+```
+
+### neq - not equal
+*Defined in: std/core/numbers.s*
+
+```rust
+neq(float x, float y) -> (bool z)
+```
+
+### neq - not equal
+*Defined in: std/core/numbers.s*
+
+```rust
+neq(nat x, nat y) -> (bool z)
+```
+
+### neq - not equal
+*Defined in: std/core/numbers.s*
+
+Compares two error messages. This comparison is
+used only for comparing error messages produced
+by the same running program.
+
+```rust
+neq(catch x, catch y) -> (bool z)
+```
+
+### neq - not equal
 *Defined in: std/core/bool.s*
 
 ```rust
 neq(bool x, false y) -> (bool)
 ```
 
-### neq - not equal to
+### neq - not equal
 *Defined in: std/core/bool.s*
 
 ```rust
 neq(bool x, true y) -> (bool)
 ```
 
-### neq - not equal to
+### neq - not equal
 *Defined in: std/core/bool.s*
 
 ```rust
 neq(false x, bool y) -> (bool)
 ```
 
-### neq - not equal to
+### neq - not equal
 *Defined in: std/core/bool.s*
 
 ```rust
 neq(true x, bool y) -> (bool)
 ```
 
-### neq - not equal to
+### neq - not equal
 *Defined in: std/core/bool.s*
 
 ```rust
 neq(false x, false y) -> (false)
 ```
 
-### neq - not equal to
+### neq - not equal
 *Defined in: std/core/bool.s*
 
 ```rust
 neq(false x, true y) -> (true)
 ```
 
-### neq - not equal to
+### neq - not equal
 *Defined in: std/core/bool.s*
 
 ```rust
 neq(true x, true y) -> (false)
 ```
 
-### neq - not equal to
+### neq - not equal
 *Defined in: std/core/bool.s*
 
 ```rust
 neq(true x, false y) -> (true)
 ```
 
-### neq - not equal to
+### neq - not equal
 *Defined in: std/core/bool.s*
 
 ```rust
@@ -835,6 +853,17 @@ neq(char x, char y) -> (bool z)
 ### not - logical inverse
 *Defined in: std/core/bool.s*
 
+This operates on boolean values at runtime.
+
+```rust
+not(bool value) -> (bool z)
+```
+
+### not - logical inverse
+*Defined in: std/core/bool.s*
+
+This is a compile-time operations on the compiler:false type rather than a runtime boolean.
+
 ```rust
 not(false) -> (true)
 ```
@@ -842,15 +871,10 @@ not(false) -> (true)
 ### not - logical inverse
 *Defined in: std/core/bool.s*
 
+This is a compile-time operations on the compiler:true type rather than a runtime boolean.
+
 ```rust
 not(true) -> (false)
-```
-
-### not - logical inverse
-*Defined in: std/core/bool.s*
-
-```rust
-not(bool value) -> (bool z)
 ```
 
 # Number
@@ -947,6 +971,8 @@ is_different(float x, float y) -> (false)
 ### add - add
 *Defined in: std/core/numbers.s*
 
+Adds two numbers of the same type. This is an overload for the + operator.
+
 ```rust
 add(nat x, nat y) -> (nat z)
 ```
@@ -954,12 +980,16 @@ add(nat x, nat y) -> (nat z)
 ### add - add
 *Defined in: std/core/numbers.s*
 
+Adds two numbers of the same type. This is an overload for the + operator.
+
 ```rust
 add(int x, int y) -> (int z)
 ```
 
 ### add - add
 *Defined in: std/core/numbers.s*
+
+Adds two numbers of the same type. This is an overload for the + operator.
 
 ```rust
 add(float x, float y) -> (float z)
@@ -1136,6 +1166,8 @@ Potential errors:
 ### mul - multiply with
 *Defined in: std/core/numbers.s*
 
+Multiplies two numbers of the same type. This is an overload for the * operator.
+
 ```rust
 mul(nat x, nat y) -> (nat z)
 ```
@@ -1143,12 +1175,16 @@ mul(nat x, nat y) -> (nat z)
 ### mul - multiply with
 *Defined in: std/core/numbers.s*
 
+Multiplies two numbers of the same type. This is an overload for the * operator.
+
 ```rust
 mul(int x, int y) -> (int z)
 ```
 
 ### mul - multiply with
 *Defined in: std/core/numbers.s*
+
+Multiplies two numbers of the same type. This is an overload for the * operator.
 
 ```rust
 mul(float x, float y) -> (float z)
@@ -1491,6 +1527,9 @@ Potential errors:
 ### div - divide by
 *Defined in: std/core/numbers.s*
 
+Divides two numbers of the same type. This is an overload for the / operator.
+Safeguards against division by zero.
+
 ```rust
 div(nat x, nat y) -> (nat z)
 ```
@@ -1501,6 +1540,9 @@ Potential errors:
 ### div - divide by
 *Defined in: std/core/numbers.s*
 
+Divides two numbers of the same type. This is an overload for the / operator.
+Safeguards against division by zero.
+
 ```rust
 div(int x, int y) -> (int z)
 ```
@@ -1510,6 +1552,9 @@ Potential errors:
 
 ### div - divide by
 *Defined in: std/core/numbers.s*
+
+Divides two numbers of the same type. This is an overload for the / operator.
+Safeguards against division by zero.
 
 ```rust
 div(float x, float y) -> (float z)
@@ -1603,11 +1648,11 @@ Potential errors:
 2. null pointer
 3. division by zero 
 8. iteration end
+15. out of bounds
 58. can only place vectors on contiguous buffers
 59. cannot place vectors on buffer offsets
 60. vector exceeeds buffer limits
 61. different vector sizes
-15. out of bounds
 
 ### div - vector division
 *Defined in: std/sci/vec.s*
@@ -1640,11 +1685,11 @@ Potential errors:
 2. null pointer
 3. division by zero 
 8. iteration end
+15. out of bounds
 58. can only place vectors on contiguous buffers
 59. cannot place vectors on buffer offsets
 60. vector exceeeds buffer limits
 61. different vector sizes
-15. out of bounds
 
 ### div - vector division
 *Defined in: std/sci/vec.s*
@@ -1676,16 +1721,18 @@ Potential errors:
 
 2. null pointer
 3. division by zero 
-13. cannot allocate a buffer of unsized type
 8. iteration end
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
-61. different vector sizes
+13. cannot allocate a buffer of unsized type
 15. out of bounds
+61. different vector sizes
 
 # mod
 ### mod - modulo by
 *Defined in: std/core/numbers.s*
+
+Computes the modulo between two natural numbers. This is an overload for the % operator.
 
 ```rust
 mod(nat x, nat y) -> (nat z)
@@ -1698,12 +1745,16 @@ Potential errors:
 ### lt - less than
 *Defined in: std/core/numbers.s*
 
+Compares two numbers of the same type. This is an overload for the < operator.
+
 ```rust
 lt(nat x, nat y) -> (bool z)
 ```
 
 ### lt - less than
 *Defined in: std/core/numbers.s*
+
+Compares two numbers of the same type. This is an overload for the < operator.
 
 ```rust
 lt(int x, int y) -> (bool z)
@@ -1712,35 +1763,54 @@ lt(int x, int y) -> (bool z)
 ### lt - less than
 *Defined in: std/core/numbers.s*
 
+Compares two numbers of the same type. This is an overload for the < operator.
+
 ```rust
 lt(float x, float y) -> (bool z)
 ```
 
 # gt
-### gt - greater than
+### gt - Compares two numbers of the same type. This is an overload for the > operator.
 *Defined in: std/core/numbers.s*
 
-```rust
-gt(nat x, nat y) -> (bool z)
-```
-
-### gt - greater than
-*Defined in: std/core/numbers.s*
+greater than
 
 ```rust
 gt(int x, int y) -> (bool z)
 ```
 
-### gt - greater than
+### gt - Compares two numbers of the same type. This is an overload for the > operator.
 *Defined in: std/core/numbers.s*
+
+greater than
 
 ```rust
 gt(float x, float y) -> (bool z)
 ```
 
+### gt - Compares two numbers of the same type. This is an overload for the > operator.
+*Defined in: std/core/numbers.s*
+
+greater than
+
+```rust
+gt(nat x, nat y) -> (bool z)
+```
+
 # le
 ### le - less than or equal to
 *Defined in: std/core/numbers.s*
+
+Compares two numbers of the same type. This is an overload for the <= operator.
+
+```rust
+le(float x, float y) -> (bool z)
+```
+
+### le - less than or equal to
+*Defined in: std/core/numbers.s*
+
+Compares two numbers of the same type. This is an overload for the <= operator.
 
 ```rust
 le(int x, int y) -> (bool z)
@@ -1749,20 +1819,17 @@ le(int x, int y) -> (bool z)
 ### le - less than or equal to
 *Defined in: std/core/numbers.s*
 
+Compares two numbers of the same type. This is an overload for the <= operator.
+
 ```rust
 le(nat x, nat y) -> (bool z)
-```
-
-### le - less than or equal to
-*Defined in: std/core/numbers.s*
-
-```rust
-le(float x, float y) -> (bool z)
 ```
 
 # ge
 ### ge - greater than or equal to
 *Defined in: std/core/numbers.s*
+
+Compares two numbers of the same type. This is an overload for the >= operator.
 
 ```rust
 ge(float x, float y) -> (bool z)
@@ -1771,12 +1838,16 @@ ge(float x, float y) -> (bool z)
 ### ge - greater than or equal to
 *Defined in: std/core/numbers.s*
 
+Compares two numbers of the same type. This is an overload for the >= operator.
+
 ```rust
 ge(int x, int y) -> (bool z)
 ```
 
 ### ge - greater than or equal to
 *Defined in: std/core/numbers.s*
+
+Compares two numbers of the same type. This is an overload for the >= operator.
 
 ```rust
 ge(nat x, nat y) -> (bool z)
@@ -1786,12 +1857,16 @@ ge(nat x, nat y) -> (bool z)
 ### sub - subtract by
 *Defined in: std/core/numbers.s*
 
+Subtracts two numbers of the same type. This is an overload for the - operator.
+
 ```rust
 sub(float x, float y) -> (float z)
 ```
 
 ### sub - subtract by
 *Defined in: std/core/numbers.s*
+
+Subtracts two numbers of the same type. This is an overload for the - operator.
 
 ```rust
 sub(int x, int y) -> (int z)
@@ -1800,7 +1875,8 @@ sub(int x, int y) -> (int z)
 ### sub - subtract by
 *Defined in: std/core/numbers.s*
 
-
+Subtracts two numbers of the same type. This is an overload for the - operator.
+Natural numbers are safeguarded against acquiring negative results, which would overflow.
 
 ```rust
 sub(nat x, nat y) -> (nat z)
@@ -1969,6 +2045,8 @@ Potential errors:
 ### pow - exponentiate by
 *Defined in: std/core/numbers.s*
 
+Exponentiates a natural number by another.
+
 ```rust
 pow(nat x, nat y) -> (mut nat ret)
 ```
@@ -1989,18 +2067,7 @@ This enables the pattern 'print nn value'
 to print without automatically adding a new line.
 
 ```rust
-nn(cstr value) -> (cstr value, cstr)
-```
-
-### nn - no new line
-*Defined in: std/core/print.s*
-
-Given a value, creates a tuple of (value, \"\").
-This enables the pattern 'print nn value'
-to print without automatically adding a new line.
-
-```rust
-nn(float value) -> (float value, cstr)
+nn(nat value) -> (nat value, cstr)
 ```
 
 ### nn - no new line
@@ -2022,7 +2089,18 @@ This enables the pattern 'print nn value'
 to print without automatically adding a new line.
 
 ```rust
-nn(nat value) -> (nat value, cstr)
+nn(float value) -> (float value, cstr)
+```
+
+### nn - no new line
+*Defined in: std/core/print.s*
+
+Given a value, creates a tuple of (value, \"\").
+This enables the pattern 'print nn value'
+to print without automatically adding a new line.
+
+```rust
+nn(cstr value) -> (cstr value, cstr)
 ```
 
 ### nn - no new line
@@ -2048,29 +2126,6 @@ nn(const vec) -> (const vec, cstr)
 ```
 
 # print
-### print - prints an unsigned integer
-*Defined in: std/core/print.s*
-
-```rust
-print(nat value, cstr endl) -> ()
-```
-
-### print - prints an integer
-*Defined in: std/core/print.s*
-
-Automatically ends the line too.
-
-```rust
-print(int value) -> ()
-```
-
-### print - prints an integer
-*Defined in: std/core/print.s*
-
-```rust
-print(int value, cstr endl) -> ()
-```
-
 ### print - prints a float
 *Defined in: std/core/print.s*
 
@@ -2193,6 +2248,29 @@ Automatically ends the line too.
 
 ```rust
 print(nat value) -> ()
+```
+
+### print - prints an unsigned integer
+*Defined in: std/core/print.s*
+
+```rust
+print(nat value, cstr endl) -> ()
+```
+
+### print - prints an integer
+*Defined in: std/core/print.s*
+
+Automatically ends the line too.
+
+```rust
+print(int value) -> ()
+```
+
+### print - prints an integer
+*Defined in: std/core/print.s*
+
+```rust
+print(int value, cstr endl) -> ()
 ```
 
 ### print - writes a cstr to a write file
@@ -3861,8 +3939,8 @@ push(list) -> (mut any ptr val {follows any ptr l.buffer.unsafe_ptr})
 ```
 Potential errors:
 
-11. reallocation failed
 3. division by zero 
+11. reallocation failed
 14. cannot resize an unallocated or freed buffer
 15. out of bounds
 

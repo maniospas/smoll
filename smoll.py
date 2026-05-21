@@ -4831,7 +4831,7 @@ async def main():
                 if "___" in union_type.name: continue
                 name = union_type.name.replace("_", "\\_")
                 docs_file.write("["+name+"](#"+name.lower()+") \n")
-            docs_file.write("</div>")
+            docs_file.write("</div>\n\n")
 
 
             for union_type in file.types.values():

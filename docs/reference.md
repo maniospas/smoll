@@ -11,6 +11,7 @@ _1.7._ [recursion](#recursion) <br>
 _1.8._ [unions](#unions) <br>
 _1.9._ [literal types](#literal-types) <br>
 _1.10._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)
+_1.11._ [compile-time evaluation](#compile-time-evaluation)
 
 
 **Section 2. Safe Resources**<br>
@@ -35,6 +36,7 @@ _3.5._ [processes](#processes)<br>
 _3.6._ [random](#random)<br>
 _3.7._ [{mini and bits}](#mini-and-bits)<br>
 _3.8._ [vectors](#vectors)<br>
+_3.9._ [graphics](#graphics)<br>
 
 {...} are advanced functionality
 
@@ -715,7 +717,6 @@ def main()
     typed_print "test"
 ```
 
-
 The same mechanism can be used to create optional arguments
 using the `blank` builtin type; that has no contents and therefore
 skips respective variable definition. Conversely, non-existing
@@ -764,6 +765,49 @@ def main()
     print inc 2.0  # prints 3.0
     print inc(2,2) # prints 4
 ```
+
+## compile-time evaluat
+
+Rember value literals? There exists actually a more general mechanism
+that packs a tuple of values onto a literal after evaluating them at
+compilation time. This evaluation uses a lightweight built-in interpreter
+and is initiated with the `compt` keyword. Next is an example.
+
+```python
+import "std/core.s"
+
+def VALUES = compt (1,2)
+def main()
+    print add VALUES
+```
+
+Next is a more complicated scenario where several functions
+build a temporary `cstr` to be used during exectuion. The interpreter
+is robust against even unsafe functions by showing errors when
+things go wrong. Normal pointers cannot be literals and therefore
+we could not just pack a `str`.
+
+```python
+import "std/core.s"
+
+def constant = compt cstr unsafe_temp add(bufpos alloc 128, "hello", " world!")
+def main()
+    print constant
+    print constant=="hello world!" # 'true' even if thecomparison of cstr is done via pointers
+```
+
+Lastly, leverage this mechanism to run code during compilations, like below.
+
+```python
+import "std/core.s"
+
+def main()
+    compt print "compiling"
+    print "running"
+```
+
+*Warning: Compile-time evaluation is computationally bounded by force, operating in a few KB of memory, and up to a million unoptimized operations that translate to less than a second of running time in modern computers. However, overusing this feature may still make your programs slow.*
+
 
 # Section 2. Safe Resources
 
@@ -1888,4 +1932,73 @@ def main()
 
     print "a*b"
     print a*b
+```
+
+
+## graphics
+
+Graphics for games of desktop applications are supported
+via *raylib*. Below is an example that moves sevral circles
+around in a window.
+
+
+```python
+import "std/core.s"
+import "std/sci.s" as sci
+import "std/ray.s" as ray
+
+def Circle(float _cx, float _cy, float _vx, float _vy, float _radius)
+    cx = mut _cx
+    cy = mut _cy
+    vx = mut _vx
+    vy = mut _vy
+    radius = mut _radius
+    return (cx,cy,vx,vy,radius)
+
+def process(mut Circle ptr _self, float dt)
+    self = _self.. # unpack
+    self.cx = self.cx + self.vx * dt
+    self.cy = self.cy + self.vy * dt
+    if self.cx - self.radius < 0.0
+        self.cx = self.radius
+        self.vx = sci:abs self.vx
+    if self.cx + self.radius > 800.0
+        self.cx = 800.0 - self.radius
+        self.vx = 0.0-(sci:abs self.vx)
+    if self.cy - self.radius < 0.0
+        self.cy = self.radius
+        self.vy = sci:abs self.vy
+    if self.cy + self.radius > 600.0
+        self.cy = 600.0 - self.radius
+        self.vy = 0.0-(sci:abs self.vy)
+    _self << self
+
+def draw(Circle self, edit ray:Window win)
+    white  = ray:Color(255, 255, 255)
+    teal   = ray:Color(0,   200, 180)
+    shadow = ray:Color(0,   200, 180, 60)
+    pos = (self.cx, self.cy)
+    win
+    .ray:circ(self.cx + 4.0, self.cy + 4.0, self.radius, shadow)
+    .ray:circ(pos, self.radius, teal)
+    .ray:circ_line(pos, nat self.radius, 2, white)
+
+def main()
+    win = ray:Size(800.0, 600.0).ray:Window "Circles"
+
+    N = 1000
+    circles = Circle[].alloc N
+    for create_circle&& in circles
+        i = float compiler:for_counter() # builtin way of enumerating
+        create_circle << Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
+
+    while ray:is_open win
+        dt = ray:dt()
+        for proc_circle&& in circles # mutable pointer
+            proc_circle.process dt
+        frame = ray:draw win
+        win.ray:clear ray:Color(20, 20, 60)
+        for draw_circle in circles
+            draw_circle.draw win
+        del frame
 ```

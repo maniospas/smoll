@@ -181,7 +181,8 @@
 <em>1.7.</em> <a href="#recursion">recursion</a> <br>
 <em>1.8.</em> <a href="#unions">unions</a> <br>
 <em>1.9.</em> <a href="#literal-types">literal types</a> <br>
-<em>1.10.</em> <a href="#conditional-compilation-and-default-arguments">conditional compilation and default arguments</a></p>
+<em>1.10.</em> <a href="#conditional-compilation-and-default-arguments">conditional compilation and default arguments</a>
+<em>1.11.</em> <a href="#compile-time-evaluation">compile-time evaluation</a></p>
 
 <p><strong>Section 2. Safe Resources</strong><br>
 <em>2.1.</em> <a href="#buffers">buffers</a><br>
@@ -204,7 +205,8 @@
 <em>3.5.</em> <a href="#processes">processes</a><br>
 <em>3.6.</em> <a href="#random">random</a><br>
 <em>3.7.</em> <a href="#mini-and-bits">{mini and bits}</a><br>
-<em>3.8.</em> <a href="#vectors">vectors</a><br></p>
+<em>3.8.</em> <a href="#vectors">vectors</a><br>
+<em>3.9.</em> <a href="#graphics">graphics</a><br></p>
 
 <p>{&#8230;} are advanced functionality</p>
 
@@ -959,6 +961,51 @@ occur only during compilation and do not affect running time.</p>
     <span class="nb">print</span> <span class="n">inc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># prints 4</span>
 </code></pre>
 </div>
+
+<h2 id="compile-time-evaluat">compile-time evaluat</h2>
+
+<p>Rember value literals? There exists actually a more general mechanism
+that packs a tuple of values onto a literal after evaluating them at
+compilation time. This evaluation uses a lightweight built-in interpreter
+and is initiated with the <code>compt</code> keyword. Next is an example.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">VALUES</span> <span class="o">=</span> <span class="n">compt</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">add</span> <span class="n">VALUES</span>
+</code></pre>
+</div>
+
+<p>Next is a more complicated scenario where several functions
+build a temporary <code>cstr</code> to be used during exectuion. The interpreter
+is robust against even unsafe functions by showing errors when
+things go wrong. Normal pointers cannot be literals and therefore
+we could not just pack a <code>str</code>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">constant</span> <span class="o">=</span> <span class="n">compt</span> <span class="n">cstr</span> <span class="n">unsafe_temp</span> <span class="n">add</span><span class="p">(</span><span class="n">bufpos</span> <span class="n">alloc</span> <span class="mi">128</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot; world!&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">constant</span>
+    <span class="nb">print</span> <span class="n">constant</span><span class="o">==</span><span class="s2">&quot;hello world!&quot;</span> <span class="c1"># &#39;true&#39; even if thecomparison of cstr is done via pointers</span>
+</code></pre>
+</div>
+
+<p>Lastly, leverage this mechanism to run code during compilations, like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">compt</span> <span class="nb">print</span> <span class="s2">&quot;compiling&quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;running&quot;</span>
+</code></pre>
+</div>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> Compile-time evaluation is computationally bounded by force, operating in a few KB of memory, and up to a million unoptimized operations that translate to less than a second of running time in modern computers. However, overusing this feature may still make your programs slow.</div>
 
 <h1 id="section-2-safe-resources">Section 2. Safe Resources</h1>
 
@@ -2117,6 +2164,74 @@ implemented.</p>
 
     <span class="nb">print</span> <span class="s2">&quot;a*b&quot;</span>
     <span class="nb">print</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span>
+</code></pre>
+</div>
+
+<h2 id="graphics">graphics</h2>
+
+<p>Graphics for games of desktop applications are supported
+via <em>raylib</em>. Below is an example that moves sevral circles
+around in a window.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span> <span class="k">as</span> <span class="n">sci</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/ray.s&quot;</span> <span class="k">as</span> <span class="n">ray</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Circle</span><span class="p">(</span><span class="nb">float</span> <span class="n">_cx</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_cy</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_vx</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_vy</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_radius</span><span class="p">)</span>
+    <span class="n">cx</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_cx</span>
+    <span class="n">cy</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_cy</span>
+    <span class="n">vx</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_vx</span>
+    <span class="n">vy</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_vy</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_radius</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">cx</span><span class="p">,</span><span class="n">cy</span><span class="p">,</span><span class="n">vx</span><span class="p">,</span><span class="n">vy</span><span class="p">,</span><span class="n">radius</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="n">mut</span> <span class="n">Circle</span> <span class="n">ptr</span> <span class="n">_self</span><span class="p">,</span> <span class="nb">float</span> <span class="n">dt</span><span class="p">)</span>
+    <span class="bp">self</span> <span class="o">=</span> <span class="n">_self</span><span class="o">..</span> <span class="c1"># unpack</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vx</span> <span class="o">*</span> <span class="n">dt</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vy</span> <span class="o">*</span> <span class="n">dt</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vx</span> <span class="o">=</span> <span class="n">sci</span><span class="p">:</span><span class="nb">abs</span> <span class="bp">self</span><span class="o">.</span><span class="n">vx</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">&gt;</span> <span class="mf">800.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">=</span> <span class="mf">800.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vx</span> <span class="o">=</span> <span class="mf">0.0</span><span class="o">-</span><span class="p">(</span><span class="n">sci</span><span class="p">:</span><span class="nb">abs</span> <span class="bp">self</span><span class="o">.</span><span class="n">vx</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vy</span> <span class="o">=</span> <span class="n">sci</span><span class="p">:</span><span class="nb">abs</span> <span class="bp">self</span><span class="o">.</span><span class="n">vy</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">&gt;</span> <span class="mf">600.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">=</span> <span class="mf">600.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vy</span> <span class="o">=</span> <span class="mf">0.0</span><span class="o">-</span><span class="p">(</span><span class="n">sci</span><span class="p">:</span><span class="nb">abs</span> <span class="bp">self</span><span class="o">.</span><span class="n">vy</span><span class="p">)</span>
+    <span class="n">_self</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="n">Circle</span> <span class="bp">self</span><span class="p">,</span> <span class="n">edit</span> <span class="n">ray</span><span class="p">:</span><span class="n">Window</span> <span class="n">win</span><span class="p">)</span>
+    <span class="n">white</span>  <span class="o">=</span> <span class="n">ray</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+    <span class="n">teal</span>   <span class="o">=</span> <span class="n">ray</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>   <span class="mi">200</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+    <span class="n">shadow</span> <span class="o">=</span> <span class="n">ray</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>   <span class="mi">200</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span><span class="p">)</span>
+    <span class="n">win</span>
+    <span class="o">.</span><span class="n">ray</span><span class="p">:</span><span class="n">circ</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">+</span> <span class="mf">4.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">+</span> <span class="mf">4.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">shadow</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">ray</span><span class="p">:</span><span class="n">circ</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">teal</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">ray</span><span class="p">:</span><span class="n">circ_line</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">nat</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">white</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">win</span> <span class="o">=</span> <span class="n">ray</span><span class="p">:</span><span class="n">Size</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">)</span><span class="o">.</span><span class="n">ray</span><span class="p">:</span><span class="n">Window</span> <span class="s2">&quot;Circles&quot;</span>
+
+    <span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">circles</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">N</span>
+    <span class="k">for</span> <span class="n">create_circle</span><span class="o">&amp;&amp;</span> <span class="ow">in</span> <span class="n">circles</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">compiler</span><span class="p">:</span><span class="n">for_counter</span><span class="p">()</span> <span class="c1"># builtin way of enumerating</span>
+        <span class="n">create_circle</span> <span class="o">&lt;&lt;</span> <span class="n">Circle</span><span class="p">(</span><span class="mf">400.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="o">-</span><span class="n">i</span><span class="p">,</span> <span class="mf">160.0</span><span class="o">+</span><span class="n">i</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="n">ray</span><span class="p">:</span><span class="n">is_open</span> <span class="n">win</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">ray</span><span class="p">:</span><span class="n">dt</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">proc_circle</span><span class="o">&amp;&amp;</span> <span class="ow">in</span> <span class="n">circles</span> <span class="c1"># mutable pointer</span>
+            <span class="n">proc_circle</span><span class="o">.</span><span class="n">process</span> <span class="n">dt</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">ray</span><span class="p">:</span><span class="n">draw</span> <span class="n">win</span>
+        <span class="n">win</span><span class="o">.</span><span class="n">ray</span><span class="p">:</span><span class="n">clear</span> <span class="n">ray</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">draw_circle</span> <span class="ow">in</span> <span class="n">circles</span>
+            <span class="n">draw_circle</span><span class="o">.</span><span class="n">draw</span> <span class="n">win</span>
+        <span class="k">del</span> <span class="n">frame</span>
 </code></pre>
 </div>
 

@@ -25,7 +25,7 @@ def is_dir(cstr path)
 
 def is_dir(str|cstr path)
     doc "checks whether a path points to an existing directory"
-    return is_dir temporary_cstr(path).cstr
+    return is_dir cstr unsafe_temp path
 
 def create_dir(cstr path)
     doc "creates a directory at a cstr path, fails if it already exists or cannot be created"
@@ -34,17 +34,17 @@ def create_dir(cstr path)
     if not result fail "failed to create directory"
 
 def create_dir(str path)
-    create_dir temporary_cstr(path).cstr
+    create_dir cstr unsafe_temp path
 
 def is_file(str|cstr _path)
     doc "checks whether a cstr path points to an existing file"
-    path = temporary_cstr(_path).cstr
+    path = cstr unsafe_temp _path
     {builtins:bool exists = __smo_is_file(path);}
     return exists
 
 def remove(str|cstr _path)
     doc "removes a file at a cstr path, fails if it cannot be removed"
-    path = temporary_cstr(_path).cstr
+    path = cstr unsafe_temp _path
     {builtins:bool result = __smo_remove_file(path);}
     if not result fail "failed to remove file"
 
@@ -62,7 +62,7 @@ def read(cstr path)
     return class(unsafe_mut unsafe_ptr)
 
 def read(str path)
-    return read temporary_cstr(path).cstr
+    return read cstr unsafe_temp path
 
 local def raw_entry(edit read f) # this function returns a content pointer, but this does not allow safe comparisons
     VM "[safeguard(lambda memory=memory: memory.write_cstr(next(memory.get_foreign($f__unsafe_ptr)).name), ExpectedException('end of dir'))]"

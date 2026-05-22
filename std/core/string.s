@@ -111,35 +111,45 @@ def copy(str|cstr _other)
 def copy_null_terminated(str other)
     doc "create null terminated string"
     doc "Copies a string to a new buffer while ensuring null termination."
-    doc "This is mainly useful for supporting 'temporary_cstr'."
+    doc "This is mainly useful for supporting 'cstr unsafe_temp'."
     buf = char[].alloc 1+len other
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     {builtins:compiler:ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}
     return str(buf, 0, other.dat.length, other.dat.first)
 
-def temporary_cstr(str other)
-    doc "convert a string to a temporary cstr"
+def unsafe_temp(str other)
+    doc "convert a string to a temporary null-terminated (cstr,str) pair"
     doc "This function's return is meant to be passed to operating system calls,"
-    doc "and will become invalid once the calling site ends."
+    doc "or return from compt with the pattern 'cstr unsafe_temp string_value'."
+    doc "It will become invalid once the calling site ends."
     doc "It also does not admit proper cstr equality comparisons via pointer values"
     doc "that reflect contents; it will always compare equal only to itself."
     doc "An optimization that safely checks the last element and one position beyond"
     doc "the buffer's contents for null termination is also employed. Modifying the"
     doc "string buffer in any capacity"
     doc "invalidates the null termination property, so in general do not manipulate" 
-    doc "strings while this is used in code; it should only be used for operating"
-    doc "system calls."
+    doc "strings while this is used in code; use it only for its intended purposes."
+    doc ""
+    doc "*Warning: This is unsafe, unless 'cstr unsafe_temp' is the last system or 'compt' call.*"
+    doc ""
+    doc "*Info: This is safe to run during 'compt' in that the latter will fail gracefully.*"
     str = copy_null_terminated(other)
     _ret = str.unsafe_ptr+str.dat.pos
     {builtins:cstr cstr = _ret;}
-    return (cstr, str)
+    return class(cstr, str)
 
-def temporary_cstr(cstr cstr)
+def unsafe_temp(cstr cstr)
     doc "tautology function for cstr"
     doc "This is mainly used as a stt-input counterpart for converting str|cstr to cstr."
     str = str cstr
     return (cstr, str)
+
+def cstr(unsafe_temp value)
+    doc "extract the cstr from unsafe_temp string"
+    doc "This function's return is meant to be passed to operating system calls,"
+    doc "or to comptime returns with the pattern 'cstr unsafe_temp string_value'."
+    return value.cstr
 
 def bufpos(edit any[] buf)
     doc "a buffer and mutable position pair"
@@ -317,3 +327,9 @@ def nn(str value)
     doc "This enables the pattern 'print nn value'"
     doc "to print without a new line."
     return (value, "")
+
+def add(edit char[] buf, mut nat pos, str|cstr s1, str|cstr s2)
+    start = pos
+    copy(buf, pos, s1)
+    copy(buf, pos, s2)
+    return str(buf, start, pos)

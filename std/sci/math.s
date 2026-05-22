@@ -1,6 +1,13 @@
 local import "std/extern/math.h"
 local import "std/core.s"
 
+def abs(float x)
+    if x<0.0 return 0.0-x
+    return x
+
+def abs(int x)
+    if x<int(0) return int(0)-x
+    return x
 
 def sqrt(float x)
     {builtins:float z = sqrt(x);}

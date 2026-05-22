@@ -217,7 +217,7 @@
 <a href="#str">str</a> 
 <a href="#copy">copy</a> 
 <a href="#copy_null_terminated">copy_null_terminated</a> 
-<a href="#temporary_cstr">temporary_cstr</a> 
+<a href="#unsafe_temp">unsafe_temp</a> 
 <a href="#bufpos">bufpos</a> 
 <a href="#strbufpos">strbufpos</a> 
 <a href="#endpos">endpos</a> 
@@ -248,6 +248,7 @@
 <a href="#strmap">strmap</a> 
 <a href="#natmap">natmap</a> 
 <a href="#unpack">unpack</a> 
+<a href="#abs">abs</a> 
 <a href="#sqrt">sqrt</a> 
 <a href="#sin">sin</a> 
 <a href="#cos">cos</a> 
@@ -286,6 +287,30 @@
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">cstr</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="cstr-extract-the-cstr-from-unsafe_temp-string">cstr - extract the cstr from unsafe_temp string</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<p>This function&#8217;s return is meant to be passed to operating system calls,
+or to comptime returns with the pattern &#8216;cstr unsafe<em>temp string</em>value&#8217;.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">cstr</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">cstr</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">cstr</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="cstr-extract-the-cstr-from-unsafe_temp-string-2">cstr - extract the cstr from unsafe_temp string</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<p>This function&#8217;s return is meant to be passed to operating system calls,
+or to comptime returns with the pattern &#8216;cstr unsafe<em>temp string</em>value&#8217;.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">cstr</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">unsafe_temp</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">cstr</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -600,7 +625,7 @@ If it does not, this operation can fail.</p>
 
 <p>Potential errors:</p>
 
-<ol start="57">
+<ol start="58">
 <li>nat value too large to pack in nat32</li>
 </ol>
 
@@ -631,7 +656,7 @@ If it does not, this operation can fail.</p>
 
 <p>Potential errors:</p>
 
-<ol start="56">
+<ol start="57">
 <li>nat value too large to pack in nat16</li>
 </ol>
 
@@ -648,6 +673,24 @@ If it does not, this operation can fail.</p>
 </code></pre>
 </div>
 
+<h3 id="nat8-convert-unsigned-number-to-8-bits">nat8 - convert unsigned number to 8 bits</h3>
+
+<p><em>Defined in: std/mini.s</em></p>
+
+<p>The conversion checks whether the previous value fits in the new one.
+If it does not, this operation can fail.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">nat8</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat8</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="56">
+<li>nat value too large to pack in nat8</li>
+</ol>
+
 <h1 id="float">float</h1>
 
 <h3 id="float-2">float</h3>
@@ -663,10 +706,10 @@ If it does not, this operation can fail.</p>
 
 <p><em>Defined in: std/core/convert.s</em></p>
 
-<p>Converts a bit representation to the corresponding float number.</p>
+<p>Serves as a tautology function for code that parses on multiple number types.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">bits</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -677,7 +720,7 @@ If it does not, this operation can fail.</p>
 <p>May lose information because floats are not exact representation of all integers.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -688,7 +731,7 @@ If it does not, this operation can fail.</p>
 <p>May lose information because floats are not exact representation of all integers.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -696,10 +739,10 @@ If it does not, this operation can fail.</p>
 
 <p><em>Defined in: std/core/convert.s</em></p>
 
-<p>Serves as a tautology function for code that parses on multiple number types.</p>
+<p>Converts a bit representation to the corresponding float number.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">bits</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -850,17 +893,10 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="eq-equals-2">eq - equals</h3>
-
-<p><em>Defined in: std/core/numbers.s</em></p>
+<p>Compares the address of two pointers.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -877,14 +913,21 @@ by the same running program.</p>
 </code></pre>
 </div>
 
+<h3 id="eq-equals-2">eq - equals</h3>
+
+<p><em>Defined in: std/core/numbers.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
 <h3 id="eq-equals-3">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
-<p>Compares the address of two pointers.</p>
-
 <div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1066,8 +1109,12 @@ by the same running program.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Compares two error messages. This comparison is
+used only for comparing error messages produced
+by the same running program.</p>
+
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">catch</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">catch</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1076,7 +1123,7 @@ by the same running program.</p>
 <p><em>Defined in: std/core/numbers.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1085,7 +1132,7 @@ by the same running program.</p>
 <p><em>Defined in: std/core/numbers.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1093,12 +1140,8 @@ by the same running program.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
-<p>Compares two error messages. This comparison is
-used only for comparing error messages produced
-by the same running program.</p>
-
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">catch</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">catch</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1252,17 +1295,6 @@ by the same running program.</p>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
-<p>This operates on boolean values at runtime.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">not</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="not-logical-inverse-2">not - logical inverse</h3>
-
-<p><em>Defined in: std/core/bool.s</em></p>
-
 <p>This is a compile-time operations on the compiler:false type rather than a runtime boolean.</p>
 
 <div class="codehilite">
@@ -1270,7 +1302,7 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="not-logical-inverse-3">not - logical inverse</h3>
+<h3 id="not-logical-inverse-2">not - logical inverse</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -1278,6 +1310,17 @@ by the same running program.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">not</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="not-logical-inverse-3">not - logical inverse</h3>
+
+<p><em>Defined in: std/core/bool.s</em></p>
+
+<p>This operates on boolean values at runtime.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">not</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1445,6 +1488,82 @@ by the same running program.</p>
 </code></pre>
 </div>
 
+<h3 id="add-2">add</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">s1</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">s2</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>null pointer</li>
+<li>string buffer out of memory</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="add-3">add</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">s1</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>null pointer</li>
+<li>string buffer out of memory</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="add-4">add</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">s2</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>null pointer</li>
+<li>string buffer out of memory</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="add-5">add</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>null pointer</li>
+<li>string buffer out of memory</li>
+<li>out of bounds</li>
+</ol>
+
 <h3 id="add-vector-addition">add - vector addition</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
@@ -1518,6 +1637,28 @@ by the same running program.</p>
 <p>Grabs an allocator for the result as an effect.</p>
 
 <div class="codehilite">
+<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>iteration end</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="add-vector-addition-5">add - vector addition</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
 <pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
 </code></pre>
 </div>
@@ -1531,28 +1672,6 @@ by the same running program.</p>
 <li>cannot place vectors on buffer offsets</li>
 <li>vector exceeeds buffer limits</li>
 <li>different vector sizes</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="add-vector-addition-5">add - vector addition</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">allocator</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>iteration end</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
 <li>out of bounds</li>
 </ol>
 
@@ -1616,10 +1735,10 @@ by the same running program.</p>
 
 <ol start="2">
 <li>null pointer</li>
-<li>cannot allocate a buffer of unsized type</li>
 <li>iteration end</li>
 <li>allocation failed</li>
 <li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
 <li>different vector sizes</li>
 <li>out of bounds</li>
 </ol>
@@ -1631,7 +1750,7 @@ by the same running program.</p>
 <p>Grabs an allocator for the result as an effect.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">allocator</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
 </code></pre>
 </div>
 
@@ -1681,181 +1800,30 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="mul-matrix-matrix-multiplication">mul - matrix-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">new</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>row out of bounds</li>
-<li>inner dimensions must agree</li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-</ol>
-
-<h3 id="mul-vector-matrix-multiplication">mul - vector-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>row out of bounds</li>
-<li>vector length must match matrix rows</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-</ol>
-
-<h3 id="mul-vector-matrix-multiplication-2">mul - vector-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">allocator</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>row out of bounds</li>
-<li>vector length must match matrix rows</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-</ol>
-
-<h3 id="mul-vector-matrix-multiplication-3">mul - vector-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">new</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>row out of bounds</li>
-<li>vector length must match matrix rows</li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="mul-matrix-vector-multiplication">mul - matrix-vector multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>matrix columns must match vector length</li>
-<li>row out of bounds</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-</ol>
-
-<h3 id="mul-matrix-vector-multiplication-2">mul - matrix-vector multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">allocator</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>matrix columns must match vector length</li>
-<li>row out of bounds</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-</ol>
-
-<h3 id="mul-matrix-vector-multiplication-3">mul - matrix-vector multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">new</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>matrix columns must match vector length</li>
-<li>row out of bounds</li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>out of bounds</li>
-</ol>
-
 <h3 id="mul-vector-multiplication">mul - vector multiplication</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>iteration end</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+<li>different vector sizes</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="mul-vector-multiplication-2">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1877,7 +1845,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="mul-vector-multiplication-2">mul - vector multiplication</h3>
+<h3 id="mul-vector-multiplication-3">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1899,7 +1867,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="mul-vector-multiplication-3">mul - vector multiplication</h3>
+<h3 id="mul-vector-multiplication-4">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1921,7 +1889,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="mul-vector-multiplication-4">mul - vector multiplication</h3>
+<h3 id="mul-vector-multiplication-5">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1940,29 +1908,6 @@ by the same running program.</p>
 <li>can only place vectors on contiguous buffers</li>
 <li>cannot place vectors on buffer offsets</li>
 <li>vector exceeeds buffer limits</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="mul-vector-multiplication-5">mul - vector multiplication</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>iteration end</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-<li>different vector sizes</li>
 <li>out of bounds</li>
 </ol>
 
@@ -2048,15 +1993,15 @@ by the same running program.</p>
 
 <ol start="2">
 <li>null pointer</li>
-<li>cannot allocate a buffer of unsized type</li>
 <li>iteration end</li>
 <li>allocation failed</li>
 <li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
 <li>different vector sizes</li>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="mul-matrix-matrix-multiplication-2">mul - matrix-matrix multiplication</h3>
+<h3 id="mul-matrix-matrix-multiplication">mul - matrix-matrix multiplication</h3>
 
 <p><em>Defined in: std/sci/mat.s</em></p>
 
@@ -2070,17 +2015,17 @@ by the same running program.</p>
 <p>Potential errors:</p>
 
 <ol start="64">
+<li>cannot place matrices on buffer offsets</li>
 <li>matrix exceeds buffer limits</li>
 <li>null pointer</li>
-<li>column out of bounds</li>
 <li>row out of bounds</li>
+<li>column out of bounds</li>
 <li>inner dimensions must agree</li>
 <li>iteration end</li>
 <li>can only place matrices on contiguous buffers</li>
-<li>cannot place matrices on buffer offsets</li>
 </ol>
 
-<h3 id="mul-matrix-matrix-multiplication-3">mul - matrix-matrix multiplication</h3>
+<h3 id="mul-matrix-matrix-multiplication-2">mul - matrix-matrix multiplication</h3>
 
 <p><em>Defined in: std/sci/mat.s</em></p>
 
@@ -2094,14 +2039,188 @@ by the same running program.</p>
 <p>Potential errors:</p>
 
 <ol start="64">
+<li>cannot place matrices on buffer offsets</li>
 <li>matrix exceeds buffer limits</li>
 <li>null pointer</li>
-<li>column out of bounds</li>
 <li>row out of bounds</li>
+<li>column out of bounds</li>
 <li>inner dimensions must agree</li>
 <li>iteration end</li>
 <li>can only place matrices on contiguous buffers</li>
-<li>cannot place matrices on buffer offsets</li>
+</ol>
+
+<h3 id="mul-matrix-matrix-multiplication-3">mul - matrix-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">new</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>inner dimensions must agree</li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+</ol>
+
+<h3 id="mul-vector-matrix-multiplication">mul - vector-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>vector length must match matrix rows</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+</ol>
+
+<h3 id="mul-vector-matrix-multiplication-2">mul - vector-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">allocator</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>vector length must match matrix rows</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+</ol>
+
+<h3 id="mul-vector-matrix-multiplication-3">mul - vector-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">new</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>vector length must match matrix rows</li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="mul-matrix-vector-multiplication">mul - matrix-vector multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>matrix columns must match vector length</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+</ol>
+
+<h3 id="mul-matrix-vector-multiplication-2">mul - matrix-vector multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">allocator</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>matrix columns must match vector length</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+</ol>
+
+<h3 id="mul-matrix-vector-multiplication-3">mul - matrix-vector multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">new</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>matrix columns must match vector length</li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>out of bounds</li>
 </ol>
 
 <h1 id="div">div</h1>
@@ -2433,7 +2552,7 @@ Safeguards against division by zero.</p>
 <p>greater than</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2444,7 +2563,7 @@ Safeguards against division by zero.</p>
 <p>greater than</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2455,7 +2574,7 @@ Safeguards against division by zero.</p>
 <p>greater than</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2535,12 +2654,19 @@ Safeguards against division by zero.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
-<p>Subtracts two numbers of the same type. This is an overload for the - operator.</p>
+<p>Subtracts two numbers of the same type. This is an overload for the - operator.
+Natural numbers are safeguarded against acquiring negative results, which would overflow.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
+
+<p>Potential errors:</p>
+
+<ol start="5">
+<li>nat subtraction would yield a negative</li>
+</ol>
 
 <h3 id="sub-subtract-by-2">sub - subtract by</h3>
 
@@ -2557,19 +2683,12 @@ Safeguards against division by zero.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
-<p>Subtracts two numbers of the same type. This is an overload for the - operator.
-Natural numbers are safeguarded against acquiring negative results, which would overflow.</p>
+<p>Subtracts two numbers of the same type. This is an overload for the - operator.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
-
-<p>Potential errors:</p>
-
-<ol start="5">
-<li>id subtraction would yield a negative</li>
-</ol>
 
 <h3 id="sub-vector-subtraction">sub - vector subtraction</h3>
 
@@ -2764,10 +2883,10 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 
 <ol start="2">
 <li>null pointer</li>
-<li>cannot allocate a buffer of unsized type</li>
 <li>iteration end</li>
 <li>allocation failed</li>
 <li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
 <li>different vector sizes</li>
 <li>out of bounds</li>
 </ol>
@@ -2876,41 +2995,7 @@ to print without a new line.</p>
 
 <h1 id="print">print</h1>
 
-<h3 id="print-prints-a-float">print - prints a float</h3>
-
-<p><em>Defined in: std/core/print.s</em></p>
-
-<p>To pre-specified 6 decimal digits.
-Automatically ends the line too.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="print-prints-a-float-2">print - prints a float</h3>
-
-<p><em>Defined in: std/core/print.s</em></p>
-
-<p>To pre-specified 6 decimal digits.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
 <h3 id="print-prints-a-cstr">print - prints a cstr</h3>
-
-<p><em>Defined in: std/core/print.s</em></p>
-
-<p>Automatically ends the line too.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="print-prints-a-cstr-2">print - prints a cstr</h3>
 
 <p><em>Defined in: std/core/print.s</em></p>
 
@@ -3059,6 +3144,40 @@ Automatically ends the line too.</p>
 </code></pre>
 </div>
 
+<h3 id="print-prints-a-float">print - prints a float</h3>
+
+<p><em>Defined in: std/core/print.s</em></p>
+
+<p>To pre-specified 6 decimal digits.
+Automatically ends the line too.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="print-prints-a-float-2">print - prints a float</h3>
+
+<p><em>Defined in: std/core/print.s</em></p>
+
+<p>To pre-specified 6 decimal digits.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="print-prints-a-cstr-2">print - prints a cstr</h3>
+
+<p><em>Defined in: std/core/print.s</em></p>
+
+<p>Automatically ends the line too.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
 <h3 id="print-writes-a-cstr-to-a-write-file">print - writes a cstr to a write file</h3>
 
 <p><em>Defined in: std/io/file.s</em></p>
@@ -3168,7 +3287,7 @@ Automatically ends the line too.</p>
 <ol start="8">
 <li>iteration end</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>out of bounds</li>
 </ol>
 
@@ -3188,7 +3307,7 @@ Automatically ends the line too.</p>
 <ol start="8">
 <li>iteration end</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>out of bounds</li>
 </ol>
 
@@ -3207,9 +3326,9 @@ Automatically ends the line too.</p>
 
 <ol start="2">
 <li>null pointer</li>
-<li>column out of bounds</li>
 <li>row out of bounds</li>
-<li>id subtraction would yield a negative</li>
+<li>column out of bounds</li>
+<li>nat subtraction would yield a negative</li>
 <li>iteration end</li>
 </ol>
 
@@ -3228,9 +3347,9 @@ Automatically ends the line too.</p>
 
 <ol start="2">
 <li>null pointer</li>
-<li>column out of bounds</li>
 <li>row out of bounds</li>
-<li>id subtraction would yield a negative</li>
+<li>column out of bounds</li>
+<li>nat subtraction would yield a negative</li>
 <li>iteration end</li>
 </ol>
 
@@ -3353,8 +3472,10 @@ arithmetics and bitwise operations.</p>
 
 <p><em>Defined in: std/core/range.s</em></p>
 
+<p>the range&#8217;s start is assumed to be zero</p>
+
 <div class="codehilite">
-<pre><span></span><code><span class="n">range</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_from</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">to</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">range</span><span class="p">)</span>
+<pre><span></span><code><span class="n">range</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">to</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">range</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3362,10 +3483,8 @@ arithmetics and bitwise operations.</p>
 
 <p><em>Defined in: std/core/range.s</em></p>
 
-<p>the range&#8217;s start is assumed to be zero</p>
-
 <div class="codehilite">
-<pre><span></span><code><span class="n">range</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">to</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">range</span><span class="p">)</span>
+<pre><span></span><code><span class="n">range</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_from</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">to</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">range</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3406,7 +3525,7 @@ arithmetics and bitwise operations.</p>
 <p><em>Defined in: std/map.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">next</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
+<pre><span></span><code><span class="n">next</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3422,7 +3541,7 @@ arithmetics and bitwise operations.</p>
 <p><em>Defined in: std/map.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">next</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+<pre><span></span><code><span class="n">next</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3529,7 +3648,7 @@ arithmetics and bitwise operations.</p>
 <p><em>Defined in: std/io.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="n">write</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="n">read</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3539,7 +3658,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 <li>not open file</li>
@@ -3561,7 +3680,7 @@ arithmetics and bitwise operations.</p>
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>index not found</li>
 <li>iteration end</li>
 <li>out of bounds</li>
@@ -3583,7 +3702,7 @@ arithmetics and bitwise operations.</p>
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>index not found</li>
 <li>iteration end</li>
 <li>out of bounds</li>
@@ -3605,7 +3724,7 @@ arithmetics and bitwise operations.</p>
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>iteration end</li>
 <li>out of bounds</li>
 <li>can only define strings on contiguous buffers</li>
@@ -3628,7 +3747,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 </ol>
@@ -3648,7 +3767,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 <li>not open file</li>
@@ -3669,7 +3788,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 <li>not open file</li>
@@ -3680,7 +3799,7 @@ arithmetics and bitwise operations.</p>
 <p><em>Defined in: std/io.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="n">read</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="n">write</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3690,7 +3809,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 <li>not open file</li>
@@ -3711,7 +3830,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 <li>not open file</li>
@@ -3732,7 +3851,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 </ol>
@@ -3752,7 +3871,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 <li>not open file</li>
@@ -3773,7 +3892,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 <li>not open file</li>
@@ -3794,7 +3913,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 <li>not open file</li>
@@ -3815,7 +3934,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 <li>not open file</li>
@@ -3836,7 +3955,7 @@ arithmetics and bitwise operations.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>end of file</li>
 <li>out of bounds</li>
 <li>not open file</li>
@@ -4061,7 +4180,7 @@ For ease of use, the path is returned.</p>
 
 <p>Potential errors:</p>
 
-<ol start="66">
+<ol start="67">
 <li>row out of bounds</li>
 <li>column out of bounds</li>
 </ol>
@@ -4303,7 +4422,7 @@ on negative comparisons.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>read string does not fit on buffer</li>
 <li>out of bounds</li>
 </ol>
@@ -4344,7 +4463,7 @@ retrieving data with &#8216;unpack&#8217; for memory efficiency.</p>
 
 <p>Potential errors:</p>
 
-<ol start="56">
+<ol start="57">
 <li>nat value too large to pack in nat16</li>
 </ol>
 
@@ -4582,7 +4701,7 @@ This operation may fail if the string does not fit the current allocation - pref
 <p><em>Defined in: std/core/string.s</em></p>
 
 <p>Copies a string to a new buffer while ensuring null termination.
-This is mainly useful for supporting &#8216;temporary_cstr&#8217;.</p>
+This is mainly useful for supporting &#8216;cstr unsafe_temp&#8217;.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">copy_null_terminated</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
@@ -4599,16 +4718,16 @@ This is mainly useful for supporting &#8216;temporary_cstr&#8217;.</p>
 <li>cannot allocate a buffer of unsized type</li>
 </ol>
 
-<h1 id="temporary_cstr">temporary_cstr</h1>
+<h1 id="unsafe_temp">unsafe_temp</h1>
 
-<h3 id="temporary_cstr-tautology-function-for-cstr">temporary_cstr - tautology function for cstr</h3>
+<h3 id="unsafe_temp-tautology-function-for-cstr">unsafe_temp - tautology function for cstr</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
 <p>This is mainly used as a stt-input counterpart for converting str|cstr to cstr.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">temporary_cstr</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">cstr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">cstr</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+<pre><span></span><code><span class="n">unsafe_temp</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">cstr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">cstr</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -4621,23 +4740,27 @@ This is mainly useful for supporting &#8216;temporary_cstr&#8217;.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="temporary_cstr-convert-a-string-to-a-temporary-cstr">temporary_cstr - convert a string to a temporary cstr</h3>
+<h3 id="unsafe_temp-convert-a-string-to-a-temporary-null-terminated-cstrstr-pair">unsafe_temp - convert a string to a temporary null-terminated (cstr,str) pair</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
 <p>This function&#8217;s return is meant to be passed to operating system calls,
-and will become invalid once the calling site ends.
+or return from compt with the pattern &#8216;cstr unsafe<em>temp string</em>value&#8217;.
+It will become invalid once the calling site ends.
 It also does not admit proper cstr equality comparisons via pointer values
 that reflect contents; it will always compare equal only to itself.
 An optimization that safely checks the last element and one position beyond
 the buffer&#8217;s contents for null termination is also employed. Modifying the
 string buffer in any capacity
 invalidates the null termination property, so in general do not manipulate
-strings while this is used in code; it should only be used for operating
-system calls.</p>
+strings while this is used in code; use it only for its intended purposes.</p>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This is unsafe, unless &#8216;cstr unsafe_temp&#8217; is the last system or &#8216;compt&#8217; call.</div>
+
+<div class="notice-box box-info"><strong>Info:</strong> This is safe to run during &#8216;compt&#8217; in that the latter will fail gracefully.</div>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">temporary_cstr</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">cstr</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+<pre><span></span><code><span class="n">unsafe_temp</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">unsafe_temp</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -4712,7 +4835,7 @@ enclosing buffer.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>slice out of string bounds</li>
 <li>out of bounds</li>
 </ol>
@@ -4720,66 +4843,6 @@ enclosing buffer.</p>
 <h1 id="starts_with">starts_with</h1>
 
 <h3 id="starts_with-2">starts_with</h3>
-
-<p><em>Defined in: std/core/string.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">starts_with</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">_needle</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="16">
-<li>can only define strings on contiguous buffers</li>
-<li>can only define strings on non-offset buffers</li>
-<li>null pointer</li>
-<li>id subtraction would yield a negative</li>
-<li>slice out of string bounds</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="starts_with-3">starts_with</h3>
-
-<p><em>Defined in: std/core/string.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">starts_with</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">_stack</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="16">
-<li>can only define strings on contiguous buffers</li>
-<li>can only define strings on non-offset buffers</li>
-<li>null pointer</li>
-<li>id subtraction would yield a negative</li>
-<li>slice out of string bounds</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="starts_with-4">starts_with</h3>
-
-<p><em>Defined in: std/core/string.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">starts_with</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">_stack</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">_needle</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="16">
-<li>can only define strings on contiguous buffers</li>
-<li>can only define strings on non-offset buffers</li>
-<li>null pointer</li>
-<li>id subtraction would yield a negative</li>
-<li>slice out of string bounds</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="starts_with-5">starts_with</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
@@ -4794,7 +4857,67 @@ enclosing buffer.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
+<li>slice out of string bounds</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="starts_with-3">starts_with</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">starts_with</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">_needle</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>null pointer</li>
+<li>nat subtraction would yield a negative</li>
+<li>slice out of string bounds</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="starts_with-4">starts_with</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">starts_with</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">_stack</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>null pointer</li>
+<li>nat subtraction would yield a negative</li>
+<li>slice out of string bounds</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="starts_with-5">starts_with</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">starts_with</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">_stack</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">_needle</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>null pointer</li>
+<li>nat subtraction would yield a negative</li>
 <li>slice out of string bounds</li>
 <li>out of bounds</li>
 </ol>
@@ -4816,7 +4939,7 @@ enclosing buffer.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>slice out of string bounds</li>
 <li>out of bounds</li>
 </ol>
@@ -4836,7 +4959,7 @@ enclosing buffer.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>slice out of string bounds</li>
 <li>out of bounds</li>
 </ol>
@@ -4856,7 +4979,7 @@ enclosing buffer.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>slice out of string bounds</li>
 <li>out of bounds</li>
 </ol>
@@ -4876,7 +4999,7 @@ enclosing buffer.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>slice out of string bounds</li>
 <li>out of bounds</li>
 </ol>
@@ -4898,7 +5021,7 @@ enclosing buffer.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>slice out of string bounds</li>
 <li>out of bounds</li>
 </ol>
@@ -4918,7 +5041,7 @@ enclosing buffer.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>slice out of string bounds</li>
 <li>out of bounds</li>
 </ol>
@@ -4938,7 +5061,7 @@ enclosing buffer.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>slice out of string bounds</li>
 <li>out of bounds</li>
 </ol>
@@ -4958,7 +5081,7 @@ enclosing buffer.</p>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers</li>
 <li>null pointer</li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>slice out of string bounds</li>
 <li>out of bounds</li>
 </ol>
@@ -5084,7 +5207,7 @@ resources.</p>
 <p>Potential errors:</p>
 
 <ol start="5">
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>out of bounds</li>
 </ol>
 
@@ -5102,7 +5225,7 @@ resources.</p>
 <p>Potential errors:</p>
 
 <ol start="5">
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>out of bounds</li>
 </ol>
 
@@ -5154,7 +5277,7 @@ resources.</p>
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>string buffer is full</li>
 <li>iteration end</li>
 <li>out of bounds</li>
@@ -5176,7 +5299,7 @@ resources.</p>
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>string buffer is full</li>
 <li>iteration end</li>
 <li>out of bounds</li>
@@ -5198,7 +5321,7 @@ resources.</p>
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>iteration end</li>
 <li>out of bounds</li>
 <li>can only define strings on contiguous buffers</li>
@@ -5217,7 +5340,7 @@ resources.</p>
 
 <p>Potential errors:</p>
 
-<ol start="66">
+<ol start="67">
 <li>row out of bounds</li>
 <li>column out of bounds</li>
 </ol>
@@ -5591,7 +5714,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>index not found</li>
 <li>iteration end</li>
 <li>out of bounds</li>
@@ -5611,7 +5734,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>index not found</li>
 <li>iteration end</li>
 <li>out of bounds</li>
@@ -5631,7 +5754,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>iteration end</li>
 <li>out of bounds</li>
 <li>can only define strings on contiguous buffers</li>
@@ -5653,7 +5776,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>index not found</li>
 <li>iteration end</li>
 <li>out of bounds</li>
@@ -5673,7 +5796,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>index not found</li>
 <li>iteration end</li>
 <li>out of bounds</li>
@@ -5693,7 +5816,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>iteration end</li>
 <li>out of bounds</li>
 <li>can only define strings on contiguous buffers</li>
@@ -5708,6 +5831,26 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <p><em>Defined in: std/hash.s</em></p>
 
 <div class="codehilite">
+<pre><span></span><code><span class="n">at</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>modulo by zero </li>
+<li>nat subtraction would yield a negative</li>
+<li>string buffer is full</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="at-3">at</h3>
+
+<p><em>Defined in: std/hash.s</em></p>
+
+<div class="codehilite">
 <pre><span></span><code><span class="n">at</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">_k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -5717,7 +5860,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>iteration end</li>
 <li>out of bounds</li>
 <li>can only define strings on contiguous buffers</li>
@@ -5725,7 +5868,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <li>string buffer is full</li>
 </ol>
 
-<h3 id="at-3">at</h3>
+<h3 id="at-4">at</h3>
 
 <p><em>Defined in: std/hash.s</em></p>
 
@@ -5739,27 +5882,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <ol start="2">
 <li>null pointer</li>
 <li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
-<li>string buffer is full</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="at-4">at</h3>
-
-<p><em>Defined in: std/hash.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">at</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>modulo by zero </li>
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 <li>string buffer is full</li>
 <li>iteration end</li>
 <li>out of bounds</li>
@@ -5835,6 +5958,26 @@ that is more efficient for computations in 64-bit architectures.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">unpack</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h1 id="abs">abs</h1>
+
+<h3 id="abs-2">abs</h3>
+
+<p><em>Defined in: std/sci/math.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">abs</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="abs-3">abs</h3>
+
+<p><em>Defined in: std/sci/math.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">abs</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -5981,7 +6124,7 @@ that is more efficient for computations in 64-bit architectures.</p>
 
 <p>Potential errors:</p>
 
-<ol start="58">
+<ol start="59">
 <li>can only place vectors on contiguous buffers</li>
 <li>cannot place vectors on buffer offsets</li>
 <li>vector exceeeds buffer limits</li>
@@ -6000,7 +6143,7 @@ that is more efficient for computations in 64-bit architectures.</p>
 
 <p>Potential errors:</p>
 
-<ol start="58">
+<ol start="59">
 <li>can only place vectors on contiguous buffers</li>
 <li>cannot place vectors on buffer offsets</li>
 <li>vector exceeeds buffer limits</li>
@@ -6017,7 +6160,7 @@ that is more efficient for computations in 64-bit architectures.</p>
 
 <p>Potential errors:</p>
 
-<ol start="58">
+<ol start="59">
 <li>can only place vectors on contiguous buffers</li>
 <li>cannot place vectors on buffer offsets</li>
 </ol>
@@ -6054,15 +6197,6 @@ that is more efficient for computations in 64-bit architectures.</p>
 
 <h1 id="circular">circular</h1>
 
-<h3 id="circular-2">circular</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">circular</span><span class="p">)</span>
-</code></pre>
-</div>
-
 <h3 id="circular-circular-buffer">circular - circular buffer</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
@@ -6077,7 +6211,7 @@ that is more efficient for computations in 64-bit architectures.</p>
 <p>Potential errors:</p>
 
 <ol start="5">
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 </ol>
 
 <h3 id="circular-circular-buffer-2">circular - circular buffer</h3>
@@ -6105,8 +6239,17 @@ that is more efficient for computations in 64-bit architectures.</p>
 <p>Potential errors:</p>
 
 <ol start="5">
-<li>id subtraction would yield a negative</li>
+<li>nat subtraction would yield a negative</li>
 </ol>
+
+<h3 id="circular-2">circular</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">circular</span><span class="p">)</span>
+</code></pre>
+</div>
 
 <h1 id="vecpos">vecpos</h1>
 
@@ -6120,6 +6263,15 @@ that is more efficient for computations in 64-bit architectures.</p>
 </div>
 
 <h1 id="vec_allocator">vec_allocator</h1>
+
+<h3 id="vecpos-3">vecpos</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">vecpos</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span>
+</code></pre>
+</div>
 
 <h3 id="circular-3">circular</h3>
 
@@ -6136,15 +6288,6 @@ that is more efficient for computations in 64-bit architectures.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">new</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">new</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="vecpos-3">vecpos</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">vecpos</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -6347,9 +6490,9 @@ to indicate the new matrix&#8217;s orientation.</p>
 <p>Potential errors:</p>
 
 <ol start="64">
+<li>cannot place matrices on buffer offsets</li>
 <li>matrix exceeds buffer limits</li>
 <li>can only place matrices on contiguous buffers</li>
-<li>cannot place matrices on buffer offsets</li>
 </ol>
 
 <h3 id="mat-matrix-on-an-existing-float-buffer">mat - matrix on an existing float[] buffer</h3>
@@ -6364,11 +6507,11 @@ to indicate the new matrix&#8217;s orientation.</p>
 <p>Potential errors:</p>
 
 <ol start="64">
+<li>cannot place matrices on buffer offsets</li>
 <li>matrix exceeds buffer limits</li>
 <li>buffer size not divisible by vector rows</li>
 <li>division by zero </li>
 <li>can only place matrices on contiguous buffers</li>
-<li>cannot place matrices on buffer offsets</li>
 </ol>
 
 <h3 id="mat-matrix-on-an-existing-vecpos">mat - matrix on an existing vecpos</h3>
@@ -6383,9 +6526,9 @@ to indicate the new matrix&#8217;s orientation.</p>
 <p>Potential errors:</p>
 
 <ol start="64">
+<li>cannot place matrices on buffer offsets</li>
 <li>matrix exceeds buffer limits</li>
 <li>can only place matrices on contiguous buffers</li>
-<li>cannot place matrices on buffer offsets</li>
 </ol>
 
 <h3 id="mat-matrix-on-a-fresh-buffer">mat - matrix on a fresh buffer</h3>
@@ -6440,7 +6583,7 @@ to indicate the new matrix&#8217;s orientation.</p>
 
 <p>Potential errors:</p>
 
-<ol start="66">
+<ol start="67">
 <li>row out of bounds</li>
 </ol>
 

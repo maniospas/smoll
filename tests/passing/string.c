@@ -575,7 +575,7 @@ static inline __attribute__((always_inline)) int copy_null_terminated__t703t(cha
   return __t_errcode;
 }
 
-int temporary_cstr__t712t(char* other__unsafe_ptr, uint64_t other__dat__pos, uint64_t other__dat__length, char other__dat__first, const char** __t1909t, char** __t1910t, uint64_t* __t1911t, uint64_t* __t1912t, char* __t1913t) {
+int cstr unsafe_tmp__t712t(char* other__unsafe_ptr, uint64_t other__dat__pos, uint64_t other__dat__length, char other__dat__first, const char** __t1909t, char** __t1910t, uint64_t* __t1911t, uint64_t* __t1912t, char* __t1913t) {
   char* __t713t__unsafe_ptr=0;
   uint64_t __t713t__dat__pos=0;
   uint64_t __t713t__dat__length=0;
@@ -638,7 +638,7 @@ static inline __attribute__((always_inline)) int read__t1387t(char* _path__unsaf
   char __t1391t__=0;
   int __t_errcode=0;
   int __t_complain=0;
-  __t_errcode=temporary_cstr__t712t(_path__unsafe_ptr,_path__dat__pos,_path__dat__length,_path__dat__first,&__t1388t__cstr,&__t1388t__str__unsafe_ptr,&__t1388t__str__dat__pos,&__t1388t__str__dat__length,&__t1388t__str__dat__first);
+  __t_errcode=cstr unsafe_tmp__t712t(_path__unsafe_ptr,_path__dat__pos,_path__dat__length,_path__dat__first,&__t1388t__cstr,&__t1388t__str__unsafe_ptr,&__t1388t__str__dat__pos,&__t1388t__str__dat__length,&__t1388t__str__dat__first);
   if(__t_errcode){
   goto __t_failure;
   }

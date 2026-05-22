@@ -3,6 +3,14 @@ local import "std/core/numbers.s"
 local import "std/core/array.s"
 local import "std/core/string.s" as string
 
+def nat8(nat x)
+    doc "convert unsigned number to 8 bits"
+    doc "The conversion checks whether the previous value fits in the new one."
+    doc "If it does not, this operation can fail."
+    if x>255 fail "nat value too large to pack in nat8"
+    {builtins:nat8 value = x;}
+    return value
+
 def nat16(nat x)
     doc "convert unsigned number to 16 bits"
     doc "The conversion checks whether the previous value fits in the new one."

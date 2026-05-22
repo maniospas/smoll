@@ -41,7 +41,7 @@ def read(cstr cmd)
 
 def read(str cmd)
     doc "create a readable system process"
-    return read temporary_cstr(cmd).cstr
+    return read cstr unsafe_temp cmd
 
 def chunk(char[] buf, mut nat|blank pos, read f)
     if pos is blank
@@ -84,5 +84,5 @@ def system(cstr|str _cmd)
     doc "system command"
     doc "Runs a system command and waits until that completes."
     doc "Fails if the return code is non-zero, but does not expose that code."
-    result = system_return safe temporary_cstr(_cmd).cstr
+    result = system_return safe cstr unsafe_temp _cmd
     if result!=int 0 fail "system call failed"

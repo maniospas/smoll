@@ -142,7 +142,7 @@ def sub(Number x, Number y)
     if x is nat
         doc "Natural numbers are safeguarded against acquiring negative results, which would overflow."
     if x is nat and x<y
-        fail "id subtraction would yield a negative"
+        fail "nat subtraction would yield a negative"
     {type(x) z=x-y;}
     return z
 

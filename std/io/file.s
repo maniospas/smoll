@@ -20,7 +20,7 @@ local import "std/unsafe.s" as unsafe
 def read(str|cstr _path)
     doc "loads a path as a readable file"
     doc "The file name is not maintained and must be tracked externally, if needed."
-    path = temporary_cstr(_path).cstr
+    path = cstr unsafe_temp _path
     {builtins:compiler:ptr unsafe_ptr = (char*)fopen(path, "r");}
     defer
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
@@ -28,7 +28,7 @@ def read(str|cstr _path)
     return class(unsafe_mut unsafe_ptr)
 
 def write(str|cstr _path)
-    path = temporary_cstr(_path).cstr
+    path = cstr unsafe_temp _path
     doc "creates a new file at cstr path as a writable object, fails if it already exists"
     {builtins:compiler:ptr unsafe_ptr = (char*)fopen(path, "wx+");}
     defer

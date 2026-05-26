@@ -153,7 +153,7 @@ by default but this time we prevent that to no end the line.
 import "std/core.s"
 
 def main()
-    print nn "hello "
+    print nn "hello " # equivalent to print("hello", "")
     print "world!" 
 ```
 
@@ -201,14 +201,13 @@ def toinfinity(nat start)
     pos = mut start
     return (start, pos)
 
-def next(toinfinity r)
+def next(edit toinfinity r)
     r.pos = r.pos+1
 
 def main()
-    r = toinfinity(0)
+    r = toinfinity 0
     next r # proper loops later
     print r.pos
-    print "\n"
     print add r
 ```
 
@@ -355,9 +354,9 @@ import "std/core.s"
 
 def main()
     x = 1.0-2.0
-    if x<0.0 print "x is negative\n"
-    else if x==0.0 print "x is zero\n"
-    else print "x is positive\n"
+    if x<0.0 print "x is negative"
+    else if x==0.0 print "x is zero"
+    else print "x is positive"
 ```
 
 ```python
@@ -556,13 +555,16 @@ def main()
     print unsafe_add (1.0, 2)
 ```
 
+
+*Warning: You can skip the more complicated aspects of the type system in the rest of this subsection. Unlike `|`, they are only rarely needed, especially in well-structured code that defines types incrementally.*
+
 In truth, *smoλ* implements a linear type system, but this
 was hidden till this point because people tend to shy away
 from reading technical terms. Practically, it means
 that -in addition to type unions- you can also get the intersection
 of type unions with the `&` symbol. Use parantheses like normal.
 
-Here is an example where, say, we define a `float` function that returns
+Next is an example where, say, we define a `float` function that returns
 something other than a builtin float number. We can get the intersection
 of all float definitions that are also numbers, or all those definitions
 that are not numbers with the '\` symbol, which is the mathematical 
@@ -601,13 +603,13 @@ are attached to specific values.
 Below is an example on using this concept to define numeric or 
 cstr constants first. Literal types evaluate to their value when 
 used within code - nothing
-out of the ordinary.
+out of the ordinary. By the way, prefer annotating literals with all-capital
+letters.
 
 ```python
 import "std/core.s"
 
 def INCREMENT = 1
-
 def inc(nat x)
     return x+INCREMENT
 
@@ -615,7 +617,7 @@ def main()
     print inc 0  # prints 1
 ```
 
-But literal types can also specialize among which
+But literal types can also select which
 function to call, like below. Doing so requires retrieving
 the literal's type by evaluating `type value`, where value
 can be a string or number literal.
@@ -624,10 +626,8 @@ can be a string or number literal.
 import "std/core.s"
 
 def VERSION = "two"
-
 def version("one") # just a literal type
     print "version one"
-
 def version("two")
     print "version two"
 
@@ -766,7 +766,7 @@ def main()
     print inc(2,2) # prints 4
 ```
 
-## compile-time evaluat
+## compile-time evaluation
 
 Rember value literals? There exists actually a more general mechanism
 that packs a tuple of values onto a literal after evaluating them at
@@ -790,10 +790,10 @@ we could not just pack a `str`.
 ```python
 import "std/core.s"
 
-def constant = compt cstr unsafe_temp add(bufpos alloc 128, "hello", " world!")
+def CONSTANT = compt cstr unsafe_temp add(bufpos alloc 128, "hello", " world!")
 def main()
-    print constant
-    print constant=="hello world!" # 'true' even if thecomparison of cstr is done via pointers
+    print CONSTANT
+    print CONSTANT=="hello world!" # 'true' even if thecomparison of cstr is done via pointers
 ```
 
 Lastly, leverage this mechanism to run code during compilations, like below.

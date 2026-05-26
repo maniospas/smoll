@@ -131,7 +131,8 @@ def unsafe_temp(str other)
     doc "invalidates the null termination property, so in general do not manipulate" 
     doc "strings while this is used in code; use it only for its intended purposes."
     doc ""
-    doc "*Warning: This is unsafe, unless 'cstr unsafe_temp' is the last system or 'compt' call.*"
+    doc "*Warning: This is unsafe, unless 'cstr unsafe_temp' is the last call before"
+    doc "passing data to 'system' or 'compt'.*"
     doc ""
     doc "*Info: This is safe to run during 'compt' in that the latter will fail gracefully.*"
     str = copy_null_terminated(other)

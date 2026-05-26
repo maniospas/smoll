@@ -421,7 +421,9 @@ class Variable(CodeSegment):
     def stabilized_name(self) -> str:
         if self._references is None: return self.name
         return self._references
-        
+
+
+
 def signature_like(vars: list[Variable], impl=None):
     ret = ""
     i = 0
@@ -463,6 +465,17 @@ def signature_like(vars: list[Variable], impl=None):
             i += len(type.rets)
         assert len(type.rets)
     return ret
+
+def code_summary(tokens: list[CodeSegment], impl: "ImplementedType") -> str:
+    ret = ""
+    for tok in tokens:
+        # if isinstance(tok, Variable):
+        #     ret += signature_like([tok], impl)+"\n"
+        if isinstance(tok, CallPointer):
+            ret += tok.callee.signature()+"\n"
+    return ret
+            
+        
 
 global_cstr2var: dict[str,str] = dict() # from literal to variable name
 global_var2cstr: dict[str,str] = dict() # from variable name to literal
@@ -895,14 +908,14 @@ class ImplementedType:
                 defer = normalized_defer
                 has_any_returned_value = any(u.tostring()==v.name for v in value for u in defer)
                 if not has_any_returned_value: continue
-                if any(not segment.immutable and segment.tostring() in self.args and not segment.tostring() in self.rets for segment in value):
+                if any(not segment.immutable and segment.tostring() in self.args and segment.tostring() not in self.rets for segment in value):
                     error_token.error("safety", "cannot have a 'defer' that mixes non-returned mutable argument and returns")
                 has_assigned = set()
                 has_not_assigned = set()
                 for pos, segment in enumerate(defer):
-                    if pos<len(defer)-1 and defer[pos+1].tostring()=="=" and not segment in has_not_assigned: has_assigned.add(segment)
+                    if pos<len(defer)-1 and defer[pos+1].tostring()=="=" and segment not in has_not_assigned: has_assigned.add(segment)
                     has_not_assigned.add(segment)
-                    if isinstance(segment, Variable) and segment.name not in global_var2cstr and not segment.is_temp() and not segment in has_assigned and not any(segment.tostring()==v.name for v in value):
+                    if isinstance(segment, Variable) and segment.name not in global_var2cstr and not segment.is_temp() and segment not in has_assigned and not any(segment.tostring()==v.name for v in value):
                         if not segment in value: error_token.error("safety", "cannot return a partial 'defer'\nThis return statement does not explicitly return '"+pretty_name(segment.tostring())+"'. However, a value from that is used within a 'defer' that also contains returned values; the latter would be delegated for later calling without knowing the missing return value.", suggestions=["return '"+pretty_name(segment.tostring())+"' too, or any structure it resides in", "do not return variables within the same 'defer'"])
                 self.returned_defers.append(defer)
                 to_remove.append(orignal_defer)
@@ -1804,6 +1817,8 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
             if callee.needs_failure_mode: print("Potential errors:\n")
             else: print("No failing errors, but can catch these intercepted ones:\n")
         for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
+        if callee.returned_defers: print("\nReturned defered calls:")
+        for defer in callee.returned_defers: print("```rust\n"+code_summary(defer,callee)+"```")
     return callee
 
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
@@ -2362,6 +2377,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "a float value")
         return pos+1, create_literal_type(literal_tok, FLOAT_TYPE)
     if literal_tok.text=="compt":
+        if is_lsp and literal_tok.file.is_main_file: print_lsp_keyword(literal_tok, "**compile time evaluation**\n\nEvaluates the following expression to a literal value during compilation. This requires that the VM is able to axecute all of the expression's dependent code.")
         temporary_implementation = ImplementedType("compt", at=literal_tok)
         pos, ret = await process_statement(file, tokens, pos+1, temporary_implementation, current_operator_priority=0)
         pos, ret = await process_statement_operator(file, tokens, temporary_implementation, pos, ret, current_operator_priority=0)
@@ -2372,6 +2388,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         temporary_implementation.returns(ret, literal_tok, is_safe=True)
         memory = MemoryEmulator(1024*vm_memory_kb)
         returned_values = [0 for _ in ret]
+        temporary_implementation.defers.clear()
         returned_error = await temporary_implementation.interpret(returned_values, memory, recursion_budget=vm_recursion_budget)
         if returned_error!=0: literal_tok.error("interpreter", "failed because "+err_code_list[returned_error][1:-1])
         lits: list[ImplementedType] = list()
@@ -4302,6 +4319,8 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                             if callee.needs_failure_mode: print("Potential errors:\n")
                             else: print("No failing errors, but can catch these intercepted ones:\n")
                         for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
+                        if callee.returned_defers: print("\nReturned defered calls:")
+                        for defer in callee.returned_defers: print("```rust\n"+code_summary(defer, callee)+"```")
             except FastReturnException: 
                 assert fast_return_exception
             #if not impl.force_not_inline and fast_return_exception: continue # register only forcefully RECURSIVE variations

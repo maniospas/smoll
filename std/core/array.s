@@ -44,8 +44,7 @@ def alloc(edit any[] buffer, nat|blank size)
         doc "This version allocates a buffer of ONE element, which can be used for stable indirection."
         size = 1
     defer
-        if buffer.unsafe_size!=0
-            buffer.unsafe_size = 0
+        if exists buffer.unsafe_ptr
             ptr = buffer.unsafe_ptr
             buffer.unsafe_ptr.unsafe:free()
     if buffer.unsafe_size==size

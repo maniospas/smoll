@@ -1,9 +1,9 @@
 import "std/core.s"
 
 def constant = compt cstr unsafe_temp add(bufpos alloc 128, "hello", " world!")
-def test = compt (1,2)
 
 def main()
-    compt print "compiling"
+    buf = bufpos char[].alloc 16
+    test = buf.copy "test"
+    print cstr unsafe_temp test
     print constant
-    print add test

@@ -373,14 +373,13 @@ a deliberate choise to enforce memory safety later.</p>
     <span class="n">pos</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">start</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">toinfinity</span> <span class="n">r</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">edit</span> <span class="n">toinfinity</span> <span class="n">r</span><span class="p">)</span>
     <span class="n">r</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">toinfinity</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">toinfinity</span> <span class="mi">0</span>
     <span class="nb">next</span> <span class="n">r</span> <span class="c1"># proper loops later</span>
     <span class="nb">print</span> <span class="n">r</span><span class="o">.</span><span class="n">pos</span>
-    <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
     <span class="nb">print</span> <span class="n">add</span> <span class="n">r</span>
 </code></pre>
 </div>
@@ -533,9 +532,9 @@ like the following versions.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
-    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mf">0.0</span> <span class="nb">print</span> <span class="s2">&quot;x is negative</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mf">0.0</span> <span class="nb">print</span> <span class="s2">&quot;x is zero</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="k">else</span> <span class="nb">print</span> <span class="s2">&quot;x is positive</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mf">0.0</span> <span class="nb">print</span> <span class="s2">&quot;x is negative&quot;</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mf">0.0</span> <span class="nb">print</span> <span class="s2">&quot;x is zero&quot;</span>
+    <span class="k">else</span> <span class="nb">print</span> <span class="s2">&quot;x is positive&quot;</span>
 </code></pre>
 </div>
 
@@ -1451,7 +1450,7 @@ is converted into a <code>while try</code>.</p>
 but instead employ the <code>get(data, nat index)</code> function 
 that overloads the <code>data[index]</code> operator for indexes
 that are natural numbers. In truth, the range ieration
-examples is equivalent like the next tone.</p>
+examples is equivalent like the next one.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1828,7 +1827,7 @@ on an erroneous program.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">ref</span> <span class="nb">list</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">ref</span> <span class="n">mut</span> <span class="nb">list</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span>
     <span class="n">s1</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span> <span class="c1"># would have been invalidated if we did not use `ref`</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">print</span> <span class="n">s1</span>

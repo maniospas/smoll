@@ -1241,7 +1241,7 @@ However, iterators do not apply arbitary functions
 but instead employ the `get(data, nat index)` function 
 that overloads the `data[index]` operator for indexes
 that are natural numbers. In truth, the range ieration
-examples is equivalent like the next tone.
+examples is equivalent like the next one.
 
 ```python
 import "std/core.s"

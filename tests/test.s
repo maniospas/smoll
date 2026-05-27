@@ -1,9 +1,10 @@
 import "std/core.s"
-
-def constant = compt cstr unsafe_temp add(bufpos alloc 128, "hello", " world!")
+import "std/sci.s"
 
 def main()
-    buf = bufpos char[].alloc 16
-    test = buf.copy "test"
-    print cstr unsafe_temp test
-    print constant
+    v = compt mat [
+        2.0, 2.0, 
+        34.0, 1.0
+    ].any 2
+    print v[0,0]
+    #v[0,0] = 1.0

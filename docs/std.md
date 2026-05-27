@@ -91,6 +91,7 @@
 [circular](#circular) 
 [vecpos](#vecpos) 
 [vec\_allocator](#vec\_allocator) 
+[constvec](#constvec) 
 [reduce](#reduce) 
 [sum](#sum) 
 [mean](#mean) 
@@ -99,6 +100,8 @@
 [mat](#mat) 
 [rows](#rows) 
 [cols](#cols) 
+[constmat](#constmat) 
+[mutvec](#mutvec) 
 [row](#row) 
 [realloc](#realloc) 
 [free](#free) 
@@ -111,6 +114,21 @@
 
 ```rust
 cstr() -> (cstr value)
+```
+
+### cstr - a cstr description of an error code
+*Defined in: std/core/error.s*
+
+Error codes should *not* be compared numerically against
+given numbers, as their numbering changes for different
+programs. Instead, they should be converted to a cstr
+string with this function, which can then be compared.
+This comparison is also one numerical comparison, as
+care is taken for all cstr to point to the same memory
+location.
+
+```rust
+cstr(catch value) -> (cstr ret)
 ```
 
 ### cstr - extract the cstr from unsafe_temp string
@@ -131,21 +149,6 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 
 ```rust
 cstr(const unsafe_temp) -> (cstr value.cstr)
-```
-
-### cstr - a cstr description of an error code
-*Defined in: std/core/error.s*
-
-Error codes should *not* be compared numerically against
-given numbers, as their numbering changes for different
-programs. Instead, they should be converted to a cstr
-string with this function, which can then be compared.
-This comparison is also one numerical comparison, as
-care is taken for all cstr to point to the same memory
-location.
-
-```rust
-cstr(catch value) -> (cstr ret)
 ```
 
 # int
@@ -179,19 +182,19 @@ int(nat x) -> (int z)
 ### int - cast to int
 *Defined in: std/core/convert.s*
 
-Serves as a tautology function for code that parses on multiple number types.
+May lose information due to truncating.
 
 ```rust
-int(int x) -> (int z)
+int(float x) -> (int z)
 ```
 
 ### int - cast to int
 *Defined in: std/core/convert.s*
 
-May lose information due to truncating.
+Serves as a tautology function for code that parses on multiple number types.
 
 ```rust
-int(float x) -> (int z)
+int(int x) -> (int z)
 ```
 
 ### int - converts a string to an integer
@@ -234,15 +237,6 @@ Potential errors:
 23. user input was not an int
 
 # nat
-### nat - an unsigned integer value
-*Defined by the compiler*
-
-Represents values in the range `0 to 2^64-1`.
-
-```rust
-nat() -> (nat value)
-```
-
 ### nat - cast to nat
 *Defined in: std/core/convert.s*
 
@@ -298,11 +292,13 @@ Potential errors:
 
 6. cannot convert negative float to id
 
-### nat
-*Defined in: std/core/array.s*
+### nat - an unsigned integer value
+*Defined by the compiler*
+
+Represents values in the range `0 to 2^64-1`.
 
 ```rust
-nat(nat16 x) -> (nat value)
+nat() -> (nat value)
 ```
 
 ### nat - converts a string to an unsigned integer
@@ -343,6 +339,13 @@ nat(const console) -> (nat number)
 Potential errors:
 
 24. user input was not a nat
+
+### nat
+*Defined in: std/core/array.s*
+
+```rust
+nat(nat16 x) -> (nat value)
+```
 
 ### nat - retrieved unsigned number from 32 bits
 *Defined in: std/mini.s*
@@ -421,11 +424,13 @@ Potential errors:
 56. nat value too large to pack in nat8
 
 # float
-### float
-*Defined by the compiler*
+### float - cast to float
+*Defined in: std/core/convert.s*
+
+May lose information because floats are not exact representation of all integers.
 
 ```rust
-float() -> (float value)
+float(int x) -> (float z)
 ```
 
 ### float - cast to float
@@ -440,10 +445,10 @@ float(float x) -> (float z)
 ### float - cast to float
 *Defined in: std/core/convert.s*
 
-May lose information because floats are not exact representation of all integers.
+Converts a bit representation to the corresponding float number.
 
 ```rust
-float(int x) -> (float z)
+float(const bits) -> (float z)
 ```
 
 ### float - cast to float
@@ -455,13 +460,11 @@ May lose information because floats are not exact representation of all integers
 float(nat x) -> (float z)
 ```
 
-### float - cast to float
-*Defined in: std/core/convert.s*
-
-Converts a bit representation to the corresponding float number.
+### float
+*Defined by the compiler*
 
 ```rust
-float(const bits) -> (float z)
+float() -> (float value)
 ```
 
 ### float - converts a string to a float
@@ -662,13 +665,6 @@ eq(true, false) -> (false)
 ### eq - equals
 *Defined in: std/core/bool.s*
 
-```rust
-eq(bool x, bool y) -> (bool z)
-```
-
-### eq - equals
-*Defined in: std/core/bool.s*
-
 This is a compile-time operations that does not evoke any runtime booleans.
 
 ```rust
@@ -682,6 +678,13 @@ This is a compile-time operations that does not evoke any runtime booleans.
 
 ```rust
 eq(true, true) -> (true)
+```
+
+### eq - equals
+*Defined in: std/core/bool.s*
+
+```rust
+eq(bool x, bool y) -> (bool z)
 ```
 
 ### eq - equals
@@ -763,14 +766,14 @@ neq(nat x, nat y) -> (bool z)
 *Defined in: std/core/numbers.s*
 
 ```rust
-neq(float x, float y) -> (bool z)
+neq(int x, int y) -> (bool z)
 ```
 
 ### neq - not equal
 *Defined in: std/core/numbers.s*
 
 ```rust
-neq(int x, int y) -> (bool z)
+neq(float x, float y) -> (bool z)
 ```
 
 ### neq - not equal
@@ -819,14 +822,14 @@ neq(false x, true y) -> (true)
 *Defined in: std/core/bool.s*
 
 ```rust
-neq(true x, true y) -> (false)
+neq(true x, false y) -> (true)
 ```
 
 ### neq - not equal
 *Defined in: std/core/bool.s*
 
 ```rust
-neq(true x, false y) -> (true)
+neq(true x, true y) -> (false)
 ```
 
 ### neq - not equal
@@ -912,6 +915,15 @@ not(bool value) -> (bool z)
 ```
 
 # Number
+### int - a signed integer value
+*Defined by the compiler*
+
+Represents values in the range `2^-63 to 2^63-1`.
+
+```rust
+int() -> (int value)
+```
+
 ### nat - an unsigned integer value
 *Defined by the compiler*
 
@@ -926,15 +938,6 @@ nat() -> (nat value)
 
 ```rust
 float() -> (float value)
-```
-
-### int - a signed integer value
-*Defined by the compiler*
-
-Represents values in the range `2^-63 to 2^63-1`.
-
-```rust
-int() -> (int value)
 ```
 
 # is\_different
@@ -1029,6 +1032,62 @@ Adds two numbers of the same type. This is an overload for the + operator.
 add(float x, float y) -> (float z)
 ```
 
+### add
+*Defined in: std/core/string.s*
+
+```rust
+add(mut char[] {element size 1}, mut nat pos, cstr s1, cstr s2) -> (const str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+20. string buffer out of memory
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s*
+
+```rust
+add(mut char[] {element size 1}, mut nat pos, cstr s1, const str) -> (const str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+20. string buffer out of memory
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s*
+
+```rust
+add(mut char[] {element size 1}, mut nat pos, const str, cstr s2) -> (const str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+20. string buffer out of memory
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s*
+
+```rust
+add(mut char[] {element size 1}, mut nat pos, const str, const str) -> (const str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+20. string buffer out of memory
+15. out of bounds
+
 ### add - pointer addition
 *Defined in: std/unsafe.s*
 
@@ -1040,69 +1099,13 @@ Adds a natural number offset to a pointer.
 add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
 ```
 
-### add
-*Defined in: std/core/string.s*
-
-```rust
-add(edit char[] {element size 1}, mut nat pos, cstr s1, cstr s2) -> (const str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-20. string buffer out of memory
-15. out of bounds
-
-### add
-*Defined in: std/core/string.s*
-
-```rust
-add(edit char[] {element size 1}, mut nat pos, cstr s1, const str) -> (const str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-20. string buffer out of memory
-15. out of bounds
-
-### add
-*Defined in: std/core/string.s*
-
-```rust
-add(edit char[] {element size 1}, mut nat pos, const str, cstr s2) -> (const str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-20. string buffer out of memory
-15. out of bounds
-
-### add
-*Defined in: std/core/string.s*
-
-```rust
-add(edit char[] {element size 1}, mut nat pos, const str, const str) -> (const str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-20. string buffer out of memory
-15. out of bounds
-
 ### add - vector addition
 *Defined in: std/sci/vec.s*
 
 Grabs an allocator for the result as an effect.
 
 ```rust
-add(circular, float v1, const vec) -> (const vec) with effects allocator
+add(const float[] {element size 8}, mut nat allocator.pos, float v1, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1119,24 +1122,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-add(const float[] {element size 8}, mut nat allocator.pos, float v1, const vec) -> (const vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-8. iteration end
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-61. vector exceeeds buffer limits
-15. out of bounds
-
-### add - vector addition
-*Defined in: std/sci/vec.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-add(const new allocator, float v1, const vec) -> (const vec) with effects allocator
+add(const new allocator, float v1, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1153,7 +1139,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-add(circular, const vec, float v2) -> (const vec) with effects allocator
+add(circular, const vec, float v2) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1170,7 +1156,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-add(circular, const vec, const vec) -> (const vec) with effects allocator
+add(circular, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1188,7 +1174,24 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-add(const float[] {element size 8}, mut nat allocator.pos, const vec, const vec) -> (const vec) with effects allocator
+add(const float[] {element size 8}, mut nat allocator.pos, const vec, float v2) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+8. iteration end
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+61. vector exceeeds buffer limits
+15. out of bounds
+
+### add - vector addition
+*Defined in: std/sci/vec.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+add(const float[] {element size 8}, mut nat allocator.pos, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1206,7 +1209,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-add(const new allocator, const vec, float v2) -> (const vec) with effects allocator
+add(const new allocator, const vec, float v2) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1223,7 +1226,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-add(const new allocator, const vec, const vec) -> (const vec) with effects allocator
+add(const new allocator, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1241,7 +1244,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-add(const float[] {element size 8}, mut nat allocator.pos, const vec, float v2) -> (const vec) with effects allocator
+add(circular, float v1, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1286,7 +1289,153 @@ mul(float x, float y) -> (float z)
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(circular, const vec, const vec) -> (const vec) with effects allocator
+mul(const new allocator, const vec, const vec) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+8. iteration end
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+62. different vector sizes
+15. out of bounds
+
+### mul - matrix-vector multiplication
+*Defined in: std/sci/mat.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(circular, const mat, const vec) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+67. row out of bounds
+68. column out of bounds
+69. matrix columns must match vector length
+8. iteration end
+15. out of bounds
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+61. vector exceeeds buffer limits
+
+### mul - matrix-vector multiplication
+*Defined in: std/sci/mat.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(const float[] {element size 8}, mut nat allocator.pos, const mat, const vec) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+67. row out of bounds
+68. column out of bounds
+69. matrix columns must match vector length
+8. iteration end
+15. out of bounds
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+61. vector exceeeds buffer limits
+
+### mul - matrix-vector multiplication
+*Defined in: std/sci/mat.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(const new allocator, const mat, const vec) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+67. row out of bounds
+68. column out of bounds
+69. matrix columns must match vector length
+8. iteration end
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+15. out of bounds
+
+### mul - vector multiplication
+*Defined in: std/sci/vec.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(circular, float v1, const vec) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+8. iteration end
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+61. vector exceeeds buffer limits
+15. out of bounds
+
+### mul - vector multiplication
+*Defined in: std/sci/vec.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(const float[] {element size 8}, mut nat allocator.pos, float v1, const vec) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+8. iteration end
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+61. vector exceeeds buffer limits
+15. out of bounds
+
+### mul - vector multiplication
+*Defined in: std/sci/vec.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(const new allocator, float v1, const vec) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+8. iteration end
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+15. out of bounds
+
+### mul - vector multiplication
+*Defined in: std/sci/vec.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(circular, const vec, float v2) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+8. iteration end
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+61. vector exceeeds buffer limits
+15. out of bounds
+
+### mul - vector multiplication
+*Defined in: std/sci/vec.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(circular, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1304,7 +1453,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(circular, float v1, const vec) -> (const vec) with effects allocator
+mul(const float[] {element size 8}, mut nat allocator.pos, const vec, float v2) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1321,75 +1470,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(const float[] {element size 8}, mut nat allocator.pos, float v1, const vec) -> (const vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-8. iteration end
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-61. vector exceeeds buffer limits
-15. out of bounds
-
-### mul - vector multiplication
-*Defined in: std/sci/vec.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(const new allocator, float v1, const vec) -> (const vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-8. iteration end
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
-
-### mul - vector multiplication
-*Defined in: std/sci/vec.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(circular, const vec, float v2) -> (const vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-8. iteration end
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-61. vector exceeeds buffer limits
-15. out of bounds
-
-### mul - vector multiplication
-*Defined in: std/sci/vec.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(const float[] {element size 8}, mut nat allocator.pos, const vec, float v2) -> (const vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-8. iteration end
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-61. vector exceeeds buffer limits
-15. out of bounds
-
-### mul - vector multiplication
-*Defined in: std/sci/vec.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(const float[] {element size 8}, mut nat allocator.pos, const vec, const vec) -> (const vec) with effects allocator
+mul(const float[] {element size 8}, mut nat allocator.pos, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1407,7 +1488,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(const new allocator, const vec, float v2) -> (const vec) with effects allocator
+mul(const new allocator, const vec, float v2) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1416,24 +1497,6 @@ Potential errors:
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
-15. out of bounds
-
-### mul - vector multiplication
-*Defined in: std/sci/vec.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(const new allocator, const vec, const vec) -> (const vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-8. iteration end
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-62. different vector sizes
 15. out of bounds
 
 ### mul - matrix-matrix multiplication
@@ -1442,7 +1505,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(circular, const mat, const mat) -> (const mat) with effects allocator
+mul(circular, const mat, const mat) -> (mut mat) with effects allocator
 ```
 Potential errors:
 
@@ -1461,7 +1524,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(const float[] {element size 8}, mut nat allocator.pos, const mat, const mat) -> (const mat) with effects allocator
+mul(const float[] {element size 8}, mut nat allocator.pos, const mat, const mat) -> (mut mat) with effects allocator
 ```
 Potential errors:
 
@@ -1480,7 +1543,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(const new allocator, const mat, const mat) -> (const mat) with effects allocator
+mul(const new allocator, const mat, const mat) -> (mut mat) with effects allocator
 ```
 Potential errors:
 
@@ -1499,7 +1562,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(circular, const vec, const mat) -> (const vec) with effects allocator
+mul(circular, const vec, const mat) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1519,7 +1582,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(const float[] {element size 8}, mut nat allocator.pos, const vec, const mat) -> (const vec) with effects allocator
+mul(const float[] {element size 8}, mut nat allocator.pos, const vec, const mat) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1539,7 +1602,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(const new allocator, const vec, const mat) -> (const vec) with effects allocator
+mul(const new allocator, const vec, const mat) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1547,66 +1610,6 @@ Potential errors:
 67. row out of bounds
 68. column out of bounds
 70. vector length must match matrix rows
-8. iteration end
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
-
-### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(circular, const mat, const vec) -> (const vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-67. row out of bounds
-68. column out of bounds
-69. matrix columns must match vector length
-8. iteration end
-15. out of bounds
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-61. vector exceeeds buffer limits
-
-### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(const float[] {element size 8}, mut nat allocator.pos, const mat, const vec) -> (const vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-67. row out of bounds
-68. column out of bounds
-69. matrix columns must match vector length
-8. iteration end
-15. out of bounds
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-61. vector exceeeds buffer limits
-
-### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(const new allocator, const mat, const vec) -> (const vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-67. row out of bounds
-68. column out of bounds
-69. matrix columns must match vector length
 8. iteration end
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
@@ -1659,7 +1662,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-div(circular, float v1, const vec) -> (const vec) with effects allocator
+div(circular, float v1, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1677,7 +1680,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-div(const float[] {element size 8}, mut nat allocator.pos, float v1, const vec) -> (const vec) with effects allocator
+div(const float[] {element size 8}, mut nat allocator.pos, float v1, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1695,7 +1698,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-div(const new allocator, float v1, const vec) -> (const vec) with effects allocator
+div(const new allocator, float v1, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1713,7 +1716,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-div(circular, const vec, float v2) -> (const vec) with effects allocator
+div(circular, const vec, float v2) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1731,18 +1734,18 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-div(circular, const vec, const vec) -> (const vec) with effects allocator
+div(circular, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
 2. null pointer
 3. division by zero 
 8. iteration end
-15. out of bounds
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 61. vector exceeeds buffer limits
 62. different vector sizes
+15. out of bounds
 
 ### div - vector division
 *Defined in: std/sci/vec.s*
@@ -1750,7 +1753,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-div(const float[] {element size 8}, mut nat allocator.pos, const vec, float v2) -> (const vec) with effects allocator
+div(const float[] {element size 8}, mut nat allocator.pos, const vec, float v2) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1768,18 +1771,18 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-div(const float[] {element size 8}, mut nat allocator.pos, const vec, const vec) -> (const vec) with effects allocator
+div(const float[] {element size 8}, mut nat allocator.pos, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
 2. null pointer
 3. division by zero 
 8. iteration end
-15. out of bounds
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 61. vector exceeeds buffer limits
 62. different vector sizes
+15. out of bounds
 
 ### div - vector division
 *Defined in: std/sci/vec.s*
@@ -1787,7 +1790,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-div(const new allocator, const vec, float v2) -> (const vec) with effects allocator
+div(const new allocator, const vec, float v2) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1805,7 +1808,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-div(const new allocator, const vec, const vec) -> (const vec) with effects allocator
+div(const new allocator, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -1815,8 +1818,8 @@ Potential errors:
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
-15. out of bounds
 62. different vector sizes
+15. out of bounds
 
 # mod
 ### mod - modulo by
@@ -1875,7 +1878,7 @@ gt(float x, float y) -> (bool z)
 greater than
 
 ```rust
-gt(nat x, nat y) -> (bool z)
+gt(int x, int y) -> (bool z)
 ```
 
 ### gt - Compares two numbers of the same type. This is an overload for the > operator.
@@ -1884,7 +1887,7 @@ gt(nat x, nat y) -> (bool z)
 greater than
 
 ```rust
-gt(int x, int y) -> (bool z)
+gt(nat x, nat y) -> (bool z)
 ```
 
 # le
@@ -1922,15 +1925,6 @@ le(nat x, nat y) -> (bool z)
 Compares two numbers of the same type. This is an overload for the >= operator.
 
 ```rust
-ge(float x, float y) -> (bool z)
-```
-
-### ge - greater than or equal to
-*Defined in: std/core/numbers.s*
-
-Compares two numbers of the same type. This is an overload for the >= operator.
-
-```rust
 ge(int x, int y) -> (bool z)
 ```
 
@@ -1941,6 +1935,15 @@ Compares two numbers of the same type. This is an overload for the >= operator.
 
 ```rust
 ge(nat x, nat y) -> (bool z)
+```
+
+### ge - greater than or equal to
+*Defined in: std/core/numbers.s*
+
+Compares two numbers of the same type. This is an overload for the >= operator.
+
+```rust
+ge(float x, float y) -> (bool z)
 ```
 
 # sub
@@ -1963,7 +1966,7 @@ Potential errors:
 Subtracts two numbers of the same type. This is an overload for the - operator.
 
 ```rust
-sub(int x, int y) -> (int z)
+sub(float x, float y) -> (float z)
 ```
 
 ### sub - subtract by
@@ -1972,7 +1975,7 @@ sub(int x, int y) -> (int z)
 Subtracts two numbers of the same type. This is an overload for the - operator.
 
 ```rust
-sub(float x, float y) -> (float z)
+sub(int x, int y) -> (int z)
 ```
 
 ### sub - vector subtraction
@@ -1981,24 +1984,7 @@ sub(float x, float y) -> (float z)
 Grabs an allocator for the result as an effect.
 
 ```rust
-sub(circular, float v1, const vec) -> (const vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-8. iteration end
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-61. vector exceeeds buffer limits
-15. out of bounds
-
-### sub - vector subtraction
-*Defined in: std/sci/vec.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-sub(const float[] {element size 8}, mut nat allocator.pos, float v1, const vec) -> (const vec) with effects allocator
+sub(circular, float v1, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -2015,7 +2001,24 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-sub(const new allocator, float v1, const vec) -> (const vec) with effects allocator
+sub(const float[] {element size 8}, mut nat allocator.pos, float v1, const vec) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+8. iteration end
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+61. vector exceeeds buffer limits
+15. out of bounds
+
+### sub - vector subtraction
+*Defined in: std/sci/vec.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+sub(const new allocator, float v1, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -2032,7 +2035,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-sub(circular, const vec, float v2) -> (const vec) with effects allocator
+sub(circular, const vec, float v2) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -2049,7 +2052,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-sub(circular, const vec, const vec) -> (const vec) with effects allocator
+sub(circular, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -2067,7 +2070,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-sub(const float[] {element size 8}, mut nat allocator.pos, const vec, float v2) -> (const vec) with effects allocator
+sub(const float[] {element size 8}, mut nat allocator.pos, const vec, float v2) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -2084,7 +2087,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-sub(const float[] {element size 8}, mut nat allocator.pos, const vec, const vec) -> (const vec) with effects allocator
+sub(const float[] {element size 8}, mut nat allocator.pos, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -2102,7 +2105,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-sub(const new allocator, const vec, float v2) -> (const vec) with effects allocator
+sub(const new allocator, const vec, float v2) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -2119,7 +2122,7 @@ Potential errors:
 Grabs an allocator for the result as an effect.
 
 ```rust
-sub(const new allocator, const vec, const vec) -> (const vec) with effects allocator
+sub(const new allocator, const vec, const vec) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -2216,45 +2219,6 @@ nn(const vec) -> (const vec, cstr)
 ```
 
 # print
-### print - prints a cstr
-*Defined in: std/core/print.s*
-
-```rust
-print(cstr value, cstr endl) -> ()
-```
-
-### print - print a character
-*Defined in: std/core/string.s*
-
-Ends the line too.
-
-```rust
-print(char c) -> ()
-```
-
-### print - print a character
-*Defined in: std/core/string.s*
-
-```rust
-print(char c, cstr endl) -> ()
-```
-
-### print - print a string
-*Defined in: std/core/string.s*
-
-Ends the line too.
-
-```rust
-print(const str) -> ()
-```
-
-### print - print a string
-*Defined in: std/core/string.s*
-
-```rust
-print(const str, cstr endl) -> ()
-```
-
 ### print - prints a boolean
 *Defined in: std/core/print.s*
 
@@ -2361,6 +2325,45 @@ Automatically ends the line too.
 
 ```rust
 print(cstr value) -> ()
+```
+
+### print - prints a cstr
+*Defined in: std/core/print.s*
+
+```rust
+print(cstr value, cstr endl) -> ()
+```
+
+### print - print a character
+*Defined in: std/core/string.s*
+
+Ends the line too.
+
+```rust
+print(char c) -> ()
+```
+
+### print - print a character
+*Defined in: std/core/string.s*
+
+```rust
+print(char c, cstr endl) -> ()
+```
+
+### print - print a string
+*Defined in: std/core/string.s*
+
+Ends the line too.
+
+```rust
+print(const str) -> ()
+```
+
+### print - print a string
+*Defined in: std/core/string.s*
+
+```rust
+print(const str, cstr endl) -> ()
 ```
 
 ### print - writes a cstr to a write file
@@ -2612,16 +2615,19 @@ Potential errors:
 
 8. iteration end
 
-### next
-*Defined in: std/map.s*
+### next - Computes the next random number of a Rand sequence.
+*Defined in: std/rand.s*
 
 ```rust
-next(const robinhood_str_entry[] {element size 33}, mut nat pos) -> (mut str)
+next(mut Rand) -> (float value)
 ```
-Potential errors:
 
-2. null pointer
-15. out of bounds
+### next - Computes the next random number of a Rand sequence.
+*Defined in: std/rand.s*
+
+```rust
+next(mut Rand) -> (float value)
+```
 
 ### next
 *Defined in: std/map.s*
@@ -2634,27 +2640,39 @@ Potential errors:
 2. null pointer
 15. out of bounds
 
-### next - Computes the next random number of a Rand sequence.
-*Defined in: std/rand.s*
+### next
+*Defined in: std/map.s*
 
 ```rust
-next(mut Rand) -> (float value)
+next(const robinhood_str_entry[] {element size 33}, mut nat pos) -> (mut str)
 ```
+Potential errors:
 
-### next - Computes the next random number of a Rand sequence.
-*Defined in: std/rand.s*
-
-```rust
-next(mut Rand) -> (float value)
-```
+2. null pointer
+15. out of bounds
 
 # get
-### get - a character in a string
-*Defined in: std/core/string.s*
+### get
+*Defined in: std/core/range.s*
 
 ```rust
-get(const str, nat i) -> (char ptr {follows char ptr s.unsafe_ptr})
+get(const range, nat pos) -> (nat pos)
 ```
+Potential errors:
+
+8. iteration end
+9. iterator range
+
+### get
+*Defined in: std/core/range.s*
+
+```rust
+get(const range, nat pos) -> (nat pos)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
 
 ### get - get a list element pointer
 *Defined in: std/core/array.s*
@@ -2666,6 +2684,13 @@ Potential errors:
 
 15. out of bounds
 
+### get - a character in a string
+*Defined in: std/core/string.s*
+
+```rust
+get(const str, nat i) -> (char ptr {follows char ptr s.unsafe_ptr})
+```
+
 ### get - get a pointer to a buffer element
 *Defined in: std/core/array.s*
 
@@ -2675,97 +2700,6 @@ get(const any[] {element size ?}, nat i) -> (any ptr {follows any ptr buffer.uns
 Potential errors:
 
 15. out of bounds
-
-### get
-*Defined in: std/core/range.s*
-
-```rust
-get(const range, nat pos) -> (nat pos)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-
-### get
-*Defined in: std/core/range.s*
-
-```rust
-get(const range, nat pos) -> (nat pos)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, read, nat) -> (const str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-47. not open file
-
-### get - get a hash map entry
-*Defined in: std/map.s*
-
-Implemented for string or cstr keys but buffer of any values.
-
-```rust
-get(const robinhood_nat_entry[] {element size 16}, const any[] {element size ?}, nat key) -> (any ptr {follows any ptr values.unsafe_ptr})
-```
-Potential errors:
-
-2. null pointer
-4. modulo by zero 
-5. nat subtraction would yield a negative
-54. index not found
-8. iteration end
-15. out of bounds
-
-### get - get a hash map entry
-*Defined in: std/map.s*
-
-Implemented for string or cstr keys but buffer of any values.
-
-```rust
-get(const robinhood_str_entry[] {element size 33}, const any[] {element size ?}, const str) -> (any ptr {follows any ptr values.unsafe_ptr})
-```
-Potential errors:
-
-2. null pointer
-4. modulo by zero 
-5. nat subtraction would yield a negative
-54. index not found
-8. iteration end
-15. out of bounds
-
-### get - get a hash map entry
-*Defined in: std/map.s*
-
-Implemented for string or cstr keys but buffer of any values.
-
-```rust
-get(const robinhood_str_entry[] {element size 33}, const any[] {element size ?}, cstr key) -> (any ptr {follows any ptr values.unsafe_ptr})
-```
-Potential errors:
-
-2. null pointer
-4. modulo by zero 
-5. nat subtraction would yield a negative
-8. iteration end
-15. out of bounds
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-54. index not found
 
 ### get
 *Defined in: std/io.s*
@@ -2818,7 +2752,7 @@ Potential errors:
 *Defined in: std/io.s*
 
 ```rust
-get(edit char[] {element size 1}, write, nat) -> (const str)
+get(edit char[] {element size 1}, read, nat) -> (const str)
 ```
 Potential errors:
 
@@ -3114,16 +3048,21 @@ Potential errors:
 18. string does not fit on buffer
 20. string buffer out of memory
 
-### get - reference to matrix element (i,j)
-*Defined in: std/sci/mat.s*
+### get
+*Defined in: std/io.s*
 
 ```rust
-get(const mat, nat i, nat j) -> (float ptr {follows float ptr m.unsafe_ptr})
+get(edit char[] {element size 1}, write, nat) -> (const str)
 ```
 Potential errors:
 
-67. row out of bounds
-68. column out of bounds
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+47. not open file
 
 ### get - get a vector element at given position
 *Defined in: std/sci/vec.s*
@@ -3134,6 +3073,70 @@ get(const vec, nat i) -> (float ptr {follows float ptr v.unsafe_ptr})
 Potential errors:
 
 15. out of bounds
+
+### get - get a hash map entry
+*Defined in: std/map.s*
+
+Implemented for string or cstr keys but buffer of any values.
+
+```rust
+get(const robinhood_nat_entry[] {element size 16}, const any[] {element size ?}, nat key) -> (any ptr {follows any ptr values.unsafe_ptr})
+```
+Potential errors:
+
+2. null pointer
+4. modulo by zero 
+5. nat subtraction would yield a negative
+54. index not found
+8. iteration end
+15. out of bounds
+
+### get - get a hash map entry
+*Defined in: std/map.s*
+
+Implemented for string or cstr keys but buffer of any values.
+
+```rust
+get(const robinhood_str_entry[] {element size 33}, const any[] {element size ?}, const str) -> (any ptr {follows any ptr values.unsafe_ptr})
+```
+Potential errors:
+
+2. null pointer
+4. modulo by zero 
+5. nat subtraction would yield a negative
+54. index not found
+8. iteration end
+15. out of bounds
+
+### get - get a hash map entry
+*Defined in: std/map.s*
+
+Implemented for string or cstr keys but buffer of any values.
+
+```rust
+get(const robinhood_str_entry[] {element size 33}, const any[] {element size ?}, cstr key) -> (any ptr {follows any ptr values.unsafe_ptr})
+```
+Potential errors:
+
+2. null pointer
+4. modulo by zero 
+5. nat subtraction would yield a negative
+8. iteration end
+15. out of bounds
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+54. index not found
+
+### get - reference to matrix element (i,j)
+*Defined in: std/sci/mat.s*
+
+```rust
+get(const mat, nat i, nat j) -> (float ptr {follows float ptr m.unsafe_ptr})
+```
+Potential errors:
+
+67. row out of bounds
+68. column out of bounds
 
 # KB
 ### KB - kilobytes to bytes
@@ -3182,6 +3185,21 @@ len(const vec) -> (nat v.length)
 ```
 
 # str
+### str - reads a string from the console into buf at pos, returns the read slice
+*Defined in: std/core/convertstr.s*
+
+```rust
+str(mut char[] {element size 1}, mut nat pos, const console console) -> (const str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+26. read string does not fit on buffer
+15. out of bounds
+
 ### str - declare a string on a list's char[] buffer
 *Defined in: std/core/string.s*
 
@@ -3289,21 +3307,6 @@ str(char ptr unsafe_ptr, nat pos, nat length) -> (const str)
 str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (const str)
 ```
 
-### str - reads a string from the console into buf at pos, returns the read slice
-*Defined in: std/core/convertstr.s*
-
-```rust
-str(edit char[] {element size 1}, mut nat pos, const console console) -> (const str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-26. read string does not fit on buffer
-15. out of bounds
-
 ### str - create a compact str
 *Defined in: std/mini.s*
 
@@ -3343,7 +3346,7 @@ The list may automatically resize its managed buffer to fit the new string.
 This operation therefore destabilizes memory, and the `.dat` segment of strings should be obtained.
 
 ```rust
-copy(list, cstr _other) -> (const str)
+copy(mut list, cstr _other) -> (const str)
 ```
 Potential errors:
 
@@ -3365,7 +3368,7 @@ The list may automatically resize its managed buffer to fit the new string.
 This operation therefore destabilizes memory, and the `.dat` segment of strings should be obtained.
 
 ```rust
-copy(list, const str) -> (const str)
+copy(mut list, const str) -> (const str)
 ```
 Potential errors:
 
@@ -3385,7 +3388,7 @@ The position is mutated to indicate where the string ends (e.g., to copy more st
 This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead.
 
 ```rust
-copy(edit char[] {element size 1}, mut nat pos, cstr _other) -> (const str)
+copy(mut char[] {element size 1}, mut nat pos, cstr _other) -> (const str)
 ```
 Potential errors:
 
@@ -3403,7 +3406,7 @@ The position is mutated to indicate where the string ends (e.g., to copy more st
 This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead.
 
 ```rust
-copy(edit char[] {element size 1}, mut nat pos, const str) -> (const str)
+copy(mut char[] {element size 1}, mut nat pos, const str) -> (const str)
 ```
 Potential errors:
 
@@ -3419,7 +3422,7 @@ Then, returns a string corresponding to the copied region.
 The character is automatically set to be repeated one time.
 
 ```rust
-copy(edit char[] {element size 1}, mut nat pos, char character) -> (const str)
+copy(mut char[] {element size 1}, mut nat pos, char character) -> (const str)
 ```
 Potential errors:
 
@@ -3436,7 +3439,7 @@ Copies a new character at a given buffer a number of times
 Then, returns a string corresponding to the copied region.
 
 ```rust
-copy(edit char[] {element size 1}, mut nat pos, char character, nat repeat) -> (const str)
+copy(mut char[] {element size 1}, mut nat pos, char character, nat repeat) -> (const str)
 ```
 Potential errors:
 
@@ -3485,7 +3488,7 @@ The position is mutated to indicate where the string ends (e.g., to copy more st
 This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead.
 
 ```rust
-copy_null_terminated(edit char[] {element size 1}, mut nat pos, cstr _other) -> (const str)
+copy_null_terminated(mut char[] {element size 1}, mut nat pos, cstr _other) -> (const str)
 ```
 Potential errors:
 
@@ -3503,7 +3506,7 @@ The position is mutated to indicate where the string ends (e.g., to copy more st
 This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead.
 
 ```rust
-copy_null_terminated(edit char[] {element size 1}, mut nat pos, const str) -> (const str)
+copy_null_terminated(mut char[] {element size 1}, mut nat pos, const str) -> (const str)
 ```
 Potential errors:
 
@@ -3558,7 +3561,8 @@ string buffer in any capacity
 invalidates the null termination property, so in general do not manipulate
 strings while this is used in code; use it only for its intended purposes.
 
-*Warning: This is unsafe, unless 'cstr unsafe_temp' is the last system or 'compt' call.*
+*Warning: This is unsafe, unless 'cstr unsafe_temp' is the last call before
+passing data to 'system' or 'compt'.*
 
 *Info: This is safe to run during 'compt' in that the latter will fail gracefully.*
 
@@ -3581,7 +3585,7 @@ The position starts from 0. This structure is often used in leau of pointers
 to maintain stable references within specified storage buffers.
 
 ```rust
-bufpos(edit any[] {element size ?}) -> (edit any[] {element size ?}, mut nat pos)
+bufpos(mut any[] {element size ?}) -> (mut any[] {element size ?}, mut nat pos)
 ```
 
 # strbufpos
@@ -3594,7 +3598,7 @@ at the buffer at the given position and the position then progresses to accomoda
 further string additions.
 
 ```rust
-strbufpos(edit char[] {element size 1}) -> (edit char[] {element size 1} {follows char ptr buf.unsafe_ptr}, mut nat)
+strbufpos(mut char[] {element size 1}) -> (mut char[] {element size 1} {follows char ptr buf.unsafe_ptr}, mut nat)
 ```
 
 # endpos
@@ -3904,7 +3908,7 @@ Potential errors:
 *Defined in: std/core/array.s*
 
 ```rust
-mutlast(edit any[] {element size ?}) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
+mutlast(mut any[] {element size ?}) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 ```
 Potential errors:
 
@@ -3916,7 +3920,7 @@ Potential errors:
 *Defined in: std/core/array.s*
 
 ```rust
-mutget(list, nat pos) -> (mut any ptr ret {follows any ptr l.buffer.unsafe_ptr})
+mutget(mut list, nat pos) -> (mut any ptr ret {follows any ptr l.buffer.unsafe_ptr})
 ```
 Potential errors:
 
@@ -3926,7 +3930,17 @@ Potential errors:
 *Defined in: std/core/array.s*
 
 ```rust
-mutget(edit any[] {element size ?}, nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
+mutget(mut any[] {element size ?}, nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
+```
+Potential errors:
+
+15. out of bounds
+
+### mutget - modify a vector element at given position
+*Defined in: std/sci/vec.s*
+
+```rust
+mutget(vec, nat i) -> (mut float ptr {follows float ptr v.unsafe_ptr})
 ```
 Potential errors:
 
@@ -3938,24 +3952,7 @@ Potential errors:
 Implemented for string or cstr keys but buffer of any values.
 
 ```rust
-mutget(edit robinhood_nat_entry[] {element size 16}, edit any[] {element size ?}, nat key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
-```
-Potential errors:
-
-2. null pointer
-4. modulo by zero 
-5. nat subtraction would yield a negative
-55. string buffer is full
-8. iteration end
-15. out of bounds
-
-### mutget - get a mutable hash map entry
-*Defined in: std/map.s*
-
-Implemented for string or cstr keys but buffer of any values.
-
-```rust
-mutget(edit robinhood_str_entry[] {element size 33}, edit any[] {element size ?}, const str) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+mutget(mut robinhood_nat_entry[] {element size 16}, mut any[] {element size ?}, nat key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
 ```
 Potential errors:
 
@@ -3972,7 +3969,24 @@ Potential errors:
 Implemented for string or cstr keys but buffer of any values.
 
 ```rust
-mutget(edit robinhood_str_entry[] {element size 33}, edit any[] {element size ?}, cstr key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+mutget(mut robinhood_str_entry[] {element size 33}, mut any[] {element size ?}, const str) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+```
+Potential errors:
+
+2. null pointer
+4. modulo by zero 
+5. nat subtraction would yield a negative
+55. string buffer is full
+8. iteration end
+15. out of bounds
+
+### mutget - get a mutable hash map entry
+*Defined in: std/map.s*
+
+Implemented for string or cstr keys but buffer of any values.
+
+```rust
+mutget(mut robinhood_str_entry[] {element size 33}, mut any[] {element size ?}, cstr key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
 ```
 Potential errors:
 
@@ -3989,22 +4003,12 @@ Potential errors:
 *Defined in: std/sci/mat.s*
 
 ```rust
-mutget(const mat, nat i, nat j) -> (mut float ptr {follows float ptr m.unsafe_ptr})
+mutget(mat, nat i, nat j) -> (mut float ptr {follows float ptr m.unsafe_ptr})
 ```
 Potential errors:
 
 67. row out of bounds
 68. column out of bounds
-
-### mutget - modify a vector element at given position
-*Defined in: std/sci/vec.s*
-
-```rust
-mutget(const vec, nat i) -> (mut float ptr {follows float ptr v.unsafe_ptr})
-```
-Potential errors:
-
-15. out of bounds
 
 # list
 ### list - list of buffer
@@ -4014,7 +4018,7 @@ List defined over a mutable buffer that is automatically managed and resized.
 A capacity is maintained so that resizes are not performed too frequently.
 
 ```rust
-list(edit any[] {element size ?}) -> (list)
+list(mut any[] {element size ?}) -> (list)
 ```
 Potential errors:
 
@@ -4029,7 +4033,7 @@ Potential errors:
 Grows the list and returns a mutable pointer to the newlly created last element.
 
 ```rust
-push(list) -> (mut any ptr val {follows any ptr l.buffer.unsafe_ptr})
+push(mut list) -> (mut any ptr val {follows any ptr l.buffer.unsafe_ptr})
 ```
 Potential errors:
 
@@ -4136,13 +4140,6 @@ Potential errors:
 *Defined in: std/hash.s*
 
 ```rust
-to_hash_base(nat k) -> (const bits)
-```
-
-### to\_hash\_base
-*Defined in: std/hash.s*
-
-```rust
 to_hash_base(int k) -> (const bits)
 ```
 
@@ -4171,6 +4168,13 @@ Potential errors:
 
 ```rust
 to_hash_base(const str) -> (const str)
+```
+
+### to\_hash\_base
+*Defined in: std/hash.s*
+
+```rust
+to_hash_base(nat k) -> (const bits)
 ```
 
 # robinhood\_str\_entry
@@ -4361,22 +4365,7 @@ Potential errors:
 *Defined in: std/hash.s*
 
 ```rust
-at(edit robinhood_nat_entry[] {element size 16}, nat _k) -> (mut nat)
-```
-Potential errors:
-
-2. null pointer
-4. modulo by zero 
-5. nat subtraction would yield a negative
-55. string buffer is full
-8. iteration end
-15. out of bounds
-
-### at
-*Defined in: std/hash.s*
-
-```rust
-at(edit robinhood_str_entry[] {element size 33}, cstr _k) -> (mut nat)
+at(mut robinhood_str_entry[] {element size 33}, cstr _k) -> (mut nat)
 ```
 Potential errors:
 
@@ -4393,7 +4382,22 @@ Potential errors:
 *Defined in: std/hash.s*
 
 ```rust
-at(edit robinhood_str_entry[] {element size 33}, const str) -> (mut nat)
+at(mut robinhood_str_entry[] {element size 33}, const str) -> (mut nat)
+```
+Potential errors:
+
+2. null pointer
+4. modulo by zero 
+5. nat subtraction would yield a negative
+55. string buffer is full
+8. iteration end
+15. out of bounds
+
+### at
+*Defined in: std/hash.s*
+
+```rust
+at(mut robinhood_nat_entry[] {element size 16}, nat _k) -> (mut nat)
 ```
 Potential errors:
 
@@ -4560,20 +4564,13 @@ exp(float x) -> (float z)
 ```
 
 # vec
-### vec - view a matrix as a vector
-*Defined in: std/sci/mat.s*
-
-```rust
-vec(const mat) -> (const vec)
-```
-
 ### vec - vector on an existing buffer
 *Defined in: std/sci/vec.s*
 
 Has the provided length. Can grab a circular buffer allocator as an effect, so that only the length is provided.
 
 ```rust
-vec(circular, nat length) -> (const vec) with effects allocator
+vec(circular, nat length) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -4587,7 +4584,7 @@ Potential errors:
 Has the provided length. Can grab the buffer and mutable position allocator as an effect, so that only the length is provided.
 
 ```rust
-vec(const float[] {element size 8}, mut nat allocator.pos, nat length) -> (const vec) with effects allocator
+vec(const float[] {element size 8}, mut nat allocator.pos, nat length) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
@@ -4599,7 +4596,7 @@ Potential errors:
 *Defined in: std/sci/vec.s*
 
 ```rust
-vec(edit float[] {element size 8}) -> (const vec)
+vec(edit float[] {element size 8}) -> (mut vec)
 ```
 Potential errors:
 
@@ -4612,13 +4609,20 @@ Potential errors:
 Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer.
 
 ```rust
-vec(const new allocator, nat length) -> (const vec) with effects allocator
+vec(const new allocator, nat length) -> (mut vec) with effects allocator
 ```
 Potential errors:
 
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
+
+### vec - view a matrix as a vector
+*Defined in: std/sci/mat.s*
+
+```rust
+vec(const mat) -> (mut vec)
+```
 
 # new
 ### new
@@ -4698,6 +4702,18 @@ circular(const any[] {element size ?}, mut nat pos, nat length) -> (circular)
 ```rust
 new() -> (const new)
 ```
+
+# constvec
+### constvec - treat an immutable float buffer as an immutable vector
+*Defined in: std/sci/vec.s*
+
+```rust
+constvec(const float[] {element size 8}) -> (const vec)
+```
+Potential errors:
+
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
 
 # reduce
 ### reduce - reduce a vector to one value
@@ -4823,7 +4839,7 @@ A 'type \"row\"' or 'type \"col\"' marker is needed
 to indicate the new matrix's orientation.
 
 ```rust
-mat(const vec, "col") -> (const mat)
+mat(const vec, "col") -> (mut mat)
 ```
 
 ### mat - view a vector as a matrix on the same memory
@@ -4833,14 +4849,14 @@ A 'type \"row\"' or 'type \"col\"' marker is needed
 to indicate the new matrix's orientation.
 
 ```rust
-mat(const vec, "row") -> (const mat)
+mat(const vec, "row") -> (mut mat)
 ```
 
 ### mat - matrix on a circular buffer
 *Defined in: std/sci/mat.s*
 
 ```rust
-mat(circular, nat rows, nat cols) -> (const mat) with effects allocator
+mat(circular, nat rows, nat cols) -> (mut mat) with effects allocator
 ```
 Potential errors:
 
@@ -4852,7 +4868,7 @@ Potential errors:
 *Defined in: std/sci/mat.s*
 
 ```rust
-mat(edit float[] {element size 8}, nat rows) -> (const mat)
+mat(edit float[] {element size 8}, nat rows) -> (mut mat)
 ```
 Potential errors:
 
@@ -4866,7 +4882,7 @@ Potential errors:
 *Defined in: std/sci/mat.s*
 
 ```rust
-mat(const float[] {element size 8}, mut nat allocator.pos, nat rows, nat cols) -> (const mat) with effects allocator
+mat(const float[] {element size 8}, mut nat allocator.pos, nat rows, nat cols) -> (mut mat) with effects allocator
 ```
 Potential errors:
 
@@ -4878,7 +4894,7 @@ Potential errors:
 *Defined in: std/sci/mat.s*
 
 ```rust
-mat(const new allocator, nat rows, nat cols) -> (const mat) with effects allocator
+mat(const new allocator, nat rows, nat cols) -> (mut mat) with effects allocator
 ```
 Potential errors:
 
@@ -4902,12 +4918,35 @@ rows(const mat) -> (nat m.rows)
 cols(const mat) -> (nat m.cols)
 ```
 
+# constmat
+### constmat - immutable matrix on an immutable float[] buffer
+*Defined in: std/sci/mat.s*
+
+```rust
+constmat(const float[] {element size 8}, nat rows) -> (const mat)
+```
+Potential errors:
+
+64. cannot place matrices on buffer offsets
+65. matrix exceeds buffer limits
+66. buffer size not divisible by vector rows
+3. division by zero 
+63. can only place matrices on contiguous buffers
+
+# mutvec
+### mutvec - view a matrix as a vector
+*Defined in: std/sci/mat.s*
+
+```rust
+mutvec(const mat) -> (mut vec)
+```
+
 # row
 ### row - view matrix row as a vector
 *Defined in: std/sci/mat.s*
 
 ```rust
-row(const mat, nat i) -> (const vec)
+row(const mat, nat i) -> (mut vec)
 ```
 Potential errors:
 

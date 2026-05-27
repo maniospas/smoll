@@ -190,6 +190,11 @@ class MemoryEmulator:
     def memcmp(self, addr: int, addr2: int, size: int):
         return 0 if self.contents[addr:(addr+size)] == self.contents[addr2:(addr2+size)] else 1
 
+    def as_rawstr(self, addr: int, size: int):
+        end = len(self.contents)
+        raw = self.contents[addr:min(addr + size, end)]
+        return raw.decode('latin-1').encode('unicode_escape').decode('ascii')
+
     def as_str(self, addr: int, size: int):
         try: end = self.contents.index(0, addr)
         except ValueError: end = len(self.contents)
@@ -521,6 +526,7 @@ class ImplementedType:
         self.needs_failure_mode: Optional["Token"] = None
         self.has_any_complaint = False
         self.is_buffer_of: ImplementedType|None = None
+        self.is_forced_pointer_type_of: ImplementedType|None = None
         self.used_globals: set[str] = set()
         self.dependent_implementations: list[ImplementedType] = list() # deoendent pointer TYPES
         self.dependent_assignments: dict[str, str] = dict() # e.g., dependent memory regions
@@ -733,6 +739,7 @@ class ImplementedType:
 
     def get_pointer_type(self, var: Variable) -> Optional["ImplementedType"]:
         assert isinstance(var, Variable)
+        if var.type.is_forced_pointer_type_of: return var.type.is_forced_pointer_type_of
         visited: set[str] = set()
         while True:
             ret = self._pointer_types.get(var.name, None)
@@ -812,6 +819,12 @@ class ImplementedType:
         if existing and existing._references is not None and value[0]._references!=existing._references and perform_immutability_checks:
             error_token.error("safety", "variable '"+pretty_name(existing.name.split("____")[0])+"' is an in-scope reference to '"+pretty_name(existing._references.split("____")[0])+"' and can only get assigned another reference to the same variable (this does nothing but is handy for handling tuples that contain references)")
         if existing and not existing.immutable and value[0].immutable: 
+            # if value[0].type == POINTER_TYPE:
+            #     if not any(self.get_assignment(value[0].name, [arg]) for arg in self.args):
+            #         value[0] = value[0].mutable_copy(None)
+            #     else:
+            #         value[0] = value[0].mutable_copy(error_token)
+            # else: 
             value[0] = value[0].mutable_copy(error_token)
             #error_token.error("type", "cannot overwrite mutable variable with immutable one '"+varname+"'")
         #if existing is None: # force the following two lines so that we can revoke mutability
@@ -1817,7 +1830,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
             if callee.needs_failure_mode: print("Potential errors:\n")
             else: print("No failing errors, but can catch these intercepted ones:\n")
         for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
-        if callee.returned_defers: print("\nReturned defered calls:")
+        if callee.returned_defers: print("\nReturned defers use the following:")
         for defer in callee.returned_defers: print("```rust\n"+code_summary(defer,callee)+"```")
     return callee
 
@@ -2342,9 +2355,9 @@ def create_buffer_type(name, memory_size, variation, error_token):
 
 literal_types: dict[str, UnionType] = dict()
     
-def create_literal_type(literal_tok: Token, type: ImplementedType):
+def create_literal_type(literal_tok: Token, type: ImplementedType, allow_cache=True):
     text = literal_tok.text
-    if text in literal_types: return literal_types[text]
+    if allow_cache and text in literal_types: return literal_types[text]
     ret = ImplementedType(create_temp(), at=literal_tok)
     ret.is_literal_of = type
     type_var = create_temp()
@@ -2354,7 +2367,7 @@ def create_literal_type(literal_tok: Token, type: ImplementedType):
     #ret.args.append("arg")
     uret = UnionType(ret.name, at=ret.at)
     uret.variations.append(ret)
-    literal_types[text] = uret
+    if allow_cache: literal_types[text] = uret
     return uret
 
 async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False, reduce_to_unique_variations: bool=True) -> tuple[int, File|UnionType]:
@@ -2381,40 +2394,50 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         temporary_implementation = ImplementedType("compt", at=literal_tok)
         pos, ret = await process_statement(file, tokens, pos+1, temporary_implementation, current_operator_priority=0)
         pos, ret = await process_statement_operator(file, tokens, temporary_implementation, pos, ret, current_operator_priority=0)
-        for r in ret:
+        for i in range(len(ret)):
+            r = ret[i]
+            if r.type.is_buffer_of:
+                if any(r.type.is_buffer_of.vars[r_ret].type==POINTER_TYPE for r_ret in r.type.is_buffer_of.rets):
+                    literal_tok.error("interpreter", "'compt' cannot serialize pointer indirection, like pointers within buffers in "+signature_like(ret, temporary_implementation))
             if not r.type.builtin: continue
-            if r.type not in [FLOAT_TYPE, UINT_TYPE, INT_TYPE, CSTR_TYPE, BOOL_TYPE]:
-                literal_tok.error("interpreter", "'compt' requires that float, int, nat, bool, ptr, or cstr are retrieved '"+signature_like(ret, temporary_implementation)+"' that contains '"+pretty_name(r.type.name)+"'")
+            if r.type not in [FLOAT_TYPE, UINT_TYPE, INT_TYPE, CSTR_TYPE, BOOL_TYPE, POINTER_TYPE, UINT16_TYPE, UINT32_TYPE, UINT8_TYPE]:
+                literal_tok.error("interpreter", "'compt' requires that primitives are retrieved but got '"+signature_like(ret, temporary_implementation)+"' that contains '"+pretty_name(r.type.name)+"'")
         temporary_implementation.returns(ret, literal_tok, is_safe=True)
         memory = MemoryEmulator(1024*vm_memory_kb)
-        returned_values = [0 for _ in ret]
+        returned_values = [0 for r in ret if r.type.builtin]
         temporary_implementation.defers.clear()
         returned_error = await temporary_implementation.interpret(returned_values, memory, recursion_budget=vm_recursion_budget)
         if returned_error!=0: literal_tok.error("interpreter", "failed because "+err_code_list[returned_error][1:-1])
         lits: list[ImplementedType] = list()
         has_builtins = False
-        for i, r in enumerate(ret):
+        i = 0
+        for r in ret:
             if not r.type.builtin:
-                lits.append(r)
+                lits.append(r.type)
                 continue
             has_builtins = True
             if r.type==FLOAT_TYPE: 
-                lits.append(create_literal_type(Token(str(returned_values[0]), literal_tok.file, literal_tok.row, literal_tok.col), FLOAT_TYPE))
-            elif r.type==INT_TYPE: 
-                lits.append(create_literal_type(Token(str(int(returned_values[0])), literal_tok.file, literal_tok.row, literal_tok.col), INT_TYPE))
-            elif r.type==UINT_TYPE: 
-                lits.append(create_literal_type(Token(str(int(returned_values[0])), literal_tok.file, literal_tok.row, literal_tok.col), UINT_TYPE))
+                lits.append(create_literal_type(Token(str(returned_values[i]), literal_tok.file, literal_tok.row, literal_tok.col), FLOAT_TYPE).variations[0])
+            elif r.type in [INT_TYPE, UINT_TYPE, UINT16_TYPE, UINT32_TYPE, UINT8_TYPE]: 
+                lits.append(create_literal_type(Token(str(int(returned_values[i])), literal_tok.file, literal_tok.row, literal_tok.col), r.type).variations[0])
             elif r.type==BOOL_TYPE: 
-                lits.append(create_literal_type(Token(str(int(returned_values[0])), literal_tok.file, literal_tok.row, literal_tok.col), BOOL_TYPE))
+                lits.append(create_literal_type(Token(str(int(returned_values[i])), literal_tok.file, literal_tok.row, literal_tok.col), BOOL_TYPE).variations[0])
+            elif r.type==POINTER_TYPE:
+                mem_size = memory.alloc_sizes.get(returned_values[i], None)
+                if returned_values[i]==0: literal_tok.error("interpreter", "failed because 'compt' evaluated to a null pointer value")
+                if mem_size is None: literal_tok.error("interpreter", "failed because 'compt' can not capture pointers to foreign resources (like file handles)")
+                lits.append(create_literal_type(Token("\""+memory.as_rawstr(returned_values[i], mem_size)+"\"", literal_tok.file, literal_tok.row, literal_tok.col), POINTER_TYPE, allow_cache=False).variations[0])
+                raw_type = temporary_implementation.get_pointer_type(r)
+                if raw_type and raw_type!=ANY_TYPE: lits[-1].is_literal_of.is_forced_pointer_type_of = raw_type
             else: 
-                lits.append(create_literal_type(Token("\""+memory.as_cstr(returned_values[0])+"\"", literal_tok.file, literal_tok.row, literal_tok.col), CSTR_TYPE))
-        if len(lits)==1 and has_builtins: return pos, lits[0]
+                lits.append(create_literal_type(Token("\""+memory.as_cstr(returned_values[i])+"\"", literal_tok.file, literal_tok.row, literal_tok.col), CSTR_TYPE).variations[0])
+            i += 1
         if len(lits)==0:
             return pos, smol_namespace.types["blank"]
         synthetic_type = ImplementedType(signature_like(ret, temporary_implementation), at=literal_tok)
         synthetic_type.is_literal_of = synthetic_type # self-literals mean unpacking
         for lit in lits:
-            var = Variable(create_temp(), lit.variations[0])
+            var = Variable(create_temp(), lit)
             synthetic_type.rets.append(var.name)
             synthetic_type.vars[var.name] = var
         synthetic_type_union = UnionType(synthetic_type.name, at=synthetic_type.at)
@@ -2819,10 +2842,10 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         for arg_pos, arg in enumerate(variation.args):
                             literal_method = variation.vars[arg].type
                             if literal_method.is_literal_of is None: continue # already checked
-                            if literal_method.is_literal_of==CSTR_TYPE:
+                            if literal_method.is_literal_of in [CSTR_TYPE, POINTER_TYPE]:
                                 current = literal_method.at.text
                                 tmp: str|None = global_cstr2var.get(current, None)
-                                variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE, token=op_token)
+                                variable = Variable(tmp if tmp else create_temp(), literal_method.is_literal_of, token=op_token)
                                 if tmp is None: 
                                     global_cstr2var[current] = variable.name
                                     global_var2cstr[variable.name] = current
@@ -3564,11 +3587,13 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 varsret = list()
                 for ret in literal_method.rets:
                     lit_method = literal_method.vars[ret].type
-                    if lit_method.is_literal_of==CSTR_TYPE:
+                    if lit_method.is_literal_of in [CSTR_TYPE, POINTER_TYPE]:
                         current = lit_method.at.text
-                        if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
+                        if is_lsp and current_token.file.is_main_file: 
+                            if lit_method.is_literal_of==CSTR_TYPE: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
+                            else: print_lsp_literal(call_token, "**literal**\n\nstatic pointer transferred via a char[] representation")
                         tmp: str|None = global_cstr2var.get(current, None)
-                        variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE, token=current_token)
+                        variable = Variable(tmp if tmp else create_temp(), lit_method.is_literal_of, token=current_token)
                         if tmp is None: 
                             global_cstr2var[current] = variable.name
                             global_var2cstr[variable.name] = current
@@ -4249,6 +4274,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                     impl.vars[arg_name] = Variable(arg_name, POINTER_TYPE, immutable!=0, token=start_token)
                     impl.args.append(arg_name)
                     impl.set_pointer_type(impl.vars[arg_name], arg_type)
+                    if immutable==1: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
                     continue
                 elif arg_type.builtin:
                     impl.vars[arg_name] = Variable(arg_name, arg_type, immutable!=0, token=start_token)
@@ -4256,10 +4282,19 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                     if arg_type==POINTER_TYPE: impl.set_pointer_type(impl.vars[arg_name], ANY_TYPE)
                     continue
                 prefix_len = len(longest_common_prefix(arg_type.rets))
+                used_immutable = False
                 for ret in arg_type.rets:
                     ret_name = arg_name+"__"+ret[prefix_len:]  if len(arg_type.rets)>1 else arg_name
                     impl.vars[ret_name] = arg_type.vars[ret].renamed_copy(ret_name, start_token)
-                    if immutable==0: impl.vars[ret_name] = impl.vars[ret_name].mutable_copy(tokens[pos])
+                    if immutable==0: impl.vars[ret_name] = impl.vars[ret_name].mutable_copy(tokens[pos-1])
+                    elif immutable==1:
+                        original_var = impl.vars[ret_name] 
+                        if (not impl.vars[ret_name].isprivate and not impl.vars[ret_name].immutable): #or not impl.vars[ret_name].type.builtin: 
+                            impl.vars[ret_name] = impl.vars[ret_name].mutable_copy(tokens[pos-1])
+                        else: 
+                            impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
+                            #if original_var.immutable!=impl.vars[ret_name].immutable:
+                            used_immutable = True
                     elif immutable==-1: impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
                     elif immutable==-2:
                         impl.vars[ret_name] = impl.vars[ret_name].stable_copy()
@@ -4271,6 +4306,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         #else:
                         #    dep = arg_type.follow_pointer_dependency(arg_type.vars[ret])
                         #    if dep is not None: impl.set_pointer_depedency(dep.renamed_copy(arg_name+"__"+dep.name[prefix_len:]))
+                if immutable==1 and not used_immutable: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
             found_type: UnionType|None = file.types.get(impl.name)
             already_parsed = None
             if found_type is not None:
@@ -4319,7 +4355,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                             if callee.needs_failure_mode: print("Potential errors:\n")
                             else: print("No failing errors, but can catch these intercepted ones:\n")
                         for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
-                        if callee.returned_defers: print("\nReturned defered calls:")
+                        if callee.returned_defers: print("\nReturned defers use the following:")
                         for defer in callee.returned_defers: print("```rust\n"+code_summary(defer, callee)+"```")
             except FastReturnException: 
                 assert fast_return_exception

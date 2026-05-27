@@ -23,10 +23,10 @@ def circular(mut float[] buf, mut nat|blank pos, nat|blank length)
     pos = pos+length
     return circular(buf, start, length)
 
-def vec(effect edit new allocator, nat length)
+def vec(effect new allocator, nat length)
     doc "vector on a new buffer"
     doc "Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer."
-    buf = float[].alloc length
+    buf = ref float[].alloc length
     return vec(buf.unsafe_ptr, 0, length)
 
 def vec(edit float[] buf)
@@ -34,6 +34,12 @@ def vec(edit float[] buf)
     if buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
     if buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
     return vec(buf.unsafe_ptr, 0, len buf)
+
+def constvec(float[] buf)
+    doc "treat an immutable float buffer as an immutable vector"
+    if buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
+    if buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
+    return const vec(unsafe_mut buf.unsafe_ptr, 0, len buf)
 
 def vec(effect edit vecpos allocator, nat length)
     doc "vector on an existing buffer"
@@ -84,7 +90,7 @@ def add(effect edit vec_allocator allocator, vec v1, vec|float v2)
     if v2 is vec and v1.length!=v2.length
         fail "different vector sizes"
     v = vec v1.length
-    it = range v1.length
+    it = mut range v1.length
     p1 = v1.unsafe_ptr
     while try i=next it
         v[i] = v1[i]+v2.at i

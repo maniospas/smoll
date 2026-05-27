@@ -1609,7 +1609,7 @@ on an erroneous program.
 import "std/core.s"
 
 def main()
-    buf = ref list mut char[]
+    buf = ref mut list mut char[]
     s1 = buf.copy "hello world!" # would have been invalidated if we did not use `ref`
     s2 = buf.copy "hello world!"
     print s1

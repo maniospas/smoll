@@ -4,14 +4,14 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t1310t="123";
-const char* const __t370t="\n";
+const char* const __t371t="\n";
+const char* const __t1326t="123";
 static const char* __t_all_errcodes[36] = {"noerr",
 "error",
 "null pointer",
 "division by zero ",
 "modulo by zero ",
-"id subtraction would yield a negative",
+"nat subtraction would yield a negative",
 "cannot convert negative float to id",
 "cannot convert negative int to id",
 "iteration end",
@@ -44,18 +44,18 @@ static const char* __t_all_errcodes[36] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__t826t(const char* x, const char* y, char* __t1313t) {
+static inline __attribute__((always_inline)) void eq__t826t(const char* x, const char* y, char* __t1329t) {
   char z=0;
   z=(x==y);
   goto __t_return;
   __t_return:
-  *__t1313t=z;
+  *__t1329t=z;
 }
 
-static inline __attribute__((always_inline)) void print__t385t(char value) {
-  int __t386t=0;
+static inline __attribute__((always_inline)) void print__t386t(char value) {
+  int __t387t=0;
   const char* endl=0;
-  endl=__t370t;
+  endl=__t371t;
   if(value){
   printf("%s%s","true",endl);
   }
@@ -64,10 +64,10 @@ static inline __attribute__((always_inline)) void print__t385t(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__t1309t() {
-  char __t1311t__=0;
-  eq__t826t(__t1310t,__t1310t,&__t1311t__);
-  print__t385t(__t1311t__);
+static inline __attribute__((always_inline)) void main__t1325t() {
+  char __t1327t__=0;
+  eq__t826t(__t1326t,__t1326t,&__t1327t__);
+  print__t386t(__t1327t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1309t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1325t();return 0;}

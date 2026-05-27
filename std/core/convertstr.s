@@ -68,7 +68,7 @@ def float(console)
         fail "user input was not a float"
     return number
 
-def str(edit char[] buf, mut nat pos, console console)
+def str(mut char[] buf, mut nat pos, console console)
     doc "reads a string from the console into buf at pos, returns the read slice"
     if buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
     if buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
@@ -109,7 +109,7 @@ def nat(cstr|str _s)
     s = str _s
     if 0==len s fail "invalid nat conversion from empty string"
     number = mut nat 0
-    it = range len s
+    it = mut range len s
     while try i=next it
         c = s[i]
         {builtins:bool is_digit=c>='0' && c<='9'; builtins:nat digit=c-'0';}

@@ -104,7 +104,7 @@ def neq(char x, char y)
 def copy(str|cstr _other)
     doc "copy a string to a new buffer"
     other = str _other
-    buf = char[].alloc len other
+    buf = alloc(mut char[], len other)
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     return str(buf, 0, other.dat.length, other.dat.first)
 
@@ -112,7 +112,7 @@ def copy_null_terminated(str other)
     doc "create null terminated string"
     doc "Copies a string to a new buffer while ensuring null termination."
     doc "This is mainly useful for supporting 'cstr unsafe_temp'."
-    buf = char[].alloc 1+len other
+    buf = alloc(mut char[], 1+len other)
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     {builtins:compiler:ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}
@@ -152,14 +152,14 @@ def cstr(unsafe_temp value)
     doc "or to comptime returns with the pattern 'cstr unsafe_temp string_value'."
     return value.cstr
 
-def bufpos(edit any[] buf)
+def bufpos(mut any[] buf)
     doc "a buffer and mutable position pair"
     doc "The position starts from 0. This structure is often used in leau of pointers"
     doc "to maintain stable references within specified storage buffers."
     pos = mut 0
     return (buf, pos)
 
-def strbufpos(edit char[] buf)
+def strbufpos(mut char[] buf)
     doc "bufpos specialized for char[] buffers"
     doc "This is used to indicate a pair of a character buffer and a mutable position."
     doc "It is used as a string allocator so that they new ones can be created or copied"
@@ -167,7 +167,7 @@ def strbufpos(edit char[] buf)
     doc "further string additions."
     return bufpos buf
 
-def copy(edit char[] buf, mut nat pos, char character, nat|blank repeat)
+def copy(mut char[] buf, mut nat pos, char character, nat|blank repeat)
     doc "copies a character as a string"
     doc "Copies a new character at a given buffer a number of times"
     doc "Then, returns a string corresponding to the copied region."
@@ -184,7 +184,7 @@ def endpos(const str s)
     doc "enclosing buffer."
     return s.dat.pos+s.dat.length
 
-def copy(edit char[] buf, mut nat pos, str|cstr _other)
+def copy(mut char[] buf, mut nat pos, str|cstr _other)
     doc "copy a string"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -197,7 +197,7 @@ def copy(edit char[] buf, mut nat pos, str|cstr _other)
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)
 
-def copy_null_terminated(edit char[] buf, mut nat pos, str|cstr _other)
+def copy_null_terminated(mut char[] buf, mut nat pos, str|cstr _other)
     doc "copy a string while adding null termination"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -228,7 +228,7 @@ def str(charlist li)
     doc "declare a string on a list's char[] buffer"
     return str li.buffer
 
-def copy(edit charlist li, str|cstr _other)
+def copy(mut charlist li, str|cstr _other)
     doc "copy a string"
     doc "Constructs the copy on a buffer managed by a list."
     doc "The list may automatically resize its managed buffer to fit the new string."
@@ -329,7 +329,7 @@ def nn(str value)
     doc "to print without a new line."
     return (value, "")
 
-def add(edit char[] buf, mut nat pos, str|cstr s1, str|cstr s2)
+def add(mut char[] buf, mut nat pos, str|cstr s1, str|cstr s2)
     start = pos
     copy(buf, pos, s1)
     copy(buf, pos, s2)

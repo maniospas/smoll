@@ -4,13 +4,13 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t370t="\n";
+const char* const __t371t="\n";
 static const char* __t_all_errcodes[36] = {"noerr",
 "error",
 "null pointer",
 "division by zero ",
 "modulo by zero ",
-"id subtraction would yield a negative",
+"nat subtraction would yield a negative",
 "cannot convert negative float to id",
 "cannot convert negative int to id",
 "iteration end",
@@ -43,60 +43,60 @@ static const char* __t_all_errcodes[36] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void false__t10t(int* __t1315t) {
+static inline __attribute__((always_inline)) void false__t10t(int* __t1331t) {
   int value=0;
-  *__t1315t=value;
+  *__t1331t=value;
 }
 
-static inline __attribute__((always_inline)) void not__t35t(int __t_anon0, int* __t1316t) {
-  int __t36t__=0;
-  false__t10t(&__t36t__);
+static inline __attribute__((always_inline)) void not__t36t(int __t_anon0, int* __t1332t) {
+  int __t37t__=0;
+  false__t10t(&__t37t__);
   goto __t_return;
   __t_return:
-  *__t1316t=__t36t__;
+  *__t1332t=__t37t__;
 }
 
-static inline __attribute__((always_inline)) void is_different__t93t(uint64_t x, uint64_t y, int* __t1317t) {
-  int __t94t=0;
-  int __t95t__=0;
-  not__t35t(__t94t,&__t95t__);
+static inline __attribute__((always_inline)) void is_different__t94t(uint64_t x, uint64_t y, int* __t1333t) {
+  int __t95t=0;
+  int __t96t__=0;
+  not__t36t(__t95t,&__t96t__);
   goto __t_return;
   __t_return:
-  *__t1317t=__t95t__;
+  *__t1333t=__t96t__;
 }
 
-static inline __attribute__((always_inline)) void add__t170t(uint64_t x, uint64_t y, uint64_t* __t1318t) {
-  int __t171t__=0;
+static inline __attribute__((always_inline)) void add__t171t(uint64_t x, uint64_t y, uint64_t* __t1334t) {
+  int __t172t__=0;
   uint64_t z=0;
-  is_different__t93t(x,y,&__t171t__);
+  is_different__t94t(x,y,&__t172t__);
   z=x+y;
   goto __t_return;
   __t_return:
-  *__t1318t=z;
+  *__t1334t=z;
 }
 
-static inline __attribute__((always_inline)) void print__t381t(uint64_t value) {
-  int __t382t=0;
+static inline __attribute__((always_inline)) void print__t382t(uint64_t value) {
+  int __t383t=0;
   const char* endl=0;
-  endl=__t370t;
+  endl=__t371t;
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__t1309t() {
-  uint64_t __t1310t=0;
-  uint64_t __t1311t=0;
+static inline __attribute__((always_inline)) void main__t1325t() {
+  uint64_t __t1326t=0;
+  uint64_t __t1327t=0;
   uint64_t x=0;
   uint64_t y=0;
   uint64_t z=0;
-  uint64_t __t1312t=0;
-  uint64_t __t1313t__=0;
-  __t1310t=1;
-  __t1311t=__t1310t;
-  x=__t1311t;
-  __t1312t=2;
-  x=__t1312t;
-  add__t170t(x,x,&__t1313t__);
-  print__t381t(__t1313t__);
+  uint64_t __t1328t=0;
+  uint64_t __t1329t__=0;
+  __t1326t=1;
+  __t1327t=__t1326t;
+  x=__t1327t;
+  __t1328t=2;
+  x=__t1328t;
+  add__t171t(x,x,&__t1329t__);
+  print__t382t(__t1329t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1309t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1325t();return 0;}

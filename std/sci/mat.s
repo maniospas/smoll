@@ -25,6 +25,12 @@ def mat(effect edit vecpos allocator, nat rows, nat cols)
     allocator.pos = allocator.pos+rows*cols
     return mat(allocator.buf.unsafe_ptr, start, rows, cols, cols)
 
+def constmat(float[] buf, nat rows)
+    doc "immutable matrix on an immutable float[] buffer"
+    cols = len(buf)/rows
+    if cols*rows!=len buf fail "buffer size not divisible by vector rows"
+    return const mat(buf, mut 0, rows, cols)
+
 def mat(edit float[] buf, nat rows)
     doc "matrix on an existing float[] buffer"
     cols = len(buf)/rows
@@ -68,6 +74,10 @@ def mat(vec v, "row"|"col" orientation)
 def vec(mat m)
     doc "view a matrix as a vector"
     return vec(m.unsafe_ptr, m.pos, m.rows*m.cols)
+
+def mutvec(mat m)
+    doc "view a matrix as a vector"
+    return unsafe_mut vec(m.unsafe_ptr, m.pos, m.rows*m.cols)
 
 def row(mat m, nat i)
     doc "view matrix row as a vector"

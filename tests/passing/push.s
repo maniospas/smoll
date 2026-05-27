@@ -1,7 +1,7 @@
 import "std/core.s"
 
 def main()
-    li = ref list float[]
+    li = mut list ref mut float[]
     (push li) << 0.1
     (push li) << 0.1
     (push li) << 0.1

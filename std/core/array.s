@@ -59,7 +59,7 @@ def alloc(edit any[] buffer, nat|blank size)
 def alloc(nat size)
     return alloc(edit char[], size)
 
-def resize(mut any[] buffer, nat size)
+def resize(edit any[] buffer, nat size)
     doc "resize the buffer"
     doc "This does nothing if the previous size is the same or less, frees the buffer if new size is zero."
     doc "If old size was zero, an error is created instead of allocating so that this does not leak"
@@ -81,12 +81,12 @@ def last(any[] buffer)
     if 0==buffer.unsafe_size fail "out of bounds"
     unsafe_return buffer.unsafe_ptr.unsafe:add((buffer.unsafe_size-1)*buffer.unsafe_align.nat())
 
-def mutlast(mut any[] buffer)
+def mutlast(edit any[] buffer)
     doc "get a mutable pointer to the last buffer element"
     if 0==buffer.unsafe_size fail "out of bounds"
     unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe:add((buffer.unsafe_size-1)*buffer.unsafe_align.nat())
     
-def mutget(mut any[] buffer, nat i)
+def mutget(edit any[] buffer, nat i)
     doc "get a mutable pointer to a buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
     unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe:add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
@@ -113,13 +113,13 @@ def get(list l, nat pos)
     if pos>=l.length fail "out of bounds"
     unsafe_return get(l.buffer,pos)
 
-def mutget(mut list l, nat pos)
+def mutget(edit list l, nat pos)
     doc "get a mutable list element pointer"
     if pos>=l.length fail "out of bounds"
     ret = l.buffer.mutget pos
     unsafe_return ret
 
-def push(mut list l)
+def push(edit list l)
     doc "get a mutable pointer to a new list element"
     doc "Grows the list and returns a mutable pointer to the newlly created last element."
     prev_length = l.length

@@ -4,8 +4,8 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
+const char* const __t1322t="123";
 const char* const __t371t="\n";
-const char* const __t1326t="123";
 static const char* __t_all_errcodes[36] = {"noerr",
 "error",
 "null pointer",
@@ -44,12 +44,12 @@ static const char* __t_all_errcodes[36] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__t826t(const char* x, const char* y, char* __t1329t) {
+static inline __attribute__((always_inline)) void eq__t822t(const char* x, const char* y, char* __t1325t) {
   char z=0;
   z=(x==y);
   goto __t_return;
   __t_return:
-  *__t1329t=z;
+  *__t1325t=z;
 }
 
 static inline __attribute__((always_inline)) void print__t386t(char value) {
@@ -64,10 +64,10 @@ static inline __attribute__((always_inline)) void print__t386t(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__t1325t() {
-  char __t1327t__=0;
-  eq__t826t(__t1326t,__t1326t,&__t1327t__);
-  print__t386t(__t1327t__);
+static inline __attribute__((always_inline)) void main__t1321t() {
+  char __t1323t__=0;
+  eq__t822t(__t1322t,__t1322t,&__t1323t__);
+  print__t386t(__t1323t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1325t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1321t();return 0;}

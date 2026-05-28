@@ -1,7 +1,7 @@
 import "std/core.s"
 
 def test1()
-    x = (mut float[]).alloc 1
+    x = mut float[].alloc 1
     x[0] = 1.0
     y = float[]
     return x

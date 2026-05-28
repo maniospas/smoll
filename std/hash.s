@@ -70,7 +70,7 @@ def find(robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
             return idx
     fail "index not found"
 
-def at(mut robinhood_entry[] data, cstr|str|nat _k)
+def at(edit robinhood_entry[] data, cstr|str|nat _k)
     k = unsafe_mut raw _k
     if is_zero k
         return 0

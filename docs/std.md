@@ -1151,7 +1151,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1226,7 +1226,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1250,7 +1250,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1353,7 +1353,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1446,7 +1446,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1470,7 +1470,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1533,7 +1533,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1599,7 +1599,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1665,7 +1665,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1765,7 +1765,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1863,7 +1863,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -1888,7 +1888,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -2102,7 +2102,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -2195,7 +2195,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -2219,7 +2219,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -3556,7 +3556,7 @@ Potential errors:
 15. out of bounds
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -3576,7 +3576,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -3634,7 +3634,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -3686,7 +3686,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -3939,7 +3939,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -3964,7 +3964,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -3988,7 +3988,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -4159,7 +4159,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -4563,7 +4563,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -4585,7 +4585,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -4768,7 +4768,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()
@@ -5059,7 +5059,7 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 
 
-Returned values defer usage of the following functions:
+Returned values defer use of the following functions:
 ```rust
 exists(any ptr x) -> (bool z)
 free(mut any ptr allocated) -> ()

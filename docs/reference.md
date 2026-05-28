@@ -817,7 +817,7 @@ def main()
     allocator = bufpos float[].alloc 128
     v = v+ones
     print v[0] # prints 6.0
-    print v[0] # prints 11.0
+    print v[1] # prints 11.0
 ```
 
 Lastly, leverage this mechanism to run code during compilations, like below.
@@ -1657,7 +1657,7 @@ import "std/core.s"
 import "std/map.s"
 
 def main()
-    map = strmap str[].alloc 128
+    map = mut strmap str[].alloc 128
     map["hello"] = str "hello world!"
     map["manio"] = str "it's a me, manio."
     print map["hello"]

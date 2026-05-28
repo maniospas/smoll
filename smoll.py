@@ -1838,7 +1838,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
             if callee.needs_failure_mode: print("Potential errors:\n")
             else: print("No failing errors, but can catch these intercepted ones:\n")
         for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
-        if callee.returned_defers: print("\nReturned values defer usage of the following functions:")
+        if callee.returned_defers: print("\nReturned values defer use of the following functions:")
         for defer in callee.returned_defers: print("```rust\n"+code_summary(defer,callee)+"```")
     return callee
 
@@ -2847,7 +2847,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         for arg_pos, arg in enumerate(variation.args):
                             literal_method = variation.vars[arg].type
                             if literal_method.is_literal_of is None: continue # already checked
-                            if literal_method.is_literal_of in CSTR_TYPE or literal_method.is_forced_pointer_type_of:
+                            if literal_method.is_literal_of==CSTR_TYPE or literal_method.is_forced_pointer_type_of:
                                 current = literal_method.at.text
                                 tmp: str|None = global_cstr2var.get(current, None)
                                 ptr_type = literal_method.is_forced_pointer_type_of
@@ -4364,7 +4364,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                             if callee.needs_failure_mode: print("Potential errors:\n")
                             else: print("No failing errors, but can catch these intercepted ones:\n")
                         for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
-                        if callee.returned_defers: print("\nReturned values defer usage of the following functions:")
+                        if callee.returned_defers: print("\nReturned values defer use of the following functions:")
                         for defer in callee.returned_defers: print("```rust\n"+code_summary(defer, callee)+"```")
             except FastReturnException: 
                 assert fast_return_exception
@@ -5030,7 +5030,7 @@ async def main():
                         else: docs_file.write("No failing errors, but can catch these intercepted ones:\n\n")
                     for code in spawned_error_codes: docs_file.write(str(code)+". "+err_code_list[code][1:-1]+"\n")
                     docs_file.write("\n")
-                    if callee.returned_defers: docs_file.write("\nReturned values defer usage of the following functions:\n")
+                    if callee.returned_defers: docs_file.write("\nReturned values defer use of the following functions:\n")
                     for defer in callee.returned_defers: docs_file.write("```rust\n"+code_summary(defer, callee)+"```\n")
     elif not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)

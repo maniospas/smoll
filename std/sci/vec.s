@@ -10,7 +10,7 @@ def circular(any[] buf, mut nat pos, nat length)
 def vecpos(edit float[] buf, mut nat pos)
 def vec_allocator = new|vecpos|circular
 
-def circular(mut float[] buf, mut nat|blank pos, nat|blank length)
+def circular(edit float[] buf, mut nat|blank pos, nat|blank length)
     doc "circular buffer"
     doc "Is used as allocator"
     if pos is nat and length is nat

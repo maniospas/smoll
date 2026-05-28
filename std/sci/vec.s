@@ -7,7 +7,7 @@ def new()
 
 def circular(any[] buf, mut nat pos, nat length)
     return class(buf, pos, length)
-def vecpos(float[] buf, mut nat pos)
+def vecpos(edit float[] buf, mut nat pos)
 def vec_allocator = new|vecpos|circular
 
 def circular(mut float[] buf, mut nat|blank pos, nat|blank length)

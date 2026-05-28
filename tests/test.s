@@ -1,10 +1,9 @@
 import "std/core.s"
 import "std/sci.s"
 
+def ones = compt vec [1.0, 1.0]
 def main()
-    v = compt mat [
-        2.0, 2.0, 
-        34.0, 1.0
-    ].any 2
-    print v[0,0]
-    #v[0,0] = 1.0
+    v = mut vec [5.0, 10.0]
+    allocator = bufpos float[].alloc 128
+    v = v+ones
+    print v[0]

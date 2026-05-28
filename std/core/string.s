@@ -152,10 +152,10 @@ def cstr(unsafe_temp value)
     doc "or to comptime returns with the pattern 'cstr unsafe_temp string_value'."
     return value.cstr
 
-def bufpos(mut any[] buf)
+def bufpos(edit any[] buf)
     doc "a buffer and mutable position pair"
-    doc "The position starts from 0. This structure is often used in leau of pointers"
-    doc "to maintain stable references within specified storage buffers."
+    doc "The position starts from 0. This structure is often used"
+    doc "to maintain stable references within the buffer."
     pos = mut 0
     return (buf, pos)
 

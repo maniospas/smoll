@@ -44,22 +44,17 @@ def alloc(edit any[] buffer, nat|blank size)
         doc "This version allocates a buffer of ONE element, which can be used for stable indirection."
         size = 1
     defer
-        if exists buffer.unsafe_ptr
-            ptr = buffer.unsafe_ptr
-            buffer.unsafe_ptr.unsafe:free()
+        if exists buffer.unsafe_ptr buffer.unsafe_ptr.unsafe:free()
     if buffer.unsafe_size==size
-        if size!=0
-            buffer.unsafe_ptr.unsafe:zero(0, buffer.unsafe_align.nat()*size)
-        return mut buffer
-    if buffer.unsafe_size!=0
-        fail "cannot resize buffers with alloc; it promises no data reallocation"
+        if size!=0 buffer.unsafe_ptr.unsafe:zero(0, buffer.unsafe_align.nat()*size)
+        return buffer
+    if buffer.unsafe_size!=0 fail "cannot resize buffers with alloc; it promises no data reallocation"
     bytes = buffer.unsafe_align.nat()*size
-    if bytes==0
-        fail "cannot allocate a buffer of unsized type"
+    if bytes==0 fail "cannot allocate a buffer of unsized type"
     buffer.unsafe_size = size
     buffer.unsafe_ptr = unsafe_mut unsafe:alloc(bytes)
     buffer.unsafe_ptr.unsafe:zero(0, bytes)
-    return mut buffer
+    return buffer
 
 def alloc(nat size)
     return alloc(edit char[], size)

@@ -29,7 +29,7 @@ def constmat(float[] buf, nat rows)
     doc "immutable matrix on an immutable float[] buffer"
     cols = len(buf)/rows
     if cols*rows!=len buf fail "buffer size not divisible by vector rows"
-    return const mat(buf, mut 0, rows, cols)
+    return const mat(unsafe_mut buf, mut 0, rows, cols)
 
 def mat(edit float[] buf, nat rows)
     doc "matrix on an existing float[] buffer"

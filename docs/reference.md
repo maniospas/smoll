@@ -287,7 +287,8 @@ def main()
     print(t.x) 
 ```
 
-You can strip away any mutation capabilities by use `const` like `mut`.
+Strip away any mutation capabilities by using `const` like `mut`.
+
 ```python
 import "std/core.s"
 
@@ -341,9 +342,9 @@ import "std/core.s"
 
 def main()
     x = 1.0-2.0
-    if x<0
-        print "x is negative\n"
-    print "done\n"
+    if x<0.0
+        print "x is negative"
+    print "done"
 ```
 
 You can have one-liners for conditions and loops,
@@ -365,9 +366,8 @@ import "std/core.s"
 def main()
     x = 1.0-2.0
     if x<0.0 sgn = "-" else sgn = "+"
-    print "sign is: "
+    print nn "sign is: "
     print sgn
-    print "\n"
 ```
 
 Loops are similar to conditions, but execute multiple
@@ -384,7 +384,7 @@ def main()
         if i==5 
             break # stop this way
         if i==3
-            i = i+1 # skip printing in 
+            i = i+1 # skip printing 3 
             continue 
         print i
         i = i+1
@@ -456,8 +456,7 @@ at tests/test.s line 5 column 12
 </code>
 </div>
 
-Before moving forward, it must be mentioned that
-smoλ's type system is deliberately
+Smoλ's type system is deliberately
 simplified so that programs *can be read sequentially*
 and *resolve types in finite time*. Recursion is too
 convenient to disallow fully, so explicit recursive declarations
@@ -490,14 +489,16 @@ def call_fib(nat n)
     return fib(n)
 
 def main()
-    print fib(10)
+    print fib(10) # prints 89
 ```
 
 
-A simple trick to declare return types without affecting your logic is
-to guard them within false conditions, like below. Why this is not 
-meaningless is discussed much later in the advanced section about
-[bounded compute](#bounded-compute).
+But sometimes we really need unbounded recursion, right?
+A simple trick is to declare returns that never run, like below. 
+Why returns that "never" run are useful in edge cases 
+will be discussed later, in the [bounded compute](#bounded-compute) 
+section. For now, just it suffices to say that "never" does not actually
+mean never.
 
 ```python
 import "std/core.s"
@@ -528,7 +529,8 @@ for interweaving a superset of C that interacts with smoll
 will be added in the future.
 
 ```python
-import "std/core.s"
+import "builtins"
+import "std/core.s":print
 
 def unsafe_add(float x, float|int y)
     {builtins:float z=x+y;}
@@ -545,6 +547,7 @@ An example follows.
 
 ```python
 import "builtins"
+import "std/core.s":print
 
 def Number = float|int|nat
 def unsafe_add(Number x, Number y)
@@ -706,10 +709,10 @@ import "std/core.s"
 
 def typed_print(nat|int|float|cstr value) 
     if value is nat|int|float
-        print("this is a number:")
+        print nn "this is a number: "
     else
-        print("this is a string:")
-    print(value)
+        print nn "this is a string: "
+    print value
 
 def main()
     typed_print 1
@@ -793,7 +796,28 @@ import "std/core.s"
 def CONSTANT = compt cstr unsafe_temp add(bufpos alloc 128, "hello", " world!")
 def main()
     print CONSTANT
-    print CONSTANT=="hello world!" # 'true' even if thecomparison of cstr is done via pointers
+    print CONSTANT=="hello world!" # 'true'
+    # the above check is correct even if the
+    # comparison of cstr is done via pointers
+```
+
+Even simple memory layouts (that do not nest pointer indirection) can 
+be ported from `compt` as constants. An example using vector operations
+is shown below. See more about [vectors](#vectors) later; for now it
+is important to see that a constant data segment is ported over to 
+runtime.
+
+```python
+import "std/core.s"
+import "std/sci.s"
+
+def ones = compt vec [1.0, 1.0]
+def main()
+    v = mut vec [5.0, 10.0]
+    allocator = bufpos float[].alloc 128
+    v = v+ones
+    print v[0] # prints 6.0
+    print v[0] # prints 11.0
 ```
 
 Lastly, leverage this mechanism to run code during compilations, like below.
@@ -1516,7 +1540,7 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
 ```python
 import "std/core.s"
 
-rec wooo(effect range recursion_safety, nat i)
+rec wooo(effect edit range recursion_safety, nat i)
     next recursion_safety
     if false return blank() # do not return anything
     return wooo(i+1)

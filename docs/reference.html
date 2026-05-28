@@ -462,7 +462,7 @@ be able to overwrite the immutable <code>t.y</code> field by itself.</p>
 </code></pre>
 </div>
 
-<p>You can strip away any mutation capabilities by use <code>const</code> like <code>mut</code>.</p>
+<p>Strip away any mutation capabilities by using <code>const</code> like <code>mut</code>.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -518,9 +518,9 @@ be prematurely terminated with <code>break</code> or skipped with
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
-    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mi">0</span>
-        <span class="nb">print</span> <span class="s2">&quot;x is negative</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="nb">print</span> <span class="s2">&quot;done</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mf">0.0</span>
+        <span class="nb">print</span> <span class="s2">&quot;x is negative&quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;done&quot;</span>
 </code></pre>
 </div>
 
@@ -544,9 +544,8 @@ like the following versions.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mf">0.0</span> <span class="n">sgn</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span> <span class="k">else</span> <span class="n">sgn</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
-    <span class="nb">print</span> <span class="s2">&quot;sign is: &quot;</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;sign is: &quot;</span>
     <span class="nb">print</span> <span class="n">sgn</span>
-    <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
 </code></pre>
 </div>
 
@@ -564,7 +563,7 @@ Here is a simple example. Please do not write code like this.</p>
         <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">5</span> 
             <span class="k">break</span> <span class="c1"># stop this way</span>
         <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">3</span>
-            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># skip printing in </span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># skip printing 3 </span>
             <span class="k">continue</span> 
         <span class="nb">print</span> <span class="n">i</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
@@ -640,8 +639,7 @@ at tests/test.s line 5 column 12
 </code>
 </div>
 
-<p>Before moving forward, it must be mentioned that
-smoλ&#8217;s type system is deliberately
+<p>Smoλ&#8217;s type system is deliberately
 simplified so that programs <em>can be read sequentially</em>
 and <em>resolve types in finite time</em>. Recursion is too
 convenient to disallow fully, so explicit recursive declarations
@@ -673,14 +671,16 @@ as recursive.</p>
     <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="nb">print</span> <span class="n">fib</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">fib</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># prints 89</span>
 </code></pre>
 </div>
 
-<p>A simple trick to declare return types without affecting your logic is
-to guard them within false conditions, like below. Why this is not 
-meaningless is discussed much later in the advanced section about
-<a href="#bounded-compute">bounded compute</a>.</p>
+<p>But sometimes we really need unbounded recursion, right?
+A simple trick is to declare returns that never run, like below. 
+Why returns that &#8220;never&#8221; run are useful in edge cases 
+will be discussed later, in the <a href="#bounded-compute">bounded compute</a> 
+section. For now, just it suffices to say that &#8220;never&#8221; does not actually
+mean never.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -712,7 +712,8 @@ for interweaving a superset of C that interacts with smoll
 will be added in the future.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">:</span><span class="nb">print</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span> <span class="n">y</span><span class="p">)</span>
     <span class="p">{</span><span class="n">builtins</span><span class="p">:</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
@@ -730,6 +731,7 @@ An example follows.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">:</span><span class="nb">print</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Number</span> <span class="o">=</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="n">Number</span> <span class="n">x</span><span class="p">,</span> <span class="n">Number</span> <span class="n">y</span><span class="p">)</span>
@@ -896,10 +898,10 @@ as the standard library&#8217;s core. Below is an example of a conditional check
 
 <span class="k">def</span><span class="w"> </span><span class="nf">typed_print</span><span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="o">|</span><span class="n">cstr</span> <span class="n">value</span><span class="p">)</span> 
     <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">nat</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this is a number:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;this is a number: &quot;</span>
     <span class="k">else</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this is a string:&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;this is a string: &quot;</span>
+    <span class="nb">print</span> <span class="n">value</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">typed_print</span> <span class="mi">1</span>
@@ -989,7 +991,29 @@ we could not just pack a <code>str</code>.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">CONSTANT</span> <span class="o">=</span> <span class="n">compt</span> <span class="n">cstr</span> <span class="n">unsafe_temp</span> <span class="n">add</span><span class="p">(</span><span class="n">bufpos</span> <span class="n">alloc</span> <span class="mi">128</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot; world!&quot;</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="nb">print</span> <span class="n">CONSTANT</span>
-    <span class="nb">print</span> <span class="n">CONSTANT</span><span class="o">==</span><span class="s2">&quot;hello world!&quot;</span> <span class="c1"># &#39;true&#39; even if thecomparison of cstr is done via pointers</span>
+    <span class="nb">print</span> <span class="n">CONSTANT</span><span class="o">==</span><span class="s2">&quot;hello world!&quot;</span> <span class="c1"># &#39;true&#39;</span>
+    <span class="c1"># the above check is correct even if the</span>
+    <span class="c1"># comparison of cstr is done via pointers</span>
+</code></pre>
+</div>
+
+<p>Even simple memory layouts (that do not nest pointer indirection) can 
+be ported from <code>compt</code> as constants. An example using vector operations
+is shown below. See more about <a href="#vectors">vectors</a> later; for now it
+is important to see that a constant data segment is ported over to 
+runtime.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">ones</span> <span class="o">=</span> <span class="n">compt</span> <span class="n">vec</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">vec</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]</span>
+    <span class="n">allocator</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">+</span><span class="n">ones</span>
+    <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># prints 6.0</span>
+    <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># prints 11.0</span>
 </code></pre>
 </div>
 
@@ -1731,7 +1755,7 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">effect</span> <span class="nb">range</span> <span class="n">recursion_safety</span><span class="p">,</span> <span class="n">nat</span> <span class="n">i</span><span class="p">)</span>
+<span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="nb">range</span> <span class="n">recursion_safety</span><span class="p">,</span> <span class="n">nat</span> <span class="n">i</span><span class="p">)</span>
     <span class="nb">next</span> <span class="n">recursion_safety</span>
     <span class="k">if</span> <span class="n">false</span> <span class="k">return</span> <span class="n">blank</span><span class="p">()</span> <span class="c1"># do not return anything</span>
     <span class="k">return</span> <span class="n">wooo</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>

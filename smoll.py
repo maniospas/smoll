@@ -416,6 +416,7 @@ class Variable(CodeSegment):
     def private_copy(self): return Variable(self.name, self.type, self.immutable, True, self._references, self.token)
     def is_same(self, other: "Variable"):
         if self.type!=other.type: return False
+        if self.type.is_buffer_of!=other.type.is_buffer_of: return False
         if self.immutable!=other.immutable: return False
         if self.isprivate!=other.isprivate: return False
         #if self.type.builtin and self.name!=other.name: return False # skip name matching
@@ -455,7 +456,7 @@ def signature_like(vars: list[Variable], impl=None):
             i += len(type.rets)
         elif type.is_buffer_of: 
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
-            elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "const "
+            elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): pass#ret += "const "
             elif any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "edit "
             element_size = type.is_buffer_of.memory_size()
             ret += type.is_buffer_of.name+"[]"+arg_name+" {element size "+(str(element_size) if element_size else "?")+"}"
@@ -465,7 +466,7 @@ def signature_like(vars: list[Variable], impl=None):
             i += len(type.rets)
         else:
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
-            elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "const "
+            elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): pass#ret += "const "
             ret += type.name+arg_name
             i += len(type.rets)
         assert len(type.rets)
@@ -1753,12 +1754,15 @@ def match_structure_with(x: ImplementedType, y: ImplementedType):
     for rx,ry in zip(x.rets, y.rets):
         if x.vars[rx].type!=y.vars[ry].type: return False
         if x.vars[rx].immutable and not y.vars[ry].immutable: return False
+        if x.vars[rx].type.is_buffer_of!=y.vars[ry].type.is_buffer_of: return False
         #if x.vars[rx].isprivate!=y.vars[ry].isprivate: return False
     return True
 
 def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_vars: list[Variable], error_token: Token) -> ImplementedType:
     available_types: list[ImplementedType] = list()
+    alternative_list: list[ImplementedType] = list()
     for variation in method.variations:
+        if variation in available_types: continue
         if len(argument_vars)<len(variation.args):
             vars: list[Variable] = list()
             for effect_var in variation.effect_names: 
@@ -1768,6 +1772,10 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
             vars.extend(argument_vars)
         else: vars = argument_vars
         if len(variation.args)!=len(vars): continue
+
+        # most signature mistakes will be from mutablity or simple type errors, so have a preferred list for quickly resolving such issues
+        if not variation in alternative_list: alternative_list.append(variation)
+
         is_available = True
         for i in range(len(vars)):
             # we can allow lowering buffers to generic any
@@ -1780,6 +1788,8 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
                 buffer2 = variation.vars[variation.args[i]].type.is_buffer_of
                 if buffer1 is not None and buffer2 is not None and match_structure_with(buffer1, buffer2):
                     is_available = True
+                if buffer2 is None and buffer2 is not None:
+                    is_available = False
                 if not is_available: break
             if not variation.vars[variation.args[i]].immutable and vars[i].immutable:
                 is_available = False
@@ -1799,10 +1809,8 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
 
         if is_available: available_types.append(variation)
     if len(available_types)==0:
-        # has_defs = False
-        # for i, tok in enumerate(file.tokens):
-        #     if tok.text=="def" and peek_text(tokens, i+1)==method.name
-        error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature() for t in method.variations])
+        if not alternative_list: alternative_list = method.variations
+        error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature() for t in alternative_list])#+([] if alternative_list==method.variations else ["or one of "+str(len(method.variations)-len(alternative_list))+" overloads"]))
     if len(available_types)>1:
         error_token.error("type", "more than one conflicting call '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature()+(" defined in "+t.at.file.path if t.at else " from compiler definitions") for t in available_types])
 
@@ -2310,7 +2318,7 @@ def find_unique_variations(variations: list[ImplementedType]):
             is_same = len(variation.rets)==len(impl.rets)
             if is_same:
                 for variation_arg, impl_arg in zip(variation.rets, impl.rets):
-                    if variation.vars[variation_arg].type!=impl.vars[impl_arg].type:
+                    if variation.vars[variation_arg].type!=impl.vars[impl_arg].type:# or variation.vars[variation_arg].type.is_buffer_of!=impl.vars[impl_arg].type.is_buffer_of:
                         is_same = False
             if is_same:
                 already_parsed = True
@@ -2327,12 +2335,8 @@ def create_buffer_type(name, memory_size, variation, error_token):
     i = 0
     while i<len(variation.rets):
         varg = variation.rets[i]
-        # if variation.vars[varg].type.is_buffer_of:
-        #      i += 4
-        #      continue
         if variation.vars[varg].type == POINTER_TYPE:
             actual_variation.invalidated_by = POINTER_TYPE
-            #error_token.error("safety", "cannot place a pointer '"+pretty_name(varg)+"' onto a buffer", reason=variation.at)
         i += 1
     actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=True, isprivate=False)
     actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
@@ -2355,7 +2359,7 @@ def create_buffer_type(name, memory_size, variation, error_token):
 
 literal_types: dict[str, UnionType] = dict()
     
-def create_literal_type(literal_tok: Token, type: ImplementedType, allow_cache=True):
+def create_literal_type(literal_tok: Token, type: ImplementedType, allow_cache: bool=True):
     text = literal_tok.text
     if allow_cache and text in literal_types: return literal_types[text]
     ret = ImplementedType(create_temp(), at=literal_tok)
@@ -2428,7 +2432,8 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 if mem_size is None: literal_tok.error("interpreter", "failed because 'compt' can not capture pointers to foreign resources (like file handles)")
                 lits.append(create_literal_type(Token("\""+memory.as_rawstr(returned_values[i], mem_size)+"\"", literal_tok.file, literal_tok.row, literal_tok.col), POINTER_TYPE, allow_cache=False).variations[0])
                 raw_type = temporary_implementation.get_pointer_type(r)
-                if raw_type and raw_type!=ANY_TYPE: lits[-1].is_literal_of.is_forced_pointer_type_of = raw_type
+                if raw_type and raw_type!=ANY_TYPE: lits[-1].is_forced_pointer_type_of = raw_type
+                else: lits[-1].is_forced_pointer_type_of = ANY_TYPE
             else: 
                 lits.append(create_literal_type(Token("\""+memory.as_cstr(returned_values[i])+"\"", literal_tok.file, literal_tok.row, literal_tok.col), CSTR_TYPE).variations[0])
             i += 1
@@ -2842,15 +2847,17 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         for arg_pos, arg in enumerate(variation.args):
                             literal_method = variation.vars[arg].type
                             if literal_method.is_literal_of is None: continue # already checked
-                            if literal_method.is_literal_of in [CSTR_TYPE, POINTER_TYPE]:
+                            if literal_method.is_literal_of in CSTR_TYPE or literal_method.is_forced_pointer_type_of:
                                 current = literal_method.at.text
                                 tmp: str|None = global_cstr2var.get(current, None)
-                                variable = Variable(tmp if tmp else create_temp(), literal_method.is_literal_of, token=op_token)
+                                ptr_type = literal_method.is_forced_pointer_type_of
+                                variable = Variable(tmp if tmp else create_temp(), POINTER_TYPE if ptr_type else literal_method.is_literal_of, token=op_token)
                                 if tmp is None: 
                                     global_cstr2var[current] = variable.name
                                     global_var2cstr[variable.name] = current
                                 impl.vars[variable.name] = variable
                                 impl.used_globals.add(variable.name)
+                                if ptr_type: impl.set_pointer_type(variable, ptr_type)
                             else:
                                 variable = Variable(create_temp(), literal_method.is_literal_of, token=op_token)
                                 impl.vars[variable.name] = variable
@@ -3587,18 +3594,20 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 varsret = list()
                 for ret in literal_method.rets:
                     lit_method = literal_method.vars[ret].type
-                    if lit_method.is_literal_of in [CSTR_TYPE, POINTER_TYPE]:
+                    if lit_method.is_literal_of==CSTR_TYPE or (literal_method.is_literal_of and literal_method.is_forced_pointer_type_of):
                         current = lit_method.at.text
                         if is_lsp and current_token.file.is_main_file: 
                             if lit_method.is_literal_of==CSTR_TYPE: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
                             else: print_lsp_literal(call_token, "**literal**\n\nstatic pointer transferred via a char[] representation")
                         tmp: str|None = global_cstr2var.get(current, None)
-                        variable = Variable(tmp if tmp else create_temp(), lit_method.is_literal_of, token=current_token)
+                        ptr_type = literal_method.is_forced_pointer_type_of
+                        variable = Variable(tmp if tmp else create_temp(), POINTER_TYPE if ptr_type else lit_method.is_literal_of, token=current_token)
                         if tmp is None: 
                             global_cstr2var[current] = variable.name
                             global_var2cstr[variable.name] = current
                         impl.vars[variable.name] = variable
                         impl.used_globals.add(variable.name)
+                        if ptr_type: impl.set_pointer_type(variable, ptr_type)
                         varsret.append(variable)
                     elif lit_method.is_literal_of:
                         variable = Variable(create_temp(), lit_method.is_literal_of, token=current_token)

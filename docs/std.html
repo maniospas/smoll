@@ -373,10 +373,10 @@ or to comptime returns with the pattern &#8216;cstr unsafe<em>temp string</em>va
 
 <p><em>Defined in: std/core/convert.s</em></p>
 
-<p>Serves as a tautology function for code that parses on multiple number types.</p>
+<p>May lose information due to truncating.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">int</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">int</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -384,10 +384,10 @@ or to comptime returns with the pattern &#8216;cstr unsafe<em>temp string</em>va
 
 <p><em>Defined in: std/core/convert.s</em></p>
 
-<p>May lose information due to truncating.</p>
+<p>Serves as a tautology function for code that parses on multiple number types.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">int</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">int</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -446,26 +446,6 @@ or to comptime returns with the pattern &#8216;cstr unsafe<em>temp string</em>va
 </ol>
 
 <h1 id="nat">nat</h1>
-
-<h3 id="nat-an-unsigned-integer-value">nat - an unsigned integer value</h3>
-
-<p><em>Defined by the compiler</em></p>
-
-<p>Represents values in the range <code>0 to 2^64-1</code>.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">nat</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="nat-2">nat</h3>
-
-<p><em>Defined in: std/core/array.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">nat</span><span class="p">(</span><span class="n">nat16</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
-</code></pre>
-</div>
 
 <h3 id="nat-cast-to-nat">nat - cast to nat</h3>
 
@@ -538,6 +518,17 @@ its bit representation interpreted as an unsigned number.</p>
 <li>cannot convert negative float to id</li>
 </ol>
 
+<h3 id="nat-an-unsigned-integer-value">nat - an unsigned integer value</h3>
+
+<p><em>Defined by the compiler</em></p>
+
+<p>Represents values in the range <code>0 to 2^64-1</code>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">nat</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
+</code></pre>
+</div>
+
 <h3 id="nat-converts-a-string-to-an-unsigned-integer">nat - converts a string to an unsigned integer</h3>
 
 <p><em>Defined in: std/core/convertstr.s</em></p>
@@ -591,6 +582,15 @@ its bit representation interpreted as an unsigned number.</p>
 <ol start="24">
 <li>user input was not a nat</li>
 </ol>
+
+<h3 id="nat-2">nat</h3>
+
+<p><em>Defined in: std/core/array.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">nat</span><span class="p">(</span><span class="n">nat16</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
+</code></pre>
+</div>
 
 <h3 id="nat-retrieved-unsigned-number-from-32-bits">nat - retrieved unsigned number from 32 bits</h3>
 
@@ -696,27 +696,7 @@ If it does not, this operation can fail.</p>
 
 <h1 id="float">float</h1>
 
-<h3 id="float-2">float</h3>
-
-<p><em>Defined by the compiler</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">float</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
-</code></pre>
-</div>
-
 <h3 id="float-cast-to-float">float - cast to float</h3>
-
-<p><em>Defined in: std/core/convert.s</em></p>
-
-<p>Serves as a tautology function for code that parses on multiple number types.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="float-cast-to-float-2">float - cast to float</h3>
 
 <p><em>Defined in: std/core/convert.s</em></p>
 
@@ -727,7 +707,29 @@ If it does not, this operation can fail.</p>
 </code></pre>
 </div>
 
+<h3 id="float-cast-to-float-2">float - cast to float</h3>
+
+<p><em>Defined in: std/core/convert.s</em></p>
+
+<p>Serves as a tautology function for code that parses on multiple number types.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
 <h3 id="float-cast-to-float-3">float - cast to float</h3>
+
+<p><em>Defined in: std/core/convert.s</em></p>
+
+<p>Converts a bit representation to the corresponding float number.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="float-cast-to-float-4">float - cast to float</h3>
 
 <p><em>Defined in: std/core/convert.s</em></p>
 
@@ -738,14 +740,12 @@ If it does not, this operation can fail.</p>
 </code></pre>
 </div>
 
-<h3 id="float-cast-to-float-4">float - cast to float</h3>
+<h3 id="float-2">float</h3>
 
-<p><em>Defined in: std/core/convert.s</em></p>
-
-<p>Converts a bit representation to the corresponding float number.</p>
+<p><em>Defined by the compiler</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">float</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -892,6 +892,17 @@ for example to write <code>c = char str \"C\"</code>.</p>
 
 <h1 id="eq">eq</h1>
 
+<h3 id="eq-equals">eq - equals</h3>
+
+<p><em>Defined in: std/core/numbers.s</em></p>
+
+<p>Compares the address of two pointers.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
 <h3 id="eq-eqqual-to">eq - eqqual to</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
@@ -905,7 +916,7 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equals">eq - equals</h3>
+<h3 id="eq-equals-2">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
@@ -914,7 +925,7 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equals-2">eq - equals</h3>
+<h3 id="eq-equals-3">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
@@ -923,7 +934,7 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equals-3">eq - equals</h3>
+<h3 id="eq-equals-4">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
@@ -932,7 +943,7 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equals-4">eq - equals</h3>
+<h3 id="eq-equals-5">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -941,7 +952,7 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equals-5">eq - equals</h3>
+<h3 id="eq-equals-6">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -950,7 +961,7 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equals-6">eq - equals</h3>
+<h3 id="eq-equals-7">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
@@ -959,23 +970,12 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="eq-equals-7">eq - equals</h3>
+<h3 id="eq-equals-8">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="eq-equals-8">eq - equals</h3>
-
-<p><em>Defined in: std/core/bool.s</em></p>
-
-<p>This is a compile-time operations that does not evoke any runtime booleans.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -986,7 +986,7 @@ by the same running program.</p>
 <p>This is a compile-time operations that does not evoke any runtime booleans.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -994,8 +994,10 @@ by the same running program.</p>
 
 <p><em>Defined in: std/core/bool.s</em></p>
 
+<p>This is a compile-time operations that does not evoke any runtime booleans.</p>
+
 <div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1023,12 +1025,10 @@ by the same running program.</p>
 
 <h3 id="eq-equals-13">eq - equals</h3>
 
-<p><em>Defined in: std/core/numbers.s</em></p>
-
-<p>Compares the address of two pointers.</p>
+<p><em>Defined in: std/core/bool.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1101,6 +1101,17 @@ by the same running program.</p>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
+<p>Compares the address of two pointers.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="neq-not-equal-2">neq - not equal</h3>
+
+<p><em>Defined in: std/core/numbers.s</em></p>
+
 <p>Compares two error messages. This comparison is
 used only for comparing error messages produced
 by the same running program.</p>
@@ -1110,21 +1121,12 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="neq-not-equal-2">neq - not equal</h3>
-
-<p><em>Defined in: std/core/numbers.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
 <h3 id="neq-not-equal-3">neq - not equal</h3>
 
 <p><em>Defined in: std/core/numbers.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1139,10 +1141,10 @@ by the same running program.</p>
 
 <h3 id="neq-not-equal-5">neq - not equal</h3>
 
-<p><em>Defined in: std/core/bool.s</em></p>
+<p><em>Defined in: std/core/numbers.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1151,7 +1153,7 @@ by the same running program.</p>
 <p><em>Defined in: std/core/bool.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1160,7 +1162,7 @@ by the same running program.</p>
 <p><em>Defined in: std/core/bool.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kc">false</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1169,7 +1171,7 @@ by the same running program.</p>
 <p><em>Defined in: std/core/bool.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kc">true</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kc">false</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1178,7 +1180,7 @@ by the same running program.</p>
 <p><em>Defined in: std/core/bool.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kc">false</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kc">true</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1187,7 +1189,7 @@ by the same running program.</p>
 <p><em>Defined in: std/core/bool.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kc">false</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kc">false</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1196,7 +1198,7 @@ by the same running program.</p>
 <p><em>Defined in: std/core/bool.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kc">true</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kc">false</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1214,18 +1216,16 @@ by the same running program.</p>
 <p><em>Defined in: std/core/bool.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kc">true</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <h3 id="neq-not-equal-14">neq - not equal</h3>
 
-<p><em>Defined in: std/core/numbers.s</em></p>
-
-<p>Compares the address of two pointers.</p>
+<p><em>Defined in: std/core/bool.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1329,6 +1329,17 @@ by the same running program.</p>
 
 <h1 id="number">Number</h1>
 
+<h3 id="int-a-signed-integer-value-2">int - a signed integer value</h3>
+
+<p><em>Defined by the compiler</em></p>
+
+<p>Represents values in the range <code>2^-63 to 2^63-1</code>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">int</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
+</code></pre>
+</div>
+
 <h3 id="nat-an-unsigned-integer-value-2">nat - an unsigned integer value</h3>
 
 <p><em>Defined by the compiler</em></p>
@@ -1346,17 +1357,6 @@ by the same running program.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">float</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="int-a-signed-integer-value-2">int - a signed integer value</h3>
-
-<p><em>Defined by the compiler</em></p>
-
-<p>Represents values in the range <code>2^-63 to 2^63-1</code>.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">int</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1444,19 +1444,6 @@ by the same running program.</p>
 </div>
 
 <h1 id="add">add</h1>
-
-<h3 id="add-pointer-addition">add - pointer addition</h3>
-
-<p><em>Defined in: std/unsafe.s</em></p>
-
-<p>Adds a natural number offset to a pointer.</p>
-
-<div class="notice-box box-warning"><strong>Warning:</strong> Its usage in unsafe and guarded under std/unsafe.s.</div>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">offset</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">})</span>
-</code></pre>
-</div>
 
 <h3 id="add-add">add - add</h3>
 
@@ -1567,29 +1554,20 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="add-vector-addition">add - vector addition</h3>
+<h3 id="add-pointer-addition">add - pointer addition</h3>
 
-<p><em>Defined in: std/sci/vec.s</em></p>
+<p><em>Defined in: std/unsafe.s</em></p>
 
-<p>Grabs an allocator for the result as an effect.</p>
+<p>Adds a natural number offset to a pointer.</p>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> Its usage in unsafe and guarded under std/unsafe.s.</div>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">offset</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">})</span>
 </code></pre>
 </div>
 
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>iteration end</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="add-vector-addition-2">add - vector addition</h3>
+<h3 id="add-vector-addition">add - vector addition</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1611,7 +1589,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="add-vector-addition-3">add - vector addition</h3>
+<h3 id="add-vector-addition-2">add - vector addition</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1641,7 +1619,7 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="add-vector-addition-4">add - vector addition</h3>
+<h3 id="add-vector-addition-3">add - vector addition</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1663,7 +1641,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="add-vector-addition-5">add - vector addition</h3>
+<h3 id="add-vector-addition-4">add - vector addition</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1686,7 +1664,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="add-vector-addition-6">add - vector addition</h3>
+<h3 id="add-vector-addition-5">add - vector addition</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1705,6 +1683,29 @@ by the same running program.</p>
 <li>can only place vectors on contiguous buffers</li>
 <li>cannot place vectors on buffer offsets</li>
 <li>vector exceeeds buffer limits</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="add-vector-addition-6">add - vector addition</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">allocator</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>iteration end</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+<li>different vector sizes</li>
 <li>out of bounds</li>
 </ol>
 
@@ -1776,7 +1777,7 @@ by the same running program.</p>
 <p>Grabs an allocator for the result as an effect.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">allocator</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+<pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
 </code></pre>
 </div>
 
@@ -1788,7 +1789,6 @@ by the same running program.</p>
 <li>can only place vectors on contiguous buffers</li>
 <li>cannot place vectors on buffer offsets</li>
 <li>vector exceeeds buffer limits</li>
-<li>different vector sizes</li>
 <li>out of bounds</li>
 </ol>
 
@@ -1834,6 +1834,120 @@ by the same running program.</p>
 <p>Grabs an allocator for the result as an effect.</p>
 
 <div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>different vector sizes</li>
+<li>out of bounds</li>
+</ol>
+
+<p>Returned values defer use of the following functions:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="mul-matrix-vector-multiplication">mul - matrix-vector multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>matrix columns must match vector length</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+</ol>
+
+<h3 id="mul-matrix-vector-multiplication-2">mul - matrix-vector multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">allocator</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>matrix columns must match vector length</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+</ol>
+
+<h3 id="mul-matrix-vector-multiplication-3">mul - matrix-vector multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>matrix columns must match vector length</li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>out of bounds</li>
+</ol>
+
+<p>Returned values defer use of the following functions:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="mul-vector-multiplication-2">mul - vector multiplication</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
 <pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
 </code></pre>
 </div>
@@ -1849,7 +1963,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="mul-vector-multiplication-2">mul - vector multiplication</h3>
+<h3 id="mul-vector-multiplication-3">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1871,7 +1985,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="mul-vector-multiplication-3">mul - vector multiplication</h3>
+<h3 id="mul-vector-multiplication-4">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1901,7 +2015,7 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="mul-vector-multiplication-4">mul - vector multiplication</h3>
+<h3 id="mul-vector-multiplication-5">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1923,7 +2037,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="mul-vector-multiplication-5">mul - vector multiplication</h3>
+<h3 id="mul-vector-multiplication-6">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1946,7 +2060,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="mul-vector-multiplication-6">mul - vector multiplication</h3>
+<h3 id="mul-vector-multiplication-7">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1968,7 +2082,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="mul-vector-multiplication-7">mul - vector multiplication</h3>
+<h3 id="mul-vector-multiplication-8">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -1991,7 +2105,7 @@ by the same running program.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="mul-vector-multiplication-8">mul - vector multiplication</h3>
+<h3 id="mul-vector-multiplication-9">mul - vector multiplication</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -2010,37 +2124,6 @@ by the same running program.</p>
 <li>allocation failed</li>
 <li>cannot resize buffers with alloc; it promises no data reallocation</li>
 <li>cannot allocate a buffer of unsized type</li>
-<li>out of bounds</li>
-</ol>
-
-<p>Returned values defer use of the following functions:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="mul-vector-multiplication-9">mul - vector multiplication</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>different vector sizes</li>
 <li>out of bounds</li>
 </ol>
 
@@ -2200,89 +2283,6 @@ by the same running program.</p>
 <li>row out of bounds</li>
 <li>column out of bounds</li>
 <li>vector length must match matrix rows</li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>out of bounds</li>
-</ol>
-
-<p>Returned values defer use of the following functions:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="mul-matrix-vector-multiplication">mul - matrix-vector multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>matrix columns must match vector length</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-</ol>
-
-<h3 id="mul-matrix-vector-multiplication-2">mul - matrix-vector multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">allocator</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>matrix columns must match vector length</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-</ol>
-
-<h3 id="mul-matrix-vector-multiplication-3">mul - matrix-vector multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">allocator</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>matrix columns must match vector length</li>
 <li>iteration end</li>
 <li>allocation failed</li>
 <li>cannot resize buffers with alloc; it promises no data reallocation</li>
@@ -2471,11 +2471,11 @@ Safeguards against division by zero.</p>
 <li>null pointer</li>
 <li>division by zero </li>
 <li>iteration end</li>
-<li>out of bounds</li>
 <li>can only place vectors on contiguous buffers</li>
 <li>cannot place vectors on buffer offsets</li>
 <li>vector exceeeds buffer limits</li>
 <li>different vector sizes</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="div-vector-division-6">div - vector division</h3>
@@ -2651,7 +2651,7 @@ Safeguards against division by zero.</p>
 <p>greater than</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2662,7 +2662,7 @@ Safeguards against division by zero.</p>
 <p>greater than</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2721,7 +2721,7 @@ Safeguards against division by zero.</p>
 <p>Compares two numbers of the same type. This is an overload for the &gt;= operator.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2732,7 +2732,7 @@ Safeguards against division by zero.</p>
 <p>Compares two numbers of the same type. This is an overload for the &gt;= operator.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2743,7 +2743,7 @@ Safeguards against division by zero.</p>
 <p>Compares two numbers of the same type. This is an overload for the &gt;= operator.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2774,7 +2774,7 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 <p>Subtracts two numbers of the same type. This is an overload for the - operator.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2785,7 +2785,7 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 <p>Subtracts two numbers of the same type. This is an overload for the - operator.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3394,6 +3394,46 @@ Automatically ends the line too.</p>
 <li>failed to write to file</li>
 </ol>
 
+<h3 id="print-print-a-vector">print - print a vector</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<p>Prints as a row, such as [ 1.0  2.0  3.0 ]</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="8">
+<li>iteration end</li>
+<li>null pointer</li>
+<li>nat subtraction would yield a negative</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="print-print-a-vector-2">print - print a vector</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<p>Prints as a row, such as [ 1.0  2.0  3.0 ]</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="8">
+<li>iteration end</li>
+<li>null pointer</li>
+<li>nat subtraction would yield a negative</li>
+<li>out of bounds</li>
+</ol>
+
 <h3 id="print-print-a-matrix-with-aligned-brackets">print - print a matrix with aligned brackets</h3>
 
 <p><em>Defined in: std/sci/mat.s</em></p>
@@ -3436,56 +3476,7 @@ Automatically ends the line too.</p>
 <li>iteration end</li>
 </ol>
 
-<h3 id="print-print-a-vector">print - print a vector</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<p>Prints as a row, such as [ 1.0  2.0  3.0 ]</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="8">
-<li>iteration end</li>
-<li>null pointer</li>
-<li>nat subtraction would yield a negative</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="print-print-a-vector-2">print - print a vector</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<p>Prints as a row, such as [ 1.0  2.0  3.0 ]</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="8">
-<li>iteration end</li>
-<li>null pointer</li>
-<li>nat subtraction would yield a negative</li>
-<li>out of bounds</li>
-</ol>
-
 <h1 id="exists">exists</h1>
-
-<h3 id="exists-checks-whether-a-cstr-is-not-zero-initialized">exists - checks whether a cstr is not zero-initialized</h3>
-
-<p><em>Defined in: std/core/string.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
 
 <h3 id="exists-checks-that-a-pointer-exists">exists - checks that a pointer exists</h3>
 
@@ -3493,6 +3484,15 @@ Automatically ends the line too.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="exists-checks-whether-a-cstr-is-not-zero-initialized">exists - checks whether a cstr is not zero-initialized</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3643,22 +3643,6 @@ arithmetics and bitwise operations.</p>
 <li>iteration end</li>
 </ol>
 
-<h3 id="next-4">next</h3>
-
-<p><em>Defined in: std/map.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">next</span><span class="p">(</span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
 <h3 id="next-computes-the-next-random-number-of-a-rand-sequence">next - Computes the next random number of a Rand sequence.</h3>
 
 <p><em>Defined in: std/rand.s</em></p>
@@ -3677,6 +3661,22 @@ arithmetics and bitwise operations.</p>
 </code></pre>
 </div>
 
+<h3 id="next-4">next</h3>
+
+<p><em>Defined in: std/map.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">next</span><span class="p">(</span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>out of bounds</li>
+</ol>
+
 <h3 id="next-5">next</h3>
 
 <p><em>Defined in: std/map.s</em></p>
@@ -3694,36 +3694,6 @@ arithmetics and bitwise operations.</p>
 </ol>
 
 <h1 id="get">get</h1>
-
-<h3 id="get-get-a-list-element-pointer">get - get a list element pointer</h3>
-
-<p><em>Defined in: std/core/array.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="15">
-<li>out of bounds</li>
-</ol>
-
-<h3 id="get-get-a-pointer-to-a-buffer-element">get - get a pointer to a buffer element</h3>
-
-<p><em>Defined in: std/core/array.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="15">
-<li>out of bounds</li>
-</ol>
 
 <h3 id="get-2">get</h3>
 
@@ -3765,6 +3735,36 @@ arithmetics and bitwise operations.</p>
 <pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
 </code></pre>
 </div>
+
+<h3 id="get-get-a-list-element-pointer">get - get a list element pointer</h3>
+
+<p><em>Defined in: std/core/array.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="15">
+<li>out of bounds</li>
+</ol>
+
+<h3 id="get-get-a-pointer-to-a-buffer-element">get - get a pointer to a buffer element</h3>
+
+<p><em>Defined in: std/core/array.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="15">
+<li>out of bounds</li>
+</ol>
 
 <h3 id="get-4">get</h3>
 
@@ -4358,21 +4358,21 @@ For ease of use, the path is returned.</p>
 
 <h1 id="len">len</h1>
 
-<h3 id="len-the-number-of-buffer-elements">len - the number of buffer elements</h3>
-
-<p><em>Defined in: std/core/array.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">len</span><span class="p">(</span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_size</span><span class="p">)</span>
-</code></pre>
-</div>
-
 <h3 id="len-string-length">len - string length</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">len</span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">dat</span><span class="p">.</span><span class="n">length</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="len-the-number-of-buffer-elements">len - the number of buffer elements</h3>
+
+<p><em>Defined in: std/core/array.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">len</span><span class="p">(</span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_size</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -4386,6 +4386,66 @@ For ease of use, the path is returned.</p>
 </div>
 
 <h1 id="str">str</h1>
+
+<h3 id="str-reads-a-string-from-the-console-into-buf-at-pos-returns-the-read-slice">str - reads a string from the console into buf at pos, returns the read slice</h3>
+
+<p><em>Defined in: std/core/convertstr.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kt">str</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">console</span><span class="w"> </span><span class="n">console</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>null pointer</li>
+<li>nat subtraction would yield a negative</li>
+<li>read string does not fit on buffer</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="str-declare-a-string-on-a-lists-char-buffer">str - declare a string on a list&#8217;s char[] buffer</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kt">str</span><span class="p">(</span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>string does not fit on buffer</li>
+<li>null pointer</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="str-convert-to-string">str - convert to string</h3>
+
+<p><em>Defined in: std/core/string.s</em></p>
+
+<p>Defines an implicit constant buffer using the cstr&#8217;s memory data.
+Subsequent comparisons no longer use the underlying pointer value.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kt">str</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>null pointer</li>
+<li>out of bounds</li>
+</ol>
 
 <h3 id="str-a-string-residing-on-a-buffer">str - a string residing on a buffer</h3>
 
@@ -4489,66 +4549,6 @@ on negative comparisons.</p>
 <pre><span></span><code><span class="kt">str</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">dat</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">dat</span><span class="p">.</span><span class="n">length</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">dat</span><span class="p">.</span><span class="n">first</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
 </code></pre>
 </div>
-
-<h3 id="str-reads-a-string-from-the-console-into-buf-at-pos-returns-the-read-slice">str - reads a string from the console into buf at pos, returns the read slice</h3>
-
-<p><em>Defined in: std/core/convertstr.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="kt">str</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">console</span><span class="w"> </span><span class="n">console</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="16">
-<li>can only define strings on contiguous buffers</li>
-<li>can only define strings on non-offset buffers</li>
-<li>null pointer</li>
-<li>nat subtraction would yield a negative</li>
-<li>read string does not fit on buffer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="str-declare-a-string-on-a-lists-char-buffer">str - declare a string on a list&#8217;s char[] buffer</h3>
-
-<p><em>Defined in: std/core/string.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="kt">str</span><span class="p">(</span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="16">
-<li>can only define strings on contiguous buffers</li>
-<li>can only define strings on non-offset buffers</li>
-<li>string does not fit on buffer</li>
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="str-convert-to-string">str - convert to string</h3>
-
-<p><em>Defined in: std/core/string.s</em></p>
-
-<p>Defines an implicit constant buffer using the cstr&#8217;s memory data.
-Subsequent comparisons no longer use the underlying pointer value.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="kt">str</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="16">
-<li>can only define strings on contiguous buffers</li>
-<li>can only define strings on non-offset buffers</li>
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
 
 <h3 id="str-create-a-compact-str">str - create a compact str</h3>
 
@@ -5362,7 +5362,7 @@ If old size was zero, an error is created instead of allocating so that this doe
 resources.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">resize</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">})</span>
+<pre><span></span><code><span class="n">resize</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -5398,7 +5398,7 @@ resources.</p>
 <p><em>Defined in: std/core/array.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">mutlast</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+<pre><span></span><code><span class="n">mutlast</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -5416,7 +5416,7 @@ resources.</p>
 <p><em>Defined in: std/core/array.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -5431,7 +5431,7 @@ resources.</p>
 <p><em>Defined in: std/core/array.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -5463,7 +5463,7 @@ resources.</p>
 <p>Implemented for string or cstr keys but buffer of any values.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -5485,7 +5485,7 @@ resources.</p>
 <p>Implemented for string or cstr keys but buffer of any values.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -5507,7 +5507,7 @@ resources.</p>
 <p>Implemented for string or cstr keys but buffer of any values.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -5579,7 +5579,7 @@ A capacity is maintained so that resizes are not performed too frequently.</p>
 <p>Grows the list and returns a mutable pointer to the newlly created last element.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">push</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+<pre><span></span><code><span class="n">push</span><span class="p">(</span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -5719,7 +5719,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <p><em>Defined in: std/hash.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">to_hash_base</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
+<pre><span></span><code><span class="n">to_hash_base</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -5728,20 +5728,11 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <p><em>Defined in: std/hash.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">to_hash_base</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="to_hash_base-4">to_hash_base</h3>
-
-<p><em>Defined in: std/hash.s</em></p>
-
-<div class="codehilite">
 <pre><span></span><code><span class="n">to_hash_base</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
 </code></pre>
 </div>
 
-<h3 id="to_hash_base-5">to_hash_base</h3>
+<h3 id="to_hash_base-4">to_hash_base</h3>
 
 <p><em>Defined in: std/hash.s</em></p>
 
@@ -5759,12 +5750,21 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <li>out of bounds</li>
 </ol>
 
-<h3 id="to_hash_base-6">to_hash_base</h3>
+<h3 id="to_hash_base-5">to_hash_base</h3>
 
 <p><em>Defined in: std/hash.s</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">to_hash_base</span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="to_hash_base-6">to_hash_base</h3>
+
+<p><em>Defined in: std/hash.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">to_hash_base</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -6019,7 +6019,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <p><em>Defined in: std/hash.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">at</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">_k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
+<pre><span></span><code><span class="n">at</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">_k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -6041,7 +6041,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <p><em>Defined in: std/hash.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">at</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
+<pre><span></span><code><span class="n">at</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -6061,7 +6061,7 @@ defaults to a time-based initialization if not provided. Its period is 2^256-1.<
 <p><em>Defined in: std/hash.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">at</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
+<pre><span></span><code><span class="n">at</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -6416,7 +6416,7 @@ that is more efficient for computations in 64-bit architectures.</p>
 <p>Is used as allocator</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">circular</span><span class="p">)</span>
+<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">circular</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -6433,7 +6433,7 @@ that is more efficient for computations in 64-bit architectures.</p>
 <p>Is used as allocator</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">circular</span><span class="p">)</span>
+<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">circular</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -6444,7 +6444,7 @@ that is more efficient for computations in 64-bit architectures.</p>
 <p>Is used as allocator</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">circular</span><span class="p">)</span>
+<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">circular</span><span class="p">)</span>
 </code></pre>
 </div>
 

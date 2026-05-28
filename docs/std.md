@@ -116,6 +116,21 @@
 cstr() -> (cstr value)
 ```
 
+### cstr - a cstr description of an error code
+*Defined in: std/core/error.s*
+
+Error codes should *not* be compared numerically against
+given numbers, as their numbering changes for different
+programs. Instead, they should be converted to a cstr
+string with this function, which can then be compared.
+This comparison is also one numerical comparison, as
+care is taken for all cstr to point to the same memory
+location.
+
+```rust
+cstr(catch value) -> (cstr ret)
+```
+
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s*
 
@@ -134,21 +149,6 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 
 ```rust
 cstr(unsafe_temp) -> (cstr value.cstr)
-```
-
-### cstr - a cstr description of an error code
-*Defined in: std/core/error.s*
-
-Error codes should *not* be compared numerically against
-given numbers, as their numbering changes for different
-programs. Instead, they should be converted to a cstr
-string with this function, which can then be compared.
-This comparison is also one numerical comparison, as
-care is taken for all cstr to point to the same memory
-location.
-
-```rust
-cstr(catch value) -> (cstr ret)
 ```
 
 # int
@@ -246,6 +246,13 @@ Represents values in the range `0 to 2^64-1`.
 nat() -> (nat value)
 ```
 
+### nat
+*Defined in: std/core/array.s*
+
+```rust
+nat(nat16 x) -> (nat value)
+```
+
 ### nat - cast to nat
 *Defined in: std/core/convert.s*
 
@@ -300,13 +307,6 @@ nat(float x) -> (nat value)
 Potential errors:
 
 6. cannot convert negative float to id
-
-### nat
-*Defined in: std/core/array.s*
-
-```rust
-nat(nat16 x) -> (nat value)
-```
 
 ### nat - converts a string to an unsigned integer
 *Defined in: std/core/convertstr.s*
@@ -575,15 +575,6 @@ any() -> ()
 ```
 
 # eq
-### eq - equals
-*Defined in: std/core/numbers.s*
-
-Compares the address of two pointers.
-
-```rust
-eq(any ptr x, any ptr y) -> (bool z)
-```
-
 ### eq - eqqual to
 *Defined in: std/core/numbers.s*
 
@@ -688,6 +679,15 @@ eq(true, true) -> (true)
 ```
 
 ### eq - equals
+*Defined in: std/core/numbers.s*
+
+Compares the address of two pointers.
+
+```rust
+eq(any ptr x, any ptr y) -> (bool z)
+```
+
+### eq - equals
 *Defined in: std/core/string.s*
 
 ```rust
@@ -735,15 +735,6 @@ eq(char x, char y) -> (bool z)
 ```
 
 # neq
-### neq - not equal
-*Defined in: std/core/numbers.s*
-
-Compares the address of two pointers.
-
-```rust
-neq(any ptr x, any ptr y) -> (bool z)
-```
-
 ### neq - not equal
 *Defined in: std/core/numbers.s*
 
@@ -837,6 +828,15 @@ neq(true x, false y) -> (true)
 
 ```rust
 neq(bool x, bool y) -> (bool z)
+```
+
+### neq - not equal
+*Defined in: std/core/numbers.s*
+
+Compares the address of two pointers.
+
+```rust
+neq(any ptr x, any ptr y) -> (bool z)
 ```
 
 ### neq - not equals
@@ -1005,6 +1005,17 @@ is_different(float x, float y) -> (false)
 ```
 
 # add
+### add - pointer addition
+*Defined in: std/unsafe.s*
+
+Adds a natural number offset to a pointer.
+
+*Warning: Its usage in unsafe and guarded under std/unsafe.s.*
+
+```rust
+add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
+```
+
 ### add - add
 *Defined in: std/core/numbers.s*
 
@@ -1032,22 +1043,11 @@ Adds two numbers of the same type. This is an overload for the + operator.
 add(float x, float y) -> (float z)
 ```
 
-### add - pointer addition
-*Defined in: std/unsafe.s*
-
-Adds a natural number offset to a pointer.
-
-*Warning: Its usage in unsafe and guarded under std/unsafe.s.*
-
-```rust
-add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
-```
-
 ### add
 *Defined in: std/core/string.s*
 
 ```rust
-add(mut char[] {element size 1}, mut nat pos, cstr s1, cstr s2) -> (str)
+add(edit char[] {element size 1}, mut nat pos, cstr s1, cstr s2) -> (str)
 ```
 Potential errors:
 
@@ -1061,7 +1061,7 @@ Potential errors:
 *Defined in: std/core/string.s*
 
 ```rust
-add(mut char[] {element size 1}, mut nat pos, cstr s1, str) -> (str)
+add(edit char[] {element size 1}, mut nat pos, cstr s1, str) -> (str)
 ```
 Potential errors:
 
@@ -1075,7 +1075,7 @@ Potential errors:
 *Defined in: std/core/string.s*
 
 ```rust
-add(mut char[] {element size 1}, mut nat pos, str, cstr s2) -> (str)
+add(edit char[] {element size 1}, mut nat pos, str, cstr s2) -> (str)
 ```
 Potential errors:
 
@@ -1089,7 +1089,7 @@ Potential errors:
 *Defined in: std/core/string.s*
 
 ```rust
-add(mut char[] {element size 1}, mut nat pos, str, str) -> (str)
+add(edit char[] {element size 1}, mut nat pos, str, str) -> (str)
 ```
 Potential errors:
 
@@ -1097,24 +1097,6 @@ Potential errors:
 17. can only define strings on non-offset buffers
 2. null pointer
 20. string buffer out of memory
-15. out of bounds
-
-### add - vector addition
-*Defined in: std/sci/vec.s*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-add(edit float[] {element size 8}, mut nat allocator.pos, vec, vec) -> (mut vec) with effects allocator
-```
-Potential errors:
-
-2. null pointer
-8. iteration end
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-61. vector exceeeds buffer limits
-62. different vector sizes
 15. out of bounds
 
 ### add - vector addition
@@ -1168,6 +1150,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### add - vector addition
 *Defined in: std/sci/vec.s*
 
@@ -1237,6 +1225,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### add - vector addition
 *Defined in: std/sci/vec.s*
 
@@ -1252,6 +1246,30 @@ Potential errors:
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
+62. different vector sizes
+15. out of bounds
+
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
+### add - vector addition
+*Defined in: std/sci/vec.s*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+add(edit float[] {element size 8}, mut nat allocator.pos, vec, vec) -> (mut vec) with effects allocator
+```
+Potential errors:
+
+2. null pointer
+8. iteration end
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+61. vector exceeeds buffer limits
 62. different vector sizes
 15. out of bounds
 
@@ -1334,6 +1352,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s*
 
@@ -1421,6 +1445,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s*
 
@@ -1439,6 +1469,12 @@ Potential errors:
 62. different vector sizes
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### mul - matrix-matrix multiplication
 *Defined in: std/sci/mat.s*
 
@@ -1496,6 +1532,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### mul - vector-matrix multiplication
 *Defined in: std/sci/mat.s*
 
@@ -1556,6 +1598,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### mul - matrix-vector multiplication
 *Defined in: std/sci/mat.s*
 
@@ -1616,6 +1664,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 # div
 ### div - divide by
 *Defined in: std/core/numbers.s*
@@ -1710,6 +1764,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### div - vector division
 *Defined in: std/sci/vec.s*
 
@@ -1802,6 +1862,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### div - vector division
 *Defined in: std/sci/vec.s*
 
@@ -1821,6 +1887,12 @@ Potential errors:
 62. different vector sizes
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 # mod
 ### mod - modulo by
 *Defined in: std/core/numbers.s*
@@ -1869,6 +1941,15 @@ lt(float x, float y) -> (bool z)
 greater than
 
 ```rust
+gt(int x, int y) -> (bool z)
+```
+
+### gt - Compares two numbers of the same type. This is an overload for the > operator.
+*Defined in: std/core/numbers.s*
+
+greater than
+
+```rust
 gt(float x, float y) -> (bool z)
 ```
 
@@ -1879,15 +1960,6 @@ greater than
 
 ```rust
 gt(nat x, nat y) -> (bool z)
-```
-
-### gt - Compares two numbers of the same type. This is an overload for the > operator.
-*Defined in: std/core/numbers.s*
-
-greater than
-
-```rust
-gt(int x, int y) -> (bool z)
 ```
 
 # le
@@ -2029,6 +2101,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s*
 
@@ -2116,6 +2194,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s*
 
@@ -2134,6 +2218,12 @@ Potential errors:
 62. different vector sizes
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 # pow
 ### pow - exponentiate by
 *Defined in: std/core/numbers.s*
@@ -2219,45 +2309,6 @@ nn(vec) -> (vec, cstr)
 ```
 
 # print
-### print - prints a cstr
-*Defined in: std/core/print.s*
-
-```rust
-print(cstr value, cstr endl) -> ()
-```
-
-### print - print a character
-*Defined in: std/core/string.s*
-
-Ends the line too.
-
-```rust
-print(char c) -> ()
-```
-
-### print - print a character
-*Defined in: std/core/string.s*
-
-```rust
-print(char c, cstr endl) -> ()
-```
-
-### print - print a string
-*Defined in: std/core/string.s*
-
-Ends the line too.
-
-```rust
-print(str) -> ()
-```
-
-### print - print a string
-*Defined in: std/core/string.s*
-
-```rust
-print(str, cstr endl) -> ()
-```
-
 ### print - prints a boolean
 *Defined in: std/core/print.s*
 
@@ -2364,6 +2415,45 @@ Automatically ends the line too.
 
 ```rust
 print(cstr value) -> ()
+```
+
+### print - prints a cstr
+*Defined in: std/core/print.s*
+
+```rust
+print(cstr value, cstr endl) -> ()
+```
+
+### print - print a character
+*Defined in: std/core/string.s*
+
+Ends the line too.
+
+```rust
+print(char c) -> ()
+```
+
+### print - print a character
+*Defined in: std/core/string.s*
+
+```rust
+print(char c, cstr endl) -> ()
+```
+
+### print - print a string
+*Defined in: std/core/string.s*
+
+Ends the line too.
+
+```rust
+print(str) -> ()
+```
+
+### print - print a string
+*Defined in: std/core/string.s*
+
+```rust
+print(str, cstr endl) -> ()
 ```
 
 ### print - writes a cstr to a write file
@@ -2492,18 +2582,18 @@ Potential errors:
 15. out of bounds
 
 # exists
-### exists - checks that a pointer exists
-*Defined in: std/core/convert.s*
-
-```rust
-exists(any ptr x) -> (bool z)
-```
-
 ### exists - checks whether a cstr is not zero-initialized
 *Defined in: std/core/string.s*
 
 ```rust
 exists(cstr c) -> (bool z)
+```
+
+### exists - checks that a pointer exists
+*Defined in: std/core/convert.s*
+
+```rust
+exists(any ptr x) -> (bool z)
 ```
 
 # bits
@@ -2619,17 +2709,6 @@ Potential errors:
 *Defined in: std/map.s*
 
 ```rust
-next(robinhood_str_entry[] {element size 33}, mut nat pos) -> (mut str)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### next
-*Defined in: std/map.s*
-
-```rust
 next(robinhood_nat_entry[] {element size 16}, mut nat pos) -> (mut nat)
 ```
 Potential errors:
@@ -2651,14 +2730,18 @@ next(mut Rand) -> (float value)
 next(mut Rand) -> (float value)
 ```
 
-# get
-### get - a character in a string
-*Defined in: std/core/string.s*
+### next
+*Defined in: std/map.s*
 
 ```rust
-get(str, nat i) -> (char ptr {follows char ptr s.unsafe_ptr})
+next(robinhood_str_entry[] {element size 33}, mut nat pos) -> (mut str)
 ```
+Potential errors:
 
+2. null pointer
+15. out of bounds
+
+# get
 ### get - get a list element pointer
 *Defined in: std/core/array.s*
 
@@ -2700,6 +2783,171 @@ Potential errors:
 
 8. iteration end
 9. iterator range
+
+### get - a character in a string
+*Defined in: std/core/string.s*
+
+```rust
+get(str, nat i) -> (char ptr {follows char ptr s.unsafe_ptr})
+```
+
+### get
+*Defined in: std/io.s*
+
+```rust
+get(edit char[] {element size 1}, read, nat) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+
+### get
+*Defined in: std/io.s*
+
+```rust
+get(edit char[] {element size 1}, terminal, nat) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+47. not open file
+
+### get
+*Defined in: std/io.s*
+
+```rust
+get(edit char[] {element size 1}, write, nat) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+47. not open file
+
+### get
+*Defined in: std/io.s*
+
+```rust
+get(edit char[] {element size 1}, read, nat) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+47. not open file
+
+### get
+*Defined in: std/io.s*
+
+```rust
+get(edit char[] {element size 1}, read, nat) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+47. not open file
+
+### get
+*Defined in: std/io.s*
+
+```rust
+get(edit char[] {element size 1}, mut nat pos, read, nat) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+
+### get
+*Defined in: std/io.s*
+
+```rust
+get(edit char[] {element size 1}, mut nat pos, terminal, nat) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+47. not open file
+
+### get
+*Defined in: std/io.s*
+
+```rust
+get(edit char[] {element size 1}, mut nat pos, write, nat) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+47. not open file
+
+### get
+*Defined in: std/io.s*
+
+```rust
+get(edit char[] {element size 1}, mut nat pos, write, nat) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+47. not open file
+
+### get
+*Defined in: std/io.s*
+
+```rust
+get(edit char[] {element size 1}, mut nat pos, read, nat) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+38. end of file
+15. out of bounds
+47. not open file
 
 ### get
 *Defined in: std/io.s*
@@ -2906,6 +3154,16 @@ Potential errors:
 15. out of bounds
 47. not open file
 
+### get - get a vector element at given position
+*Defined in: std/sci/vec.s*
+
+```rust
+get(vec, nat i) -> (float ptr {follows float ptr v.unsafe_ptr})
+```
+Potential errors:
+
+15. out of bounds
+
 ### get - get a hash map entry
 *Defined in: std/map.s*
 
@@ -2959,174 +3217,6 @@ Potential errors:
 17. can only define strings on non-offset buffers
 54. index not found
 
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, read, nat) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, terminal, nat) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-47. not open file
-
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, write, nat) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-47. not open file
-
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, read, nat) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-47. not open file
-
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, read, nat) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-47. not open file
-
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, mut nat pos, read, nat) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, mut nat pos, terminal, nat) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-47. not open file
-
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, mut nat pos, write, nat) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-47. not open file
-
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, mut nat pos, write, nat) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-47. not open file
-
-### get
-*Defined in: std/io.s*
-
-```rust
-get(edit char[] {element size 1}, mut nat pos, read, nat) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-38. end of file
-15. out of bounds
-47. not open file
-
-### get - get a vector element at given position
-*Defined in: std/sci/vec.s*
-
-```rust
-get(vec, nat i) -> (float ptr {follows float ptr v.unsafe_ptr})
-```
-Potential errors:
-
-15. out of bounds
-
 ### get - reference to matrix element (i,j)
 *Defined in: std/sci/mat.s*
 
@@ -3163,18 +3253,18 @@ GB(nat x) -> (nat)
 ```
 
 # len
-### len - string length
-*Defined in: std/core/string.s*
-
-```rust
-len(str) -> (nat s.dat.length)
-```
-
 ### len - the number of buffer elements
 *Defined in: std/core/array.s*
 
 ```rust
 len(any[] {element size ?}) -> (nat buffer.unsafe_size)
+```
+
+### len - string length
+*Defined in: std/core/string.s*
+
+```rust
+len(str) -> (nat s.dat.length)
 ```
 
 ### len - vectot length
@@ -3185,36 +3275,6 @@ len(vec) -> (nat v.length)
 ```
 
 # str
-### str - declare a string on a list's char[] buffer
-*Defined in: std/core/string.s*
-
-```rust
-str(list) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-18. string does not fit on buffer
-2. null pointer
-15. out of bounds
-
-### str - convert to string
-*Defined in: std/core/string.s*
-
-Defines an implicit constant buffer using the cstr's memory data.
-Subsequent comparisons no longer use the underlying pointer value.
-
-```rust
-str(cstr c) -> (str)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-15. out of bounds
-
 ### str - a string residing on a buffer
 *Defined in: std/core/string.s*
 
@@ -3307,6 +3367,36 @@ Potential errors:
 26. read string does not fit on buffer
 15. out of bounds
 
+### str - declare a string on a list's char[] buffer
+*Defined in: std/core/string.s*
+
+```rust
+str(list) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+18. string does not fit on buffer
+2. null pointer
+15. out of bounds
+
+### str - convert to string
+*Defined in: std/core/string.s*
+
+Defines an implicit constant buffer using the cstr's memory data.
+Subsequent comparisons no longer use the underlying pointer value.
+
+```rust
+str(cstr c) -> (str)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+15. out of bounds
+
 ### str - create a compact str
 *Defined in: std/mini.s*
 
@@ -3388,7 +3478,7 @@ The position is mutated to indicate where the string ends (e.g., to copy more st
 This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead.
 
 ```rust
-copy(mut char[] {element size 1}, mut nat pos, cstr _other) -> (str)
+copy(edit char[] {element size 1}, mut nat pos, cstr _other) -> (str)
 ```
 Potential errors:
 
@@ -3406,7 +3496,7 @@ The position is mutated to indicate where the string ends (e.g., to copy more st
 This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead.
 
 ```rust
-copy(mut char[] {element size 1}, mut nat pos, str) -> (str)
+copy(edit char[] {element size 1}, mut nat pos, str) -> (str)
 ```
 Potential errors:
 
@@ -3422,7 +3512,7 @@ Then, returns a string corresponding to the copied region.
 The character is automatically set to be repeated one time.
 
 ```rust
-copy(mut char[] {element size 1}, mut nat pos, char character) -> (str)
+copy(edit char[] {element size 1}, mut nat pos, char character) -> (str)
 ```
 Potential errors:
 
@@ -3439,7 +3529,7 @@ Copies a new character at a given buffer a number of times
 Then, returns a string corresponding to the copied region.
 
 ```rust
-copy(mut char[] {element size 1}, mut nat pos, char character, nat repeat) -> (str)
+copy(edit char[] {element size 1}, mut nat pos, char character, nat repeat) -> (str)
 ```
 Potential errors:
 
@@ -3465,6 +3555,12 @@ Potential errors:
 13. cannot allocate a buffer of unsized type
 15. out of bounds
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### copy - copy a string to a new buffer
 *Defined in: std/core/string.s*
 
@@ -3479,6 +3575,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 # copy\_null\_terminated
 ### copy\_null\_terminated - copy a string while adding null termination
 *Defined in: std/core/string.s*
@@ -3488,7 +3590,7 @@ The position is mutated to indicate where the string ends (e.g., to copy more st
 This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead.
 
 ```rust
-copy_null_terminated(mut char[] {element size 1}, mut nat pos, cstr _other) -> (str)
+copy_null_terminated(edit char[] {element size 1}, mut nat pos, cstr _other) -> (str)
 ```
 Potential errors:
 
@@ -3506,7 +3608,7 @@ The position is mutated to indicate where the string ends (e.g., to copy more st
 This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead.
 
 ```rust
-copy_null_terminated(mut char[] {element size 1}, mut nat pos, str) -> (str)
+copy_null_terminated(edit char[] {element size 1}, mut nat pos, str) -> (str)
 ```
 Potential errors:
 
@@ -3531,6 +3633,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 # unsafe\_temp
 ### unsafe\_temp - tautology function for cstr
 *Defined in: std/core/string.s*
@@ -3577,6 +3685,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 # bufpos
 ### bufpos - a buffer and mutable position pair
 *Defined in: std/core/string.s*
@@ -3598,7 +3712,7 @@ at the buffer at the given position and the position then progresses to accomoda
 further string additions.
 
 ```rust
-strbufpos(mut char[] {element size 1}) -> (edit char[] {element size 1} {follows char ptr buf.unsafe_ptr}, mut nat)
+strbufpos(edit char[] {element size 1}) -> (edit char[] {element size 1} {follows char ptr buf.unsafe_ptr}, mut nat)
 ```
 
 # endpos
@@ -3755,21 +3869,6 @@ Potential errors:
 *Defined in: std/core/string.s*
 
 ```rust
-contains(cstr _stack, cstr _needle) -> (bool)
-```
-Potential errors:
-
-16. can only define strings on contiguous buffers
-17. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-22. slice out of string bounds
-15. out of bounds
-
-### contains
-*Defined in: std/core/string.s*
-
-```rust
 contains(str, str) -> (bool)
 ```
 Potential errors:
@@ -3811,6 +3910,21 @@ Potential errors:
 22. slice out of string bounds
 15. out of bounds
 
+### contains
+*Defined in: std/core/string.s*
+
+```rust
+contains(cstr _stack, cstr _needle) -> (bool)
+```
+Potential errors:
+
+16. can only define strings on contiguous buffers
+17. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+22. slice out of string bounds
+15. out of bounds
+
 # alloc
 ### alloc
 *Defined in: std/core/array.s*
@@ -3824,6 +3938,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### alloc - allocates a buffer
 *Defined in: std/core/array.s*
 
@@ -3843,6 +3963,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### alloc - allocates a buffer
 *Defined in: std/core/array.s*
 
@@ -3861,6 +3987,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### alloc - allocate memory
 *Defined in: std/unsafe.s*
 
@@ -3936,6 +4068,16 @@ Potential errors:
 
 15. out of bounds
 
+### mutget - modify a vector element at given position
+*Defined in: std/sci/vec.s*
+
+```rust
+mutget(vec, nat i) -> (mut float ptr {follows float ptr v.unsafe_ptr})
+```
+Potential errors:
+
+15. out of bounds
+
 ### mutget - get a mutable hash map entry
 *Defined in: std/map.s*
 
@@ -3989,16 +4131,6 @@ Potential errors:
 17. can only define strings on non-offset buffers
 55. string buffer is full
 
-### mutget - modify a vector element at given position
-*Defined in: std/sci/vec.s*
-
-```rust
-mutget(vec, nat i) -> (mut float ptr {follows float ptr v.unsafe_ptr})
-```
-Potential errors:
-
-15. out of bounds
-
 ### mutget - mutable reference to matrix element (i,j)
 *Defined in: std/sci/mat.s*
 
@@ -4026,6 +4158,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 # push
 ### push - get a mutable pointer to a new list element
 *Defined in: std/core/array.s*
@@ -4424,6 +4562,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 # natmap
 ### natmap - a natural number map
 *Defined in: std/map.s*
@@ -4440,6 +4584,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 # unpack
 ### unpack
 *Defined in: std/mini.s*
@@ -4617,6 +4767,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 ### vec - view a matrix as a vector
 *Defined in: std/sci/mat.s*
 
@@ -4902,6 +5058,12 @@ Potential errors:
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 
+
+Returned values defer usage of the following functions:
+```rust
+exists(any ptr x) -> (bool z)
+free(mut any ptr allocated) -> ()
+```
 # rows
 ### rows - number of rows
 *Defined in: std/sci/mat.s*

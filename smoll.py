@@ -1029,6 +1029,7 @@ class ImplementedType:
                 k = tok.tostring()
                 value: float|int|None = local_vars.get(tok.tostring(), None)
                 if value is not None: return value
+                if k=="EOF": return -1
                 if k in global_var2cstr: 
                     cstr_global = global_var2cstr[k]
                     return memory.named_alloc_value(k, cstr_global[1:-1])
@@ -1036,7 +1037,16 @@ class ImplementedType:
                     return memory.named_alloc_value(k, k[1:-1])
                 if len(k)>=2 and k.startswith("'") and k.endswith("'"):
                     try:
-                        return ord(k[1:-1])
+                        inner = k[1:-1]
+                        if inner.startswith("\\"):
+                            escape_map = {
+                                'n': 10, 't': 9, 'r': 13, '0': 0,
+                                '\\': 92, '\'': 39, '"': 34,
+                                'a': 7, 'b': 8, 'f': 12, 'v': 11,
+                            }
+                            if len(inner) == 2 and inner[1] in escape_map: return escape_map[inner[1]]
+                            if len(inner) >= 2 and inner[1] == 'x': return int(inner[2:], 16)
+                        return ord(inner)
                     except: self.at.error("interpreter", "failed to understand character "+k)
                 try:
                     s = tok.tostring().rstrip('UuLl')
@@ -1065,6 +1075,8 @@ class ImplementedType:
             elif impl[pos+1].tostring()[0] in "+-*/<>=!^|&%":
                 op = impl[pos+1].tostring()
                 v1 = await process_expression(impl,pos,pos)
+                if(op=="&" and impl[pos+2].tostring()=="&"): op = "&&"; pos += 1
+                if(op=="|" and impl[pos+2].tostring()=="|"): op = "||"; pos += 1
                 v2 = await process_expression(impl,pos+2,pos+2)
                 if op=="+": return v1+v2
                 if op=="-": return v1-v2
@@ -1079,6 +1091,8 @@ class ImplementedType:
                 if op=="<=": return 1 if v1<=v2 else 0
                 if op=="==": return 1 if v1==v2 else 0
                 if op=="!=": return 1 if v1!=v2 else 0
+                if op=="&&": return 1 if v1 and v2 else 0
+                if op=="||": return 1 if v1 or v2 else 0
                 if op=="^": return v1^v2
                 if op=="|": return v1|v2
                 if op=="&": return v1&v2
@@ -1098,7 +1112,7 @@ class ImplementedType:
                         if candidate.monomorphic_name==candidate_name:
                             callee = candidate
                             break
-                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy", "strlen", "memcmp", "fopen", "fclose", "fgets", "sqrt", "sin", "cos", "pos", "exp", "tan", "atan", "pow"]:
+                if callee is None and candidate_name not in ["printf", "malloc", "realloc", "free", "ptr_memzero", "memcpy", "strlen", "memcmp", "fopen", "fclose", "fgets", "sqrt", "sin", "cos", "pos", "exp", "tan", "atan", "pow", "getchar"]:
                     self.at.error("interpreter", "failed to interpret C function '"+candidate_name+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                 gathered_args: list[str] = list()
                 gathered_args_by_pointer: list[bool] = list()
@@ -1305,6 +1319,12 @@ class ImplementedType:
                         if len(values) != 1: self.at.error("malformed smollC", "'acos' requires one argument")
                         if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'acos'")
                         return math.acos(values[0])
+
+                    if candidate_name == "getchar":
+                        if len(values) != 0: self.at.error("malformed smollC", "'getchar' requires no arguments")
+                        ch = sys.stdin.read(1)
+                        if not ch: return -1  # EOF
+                        return ord(ch)
 
                     if candidate_name == "printf":
                         if not values: return None
@@ -2810,6 +2830,27 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             pack_name = create_temp()
             impl.assign(pack_name, rets, op_token)
             rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
+            impl.implementation.extend([
+                CODEWORD_RBRACKET,
+                CodeWord("else"),
+                CODEWORD_LBRACKET,
+            ])
+            for ret in rets:
+                if ret.type.builtin:
+                    impl.implementation.extend([
+                        ret,
+                        CODEWORD_EQUALS,
+                        CodeWord("0"),
+                        CODEWORD_SEMICOLON
+                    ])
+                get_func_name = "not"
+                type = file.types.get(get_func_name, None)
+                if type is None: op_token.error("type", "missing implementation for '"+get_func_name+"'")
+                assert type is not None
+                new_rets = resolve_call(file, impl, type, rets, op_token)
+                if len(new_rets)!=len(rets): op_token.error("type", "not did not return the same type")
+                for r,nr in zip(rets, new_rets):
+                    impl.assign(r.name, [nr], op_token, perform_immutability_checks=False, top_entry=False)
             impl.implementation.append(CODEWORD_RBRACKET)
             continue
 
@@ -4620,6 +4661,16 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
                             col += 1
                             if col==len(line): Token(line[token_start:col], file, row, token_start + 1 + count_spaces).error("syntax", "string never closed (strings cannot continue across multiple lines) - "+line[token_start:col])
                             if line[col]=="\"" and (line[col-1]!="\\" or col<2 or line[col-2]=="\\"): break
+                        col += 1
+                        tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                        token_start = col
+                    elif c=="'":
+                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                        token_start = col
+                        while True:
+                            col += 1
+                            if col==len(line): Token(line[token_start:col], file, row, token_start + 1 + count_spaces).error("syntax", "character never closed (strings cannot continue across multiple lines) - "+line[token_start:col])
+                            if line[col]=="'" and (line[col-1]!="\\" or col<2 or line[col-2]=="\\"): break
                         col += 1
                         tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
                         token_start = col

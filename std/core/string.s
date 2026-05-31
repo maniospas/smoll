@@ -309,17 +309,22 @@ def ends_with(cstr|str _stack, cstr|str _needle)
     ret = stack.slice(n-len needle, n)
     return ret==needle
 
+def contains(cstr|str _stack, char needle)
+    stack = str _stack
+    if stack.dat.first==needle return true
+    for i in range len stack
+        if stack[i]==needle return true
+    return false
+
 def contains(cstr|str _stack, cstr|str _needle)
     stack = str _stack
     needle = str _needle
     if stack.dat.length<needle.dat.length return false
     d = len needle
     n = len(stack)-d
-    i = mut 0
-    while i < n
+    for i in range n
         if stack.slice(i,i+d)==needle
             return true
-        i = i+1
     return false
 
 def nn(str value)

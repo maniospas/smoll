@@ -28,47 +28,97 @@ def flush(console)
     doc "flushes the print buffer on the console"
     {fflush(stdout);}
 
-def int(console)
+def char(console)
+    {builtins:int _c=getchar();}
+    {builtins:bool iseof = (_c==EOF);}
+    if iseof fail "unexpected end of console read"
+    {builtins:char c = _c;}
+    return c
+
+def is_number(char c)
+    {builtins:bool ge=(c>='0');}
+    {builtins:bool le=(c<='9');}
+    return ge and le
+
+def int(console console)
     doc "reads an integer from the console"
-    SPACE = char " "
-    {builtins:int _c; while((_c=getchar())==SPACE||_c=='\t');}
-    {builtins:bool _neg=(_c=='-'); if(_neg||_c=='+') _c=getchar();}
-    {builtins:int number=0; builtins:bool _has=0;}
-    {while(_c>='0'&&_c<='9'){number=number*10+(_c-'0');_has=1;_c=getchar();}}
-    {if(_neg) number=-number;}
-    {builtins:bool success=_has&&(_c=='\n'||_c=='\r'||_c==EOF);}
-    if not success
-        {while(_c!='\n'&&_c!='\r'&&_c!=EOF)_c=getchar();}
-        fail "user input was not an int"
-    return number
-
-def nat(console)
-    doc "reads an unsigned integer from the console"
-    SPACE = char " "
-    {builtins:int _c; while((_c=getchar())==SPACE||_c=='\t');}
-    {builtins:nat number=0; builtins:bool _has=0; builtins:bool success=0;}
-    {if(_c!='-'){if(_c=='+')_c=getchar(); while(_c>='0'&&_c<='9'){number=number*10+(_c-'0');_has=1;_c=getchar();} success=_has&&(_c=='\n'||_c=='\r'||_c==EOF);}}
-    if not success
-        {while(_c!='\n'&&_c!='\r'&&_c!=EOF)_c=getchar();}
-        fail "user input was not a nat"
-    return number
-
-def float(console)
-    doc "reads a float from the console"
-    SPACE = char " "
-    {builtins:int _c; while((_c=getchar())==SPACE||_c=='\t');}
-    {builtins:bool _neg=(_c=='-'); if(_neg||_c=='+') _c=getchar();}
-    {builtins:float number=0.0; builtins:bool _has=0;}
-    {while(_c>='0'&&_c<='9'){number=number*10.0+(_c-'0');_has=1;_c=getchar();}}
-    {if(_c=='.'){_c=getchar(); builtins:float _base=0.1; while(_c>='0'&&_c<='9'){number+=(_c-'0')*_base;_base*=0.1;_has=1;_c=getchar();}}}
-    {if(_neg) number=-number;}
-    {builtins:bool success=_has&&(_c=='\n'||_c=='\r'||_c==EOF);}
-    if not success
-        {while(_c!='\n'&&_c!='\r'&&_c!=EOF)_c=getchar();}
+    while try c=mut char console 
+        if not "\t ".contains c break
+    neg = c==char"-"
+    if neg or c==char "+" 
+        c = char console
+    number = mut int 0
+    digits = mut 0
+    eof = mut false
+    while is_number c
+        {builtins:int digit = (c-'0');}
+        number = number*int(10)+digit
+        digits = digits + 1
+        eof = not try c = char console
+        if eof break
+    if neg number = int(0)-number
+    if digits==0
+        while not eof
+            if "\n\r".contains c break
+            eof = not try c=char console
         fail "user input was not a float"
     return number
 
-def str(mut char[] buf, mut nat pos, console console)
+def nat(console console)
+    doc "reads an unsigned integer from the console"
+    while try c=mut char console 
+        if not "\t ".contains c break
+    number = mut nat 0
+    digits = mut 0
+    eof = mut false
+    while is_number c
+        {builtins:nat digit = (c-'0');}
+        number = number*10+digit
+        digits = digits + 1
+        eof = not try c = char console
+        if eof break
+    if digits==0
+        while not eof
+            if "\n\r".contains c break
+            eof = not try c=char console
+        fail "user input was not a float"
+    return number
+
+def float(console console)
+    doc "reads a float from the console"
+    while try c=mut char console 
+        if not "\t ".contains c break
+    neg = c==char"-"
+    if neg or c==char "+" 
+        c = char console
+    number = mut 0.0
+    digits = mut 0
+    eof = mut false
+    while is_number c
+        {builtins:float digit = (c-'0');}
+        number = number*10.0+digit
+        digits = digits + 1
+        eof = not try c = char console
+        if eof break
+    if c==char "." and not eof
+        c = char console
+        base = mut 0.1
+        while is_number c
+            {builtins:float decimal_digit = (c-'0');}
+            number = number+decimal_digit*base
+            base = base*0.1
+            digits = digits + 1
+            eof = not try c = char console 
+            if eof break
+    if neg number = 0.0-number
+    if digits==0
+        while not eof
+            if "\n\r".contains c break
+            eof = not try c=char console
+        fail "user input was not a float"
+    return number
+
+def str(edit char[] buf, mut nat pos, console console)
     doc "reads a string from the console into buf at pos, returns the read slice"
     if buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
     if buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
@@ -77,7 +127,8 @@ def str(mut char[] buf, mut nat pos, console console)
         {builtins:int _c = getchar();}
         {if(_c=='\n'||_c=='\r'||_c==EOF){break;}}
         if pos>=buf.unsafe_size fail "read string does not fit on buffer"
-        {buf__unsafe_ptr[pos]=_c;}
+        {builtins:compiler:ptr ptr_pos = buf__unsafe_ptr+pos;}
+        {*ptr_pos=_c;}
         pos = pos+1
     return str(buf, start, pos-start)
 

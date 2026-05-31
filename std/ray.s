@@ -1,5 +1,3 @@
-# https://onerelease.space/projects/raysan5/raylib/releases/5.5/
-
 import "std/core.s"
 import "std/mini.s"
 import "std/extern/raysupport.h"
@@ -18,13 +16,8 @@ def Position(float x, float y)
 def Size(float width, float height)
 
 def Window(Size size, cstr title)
-    {"-Istd/raylib/raylib-5.5_linux_amd64/include"}
-    {"-Lstd/raylib/raylib-5.5_linux_amd64/lib"}
     {"-lraylib"}
-    {"-ldl"}
-    {"-lpthread"}
     {"-lGL"}
-    {"-lX11"}
     {SetTraceLogLevel(LOG_WARNING); InitWindow(size__width, size__height, title); }
     ready = mut false
     return singleton(size, title, ready)
@@ -78,7 +71,6 @@ def read(cstr path)
     defer
         {UnloadTexture((Texture2D){id, (int)width, (int)height, (int)mipmaps, (int)format});}
     return Texture(id, Size(width, height), mipmaps, format)
-
 
 def draw(edit Window window, Texture _tex, Position pos, Color color)
     tex = TextureData _tex.data[0]

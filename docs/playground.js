@@ -1,4 +1,3 @@
-
 (function(){
 var pyodide=null, smollSource=null, pyodideReady=false;
 var d=document.getElementById('terminal');
@@ -23,6 +22,13 @@ editor.addEventListener('keydown',function(e){
   }
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runVM();}
 });
+
+// Inject blink keyframe once
+(function(){
+  var style=document.createElement('style');
+  style.textContent='@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}';
+  document.head.appendChild(style);
+})();
 
 function clog(msg,color){
   var span=document.createElement('span');
@@ -95,33 +101,113 @@ async function runVM(){
     d.appendChild(span);
     d.parentElement.scrollTop=d.parentElement.scrollHeight;
   });
-  pyodide.globals.set('_js_input',async function(prompt){return '';});
+
+  // Interactive input: renders a live input line in the terminal, resolves on Enter
+  pyodide.globals.set('_js_input', function(prompt) {
+    return new Promise(function(resolve) {
+      var line = document.createElement('div');
+      line.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;';
+
+      if (prompt) {
+        var promptSpan = document.createElement('span');
+        promptSpan.innerHTML = ansiToHtml(String(prompt));
+        line.appendChild(promptSpan);
+      }
+
+      var inputSpan = document.createElement('span');
+      var cursor = document.createElement('span');
+      cursor.textContent = '█';
+      cursor.style.cssText = 'animation:blink 1s step-end infinite;';
+      line.appendChild(inputSpan);
+      line.appendChild(cursor);
+      d.appendChild(line);
+      d.parentElement.scrollTop = d.parentElement.scrollHeight;
+
+      var value = '';
+
+      function onKey(e) {
+        // Ignore if a modifier-only key or if focus is in the editor
+        if (document.activeElement === editor) return;
+        if (e.key === 'Enter') {
+          document.removeEventListener('keydown', onKey);
+          cursor.remove();
+          // append a newline node so the next output starts on a fresh line
+          line.appendChild(document.createTextNode('\n'));
+          d.parentElement.scrollTop = d.parentElement.scrollHeight;
+          resolve(value);
+        } else if (e.key === 'Backspace') {
+          e.preventDefault();
+          value = value.slice(0, -1);
+          inputSpan.textContent = value;
+        } else if (e.key.length === 1) {
+          e.preventDefault();
+          value += e.key;
+          inputSpan.textContent = value;
+          d.parentElement.scrollTop = d.parentElement.scrollHeight;
+        }
+      }
+      document.addEventListener('keydown', onKey);
+    });
+  });
 
   try{
     await pyodide.FS.writeFile('/program.s',editor.value);
     await pyodide.FS.writeFile('/smoll_src.py',smollSource);
     await pyodide.runPythonAsync(`
-import sys, types, os, asyncio
+import sys, types, os, asyncio, io
 from pyodide.ffi import to_js
 sys.argv=['smoll','/program.s']
 import builtins as _bt
 _orig_print = _bt.print
 _orig_input = _bt.input
+_orig_stdin = sys.stdin
+
 def _patched_print(*args, **kwargs):
-    import io
     buf = io.StringIO()
     kwargs2 = {k:v for k,v in kwargs.items() if k not in ('file','end')}
-    _orig_print(*args, file=buf, end='',**kwargs2)
-    if 'end' in kwargs: _js_print(buf.getvalue(), kwargs['end'])
-    else: _js_print(buf.getvalue(), '\\n')
+    _orig_print(*args, file=buf, end='', **kwargs2)
+    _js_print(buf.getvalue(), kwargs.get('end', '\\n'))
+
+class _AsyncStdin:
+    """
+    read() and readline() return coroutines — must be awaited.
+    Use as: ch = await sys.stdin.read(1)
+    """
+    def __init__(self): self._buf = ''
+    async def _refill(self):
+        line = await _js_input('')
+        self._buf += (line if line is not None else '') + '\\n'
+    async def read(self, n=-1):
+        if n < 0: return ''
+        while len(self._buf) < n:
+            await self._refill()
+        chunk, self._buf = self._buf[:n], self._buf[n:]
+        return chunk
+    async def readline(self):
+        while '\\n' not in self._buf:
+            await self._refill()
+        idx = self._buf.index('\\n') + 1
+        chunk, self._buf = self._buf[:idx], self._buf[idx:]
+        return chunk
+    def readable(self): return True
+    def fileno(self): raise io.UnsupportedOperation('fileno')
+
+_stdin_obj = _AsyncStdin()
+sys.stdin = _stdin_obj
+
 async def _patched_input_async(prompt=''):
-    result = await _js_input(str(prompt))
+    result = await _js_input(str(prompt) if prompt else '')
     return result if result is not None else ''
+
+async def _patched_input_coro(prompt=''):
+    return await _patched_input_async(prompt)
+
 def _patched_input(prompt=''):
-    import asyncio
-    loop = asyncio.get_event_loop()
-    fut = asyncio.ensure_future(_patched_input_async(prompt))
-    return asyncio.get_event_loop().run_until_complete(fut) if not loop.is_running() else ''
+    return asyncio.get_event_loop().run_until_complete(_patched_input_async(prompt))
+
+_bt.input = _patched_input
+_bt.print = _patched_print
+
 _bt.print = _patched_print
 _bt.input = _patched_input
 _mod = types.ModuleType('smoll')
@@ -141,6 +227,7 @@ except SystemExit as e: pass
 finally:
     _bt.print = _orig_print
     _bt.input = _orig_input
+    sys.stdin = _orig_stdin
 `);
   }catch(err){
     var msg=err.message||String(err);

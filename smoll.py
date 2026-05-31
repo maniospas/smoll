@@ -1322,7 +1322,10 @@ class ImplementedType:
 
                     if candidate_name == "getchar":
                         if len(values) != 0: self.at.error("malformed smollC", "'getchar' requires no arguments")
+                        if is_lsp: return -1  # return EOF 
                         ch = sys.stdin.read(1)
+                        if asyncio.iscoroutine(ch):
+                            ch = await ch
                         if not ch: return -1  # EOF
                         return ord(ch)
 

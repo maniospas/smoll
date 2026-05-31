@@ -4,14 +4,14 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t371t="\n";
-const char* const __t1346t="B";
 const char* const __t1355t=" minutes\n";
-const char* const __t1349t="answered: ";
+const char* const __t1353t="in";
 const char* const __t1049t=" ";
 const char* const __t1347t="C";
-const char* const __t1353t="in";
+const char* const __t1346t="B";
 const char* const __t1341t="A";
+const char* const __t371t="\n";
+const char* const __t1349t="answered: ";
 static const char* __t_all_errcodes[37] = {"noerr",
 "error",
 "null pointer",

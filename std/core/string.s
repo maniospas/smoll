@@ -228,7 +228,7 @@ def str(charlist li)
     doc "declare a string on a list's char[] buffer"
     return str li.buffer
 
-def copy(mut charlist li, str|cstr _other)
+def copy(edit charlist li, str|cstr _other)
     doc "copy a string"
     doc "Constructs the copy on a buffer managed by a list."
     doc "The list may automatically resize its managed buffer to fit the new string."

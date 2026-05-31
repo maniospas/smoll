@@ -4,11 +4,11 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
+const char* const __t363t="";
+const char* const __t371t="\n";
+const char* const __t1904t=".s";
 const char* const __t1885t="./tests/passing/";
 const char* const __t1891t="./smoll ";
-const char* const __t363t="";
-const char* const __t1904t=".s";
-const char* const __t371t="\n";
 static const char* __t_all_errcodes[54] = {"noerr",
 "error",
 "null pointer",

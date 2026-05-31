@@ -43,7 +43,7 @@ GREEN = "\033[32m"
 YELLOW= "\033[33m"
 PURPLE= "\033[35m"
 RESET = "\033[0m"
-symbols = "=\\/+-*@<>!%&#!(){}[]:.',;|^"
+symbols = "=\\/+-*@<>!%&#!(){}[]:.,;|^"
 END_TOKEN = "...]" # impossible for something else to be tokenized as this
 START_TOKEN = "[..." # impossible for something else to be tokenized as this
 err_code_table: dict[str,int] = dict()
@@ -1034,6 +1034,11 @@ class ImplementedType:
                     return memory.named_alloc_value(k, cstr_global[1:-1])
                 if len(k)>=2 and k.startswith("\"") and k.endswith("\""):
                     return memory.named_alloc_value(k, k[1:-1])
+                if len(k)>=2 and k.startswith("'") and k.endswith("'"):
+                    try:
+                        return ord(k[1:-1])
+                    except: 
+                        self.at.error("interpreter", "failed to understand character "+k)
                 try:
                     s = tok.tostring().rstrip('UuLl')
                     if s.startswith('0x') or s.startswith('0X'): int_ret = int(s, 16)
@@ -1648,6 +1653,7 @@ class Token:
     def starts(self): return self.text==START_TOKEN
     def ends(self): return self.text == END_TOKEN
     def is_string(self): return len(self.text)>=2 and self.text[0]=="\"" and self.text[len(self.text)-1]=="\""
+    def is_char(self): return len(self.text)>=2 and self.text[0]=="'" and self.text[len(self.text)-1]=="'"
     def is_int(self):
         try:
             int(self.text)
@@ -2384,6 +2390,9 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
     if literal_tok.is_string() and peek_text(tokens, pos+1)!=":":
         if is_lsp and literal_tok.file.is_main_file: print_lsp_string(literal_tok)
         return pos+1, create_literal_type(literal_tok, CSTR_TYPE)
+    if literal_tok.is_char():
+        if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "a character")
+        return pos+1, create_literal_type(literal_tok, CHAR_TYPE)
     if literal_tok.is_uint():
         if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "an unsigned integer")
         return pos+1, create_literal_type(literal_tok, UINT_TYPE)

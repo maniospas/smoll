@@ -614,11 +614,11 @@ static inline __attribute__((always_inline)) int main__t1333t() {
   double __t1342t=0;
   uint64_t __t1343t=0;
   char* __t1344t__=0;
-  double __t1345t__value=0;
+  double __t1345t__z=0;
   uint64_t __t1347t=0;
   char* __t1348t__=0;
   char* f0=0;
-  double __t1349t__value=0;
+  double __t1349t__z=0;
   uint64_t __t1350t=0;
   char* __t1351t__unsafe_ptr=0;
   uint64_t __t1351t__unsafe_size=0;
@@ -668,7 +668,7 @@ static inline __attribute__((always_inline)) int main__t1333t() {
   char __t1374t____t511t__=0;
   char* __t1375t__=0;
   char* n=0;
-  double __t1376t__value=0;
+  double __t1376t__z=0;
   int __t_errcode=0;
   int __t_complain=0;
   float____t_buffer____buffer__t1334t(&__t1336t__unsafe_ptr,&__t1336t__unsafe_size,&__t1336t__unsafe_offset,&__t1336t__unsafe_align);
@@ -697,8 +697,8 @@ static inline __attribute__((always_inline)) int main__t1333t() {
   __t_errcode=2;
   goto __t_failure;
   }
-  memcpy(&__t1345t__value,__t1344t__,8);
-  print__t374t(__t1345t__value);
+  memcpy(&__t1345t__z,__t1344t__,8);
+  print__t374t(__t1345t__z);
   __t1347t=0;
   __t_errcode=mutget__t584t(&__t1338t__unsafe_ptr,&__t1338t__unsafe_size,&__t1338t__unsafe_offset,&__t1338t__unsafe_align,__t1347t,&__t1348t__);
   if(__t_errcode){
@@ -709,7 +709,7 @@ static inline __attribute__((always_inline)) int main__t1333t() {
   __t_errcode=2;
   goto __t_failure;
   }
-  memcpy(&__t1349t__value,f0,8);
+  memcpy(&__t1349t__z,f0,8);
   __t1350t=2;
   __t_errcode=resize__t557t(&__t1338t__unsafe_ptr,&__t1338t__unsafe_size,&__t1338t__unsafe_offset,&__t1338t__unsafe_align,__t1350t,&__t1351t__unsafe_ptr,&__t1351t__unsafe_size,&__t1351t__unsafe_offset,&__t1351t__unsafe_align);
   if(__t_errcode){
@@ -723,7 +723,7 @@ static inline __attribute__((always_inline)) int main__t1333t() {
   __t_errcode=2;
   goto __t_failure;
   }
-  memcpy(__t1352t__,&__t1349t__value,8);
+  memcpy(__t1352t__,&__t1349t__z,8);
   Field____t_buffer____buffer__t1353t(&__t1355t__unsafe_ptr,&__t1355t__unsafe_size,&__t1355t__unsafe_offset,&__t1355t__unsafe_align);
   __t1356t__unsafe_ptr=__t1355t__unsafe_ptr;
   __t1356t__unsafe_size=__t1355t__unsafe_size;
@@ -789,8 +789,8 @@ static inline __attribute__((always_inline)) int main__t1333t() {
   __t_errcode=2;
   goto __t_failure;
   }
-  memcpy(&__t1376t__value,n,8);
-  print__t374t(__t1376t__value);
+  memcpy(&__t1376t__z,n,8);
+  print__t374t(__t1376t__z);
   
   __t_failure:exists__t436t(__t1373t__unsafe_ptr,&__t1374t____t511t__);
   if(__t1374t____t511t__){

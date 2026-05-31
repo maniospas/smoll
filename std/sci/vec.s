@@ -90,9 +90,8 @@ def add(effect edit vec_allocator allocator, vec v1, vec|float v2)
     if v2 is vec and v1.length!=v2.length
         fail "different vector sizes"
     v = vec v1.length
-    it = mut range v1.length
     p1 = v1.unsafe_ptr
-    while try i=next it
+    for i in range v1.length
         v[i] = v1[i]+v2.at i
     return v
 

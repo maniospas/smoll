@@ -1480,6 +1480,8 @@ class ImplementedType:
             except ExpectedException as e:
                 err_code = err_code_table.get("\""+str(e)+"\"", 1)
                 return err_code
+            except Exception as e:
+                self.at.error("interpreter", "the VM failed with error "+str(e)+" for command: "+call_text)
             if not isinstance(evaluated, list): evaluated = []
             if len(evaluated)!=len(args)-input_args:
                 self.at.error("interpreter", "the VM command returned a different number of values than the original")
@@ -5044,20 +5046,21 @@ async def main():
     elif not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)
         if not main_type: print(f"{RED}error{RESET}: missing main type"); errexit()
-        if len(main_type.variations) > 1: print(f"{RED}error{RESET}: more than one main type"); errexit()
-        if main_type.variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); errexit()
+        main_type_variations = [variation for variation in main_type.variations if variation.at.file==file]
+        if len(main_type_variations) > 1: print(f"{RED}error{RESET}: more than one main type in this file"); errexit()
+        if main_type_variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); errexit()
         exe_path = src_path.with_suffix("")
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
             memory = MemoryEmulator(1024*vm_memory_kb)
-            await main_type.variations[0].interpret([], memory, recursion_budget=vm_recursion_budget) # emulate 16kb memory
+            await main_type_variations[0].interpret([], memory, recursion_budget=vm_recursion_budget) # emulate 16kb memory
             for pos in memory.must_free:
                 if pos in memory.alloc_sizes: 
                     try: print(("non-freed memory at "+str(pos)+":\t ").ljust(15)+memory.as_cstr(pos))
                     except: print(("non-freed memory at "+str(pos)+":\t ").ljust(15)+str(memory.read_int64(pos)))
             for k,v in memory.foreign_objects.items(): print("non-freed foreign object"+v[1])
         else:
-            write_and_compile(str(exe_path), [main_type.variations[0]], main_type.variations[0].monomorphic_name)
+            write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0].monomorphic_name)
             if not args.build and chosen_compiler!="none":
                 extra_args_str = " ".join(extra_args)
                 if extra_args_str: extra_args_str = " "+extra_args_str

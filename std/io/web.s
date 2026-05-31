@@ -8,7 +8,7 @@ def url(cstr path)
     return url str path
 
 local def raw_get(url url, str path)
-    VM "download(memory.as_str($url__unsafe_ptr+$url__dat__pos, $url__dat__length), memory.as_str($path__unsafe_ptr+$path__dat__pos, $path__dat__length))"
+    VM "download(memory.as_str($url__path__unsafe_ptr+$url__path__dat__pos, $url__path__dat__length), memory.as_str($path__unsafe_ptr+$path__dat__pos, $path__dat__length))"
     prefix = "curl -s -X GET \""
     postfix = "\" -o "
     buf = bufpos char[].alloc len(url.path)+len(path)+len(str prefix)+len(str postfix)+1

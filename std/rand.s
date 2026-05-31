@@ -62,13 +62,12 @@ def splitmix64()
     {builtins:nat seed = (unsigned long long)((struct timespec*)ts)->tv_sec * (unsigned long long)1000000000 + ((struct timespec*)ts)->tv_nsec;}
     return seed
 
-def Rand(nat|blank seed)
+def Rand(nat seed)
     doc "random number generator"
     doc "Xoshiro256plus random numbers from https://prng.di.unimi.it/"
     doc "These and are NOT cryptographically secure."
     doc "This a structural type for storing the progress of random number generators "
-    doc "on four u64 state fields. It can be initialized with an optional seed, which "
-    doc "defaults to a time-based initialization if not provided. Its period is 2^256-1."
+    doc "on four u64 state fields. The version is seed-initalized. Its period is 2^256-1."
     if seed is blank
         seed = splitmix64()
     modifying_seed = mut seed
@@ -77,6 +76,14 @@ def Rand(nat|blank seed)
     s2 = mut splitmix64(modifying_seed)
     s3 = mut splitmix64(modifying_seed)
     return class(s0,s1,s2,s3)
+
+def Rand()
+    doc "random number generator"
+    doc "Xoshiro256plus random numbers from https://prng.di.unimi.it/"
+    doc "These and are NOT cryptographically secure."
+    doc "This a structural type for storing the progress of random number generators "
+    doc "on four u64 state fields. This version defaults to a time-based seed. Its period is 2^256-1."
+    return Rand splitmix64()
 
 def next(mut Rand self)
     doc "Computes the next random number of a Rand sequence."

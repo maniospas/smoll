@@ -37,6 +37,7 @@ _3.6._ [random](#random)<br>
 _3.7._ [{mini and bits}](#mini-and-bits)<br>
 _3.8._ [vectors](#vectors)<br>
 _3.9._ [graphics](#graphics)<br>
+_3.10._ [process and web](#process-and-web)<br>
 
 {...} are advanced functionality
 
@@ -1958,7 +1959,6 @@ def main()
     print a*b
 ```
 
-
 ## graphics
 
 Graphics for games of desktop applications are supported
@@ -2026,3 +2026,71 @@ def main()
             draw_circle.draw win
         del frame
 ```
+
+## process and web
+
+One part of *smoλ*'s design philosophy is that programs should be able to communicate with
+other programs to form an ecosystem in each machine. For example, why should someone embed
+[CURL](https://curl.se/) and corresponding security features in their executable when they
+can have the battle-tested command line tool at their disposal?
+
+*This is not static linking!* It is actively encouraged to communicate with operating system
+processes when the latter are longer-running. Then, system error codes are propagated as
+normal failure. Of course, this vision requires a robust way of communicating with the operating
+system. This is done via the  `process` namespace under the `std.io.s` include like below that is
+directly copied from the library. This dynamically constructs a command string on a buffer
+and uses it to run a system process. The deferred process deletion can be force-executed via `del`,
+thus waiting for the process's end. This may leave a notification of non-zero exit code, 
+which can be caught afterwards to check for successful termination.
+
+*Warning: System commands are not available in the online playground.*
+
+```python
+import "std/core.s"
+import "std/io.s"
+
+def run(cstr|str command)
+    proc = mut process:read command
+    del proc # force resource deallocation = end the process
+    if try error = compiler:catch()
+        print cstr error
+
+def main()
+    path = "./tests/passing/"
+    bp = bufpos char[].alloc 256 # buffer and mutable position pair
+    bp.copy "./smoll "
+    bp.copy path
+    test_dir = dir:read path
+    proc_buf = char[].alloc KB 4
+    for entry in test_dir # do not move the position
+        if not entry.ends_with ".s" continue
+        command = bp.buf.str((local bp).copy_null_terminated(str entry).endpos())
+        print command
+        run command
+```
+
+The next example demonstrates usage of CURL via the `web` namespace in the same include.
+You might recognize this example from the language's front page.
+The main usage pattern is that strings must be packed into a `web:url` class to ensure
+that web requirests are the actual intent. Pass the url into ther `web:get` function
+to create a temporary file and retrieve that. Of course, programmatic integration of libCURL 
+functionality is still easy via C code injection, but is left outside of the standard library
+for now.
+
+```python
+import "std/core.s"
+import "std/io.s"
+
+def CHUNK_SIZE = 4096
+def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
+
+def main()
+    mem = char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
+    f = file:read web:get web:url README  # save to .tmp with system curl and read it
+    size = mut 0
+    for line in (mem, f) # iterator defined over a (memory buffer, file) tuple
+        size = size+len line
+    print(size, " bytes downloaded\n")
+```
+
+*Info: The above pattern incurs some overhead in saving the file but will be further optimized in future language versions, for example with memory mapped files. Safety will remain the main concern of smoλ in all deployment settings.*

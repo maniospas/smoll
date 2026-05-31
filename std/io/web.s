@@ -1,18 +1,24 @@
 local import "std/core.s"
 local import "std/io/process.s" as process
 
-local def raw_get(str url, str path)
+def url(str path)
+    return class path
+
+def url(cstr path)
+    return url str path
+
+local def raw_get(url url, str path)
     VM "download(memory.as_str($url__unsafe_ptr+$url__dat__pos, $url__dat__length), memory.as_str($path__unsafe_ptr+$path__dat__pos, $path__dat__length))"
     prefix = "curl -s -X GET \""
     postfix = "\" -o "
-    buf = bufpos char[].alloc len(url)+len(path)+len(str prefix)+len(str postfix)+1
+    buf = bufpos char[].alloc len(url.path)+len(path)+len(str prefix)+len(str postfix)+1
     buf.copy prefix
-    buf.copy url
+    buf.copy url.path
     buf.copy postfix
     buf.copy path
     process:system str buf
 
-def get(str|cstr url, str|cstr|blank path)
+def get(url url, str|cstr|blank path)
     doc "GET with system curl"
     doc "This creates a GET request using the system's curl."
     doc "This implementation is ideal for obtaining individual"
@@ -22,5 +28,5 @@ def get(str|cstr url, str|cstr|blank path)
     if path is blank
         doc "This version downloads to a '.tmp' file."
         path = ".tmp"
-    raw_get(str url, str path)
+    raw_get(url, str path)
     return str path

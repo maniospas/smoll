@@ -1037,8 +1037,7 @@ class ImplementedType:
                 if len(k)>=2 and k.startswith("'") and k.endswith("'"):
                     try:
                         return ord(k[1:-1])
-                    except: 
-                        self.at.error("interpreter", "failed to understand character "+k)
+                    except: self.at.error("interpreter", "failed to understand character "+k)
                 try:
                     s = tok.tostring().rstrip('UuLl')
                     if s.startswith('0x') or s.startswith('0X'): int_ret = int(s, 16)
@@ -5041,6 +5040,7 @@ async def main():
                     docs_file.write("\n")
                     if callee.returned_defers: docs_file.write("\nReturned values defer use of the following functions:\n")
                     for defer in callee.returned_defers: docs_file.write("```rust\n"+code_summary(defer, callee)+"```\n")
+                    if callee.VM: docs_file.write("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*\n")
     elif not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)
         if not main_type: print(f"{RED}error{RESET}: missing main type"); errexit()

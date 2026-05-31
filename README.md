@@ -52,16 +52,16 @@ repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as
 import "std/core.s"
 import "std/io.s"
 
-def CHUNK_SIZE = 4096 # number literal
+def CHUNK_SIZE = 4096
+def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 
 def main()
-    f = file:read "README.md"
-    mem = char[].alloc CHUNK_SIZE
-    for line in (mem, f)
-        # nn adds an empty new line to the print instead of default '\n'
-        print nn "| "
-        print nn line
-    print ""
+    mem = char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
+    f = file:read web:get web:url README  # save to .tmp with system curl and read it
+    size = mut 0
+    for line in (mem, f) # iterator defined over a (memory buffer, file) tuple
+        size = size+len line
+    print(size, " bytes downloaded\n")
 ```
 
 Download the executable from the 

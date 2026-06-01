@@ -49,14 +49,25 @@ def terminal()
 def File = read|write|terminal
 
 def to_start(edit File f)
+    doc "move to file start"
+    doc "Moves the file reading position to the start of the file."
     if not exists f.unsafe_ptr fail "failed to move to start of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_SET);}
 
 def to_end(edit File f)
+    doc "move to file end"
+    doc "Moves the file reading position to the end of the file"
+    doc "but does not close it."
     if not exists f.unsafe_ptr fail "failed to move to end of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_END);}
 
 def chunk(edit char[] buf, mut nat|blank pos, edit File f)
+    doc "next line"
+    doc "Retrieves the next chunk of data from a file,"
+    doc "and stores it on a char[] buffer at a given position."
+    doc "A string representation of the stored data are returned."
+    doc "An error is created if the buffer's"
+    doc "size is exceeded."
     if pos is blank
         pos = mut 0
     if not exists buf.unsafe_ptr fail "not open file"
@@ -69,7 +80,16 @@ def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     return str(buf, prev_pos, bytes_read)
     
 def line(edit char[] buf, mut nat|blank pos, edit File f)
+    doc "next line"
+    doc "Retrieves the next line from a file,"
+    doc "and stores it on a char[] buffer at a given position."
+    doc "A string representation of the stored data are returned."
+    doc "The result may not end at a"
+    doc "new line character, in case the line does not fit onto the buffer"
+    doc "at once, in which case it requires multiple reads, or at the"
+    doc "output stream's end."
     if pos is blank
+        doc "The starting position is the buffer's beginning."
         pos = mut 0
     if not exists buf.unsafe_ptr
         fail "not open file"

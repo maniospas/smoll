@@ -2,9 +2,13 @@ local import "std/core.s"
 local import "std/io/process.s" as process
 
 def url(str path)
+    doc "a string url"
+    doc "Packs a string into a url so that it can be unambiguously passed through web requests."
     return class path
 
 def url(cstr path)
+    doc "a string url"
+    doc "Packs a string into a url so that it can be unambiguously passed through web requests."
     return url str path
 
 local def raw_get(url url, str path)

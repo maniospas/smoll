@@ -10,4 +10,5 @@ def main()
     size = mut 0
     for line in (mem, f) # iterator defined over a (memory buffer, file) tuple
         size = size+len line
-    print(size, " bytes downloaded\n")
+    print nn size
+    print " bytes downloaded"

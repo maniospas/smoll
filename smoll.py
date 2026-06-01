@@ -4074,7 +4074,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 if peek_text(tokens, pos)=="else":
                     if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "**else**\n\nAlternative to conditional statement.")
                     pos += 1
-                    if get(tokens, pos).text!=START_TOKEN: pos = skip_statement(file, tokens, pos)
+                    if get_skip(tokens, pos).text!=START_TOKEN: pos = skip_statement(file, tokens, pos)
                     else:
                         depth = 1
                         pos += 1
@@ -4094,8 +4094,9 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                         if next_token==START_TOKEN: depth += 1
                         elif next_token==END_TOKEN: depth -= 1
                         pos += 1
-                if peek_text(tokens, pos)=="else":
+                if get_skip(tokens, pos).text=="else":
                     if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "**else**\n\nAlternative to conditional statement.")
+                    pos += 1
                     if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
                     else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
                 continue

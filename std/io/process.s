@@ -44,7 +44,14 @@ def read(str cmd)
     return read cstr unsafe_temp cmd
 
 def chunk(char[] buf, mut nat|blank pos, read f)
+    doc "next line"
+    doc "Retrieves the next chunk of data outputted by a process into its stdout,"
+    doc "and stores it on a char[] buffer at a given position."
+    doc "A string representation of the stored data are returned."
+    doc "An error is created if the buffer's"
+    doc "size is exceeded."
     if pos is blank
+        doc "The starting position is the buffer's beginning."
         pos = mut 0
     unsafe_ptr = unsafe:add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos
@@ -55,7 +62,16 @@ def chunk(char[] buf, mut nat|blank pos, read f)
     return str(buf, prev_pos, bytes_read)
 
 def line(char[] buf, mut nat|blank pos, read f)
+    doc "next line"
+    doc "Retrieves the next line outputted by a process into its stdout,"
+    doc "and stores it on a char[] buffer at a given position."
+    doc "A string representation of the stored data are returned."
+    doc "The result may not end at a"
+    doc "new line character, in case the line does not fit onto the buffer"
+    doc "at once, in which case it requires multiple reads, or at the"
+    doc "output stream's end."
     if pos is blank
+        doc "The starting position is the buffer's beginning."
         pos = mut 0
     unsafe_ptr = unsafe:add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos

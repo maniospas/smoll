@@ -440,6 +440,25 @@ immediately return all its fields is to omit its body, like next.</p>
 </code></pre>
 </div>
 
+<p>One notable singleton in the standard library is the <code>console</code>.
+This is used to represent the system terminal in which the program 
+is running. This is used to force a sequential execution order,
+even in programs that leverage parallelism. Below is an example
+where this singleton is used to read a float number. Similar 
+methods exist for reading strings on buffers, or other number types.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">console</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;Give a number: &quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">console</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;Its square is: &quot;</span>
+    <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+</code></pre>
+</div>
+
 <h2 id="type-mutability">type mutability</h2>
 
 <p>Normal mutability rules apply when overwriting whole objects. For example,
@@ -587,6 +606,38 @@ More on iterators later.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="mi">10</span>
         <span class="nb">print</span> <span class="n">i</span>
+</code></pre>
+</div>
+
+<p><em>Smoλ</em> provides <code>and</code> and <code>or</code> operators. These work on boolean variables
+like normal, but have two more properties:</p>
+
+<ul>
+<li>They &#8220;short-circuit&#8221; the right-hand side of the expression if the result can already be inferred from the left operand. For example, the expression <code>x and complicate_check(y)</code> does not run the function if <code>x</code> is false, whereas <code>x or complicate_check(y)</code> does not run the function if it&#8217;s true.</li>
+<li>Non-boolean values can be provided for the right-hand operand, in which case the expression&#8217;s result has the same type as the operand. In case of short-circuiting <code>x = false and y</code> sets <code>x</code> to be a zero-initialized copy of <code>y</code> (zero initialization is always valid), whereas <code>x = true or y</code> set the result to be <code>not y</code> given that a function <code>not</code> exists.</li>
+</ul>
+
+<p>Below is an example that highlights the short-circuiting properties of logical operators.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">point</span> <span class="n">p1</span><span class="p">,</span> <span class="n">point</span> <span class="n">p2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">point</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">p2</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">p1</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="n">p2</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">all_positives</span><span class="p">(</span><span class="n">point</span> <span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="o">&gt;</span><span class="mf">0.0</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="o">&gt;</span><span class="mf">0.0</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">not</span><span class="p">(</span><span class="n">point</span> <span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">point</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">point</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">)</span>
+    <span class="c1"># &#39;neg&#39; to make numbers negative</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">all_positives</span> <span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">neg</span> <span class="mf">30.0</span><span class="p">,</span> <span class="n">neg</span> <span class="mf">30.0</span><span class="p">)</span> 
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="c1"># -20.0</span>
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="c1"># -10.0</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="ow">not</span> <span class="n">all_positives</span> <span class="n">p</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="c1"># 0.0</span>
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="c1"># 0.0</span>
 </code></pre>
 </div>
 

@@ -2809,6 +2809,17 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             impl.assign(pack_name, rets, op_token)
             rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
             impl.implementation.append(CODEWORD_RBRACKET)
+            if "while" in impl.nesting:
+                impl.implementation.append(CODEWORD_LBRACKET)
+                for ret in rets:
+                    if ret.type.builtin:
+                        impl.implementation.extend([
+                            ret,
+                            CODEWORD_EQUALS,
+                            CodeWord("0"),
+                            CODEWORD_SEMICOLON
+                        ])
+                impl.implementation.append(CODEWORD_RBRACKET)
             continue
 
         if op_name=="or":

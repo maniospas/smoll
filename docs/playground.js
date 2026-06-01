@@ -105,15 +105,12 @@ async function runVM(){
   // Interactive input: renders a live input line in the terminal, resolves on Enter
   pyodide.globals.set('_js_input', function(prompt) {
     return new Promise(function(resolve) {
-      var line = document.createElement('div');
-      line.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;';
-
+      var line = document.createElement('span');
       if (prompt) {
         var promptSpan = document.createElement('span');
         promptSpan.innerHTML = ansiToHtml(String(prompt));
         line.appendChild(promptSpan);
       }
-
       var inputSpan = document.createElement('span');
       var cursor = document.createElement('span');
       cursor.textContent = '█';

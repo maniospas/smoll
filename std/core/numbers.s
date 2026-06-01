@@ -65,6 +65,11 @@ def neq(any ptr x, any ptr y)
     {builtins:bool z=(x!=y);}
     return z
 
+def neg(Number x)
+    doc "negative of a number"
+    {type(x) z=-x;}
+    return z
+
 def add(Number x, Number y)
     doc "add"
     doc "Adds two numbers of the same type. This is an overload for the + operator."

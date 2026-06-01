@@ -266,6 +266,25 @@ def main()
     print f.a.x+f.b.y # prints 5.0
 ```
 
+One notable singleton in the standard library is the `console`.
+This is used to represent the system terminal in which the program 
+is running. This is used to force a sequential execution order,
+even in programs that leverage parallelism. Below is an example
+where this singleton is used to read a float number. Similar 
+methods exist for reading strings on buffers, or other number types.
+
+```python
+import "std/core.s"
+
+def main()
+    console = console()
+    print nn "Give a number: "
+    x = float console
+    print nn "Its square is: "
+    print x*x
+```
+
+
 ## type mutability
 
 Normal mutability rules apply when overwriting whole objects. For example,
@@ -407,6 +426,35 @@ import "std/core.s"
 def main()
     for i in range 10
         print i
+```
+
+*Smoλ* provides `and` and `or` operators. These work on boolean variables
+like normal, but have two more properties:
+
+- They "short-circuit" the right-hand side of the expression if the result can already be inferred from the left operand. For example, the expression `x and complicate_check(y)` does not run the function if `x` is false, whereas `x or complicate_check(y)` does not run the function if it's true.
+- Non-boolean values can be provided for the right-hand operand, in which case the expression's result has the same type as the operand. In case of short-circuiting `x = false and y` sets `x` to be a zero-initialized copy of `y` (zero initialization is always valid), whereas `x = true or y` set the result to be `not y` given that a function `not` exists.
+
+Below is an example that highlights the short-circuiting properties of logical operators.
+
+```python
+import "std/core.s"
+
+def point(float x, float y)
+def add(point p1, point p2)
+    return point(p1.x+p2.x, p1.y+p2.y)
+def all_positives(point p)
+    return p.x>0.0 and p.y>0.0
+def not(point p)
+    return point(0.0, 0.0)
+def main()
+    p = mut point(10.0, 20.0)
+    # 'neg' to make numbers negative
+    p = (all_positives p) and add(p, neg 30.0, neg 30.0) 
+    print p.x # -20.0
+    print p.y # -10.0
+    p = (not all_positives p) or (1.0,1.0)
+    print p.x # 0.0
+    print p.y # 0.0
 ```
 
 ## recursion

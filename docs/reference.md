@@ -445,7 +445,7 @@ def add(point p1, point p2)
 def all_positives(point p)
     return p.x>0.0 and p.y>0.0
 def not(point p)
-    return point(0.0, 0.0)
+    return point(1.0-p.x, 1.0-p.y)
 def main()
     p = mut point(10.0, 20.0)
     # 'neg' to make numbers negative
@@ -453,8 +453,8 @@ def main()
     print p.x # -20.0
     print p.y # -10.0
     p = (not all_positives p) or (1.0,1.0)
-    print p.x # 0.0
-    print p.y # 0.0
+    print p.x # 1.0
+    print p.y # 1.0
 ```
 
 ## recursion

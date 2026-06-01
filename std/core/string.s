@@ -287,7 +287,7 @@ def print(char c, cstr|blank endl)
 def slice(str _s, nat from, nat to)
     s = str _s
     if from==to return str ""
-    if from<to or to>s.dat.length fail "slice out of string bounds"
+    if from>to or to>s.dat.length fail "slice out of string bounds"
     new_length = to-from
     if from!=0 new_first = s[from]
     else new_first = const s.dat.first

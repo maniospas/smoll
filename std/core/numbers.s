@@ -67,7 +67,7 @@ def neq(any ptr x, any ptr y)
 
 def neg(Number x)
     doc "negative of a number"
-    {type(x) z=-x;}
+    {type(x) z=(-x);}
     return z
 
 def add(Number x, Number y)

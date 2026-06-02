@@ -2541,11 +2541,10 @@ which can be caught afterwards to check for successful termination.</p>
 
 <p>The next example demonstrates usage of CURL via the <code>web</code> namespace in the same include.
 You might recognize this example from the language&#8217;s front page.
-The main usage pattern is that strings must be packed into a <code>web:url</code> class to ensure
-that web requirests are the actual intent. Pass the url into ther <code>web:get</code> function
-to create a temporary file and retrieve that. Of course, programmatic integration of libCURL 
-functionality is still easy via C code injection, but is left outside of the standard library
-for now.</p>
+The main usage pattern consists of passing a string or cstr url into the <code>web:get</code> function
+to create a temporary file. The function returns the remporary file&#8217;s path.
+Of course, programmatic integration of libCURL functionality is still viable via 
+C code injection, but is left outside of the standard library for now.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -2557,7 +2556,7 @@ for now.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">mem</span> <span class="o">=</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">CHUNK_SIZE</span> <span class="c1"># pipe argument with dot, parentheses optional for one argument</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">web</span><span class="p">:</span><span class="n">url</span> <span class="n">README</span>  <span class="c1"># save to .tmp with system curl and read it</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span>  <span class="c1"># save to .tmp with system curl and read it</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="c1"># iterator defined over a (memory buffer, file) tuple</span>
         <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">+</span><span class="nb">len</span> <span class="n">line</span>

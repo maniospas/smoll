@@ -1,14 +1,14 @@
 import "std/core.s"
+import "std/io.s"
 
-def modify(mut nat x, "add", "one")
-    x = x+1
-def modify(mut nat x, "add", nat y)
-    x = x+y
-def modify(mut nat x, "sub", nat y)
-    x = x-y
+def CHUNK_SIZE = 4096
+def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
+
 def main()
-    CLI = console()
-    x = mut 5
-    modify(x add 3)
-    modify(x add blank() one)
-    print x # prints 9
+    CLI = console() # use the CLI effect
+    mem = alloc CHUNK_SIZE
+    f = file:read web:get web:url README # save to .tmp with system curl and read it
+    size = mut 0
+    for line in (mem, f)    # iterator defined over a (memory buffer, file) tuple
+        size = size+len line
+    print(size, " bytes downloaded\n")

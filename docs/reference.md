@@ -1860,7 +1860,6 @@ def main()
     copy " "
     copy "world!"
     print str(CHARS from start)
-
 ```
 
 
@@ -2305,11 +2304,10 @@ def main()
 
 The next example demonstrates usage of CURL via the `web` namespace in the same include.
 You might recognize this example from the language's front page.
-The main usage pattern is that strings must be packed into a `web:url` class to ensure
-that web requirests are the actual intent. Pass the url into ther `web:get` function
-to create a temporary file and retrieve that. Of course, programmatic integration of libCURL 
-functionality is still easy via C code injection, but is left outside of the standard library
-for now.
+The main usage pattern consists of passing a string or cstr url into the `web:get` function
+to create a temporary file. The function returns the remporary file's path.
+Of course, programmatic integration of libCURL functionality is still viable via 
+C code injection, but is left outside of the standard library for now.
 
 ```python
 import "std/core.s"
@@ -2321,7 +2319,7 @@ def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/
 def main()
     CLI = console()
     mem = char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
-    f = file:read web:get web:url README  # save to .tmp with system curl and read it
+    f = file:read web:get README  # save to .tmp with system curl and read it
     size = mut 0
     for line in (mem, f) # iterator defined over a (memory buffer, file) tuple
         size = size+len line

@@ -1780,11 +1780,11 @@ by the same running program.</p>
 <li>null pointer</li>
 <li>iteration end</li>
 <li>iterator range</li>
+<li>out of bounds</li>
 <li>can only place vectors on contiguous buffers</li>
 <li>cannot place vectors on buffer offsets</li>
 <li>vector exceeeds buffer limits</li>
 <li>different vector sizes</li>
-<li>out of bounds</li>
 </ol>
 
 <h3 id="add-vector-addition-7">add - vector addition</h3>
@@ -1833,13 +1833,13 @@ by the same running program.</p>
 
 <ol start="2">
 <li>null pointer</li>
-<li>cannot allocate a buffer of unsized type</li>
 <li>iteration end</li>
 <li>iterator range</li>
 <li>allocation failed</li>
 <li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>different vector sizes</li>
+<li>cannot allocate a buffer of unsized type</li>
 <li>out of bounds</li>
+<li>different vector sizes</li>
 </ol>
 
 <p>Returned values defer use of the following functions:</p>
@@ -1905,178 +1905,6 @@ by the same running program.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<h3 id="mul-matrix-matrix-multiplication">mul - matrix-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="64">
-<li>matrix exceeds buffer limits</li>
-<li>null pointer</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>inner dimensions must agree</li>
-<li>iteration end</li>
-<li>can only place matrices on contiguous buffers</li>
-<li>cannot place matrices on buffer offsets</li>
-</ol>
-
-<h3 id="mul-matrix-matrix-multiplication-2">mul - matrix-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>row out of bounds</li>
-<li>inner dimensions must agree</li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-</ol>
-
-<p>Returned values defer use of the following functions:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="mul-vector-matrix-multiplication">mul - vector-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>vector length must match matrix rows</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-</ol>
-
-<h3 id="mul-vector-matrix-multiplication-2">mul - vector-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>vector length must match matrix rows</li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>out of bounds</li>
-</ol>
-
-<p>Returned values defer use of the following functions:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="mul-matrix-vector-multiplication">mul - matrix-vector multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>row out of bounds</li>
-<li>matrix columns must match vector length</li>
-<li>column out of bounds</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-</ol>
-
-<h3 id="mul-matrix-vector-multiplication-2">mul - matrix-vector multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>row out of bounds</li>
-<li>matrix columns must match vector length</li>
-<li>column out of bounds</li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>out of bounds</li>
-</ol>
-
-<p>Returned values defer use of the following functions:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
 </code></pre>
 </div>
 
@@ -2305,6 +2133,178 @@ by the same running program.</p>
 </code></pre>
 </div>
 
+<h3 id="mul-matrix-matrix-multiplication">mul - matrix-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="64">
+<li>matrix exceeds buffer limits</li>
+<li>null pointer</li>
+<li>column out of bounds</li>
+<li>row out of bounds</li>
+<li>inner dimensions must agree</li>
+<li>iteration end</li>
+<li>can only place matrices on contiguous buffers</li>
+<li>cannot place matrices on buffer offsets</li>
+</ol>
+
+<h3 id="mul-matrix-matrix-multiplication-2">mul - matrix-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>inner dimensions must agree</li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+</ol>
+
+<p>Returned values defer use of the following functions:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="mul-vector-matrix-multiplication">mul - vector-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>vector length must match matrix rows</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+</ol>
+
+<h3 id="mul-vector-matrix-multiplication-2">mul - vector-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>vector length must match matrix rows</li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>out of bounds</li>
+</ol>
+
+<p>Returned values defer use of the following functions:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="mul-matrix-vector-multiplication">mul - matrix-vector multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>matrix columns must match vector length</li>
+<li>column out of bounds</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+</ol>
+
+<h3 id="mul-matrix-vector-multiplication-2">mul - matrix-vector multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>matrix columns must match vector length</li>
+<li>column out of bounds</li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>out of bounds</li>
+</ol>
+
+<p>Returned values defer use of the following functions:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
 <h1 id="div">div</h1>
 
 <h3 id="div-divide-by">div - divide by</h3>
@@ -2368,83 +2368,6 @@ Safeguards against division by zero.</p>
 <p>Grabs an FLOATS for the result as an effect.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>division by zero </li>
-<li>iteration end</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="div-vector-division-2">div - vector division</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<p>Grabs an FLOATS for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>division by zero </li>
-<li>iteration end</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>vector exceeeds buffer limits</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="div-vector-division-3">div - vector division</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<p>Grabs an FLOATS for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>division by zero </li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>out of bounds</li>
-</ol>
-
-<p>Returned values defer use of the following functions:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
-<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="div-vector-division-4">div - vector division</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<p>Grabs an FLOATS for the result as an effect.</p>
-
-<div class="codehilite">
 <pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
 </code></pre>
 </div>
@@ -2461,7 +2384,7 @@ Safeguards against division by zero.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="div-vector-division-5">div - vector division</h3>
+<h3 id="div-vector-division-2">div - vector division</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -2485,7 +2408,7 @@ Safeguards against division by zero.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="div-vector-division-6">div - vector division</h3>
+<h3 id="div-vector-division-3">div - vector division</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -2508,7 +2431,7 @@ Safeguards against division by zero.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="div-vector-division-7">div - vector division</h3>
+<h3 id="div-vector-division-4">div - vector division</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -2532,7 +2455,7 @@ Safeguards against division by zero.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="div-vector-division-8">div - vector division</h3>
+<h3 id="div-vector-division-5">div - vector division</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -2563,7 +2486,7 @@ Safeguards against division by zero.</p>
 </code></pre>
 </div>
 
-<h3 id="div-vector-division-9">div - vector division</h3>
+<h3 id="div-vector-division-6">div - vector division</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
@@ -2578,12 +2501,89 @@ Safeguards against division by zero.</p>
 
 <ol start="2">
 <li>null pointer</li>
-<li>division by zero </li>
 <li>cannot allocate a buffer of unsized type</li>
+<li>division by zero </li>
 <li>iteration end</li>
 <li>allocation failed</li>
 <li>cannot resize buffers with alloc; it promises no data reallocation</li>
 <li>different vector sizes</li>
+<li>out of bounds</li>
+</ol>
+
+<p>Returned values defer use of the following functions:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="div-vector-division-7">div - vector division</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<p>Grabs an FLOATS for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>division by zero </li>
+<li>iteration end</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="div-vector-division-8">div - vector division</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<p>Grabs an FLOATS for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>division by zero </li>
+<li>iteration end</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>vector exceeeds buffer limits</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="div-vector-division-9">div - vector division</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<p>Grabs an FLOATS for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>division by zero </li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
 <li>out of bounds</li>
 </ol>
 
@@ -3677,7 +3677,7 @@ arithmetics and bitwise operations.</p>
 <p><em>Defined in: std/map.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">next</span><span class="p">(</span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
+<pre><span></span><code><span class="n">next</span><span class="p">(</span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3693,7 +3693,7 @@ arithmetics and bitwise operations.</p>
 <p><em>Defined in: std/map.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">next</span><span class="p">(</span><span class="n">robinhood_str_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">33</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span>
+<pre><span></span><code><span class="n">next</span><span class="p">(</span><span class="n">robinhood_nat_entry</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3782,7 +3782,7 @@ arithmetics and bitwise operations.</p>
 <p><em>Defined in: std/io.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="n">terminal</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="n">write</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -3900,7 +3900,7 @@ arithmetics and bitwise operations.</p>
 <p><em>Defined in: std/io.s</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="n">write</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="n">terminal</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -4136,7 +4136,7 @@ For ease of use, the path is returned.
 This version downloads to a &#8216;.tmp&#8217; file.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">url</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">url</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
 </code></pre>
 </div>
 
@@ -4167,7 +4167,7 @@ are saved to a specified file path, overwriting it.
 For ease of use, the path is returned.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">path</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">path</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
 </code></pre>
 </div>
 
@@ -4198,7 +4198,7 @@ are saved to a specified file path, overwriting it.
 For ease of use, the path is returned.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
 </code></pre>
 </div>
 
@@ -4218,20 +4218,98 @@ For ease of use, the path is returned.</p>
 <li>string buffer out of memory</li>
 </ol>
 
-<h3 id="get-reference-to-matrix-element-ij">get - reference to matrix element (i,j)</h3>
+<h3 id="get-get-with-system-curl-4">get - GET with system curl</h3>
 
-<p><em>Defined in: std/sci/mat.s</em></p>
+<p><em>Defined in: std/io/web.s</em></p>
+
+<p>This creates a GET request using the system&#8217;s curl.
+This implementation is ideal for obtaining individual
+files without additional dependencies. Retrieved data
+are saved to a specified file path, overwriting it.
+For ease of use, the path is returned.
+This version downloads to a &#8216;.tmp&#8217; file.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
 </code></pre>
 </div>
 
 <p>Potential errors:</p>
 
-<ol start="66">
-<li>row out of bounds</li>
-<li>column out of bounds</li>
+<ol start="2">
+<li>null pointer</li>
+<li>unsanitized command: shell metacharacter detected</li>
+<li>system call failed</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>out of bounds</li>
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>string does not fit on buffer</li>
+<li>string buffer out of memory</li>
+</ol>
+
+<h3 id="get-get-with-system-curl-5">get - GET with system curl</h3>
+
+<p><em>Defined in: std/io/web.s</em></p>
+
+<p>This creates a GET request using the system&#8217;s curl.
+This implementation is ideal for obtaining individual
+files without additional dependencies. Retrieved data
+are saved to a specified file path, overwriting it.
+For ease of use, the path is returned.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">path</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>unsanitized command: shell metacharacter detected</li>
+<li>system call failed</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>out of bounds</li>
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>string does not fit on buffer</li>
+<li>string buffer out of memory</li>
+</ol>
+
+<h3 id="get-get-with-system-curl-6">get - GET with system curl</h3>
+
+<p><em>Defined in: std/io/web.s</em></p>
+
+<p>This creates a GET request using the system&#8217;s curl.
+This implementation is ideal for obtaining individual
+files without additional dependencies. Retrieved data
+are saved to a specified file path, overwriting it.
+For ease of use, the path is returned.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>unsanitized command: shell metacharacter detected</li>
+<li>system call failed</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>out of bounds</li>
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
+<li>string does not fit on buffer</li>
+<li>string buffer out of memory</li>
 </ol>
 
 <h3 id="get-get-a-vector-element-at-given-position">get - get a vector element at given position</h3>
@@ -4247,6 +4325,22 @@ For ease of use, the path is returned.</p>
 
 <ol start="15">
 <li>out of bounds</li>
+</ol>
+
+<h3 id="get-reference-to-matrix-element-ij">get - reference to matrix element (i,j)</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="66">
+<li>row out of bounds</li>
+<li>column out of bounds</li>
 </ol>
 
 <h1 id="kb">KB</h1>
@@ -5593,6 +5687,21 @@ resources.</p>
 <li>string buffer is full</li>
 </ol>
 
+<h3 id="mutget-modify-a-vector-element-at-given-position">mutget - modify a vector element at given position</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p>Potential errors:</p>
+
+<ol start="15">
+<li>out of bounds</li>
+</ol>
+
 <h3 id="mutget-mutable-reference-to-matrix-element-ij">mutget - mutable reference to matrix element (i,j)</h3>
 
 <p><em>Defined in: std/sci/mat.s</em></p>
@@ -5607,21 +5716,6 @@ resources.</p>
 <ol start="66">
 <li>row out of bounds</li>
 <li>column out of bounds</li>
-</ol>
-
-<h3 id="mutget-modify-a-vector-element-at-given-position">mutget - modify a vector element at given position</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
-</code></pre>
-</div>
-
-<p>Potential errors:</p>
-
-<ol start="15">
-<li>out of bounds</li>
 </ol>
 
 <h1 id="list">list</h1>
@@ -6379,15 +6473,6 @@ that is more efficient for computations in 64-bit architectures.</p>
 
 <h1 id="vec">vec</h1>
 
-<h3 id="vec-view-a-matrix-as-a-vector">vec - view a matrix as a vector</h3>
-
-<p><em>Defined in: std/sci/mat.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">vec</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span>
-</code></pre>
-</div>
-
 <h3 id="vec-vector-on-an-existing-buffer">vec - vector on an existing buffer</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
@@ -6469,6 +6554,15 @@ that is more efficient for computations in 64-bit architectures.</p>
 </code></pre>
 </div>
 
+<h3 id="vec-view-a-matrix-as-a-vector">vec - view a matrix as a vector</h3>
+
+<p><em>Defined in: std/sci/mat.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">vec</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span>
+</code></pre>
+</div>
+
 <h1 id="newvec">newvec</h1>
 
 <h3 id="newvec-2">newvec</h3>
@@ -6493,21 +6587,21 @@ that is more efficient for computations in 64-bit architectures.</p>
 
 <h1 id="vec_allocator">vec_allocator</h1>
 
-<h3 id="newvec-3">newvec</h3>
-
-<p><em>Defined in: std/sci/vec.s</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">newvec</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
-</code></pre>
-</div>
-
 <h3 id="vecpos-3">vecpos</h3>
 
 <p><em>Defined in: std/sci/vec.s</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">vecpos</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="newvec-3">newvec</h3>
+
+<p><em>Defined in: std/sci/vec.s</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">newvec</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
 </code></pre>
 </div>
 

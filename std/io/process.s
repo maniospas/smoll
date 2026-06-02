@@ -59,7 +59,7 @@ def chunk(char[] buf, mut nat|blank pos, read f)
     if bytes_read==0 fail "end of file"
     prev_pos = const pos
     pos = pos+bytes_read
-    return str(buf, prev_pos, bytes_read)
+    return str(buf, prev_pos, type "to", bytes_read)
 
 def line(char[] buf, mut nat|blank pos, read f)
     doc "next line"
@@ -80,7 +80,7 @@ def line(char[] buf, mut nat|blank pos, read f)
     {builtins:nat bytes_read = strlen(unsafe_ptr);}
     prev_pos = const pos
     pos = pos+bytes_read
-    return str(buf, prev_pos, bytes_read)
+    return str(buf, prev_pos, type "to", bytes_read)
 
 local def system_return(cstr cmd)
     VM "[os.system($cmd)]"

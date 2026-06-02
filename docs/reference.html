@@ -364,7 +364,6 @@ others of the same type.</p>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">2</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">3</span>
     <span class="nb">print</span> <span class="n">x</span>
-    <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
 </code></pre>
 </div>
 
@@ -455,11 +454,11 @@ immediately return all its fields is to omit its body, like next.</p>
 </code></pre>
 </div>
 
-<p>One notable singleton in the standard library is the <code>console</code>.
-This is used to represent the system terminal in which the program 
-is running. This is used to force a sequential execution order,
+<p>One notable singleton in the standard library is the <code>console</code>
+used to represent the system terminal in which the program 
+is running. Being a singleton forces sequential execution order,
 even in programs that leverage parallelism. Below is an example
-where this singleton is used to read a float number. Similar 
+where this singleton is used to also read a float number. Similar 
 methods exist for reading strings on buffers, or other number types.</p>
 
 <div class="codehilite">
@@ -467,9 +466,8 @@ methods exist for reading strings on buffers, or other number types.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span> 
-    <span class="n">console</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;Give a number: &quot;</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">console</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">CLI</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;Its square is: &quot;</span>
     <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
 </code></pre>
@@ -1942,10 +1940,10 @@ one place while returning a pointer to the last element.</p>
 <p>The standard library provides the <code>str</code> structural type for representing
 strings by combining character buffers (at least their addresses), 
 an offset within the buffer where the string starts (more stable than using a pointer), 
-its length, and its first character for fast cache-friendly comparisons; that is <code>\0</code> for empty
-strings.</p>
+its length, and its first character for fast cache-friendly comparisons. The first character 
+is <code>\0</code> for empty strings.</p>
 
-<p><code>cstr</code> data are trivially castable to strings. 
+<p><code>cstr</code> data are trivially convertible to strings. 
 Below is an example, where printing is also implemented for
 strings. Theoretically, this extracts the size and first
 character too, but such data are ignored if not needed.</p>
@@ -1987,7 +1985,21 @@ position with the <code>bufpos</code> (buffer-position) function.</p>
 </code></pre>
 </div>
 
-<p>Also copy strings on buffers managed by lists.
+<p>To make code read more naturally, this can be converted to a CHARS effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># effect for placing string data</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="nb">print</span> <span class="n">s</span>
+</code></pre>
+</div>
+
+<p>Also copy strings on buffers managed by lists, which can also be used 
+as a CHARS effect to manage string allocations.
 DO use <code>ref</code> for stability, as potential list resizing
 could invalidate the pointer where the string thinks the buffer starts,
 and the compiler would correctly point that out and refuse to progress
@@ -1998,11 +2010,49 @@ on an erroneous program.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">ref</span> <span class="n">mut</span> <span class="nb">list</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span>
-    <span class="n">s1</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span> <span class="c1"># would have been invalidated if we did not use `ref`</span>
-    <span class="n">s2</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">ref</span> <span class="nb">list</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span> <span class="c1"># would have been invalidated if we did not use `ref`</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">print</span> <span class="n">s1</span>
     <span class="nb">print</span> <span class="n">s2</span>
+</code></pre>
+</div>
+
+<p>Finally, strings provide the <code>add</code> function as a combination of a CHARS effect
+to place a concatenated outcome, and two individual strings or cstr. By means
+of automatically passing CHARS (normal effect behavior) this function be treated
+as a <code>+</code> operation like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello&quot;</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;world!&quot;</span>
+    <span class="nb">print</span> <span class="n">s1</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="n">s2</span>
+</code></pre>
+</div>
+
+<p>That said, it is preferred to copy strings onto
+buffers at consecutive places for more efficient operations. For example, the above
+can be rewritten to use less than half space onto the buffer per the next snippet.
+Note usage of the literal <code>type "from"</code> to indicate that the construction should be
+structurally matched to the variation <code>str(char[] buffer, nat end, "from", nat start)</code>.
+There also exists the variation <code>str(char[] buffer, nat start, "to", nat length)</code>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">bufpos</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">CHARS</span><span class="o">.</span><span class="n">pos</span>
+    <span class="n">copy</span> <span class="s2">&quot;hello&quot;</span>
+    <span class="n">copy</span> <span class="s2">&quot; &quot;</span>
+    <span class="n">copy</span> <span class="s2">&quot;world!&quot;</span>
+    <span class="nb">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">CHARS</span><span class="p">,</span> <span class="nb">type</span> <span class="s2">&quot;from&quot;</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2058,9 +2108,9 @@ store lines.</p>
     <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;README.md&quot;</span>
     <span class="n">mem</span> <span class="o">=</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># max 4 KB chunk size, on char[] by default</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="s2">&quot;&quot;</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;|&quot;</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="n">line</span>
+    <span class="nb">print</span> <span class="s2">&quot;&quot;</span> <span class="c1"># only now print a new line</span>
 </code></pre>
 </div>
 
@@ -2095,10 +2145,8 @@ safe.</p>
     <span class="nb">dir</span> <span class="o">=</span> <span class="n">mut</span> <span class="nb">dir</span><span class="p">:</span><span class="n">read</span> <span class="s2">&quot;.&quot;</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">dir</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">dir</span><span class="p">:</span><span class="n">is_file</span> <span class="n">entry</span>
-            <span class="nb">print</span> <span class="s2">&quot;file&quot;</span>
-        <span class="k">else</span>
-            <span class="nb">print</span> <span class="s2">&quot;dir&quot;</span>
+        <span class="k">if</span> <span class="nb">dir</span><span class="p">:</span><span class="n">is_file</span> <span class="n">entry</span> <span class="nb">print</span> <span class="s2">&quot;file&quot;</span>
+        <span class="k">else</span> <span class="nb">print</span> <span class="s2">&quot;dir&quot;</span>
 </code></pre>
 </div>
 
@@ -2171,8 +2219,8 @@ system clock as a source of entropy. Here is an example.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">seed</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">splitmix64</span><span class="p">()</span>
-    <span class="nb">print</span> <span class="n">splitmix64</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="n">splitmix64</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">splitmix64</span> <span class="n">seed</span> 
+    <span class="nb">print</span> <span class="n">splitmix64</span> <span class="n">seed</span>
 </code></pre>
 </div>
 
@@ -2311,8 +2359,8 @@ after the end.</p>
 </div>
 
 <p>An extension of vectors are matrices. These are defined
-with similar patterns, including the one below that consumes 
-the a whole <code>float[]</code> buffer alongside a declared number of rows.
+with similar patterns, including the consumption of
+a whole <code>float[]</code> buffer to be split into a number of rows.
 Matrix multiplication and matrix-vector multiplication are also
 implemented.</p>
 
@@ -2322,7 +2370,7 @@ implemented.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">allocator</span> <span class="o">=</span> <span class="n">new</span><span class="p">()</span> <span class="c1"># allocate to new memory whenever needed</span>
+    <span class="n">FLOATS</span> <span class="o">=</span> <span class="n">new</span><span class="p">()</span> <span class="c1"># allocate to new memory whenever needed</span>
 
     <span class="n">a</span> <span class="o">=</span> <span class="n">mat</span> <span class="p">[</span>
         <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>
@@ -2428,7 +2476,7 @@ can have the battle-tested command line tool at their disposal?</p>
 <p><em>This is not static linking!</em> It is actively encouraged to communicate with operating system
 processes when the latter are longer-running. Then, system error codes are propagated as
 normal failure. Of course, this vision requires a robust way of communicating with the operating
-system. This is done via the  <code>process</code> namespace under the <code>std.io.s</code> include like below that is
+system. This is done via the <code>process</code> namespace under the <code>std.io.s</code> include like below that is
 directly copied from the library. This dynamically constructs a command string on a buffer
 and uses it to run a system process. The deferred process deletion can be force-executed via <code>del</code>,
 thus waiting for the process&#8217;s end. This may leave a notification of non-zero exit code, 
@@ -2453,7 +2501,6 @@ which can be caught afterwards to check for successful termination.</p>
     <span class="n">bp</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;./smoll &quot;</span>
     <span class="n">bp</span><span class="o">.</span><span class="n">copy</span> <span class="n">path</span>
     <span class="n">test_dir</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">:</span><span class="n">read</span> <span class="n">path</span>
-    <span class="n">proc_buf</span> <span class="o">=</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">test_dir</span> <span class="c1"># do not move the position</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="o">.</span><span class="n">ends_with</span> <span class="s2">&quot;.s&quot;</span> <span class="k">continue</span>
         <span class="n">command</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">buf</span><span class="o">.</span><span class="n">str</span><span class="p">((</span><span class="n">local</span> <span class="n">bp</span><span class="p">)</span><span class="o">.</span><span class="n">copy_null_terminated</span><span class="p">(</span><span class="nb">str</span> <span class="n">entry</span><span class="p">)</span><span class="o">.</span><span class="n">endpos</span><span class="p">())</span>

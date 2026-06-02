@@ -18,6 +18,29 @@ local import "std/core/builtinsext.s"
 local import "std/core/array.s"
 local import "std/unsafe.s" as unsafe
 
+def new()
+    doc "allocations on new buffers"
+    return class()
+
+def bufpos(edit any[] buf)
+    doc "a buffer and mutable position pair"
+    doc "The position starts from 0. This structure is often used"
+    doc "to maintain stable references within the buffer."
+    pos = mut 0
+    return (buf, pos)
+
+def strbufpos(edit char[] buf)
+    doc "bufpos specialized for char[] buffers"
+    doc "This is used to indicate a pair of a character buffer and a mutable position."
+    doc "It is used as a string allocator so that they new ones can be created or copied"
+    doc "at the buffer at the given position and the position then progresses to accomodate"
+    doc "further string additions."
+    return bufpos buf
+
+def circular(any[] buf, mut nat pos, nat length)
+    doc "circular buffer"
+    return class(buf, pos, length)
+
 def exists(cstr c)
     doc "checks whether a cstr is not zero-initialized"
     {builtins:bool z = c!=0;}
@@ -55,13 +78,20 @@ def str(str other)
     doc "tautology function for strings"
     return other
 
-def str(char[] buf, nat pos, nat length)
+def str(char[] buf, nat pos, "to", nat length)
     doc "a string residing on a buffer"
     doc "The string automatically detects the first character,"
     doc "which is generally tracked for fewer negative indirections"
     doc "on negative comparisons."
     if length!=0 first = buf[pos]  # properly zero-initialized otherwise
     return str(buf, pos, length, first)
+
+def str(char[] buf, nat endpos, "from", nat pos)
+    doc "a string residing on a buffer"
+    doc "The string automatically detects the first character,"
+    doc "which is generally tracked for fewer negative indirections"
+    doc "on negative comparisons."
+    return str(buf, pos, type "to", endpos-pos)
 
 def str(cstr c)
     doc "convert to string"
@@ -72,7 +102,7 @@ def str(cstr c)
     buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler:attach_type(c)
     {if(c){builtins:nat length = strlen(c);}} # length initializes to zero
     buf.unsafe_size = length+1  # account for null termination
-    return str(buf,0,length)
+    return str(buf,0,type "to",length)
 
 def len(str s)
     doc "string length"
@@ -101,14 +131,14 @@ def neq(char x, char y)
     {builtins:bool z = (x!=y);}
     return z
 
-def copy(str|cstr _other)
+def copy(effect new CHARS, str|cstr _other)
     doc "copy a string to a new buffer"
     other = str _other
     buf = alloc(mut char[], len other)
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     return str(buf, 0, other.dat.length, other.dat.first)
 
-def copy_null_terminated(str other)
+def copy_null_terminated(effect new CHARS, str other)
     doc "create null terminated string"
     doc "Copies a string to a new buffer while ensuring null termination."
     doc "This is mainly useful for supporting 'cstr unsafe_temp'."
@@ -135,7 +165,7 @@ def unsafe_temp(str other)
     doc "passing data to 'system' or 'compt'.*"
     doc ""
     doc "*Info: This is safe to run during 'compt' in that the latter will fail gracefully.*"
-    str = copy_null_terminated(other)
+    str = new().copy_null_terminated(other)
     _ret = str.unsafe_ptr+str.dat.pos
     {builtins:cstr cstr = _ret;}
     return class(cstr, str)
@@ -152,31 +182,16 @@ def cstr(unsafe_temp value)
     doc "or to comptime returns with the pattern 'cstr unsafe_temp string_value'."
     return value.cstr
 
-def bufpos(edit any[] buf)
-    doc "a buffer and mutable position pair"
-    doc "The position starts from 0. This structure is often used"
-    doc "to maintain stable references within the buffer."
-    pos = mut 0
-    return (buf, pos)
-
-def strbufpos(edit char[] buf)
-    doc "bufpos specialized for char[] buffers"
-    doc "This is used to indicate a pair of a character buffer and a mutable position."
-    doc "It is used as a string allocator so that they new ones can be created or copied"
-    doc "at the buffer at the given position and the position then progresses to accomodate"
-    doc "further string additions."
-    return bufpos buf
-
-def copy(edit char[] buf, mut nat pos, char character, nat|blank repeat)
+def copy(effect edit strbufpos CHARS, char character, nat|blank repeat)
     doc "copies a character as a string"
     doc "Copies a new character at a given buffer a number of times"
     doc "Then, returns a string corresponding to the copied region."
     if repeat is blank
         doc "The character is automatically set to be repeated one time."
         repeat = 1
-    if pos+repeat>len buf fail "character copy does not fit on buffer"
-    {memset(buf__unsafe_ptr+pos, character, repeat);}
-    return str(buf, pos, repeat)
+    if CHARS.pos+repeat>len CHARS.buf fail "character copy does not fit on buffer"
+    {memset(CHARS__buf__unsafe_ptr+CHARS__pos, character, repeat);}
+    return str(CHARS.buf, CHARS.pos, type "to", repeat)
 
 def endpos(const str s)
     doc "the end position of a string"
@@ -184,35 +199,35 @@ def endpos(const str s)
     doc "enclosing buffer."
     return s.dat.pos+s.dat.length
 
-def copy(edit char[] buf, mut nat pos, str|cstr _other)
+def copy(effect edit strbufpos CHARS, str|cstr _other)
     doc "copy a string"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
     doc "This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead."
     other = str _other
-    next_pos = pos+len other
-    if next_pos>len buf fail "string buffer out of memory"
-    {memcpy(buf__unsafe_ptr+pos, other__unsafe_ptr+other__dat__pos, other__dat__length);}
-    prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
-    pos = next_pos
-    return str(buf, prev_pos, other.dat.length, other.dat.first)
+    next_pos = CHARS.pos+len other
+    if next_pos>len CHARS.buf fail "string buffer out of memory"
+    {memcpy(CHARS__buf__unsafe_ptr+CHARS__pos, other__unsafe_ptr+other__dat__pos, other__dat__length);}
+    prev_pos = CHARS.pos+0 # this is pretty important to decouple a pressumed equality in position when referencing
+    CHARS.pos = next_pos
+    return str(CHARS.buf, prev_pos, other.dat.length, other.dat.first)
 
-def copy_null_terminated(edit char[] buf, mut nat pos, str|cstr _other)
+def copy_null_terminated(effect edit strbufpos CHARS, str|cstr _other)
     doc "copy a string while adding null termination"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
     doc "This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead."
     other = str _other
-    null_pos = pos+len other
+    null_pos = CHARS.pos+len other
     next_pos = null_pos + 1
-    if next_pos>len buf
+    if next_pos>len CHARS.buf
         fail "string buffer out of memory"
-    {memcpy(buf__unsafe_ptr+pos, other__unsafe_ptr+other__dat__pos, other__dat__length);}
-    {builtins:compiler:ptr endpos = buf__unsafe_ptr+null_pos;}
+    {memcpy(CHARS__buf__unsafe_ptr+CHARS__pos, other__unsafe_ptr+other__dat__pos, other__dat__length);}
+    {builtins:compiler:ptr endpos = CHARS__buf__unsafe_ptr+null_pos;}
     {*endpos=0;}
-    prev_pos = pos+0 # this is pretty important to decouple a pressumed inquality in position when referencing
-    pos = next_pos
-    return str(buf, prev_pos, other.dat.length, other.dat.first)
+    prev_pos = CHARS.pos+0 # this is pretty important to decouple a pressumed equality in position when referencing
+    CHARS.pos = next_pos
+    return str(CHARS.buf, prev_pos, other.dat.length, other.dat.first)
 
 def print(effect console CLI, str s, cstr|blank endl)
     doc "print a string"
@@ -228,19 +243,19 @@ def str(charlist li)
     doc "declare a string on a list's char[] buffer"
     return str li.buffer
 
-def copy(edit charlist li, str|cstr _other)
+def copy(effect edit charlist CHARS, str|cstr _other)
     doc "copy a string"
     doc "Constructs the copy on a buffer managed by a list."
     doc "The list may automatically resize its managed buffer to fit the new string."
     doc "This operation therefore destabilizes memory, and the `.dat` segment of strings should be obtained."
     other = str _other
-    prev_prev_length = mut li.length
-    prev_length = li.length + len other
-    if other.unsafe_ptr==li.buffer.unsafe_ptr fail "cannot copy onto the same buffer"
-    if prev_length >= len li.buffer
-        li.buffer = li.buffer.resize(prev_length+prev_length/2+1)
-    li.length = prev_length
-    return copy(li.buffer, prev_prev_length, unsafe_valid other)
+    prev_prev_length = mut CHARS.length
+    prev_length = CHARS.length + len other
+    if other.unsafe_ptr==CHARS.buffer.unsafe_ptr fail "cannot copy onto the same buffer"
+    if prev_length >= len CHARS.buffer
+        CHARS.buffer = CHARS.buffer.resize(prev_length+prev_length/2+1)
+    CHARS.length = prev_length
+    return copy(CHARS.buffer, prev_prev_length, unsafe_valid other)
 
 def get(str s, nat i)
     doc "a character in a string"
@@ -334,8 +349,9 @@ def nn(str value)
     doc "to print without a new line."
     return (value, "")
 
-def add(edit char[] buf, mut nat pos, str|cstr s1, str|cstr s2)
-    start = pos
-    copy(buf, pos, s1)
-    copy(buf, pos, s2)
-    return str(buf, start, pos)
+def add(effect edit strbufpos CHARS, str|cstr s1, str|cstr s2)
+    start = CHARS.pos
+    copy(CHARS.buf, CHARS.pos, s1)
+    copy(CHARS.buf, CHARS.pos, s2)
+    endpos = CHARS.pos+0 # this is pretty important to decouple a pressumed equality in position when referencing
+    return str(CHARS.buf, start, type "to", endpos)

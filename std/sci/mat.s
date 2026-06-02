@@ -2,7 +2,6 @@ local import "std/core.s"
 local import "std/sci/vec.s"
 local import "std/sci/unsafe.s"
 
-
 def rows(mat m)
     doc "number of rows"
     return m.rows
@@ -11,19 +10,19 @@ def cols(mat m)
     doc "number of columns"
     return m.cols
 
-def mat(effect edit new allocator, nat rows, nat cols)
+def mat(effect edit new FLOATS, nat rows, nat cols)
     doc "matrix on a fresh buffer"
     buf = float[].alloc rows*cols
     return mat(buf.unsafe_ptr, 0, rows, cols, cols)
 
-def mat(effect edit vecpos allocator, nat rows, nat cols)
+def mat(effect edit vecpos FLOATS, nat rows, nat cols)
     doc "matrix on an existing vecpos"
-    if allocator.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
-    if allocator.buf.unsafe_offset.nat()!=0 fail "cannot place matrices on buffer offsets"
-    if allocator.pos+rows*cols>len allocator.buf fail "matrix exceeds buffer limits"
-    start = const allocator.pos
-    allocator.pos = allocator.pos+rows*cols
-    return mat(allocator.buf.unsafe_ptr, start, rows, cols, cols)
+    if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
+    if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place matrices on buffer offsets"
+    if FLOATS.pos+rows*cols>len FLOATS.buf fail "matrix exceeds buffer limits"
+    start = const FLOATS.pos
+    FLOATS.pos = FLOATS.pos+rows*cols
+    return mat(FLOATS.buf.unsafe_ptr, start, rows, cols, cols)
 
 def constmat(float[] buf, nat rows)
     doc "immutable matrix on an immutable float[] buffer"
@@ -37,17 +36,17 @@ def mat(edit float[] buf, nat rows)
     if cols*rows!=len buf fail "buffer size not divisible by vector rows"
     return mat(buf, mut 0, rows, cols)
 
-def mat(effect edit vec_allocator&circular allocator, nat rows, nat cols)
+def mat(effect edit circular FLOATS, nat rows, nat cols)
     doc "matrix on a circular buffer"
-    if allocator.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
-    if allocator.buf.unsafe_offset.nat()!=0 fail "cannot place matrices on buffer offsets"
-    if rows*cols>len allocator.buf fail "matrix exceeds buffer limits"
-    start = mut allocator.pos
-    allocator.pos = allocator.pos+rows*cols
-    if allocator.pos>=allocator.length
-        allocator.pos = rows*cols+0
+    if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
+    if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place matrices on buffer offsets"
+    if rows*cols>len FLOATS.buf fail "matrix exceeds buffer limits"
+    start = mut FLOATS.pos
+    FLOATS.pos = FLOATS.pos+rows*cols
+    if FLOATS.pos>=FLOATS.length
+        FLOATS.pos = rows*cols+0
         start = 0
-    return mat(allocator.buf.unsafe_ptr, start, rows, cols, cols)
+    return mat(FLOATS.buf.unsafe_ptr, start, rows, cols, cols)
 
 def mutget(edit mat m, nat i, nat j)
     doc "mutable reference to matrix element (i,j)"
@@ -84,7 +83,7 @@ def row(mat m, nat i)
     if i>=m.rows fail "row out of bounds"
     return vec(m.unsafe_ptr, m.pos+i*m.stride, m.cols)
 
-def mul(effect edit vec_allocator allocator, mat m, vec v)
+def mul(effect edit vec_allocator FLOATS, mat m, vec v)
     doc "matrix-vector multiplication"
     doc "Grabs an allocator for the result as an effect."
     if m.cols!=v.length fail "matrix columns must match vector length"
@@ -98,7 +97,7 @@ def mul(effect edit vec_allocator allocator, mat m, vec v)
         result[i] = acc
     return result
 
-def mul(effect edit vec_allocator allocator, vec v, mat m)
+def mul(effect edit vec_allocator FLOATS, vec v, mat m)
     doc "vector-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
     if v.length!=m.rows fail "vector length must match matrix rows"
@@ -112,7 +111,7 @@ def mul(effect edit vec_allocator allocator, vec v, mat m)
         result[j] = acc
     return result
 
-def mul(effect edit vec_allocator allocator, mat m1, mat m2)
+def mul(effect edit vec_allocator FLOATS, mat m1, mat m2)
     doc "matrix-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
     if m1.cols!=m2.rows fail "inner dimensions must agree"
@@ -127,7 +126,6 @@ def mul(effect edit vec_allocator allocator, mat m1, mat m2)
                 acc = acc+m1[i,k]*m2[k,j]
             result[i,j] = acc
     return result
-
 
 def print(effect console CLI, mat m, cstr|blank endl)
     doc "print a matrix with aligned brackets"

@@ -21,14 +21,6 @@ local import "std/unsafe.s" as unsafe
 # is that we GUARANTEE that non-zero pointers to a memory region contain
 # at least one element of the attached type (automatically inferred for any)
 
-# def free(mut any[] buffer)
-#     doc "frees a buffer - done automatically too"
-#     if buffer.unsafe_size==0
-#         return buffer
-#     buffer.unsafe_size = 0
-#     buffer.unsafe_ptr.unsafe:free()
-#     return buffer
-
 def nat(nat16 x)
     {builtins:nat value = x;}
     return value
@@ -57,6 +49,7 @@ def alloc(edit any[] buffer, nat|blank size)
     return buffer
 
 def alloc(nat size)
+    doc "allocate a char[] buffer"
     return alloc(edit char[], size)
 
 def resize(edit any[] buffer, nat size)
@@ -79,22 +72,22 @@ def resize(edit any[] buffer, nat size)
 def last(any[] buffer)
     doc "get a pointer to the last buffer element"
     if 0==buffer.unsafe_size fail "out of bounds"
-    unsafe_return buffer.unsafe_ptr.unsafe:add((buffer.unsafe_size-1)*buffer.unsafe_align.nat())
+    return buffer.unsafe_ptr.unsafe:add((buffer.unsafe_size-1)*buffer.unsafe_align.nat())
 
 def mutlast(edit any[] buffer)
     doc "get a mutable pointer to the last buffer element"
     if 0==buffer.unsafe_size fail "out of bounds"
-    unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe:add((buffer.unsafe_size-1)*buffer.unsafe_align.nat())
+    return unsafe_mut buffer.unsafe_ptr.unsafe:add((buffer.unsafe_size-1)*buffer.unsafe_align.nat())
     
 def mutget(edit any[] buffer, nat i)
     doc "get a mutable pointer to a buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
-    unsafe_return unsafe_mut buffer.unsafe_ptr.unsafe:add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
+    return unsafe_mut buffer.unsafe_ptr.unsafe:add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
     
 def get(any[] buffer, nat i)
     doc "get a pointer to a buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
-    unsafe_return buffer.unsafe_ptr.unsafe:add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
+    return buffer.unsafe_ptr.unsafe:add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
 
 def len(any[] buffer)
     doc "the number of buffer elements"
@@ -111,13 +104,13 @@ def list(mut any[] _buffer)
 def get(list l, nat pos)
     doc "get a list element pointer"
     if pos>=l.length fail "out of bounds"
-    unsafe_return get(l.buffer,pos)
+    return get(l.buffer,pos)
 
 def mutget(edit list l, nat pos)
     doc "get a mutable list element pointer"
     if pos>=l.length fail "out of bounds"
     ret = l.buffer.mutget pos
-    unsafe_return ret
+    return ret
 
 def push(edit list l)
     doc "get a mutable pointer to a new list element"
@@ -127,4 +120,4 @@ def push(edit list l)
         l.buffer = l.buffer.resize(prev_length+prev_length/2+1)
     l.length = prev_length + 1
     val = l.buffer.mutget(prev_length)
-    unsafe_return val
+    return val

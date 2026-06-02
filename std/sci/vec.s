@@ -2,17 +2,13 @@ local import "std/core.s"
 local import "std/sci/math.s"
 local import "std/sci/unsafe.s"
 
-def new()
-    return class()
-
-def circular(any[] buf, mut nat pos, nat length)
-    return class(buf, pos, length)
+def newvec() 
+    return new()
 def vecpos(edit float[] buf, mut nat pos)
-def vec_allocator = new|vecpos|circular
-
+def vec_allocator = newvec|vecpos|circular
 def circular(edit float[] buf, mut nat|blank pos, nat|blank length)
-    doc "circular buffer"
-    doc "Is used as allocator"
+    doc "circular float buffer"
+    doc "Is used as FLOATS"
     if pos is nat and length is nat
         compiler:skip()
     if pos is blank
@@ -23,7 +19,7 @@ def circular(edit float[] buf, mut nat|blank pos, nat|blank length)
     pos = pos+length
     return circular(buf, start, length)
 
-def vec(effect new allocator, nat length)
+def vec(effect new FLOATS, nat length)
     doc "vector on a new buffer"
     doc "Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer."
     buf = ref float[].alloc length
@@ -41,28 +37,28 @@ def constvec(float[] buf)
     if buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
     return const vec(unsafe_mut buf.unsafe_ptr, 0, len buf)
 
-def vec(effect edit vecpos allocator, nat length)
+def vec(effect edit vecpos FLOATS, nat length)
     doc "vector on an existing buffer"
     doc "Has the provided length. Can grab the buffer and mutable position allocator as an effect, so that only the length is provided."
-    if allocator.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
-    if allocator.buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
-    if allocator.pos+length>len allocator.buf fail "vector exceeeds buffer limits"
-    start = const allocator.pos
-    allocator.pos = allocator.pos+length
-    return vec(allocator.buf.unsafe_ptr, start, length)
+    if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
+    if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
+    if FLOATS.pos+length>len FLOATS.buf fail "vector exceeeds buffer limits"
+    start = const FLOATS.pos
+    FLOATS.pos = FLOATS.pos+length
+    return vec(FLOATS.buf.unsafe_ptr, start, length)
 
-def vec(effect edit vec_allocator&circular allocator, nat length)
+def vec(effect edit vec_allocator&circular FLOATS, nat length)
     doc "vector on an existing buffer"
-    doc "Has the provided length. Can grab a circular buffer allocator as an effect, so that only the length is provided."
-    if allocator.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
-    if allocator.buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
-    if length>len allocator.buf fail "vector exceeeds buffer limits"
-    start = mut allocator.pos
-    allocator.pos = allocator.pos+length
-    if allocator.pos>=allocator.length
-        allocator.pos = length+0
+    doc "Has the provided length. Can grab a circular buffer FLOATS as an effect, so that only the length is provided."
+    if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
+    if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
+    if length>len FLOATS.buf fail "vector exceeeds buffer limits"
+    start = mut FLOATS.pos
+    FLOATS.pos = FLOATS.pos+length
+    if FLOATS.pos>=FLOATS.length
+        FLOATS.pos = length+0
         start = 0
-    return vec(allocator.buf.unsafe_ptr, start, length)
+    return vec(FLOATS.buf.unsafe_ptr, start, length)
 
 def len(vec v)
     doc "vectot length"
@@ -84,9 +80,9 @@ local def at(float number, nat i)
 local def at(vec v, nat i)
     return v[i]
 
-def add(effect edit vec_allocator allocator, vec v1, vec|float v2)
+def add(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
     doc "vector addition"
-    doc "Grabs an allocator for the result as an effect."
+    doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length
         fail "different vector sizes"
     v = vec v1.length
@@ -95,14 +91,14 @@ def add(effect edit vec_allocator allocator, vec v1, vec|float v2)
         v[i] = v1[i]+v2.at i
     return v
 
-def add(effect edit vec_allocator allocator, float v1, vec v2)
+def add(effect edit vec_allocator FLOATS, float v1, vec v2)
     doc "vector addition"
-    doc "Grabs an allocator for the result as an effect."
+    doc "Grabs an FLOATS for the result as an effect."
     return v2+v1
 
-def sub(effect edit vec_allocator allocator, vec v1, vec|float v2)
+def sub(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
     doc "vector subtraction"
-    doc "Grabs an allocator for the result as an effect."
+    doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
     v = vec v1.length
@@ -111,18 +107,18 @@ def sub(effect edit vec_allocator allocator, vec v1, vec|float v2)
         v[i] = v1[i]-v2.at i
     return v
 
-def sub(effect edit vec_allocator allocator, float v1, vec v2)
+def sub(effect edit vec_allocator FLOATS, float v1, vec v2)
     doc "vector subtraction"
-    doc "Grabs an allocator for the result as an effect."
+    doc "Grabs an FLOATS for the result as an effect."
     v = vec v2.length
     it = range v2.length
     while try i=next it
         v[i] = v1-v2[i]
     return v
 
-def mul(effect edit vec_allocator allocator, vec v1, vec|float v2)
+def mul(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
     doc "vector multiplication"
-    doc "Grabs an allocator for the result as an effect."
+    doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
     v = vec v1.length
@@ -131,14 +127,14 @@ def mul(effect edit vec_allocator allocator, vec v1, vec|float v2)
         v[i] = v1[i]*v2.at i
     return v
 
-def mul(effect edit vec_allocator allocator, float v1, vec v2)
+def mul(effect edit vec_allocator FLOATS, float v1, vec v2)
     doc "vector multiplication"
-    doc "Grabs an allocator for the result as an effect."
+    doc "Grabs an FLOATS for the result as an effect."
     return v2*v1
 
-def div(effect edit vec_allocator allocator, vec v1, vec|float v2)
+def div(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
     doc "vector division"
-    doc "Grabs an allocator for the result as an effect."
+    doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
     v = vec v1.length
@@ -148,9 +144,9 @@ def div(effect edit vec_allocator allocator, vec v1, vec|float v2)
         v[i] = v1[i]/v2.at i
     return v
 
-def div(effect edit vec_allocator allocator, float v1, vec v2)
+def div(effect edit vec_allocator FLOATS, float v1, vec v2)
     doc "vector division"
-    doc "Grabs an allocator for the result as an effect."
+    doc "Grabs an FLOATS for the result as an effect."
     v = vec v2.length
     it = range v2.length
     while try i=next it

@@ -3,7 +3,7 @@ import "std/sci.s"
 
 def main()
     CLI = console()
-    allocator = new() # allocate to new memory whenever needed
+    FLOATS = new() # allocate to new memory whenever needed
 
     a = mat [
         1.0, 0.0, 2.0,

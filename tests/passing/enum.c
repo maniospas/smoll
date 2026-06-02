@@ -4,14 +4,14 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t1493t="B";
-const char* const __t1488t="A";
-const char* const __t1496t="answered: ";
-const char* const __t1500t="in";
-const char* const __t1501t=" ";
-const char* const __t1494t="C";
+const char* const __t1507t="C";
+const char* const __t1513t="in";
+const char* const __t1501t="A";
+const char* const __t1516t=" minutes\n";
 const char* const __t377t="\n";
-const char* const __t1503t=" minutes\n";
+const char* const __t1514t=" ";
+const char* const __t1509t="answered: ";
+const char* const __t1506t="B";
 static const char* __t_all_errcodes[36] = {"noerr",
 "error",
 "null pointer",
@@ -55,20 +55,20 @@ static inline __attribute__((always_inline)) void console__t365t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void answers__t1485t(const char* first, const char* second, uint64_t minutes_to_answer, const char** __t1505t, const char** __t1506t, uint64_t* __t1507t) {
-  *__t1505t=first;
-  *__t1506t=second;
-  *__t1507t=minutes_to_answer;
+static inline __attribute__((always_inline)) void answers__t1498t(const char* first, const char* second, uint64_t minutes_to_answer, const char** __t1518t, const char** __t1519t, uint64_t* __t1520t) {
+  *__t1518t=first;
+  *__t1519t=second;
+  *__t1520t=minutes_to_answer;
 }
 
-static inline __attribute__((always_inline)) void not__t27t(char value, char* __t1508t) {
+static inline __attribute__((always_inline)) void not__t27t(char value, char* __t1521t) {
   char z=0;
   if(!value){
   z=1;
   }
   goto __t_return;
   __t_return:
-  *__t1508t=z;
+  *__t1521t=z;
 }
 
 static inline __attribute__((always_inline)) void print__t375t(const char* value) {
@@ -88,128 +88,128 @@ static inline __attribute__((always_inline)) void print__t386t(uint64_t value, c
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) int main__t1486t() {
-  uint64_t __t1489t=0;
-  const char* __t1490t__first=0;
-  const char* __t1490t__second=0;
-  uint64_t __t1490t__minutes_to_answer=0;
+static inline __attribute__((always_inline)) int main__t1499t() {
+  uint64_t __t1502t=0;
+  const char* __t1503t__first=0;
+  const char* __t1503t__second=0;
+  uint64_t __t1503t__minutes_to_answer=0;
   const char* answers__first=0;
   const char* answers__second=0;
   uint64_t answers__minutes_to_answer=0;
-  char __t1491t=0;
-  char __t1492t=0;
-  char __t1495t__=0;
+  char __t1504t=0;
+  char __t1505t=0;
+  char __t1508t__=0;
   int __t_errcode=0;
   int __t_complain=0;
   console__t365t();
-  __t1489t=60;
-  answers__t1485t(__t1488t,__t1488t,__t1489t,&__t1490t__first,&__t1490t__second,&__t1490t__minutes_to_answer);
-  answers__first=__t1490t__first;
-  answers__second=__t1490t__second;
-  answers__minutes_to_answer=__t1490t__minutes_to_answer;
-  __t1492t=1;
-  if(__t1488t!=answers__first){
-  __t1492t=0;
+  __t1502t=60;
+  answers__t1498t(__t1501t,__t1501t,__t1502t,&__t1503t__first,&__t1503t__second,&__t1503t__minutes_to_answer);
+  answers__first=__t1503t__first;
+  answers__second=__t1503t__second;
+  answers__minutes_to_answer=__t1503t__minutes_to_answer;
+  __t1505t=1;
+  if(__t1501t!=answers__first){
+  __t1505t=0;
   }
-  if(__t1488t!=answers__second){
-  __t1492t=0;
+  if(__t1501t!=answers__second){
+  __t1505t=0;
   }
-  if(__t1492t){
-  __t1491t=1;
+  if(__t1505t){
+  __t1504t=1;
   }
-  __t1492t=1;
-  if(__t1488t!=answers__first){
-  __t1492t=0;
+  __t1505t=1;
+  if(__t1501t!=answers__first){
+  __t1505t=0;
   }
-  if(__t1493t!=answers__second){
-  __t1492t=0;
+  if(__t1506t!=answers__second){
+  __t1505t=0;
   }
-  if(__t1492t){
-  __t1491t=1;
+  if(__t1505t){
+  __t1504t=1;
   }
-  __t1492t=1;
-  if(__t1488t!=answers__first){
-  __t1492t=0;
+  __t1505t=1;
+  if(__t1501t!=answers__first){
+  __t1505t=0;
   }
-  if(__t1494t!=answers__second){
-  __t1492t=0;
+  if(__t1507t!=answers__second){
+  __t1505t=0;
   }
-  if(__t1492t){
-  __t1491t=1;
+  if(__t1505t){
+  __t1504t=1;
   }
-  __t1492t=1;
-  if(__t1493t!=answers__first){
-  __t1492t=0;
+  __t1505t=1;
+  if(__t1506t!=answers__first){
+  __t1505t=0;
   }
-  if(__t1488t!=answers__second){
-  __t1492t=0;
+  if(__t1501t!=answers__second){
+  __t1505t=0;
   }
-  if(__t1492t){
-  __t1491t=1;
+  if(__t1505t){
+  __t1504t=1;
   }
-  __t1492t=1;
-  if(__t1493t!=answers__first){
-  __t1492t=0;
+  __t1505t=1;
+  if(__t1506t!=answers__first){
+  __t1505t=0;
   }
-  if(__t1493t!=answers__second){
-  __t1492t=0;
+  if(__t1506t!=answers__second){
+  __t1505t=0;
   }
-  if(__t1492t){
-  __t1491t=1;
+  if(__t1505t){
+  __t1504t=1;
   }
-  __t1492t=1;
-  if(__t1493t!=answers__first){
-  __t1492t=0;
+  __t1505t=1;
+  if(__t1506t!=answers__first){
+  __t1505t=0;
   }
-  if(__t1494t!=answers__second){
-  __t1492t=0;
+  if(__t1507t!=answers__second){
+  __t1505t=0;
   }
-  if(__t1492t){
-  __t1491t=1;
+  if(__t1505t){
+  __t1504t=1;
   }
-  __t1492t=1;
-  if(__t1494t!=answers__first){
-  __t1492t=0;
+  __t1505t=1;
+  if(__t1507t!=answers__first){
+  __t1505t=0;
   }
-  if(__t1488t!=answers__second){
-  __t1492t=0;
+  if(__t1501t!=answers__second){
+  __t1505t=0;
   }
-  if(__t1492t){
-  __t1491t=1;
+  if(__t1505t){
+  __t1504t=1;
   }
-  __t1492t=1;
-  if(__t1494t!=answers__first){
-  __t1492t=0;
+  __t1505t=1;
+  if(__t1507t!=answers__first){
+  __t1505t=0;
   }
-  if(__t1493t!=answers__second){
-  __t1492t=0;
+  if(__t1506t!=answers__second){
+  __t1505t=0;
   }
-  if(__t1492t){
-  __t1491t=1;
+  if(__t1505t){
+  __t1504t=1;
   }
-  __t1492t=1;
-  if(__t1494t!=answers__first){
-  __t1492t=0;
+  __t1505t=1;
+  if(__t1507t!=answers__first){
+  __t1505t=0;
   }
-  if(__t1494t!=answers__second){
-  __t1492t=0;
+  if(__t1507t!=answers__second){
+  __t1505t=0;
   }
-  if(__t1492t){
-  __t1491t=1;
+  if(__t1505t){
+  __t1504t=1;
   }
-  not__t27t(__t1491t,&__t1495t__);
-  if(__t1495t__){
+  not__t27t(__t1504t,&__t1508t__);
+  if(__t1508t__){
   __t_errcode=35;
   goto __t_failure;
   }
-  print__t375t(__t1496t);
+  print__t375t(__t1509t);
   print__t375t(answers__first);
   print__t375t(answers__second);
-  print__t373t(__t1500t,__t1501t);
-  print__t386t(answers__minutes_to_answer,__t1503t);
+  print__t373t(__t1513t,__t1514t);
+  print__t386t(answers__minutes_to_answer,__t1516t);
   
   __t_failure:
   return __t_errcode;
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1486t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1499t();return 0;}

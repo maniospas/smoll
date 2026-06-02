@@ -2,8 +2,8 @@ import "std/core.s"
 import "std/sci.s"
 
 def safe_main(effect console CLI)
-    allocator  = ref float[].alloc(200).circular() # effects can grab it by name
-    allocator2 = ref float[].alloc(200).circular() # useless 
+    FLOATS  = ref float[].alloc(200).circular() # effects can grab it by name
+    FLOATS2 = ref float[].alloc(200).circular() # useless 
     v1 = new().vec 10 # force our own allocator
     v2 = new().vec 10
     v1[0] = 1.0

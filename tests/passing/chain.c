@@ -4,7 +4,7 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t1469t="123";
+const char* const __t1482t="123";
 const char* const __t377t="\n";
 static const char* __t_all_errcodes[35] = {"noerr",
 "error",
@@ -48,12 +48,12 @@ static inline __attribute__((always_inline)) void console__t365t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void eq__t828t(const char* x, const char* y, char* __t1472t) {
+static inline __attribute__((always_inline)) void eq__t833t(const char* x, const char* y, char* __t1485t) {
   char z=0;
   z=(x==y);
   goto __t_return;
   __t_return:
-  *__t1472t=z;
+  *__t1485t=z;
 }
 
 static inline __attribute__((always_inline)) void print__t392t(char value) {
@@ -68,11 +68,11 @@ static inline __attribute__((always_inline)) void print__t392t(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__t1467t() {
-  char __t1470t__=0;
+static inline __attribute__((always_inline)) void main__t1480t() {
+  char __t1483t__=0;
   console__t365t();
-  eq__t828t(__t1469t,__t1469t,&__t1470t__);
-  print__t392t(__t1470t__);
+  eq__t833t(__t1482t,__t1482t,&__t1483t__);
+  print__t392t(__t1483t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1467t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1480t();return 0;}

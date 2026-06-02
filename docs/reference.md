@@ -192,7 +192,6 @@ def main()
     x = x+2
     x = x+3
     print x
-    print "\n"
 ```
 
 
@@ -281,11 +280,11 @@ def main()
     print f.a.x+f.b.y # prints 5.0
 ```
 
-One notable singleton in the standard library is the `console`.
-This is used to represent the system terminal in which the program 
-is running. This is used to force a sequential execution order,
+One notable singleton in the standard library is the `console`
+used to represent the system terminal in which the program 
+is running. Being a singleton forces sequential execution order,
 even in programs that leverage parallelism. Below is an example
-where this singleton is used to read a float number. Similar 
+where this singleton is used to also read a float number. Similar 
 methods exist for reading strings on buffers, or other number types.
 
 ```python
@@ -293,9 +292,8 @@ import "std/core.s"
 
 def main()
     CLI = console() 
-    console = console()
     print nn "Give a number: "
-    x = float console
+    x = float CLI
     print nn "Its square is: "
     print x*x
 ```
@@ -1727,10 +1725,10 @@ def main()
 The standard library provides the `str` structural type for representing
 strings by combining character buffers (at least their addresses), 
 an offset within the buffer where the string starts (more stable than using a pointer), 
-its length, and its first character for fast cache-friendly comparisons; that is `\0` for empty
-strings.
+its length, and its first character for fast cache-friendly comparisons. The first character 
+is `\0` for empty strings.
 
-`cstr` data are trivially castable to strings. 
+`cstr` data are trivially convertible to strings. 
 Below is an example, where printing is also implemented for
 strings. Theoretically, this extracts the size and first
 character too, but such data are ignored if not needed.
@@ -1768,7 +1766,20 @@ def main()
     print s
 ```
 
-Also copy strings on buffers managed by lists.
+To make code read more naturally, this can be converted to a CHARS effect.
+
+```python
+import "std/core.s"
+
+def main()
+    CLI = console()
+    CHARS = bufpos alloc KB 4 # effect for placing string data
+    s = copy "hello world!"
+    print s
+```
+
+Also copy strings on buffers managed by lists, which can also be used 
+as a CHARS effect to manage string allocations.
 DO use `ref` for stability, as potential list resizing
 could invalidate the pointer where the string thinks the buffer starts,
 and the compiler would correctly point that out and refuse to progress
@@ -1779,12 +1790,49 @@ import "std/core.s"
 
 def main()
     CLI = console()
-    buf = ref mut list mut char[]
-    s1 = buf.copy "hello world!" # would have been invalidated if we did not use `ref`
-    s2 = buf.copy "hello world!"
+    CHARS = ref list mut char[]
+    s1 = copy "hello world!" # would have been invalidated if we did not use `ref`
+    s2 = copy "hello world!"
     print s1
     print s2
 ```
+
+Finally, strings provide the `add` function as a combination of a CHARS effect
+to place a concatenated outcome, and two individual strings or cstr. By means
+of automatically passing CHARS (normal effect behavior) this function be treated
+as a `+` operation like below.
+
+```python
+import "std/core.s"
+
+def main()
+    CLI = console()
+    CHARS = bufpos char[].alloc KB 4
+    s1 = copy "hello"
+    s2 = copy "world!"
+    print s1+" "+s2
+``` 
+
+That said, it is preferred to copy strings onto
+buffers at consecutive places for more efficient operations. For example, the above
+can be rewritten to use less than half space onto the buffer per the next snippet.
+Note usage of the literal `type "from"` to indicate that the construction should be
+structurally matched to the variation `str(char[] buffer, nat end, "from", nat start)`.
+There also exists the variation `str(char[] buffer, nat start, "to", nat length)`.
+
+```python
+import "std/core.s"
+
+def main()
+    CLI = console()
+    CHARS = bufpos char[].alloc KB 4
+    start = CHARS.pos
+    copy "hello"
+    copy " "
+    copy "world!"
+    print str(CHARS, type "from", start)
+```
+
 
 ## maps
 
@@ -1838,9 +1886,9 @@ def main()
     f = file:read "README.md"
     mem = char[].alloc KB 4 # max 4 KB chunk size, on char[] by default
     for line in (mem, f)
-        print("|", "")
-        print(line, "")
-    print ""
+        print nn "|"
+        print nn line
+    print "" # only now print a new line
 ```
 
 Similarly, create a file for writing like below. Can also delete it,
@@ -1873,10 +1921,8 @@ def main()
     dir = mut dir:read "."
     for entry in dir
         print(entry, " ")
-        if dir:is_file entry
-            print "file"
-        else
-            print "dir"
+        if dir:is_file entry print "file"
+        else print "dir"
 ```
 
 ## processes
@@ -1945,8 +1991,8 @@ import "std/rand.s"
 def main()
     CLI = console()
     seed = mut splitmix64()
-    print splitmix64(seed)
-    print splitmix64(seed)
+    print splitmix64 seed 
+    print splitmix64 seed
 ```
 
 *Xoshiro256plus* is meant to compute random numbers in the range [0,1] and is recommended
@@ -2079,8 +2125,8 @@ def main()
 ```
 
 An extension of vectors are matrices. These are defined
-with similar patterns, including the one below that consumes 
-the a whole `float[]` buffer alongside a declared number of rows.
+with similar patterns, including the consumption of
+a whole `float[]` buffer to be split into a number of rows.
 Matrix multiplication and matrix-vector multiplication are also
 implemented.
 
@@ -2090,7 +2136,7 @@ import "std/sci.s"
 
 def main()
     CLI = console()
-    allocator = new() # allocate to new memory whenever needed
+    FLOATS = new() # allocate to new memory whenever needed
 
     a = mat [
         1.0, 0.0, 2.0,
@@ -2195,7 +2241,7 @@ can have the battle-tested command line tool at their disposal?
 *This is not static linking!* It is actively encouraged to communicate with operating system
 processes when the latter are longer-running. Then, system error codes are propagated as
 normal failure. Of course, this vision requires a robust way of communicating with the operating
-system. This is done via the  `process` namespace under the `std.io.s` include like below that is
+system. This is done via the `process` namespace under the `std.io.s` include like below that is
 directly copied from the library. This dynamically constructs a command string on a buffer
 and uses it to run a system process. The deferred process deletion can be force-executed via `del`,
 thus waiting for the process's end. This may leave a notification of non-zero exit code, 
@@ -2220,7 +2266,6 @@ def main()
     bp.copy "./smoll "
     bp.copy path
     test_dir = dir:read path
-    proc_buf = char[].alloc KB 4
     for entry in test_dir # do not move the position
         if not entry.ends_with ".s" continue
         command = bp.buf.str((local bp).copy_null_terminated(str entry).endpos())

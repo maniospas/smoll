@@ -77,7 +77,7 @@ def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     if bytes_read==0 fail "end of file"
     prev_pos = const pos
     pos = pos+bytes_read
-    return str(buf, prev_pos, bytes_read)
+    return str(buf, prev_pos, type "to", bytes_read)
     
 def line(edit char[] buf, mut nat|blank pos, edit File f)
     doc "next line"
@@ -101,7 +101,7 @@ def line(edit char[] buf, mut nat|blank pos, edit File f)
     {builtins:nat bytes_read = strlen(contents);}
     prev_pos = const pos
     pos = pos+bytes_read
-    return str(buf, prev_pos, bytes_read)
+    return str(buf, prev_pos, type "to", bytes_read)
 
 def print(edit terminal|write f, str text)
     doc "writes a string to a write file"

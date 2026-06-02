@@ -122,7 +122,7 @@ def str(edit char[] buf, mut nat pos, console console)
         {builtins:compiler:ptr ptr_pos = buf__unsafe_ptr+pos;}
         {*ptr_pos=_c;}
         pos = pos+1
-    return str(buf, start, pos-start)
+    return str(buf, start, type "to", pos-start)
 
 def int(cstr|str _s)
     doc "converts a string to an integer"

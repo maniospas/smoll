@@ -11,7 +11,7 @@ def run(effect console CLI, cstr|str command)
 def main()
     CLI = console()
     path = "./tests/passing/"
-    bp = bufpos char[].alloc 256 # buffer and mutable position pair
+    bp = arena char[].alloc 256 # buffer and mutable position pair
     bp.copy "./smoll "
     bp.copy path
     test_dir = dir:read path

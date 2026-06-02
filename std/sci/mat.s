@@ -15,7 +15,7 @@ def mat(effect edit new FLOATS, nat rows, nat cols)
     buf = float[].alloc rows*cols
     return mat(buf.unsafe_ptr, 0, rows, cols, cols)
 
-def mat(effect edit vecpos FLOATS, nat rows, nat cols)
+def mat(effect edit float_arena FLOATS, nat rows, nat cols)
     doc "matrix on an existing vecpos"
     if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
     if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place matrices on buffer offsets"

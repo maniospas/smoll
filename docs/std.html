@@ -218,8 +218,8 @@
 <a href="#gb">GB</a> 
 <a href="#len">len</a> 
 <a href="#new">new</a> 
-<a href="#bufpos">bufpos</a> 
-<a href="#strbufpos">strbufpos</a> 
+<a href="#arena">arena</a> 
+<a href="#char_arena">char_arena</a> 
 <a href="#circular">circular</a> 
 <a href="#str">str</a> 
 <a href="#copy">copy</a> 
@@ -4416,9 +4416,9 @@ For ease of use, the path is returned.</p>
 </code></pre>
 </div>
 
-<h1 id="bufpos">bufpos</h1>
+<h1 id="arena">arena</h1>
 
-<h3 id="bufpos-a-buffer-and-mutable-position-pair">bufpos - a buffer and mutable position pair</h3>
+<h3 id="arena-a-buffer-and-mutable-position-pair">arena - a buffer and mutable position pair</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
@@ -4426,13 +4426,13 @@ For ease of use, the path is returned.</p>
 to maintain stable references within the buffer.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">bufpos</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span>
+<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span>
 </code></pre>
 </div>
 
-<h1 id="strbufpos">strbufpos</h1>
+<h1 id="char_arena">char_arena</h1>
 
-<h3 id="strbufpos-bufpos-specialized-for-char-buffers">strbufpos - bufpos specialized for char[] buffers</h3>
+<h3 id="char_arena-arena-specialized-for-char-buffers">char_arena - arena specialized for char[] buffers</h3>
 
 <p><em>Defined in: std/core/string.s</em></p>
 
@@ -4442,7 +4442,7 @@ at the buffer at the given position and the position then progresses to accomoda
 further string additions.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">strbufpos</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buf</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
+<pre><span></span><code><span class="n">char_arena</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="n">element</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">1</span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buf</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">},</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="p">)</span>
 </code></pre>
 </div>
 

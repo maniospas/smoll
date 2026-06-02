@@ -2,7 +2,7 @@ import "std/core.s"
 
 def main()
     console = console()
-    mem = bufpos char[].alloc 1024
+    mem = arena char[].alloc 1024
     print "what's your name"
     name = mem.str console
     print ("hello", " ")

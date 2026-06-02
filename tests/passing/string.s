@@ -8,4 +8,4 @@ def main()
     pos = mut 0
     for line in (mem,pos,f) continue
     del f
-    print str(mem,0,pos)
+    print str(mem, 0 to pos)

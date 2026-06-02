@@ -22,20 +22,20 @@ def new()
     doc "allocations on new buffers"
     return class()
 
-def bufpos(edit any[] buf)
+def arena(edit any[] buf)
     doc "a buffer and mutable position pair"
     doc "The position starts from 0. This structure is often used"
     doc "to maintain stable references within the buffer."
     pos = mut 0
     return (buf, pos)
 
-def strbufpos(edit char[] buf)
-    doc "bufpos specialized for char[] buffers"
+def char_arena(edit char[] buf)
+    doc "arena specialized for char[] buffers"
     doc "This is used to indicate a pair of a character buffer and a mutable position."
     doc "It is used as a string allocator so that they new ones can be created or copied"
     doc "at the buffer at the given position and the position then progresses to accomodate"
     doc "further string additions."
-    return bufpos buf
+    return arena buf
 
 def circular(any[] buf, mut nat pos, nat length)
     doc "circular buffer"
@@ -191,7 +191,7 @@ def cstr(unsafe_temp value)
     doc "or to comptime returns with the pattern 'cstr unsafe_temp string_value'."
     return value.cstr
 
-def copy(effect edit strbufpos CHARS, char character, nat|blank repeat)
+def copy(effect edit char_arena CHARS, char character, nat|blank repeat)
     doc "copies a character as a string"
     doc "Copies a new character at a given buffer a number of times"
     doc "Then, returns a string corresponding to the copied region."
@@ -239,7 +239,7 @@ def neq(str|cstr x, str|cstr y)
     doc "not equals"
     return not x==y
 
-def copy(effect edit strbufpos CHARS, str|cstr _other)
+def copy(effect edit char_arena CHARS, str|cstr _other)
     doc "copy a string"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -252,7 +252,7 @@ def copy(effect edit strbufpos CHARS, str|cstr _other)
     CHARS.pos = next_pos
     return str(CHARS.buf, prev_pos, other.dat.length, other.dat.first)
 
-def copy_null_terminated(effect edit strbufpos CHARS, str|cstr _other)
+def copy_null_terminated(effect edit char_arena CHARS, str|cstr _other)
     doc "copy a string while adding null termination"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -358,7 +358,7 @@ def nn(str value)
     doc "to print without a new line."
     return (value, "")
 
-def add(effect edit strbufpos CHARS, str|cstr s1, str|cstr s2)
+def add(effect edit char_arena CHARS, str|cstr s1, str|cstr s2)
     start = CHARS.pos
     copy(CHARS.buf, CHARS.pos, s1)
     copy(CHARS.buf, CHARS.pos, s2)

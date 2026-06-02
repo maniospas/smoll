@@ -966,7 +966,7 @@ we could not just pack a `str`.
 ```python
 import "std/core.s"
 
-def CONSTANT = compt cstr unsafe_temp add(bufpos alloc 128, "hello", " world!")
+def CONSTANT = compt cstr unsafe_temp add(arena alloc 128, "hello", " world!")
 def main()
     CLI = console()
     print CONSTANT
@@ -989,7 +989,7 @@ def ones = compt vec [1.0, 1.0]
 def main()
     CLI = console()
     v = mut vec [5.0, 10.0]
-    allocator = bufpos float[].alloc 128
+    allocator = arena float[].alloc 128
     v = v+ones
     print v[0] # prints 6.0
     print v[1] # prints 11.0
@@ -1048,16 +1048,16 @@ def main()
 ```
 
 The outcome of allocation is a mutable buffer. Declare this as 
-as `const` to disallow content modifications or any resizing. 
+as `const` to forcefully disallow content modifications or resizing. 
+That said, function arguments are `const` unless indicated otherwise 
+so tere will only rarely be need to use this keyword.
 Below is any example of how the compiler enforces this constraint.
-The compiler does show some additional information like element size
+The compiler does track some additional information like element size
 in bytes and, importantly, if there are dependent buffers from which
-the type is inferred. The imporant part to look out for is that
-`mutget` is being called for mutable element access -so as to modify
-an element- and that requires edit permissions 
-when a buffer is an argument (`edit any[]`) but the local buffer
-is `const float[]`. You might be tempted to promote the buffer *buf* to
-being mutable, but elevating buffer or -more generally- pointer pemissions
+the type is inferred. 
+
+In this setting, it is not allowed to wrongfully promote the buffer *buf* to
+being mutable; elevating buffer or -more generally- pointer pemissions
 from constant to mutable is not allowed for safety.
 
 ```python
@@ -1090,9 +1090,10 @@ at tests/test.s line 5 column 12
 </div>
 
 Use `any` as the type to mark functions with type-agnostic
-operations. The original type cannot be retrieved back while
-those functions are running, but this operation is useful for writing
-generic code. If you run a 
+buffer operations. The original type cannot be retrieved back while
+those functions are running, but this operation is still 
+useful for writing generic code that depends on memory contents
+and data sizes packed within buffer metadata. If you run a 
 function with such generic typing, the compiler identifies
 the correct output types for buffers of pointers. For example,
 the abovedescribed allocation mechanism is implemented
@@ -1111,7 +1112,7 @@ def main()
     print(x)
 ```
 
-For function arguments that need to be spacialized
+For function arguments that need to be specialized
 on a buffer type, declare an intermediate
 type like below.
 
@@ -1606,8 +1607,8 @@ def main()
 
 Where effects are the most useful is overloading operations that require
 external resources. The next example demonstrates this using vectors
-from the corresponding standard library [section](#vectors), where
-the *allocator* effect is used to pass a shared preallocated memory buffer
+from the corresponding standard library [section](#vectors).
+The *FLOATS* effect is used to pass a shared preallocated memory buffer
 to all needed vector construction. Effects do not propagate outwards,
 so you can only look at function signatures to know which effects can
 be declared. For example, one of the possible
@@ -1620,7 +1621,7 @@ import "std/sci.s"
 
 def main()
     CLI = console()
-    allocator  = bufpos float[].alloc 128
+    FLOATS = arena float[].alloc 128
     v1 = vec 10 # vector of 10 elements
     v2 = vec 10
     v1[0] = 1.0
@@ -1780,28 +1781,30 @@ def main()
 ```
 
 Strings can be copied on a pair of buffer and mutable position inside it `char[], mut nat`.
-This structure is used a lot when creating buffers for memory management.
-Thus, for more compact code, the structure can be constructed and initialized to start from the zero 
-position with the `bufpos` (buffer-position) function.
+This structure is used a lot when creating buffers for memory management and is called an
+`arena`. In general, arenas are just buffer and position pairs of a specific type. Later we
+will also use them to store `float` vector contents.
 
 ```python
 import "std/core.s"
 
 def main()
     CLI = console()
-    buf = bufpos alloc KB 4 # equivalent to buf = (alloc KB 4, mut 0)
+    buf = arena alloc KB 4 # equivalent to buf = (alloc KB 4, mut 0)
     s = buf.copy "hello world!"
     print s
 ```
 
-To make code read more naturally, this can be converted to a CHARS effect.
+To make code read more naturally, character arenas can be set to a CHARS effect.
+Recall that effects are arguments that are automatically retrieved from the calling
+location based on their name.
 
 ```python
 import "std/core.s"
 
 def main()
     CLI = console()
-    CHARS = bufpos alloc KB 4 # effect for placing string data
+    CHARS = arena alloc KB 4 # effect for placing string data
     s = copy "hello world!"
     print s
 ```
@@ -1835,7 +1838,7 @@ import "std/core.s"
 
 def main()
     CLI = console()
-    CHARS = bufpos char[].alloc KB 4
+    CHARS = arena char[].alloc KB 4
     s1 = copy "hello"
     s2 = copy "world!"
     print s1+" "+s2
@@ -1854,7 +1857,7 @@ import "std/core.s"
 
 def main()
     CLI = console()
-    CHARS = bufpos char[].alloc KB 4
+    CHARS = arena alloc KB 4
     start = CHARS.pos
     copy "hello"
     copy " "
@@ -1887,7 +1890,7 @@ def main()
     print map["hello"]
     print map["manio"]
     
-    it = bufpos map.keys
+    it = arena map.keys
     while try key=next it
         print key
 ```
@@ -1903,7 +1906,7 @@ pretend that they are null-terminated, a copy may be made.
 
 Read a file by opening it and iterating line by
 line, like below. This needs a `char[]` buffer 
--or a `bufpos` on that charcater buffer- on which to 
+-or a `arena` on that charcater buffer- on which to 
 store lines.
 
 ```python
@@ -1979,7 +1982,7 @@ import "std/io.s":process as proc
 def main()
     CLI = console()
     process = proc:process "ls"
-    buf = bufpos char[].alloc KB 4 # example with growing position
+    buf = arena char[].alloc KB 4 # example with growing position
     for line in (buf, process)
         print line
 ```
@@ -2079,7 +2082,7 @@ import "std/core.s"
 import "std/mini.s" as mini
 
 def concat(mini:str[] buff)
-    mem = bufpos char[].alloc KB 4
+    mem = arena char[].alloc KB 4
     iter = range len buff
     start = mem.pos
     while try i=next iter
@@ -2124,7 +2127,7 @@ def main()
     print (std v, ")\n")
 ```
 
-Vectors can be placed on `bufpos` buffer-position pairs, as well as
+Vectors can be placed on `arena` buffer-position pairs, as well as
 on circular buffer constructs that restart from the starting position 
 after the end.
 
@@ -2291,7 +2294,7 @@ def run(cstr|str command)
 def main()
     CLI = console()
     path = "./tests/passing/"
-    bp = bufpos char[].alloc 256 # buffer and mutable position pair
+    bp = arena char[].alloc 256 # buffer and mutable position pair
     bp.copy "./smoll "
     bp.copy path
     test_dir = dir:read path

@@ -2,10 +2,10 @@ local import "std/core.s"
 local import "std/sci/math.s"
 local import "std/sci/unsafe.s"
 
-def newvec() 
+def vec_new() 
     return new()
-def vecpos(edit float[] buf, mut nat pos)
-def vec_allocator = newvec|vecpos|circular
+def float_arena(edit float[] buf, mut nat pos)
+def vec_allocator = vec_new|float_arena|circular
 def circular(edit float[] buf, mut nat|blank pos, nat|blank length)
     doc "circular float buffer"
     doc "Is used as FLOATS"
@@ -37,7 +37,7 @@ def constvec(float[] buf)
     if buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
     return const vec(unsafe_mut buf.unsafe_ptr, 0, len buf)
 
-def vec(effect edit vecpos FLOATS, nat length)
+def vec(effect edit float_arena FLOATS, nat length)
     doc "vector on an existing buffer"
     doc "Has the provided length. Can grab the buffer and mutable position allocator as an effect, so that only the length is provided."
     if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"

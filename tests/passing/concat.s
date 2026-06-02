@@ -3,13 +3,13 @@ import "std/mini.s" as mini
 
 
 def concat(mini:str[] buff)
-  mem = bufpos ref char[].alloc KB 4
+  mem = arena ref char[].alloc KB 4
   iter = range len buff
   start = mem.pos
   while try i=next iter
     mem.copy mini:unpack(buff[i])
     mem.copy " "
-  return str(mem.buf,start,mem.pos)
+  return str(mem.buf,start to mem.pos)
 
 def main()
   CLI = console()

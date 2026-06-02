@@ -266,7 +266,7 @@ static inline __attribute__((always_inline)) int alloc__t509t(char** __t1442t, u
   return __t_errcode;
 }
 
-static inline __attribute__((always_inline)) void bufpos__t718t(char** __t1450t, uint64_t* __t1451t, uint16_t* __t1452t, uint16_t* __t1453t, char** __t1454t, uint64_t* __t1455t, uint16_t* __t1456t, uint16_t* __t1457t, uint64_t* __t1458t) {
+static inline __attribute__((always_inline)) void arena__t718t(char** __t1450t, uint64_t* __t1451t, uint16_t* __t1452t, uint16_t* __t1453t, char** __t1454t, uint64_t* __t1455t, uint16_t* __t1456t, uint16_t* __t1457t, uint64_t* __t1458t) {
   char* buf__unsafe_ptr=*__t1450t;
   uint64_t buf__unsafe_size=*__t1451t;
   uint16_t buf__unsafe_offset=*__t1452t;
@@ -1136,7 +1136,7 @@ static inline __attribute__((always_inline)) int main__t1399t() {
   if(__t_errcode){
   goto __t_failure;
   }
-  bufpos__t718t(&__t1405t__unsafe_ptr,&__t1405t__unsafe_size,&__t1405t__unsafe_offset,&__t1405t__unsafe_align,&__t1407t__buf__unsafe_ptr,&__t1407t__buf__unsafe_size,&__t1407t__buf__unsafe_offset,&__t1407t__buf__unsafe_align,&__t1407t__pos);
+  arena__t718t(&__t1405t__unsafe_ptr,&__t1405t__unsafe_size,&__t1405t__unsafe_offset,&__t1405t__unsafe_align,&__t1407t__buf__unsafe_ptr,&__t1407t__buf__unsafe_size,&__t1407t__buf__unsafe_offset,&__t1407t__buf__unsafe_align,&__t1407t__pos);
   mem__buf__unsafe_ptr=__t1407t__buf__unsafe_ptr;
   mem__buf__unsafe_size=__t1407t__buf__unsafe_size;
   mem__buf__unsafe_offset=__t1407t__buf__unsafe_offset;

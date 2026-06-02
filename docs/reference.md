@@ -779,13 +779,14 @@ def main()
     version type VERSION # calls the same version
 ```
 
-Literal types still adhere to all other type system conventions. 
-Those includes union declarations and having associated variables
-holding their value when used as function arguments.
+Literal types are still types and are associated to named variables.
+For example, `"two" number_name` is a valid function argument of type `"two"`.
+This is not a value and yout cannot, say, print it.
 
-Get back the associated value with the `compiler:literal` function. 
-That is, `compiler:literal type "two"` yields `"two"`.
-The benefit lies purely in extracting values from the type system.
+But you can get back the value associated value with the type via 
+the `compiler:literal` function. 
+That is, `compiler:literal type "two"` yields the `cstr` value `"two"`.
+This way, you can extract values from the type system.
 An example that restricts how functions are called is presented next.
 
 ```python
@@ -803,10 +804,10 @@ def main()
 ```
 
 Check whether a variable belongs to a
-literal type by performing the `is` check to obtain
+literal type by performing an `is` check to obtain
 a boolean value. Contrary to the zero-cost conditional 
-compilation of the next section when using `is` with 
-inferred types only, literal types may be resolved
+compilation of the next section, which has zero runtime
+overhead, literal types may be resolved
 to several runtime checks.
 
 ```python
@@ -827,6 +828,33 @@ def main()
     print answers.second
     print ("in", " ")
     print (answers.minutes_to_answer, " minutes\n")
+```
+
+Literal types culminate in a feature that allows usage of the type name as a language keyword
+in place of a comma separator. In particular, two tuple elements (such as function arguments)
+can be separated by a single word instead of commas, and that word resolves to a variable of
+the same-named type literal. Below is an example.
+
+Do remember that this syntax replaces the comma separator. So it occurs after an expression 
+ends. Therefore, to convert two literals
+back-to-back, you need use a placeholder with no outputs as an argument, 
+like `blank()`. But you can still have a literal at the end of an expression.
+
+```python
+import "std/core.s"
+
+def modify(mut nat x, "add", "one")
+    x = x+1
+def modify(mut nat x, "add", nat y)
+    x = x+y
+def modify(mut nat x, "sub", nat y)
+    x = x-y
+def main()
+    CLI = console()
+    x = mut 5
+    modify(x add 3)
+    modify(x add blank() one)
+    print x # prints 9
 ```
 
 ## conditional compilation and default arguments
@@ -1814,9 +1842,10 @@ def main()
 ``` 
 
 That said, it is preferred to copy strings onto
-buffers at consecutive places for more efficient operations. For example, the above
-can be rewritten to use less than half space onto the buffer per the next snippet.
-Note usage of the literal `type "from"` to indicate that the construction should be
+buffers at consecutive places for more efficient operations. The above string addition
+is rewritten in the next snippet to use less than half space onto the buffer.
+Note usage of the literal `from` via the comma-less syntax sugar for [literals](#literal-types). 
+This indicates that the construction should be
 structurally matched to the variation `str(char[] buffer, nat end, "from", nat start)`.
 There also exists the variation `str(char[] buffer, nat start, "to", nat length)`.
 
@@ -1830,7 +1859,8 @@ def main()
     copy "hello"
     copy " "
     copy "world!"
-    print str(CHARS, type "from", start)
+    print str(CHARS from start)
+
 ```
 
 

@@ -1870,6 +1870,10 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
         if callee.returned_defers: print("\nReturned values defer use of the following functions:")
         for defer in callee.returned_defers: print("```rust\n"+code_summary(defer,callee)+"```")
+        singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
+        if singletons: print("\nThe following singletons are initialized:")
+        for singleton in singletons: print("```rust\n"+singletons.signature()+"\n```")
+        if callee.VM: print("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*")
     return callee
 
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
@@ -2223,6 +2227,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if callee==FAIL_TYPE: 
         if impl.nesting: error_token.error("safety", "cannot create a compilation-time failure inside a 'while' or an 'if' whose condition does not evaluate to compile-time known boolean")
         raise CompfailException()
+    if callee==UNSAFE_EFFECTS_TYPE:
+        impl.dependent_implementations = [dep for dep in impl.dependent_implementations if not dep.has_retrieved_singleton]
+        return []
     if callee==SUCCESS_TYPE: 
         if impl.nesting: error_token.error("safety", "we are inside a 'while' or an 'if' whose condition cannot be inferred to a compile-time known boolean", reason=error_token)
     # and after all the above we need to transfer all defers
@@ -3556,7 +3563,12 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             if peek==")": break
             if peek==",":
                 continue
-            get(tokens, prev_pos).error("syntax", "no matching comma or closing parenthesis")
+            littype = literal_types.get("\""+peek+"\"", None)
+            if littype is None: get(tokens, prev_pos).error("syntax", "expecting comma, closing parenthesis, or keyword derived from a cstr literal type")
+            if is_lsp and get(tokens, pos).file==file: print_lsp_keyword(get(tokens, pos), "**literal type**\n\nThis is a shorthand to adding a 'type \""+peek+"\"' argument here.")
+            litvar = Variable(create_temp(), littype.variations[0])
+            impl.vars[litvar.name] = litvar
+            ret.append(litvar)
         pos += 1 # skip closing parenthesis
         if peek_text(tokens, pos)=="->" or peek_text(tokens, pos)=="." or peek_text(tokens, pos)=="[" or (peek_text(tokens, pos) in operators and for_call): return pos, ret  # manual left-to-right piping
         return await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
@@ -4396,7 +4408,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                     if is_same:
                         already_parsed = variation_position
                         break
-                if already_parsed is not None: 
+                if already_parsed is not None:
                     if found_type.variations[already_parsed].at!=impl.at: 
                         candidates.append(found_type.variations[already_parsed])
                         continue
@@ -4432,6 +4444,10 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
                         if callee.returned_defers: print("\nReturned values defer use of the following functions:")
                         for defer in callee.returned_defers: print("```rust\n"+code_summary(defer, callee)+"```")
+                        singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
+                        if singletons: print("\nThe following singletons are initialized:")
+                        for singleton in singletons: print("```rust\n"+singletons.signature()+"\n```")
+                        if callee.VM: print("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*")
             except FastReturnException: 
                 assert fast_return_exception
             #if not impl.force_not_inline and fast_return_exception: continue # register only forcefully RECURSIVE variations
@@ -4869,6 +4885,9 @@ FAIL_TYPE.doc.append("Branchless code refers loops or conditions that are elimin
 SUCCESS_TYPE = ImplementedType("branchless")
 SUCCESS_TYPE.doc.append("verify branchless code")
 SUCCESS_TYPE.doc.append("Branchless code refers loops or conditions that are eliminated during compilation as either always true or always false, based on type analysis and data analysis. This is meaningful for compiling different versions of functions based on specific conditions occuring. This function is hard-wired to create an error if it is called withing a condition or loop that has not been eliminated this way.")
+UNSAFE_EFFECTS_TYPE = ImplementedType("unsafe_singletons")
+UNSAFE_EFFECTS_TYPE.doc.append("remove singleton safety")
+UNSAFE_EFFECTS_TYPE.doc.append("Removes all currently accumulated singleton information. Mainly useful for creating unsafe singletons for debug purposes.")
 NOCATCH_TYPE = ImplementedType("nocatch")
 NOCATCH_TYPE.doc.append("verify no errors up to now")
 NOCATCH_TYPE.doc.append("Creates a compiler error if it is possible to have seen an error outside a 'try' statement that would have terminate this function before this point.")
@@ -4952,6 +4971,7 @@ debug_token = Token("debug", debug_namespace, 1, 1)
 debug_namespace.types["nocatch"] = UnionType("nocatch", at=compiler_token).append(NOCATCH_TYPE)
 debug_namespace.types["print"] = UnionType("print", at=compiler_token).append(DEBUG_TYPE)
 debug_namespace.types["branchless"] = UnionType("branchless", at=compiler_token).append(SUCCESS_TYPE)
+debug_namespace.types["unsafe_singletons"] = UnionType("unsafe_singletons", at=compiler_token).append(UNSAFE_EFFECTS_TYPE)
 smol_namespace.namespaces["debug"] = debug_namespace
 
 file_cache["builtins"] = smol_namespace
@@ -5108,6 +5128,9 @@ async def main():
                     docs_file.write("\n")
                     if callee.returned_defers: docs_file.write("\nReturned values defer use of the following functions:\n")
                     for defer in callee.returned_defers: docs_file.write("```rust\n"+code_summary(defer, callee)+"```\n")
+                    singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
+                    if singletons: docs_file.write("\nThe following singletons are initialized:\n")
+                    for singleton in singletons: docs_file.write("```rust\n"+singletons.signature()+"\n```\n")
                     if callee.VM: docs_file.write("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*\n")
     elif not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)

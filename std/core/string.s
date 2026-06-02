@@ -78,11 +78,20 @@ def str(str other)
     doc "tautology function for strings"
     return other
 
-def str(char[] buf, nat pos, "to", nat length)
+def str(char[] buf, nat pos, "lento", nat length)
     doc "a string residing on a buffer"
     doc "The string automatically detects the first character,"
     doc "which is generally tracked for fewer negative indirections"
     doc "on negative comparisons."
+    if length!=0 first = buf[pos]  # properly zero-initialized otherwise
+    return str(buf, pos, length, first)
+
+def str(char[] buf, nat pos, "to", nat endpos)
+    doc "a string residing on a buffer"
+    doc "The string automatically detects the first character,"
+    doc "which is generally tracked for fewer negative indirections"
+    doc "on negative comparisons."
+    length = endpos-pos
     if length!=0 first = buf[pos]  # properly zero-initialized otherwise
     return str(buf, pos, length, first)
 
@@ -91,7 +100,7 @@ def str(char[] buf, nat endpos, "from", nat pos)
     doc "The string automatically detects the first character,"
     doc "which is generally tracked for fewer negative indirections"
     doc "on negative comparisons."
-    return str(buf, pos, type "to", endpos-pos)
+    return str(buf, pos lento endpos-pos)
 
 def str(cstr c)
     doc "convert to string"
@@ -102,7 +111,7 @@ def str(cstr c)
     buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler:attach_type(c)
     {if(c){builtins:nat length = strlen(c);}} # length initializes to zero
     buf.unsafe_size = length+1  # account for null termination
-    return str(buf,0,type "to",length)
+    return str(buf,0 lento length)
 
 def len(str s)
     doc "string length"
@@ -191,13 +200,44 @@ def copy(effect edit strbufpos CHARS, char character, nat|blank repeat)
         repeat = 1
     if CHARS.pos+repeat>len CHARS.buf fail "character copy does not fit on buffer"
     {memset(CHARS__buf__unsafe_ptr+CHARS__pos, character, repeat);}
-    return str(CHARS.buf, CHARS.pos, type "to", repeat)
+    return str(CHARS.buf, CHARS.pos lento repeat)
 
 def endpos(const str s)
     doc "the end position of a string"
     doc "This position is computed relative to its start in its"
     doc "enclosing buffer."
     return s.dat.pos+s.dat.length
+
+def eq(cstr x, cstr y)
+    doc "equals"
+    {builtins:bool z = (x==y);}
+    return z
+
+def eq(str x, str y)
+    doc "equals"
+    n = len x
+    if n!=len y
+        return false
+    if x.dat.first!=y.dat.first
+        return false
+    {builtins:bool z = !memcmp(x__unsafe_ptr+x__dat__pos, y__unsafe_ptr+y__dat__pos, n);}
+    return z
+
+def eq(str x, cstr y)
+    doc "equals"
+    if x.dat.first != char y
+        return false
+    return x==str y
+
+def eq(cstr x, str y)
+    doc "equals"
+    if y.dat.first != char x
+        return false
+    return y==str x
+
+def neq(str|cstr x, str|cstr y)
+    doc "not equals"
+    return not x==y
 
 def copy(effect edit strbufpos CHARS, str|cstr _other)
     doc "copy a string"
@@ -261,37 +301,6 @@ def get(str s, nat i)
     doc "a character in a string"
     return s.unsafe_ptr.unsafe:add(s.dat.pos+i)
 
-def eq(cstr x, cstr y)
-    doc "equals"
-    {builtins:bool z = (x==y);}
-    return z
-
-def eq(str x, str y)
-    doc "equals"
-    n = len x
-    if n!=len y
-        return false
-    if x.dat.first!=y.dat.first
-        return false
-    {builtins:bool z = !memcmp(x__unsafe_ptr+x__dat__pos, y__unsafe_ptr+y__dat__pos, n);}
-    return z
-
-def eq(str x, cstr y)
-    doc "equals"
-    if x.dat.first != char y
-        return false
-    return x==str y
-
-def eq(cstr x, str y)
-    doc "equals"
-    if y.dat.first != char x
-        return false
-    return y==str x
-
-def neq(str|cstr x, str|cstr y)
-    doc "not equals"
-    return not x==y
-
 def print(effect console CLI, char c, cstr|blank endl)
     doc "print a character"
     if endl is blank
@@ -354,4 +363,4 @@ def add(effect edit strbufpos CHARS, str|cstr s1, str|cstr s2)
     copy(CHARS.buf, CHARS.pos, s1)
     copy(CHARS.buf, CHARS.pos, s2)
     endpos = CHARS.pos+0 # this is pretty important to decouple a pressumed equality in position when referencing
-    return str(CHARS.buf, start, type "to", endpos)
+    return str(CHARS.buf, start to endpos)

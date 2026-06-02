@@ -967,13 +967,14 @@ can be a string or number literal.</p>
 </code></pre>
 </div>
 
-<p>Literal types still adhere to all other type system conventions. 
-Those includes union declarations and having associated variables
-holding their value when used as function arguments.</p>
+<p>Literal types are still types and are associated to named variables.
+For example, <code>"two" number_name</code> is a valid function argument of type <code>"two"</code>.
+This is not a value and yout cannot, say, print it.</p>
 
-<p>Get back the associated value with the <code>compiler:literal</code> function. 
-That is, <code>compiler:literal type "two"</code> yields <code>"two"</code>.
-The benefit lies purely in extracting values from the type system.
+<p>But you can get back the value associated value with the type via 
+the <code>compiler:literal</code> function. 
+That is, <code>compiler:literal type "two"</code> yields the <code>cstr</code> value <code>"two"</code>.
+This way, you can extract values from the type system.
 An example that restricts how functions are called is presented next.</p>
 
 <div class="codehilite">
@@ -992,10 +993,10 @@ An example that restricts how functions are called is presented next.</p>
 </div>
 
 <p>Check whether a variable belongs to a
-literal type by performing the <code>is</code> check to obtain
+literal type by performing an <code>is</code> check to obtain
 a boolean value. Contrary to the zero-cost conditional 
-compilation of the next section when using <code>is</code> with 
-inferred types only, literal types may be resolved
+compilation of the next section, which has zero runtime
+overhead, literal types may be resolved
 to several runtime checks.</p>
 
 <div class="codehilite">
@@ -1016,6 +1017,34 @@ to several runtime checks.</p>
     <span class="nb">print</span> <span class="n">answers</span><span class="o">.</span><span class="n">second</span>
     <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;in&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
     <span class="nb">print</span> <span class="p">(</span><span class="n">answers</span><span class="o">.</span><span class="n">minutes_to_answer</span><span class="p">,</span> <span class="s2">&quot; minutes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Literal types culminate in a feature that allows usage of the type name as a language keyword
+in place of a comma separator. In particular, two tuple elements (such as function arguments)
+can be separated by a single word instead of commas, and that word resolves to a variable of
+the same-named type literal. Below is an example.</p>
+
+<p>Do remember that this syntax replaces the comma separator. So it occurs after an expression 
+ends. Therefore, to convert two literals
+back-to-back, you need use a placeholder with no outputs as an argument, 
+like <code>blank()</code>. But you can still have a literal at the end of an expression.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;sub&quot;</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">-</span><span class="n">y</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">5</span>
+    <span class="n">modify</span><span class="p">(</span><span class="n">x</span> <span class="n">add</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">modify</span><span class="p">(</span><span class="n">x</span> <span class="n">add</span> <span class="n">blank</span><span class="p">()</span> <span class="n">one</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">x</span> <span class="c1"># prints 9</span>
 </code></pre>
 </div>
 
@@ -2036,9 +2065,10 @@ as a <code>+</code> operation like below.</p>
 </div>
 
 <p>That said, it is preferred to copy strings onto
-buffers at consecutive places for more efficient operations. For example, the above
-can be rewritten to use less than half space onto the buffer per the next snippet.
-Note usage of the literal <code>type "from"</code> to indicate that the construction should be
+buffers at consecutive places for more efficient operations. The above string addition
+is rewritten in the next snippet to use less than half space onto the buffer.
+Note usage of the literal <code>from</code> via the comma-less syntax sugar for <a href="#literal-types">literals</a>. 
+This indicates that the construction should be
 structurally matched to the variation <code>str(char[] buffer, nat end, "from", nat start)</code>.
 There also exists the variation <code>str(char[] buffer, nat start, "to", nat length)</code>.</p>
 
@@ -2052,7 +2082,7 @@ There also exists the variation <code>str(char[] buffer, nat start, "to", nat le
     <span class="n">copy</span> <span class="s2">&quot;hello&quot;</span>
     <span class="n">copy</span> <span class="s2">&quot; &quot;</span>
     <span class="n">copy</span> <span class="s2">&quot;world!&quot;</span>
-    <span class="nb">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">CHARS</span><span class="p">,</span> <span class="nb">type</span> <span class="s2">&quot;from&quot;</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">CHARS</span> <span class="kn">from</span><span class="w"> </span><span class="nn">start</span><span class="p">)</span>
 </code></pre>
 </div>
 

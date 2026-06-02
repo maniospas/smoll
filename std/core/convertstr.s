@@ -20,14 +20,6 @@ local import "std/core/range.s"
 local import "std/core/string.s"
 local import "std/core/array.s"
 
-def console()
-    doc "references the system console"
-    return singleton()
-
-def flush(console)
-    doc "flushes the print buffer on the console"
-    {fflush(stdout);}
-
 def char(console)
     {builtins:int _c=getchar();}
     {builtins:bool iseof = (_c==EOF);}

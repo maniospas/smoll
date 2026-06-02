@@ -4,8 +4,8 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t1468t="123";
-const char* const __t374t="\n";
+const char* const __t1469t="123";
+const char* const __t377t="\n";
 static const char* __t_all_errcodes[35] = {"noerr",
 "error",
 "null pointer",
@@ -43,18 +43,23 @@ static const char* __t_all_errcodes[35] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void eq__t825t(const char* x, const char* y, char* __t1471t) {
+static inline __attribute__((always_inline)) void console__t365t() {
+  goto __t_return;
+  __t_return:
+}
+
+static inline __attribute__((always_inline)) void eq__t828t(const char* x, const char* y, char* __t1472t) {
   char z=0;
   z=(x==y);
   goto __t_return;
   __t_return:
-  *__t1471t=z;
+  *__t1472t=z;
 }
 
-static inline __attribute__((always_inline)) void print__t389t(char value) {
-  int __t390t=0;
+static inline __attribute__((always_inline)) void print__t392t(char value) {
+  int __t393t=0;
   const char* endl=0;
-  endl=__t374t;
+  endl=__t377t;
   if(value){
   printf("%s%s","true",endl);
   }
@@ -64,9 +69,10 @@ static inline __attribute__((always_inline)) void print__t389t(char value) {
 }
 
 static inline __attribute__((always_inline)) void main__t1467t() {
-  char __t1469t__=0;
-  eq__t825t(__t1468t,__t1468t,&__t1469t__);
-  print__t389t(__t1469t__);
+  char __t1470t__=0;
+  console__t365t();
+  eq__t828t(__t1469t,__t1469t,&__t1470t__);
+  print__t392t(__t1470t__);
 }
 
 int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1467t();return 0;}

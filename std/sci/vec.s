@@ -208,7 +208,7 @@ def nn(vec value)
     doc "to print without a new line."
     return (value, "")
 
-def print(vec v, cstr|blank endl)
+def print(effect console CLI, vec v, cstr|blank endl)
     doc "print a vector"
     doc "Prints as a row, such as [ 1.0  2.0  3.0 ]"
     if endl is blank

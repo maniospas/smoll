@@ -96,7 +96,7 @@ def safe(cstr cmd)
     if unsafe_chars fail "unsanitized command: shell metacharacter detected"
     return cmd
 
-def system(cstr|str _cmd)
+def system(effect console CLI, cstr|str _cmd)
     doc "system command"
     doc "Runs a system command and waits until that completes."
     doc "Fails if the return code is non-zero, but does not expose that code."

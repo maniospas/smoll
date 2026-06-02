@@ -56,6 +56,7 @@ def CHUNK_SIZE = 4096
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 
 def main()
+    CLI = console() # use the CLI effect to direct reads and prints to the console
     mem = char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
     f = file:read web:get web:url README  # save to .tmp with system curl and read it
     size = mut 0
@@ -80,4 +81,7 @@ CC0 for the standard library.
 
 *No AI was used in the development of the language's core.
 Some AI was used for boilerplate cross-platform implementations 
-in the standard library and lsp, as well as for validation.*
+in the standard library and lsp, as well as for validation. Such
+usage has been incremental, fixed by hand at pain points, tested
+similarly to the rest of the project, logically validated 
+line-by-line, and refactored into the project's coding style.*

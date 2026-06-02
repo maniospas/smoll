@@ -9,10 +9,11 @@ def inc(nat x, blank|"one")
 def inc(nat x, "two")
     return x+2
 
-def which(OPTIONS option)
+def which(effect console CLI, OPTIONS option)
     print compiler:literal option
 
 def main()
+    CLI = console()
     lit = type "one"
     which lit
     print inc 0

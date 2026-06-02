@@ -2,6 +2,7 @@ import "std/core.s"
 import "std/sci.s"
 
 def main()
+    CLI = console()
     allocator = new() # allocate to new memory whenever needed
 
     a = mat [

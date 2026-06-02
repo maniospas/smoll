@@ -3,7 +3,7 @@ import "std/core.s"
 def Person(nat id, str name, str surname)
   return class(name,surname)
 
-def print(Person p)
+def print(effect console CLI, Person p)
   print "-------------------"
   print ("name      ", "") 
   print p.name
@@ -11,7 +11,7 @@ def print(Person p)
   print p.surname
   print "-------------------"
 
-def test()
+def test(effect console CLI)
   people = Person[].alloc 4
   buf = bufpos char[].alloc KB 4
   people[0] = Person(0, buf.copy "it's a me", buf.copy "mario")
@@ -20,5 +20,6 @@ def test()
   return (buf, dat)
 
 def main()
+  CLI = console()
   t = test()
   print str(t.buf.buf, t.dat[0])

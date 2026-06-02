@@ -129,7 +129,7 @@ def mul(effect edit vec_allocator allocator, mat m1, mat m2)
     return result
 
 
-def print(mat m, cstr|blank endl)
+def print(effect console CLI, mat m, cstr|blank endl)
     doc "print a matrix with aligned brackets"
     doc "single-row matrices stay on one line; taller ones get top/mid/bottom brackets"
     if endl is blank

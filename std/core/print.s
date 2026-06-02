@@ -17,6 +17,14 @@
 import "builtins"
 import "std/extern.s"
 
+def console()
+    doc "references the system console"
+    return singleton()
+
+def flush(effect console CLI)
+    doc "flushes the print buffer on the console"
+    {fflush(stdout);}
+
 def nn(cstr|float|int|nat value)
     doc "no new line"
     doc "Given a value, creates a tuple of (value, \"\")."
@@ -24,14 +32,14 @@ def nn(cstr|float|int|nat value)
     doc "to print without automatically adding a new line."
     return (value, "")
 
-def print(cstr value, cstr|blank endl)
+def print(effect console CLI, cstr value, cstr|blank endl)
     doc "prints a cstr"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%s%s", value, endl);}
 
-def print(float value, cstr|blank endl)
+def print(effect console CLI, float value, cstr|blank endl)
     doc "prints a float"
     doc "To pre-specified 6 decimal digits."
     if endl is blank 
@@ -39,35 +47,35 @@ def print(float value, cstr|blank endl)
         endl = "\n"
     {printf("%.6f%s", value, endl);}
 
-def print(int value, cstr|blank endl)
+def print(effect console CLI, int value, cstr|blank endl)
     doc "prints an integer"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%lld%s", value, endl);}
 
-def print(nat value, cstr|blank endl)
+def print(effect console CLI, nat value, cstr|blank endl)
     doc "prints an unsigned integer"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%llu%s", value, endl);}
 
-def print(bool value, cstr|blank endl)
+def print(effect console CLI, bool value, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
     {if(value){printf("%s%s", "true", endl);}else{printf("%s%s", "false", endl);}}
 
-def print(compiler:true, cstr|blank endl)
+def print(effect console CLI, compiler:true, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("true%s", endl);}
     
-def print(compiler:false, cstr|blank endl)
+def print(effect console CLI, compiler:false, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."

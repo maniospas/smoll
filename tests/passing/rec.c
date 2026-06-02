@@ -4,7 +4,7 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t374t="\n";
+const char* const __t377t="\n";
 static const char* __t_all_errcodes[35] = {"noerr",
 "error",
 "null pointer",
@@ -41,50 +41,55 @@ static const char* __t_all_errcodes[35] = {"noerr",
 "invalid float conversion from non-number string",
 "invalid float conversion from string without a value after the dot"
 };
-int fib__t1467t(uint64_t n, uint64_t* __t1496t) ;
-static inline __attribute__((always_inline)) void false__t10t(int* __t1488t) {
-  int value=0;
-  *__t1488t=value;
+int fib__t1467t(uint64_t n, uint64_t* __t1497t) ;
+static inline __attribute__((always_inline)) void console__t365t() {
+  goto __t_return;
+  __t_return:
 }
 
-static inline __attribute__((always_inline)) void not__t36t(int __t_anon0, int* __t1489t) {
+static inline __attribute__((always_inline)) void false__t10t(int* __t1489t) {
+  int value=0;
+  *__t1489t=value;
+}
+
+static inline __attribute__((always_inline)) void not__t36t(int __t_anon0, int* __t1490t) {
   int __t37t__=0;
   false__t10t(&__t37t__);
   goto __t_return;
   __t_return:
-  *__t1489t=__t37t__;
+  *__t1490t=__t37t__;
 }
 
-static inline __attribute__((always_inline)) void is_different__t94t(uint64_t x, uint64_t y, int* __t1490t) {
+static inline __attribute__((always_inline)) void is_different__t94t(uint64_t x, uint64_t y, int* __t1491t) {
   int __t95t=0;
   int __t96t__=0;
   not__t36t(__t95t,&__t96t__);
   goto __t_return;
   __t_return:
-  *__t1490t=__t96t__;
+  *__t1491t=__t96t__;
 }
 
-static inline __attribute__((always_inline)) void le__t299t(uint64_t x, uint64_t y, char* __t1491t) {
+static inline __attribute__((always_inline)) void le__t299t(uint64_t x, uint64_t y, char* __t1492t) {
   int __t300t__=0;
   char z=0;
   is_different__t94t(x,y,&__t300t__);
   z=x<=y;
   goto __t_return;
   __t_return:
-  *__t1491t=z;
+  *__t1492t=z;
 }
 
-static inline __attribute__((always_inline)) void lt__t251t(uint64_t x, uint64_t y, char* __t1492t) {
+static inline __attribute__((always_inline)) void lt__t251t(uint64_t x, uint64_t y, char* __t1493t) {
   int __t252t__=0;
   char z=0;
   is_different__t94t(x,y,&__t252t__);
   z=x<y;
   goto __t_return;
   __t_return:
-  *__t1492t=z;
+  *__t1493t=z;
 }
 
-static inline __attribute__((always_inline)) int sub__t351t(uint64_t x, uint64_t y, uint64_t* __t1493t) {
+static inline __attribute__((always_inline)) int sub__t351t(uint64_t x, uint64_t y, uint64_t* __t1494t) {
   int __t352t__=0;
   int __t353t=0;
   int __t354t=0;
@@ -102,12 +107,12 @@ static inline __attribute__((always_inline)) int sub__t351t(uint64_t x, uint64_t
   goto __t_return;
   
   __t_failure:__t_return:
-  *__t1493t=z;
+  *__t1494t=z;
   
   return __t_errcode;
 }
 
-static inline __attribute__((always_inline)) int call_fib__t1471t(uint64_t n, uint64_t* __t1494t) {
+static inline __attribute__((always_inline)) int call_fib__t1471t(uint64_t n, uint64_t* __t1495t) {
   uint64_t __t1472t__=0;
   int __t_errcode=0;
   int __t_complain=0;
@@ -118,86 +123,87 @@ static inline __attribute__((always_inline)) int call_fib__t1471t(uint64_t n, ui
   goto __t_return;
   
   __t_failure:__t_return:
-  *__t1494t=__t1472t__;
+  *__t1495t=__t1472t__;
   
   return __t_errcode;
 }
 
-static inline __attribute__((always_inline)) void add__t174t(uint64_t x, uint64_t y, uint64_t* __t1495t) {
+static inline __attribute__((always_inline)) void add__t174t(uint64_t x, uint64_t y, uint64_t* __t1496t) {
   int __t175t__=0;
   uint64_t z=0;
   is_different__t94t(x,y,&__t175t__);
   z=x+y;
   goto __t_return;
   __t_return:
-  *__t1495t=z;
+  *__t1496t=z;
 }
 
-int fib__t1467t(uint64_t n, uint64_t* __t1496t) {
-  uint64_t __t1478t=0;
-  char __t1479t__=0;
-  uint64_t __t1480t=0;
+int fib__t1467t(uint64_t n, uint64_t* __t1497t) {
+  uint64_t __t1479t=0;
+  char __t1480t__=0;
   uint64_t __t1481t=0;
-  uint64_t __t1482t__=0;
+  uint64_t __t1482t=0;
   uint64_t __t1483t__=0;
-  uint64_t __t1484t=0;
-  uint64_t __t1485t__=0;
+  uint64_t __t1484t__=0;
+  uint64_t __t1485t=0;
   uint64_t __t1486t__=0;
   uint64_t __t1487t__=0;
+  uint64_t __t1488t__=0;
   int __t_errcode=0;
   int __t_complain=0;
-  __t1478t=1;
-  le__t299t(n,__t1478t,&__t1479t__);
-  if(__t1479t__){
-  __t1480t=1;
+  __t1479t=1;
+  le__t299t(n,__t1479t,&__t1480t__);
+  if(__t1480t__){
+  __t1481t=1;
   goto __t_return;
   }
-  __t1481t=1;
-  __t_errcode=sub__t351t(n,__t1481t,&__t1482t__);
+  __t1482t=1;
+  __t_errcode=sub__t351t(n,__t1482t,&__t1483t__);
   if(__t_errcode){
   goto __t_failure;
   }
-  __t_errcode=call_fib__t1471t(__t1482t__,&__t1483t__);
+  __t_errcode=call_fib__t1471t(__t1483t__,&__t1484t__);
   if(__t_errcode){
   goto __t_failure;
   }
-  __t1484t=2;
-  __t_errcode=sub__t351t(n,__t1484t,&__t1485t__);
+  __t1485t=2;
+  __t_errcode=sub__t351t(n,__t1485t,&__t1486t__);
   if(__t_errcode){
   goto __t_failure;
   }
-  __t_errcode=call_fib__t1471t(__t1485t__,&__t1486t__);
+  __t_errcode=call_fib__t1471t(__t1486t__,&__t1487t__);
   if(__t_errcode){
   goto __t_failure;
   }
-  add__t174t(__t1483t__,__t1486t__,&__t1487t__);
-  __t1480t=__t1487t__;
+  add__t174t(__t1484t__,__t1487t__,&__t1488t__);
+  __t1481t=__t1488t__;
   goto __t_return;
   
   __t_failure:__t_return:
-  *__t1496t=__t1480t;
+  *__t1497t=__t1481t;
   
   return __t_errcode;
 }
 
-static inline __attribute__((always_inline)) void print__t385t(uint64_t value) {
-  int __t386t=0;
+static inline __attribute__((always_inline)) void print__t388t(uint64_t value) {
+  int __t389t=0;
   const char* endl=0;
-  endl=__t374t;
+  endl=__t377t;
   printf("%llu%s",value,endl);
 }
 
 static inline __attribute__((always_inline)) int main__t1473t() {
-  uint64_t __t1474t=0;
-  uint64_t __t1475t__=0;
+  uint64_t __t1475t=0;
+  uint64_t __t1476t__=0;
   int __t_errcode=0;
   int __t_complain=0;
-  __t1474t=42;
-  __t_errcode=fib__t1467t(__t1474t,&__t1475t__);
+  console__t365t();
+  __t1475t=42;
+  __t_errcode=fib__t1467t(__t1475t,&__t1476t__);
   if(__t_errcode){
   goto __t_failure;
   }
-  print__t385t(__t1475t__);
+  print__t388t(__t1476t__);
   
   __t_failure:
   return __t_errcode;

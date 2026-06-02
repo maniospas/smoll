@@ -214,7 +214,7 @@ def copy_null_terminated(edit char[] buf, mut nat pos, str|cstr _other)
     pos = next_pos
     return str(buf, prev_pos, other.dat.length, other.dat.first)
 
-def print(str s, cstr|blank endl)
+def print(effect console CLI, str s, cstr|blank endl)
     doc "print a string"
     if endl is blank
         doc "Ends the line too."
@@ -277,7 +277,7 @@ def neq(str|cstr x, str|cstr y)
     doc "not equals"
     return not x==y
 
-def print(char c, cstr|blank endl)
+def print(effect console CLI, char c, cstr|blank endl)
     doc "print a character"
     if endl is blank
         doc "Ends the line too."

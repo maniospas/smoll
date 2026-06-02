@@ -61,7 +61,7 @@ static const char* __t_all_errcodes[53] = {"noerr",
 "end of dir"
 };
 
-static inline __attribute__((always_inline)) void char____t_buffer____buffer__t554t(char** __t2004t, uint64_t* __t2005t, uint16_t* __t2006t, uint16_t* __t2007t) {
+static inline __attribute__((always_inline)) void char____t_buffer____buffer__t557t(char** __t2004t, uint64_t* __t2005t, uint16_t* __t2006t, uint16_t* __t2007t) {
   char* unsafe_ptr=0;
   uint64_t unsafe_size=0;
   uint16_t unsafe_offset=0;
@@ -129,7 +129,7 @@ static inline __attribute__((always_inline)) void ge__t323t(uint64_t x, uint64_t
   *__t2014t=z;
 }
 
-static inline __attribute__((always_inline)) void nat__t509t(uint16_t x, uint64_t* __t2015t) {
+static inline __attribute__((always_inline)) void nat__t512t(uint16_t x, uint64_t* __t2015t) {
   uint64_t value=0;
   value=x;
   goto __t_return;
@@ -151,44 +151,44 @@ static inline __attribute__((always_inline)) void attach_type__t21t(char* to, ch
   *__t2017t=to;
 }
 
-static inline __attribute__((always_inline)) void add__t507t(char* allocated, uint64_t offset, char** __t2018t) {
+static inline __attribute__((always_inline)) void add__t510t(char* allocated, uint64_t offset, char** __t2018t) {
   char* element=0;
-  char* __t508t__=0;
+  char* __t511t__=0;
   element=allocated+offset;
-  attach_type__t21t(element,allocated,&__t508t__);
+  attach_type__t21t(element,allocated,&__t511t__);
   goto __t_return;
   __t_return:
-  *__t2018t=__t508t__;
+  *__t2018t=__t511t__;
 }
 
-static inline __attribute__((always_inline)) int get__t594t(char* buffer__unsafe_ptr, uint64_t buffer__unsafe_size, uint16_t buffer__unsafe_offset, uint16_t buffer__unsafe_align, uint64_t i, char** __t2019t) {
-  char __t595t__=0;
-  uint64_t __t596t__=0;
-  uint64_t __t597t__=0;
-  uint64_t __t598t__=0;
+static inline __attribute__((always_inline)) int get__t597t(char* buffer__unsafe_ptr, uint64_t buffer__unsafe_size, uint16_t buffer__unsafe_offset, uint16_t buffer__unsafe_align, uint64_t i, char** __t2019t) {
+  char __t598t__=0;
   uint64_t __t599t__=0;
-  char* __t600t__=0;
+  uint64_t __t600t__=0;
+  uint64_t __t601t__=0;
+  uint64_t __t602t__=0;
+  char* __t603t__=0;
   int __t_errcode=0;
   int __t_complain=0;
-  ge__t323t(i,buffer__unsafe_size,&__t595t__);
-  if(__t595t__){
+  ge__t323t(i,buffer__unsafe_size,&__t598t__);
+  if(__t598t__){
   __t_errcode=15;
   goto __t_failure;
   }
-  nat__t509t(buffer__unsafe_align,&__t596t__);
-  mul__t198t(i,__t596t__,&__t597t__);
-  nat__t509t(buffer__unsafe_offset,&__t598t__);
-  add__t174t(__t597t__,__t598t__,&__t599t__);
-  add__t507t(buffer__unsafe_ptr,__t599t__,&__t600t__);
+  nat__t512t(buffer__unsafe_align,&__t599t__);
+  mul__t198t(i,__t599t__,&__t600t__);
+  nat__t512t(buffer__unsafe_offset,&__t601t__);
+  add__t174t(__t600t__,__t601t__,&__t602t__);
+  add__t510t(buffer__unsafe_ptr,__t602t__,&__t603t__);
   goto __t_return;
   
   __t_failure:__t_return:
-  *__t2019t=__t600t__;
+  *__t2019t=__t603t__;
   
   return __t_errcode;
 }
 
-static inline __attribute__((always_inline)) void str__t629t(char* unsafe_ptr, uint64_t dat__pos, uint64_t dat__length, char dat__first, char** __t2020t, uint64_t* __t2021t, uint64_t* __t2022t, char* __t2023t) {
+static inline __attribute__((always_inline)) void str__t632t(char* unsafe_ptr, uint64_t dat__pos, uint64_t dat__length, char dat__first, char** __t2020t, uint64_t* __t2021t, uint64_t* __t2022t, char* __t2023t) {
   goto __t_return;
   __t_return:
   *__t2020t=unsafe_ptr;
@@ -197,165 +197,165 @@ static inline __attribute__((always_inline)) void str__t629t(char* unsafe_ptr, u
   *__t2023t=dat__first;
 }
 
-static inline __attribute__((always_inline)) int str__t633t(char* buf__unsafe_ptr, uint64_t buf__unsafe_size, uint16_t buf__unsafe_offset, uint16_t buf__unsafe_align, uint64_t dat__pos, uint64_t dat__length, char dat__first, char** __t2024t, uint64_t* __t2025t, uint64_t* __t2026t, char* __t2027t) {
+static inline __attribute__((always_inline)) int str__t636t(char* buf__unsafe_ptr, uint64_t buf__unsafe_size, uint16_t buf__unsafe_offset, uint16_t buf__unsafe_align, uint64_t dat__pos, uint64_t dat__length, char dat__first, char** __t2024t, uint64_t* __t2025t, uint64_t* __t2026t, char* __t2027t) {
   char* unsafe_ptr=0;
-  uint64_t __t634t__=0;
-  uint64_t __t635t=0;
-  char __t636t__=0;
   uint64_t __t637t__=0;
   uint64_t __t638t=0;
   char __t639t__=0;
-  char* __t640t__unsafe_ptr=0;
-  uint64_t __t640t__dat__pos=0;
-  uint64_t __t640t__dat__length=0;
-  char __t640t__dat__first=0;
+  uint64_t __t640t__=0;
+  uint64_t __t641t=0;
+  char __t642t__=0;
+  char* __t643t__unsafe_ptr=0;
+  uint64_t __t643t__dat__pos=0;
+  uint64_t __t643t__dat__length=0;
+  char __t643t__dat__first=0;
   int __t_errcode=0;
   int __t_complain=0;
   unsafe_ptr=buf__unsafe_ptr;
-  nat__t509t(buf__unsafe_align,&__t634t__);
-  __t635t=1;
-  neq__t143t(__t634t__,__t635t,&__t636t__);
-  if(__t636t__){
+  nat__t512t(buf__unsafe_align,&__t637t__);
+  __t638t=1;
+  neq__t143t(__t637t__,__t638t,&__t639t__);
+  if(__t639t__){
   __t_errcode=16;
   goto __t_failure;
   }
-  nat__t509t(buf__unsafe_offset,&__t637t__);
-  __t638t=0;
-  neq__t143t(__t637t__,__t638t,&__t639t__);
-  if(__t639t__){
+  nat__t512t(buf__unsafe_offset,&__t640t__);
+  __t641t=0;
+  neq__t143t(__t640t__,__t641t,&__t642t__);
+  if(__t642t__){
   __t_errcode=17;
   goto __t_failure;
   }
-  str__t629t(unsafe_ptr,dat__pos,dat__length,dat__first,&__t640t__unsafe_ptr,&__t640t__dat__pos,&__t640t__dat__length,&__t640t__dat__first);
+  str__t632t(unsafe_ptr,dat__pos,dat__length,dat__first,&__t643t__unsafe_ptr,&__t643t__dat__pos,&__t643t__dat__length,&__t643t__dat__first);
   goto __t_return;
   
   __t_failure:__t_return:
-  *__t2024t=__t640t__unsafe_ptr;
-  *__t2025t=__t640t__dat__pos;
-  *__t2026t=__t640t__dat__length;
-  *__t2027t=__t640t__dat__first;
+  *__t2024t=__t643t__unsafe_ptr;
+  *__t2025t=__t643t__dat__pos;
+  *__t2026t=__t643t__dat__length;
+  *__t2027t=__t643t__dat__first;
   
   return __t_errcode;
 }
 
-static inline __attribute__((always_inline)) int str__t665t(char* buf__unsafe_ptr, uint64_t buf__unsafe_size, uint16_t buf__unsafe_offset, uint16_t buf__unsafe_align, uint64_t pos, uint64_t length, char** __t2028t, uint64_t* __t2029t, uint64_t* __t2030t, char* __t2031t) {
-  uint64_t __t666t=0;
-  char __t667t__=0;
-  char* __t668t__=0;
-  char __t669t__value=0;
+static inline __attribute__((always_inline)) int str__t668t(char* buf__unsafe_ptr, uint64_t buf__unsafe_size, uint16_t buf__unsafe_offset, uint16_t buf__unsafe_align, uint64_t pos, uint64_t length, char** __t2028t, uint64_t* __t2029t, uint64_t* __t2030t, char* __t2031t) {
+  uint64_t __t669t=0;
+  char __t670t__=0;
+  char* __t671t__=0;
+  char __t672t__value=0;
   char first=0;
-  char* __t670t__unsafe_ptr=0;
-  uint64_t __t670t__dat__pos=0;
-  uint64_t __t670t__dat__length=0;
-  char __t670t__dat__first=0;
+  char* __t673t__unsafe_ptr=0;
+  uint64_t __t673t__dat__pos=0;
+  uint64_t __t673t__dat__length=0;
+  char __t673t__dat__first=0;
   int __t_errcode=0;
   int __t_complain=0;
-  __t666t=0;
-  neq__t143t(length,__t666t,&__t667t__);
-  if(__t667t__){
-  __t_errcode=get__t594t(buf__unsafe_ptr,buf__unsafe_size,buf__unsafe_offset,buf__unsafe_align,pos,&__t668t__);
+  __t669t=0;
+  neq__t143t(length,__t669t,&__t670t__);
+  if(__t670t__){
+  __t_errcode=get__t597t(buf__unsafe_ptr,buf__unsafe_size,buf__unsafe_offset,buf__unsafe_align,pos,&__t671t__);
   if(__t_errcode){
   goto __t_failure;
   }
-  if(!__t668t__){
+  if(!__t671t__){
   __t_errcode=2;
   goto __t_failure;
   }
-  memcpy(&__t669t__value,__t668t__,1);
-  first=__t669t__value;
+  memcpy(&__t672t__value,__t671t__,1);
+  first=__t672t__value;
   }
-  __t_errcode=str__t633t(buf__unsafe_ptr,buf__unsafe_size,buf__unsafe_offset,buf__unsafe_align,pos,length,first,&__t670t__unsafe_ptr,&__t670t__dat__pos,&__t670t__dat__length,&__t670t__dat__first);
+  __t_errcode=str__t636t(buf__unsafe_ptr,buf__unsafe_size,buf__unsafe_offset,buf__unsafe_align,pos,length,first,&__t673t__unsafe_ptr,&__t673t__dat__pos,&__t673t__dat__length,&__t673t__dat__first);
   if(__t_errcode){
   goto __t_failure;
   }
   goto __t_return;
   
   __t_failure:__t_return:
-  *__t2028t=__t670t__unsafe_ptr;
-  *__t2029t=__t670t__dat__pos;
-  *__t2030t=__t670t__dat__length;
-  *__t2031t=__t670t__dat__first;
+  *__t2028t=__t673t__unsafe_ptr;
+  *__t2029t=__t673t__dat__pos;
+  *__t2030t=__t673t__dat__length;
+  *__t2031t=__t673t__dat__first;
   
   return __t_errcode;
 }
 
-int str__t671t(const char* c, char** __t2032t, uint64_t* __t2033t, uint64_t* __t2034t, char* __t2035t) {
-  char* __t672t__unsafe_ptr=0;
-  uint64_t __t672t__unsafe_size=0;
-  uint16_t __t672t__unsafe_offset=0;
-  uint16_t __t672t__unsafe_align=0;
-  char* __t673t__unsafe_ptr=0;
-  uint64_t __t673t__unsafe_size=0;
-  uint16_t __t673t__unsafe_offset=0;
-  uint16_t __t673t__unsafe_align=0;
+int str__t674t(const char* c, char** __t2032t, uint64_t* __t2033t, uint64_t* __t2034t, char* __t2035t) {
+  char* __t675t__unsafe_ptr=0;
+  uint64_t __t675t__unsafe_size=0;
+  uint16_t __t675t__unsafe_offset=0;
+  uint16_t __t675t__unsafe_align=0;
+  char* __t676t__unsafe_ptr=0;
+  uint64_t __t676t__unsafe_size=0;
+  uint16_t __t676t__unsafe_offset=0;
+  uint16_t __t676t__unsafe_align=0;
   char* buf__unsafe_ptr=0;
   uint64_t buf__unsafe_size=0;
   uint16_t buf__unsafe_offset=0;
   uint16_t buf__unsafe_align=0;
-  char* __t674t__=0;
+  char* __t677t__=0;
   uint64_t length=0;
-  uint64_t __t675t=0;
-  uint64_t __t676t__=0;
-  uint64_t __t677t=0;
-  char* __t678t__unsafe_ptr=0;
-  uint64_t __t678t__dat__pos=0;
-  uint64_t __t678t__dat__length=0;
-  char __t678t__dat__first=0;
+  uint64_t __t678t=0;
+  uint64_t __t679t__=0;
+  uint64_t __t680t=0;
+  char* __t681t__unsafe_ptr=0;
+  uint64_t __t681t__dat__pos=0;
+  uint64_t __t681t__dat__length=0;
+  char __t681t__dat__first=0;
   int __t_errcode=0;
   int __t_complain=0;
-  char____t_buffer____buffer__t554t(&__t672t__unsafe_ptr,&__t672t__unsafe_size,&__t672t__unsafe_offset,&__t672t__unsafe_align);
-  __t673t__unsafe_ptr=__t672t__unsafe_ptr;
-  __t673t__unsafe_size=__t672t__unsafe_size;
-  __t673t__unsafe_offset=__t672t__unsafe_offset;
-  __t673t__unsafe_align=__t672t__unsafe_align;
-  buf__unsafe_ptr=__t673t__unsafe_ptr;
-  buf__unsafe_size=__t673t__unsafe_size;
-  buf__unsafe_offset=__t673t__unsafe_offset;
-  buf__unsafe_align=__t673t__unsafe_align;
+  char____t_buffer____buffer__t557t(&__t675t__unsafe_ptr,&__t675t__unsafe_size,&__t675t__unsafe_offset,&__t675t__unsafe_align);
+  __t676t__unsafe_ptr=__t675t__unsafe_ptr;
+  __t676t__unsafe_size=__t675t__unsafe_size;
+  __t676t__unsafe_offset=__t675t__unsafe_offset;
+  __t676t__unsafe_align=__t675t__unsafe_align;
+  buf__unsafe_ptr=__t676t__unsafe_ptr;
+  buf__unsafe_size=__t676t__unsafe_size;
+  buf__unsafe_offset=__t676t__unsafe_offset;
+  buf__unsafe_align=__t676t__unsafe_align;
   buf__unsafe_ptr=c;
-  attach_type__t22t(buf__unsafe_ptr,c,&__t674t__);
-  buf__unsafe_ptr=__t674t__;
+  attach_type__t22t(buf__unsafe_ptr,c,&__t677t__);
+  buf__unsafe_ptr=__t677t__;
   if(c){
   length=strlen(c);
   }
-  __t675t=1;
-  add__t174t(length,__t675t,&__t676t__);
-  buf__unsafe_size=__t676t__;
-  __t677t=0;
-  __t_errcode=str__t665t(buf__unsafe_ptr,buf__unsafe_size,buf__unsafe_offset,buf__unsafe_align,__t677t,length,&__t678t__unsafe_ptr,&__t678t__dat__pos,&__t678t__dat__length,&__t678t__dat__first);
+  __t678t=1;
+  add__t174t(length,__t678t,&__t679t__);
+  buf__unsafe_size=__t679t__;
+  __t680t=0;
+  __t_errcode=str__t668t(buf__unsafe_ptr,buf__unsafe_size,buf__unsafe_offset,buf__unsafe_align,__t680t,length,&__t681t__unsafe_ptr,&__t681t__dat__pos,&__t681t__dat__length,&__t681t__dat__first);
   if(__t_errcode){
   goto __t_failure;
   }
   goto __t_return;
   
   __t_failure:__t_return:
-  *__t2032t=__t678t__unsafe_ptr;
-  *__t2033t=__t678t__dat__pos;
-  *__t2034t=__t678t__dat__length;
-  *__t2035t=__t678t__dat__first;
+  *__t2032t=__t681t__unsafe_ptr;
+  *__t2033t=__t681t__dat__pos;
+  *__t2034t=__t681t__dat__length;
+  *__t2035t=__t681t__dat__first;
   
   return __t_errcode;
 }
 
-int unsafe_temp__t717t(const char* cstr, const char** __t2036t, char** __t2037t, uint64_t* __t2038t, uint64_t* __t2039t, char* __t2040t) {
-  char* __t718t__unsafe_ptr=0;
-  uint64_t __t718t__dat__pos=0;
-  uint64_t __t718t__dat__length=0;
-  char __t718t__dat__first=0;
+int unsafe_temp__t720t(const char* cstr, const char** __t2036t, char** __t2037t, uint64_t* __t2038t, uint64_t* __t2039t, char* __t2040t) {
+  char* __t721t__unsafe_ptr=0;
+  uint64_t __t721t__dat__pos=0;
+  uint64_t __t721t__dat__length=0;
+  char __t721t__dat__first=0;
   char* str__unsafe_ptr=0;
   uint64_t str__dat__pos=0;
   uint64_t str__dat__length=0;
   char str__dat__first=0;
   int __t_errcode=0;
   int __t_complain=0;
-  __t_errcode=str__t671t(cstr,&__t718t__unsafe_ptr,&__t718t__dat__pos,&__t718t__dat__length,&__t718t__dat__first);
+  __t_errcode=str__t674t(cstr,&__t721t__unsafe_ptr,&__t721t__dat__pos,&__t721t__dat__length,&__t721t__dat__first);
   if(__t_errcode){
   goto __t_failure;
   }
-  str__unsafe_ptr=__t718t__unsafe_ptr;
-  str__dat__pos=__t718t__dat__pos;
-  str__dat__length=__t718t__dat__length;
-  str__dat__first=__t718t__dat__first;
+  str__unsafe_ptr=__t721t__unsafe_ptr;
+  str__dat__pos=__t721t__dat__pos;
+  str__dat__length=__t721t__dat__length;
+  str__dat__first=__t721t__dat__first;
   goto __t_return;
   
   __t_failure:__t_return:
@@ -368,13 +368,13 @@ int unsafe_temp__t717t(const char* cstr, const char** __t2036t, char** __t2037t,
   return __t_errcode;
 }
 
-static inline __attribute__((always_inline)) void cstr__t720t(const char* value__cstr, char* value__str__unsafe_ptr, uint64_t value__str__dat__pos, uint64_t value__str__dat__length, char value__str__dat__first, const char** __t2041t) {
+static inline __attribute__((always_inline)) void cstr__t723t(const char* value__cstr, char* value__str__unsafe_ptr, uint64_t value__str__dat__pos, uint64_t value__str__dat__length, char value__str__dat__first, const char** __t2041t) {
   goto __t_return;
   __t_return:
   *__t2041t=value__cstr;
 }
 
-static inline __attribute__((always_inline)) void exists__t439t(char* x, char* __t2042t) {
+static inline __attribute__((always_inline)) void exists__t442t(char* x, char* __t2042t) {
   char z=0;
   z=x!=0;
   goto __t_return;
@@ -405,14 +405,14 @@ static inline __attribute__((always_inline)) int write__t1568t(const char* _path
   char __t1572t__=0;
   int __t_errcode=0;
   int __t_complain=0;
-  __t_errcode=unsafe_temp__t717t(_path,&__t1569t__cstr,&__t1569t__str__unsafe_ptr,&__t1569t__str__dat__pos,&__t1569t__str__dat__length,&__t1569t__str__dat__first);
+  __t_errcode=unsafe_temp__t720t(_path,&__t1569t__cstr,&__t1569t__str__unsafe_ptr,&__t1569t__str__dat__pos,&__t1569t__str__dat__length,&__t1569t__str__dat__first);
   if(__t_errcode){
   goto __t_failure;
   }
-  cstr__t720t(__t1569t__cstr,__t1569t__str__unsafe_ptr,__t1569t__str__dat__pos,__t1569t__str__dat__length,__t1569t__str__dat__first,&__t1570t__);
+  cstr__t723t(__t1569t__cstr,__t1569t__str__unsafe_ptr,__t1569t__str__dat__pos,__t1569t__str__dat__length,__t1569t__str__dat__first,&__t1570t__);
   path=__t1570t__;
   unsafe_ptr=(char*)fopen(path,"wx+");
-  exists__t439t(unsafe_ptr,&__t1571t__);
+  exists__t442t(unsafe_ptr,&__t1571t__);
   not__t27t(__t1571t__,&__t1572t__);
   if(__t1572t__){
   __t_errcode=41;
@@ -436,7 +436,7 @@ static inline __attribute__((always_inline)) int print__t1850t(char** __t2045t, 
   char __t1852t__=0;
   int __t_errcode=0;
   int __t_complain=0;
-  exists__t439t(f__unsafe_ptr,&__t1851t__);
+  exists__t442t(f__unsafe_ptr,&__t1851t__);
   not__t27t(__t1851t__,&__t1852t__);
   if(__t1852t__){
   __t_errcode=47;

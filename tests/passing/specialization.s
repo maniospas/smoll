@@ -8,5 +8,6 @@ def inc(float|int|nat x, float|int|nat|blank value)
     return x+value
 
 def main()
+    CLI = console()
     print inc 2.0  # prints 3.0
     print inc(2,2) # prints 4

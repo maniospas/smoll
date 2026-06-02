@@ -6,13 +6,14 @@ def Point(float x, float y)
 def Field(Point a, Point b)
     return (a,b)
 
-def print(Field ptr f)
+def print(effect console CLI, Field ptr f)
     print(f...a.x, ",")
     print(f...a.y, ",")
     print(f...b.x, ",")
     print(f...b.y)
 
 def main()
+    CLI = console()
     f = ref float[].alloc 1  # preffer alloc than resizing empty buffers (no pointer invalidation)
     f[0] = 1.0 # move data to pointer
     print f[0]

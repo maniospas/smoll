@@ -11,7 +11,7 @@ def url(cstr path)
     doc "Packs a string into a url so that it can be unambiguously passed through web requests."
     return url str path
 
-local def raw_get(url url, str path)
+local def raw_get(effect console CLI, url url, str path)
     VM "download(memory.as_str($url__path__unsafe_ptr+$url__path__dat__pos, $url__path__dat__length), memory.as_str($path__unsafe_ptr+$path__dat__pos, $path__dat__length))"
     prefix = "curl -s -X GET \""
     postfix = "\" -o "
@@ -22,7 +22,7 @@ local def raw_get(url url, str path)
     buf.copy path
     process:system str buf
 
-def get(url url, str|cstr|blank path)
+def get(effect console CLI, url url, str|cstr|blank path)
     doc "GET with system curl"
     doc "This creates a GET request using the system's curl."
     doc "This implementation is ideal for obtaining individual"

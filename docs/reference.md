@@ -8,10 +8,11 @@ _1.4._ [types](#types) <br>
 _1.5._ [type mutability](#type-mutability) <br>
 _1.6._ [conditions](#conditions)<br>
 _1.7._ [recursion](#recursion) <br>
-_1.8._ [unions](#unions) <br>
-_1.9._ [literal types](#literal-types) <br>
-_1.10._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)
-_1.11._ [compile-time evaluation](#compile-time-evaluation)
+_1.8._ [effects](#recursion) <br>
+_1.9._ [unions](#unions) <br>
+_1.10._ [literal types](#literal-types) <br>
+_1.11._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)<br>
+_1.12._ [compile-time evaluation](#compile-time-evaluation)
 
 
 **Section 2. Safe Resources**<br>
@@ -23,7 +24,7 @@ _2.5._ [try and fail](#try-and-fail)<br>
 _2.6._ [{iterators}](#iterators)<br>
 _2.7._ [{defer}](#defer)<br>
 _2.8._ [catching errors](#catching-errors)<br>
-_2.9._ [effects](#effects)<br>
+_2.9._ [allocator-effects](#allocator-effects)<br>
 _2.10._ [{debugging tools}](#debugging-tools)<br>
 _2.11._ [{bounded compute}](#bounded-compute)<br>
 
@@ -48,13 +49,18 @@ _3.10._ [process and web](#process-and-web)<br>
 ## import
 
 Here is how to import the entire contents of another source code
-file; the `print` function is imported from the core.
+file. The `print` and `console` functions are imported from the core. 
+Assigning to the CLI variable tells the program to print to the
+command line interface, that is, the currently open terminal. 
+This is actually an [effect](#effects), though up until learning about
+those just treat it as boilerplate for most simple programs.
 
 ```python
 import "std/core.s"
 
 def main()
     # this is a line comment, by the way
+    CLI = console() 
     print "hello world!"
 ```
 
@@ -71,7 +77,7 @@ repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as
 import "std/core.s"
 
 def main()
-    # this is a line comment, by the way
+    CLI = console() 
     print "hello world!"
 ```
 
@@ -85,6 +91,7 @@ namespaces defined within the imported onne.
 import "std/core.s" as core
 
 def main()
+    CLI = console() 
     core:print "hello world!"
 ```
 
@@ -97,6 +104,7 @@ from a file.
 import "std/core.s":print
 
 def main()
+    CLI = console() 
     print "hello world!"
 ```
 
@@ -119,6 +127,7 @@ tuples.
 import "std/core.s"
 
 def main()
+    CLI = console() 
     p = (1,2)
     print add p
     print add(1,2)
@@ -135,6 +144,7 @@ within namespaces.
 import "std/core.s" as core
 
 def main()
+    CLI = console() 
     x1 = 1
     x2 = x1.core:add 1
     core:print x2.core:add 2
@@ -154,6 +164,7 @@ by default but this time we prevent that to no end the line.
 import "std/core.s"
 
 def main()
+    CLI = console() 
     print nn "hello " # equivalent to print("hello", "")
     print "world!" 
 ```
@@ -176,6 +187,7 @@ others of the same type.
 import "std/core.s"
 
 def main()
+    CLI = console() 
     x = mut 1  # mutable - we want to mutate it further
     x = x+2
     x = x+3
@@ -206,6 +218,7 @@ def next(edit toinfinity r)
     r.pos = r.pos+1
 
 def main()
+    CLI = console() 
     r = toinfinity 0
     next r # proper loops later
     print r.pos
@@ -246,6 +259,7 @@ def sum(Point p)
     return p.x+p.y
 
 def main()
+    CLI = console() 
     p = Point(1.0, 2.0)
     print sum p 
 ```
@@ -262,6 +276,7 @@ def Point(float x, float y) # structural definition needs no body
 def Field(Point a, Point b)
 
 def main()
+    CLI = console() 
     f = Field(1.0, 2.0, 3.0, 4.0)
     print f.a.x+f.b.y # prints 5.0
 ```
@@ -277,6 +292,7 @@ methods exist for reading strings on buffers, or other number types.
 import "std/core.s"
 
 def main()
+    CLI = console() 
     console = console()
     print nn "Give a number: "
     x = float console
@@ -302,6 +318,7 @@ def Test()
     return class(x, y)
 
 def main()
+    CLI = console() 
     t = mut Test()
     t = Test()
     print(t.x) 
@@ -318,6 +335,7 @@ def Test()
     return class(x, y)
 
 def main()
+    CLI = console() 
     t = Test()
     print t.x # prints 1
     t.x = 0
@@ -342,6 +360,7 @@ def test(edit Test t)
     print t.x
 
 def main()
+    CLI = console() 
     t = Test()
     t.x = 5
     test t
@@ -361,6 +380,7 @@ be prematurely terminated with `break` or skipped with
 import "std/core.s"
 
 def main()
+    CLI = console() 
     x = 1.0-2.0
     if x<0.0
         print "x is negative"
@@ -368,12 +388,13 @@ def main()
 ```
 
 You can have one-liners for conditions and loops,
-like the following versions.
+like the following version.
 
 ```python
 import "std/core.s"
 
 def main()
+    CLI = console()
     x = 1.0-2.0
     if x<0.0 print "x is negative"
     else if x==0.0 print "x is zero"
@@ -384,6 +405,7 @@ def main()
 import "std/core.s"
 
 def main()
+    CLI = console()
     x = 1.0-2.0
     if x<0.0 sgn = "-" else sgn = "+"
     print nn "sign is: "
@@ -399,6 +421,7 @@ Here is a simple example. Please do not write code like this.
 import "std/core.s"
 
 def main()
+    CLI = console() 
     i = mut 0
     while true # overengineered
         if i==5 
@@ -424,6 +447,7 @@ More on iterators later.
 import "std/core.s"
 
 def main()
+    CLI = console() 
     for i in range 10
         print i
 ```
@@ -447,6 +471,7 @@ def all_positives(point p)
 def not(point p)
     return point(1.0-p.x, 1.0-p.y)
 def main()
+    CLI = console() 
     p = mut point(10.0, 20.0)
     # 'neg' to make numbers negative
     p = (all_positives p) and add(p, neg 30.0, neg 30.0) 
@@ -488,6 +513,7 @@ does not work; the programmer needs to reason about unbounded problems.
 import "std/core.s"
 
 def wooo() # CREATES AN ERROR - should have been 'rec'
+    CLI = console()
     print "wooo"
     return wooo()
 
@@ -538,6 +564,7 @@ def call_fib(nat n)
     return fib(n)
 
 def main()
+    CLI = console()
     print fib(10) # prints 89
 ```
 
@@ -553,12 +580,72 @@ mean never.
 import "std/core.s"
 
 rec wooo()
+    CLI = console()
     if false return blank()
     print "wooo"
 
 def main()
     wooo()
 ```
+
+
+
+## effects
+
+No, don't run!
+
+*Smoλ* deliberately avoids a complicated effect system; it just presents the ability to pass
+some arguments implicitly from the calling scope. In the standard library later, this mechanism
+is mainly used for passing memory allocators around. However, we have already seen a much more 
+fundamental usage in declaring `CLI = console()` in almost all our main functions.
+
+You can have the `effect` keyword before an argument in a function's signature to
+declare an effect. There is no other difference in how you would write or call the function.
+You only get one additional benefit; the compiler will try to pull variables with the same name 
+from the calling scope. Effects can only be placed at the start of funtion, and gathered
+scope variables will be placed there too. 
+
+Below is an example. Avoid using effects when not needed for clarity, as they introduce 
+calling complexity in that you are not explicitly passing arguments around.
+That said, you can explicitly pass all function arguments,
+in which case functions are called normally and nothing is gathered; this prevents 
+accidental implicit behavior. By convention, CAPITALIZE effect names so that assigning to them
+is made explicit by the code.
+
+```python
+import "std/core.s"
+
+def inc(effect nat INCREMENT, effect mut nat COUNTER, nat number)
+    COUNTER = COUNTER+1
+    return number+INCREMENT
+
+def main()
+    CLI = console()
+    COUNTER = mut 0
+    INCREMENT = 1
+    print inc inc inc 9      # prints 12
+    print inc(3, COUNTER, 4) # prints 7
+    print COUNTER            # prints 4 ('inc' was called four times)
+```
+
+Seing the above example, we can finally (and only now!) learn how to print
+in functions other than `main`; pass the CLI effect. Like below. Importantly,
+the console is a `singleton()` and thus can be created only at one place in
+a program. The added boilerplate is well worth the effort; even the console
+initialization is used to ensure that a printable console exists.
+
+
+```python
+import "std/core.s"
+
+def greet(effect console CLI)
+    print "hello world"
+
+def main()
+    CLI = console()
+    greet()
+```
+
 
 ## unions
 
@@ -586,6 +673,7 @@ def unsafe_add(float x, float|int y)
     return z
 
 def main()
+    CLI = console()
     print unsafe_add (1.0, int 2)
 ```
 
@@ -604,6 +692,7 @@ def unsafe_add(Number x, Number y)
     return z
 
 def main()
+    CLI = console()
     print unsafe_add (1.0, 2)
 ```
 
@@ -641,6 +730,7 @@ def inc(float\Number a) # define for float definitions that are not in Number
     return (x,y)
 
 def main()
+    CLI = console()
     print inc(1.0)  # print 2.0
     print inc(4.0,4.0).x # prints 5.0
 ```
@@ -655,8 +745,8 @@ are attached to specific values.
 Below is an example on using this concept to define numeric or 
 cstr constants first. Literal types evaluate to their value when 
 used within code - nothing
-out of the ordinary. By the way, prefer annotating literals with all-capital
-letters.
+out of the ordinary. By the way, prefer CAPITALIZING
+literal types (so capitals indicate either effects or literals).
 
 ```python
 import "std/core.s"
@@ -666,6 +756,7 @@ def inc(nat x)
     return x+INCREMENT
 
 def main()
+    CLI = console()
     print inc 0  # prints 1
 ```
 
@@ -678,12 +769,13 @@ can be a string or number literal.
 import "std/core.s"
 
 def VERSION = "two"
-def version("one") # just a literal type
+def version(effect console CLI, "one") # just a literal type
     print "version one"
-def version("two")
+def version(effect console CLI, "two")
     print "version two"
 
 def main()
+    CLI = console()
     v = type "two"
     version v # calls the correct version
     version type VERSION # calls the same version
@@ -707,6 +799,7 @@ def inc(nat x, blank|1|2 inc)
     return x+compiler:literal inc
 
 def main()
+    CLI = console()
     print inc 0           # prints 1
     print inc (0, type 2) # prints 2
 ```
@@ -721,11 +814,12 @@ to several runtime checks.
 ```python
 import "std/core.s"
 
-def enum = "A"|"B"|"C"
-def answer_schemas(enum first, enum second, nat minutes_to_answer)
+def ENUM = "A"|"B"|"C"
+def answer_schemas(ENUM first, ENUM second, nat minutes_to_answer)
 def answers(cstr first, cstr second, nat minutes_to_answer)
 
 def main()
+    CLI = console()
     answers = answers("A", "F", 60)
     if not answers is answer_schemas 
         print "not a valid answer" 
@@ -756,7 +850,7 @@ as the standard library's core. Below is an example of a conditional check.
 ```python
 import "std/core.s"
 
-def typed_print(nat|int|float|cstr value) 
+def typed_print(effect console CLI, nat|int|float|cstr value) 
     if value is nat|int|float
         print nn "this is a number: "
     else
@@ -764,6 +858,7 @@ def typed_print(nat|int|float|cstr value)
     print value
 
 def main()
+    CLI = console()
     typed_print 1
     typed_print 2.0
     typed_print "test"
@@ -786,6 +881,7 @@ def inc(nat x, nat|blank value)
     return x+value
 
 def main()
+    CLI = console()
     print inc 2    # prints 3
     print inc(2,2) # prints 4
 ```
@@ -814,6 +910,7 @@ def inc(Num x, Num|blank value) # equivalent: def inc(float|int|nat x, float|int
     return x+value
 
 def main()
+    CLI = console()
     print inc 2.0  # prints 3.0
     print inc(2,2) # prints 4
 ```
@@ -830,6 +927,7 @@ import "std/core.s"
 
 def VALUES = compt (1,2)
 def main()
+    CLI = console()
     print add VALUES
 ```
 
@@ -844,6 +942,7 @@ import "std/core.s"
 
 def CONSTANT = compt cstr unsafe_temp add(bufpos alloc 128, "hello", " world!")
 def main()
+    CLI = console()
     print CONSTANT
     print CONSTANT=="hello world!" # 'true'
     # the above check is correct even if the
@@ -862,6 +961,7 @@ import "std/sci.s"
 
 def ones = compt vec [1.0, 1.0]
 def main()
+    CLI = console()
     v = mut vec [5.0, 10.0]
     allocator = bufpos float[].alloc 128
     v = v+ones
@@ -914,6 +1014,7 @@ with negative indexes. Next is an example of buffer usage.
 import "std/core.s"
 
 def main()
+    CLI = console()
     buf = float[].alloc 10 # allocate 10 elements
     print buf[0] # prints 0, as buffers are zero-initialized
     buf[1] = 1.0
@@ -943,6 +1044,7 @@ def create()
     return const buf
 
 def main()
+    CLI = console()
     buf = create()
     print buf[0]
     buf[1] = 1.0 # CREATES AN ERROR
@@ -975,6 +1077,7 @@ the input buffer type.
 import "std/core.s"
 
 def print(any[] buffer)
+    CLI = console()
     print(len buffer, " elements in buffer\n")
 
 def main()
@@ -1000,6 +1103,7 @@ def populate(edit named_strbuffer named) # for str[] only
     named.buf[1] = str "world"
 
 def main()
+    CLI = console()
     elements = named_buffer(str "greeting", str[])
     elements.buf = elements.buf.alloc 2
     populate elements
@@ -1016,11 +1120,12 @@ is used to make the allocation.
 ```python
 import "std/core.s"
 
-def print(cstr[] sentences)
+def print(effect console CLI, cstr[] sentences)
     for sentence in sentences
         print sentence
 
 def main()
+    CLI = console()
     print ["hello world!", "... and goodbye for now."]
 ```
 
@@ -1066,6 +1171,7 @@ Below is an example.
 import "std/core.s"
 
 def main()
+    CLI = console()
     buf = float[].alloc 1
     element = buf[0]&&
     print element.. # prints 0 as buffers are zero-initialized
@@ -1109,6 +1215,7 @@ def Point3D(float x, float y, float z)
     return (plane,class(z))
 
 def main()
+    CLI = console()
     points = Point3D[].alloc 10
     points[0] = Point3D(1.0,2.0,3.0)
     plane = points@plane # can move this around
@@ -1136,6 +1243,7 @@ syntax like below.
 import "std/core.s"
 
 def main()
+    CLI = console()
     x = mut 0
     y = ref x
     z = ref x
@@ -1172,6 +1280,7 @@ this requires stable handling through `ref`.
 import "std/core.s"
 
 def main()
+    CLI = console()
     buf = ref alloc (mut float[], 10) # 'ref' is mandatory to resize later
     buf[1] = 1.0
     buf.resize 20
@@ -1198,6 +1307,7 @@ def test()
     return (s1,s2)
 
 def main()
+    CLI = console()
     s = test()
     print s.s1
     print s.s2
@@ -1225,11 +1335,12 @@ You can manually `fail` like so:
 ```python
 import "std/core.s"
 
-def always_fail()
+def always_fail(effect console CLI)
     print "we are failing"
     fail "we failed!"
 
 def main()
+    CLI = console()
     always_fail()
     print "this line is never printed"
 ```
@@ -1245,6 +1356,7 @@ assertion. There are various other compiler assertions too, which are covered la
 import "std/core.s"
 
 def main()
+    CLI = console()
     try x = alloc KB 4  # buffer of chars
     try x[0] = char "a" # still needs a try for buffer elements - though checks can be optimized away
     try print x[0]
@@ -1272,6 +1384,7 @@ def vector(nat size)
     return float[].alloc size
 
 def main()
+    CLI = console()
     if not try v = vector pow(1024,6)
         print "failed to allocate"
     print(len v, " numbers allocated\n")
@@ -1285,6 +1398,7 @@ where `for` loops are syntactic desugar to something similar.
 import "std/core.s"
 
 def main()
+    CLI = console()
     it = range 5
     while try i=next it
         print i
@@ -1306,6 +1420,7 @@ is converted into a `while try`.
 import "std/core.s"
 
 def main()
+    CLI = console()
     for i in range 10
         print i   # prints 0,1,2...,9
 ```
@@ -1320,6 +1435,7 @@ examples is equivalent like the next one.
 import "std/core.s"
 
 def main()
+    CLI = console()
     iterator = range 10
     hidden_index = mut 0
     while try i=iterator[hidden_index]
@@ -1335,6 +1451,7 @@ like below.
 import "std/core.s"
 
 def main()
+    CLI = console()
     for i in [1,2,3]
         print i
 ```
@@ -1357,6 +1474,7 @@ def get(edit solution s, nat) # skip the iteration index argument
     return s.y-s.x
 
 def main()
+    CLI = console()
     sol = solution(mut 32, mut 19)
     for diff in sol 
         print nn "difference "
@@ -1386,6 +1504,7 @@ Below is a simple example.
 import "std/core.s"
 
 def main()
+    CLI = console()
     defer
         print "third"
     print "first"
@@ -1402,6 +1521,7 @@ import "std/core.s"
 import "std/io.s":process as process
 
 def main()
+    CLI = console()
     proc = mut process:read "echo \"hello world!\""
     del proc # runs the process's defer, which waits for completion
     print "bye!"
@@ -1422,6 +1542,7 @@ import "std/core.s"
 import "std/io.s" as io
 
 def main()
+    CLI = console()
     try print 2*3-20 # nat cannot become negative
     if try error = compiler:catch()
         print "cannot substract two nat numbers and obtain a negative result"
@@ -1445,6 +1566,7 @@ def bye_error()
     fail "bye!" 
 
 def main()
+    CLI = console()
     proc = mut process:read "echo \"hello world!\""
     try bye_error()
     del proc
@@ -1454,41 +1576,7 @@ def main()
         fail error       # can fail with error codes too
 ```
 
-
-## effects
-
-No, don't run!
-
-*Smoλ* deliberately avoids a complicated effect system; it just presents the ability to pass
-some arguments implicitly from the calling scope. In the standard library later, this mechanism
-is mainly used for passing memory allocators around. 
-
-Basically, you can have the `effect` keyword before an argument in a function's signature to
-declare an effect. There is no other difference in how you would write or call the function.
-You only get one additional benefit; the compiler will try to pull variables with the same name 
-from the calling scope. Effects can only be placed at the start of funtion, and gathered
-scope variables will be placed there too. 
-
-Below is an example. Avoid using effects when not needed for clarity, as they introduce 
-calling complexity in that you are not explicitly passing arguments around
-That said, you can explicitly pass all function arguments,
-in which case functions are called normally and nothing is gathered; this prevents 
-accidental implicit behavior.
-
-```python
-import "std/core.s"
-
-def inc(effect nat increment, effect mut nat counter, nat number)
-    counter = counter+1
-    return number+increment
-
-def main()
-    counter = mut 0
-    increment = 1
-    print inc inc inc 9      # prints 12
-    print inc(3, counter, 4) # prints 7
-    print counter            # prints 4 ('inc' was called four times)
-```
+## allocator effects
 
 Where effects are the most useful is overloading operations that require
 external resources. The next example demonstrates this using vectors
@@ -1505,6 +1593,7 @@ import "std/core.s"
 import "std/sci.s"
 
 def main()
+    CLI = console()
     allocator  = bufpos float[].alloc 128
     v1 = vec 10 # vector of 10 elements
     v2 = vec 10
@@ -1538,6 +1627,7 @@ For example, one pattern usable for debuggining is the following.
 import "std/core.s"
 
 def main()
+    CLI = console()
     s1 = str "s1"
     s2 = str "s2"
     debug:print type "--- main ---" # prints '"--- main ---"' at compile time
@@ -1560,6 +1650,7 @@ def test1(nat a, nat b, "one"|"two")
 def test2(float a, float b, "one"|"two")
 
 def main()
+    CLI = console()
     a = 1
     b = 2.0
     c = "one"
@@ -1595,6 +1686,7 @@ rec wooo(effect edit range recursion_safety, nat i)
     return wooo(i+1)
 
 def main()
+    CLI = console()
     recursion_safety = range 14 # recursive depth limit in playground
     try wooo 0
     if try error = compiler:catch()
@@ -1619,6 +1711,7 @@ one place while returning a pointer to the last element.
 import "std/core.s"
 
 def main()
+    CLI = console()
     li = ref list mut float[]
     (push li) << 0.1
     (push li) << 0.1
@@ -1646,6 +1739,7 @@ character too, but such data are ignored if not needed.
 import "std/core.s"
 
 def main()
+    CLI = console()
     print str "hello world!"
 ```
 You can convert string contents to numeric types. 
@@ -1655,6 +1749,7 @@ This creates errors on failure.
 import "std/core.s"
 
 def main()
+    CLI = console()
     print float "123"
 ```
 
@@ -1667,6 +1762,7 @@ position with the `bufpos` (buffer-position) function.
 import "std/core.s"
 
 def main()
+    CLI = console()
     buf = bufpos alloc KB 4 # equivalent to buf = (alloc KB 4, mut 0)
     s = buf.copy "hello world!"
     print s
@@ -1682,6 +1778,7 @@ on an erroneous program.
 import "std/core.s"
 
 def main()
+    CLI = console()
     buf = ref mut list mut char[]
     s1 = buf.copy "hello world!" # would have been invalidated if we did not use `ref`
     s2 = buf.copy "hello world!"
@@ -1706,6 +1803,7 @@ import "std/core.s"
 import "std/map.s"
 
 def main()
+    CLI = console()
     map = mut strmap str[].alloc 128
     map["hello"] = str "hello world!"
     map["manio"] = str "it's a me, manio."
@@ -1736,6 +1834,7 @@ import "std/core.s"
 import "std/io.s"
 
 def main()
+    CLI = console()
     f = file:read "README.md"
     mem = char[].alloc KB 4 # max 4 KB chunk size, on char[] by default
     for line in (mem, f)
@@ -1752,6 +1851,7 @@ import "std/core.s"
 import "std/io.s"
 
 def main()
+    CLI = console()
     f = file:write "tmp.txt"
     f.print "hello world"
     defer 
@@ -1769,6 +1869,7 @@ import "std/core.s"
 import "std/io.s"
 
 def main()
+    CLI = console()
     dir = mut dir:read "."
     for entry in dir
         print(entry, " ")
@@ -1788,6 +1889,7 @@ import "std/core.s"
 import "std/io.s"
 
 def main()
+    CLI = console()
     success = try system "echo \"hello world!\""
     print success
 ```
@@ -1800,6 +1902,7 @@ import "std/core.s"
 import "std/io.s":process as proc
 
 def main()
+    CLI = console()
     process = proc:process "ls"
     buf = bufpos char[].alloc KB 4 # example with growing position
     for line in (buf, process)
@@ -1816,6 +1919,7 @@ import "std/core.s"
 import "std/io.s":process as proc
 
 def main()
+    CLI = console()
     process = proc:process "ls"
     del process
     if try error = compiler:catch()
@@ -1839,6 +1943,7 @@ import "std/core.s"
 import "std/rand.s"
 
 def main()
+    CLI = console()
     seed = mut splitmix64()
     print splitmix64(seed)
     print splitmix64(seed)
@@ -1854,6 +1959,7 @@ import "std/core.s"
 import "std/rand.s"
 
 def main()
+    CLI = console()
     rand = mut Rand()
     print next rand
     print next rand
@@ -1907,6 +2013,7 @@ def concat(mini:str[] buff)
     return str(mem.buf,start,mem.pos)
 
 def main()
+    CLI = console()
     buff = mini:str[].alloc 6
     debug:print buff # print the buffer type during compilation
     buff[0] = mini:str "hi"
@@ -1934,6 +2041,7 @@ import "std/core.s"
 import "std/sci.s"
 
 def main()
+    CLI = console()
     v = vec [1.0, 2.0, 0.0, 0.0, 0.0]
     print ("(sum, mean, std) = (", "")
     print (sum v, ", ")
@@ -1964,6 +2072,7 @@ def safe_main()
     print v[0]
     
 def main()
+    CLI = console()
     try safe_main()
     if try error=compiler:catch()
         print cstr error
@@ -1980,6 +2089,7 @@ import "std/core.s"
 import "std/sci.s"
 
 def main()
+    CLI = console()
     allocator = new() # allocate to new memory whenever needed
 
     a = mat [
@@ -2017,7 +2127,7 @@ around in a window.
 ```python
 import "std/core.s"
 import "std/sci.s" as sci
-import "std/ray.s" as ray
+import "std/graphics.s" as graphics
 
 def Circle(float _cx, float _cy, float _vx, float _vy, float _radius)
     cx = mut _cx
@@ -2045,18 +2155,18 @@ def process(mut Circle ptr _self, float dt)
         self.vy = 0.0-(sci:abs self.vy)
     _self << self
 
-def draw(Circle self, edit ray:Window win)
-    white  = ray:Color(255, 255, 255)
-    teal   = ray:Color(0,   200, 180)
-    shadow = ray:Color(0,   200, 180, 60)
+def draw(Circle self, edit graphics:Window win)
+    white  = graphics:Color(255, 255, 255)
+    teal   = graphics:Color(0,   200, 180)
+    shadow = graphics:Color(0,   200, 180, 60)
     pos = (self.cx, self.cy)
     win
-    .ray:circ(self.cx + 4.0, self.cy + 4.0, self.radius, shadow)
-    .ray:circ(pos, self.radius, teal)
-    .ray:circ_line(pos, nat self.radius, 2, white)
+    .graphics:circ(self.cx + 4.0, self.cy + 4.0, self.radius, shadow)
+    .graphics:circ(pos, self.radius, teal)
+    .graphics:circ_line(pos, nat self.radius, 2, white)
 
 def main()
-    win = ray:Size(800.0, 600.0).ray:Window "Circles"
+    win = graphics:Size(800.0, 600.0).graphics:Window "Circles"
 
     N = 1000
     circles = Circle[].alloc N
@@ -2064,12 +2174,12 @@ def main()
         i = float compiler:for_counter() # builtin way of enumerating
         create_circle << Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
 
-    while ray:is_open win
-        dt = ray:dt()
+    while graphics:is_open win
+        dt = graphics:dt()
         for proc_circle&& in circles # mutable pointer
             proc_circle.process dt
-        frame = ray:draw win
-        win.ray:clear ray:Color(20, 20, 60)
+        frame = graphics:draw win
+        win.graphics:clear graphics:Color(20, 20, 60)
         for draw_circle in circles
             draw_circle.draw win
         del frame
@@ -2104,6 +2214,7 @@ def run(cstr|str command)
         print cstr error
 
 def main()
+    CLI = console()
     path = "./tests/passing/"
     bp = bufpos char[].alloc 256 # buffer and mutable position pair
     bp.copy "./smoll "
@@ -2133,6 +2244,7 @@ def CHUNK_SIZE = 4096
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 
 def main()
+    CLI = console()
     mem = char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
     f = file:read web:get web:url README  # save to .tmp with system curl and read it
     size = mut 0

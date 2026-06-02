@@ -36,6 +36,7 @@ def CHUNK_SIZE = 4096
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 
 def main()
+    CLI = console() # use the CLI effect to direct reads and prints to the console
     mem = char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
     f = file:read web:get web:url README  # save to .tmp with system curl and read it
     size = mut 0

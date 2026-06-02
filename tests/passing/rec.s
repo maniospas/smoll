@@ -9,5 +9,6 @@ def call_fib(nat n)
     return fib(n)
 
 def main()
+    CLI = console()
     print fib(42)
 

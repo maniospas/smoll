@@ -7,6 +7,7 @@ def Answers(enum first, enum second, nat minutes_to_answer)
 def answers(cstr first, cstr second, nat minutes_to_answer)
 
 def main()
+    CLI = console()
     answers = answers("A", "A", 60)
     if not answers is Answers 
         fail "not a valid answer" # this will fail

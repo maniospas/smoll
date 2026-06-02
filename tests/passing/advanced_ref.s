@@ -8,6 +8,7 @@ def test()
     return (s1,s2)
     
 def main()
+    CLI = console()
     s = test()
     print s.s1
     print s.s2

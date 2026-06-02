@@ -12,6 +12,7 @@ def concat(mini:str[] buff)
   return str(mem.buf,start,mem.pos)
 
 def main()
+  CLI = console()
   buff = (mut mini:str[]).alloc 6
   debug:print buff
   buff[0] = mini:str "hi"

@@ -4,7 +4,7 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t374t="\n";
+const char* const __t377t="\n";
 static const char* __t_all_errcodes[35] = {"noerr",
 "error",
 "null pointer",
@@ -42,7 +42,12 @@ static const char* __t_all_errcodes[35] = {"noerr",
 "invalid float conversion from string without a value after the dot"
 };
 
-static inline __attribute__((always_inline)) void splitmix64__t1470t(uint64_t* __t1494t) {
+static inline __attribute__((always_inline)) void console__t365t() {
+  goto __t_return;
+  __t_return:
+}
+
+static inline __attribute__((always_inline)) void splitmix64__t1470t(uint64_t* __t1495t) {
   char* ts=0;
   uint64_t seed=0;
   ts=alloca(sizeof(struct timespec));
@@ -50,11 +55,11 @@ static inline __attribute__((always_inline)) void splitmix64__t1470t(uint64_t* _
   seed=(unsigned long long)((struct timespec*)ts)->tv_sec*(unsigned long long)1000000000+((struct timespec*)ts)->tv_nsec;
   goto __t_return;
   __t_return:
-  *__t1494t=seed;
+  *__t1495t=seed;
 }
 
-static inline __attribute__((always_inline)) void splitmix64__t1468t(uint64_t* __t1495t, uint64_t* __t1496t) {
-  uint64_t x=*__t1495t;
+static inline __attribute__((always_inline)) void splitmix64__t1468t(uint64_t* __t1496t, uint64_t* __t1497t) {
+  uint64_t x=*__t1496t;
   uint64_t z=0;
   uint64_t rot=0;
   uint64_t __t1469t=0;
@@ -71,11 +76,11 @@ static inline __attribute__((always_inline)) void splitmix64__t1468t(uint64_t* _
   __t1469t=z;
   goto __t_return;
   __t_return:
-  *__t1495t=x;
-  *__t1496t=__t1469t;
+  *__t1496t=x;
+  *__t1497t=__t1469t;
 }
 
-static inline __attribute__((always_inline)) void Rand__t1471t(uint64_t seed, uint64_t* __t1497t, uint64_t* __t1498t, uint64_t* __t1499t, uint64_t* __t1500t) {
+static inline __attribute__((always_inline)) void Rand__t1471t(uint64_t seed, uint64_t* __t1498t, uint64_t* __t1499t, uint64_t* __t1500t, uint64_t* __t1501t) {
   int __t1472t=0;
   uint64_t __t1473t=0;
   uint64_t modifying_seed=0;
@@ -107,13 +112,13 @@ static inline __attribute__((always_inline)) void Rand__t1471t(uint64_t seed, ui
   s3=__t1481t;
   goto __t_return;
   __t_return:
-  *__t1497t=s0;
-  *__t1498t=s1;
-  *__t1499t=s2;
-  *__t1500t=s3;
+  *__t1498t=s0;
+  *__t1499t=s1;
+  *__t1500t=s2;
+  *__t1501t=s3;
 }
 
-static inline __attribute__((always_inline)) void Rand__t1483t(uint64_t* __t1501t, uint64_t* __t1502t, uint64_t* __t1503t, uint64_t* __t1504t) {
+static inline __attribute__((always_inline)) void Rand__t1483t(uint64_t* __t1502t, uint64_t* __t1503t, uint64_t* __t1504t, uint64_t* __t1505t) {
   uint64_t __t1484t__=0;
   uint64_t __t1485t__s0=0;
   uint64_t __t1485t__s1=0;
@@ -123,13 +128,13 @@ static inline __attribute__((always_inline)) void Rand__t1483t(uint64_t* __t1501
   Rand__t1471t(__t1484t__,&__t1485t__s0,&__t1485t__s1,&__t1485t__s2,&__t1485t__s3);
   goto __t_return;
   __t_return:
-  *__t1501t=__t1485t__s0;
-  *__t1502t=__t1485t__s1;
-  *__t1503t=__t1485t__s2;
-  *__t1504t=__t1485t__s3;
+  *__t1502t=__t1485t__s0;
+  *__t1503t=__t1485t__s1;
+  *__t1504t=__t1485t__s2;
+  *__t1505t=__t1485t__s3;
 }
 
-static inline __attribute__((always_inline)) void rotl__t1467t(uint64_t x, uint64_t k, uint64_t* __t1505t) {
+static inline __attribute__((always_inline)) void rotl__t1467t(uint64_t x, uint64_t k, uint64_t* __t1506t) {
   uint64_t left=0;
   uint64_t compk=0;
   uint64_t right=0;
@@ -140,14 +145,14 @@ static inline __attribute__((always_inline)) void rotl__t1467t(uint64_t x, uint6
   z=left|right;
   goto __t_return;
   __t_return:
-  *__t1505t=z;
+  *__t1506t=z;
 }
 
-static inline __attribute__((always_inline)) void next__t1486t(uint64_t* __t1506t, uint64_t* __t1507t, uint64_t* __t1508t, uint64_t* __t1509t, double* __t1510t) {
-  uint64_t self__s0=*__t1506t;
-  uint64_t self__s1=*__t1507t;
-  uint64_t self__s2=*__t1508t;
-  uint64_t self__s3=*__t1509t;
+static inline __attribute__((always_inline)) void next__t1486t(uint64_t* __t1507t, uint64_t* __t1508t, uint64_t* __t1509t, uint64_t* __t1510t, double* __t1511t) {
+  uint64_t self__s0=*__t1507t;
+  uint64_t self__s1=*__t1508t;
+  uint64_t self__s2=*__t1509t;
+  uint64_t self__s3=*__t1510t;
   uint64_t result=0;
   uint64_t t=0;
   uint64_t __t1487t=0;
@@ -170,45 +175,46 @@ static inline __attribute__((always_inline)) void next__t1486t(uint64_t* __t1506
   value=nom/denom;
   goto __t_return;
   __t_return:
-  *__t1506t=self__s0;
-  *__t1507t=self__s1;
-  *__t1508t=self__s2;
-  *__t1509t=self__s3;
-  *__t1510t=value;
+  *__t1507t=self__s0;
+  *__t1508t=self__s1;
+  *__t1509t=self__s2;
+  *__t1510t=self__s3;
+  *__t1511t=value;
 }
 
-static inline __attribute__((always_inline)) void print__t377t(double value) {
-  int __t378t=0;
+static inline __attribute__((always_inline)) void print__t380t(double value) {
+  int __t381t=0;
   const char* endl=0;
-  endl=__t374t;
+  endl=__t377t;
   printf("%.6f%s",value,endl);
 }
 
 static inline __attribute__((always_inline)) void main__t1489t() {
-  uint64_t __t1490t__s0=0;
-  uint64_t __t1490t__s1=0;
-  uint64_t __t1490t__s2=0;
-  uint64_t __t1490t__s3=0;
   uint64_t __t1491t__s0=0;
   uint64_t __t1491t__s1=0;
   uint64_t __t1491t__s2=0;
   uint64_t __t1491t__s3=0;
+  uint64_t __t1492t__s0=0;
+  uint64_t __t1492t__s1=0;
+  uint64_t __t1492t__s2=0;
+  uint64_t __t1492t__s3=0;
   uint64_t rand__s0=0;
   uint64_t rand__s1=0;
   uint64_t rand__s2=0;
   uint64_t rand__s3=0;
-  double __t1492t__=0;
-  Rand__t1483t(&__t1490t__s0,&__t1490t__s1,&__t1490t__s2,&__t1490t__s3);
-  __t1491t__s0=__t1490t__s0;
-  __t1491t__s1=__t1490t__s1;
-  __t1491t__s2=__t1490t__s2;
-  __t1491t__s3=__t1490t__s3;
-  rand__s0=__t1491t__s0;
-  rand__s1=__t1491t__s1;
-  rand__s2=__t1491t__s2;
-  rand__s3=__t1491t__s3;
-  next__t1486t(&rand__s0,&rand__s1,&rand__s2,&rand__s3,&__t1492t__);
-  print__t377t(__t1492t__);
+  double __t1493t__=0;
+  console__t365t();
+  Rand__t1483t(&__t1491t__s0,&__t1491t__s1,&__t1491t__s2,&__t1491t__s3);
+  __t1492t__s0=__t1491t__s0;
+  __t1492t__s1=__t1491t__s1;
+  __t1492t__s2=__t1491t__s2;
+  __t1492t__s3=__t1491t__s3;
+  rand__s0=__t1492t__s0;
+  rand__s1=__t1492t__s1;
+  rand__s2=__t1492t__s2;
+  rand__s3=__t1492t__s3;
+  next__t1486t(&rand__s0,&rand__s1,&rand__s2,&rand__s3,&__t1493t__);
+  print__t380t(__t1493t__);
 }
 
 int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1489t();return 0;}

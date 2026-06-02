@@ -1,7 +1,7 @@
 import "std/core.s"
 import "std/sci.s"
 
-def safe_main()
+def safe_main(effect console CLI)
     allocator  = ref float[].alloc(200).circular() # effects can grab it by name
     allocator2 = ref float[].alloc(200).circular() # useless 
     v1 = new().vec 10 # force our own allocator
@@ -17,6 +17,7 @@ def safe_main()
     print v[0]
     
 def main()
+    CLI = console()
     try safe_main()
     if try error=compiler:catch()
         print cstr error

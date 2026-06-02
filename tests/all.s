@@ -2,13 +2,14 @@ import "std/core.s"
 import "std/io.s"
 
 
-def run(cstr|str command)
+def run(effect console CLI, cstr|str command)
     proc = mut process:read command
     del proc
     if try error = compiler:catch()
         print cstr error
 
 def main()
+    CLI = console()
     path = "./tests/passing/"
     bp = bufpos char[].alloc 256 # buffer and mutable position pair
     bp.copy "./smoll "

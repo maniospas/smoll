@@ -1,6 +1,7 @@
 import "std/core.s"
 
 def main()
+    CLI = console()
     buf1 = ref mut float[]
     buf1.alloc 20
     buf1.resize 10

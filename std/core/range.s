@@ -16,14 +16,16 @@
 
 local import "std/core/numbers.s"
 
-def range(nat|blank _from, nat to)
+def range(nat _from, nat to)
     doc "constructs a range"
     doc "Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration."
-    if _from is blank
-        doc "the range's start is assumed to be zero"
-        _from = 0
     from = mut _from
     return class(from, to)
+
+def range(nat to)
+    doc "constructs a range"
+    doc "Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration."
+    return range(0,to)
 
 def next(edit range r)
     doc "next range number"

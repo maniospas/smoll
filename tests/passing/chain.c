@@ -4,8 +4,8 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t1511t="123";
-const char* const __t378t="\n";
+const char* const __t1553t="123";
+const char* const __t382t="\n";
 static const char* __t_all_errcodes[35] = {"noerr",
 "error",
 "null pointer",
@@ -48,18 +48,18 @@ static inline __attribute__((always_inline)) void console__t366t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void eq__t773t(const char* x, const char* y, char* __t1514t) {
+static inline __attribute__((always_inline)) void eq__t815t(const char* x, const char* y, char* __t1556t) {
   char z=0;
   z=(x==y);
   goto __t_return;
   __t_return:
-  *__t1514t=z;
+  *__t1556t=z;
 }
 
-static inline __attribute__((always_inline)) void print__t393t(char value) {
-  int __t394t=0;
+static inline __attribute__((always_inline)) void print__t397t(char value) {
+  int __t398t=0;
   const char* endl=0;
-  endl=__t378t;
+  endl=__t382t;
   if(value){
   printf("%s%s","true",endl);
   }
@@ -68,11 +68,11 @@ static inline __attribute__((always_inline)) void print__t393t(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__t1509t() {
-  char __t1512t__=0;
+static inline __attribute__((always_inline)) void main__t1551t() {
+  char __t1554t__=0;
   console__t366t();
-  eq__t773t(__t1511t,__t1511t,&__t1512t__);
-  print__t393t(__t1512t__);
+  eq__t815t(__t1553t,__t1553t,&__t1554t__);
+  print__t397t(__t1554t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1509t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1551t();return 0;}

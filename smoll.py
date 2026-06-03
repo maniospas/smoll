@@ -2368,13 +2368,15 @@ def find_unique_variations(variations: list[ImplementedType]):
     all_found: list[ImplementedType] = list()
     for impl in variations:
         already_parsed = False
+        #impl_common_length = len(longest_common_prefix([v for va in impl.rets]))
         for variation in all_found:
             is_same = len(variation.rets)==len(impl.rets)
+            #variation_common_length = len(longest_common_prefix([v for va in variation.rets]))
             if is_same:
                 for variation_arg, impl_arg in zip(variation.rets, impl.rets):
                     vv = variation.vars[variation_arg]
                     iv = impl.vars[impl_arg]
-                    if vv.type != iv.type or vv.immutable != iv.immutable or vv.isprivate != iv.isprivate:
+                    if vv.type != iv.type or (vv.immutable or vv.isprivate) != (iv.immutable or iv.isprivate):
                         is_same = False
                         break
             if is_same:
@@ -2556,7 +2558,8 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
             buffer_type: UnionType|None = buffer_types[type] if type in buffer_types else None
             if buffer_type is None:
                 buffer_type = UnionType(type.name+"____t_buffer", at=type.at)
-                unique_variations = find_unique_variations(type.variations) if reduce_to_unique_variations else type.variations
+                # always found unique buffer variations
+                unique_variations = find_unique_variations(type.variations) #if reduce_to_unique_variations else type.variations
                 #unique_variations = type.variations
                 #if len(unique_variations)!=1: at_pos.error("safety", "it is not clear which version should be used for '"+type.name+"[]'", suggestions=[candidate.signature() for candidate in unique_variations])
                 for variation in unique_variations:
@@ -2639,6 +2642,7 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
         ret.variations.extend(type.variations)
         ret.variations.extend(alternatives.variations)
         ret.variations = list(dict.fromkeys(ret.variations))#list(set(ret.variations))
+        if reduce_to_unique_variations: ret.variations = find_unique_variations(ret.variations)
         type = ret
     elif peek_text(tokens, pos) == "&":
         if is_lsp and get(tokens, pos).file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "common elements of the type unions")
@@ -2915,7 +2919,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     rets = [Variable(create_temp(), TRUE_TYPE) if matched else Variable(create_temp(), FALSE_TYPE)]
                     impl.vars[rets[0].name] = rets[0]
                     return pos, rets
-                pos, type = await process_linear_type(file, tokens, pos, reduce_to_unique_variations=True, show_lsp=True)
+                pos, type = await process_linear_type(file, tokens, pos, reduce_to_unique_variations=False, show_lsp=True)
                 count_with_literals = 0
                 for variation in type.variations:
                     matched = len(variation.rets)==len(rets)
@@ -3682,7 +3686,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     if matches: method.variations.append(variation)
         else:
             # then resolve to a call based on type
-            pos, method = await process_linear_type(file, tokens, pos)
+            pos, method = await process_linear_type(file, tokens, pos, reduce_to_unique_variations=False)
         call_token = get(tokens, pos-1)
         if all(variation.is_literal_of is not None for variation in method.variations):
             if len(method.variations)!=1: call_token.error("type", "cannot have multiple literal type alternatives")

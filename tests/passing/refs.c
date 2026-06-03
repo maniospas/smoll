@@ -4,7 +4,7 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t378t="\n";
+const char* const __t382t="\n";
 static const char* __t_all_errcodes[35] = {"noerr",
 "error",
 "null pointer",
@@ -47,61 +47,61 @@ static inline __attribute__((always_inline)) void console__t366t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void false__t10t(int* __t1516t) {
+static inline __attribute__((always_inline)) void false__t10t(int* __t1558t) {
   int value=0;
-  *__t1516t=value;
+  *__t1558t=value;
 }
 
-static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t1517t) {
+static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t1559t) {
   int __t38t__=0;
   false__t10t(&__t38t__);
   goto __t_return;
   __t_return:
-  *__t1517t=__t38t__;
+  *__t1559t=__t38t__;
 }
 
-static inline __attribute__((always_inline)) void is_different__t95t(uint64_t x, uint64_t y, int* __t1518t) {
+static inline __attribute__((always_inline)) void is_different__t95t(uint64_t x, uint64_t y, int* __t1560t) {
   int __t96t=0;
   int __t97t__=0;
   not__t37t(__t96t,&__t97t__);
   goto __t_return;
   __t_return:
-  *__t1518t=__t97t__;
+  *__t1560t=__t97t__;
 }
 
-static inline __attribute__((always_inline)) void add__t175t(uint64_t x, uint64_t y, uint64_t* __t1519t) {
+static inline __attribute__((always_inline)) void add__t175t(uint64_t x, uint64_t y, uint64_t* __t1561t) {
   int __t176t__=0;
   uint64_t z=0;
   is_different__t95t(x,y,&__t176t__);
   z=x+y;
   goto __t_return;
   __t_return:
-  *__t1519t=z;
+  *__t1561t=z;
 }
 
-static inline __attribute__((always_inline)) void print__t389t(uint64_t value) {
-  int __t390t=0;
+static inline __attribute__((always_inline)) void print__t393t(uint64_t value) {
+  int __t394t=0;
   const char* endl=0;
-  endl=__t378t;
+  endl=__t382t;
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__t1509t() {
-  uint64_t __t1511t=0;
-  uint64_t __t1512t=0;
+static inline __attribute__((always_inline)) void main__t1551t() {
+  uint64_t __t1553t=0;
+  uint64_t __t1554t=0;
   uint64_t x=0;
   uint64_t y=0;
   uint64_t z=0;
-  uint64_t __t1513t=0;
-  uint64_t __t1514t__=0;
+  uint64_t __t1555t=0;
+  uint64_t __t1556t__=0;
   console__t366t();
-  __t1511t=1;
-  __t1512t=__t1511t;
-  x=__t1512t;
-  __t1513t=2;
-  x=__t1513t;
-  add__t175t(x,x,&__t1514t__);
-  print__t389t(__t1514t__);
+  __t1553t=1;
+  __t1554t=__t1553t;
+  x=__t1554t;
+  __t1555t=2;
+  x=__t1555t;
+  add__t175t(x,x,&__t1556t__);
+  print__t393t(__t1556t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1509t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1551t();return 0;}

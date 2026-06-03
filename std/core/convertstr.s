@@ -54,7 +54,7 @@ def int(console console)
             if "\n\r".contains c break
             eof = not try c=char console
         fail "user input was not a float"
-    return number
+    return const number
 
 def nat(console console)
     doc "reads an unsigned integer from the console"
@@ -74,7 +74,7 @@ def nat(console console)
             if "\n\r".contains c break
             eof = not try c=char console
         fail "user input was not a float"
-    return number
+    return const number
 
 def float(console console)
     doc "reads a float from the console"

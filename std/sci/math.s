@@ -56,3 +56,13 @@ def exp(float x)
 def pow(float x, float y)
     {builtins:float z = pow(x, y);}
     return z
+
+def isnan(float x)
+    VM "[math.isnan(x)]"
+    {builtins:bool z = (fpclassify(x)==FP_NAN);}
+    return z
+
+def isinf(float x)
+    VM "[math.isinf(x)]"
+    {builtins:bool z = (fpclassify(x)==FP_INFINITE);}
+    return z

@@ -1,12 +1,11 @@
-local import "std/core.s"
+import "std/core.s"
 local import "std/sci/math.s"
 local import "std/sci/unsafe.s"
+local import "std/unsafe.s" as unsafe
 
-def vec_new() 
-    return new()
 def float_arena(edit float[] buf, mut nat pos)
-def vec_allocator = vec_new|float_arena|circular
-def circular(edit float[] buf, mut nat|blank pos, nat|blank length)
+def vec_allocator = new|float_arena|circular
+def circular(edit float[] buf, mut nat|blank pos)
     doc "circular float buffer"
     doc "Is used as FLOATS"
     if pos is nat and length is nat
@@ -19,10 +18,12 @@ def circular(edit float[] buf, mut nat|blank pos, nat|blank length)
     pos = pos+length
     return circular(buf, start, length)
 
-def vec(effect new FLOATS, nat length)
+def vec(effect new FLOATS, nat length, "dirty"|blank clear_policy)
     doc "vector on a new buffer"
     doc "Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer."
-    buf = ref float[].alloc length
+    buf = ref float[].alloc(length dirty)
+    if clear_policy is type "dirty"
+        buf.unsafe_ptr.unsafe:zero(0, 8*length)
     return vec(buf.unsafe_ptr, 0, length)
 
 def vec(edit float[] buf)
@@ -37,7 +38,7 @@ def constvec(float[] buf)
     if buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
     return const vec(unsafe_mut buf.unsafe_ptr, 0, len buf)
 
-def vec(effect edit float_arena FLOATS, nat length)
+def vec(effect edit float_arena FLOATS, nat length, "dirty"|blank clear_policy)
     doc "vector on an existing buffer"
     doc "Has the provided length. Can grab the buffer and mutable position allocator as an effect, so that only the length is provided."
     if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
@@ -45,9 +46,11 @@ def vec(effect edit float_arena FLOATS, nat length)
     if FLOATS.pos+length>len FLOATS.buf fail "vector exceeeds buffer limits"
     start = const FLOATS.pos
     FLOATS.pos = FLOATS.pos+length
+    if clear_policy is blank
+        FLOATS.buf.unsafe_ptr.unsafe:zero(8*start, 8*(start+length))
     return vec(FLOATS.buf.unsafe_ptr, start, length)
 
-def vec(effect edit vec_allocator&circular FLOATS, nat length)
+def vec(effect edit vec_allocator&circular FLOATS, nat length, "dirty"|blank clear_policy)
     doc "vector on an existing buffer"
     doc "Has the provided length. Can grab a circular buffer FLOATS as an effect, so that only the length is provided."
     if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
@@ -58,6 +61,8 @@ def vec(effect edit vec_allocator&circular FLOATS, nat length)
     if FLOATS.pos>=FLOATS.length
         FLOATS.pos = length+0
         start = 0
+    if clear_policy is blank
+        FLOATS.buf.unsafe_ptr.unsafe:zero(8*start, 8*(start+length))
     return vec(FLOATS.buf.unsafe_ptr, start, length)
 
 def len(vec v)
@@ -85,7 +90,7 @@ def add(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length
         fail "different vector sizes"
-    v = vec v1.length
+    v = vec(v1.length dirty)
     p1 = v1.unsafe_ptr
     for i in range v1.length
         v[i] = v1[i]+v2.at i
@@ -101,9 +106,8 @@ def sub(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = vec v1.length
-    it = range v1.length
-    while try i=next it
+    v = vec(v1.length dirty)
+    for i in range v.length
         v[i] = v1[i]-v2.at i
     return v
 
@@ -111,8 +115,7 @@ def sub(effect edit vec_allocator FLOATS, float v1, vec v2)
     doc "vector subtraction"
     doc "Grabs an FLOATS for the result as an effect."
     v = vec v2.length
-    it = range v2.length
-    while try i=next it
+    for i in range v.length
         v[i] = v1-v2[i]
     return v
 
@@ -121,9 +124,8 @@ def mul(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = vec v1.length
-    it = range v1.length
-    while try i=next it
+    v = vec(v1.length dirty)
+    for i in range v.length
         v[i] = v1[i]*v2.at i
     return v
 
@@ -137,19 +139,18 @@ def div(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = vec v1.length
-    it = range v1.length
+    v = vec(v1.length dirty)
     p1 = v1.unsafe_ptr
-    while try i=next it
+    for i in range v.length
         v[i] = v1[i]/v2.at i
     return v
 
 def div(effect edit vec_allocator FLOATS, float v1, vec v2)
     doc "vector division"
     doc "Grabs an FLOATS for the result as an effect."
-    v = vec v2.length
+    v = vec(v2.length dirty)
     it = range v2.length
-    while try i=next it
+    for i in range v.length
         v[i] = v1/v2[i]
     return v
     
@@ -210,8 +211,15 @@ def print(effect console CLI, vec v, cstr|blank endl)
     if endl is blank
         endl = "\n"
     print nn "[ "
-    it = range v.length
-    while try i=next it
+    for i in range v.length
         print nn v[i]
         if i<v.length-1 print nn "  "
     print (" ]", endl)
+
+def copy(effect edit vec_allocator FLOATS, vec v)
+    doc "copy a vector"
+    doc "Grabs a FLOATS for the result as an effect."
+    result = vec v.length
+    for i in range v.length
+        result[i] = v[i]
+    return result

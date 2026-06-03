@@ -1,5 +1,5 @@
-local import "std/core.s"
-local import "std/sci/vec.s"
+import "std/core.s"
+import "std/sci/vec.s"
 local import "std/sci/unsafe.s"
 
 def rows(mat m)

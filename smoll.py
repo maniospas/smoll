@@ -499,7 +499,7 @@ class ImplementedType:
         self.name = name
         self.invalidated_by = self # which type's invalidation cause invalidation of this - right now helps invalidate pointer buffers
         self.is_literal_of: Optional["ImplementedType"] = None
-        self.monomorphic_name = name+create_temp()
+        self.monomorphic_name = name.replace(",","__")+create_temp()
         self.has_retrieved_class: Optional["Token"] = None
         self.has_retrieved_singleton: Optional["Token"] = None
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
@@ -1608,10 +1608,12 @@ class ImplementedType:
                     elif tok=="}": defer_ret += "}\n  "
                     else: defer_ret += tok
             ret += defer_ret
+            ret += "\n  goto __t_skip_returns;"
             if any(token.tostring()=="__t_return" for token in self.implementation):
                 ret += "__t_return:\n  "
             # set return values if needed
             ret += ret_body_end
+            ret += "\n  __t_skip_returns:"
             # apply defers that are applied on success
             defer_ret = ""
             for defer in reversed(self.defers):
@@ -1625,8 +1627,7 @@ class ImplementedType:
                     elif tok=="}": defer_ret += "}\n  "
                     else: defer_ret += tok
             ret += defer_ret
-            if not for_inlining:
-                ret += "\n  return __t_errcode;\n}"
+            if not for_inlining: ret += "\n  return __t_errcode;\n}"
         else:
             if any(token.tostring()=="__t_return" for token in self.implementation):
                 ret += "__t_return:\n  "
@@ -2177,7 +2178,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             impl.implementation.extend([
                 CODEWORD_PRINTF,
                 CODEWORD_LPAR,
-                CodeWord('"%s'+text+'"'),
+                CodeWord('"%s"'),
+                CODEWORD_COMMA,
+                CodeWord('"'+text.replace('"', '\\"')+'"'),
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
@@ -2305,7 +2308,9 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
             impl.implementation.extend([
                 CODEWORD_PRINTF,
                 CODEWORD_LPAR,
-                CodeWord('"%s'+text+'"'),
+                CodeWord('"%s"'),
+                CODEWORD_COMMA,
+                CodeWord('"'+text.replace('"', '\\"')+'"'),
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
@@ -2753,7 +2758,9 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     impl.implementation.extend([
                         CODEWORD_PRINTF,
                         CODEWORD_LPAR,
-                        CodeWord('"%s'+text+'"'),
+                        CodeWord('"%s"'),
+                        CODEWORD_COMMA,
+                        CodeWord('"'+text.replace('"', '\\"')+'"'),
                         CODEWORD_RPAR,
                         CODEWORD_SEMICOLON,
                     ])
@@ -3211,7 +3218,9 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 impl.implementation.extend([
                     CODEWORD_PRINTF,
                     CODEWORD_LPAR,
-                    CodeWord('"%s'+text+'"'),
+                    CodeWord('"%s"'),
+                    CODEWORD_COMMA,
+                    CodeWord('"'+text.replace('"', '\\"')+'"'),
                     CODEWORD_RPAR,
                     CODEWORD_SEMICOLON,
                 ])
@@ -3254,7 +3263,9 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             impl.implementation.extend([
                 CODEWORD_PRINTF,
                 CODEWORD_LPAR,
-                CodeWord('"%s'+text+'"'),
+                CodeWord('"%s"'),
+                CODEWORD_COMMA,
+                CodeWord('"'+text.replace('"', '\\"')+'"'),
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])

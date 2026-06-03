@@ -85,7 +85,7 @@ def main()
 You can also import a file as a namespace to access its
 contents with the `:` notation. This is more verbose
 but unambiguous, like below. You can even access child
-namespaces defined within the imported onne.
+namespaces.
 
 ```python
 import "std/core.s" as core
@@ -2293,14 +2293,14 @@ def run(cstr|str command)
 
 def main()
     CLI = console()
+    CHARS = arena char[].alloc 256
     path = "./tests/passing/"
-    bp = arena char[].alloc 256 # buffer and mutable position pair
-    bp.copy "./smoll "
-    bp.copy path
+    copy "./smoll "
+    copy path
     test_dir = dir:read path
     for entry in test_dir # do not move the position
         if not entry.ends_with ".s" continue
-        command = bp.buf.str((local bp).copy_null_terminated(str entry).endpos())
+        command = CHARS.buf.str endpos copy_null_terminated(local CHARS, str entry)
         print command
         run command
 ```

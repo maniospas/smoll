@@ -3,7 +3,7 @@ import "std/core.s"
 def Person(nat id, str name, str surname)
   return class(name,surname)
 
-def print(effect console CLI, Person p)
+def print(effect mut console CLI, Person p)
   print "-------------------"
   print ("name      ", "") 
   print p.name
@@ -11,7 +11,7 @@ def print(effect console CLI, Person p)
   print p.surname
   print "-------------------"
 
-def test(effect console CLI)
+def test(effect mut console CLI)
   people = Person[].alloc 4
   buf = arena char[].alloc KB 4
   people[0] = Person(0, buf.copy "it's a me", buf.copy "mario")

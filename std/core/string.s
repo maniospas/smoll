@@ -269,7 +269,7 @@ def copy_null_terminated(effect edit char_arena CHARS, str|cstr _other)
     CHARS.pos = next_pos
     return str(CHARS.buf, prev_pos, other.dat.length, other.dat.first)
 
-def print(effect console CLI, str s, cstr|blank endl)
+def print(effect mut console CLI, str s, cstr|blank endl)
     doc "print a string"
     if endl is blank
         doc "Ends the line too."
@@ -301,7 +301,7 @@ def get(str s, nat i)
     doc "a character in a string"
     return s.unsafe_ptr.unsafe:add(s.dat.pos+i)
 
-def print(effect console CLI, char c, cstr|blank endl)
+def print(effect mut console CLI, char c, cstr|blank endl)
     doc "print a character"
     if endl is blank
         doc "Ends the line too."

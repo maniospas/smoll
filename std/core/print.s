@@ -19,7 +19,14 @@ import "std/extern.s"
 
 def console()
     doc "references the system console"
-    return singleton()
+    doc "As a singleton for program safety, the console should usually be instantiated"
+    doc "in the `main()` function and then passed to dependent calls, for example via an"
+    doc "an effect for convenience. Standard library functions provide the CLI effect"
+    doc "and you can propagate to this by prepending `effect mut console CLI` to function"
+    doc "arguments. This is a zero-cost abstraction in that it does not transfer any data"
+    doc "but only works alongside the safety of the compiler."
+    doc "To quickly print internals for debugging, use `unsafe_console()` instead."
+    return mut singleton()
 
 def unsafe_console()
     doc "references the system console unsafely"
@@ -29,7 +36,7 @@ def unsafe_console()
     debug:unsafe_singletons()
     return CLI
 
-def flush(effect console CLI)
+def flush(effect mut console CLI)
     doc "flushes the print buffer on the console"
     {fflush(stdout);}
 
@@ -40,14 +47,14 @@ def nn(cstr|float|int|nat value)
     doc "to print without automatically adding a new line."
     return (value, "")
 
-def print(effect console CLI, cstr value, cstr|blank endl)
+def print(effect mut console CLI, cstr value, cstr|blank endl)
     doc "prints a cstr"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%s%s", value, endl);}
 
-def print(effect console CLI, float value, cstr|blank endl)
+def print(effect mut console CLI, float value, cstr|blank endl)
     doc "prints a float"
     doc "To pre-specified 6 decimal digits."
     if endl is blank 
@@ -55,35 +62,35 @@ def print(effect console CLI, float value, cstr|blank endl)
         endl = "\n"
     {printf("%.6f%s", value, endl);}
 
-def print(effect console CLI, int value, cstr|blank endl)
+def print(effect mut console CLI, int value, cstr|blank endl)
     doc "prints an integer"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%lld%s", value, endl);}
 
-def print(effect console CLI, nat value, cstr|blank endl)
+def print(effect mut console CLI, nat value, cstr|blank endl)
     doc "prints an unsigned integer"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%llu%s", value, endl);}
 
-def print(effect console CLI, bool value, cstr|blank endl)
+def print(effect mut console CLI, bool value, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
     {if(value){printf("%s%s", "true", endl);}else{printf("%s%s", "false", endl);}}
 
-def print(effect console CLI, compiler:true, cstr|blank endl)
+def print(effect mut console CLI, compiler:true, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("true%s", endl);}
     
-def print(effect console CLI, compiler:false, cstr|blank endl)
+def print(effect mut console CLI, compiler:false, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."

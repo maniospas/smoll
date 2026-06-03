@@ -17,7 +17,8 @@
 local import "std/core/numbers.s"
 
 def range(nat|blank _from, nat to)
-    doc "constructs a range given its unsigned integer endpoints"
+    doc "constructs a range"
+    doc "Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration."
     if _from is blank
         doc "the range's start is assumed to be zero"
         _from = 0
@@ -25,6 +26,8 @@ def range(nat|blank _from, nat to)
     return class(from, to)
 
 def next(edit range r)
+    doc "next range number"
+    doc "This increments the r.from position and returns the previous one."
     if r.from>=r.to
         fail "iteration end"
     ret = const r.from
@@ -32,6 +35,9 @@ def next(edit range r)
     return ret
 
 def get(range r, nat pos)
+    doc "assert that a number lies in the range"
+    doc "The item itself is returned. This lets the range be used as an iterator"
+    doc "per a pattern like `for i in range 10 ...`."
     if pos>=r.to
         fail "iteration end"
     if pos<r.from

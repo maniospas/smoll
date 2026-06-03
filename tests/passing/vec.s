@@ -1,7 +1,7 @@
 import "std/core.s"
 import "std/sci.s"
 
-def safe_main(effect console CLI)
+def safe_main(effect mut console CLI)
     FLOATS  = ref float[].alloc(200).circular() # effects can grab it by name
     FLOATS2 = ref float[].alloc(200).circular() # useless 
     v1 = new().vec 10 # force our own allocator

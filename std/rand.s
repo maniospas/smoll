@@ -71,10 +71,10 @@ def Rand(nat seed)
     if seed is blank
         seed = splitmix64()
     modifying_seed = mut seed
-    s0 = mut splitmix64(modifying_seed)
-    s1 = mut splitmix64(modifying_seed)
-    s2 = mut splitmix64(modifying_seed)
-    s3 = mut splitmix64(modifying_seed)
+    s0 = mut splitmix64 modifying_seed
+    s1 = mut splitmix64 modifying_seed
+    s2 = mut splitmix64 modifying_seed
+    s3 = mut splitmix64 modifying_seed
     return class(s0,s1,s2,s3)
 
 def Rand()

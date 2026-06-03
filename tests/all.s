@@ -2,7 +2,7 @@ import "std/core.s"
 import "std/io.s"
 
 
-def run(effect console CLI, cstr|str command)
+def run(effect mut console CLI, cstr|str command)
     proc = mut process:read command
     del proc
     if try error = compiler:catch()

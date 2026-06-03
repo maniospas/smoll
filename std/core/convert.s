@@ -114,12 +114,12 @@ def xor(bits x, bits y)
     {builtins:nat z = (x__value^y__value);}
     return bits z
 
-def and(bits x, bits y) 
+def band(bits x, bits y) 
     doc "bitwise and"
     {builtins:nat z = (x__value&y__value);}
     return bits z
 
-def or(bits x, bits y) 
+def bor(bits x, bits y) 
     doc "bitwise or"
     {builtins:nat z = (x__value|y__value);}
     return bits z

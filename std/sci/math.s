@@ -2,12 +2,13 @@ local import "std/extern/math.h"
 local import "std/core.s"
 
 def abs(float x)
-    if x<0.0 return 0.0-x
-    return x
+    mask = rshift(bits x, 63)
+    {builtins:int c = 0x7FFFFFFFFFFFFFFF;}
+    return float bits(x).band(bits c)
 
 def abs(int x)
-    if x<int(0) return int(0)-x
-    return x
+    mask = rshift(bits x, 63)
+    return nat xor(mask, bits x+int mask)
 
 def sqrt(float x)
     {builtins:float z = sqrt(x);}

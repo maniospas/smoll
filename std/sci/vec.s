@@ -178,6 +178,7 @@ def reduce(vec v, blank|"mul"|"sub"|"rel" comparison, blank|vec v2, blank|"add"|
     doc "as well as some transformation that can be applied."
     doc "A second vector can also be provided to be subtracted or obtain relative value differences"
     doc "without allocating any memory for operation results."
+    doc "All computations are branchless, as literals are optimized away during compilation."
     if reduction is "add"|blank
         ret = mut 0.0
     if reduction is "mul"
@@ -236,7 +237,7 @@ def nn(vec value)
     doc "to print without a new line."
     return (value, "")
 
-def print(effect console CLI, vec v, cstr|blank endl)
+def print(effect mut console CLI, vec v, cstr|blank endl)
     doc "print a vector"
     doc "Prints as a row, such as [ 1.0  2.0  3.0 ]"
     if endl is blank

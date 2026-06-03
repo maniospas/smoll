@@ -6,7 +6,7 @@ def Point(float x, float y)
 def Field(Point a, Point b)
     return (a,b)
 
-def print(effect console CLI, Field ptr f)
+def print(effect mut console CLI, Field ptr f)
     print(f...a.x, ",")
     print(f...a.y, ",")
     print(f...b.x, ",")

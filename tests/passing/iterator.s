@@ -1,6 +1,6 @@
 import "std/core.s"
 
-def print(effect console CLI, cstr[] sentences)
+def print(effect mut console CLI, cstr[] sentences)
     for sentence in sentences
         print sentence
 

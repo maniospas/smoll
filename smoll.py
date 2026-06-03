@@ -305,77 +305,87 @@ CODEWORD_PRINTF = CodeWord("printf")
 CODEWORD_GOTO = CodeWord("goto")
 CODEWORD_IF = CodeWord("if")
 
+lsp_text_ids: dict[str, int] = dict()
+def printid(text: int|str):
+    found_id = lsp_text_ids.get(text)
+    if found_id is None: 
+        found_id = len(lsp_text_ids)
+        lsp_text_ids[text] = found_id
+        print(f"def: {found_id},", text.replace("\n","\t"))
+    print(":"+str(found_id))
+
+
 def print_lsp_var(tok, signature:str):
     print("---")
-    print("variable")
-    print(os.path.abspath(tok.file.path))
+    printid("variable")
+    printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
     print(len(tok.text))
-    print(os.path.abspath(tok.file.path))
+    printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
-    print("```rust\n"+signature+"\n```")
+    printid("```rust\n"+signature+"\n```")
 
 def print_lsp_string(tok):
     print("---")
-    print("string")
-    print(os.path.abspath(tok.file.resolved_path))
+    printid("string")
+    printid(os.path.abspath(tok.file.resolved_path))
     print(tok.row)
     print(tok.col)
     print(len(tok.text))
-    print(os.path.abspath(tok.file.resolved_path))
+    printid(os.path.abspath(tok.file.resolved_path))
     print(tok.row)
     print(tok.col)
-    print("a string literal")
+    printid("a string literal")
 
 def print_lsp_literal(tok: "Token", name: str):
     print("---")
     print("number")
-    print(os.path.abspath(tok.file.path))
+    printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
     print(len(tok.text))
-    print(os.path.abspath(tok.file.path))
+    printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
-    print(name)
+    printid(name)
 
 def print_lsp_keyword(tok: "Token", description: str):
     print("---")
-    print("keyword")
-    print(os.path.abspath(tok.file.path))
+    printid("keyword")
+    printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
     print(len(tok.text))
-    print(os.path.abspath(tok.file.path))
+    printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
-    print(description)
+    printid(description)
 
 def print_lsp_definition(tok: "Token", description: str):
     print("---")
-    print("keyword")
-    print(os.path.abspath(tok.file.path))
+    printid("keyword")
+    printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
     print(len(tok.text))
-    print(os.path.abspath(tok.file.path))
+    printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
-    print(description)
+    printid(description)
 
 def print_lsp_decorator(tok: "Token", description: str):
     print("---")
     print("decorator")
-    print(os.path.abspath(tok.file.path))
+    printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
     print(len(tok.text))
-    print(os.path.abspath(tok.file.path))
+    printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
-    print(description)
+    printid(description)
 
 class CallPointer(CodeSegment):
     def __init__(self, callee: "ImplementedType"):
@@ -431,13 +441,14 @@ class Variable(CodeSegment):
 
 
 def signature_like(vars: list[Variable], impl=None):
+    common_prefix_length = len(longest_common_prefix([var.name for var in vars]))
     ret = ""
     i = 0
     where: list[str] = list()
     while i<len(vars):
         if ret: ret += ", "
         type = vars[i].type
-        arg_name = vars[i].name
+        arg_name = vars[i].name[common_prefix_length:]
         if arg_name.startswith("__t") or "____" in arg_name: arg_name = ""
         else: arg_name = " "+arg_name.replace("__", ".")
         if type.builtin: 
@@ -1699,25 +1710,25 @@ class Token:
                 at = reason if reason else self
                 print("---")
                 # position in processed file
-                print("function")
-                print(os.path.abspath(self.file.path))
+                printid("function")
+                printid(os.path.abspath(self.file.path))
                 print(self.row)
                 print(self.col)
                 print(len(self.text))
                 # defined at
-                print(os.path.abspath(at.file.path))
+                printid(os.path.abspath(at.file.path))
                 print(at.row)
                 print(at.col)
                 # message (may span multiple lines))
-                print(errtype+" error: "+message+" "+(raason_message+" "+reason.file.resolved_path if reason else ""))
+                printid(errtype+" error: "+message+" "+(raason_message+" "+reason.file.resolved_path if reason else ""))
                 if suggestions:
-                    print("    with alternatives:")
+                    printid("    with alternatives:")
                     for suggestion in suggestions:
                         if "->" in suggestion: 
                             suggestion_splits = suggestion.split("defined in")
-                            print("```rust\n"+suggestion_splits[0]+"\n```")
+                            printid("```rust\n"+suggestion_splits[0]+"\n```")
                             #if len(suggestion_splits)>1: print("defined in "+suggestion_splits[1])
-                        else: print("\n    -", suggestion)
+                        else: printid("\n    -", suggestion)
             if is_lsp and self.file.is_main_file and errtype=="safety": return
             raise FatalException
 
@@ -1852,30 +1863,30 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         at = callee.at if callee.at else error_token
         print("---")
         # position in processed file
-        print("function")
-        print(os.path.abspath(error_token.file.resolved_path))
+        printid("function")
+        printid(os.path.abspath(error_token.file.resolved_path))
         print(error_token.row)
         print(error_token.col)
         print(len(error_token.text))
         # defined at
-        print(os.path.abspath(at.file.resolved_path))
+        printid(os.path.abspath(at.file.resolved_path))
         print(at.row)
         print(at.col)
         # message (may span multiple lines))
         if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
         if len(callee.doc)>1: print("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:]))
-        print("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+        printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
         spawned_error_codes = callee.gather_spawned_error_codes(set())
         if len(spawned_error_codes): 
-            if callee.needs_failure_mode: print("Potential errors:\n")
-            else: print("No failing errors, but can catch these intercepted ones:\n")
-        for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
-        if callee.returned_defers: print("\nReturned values defer use of the following functions:")
-        for defer in callee.returned_defers: print("```rust\n"+code_summary(defer,callee)+"```")
+            if callee.needs_failure_mode: printid("Potential errors:\n")
+            else: printid("No failing errors, but can catch these intercepted ones:\n")
+        for code in spawned_error_codes: printid(str(code)+". "+err_code_list[code][1:-1]+"\n")
+        if callee.returned_defers: printid("\nReturned values defer use of the following functions:")
+        for defer in callee.returned_defers: printid("```rust\n"+code_summary(defer,callee)+"```")
         singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
-        if singletons: print("\nThe following singletons are initialized:")
-        for singleton in singletons: print("```rust\n"+singletons.signature()+"\n```")
-        if callee.VM: print("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*")
+        if singletons: printid("\nThe following singletons are initialized:")
+        for singleton in singletons: printid("```rust\n"+singletons.signature()+"\n```")
+        if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*")
     return callee
 
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
@@ -2568,17 +2579,17 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                     at = variation.at if variation.at else type_start
                     print("---")
                     # position in processed file
-                    print("struct")
-                    print(os.path.abspath(type_start.file.path))
+                    printid("struct")
+                    printid(os.path.abspath(type_start.file.path))
                     print(type_start.row)
                     print(type_start.col)
                     print(len(type_end.text)+type_end.col-type_start.col)
                     # defined at
-                    print(os.path.abspath(at.file.path))
+                    printid(os.path.abspath(at.file.path))
                     print(at.row)
                     print(at.col)
                     # message (may span multiple lines))
-                    print("```rust\n"+variation.signature()+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
+                    printid("```rust\n"+variation.signature()+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
 
             return pos+3, buffer_type
         # if not reduce_to_unique_variations:  # TODO: determine what we should do
@@ -2593,17 +2604,17 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 at = variation.at if variation.at else type_start
                 print("---")
                 # position in processed file
-                print("struct")
-                print(os.path.abspath(type_start.file.path))
+                printid("struct")
+                printid(os.path.abspath(type_start.file.path))
                 print(type_start.row)
                 print(type_start.col)
                 print(len(type_end.text)+type_end.col-type_start.col)
                 # defined at
-                print(os.path.abspath(at.file.path))
+                printid(os.path.abspath(at.file.path))
                 print(at.row)
                 print(at.col)
                 # message (may span multiple lines))
-                print("```rust\n"+variation.signature()+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
+                printid("```rust\n"+variation.signature()+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
 
         return pos+1, type
     namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
@@ -3936,6 +3947,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             as_pointer = False
             as_mutpointer = False
             varname = peek_text(tokens,pos)
+            vartok = get(tokens,pos)
             if peek_text(tokens, pos+1)=="&" and peek_text(tokens, pos+2)=="&":
                 pos += 2
                 as_mutpointer = True
@@ -3977,6 +3989,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 ret = resolve_call(file, impl, type, iterator_object+[indexor], get(tokens, in_pos)) 
                 if not as_pointer and not as_mutpointer:
                     _, ret = process_deref(file, pos, ret, impl, get(tokens, in_pos), explicit=False)
+                if is_lsp and vartok.file==file: print_lsp_var(vartok, signature_like(ret, impl))
                 impl.assign(varname, ret, current_token)
                 if impl.count_handled_tries[-1]==0: current_token.error("safety", "this 'try' statement does not guard against anything")
                 impl.count_handled_tries.pop()
@@ -4321,17 +4334,17 @@ async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                 at = get(tokens,pos)
                 print("---")
                 # position in processed file
-                print("function")
-                print(os.path.abspath(at.file.path))
+                printid("function")
+                printid(os.path.abspath(at.file.path))
                 print(at.row)
                 print(at.col)
                 print(len(at.text))
                 # defined at
-                print(os.path.abspath(at.file.path))
+                printid(os.path.abspath(at.file.path))
                 print(at.row)
                 print(at.col)
                 # message (may span multiple lines))
-                print("```rust\n"+POINTER_TYPE.signature()+"\n"+" from compiler definitions\n```")
+                printid("```rust\n"+POINTER_TYPE.signature()+"\n"+" from compiler definitions\n```")
             pos += 1
             abstract_arg_convert_to_ptr.append(True)
         else: abstract_arg_convert_to_ptr.append(False)
@@ -4439,29 +4452,29 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         print("---")
                         # position in processed file
                         print("function")
-                        print(os.path.abspath(name_token.file.resolved_path))
+                        printid(os.path.abspath(name_token.file.resolved_path))
                         print(name_token.row)
                         print(name_token.col)
                         print(len(name_token.text))
                         # defined at
-                        print(os.path.abspath(name_token.file.resolved_path))
+                        printid(os.path.abspath(name_token.file.resolved_path))
                         print(name_token.row)
                         print(name_token.col)
                         # message (may span multiple lines))
-                        if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
-                        if len(callee.doc)>1: print("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:]))
-                        print("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+                        if callee.doc: printid("**"+strip_quotes(callee.doc[0])+"**")
+                        if len(callee.doc)>1: printid("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:]))
+                        printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
                         spawned_error_codes = callee.gather_spawned_error_codes(set())
                         if len(spawned_error_codes):
-                            if callee.needs_failure_mode: print("Potential errors:\n")
-                            else: print("No failing errors, but can catch these intercepted ones:\n")
-                        for code in spawned_error_codes: print(str(code)+". "+err_code_list[code][1:-1]+"\n")
-                        if callee.returned_defers: print("\nReturned values defer use of the following functions:")
-                        for defer in callee.returned_defers: print("```rust\n"+code_summary(defer, callee)+"```")
+                            if callee.needs_failure_mode: printid("Potential errors:\n")
+                            else: printid("No failing errors, but can catch these intercepted ones:\n")
+                        for code in spawned_error_codes: printid(str(code)+". "+err_code_list[code][1:-1]+"\n")
+                        if callee.returned_defers: printid("\nReturned values defer use of the following functions:")
+                        for defer in callee.returned_defers: printid("```rust\n"+code_summary(defer, callee)+"```")
                         singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
-                        if singletons: print("\nThe following singletons are initialized:")
-                        for singleton in singletons: print("```rust\n"+singletons.signature()+"\n```")
-                        if callee.VM: print("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*")
+                        if singletons: printid("\nThe following singletons are initialized:")
+                        for singleton in singletons: printid("```rust\n"+singleton.signature()+"\n```")
+                        if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*")
             except FastReturnException: 
                 assert fast_return_exception
             #if not impl.force_not_inline and fast_return_exception: continue # register only forcefully RECURSIVE variations
@@ -4549,8 +4562,8 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
                     print_lsp_keyword(tok, "**import**\n\nimports a namespace or function")
                     print("---")
                     # position in processed file
-                    print("namespace") # type of token: namespace, string, keyword, function, variable
-                    print(os.path.abspath(defname.file.path))
+                    printid("namespace") # type of token: namespace, string, keyword, function, variable
+                    printid(os.path.abspath(defname.file.path))
                     print(defname.row)
                     print(defname.col)
                     endtok = get(tokens,i-1)
@@ -4558,15 +4571,15 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
                     print(endtok.col-defname.col+len(endtok.text)) # token length
                     # defined at
                     if isinstance(imported, File):
-                        print(os.path.abspath(imported.path))
+                        printid(os.path.abspath(imported.path))
                         print(1)
                         print(1)
                     else:
-                        print(os.path.abspath(imported.at.file.path))
+                        printid(os.path.abspath(imported.at.file.path))
                         print(imported.at.row)
                         print(imported.at.col)
                     # message (may span multiple lines))
-                    print("imported path")
+                    printid("imported path")
             elif tok.text=="repo":
                 if is_local: tok.error("syntax", "cannot declare a repo as 'local'")
                 if has_made_def: tok.error("safety", "can declare repos before the file's first definition", reason=first_def_tok, raason_message="first definition at")
@@ -4746,17 +4759,17 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
             if file.is_main_file:
                 print("---")
                 # position in processed file
-                print("function")
-                print(os.path.abspath(file.path))
+                printid("function")
+                printid(os.path.abspath(file.path))
                 print(row+1)
                 print(1)
                 print(3)
                 # defined at
-                print(os.path.abspath(file.path))
+                printid(os.path.abspath(file.path))
                 print(row+1)
                 print(1)
                 # message (may span multiple lines))
-                print(str(err))
+                printid(str(err))
             raise FatalException
         print(f"[{RED}✗{RESET}] {PURPLE}file read error{RESET} {err}")
         location = f"{path} line {row+1}"
@@ -5144,7 +5157,7 @@ async def main():
                     for defer in callee.returned_defers: docs_file.write("```rust\n"+code_summary(defer, callee)+"```\n")
                     singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
                     if singletons: docs_file.write("\nThe following singletons are initialized:\n")
-                    for singleton in singletons: docs_file.write("```rust\n"+singletons.signature()+"\n```\n")
+                    for singleton in singletons: docs_file.write("```rust\n"+singleton.signature()+"\n```\n")
                     if callee.VM: docs_file.write("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*\n")
     elif not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)

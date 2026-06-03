@@ -636,7 +636,7 @@ initialization is used to ensure that a printable console exists.
 ```python
 import "std/core.s"
 
-def greet(effect console CLI)
+def greet(effect mut console CLI)
     print "hello world"
 
 def main()
@@ -767,9 +767,9 @@ can be a string or number literal.
 import "std/core.s"
 
 def VERSION = "two"
-def version(effect console CLI, "one") # just a literal type
+def version(effect mut console CLI, "one") # just a literal type
     print "version one"
-def version(effect console CLI, "two")
+def version(effect mut console CLI, "two")
     print "version two"
 
 def main()
@@ -876,7 +876,7 @@ as the standard library's core. Below is an example of a conditional check.
 ```python
 import "std/core.s"
 
-def typed_print(effect console CLI, nat|int|float|cstr value) 
+def typed_print(effect mut console CLI, nat|int|float|cstr value) 
     if value is nat|int|float
         print nn "this is a number: "
     else
@@ -1147,7 +1147,7 @@ is used to make the allocation.
 ```python
 import "std/core.s"
 
-def print(effect console CLI, cstr[] sentences)
+def print(effect mut console CLI, cstr[] sentences)
     for sentence in sentences
         print sentence
 
@@ -1362,7 +1362,7 @@ You can manually `fail` like so:
 ```python
 import "std/core.s"
 
-def always_fail(effect console CLI)
+def always_fail(effect mut console CLI)
     print "we are failing"
     fail "we failed!"
 

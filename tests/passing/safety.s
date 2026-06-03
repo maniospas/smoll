@@ -1,6 +1,6 @@
 import "std/core.s"
 
-def test1(effect console CLI)
+def test1(effect mut console CLI)
     x = alloc(mut float[], 2)
     x[0] = 1.0
     x[1] = 2.0
@@ -10,7 +10,7 @@ def test1(effect console CLI)
         print len x
     return x
 
-def test2(effect console CLI) 
+def test2(effect mut console CLI) 
     t = test1()
     j = t
     k = alloc(mut float[], 3)

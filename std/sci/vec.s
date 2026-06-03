@@ -1,4 +1,4 @@
-import "std/core.s"
+local import "std/core.s"
 local import "std/sci/math.s"
 local import "std/sci/unsafe.s"
 local import "std/unsafe.s" as unsafe
@@ -22,7 +22,7 @@ def vec(effect new FLOATS, nat length, "dirty"|blank clear_policy)
     doc "vector on a new buffer"
     doc "Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer."
     buf = ref float[].alloc(length dirty)
-    if clear_policy is type "dirty"
+    if clear_policy is blank
         buf.unsafe_ptr.unsafe:zero(0, 8*length)
     return vec(buf.unsafe_ptr, 0, length)
 
@@ -91,7 +91,6 @@ def add(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
     if v2 is vec and v1.length!=v2.length
         fail "different vector sizes"
     v = vec(v1.length dirty)
-    p1 = v1.unsafe_ptr
     for i in range v1.length
         v[i] = v1[i]+v2.at i
     return v
@@ -134,6 +133,25 @@ def mul(effect edit vec_allocator FLOATS, float v1, vec v2)
     doc "Grabs an FLOATS for the result as an effect."
     return v2*v1
 
+
+def pow(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
+    doc "vector exponentiation"
+    doc "Grabs an FLOATS for the result as an effect."
+    if v2 is vec and v1.length!=v2.length 
+        fail "different vector sizes"
+    v = vec(v1.length dirty)
+    for i in range v.length
+        v[i] = pow(v1[i], v2.at i)
+    return v
+
+def pow(effect edit vec_allocator FLOATS, float v1, vec v2)
+    doc "vector exponentiation"
+    doc "Grabs an FLOATS for the result as an effect."
+    v = vec(v2.length dirty)
+    for i in range v.length
+        v[i] = pow(v1, v2[i])
+    return v
+
 def div(effect edit vec_allocator FLOATS, vec v1, vec|float v2)
     doc "vector division"
     doc "Grabs an FLOATS for the result as an effect."
@@ -154,23 +172,36 @@ def div(effect edit vec_allocator FLOATS, float v1, vec v2)
         v[i] = v1/v2[i]
     return v
     
-def reduce(vec v, "add"|"mul" reduction, blank|"sqr" transform)
+def reduce(vec v, blank|"mul"|"sub"|"rel" comparison, blank|vec v2, blank|"add"|"mul" reduction, blank|"abs"|"sqr"|"l2" transform)
     doc "reduce a vector to one value"
     doc "You can specify an additive or multiplicative reduction,"
     doc "as well as some transformation that can be applied."
-    if reduction is "add"
+    doc "A second vector can also be provided to be subtracted or obtain relative value differences"
+    doc "without allocating any memory for operation results."
+    if reduction is "add"|blank
         ret = mut 0.0
     if reduction is "mul"
         ret = mut 1.0
-    it = range len v
-    while try i=next it
+    if (v2 is blank) and (not comparison is blank)
+        compiler:skip()
+    for i in range len v
         value = mut v[i]
-        if transform is "sqr"
+        if comparison is "sub"
+            value = value-v2[i]
+        if comparison is "mul"
+            value = value-v2[i]
+        if comparison is "rel"
+            value = (value-v2[i])*2.0/(abs(value)+abs(v2[i]))
+        if transform is "abs"
+            value = abs(value)
+        if transform is "sqr"|"l2"
             value = value*value
-        if reduction is "add"
+        if reduction is "add"|blank
             ret = ret+value
         if reduction is "mul"
             ret = ret*value
+    if transform is "l2"
+        ret = pow(ret, 0.5)
     return const ret
 
 def sum(vec v)
@@ -223,3 +254,13 @@ def copy(effect edit vec_allocator FLOATS, vec v)
     for i in range v.length
         result[i] = v[i]
     return result
+
+def storage(edit vec v)
+    buf = mut float[]
+    buf.unsafe_ptr = v.unsafe_ptr
+    buf.unsafe_size = v.pos+len v
+    pos = mut v.pos
+    return (buf, pos)
+
+def self(edit vec v)
+    return (storage(v), v)

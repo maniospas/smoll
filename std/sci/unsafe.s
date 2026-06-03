@@ -7,5 +7,5 @@ def mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride)
     return mut class(unsafe_mut unsafe_ptr, pos, rows, cols, stride)
 
 def sparse_element(nat row, nat col, float value)
-def spmat(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz)
+def coo(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz)
     return mut class(unsafe_mut unsafe_ptr, rows, cols, nnz)

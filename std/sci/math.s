@@ -54,6 +54,7 @@ def exp(float x)
     return z
 
 def pow(float x, float y)
+    {"-lm"}
     {builtins:float z = pow(x, y);}
     return z
 

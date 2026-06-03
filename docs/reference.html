@@ -256,7 +256,7 @@ and fail to compile if these are not present.</p>
 <p>You can also import a file as a namespace to access its
 contents with the <code>:</code> notation. This is more verbose
 but unambiguous, like below. You can even access child
-namespaces defined within the imported onne.</p>
+namespaces.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
@@ -1248,16 +1248,16 @@ with negative indexes. Next is an example of buffer usage.</p>
 </div>
 
 <p>The outcome of allocation is a mutable buffer. Declare this as 
-as <code>const</code> to disallow content modifications or any resizing. 
+as <code>const</code> to forcefully disallow content modifications or resizing. 
+That said, function arguments are <code>const</code> unless indicated otherwise 
+so tere will only rarely be need to use this keyword.
 Below is any example of how the compiler enforces this constraint.
-The compiler does show some additional information like element size
+The compiler does track some additional information like element size
 in bytes and, importantly, if there are dependent buffers from which
-the type is inferred. The imporant part to look out for is that
-<code>mutget</code> is being called for mutable element access -so as to modify
-an element- and that requires edit permissions 
-when a buffer is an argument (<code>edit any[]</code>) but the local buffer
-is <code>const float[]</code>. You might be tempted to promote the buffer <em>buf</em> to
-being mutable, but elevating buffer or -more generally- pointer pemissions
+the type is inferred. </p>
+
+<p>In this setting, it is not allowed to wrongfully promote the buffer <em>buf</em> to
+being mutable; elevating buffer or -more generally- pointer pemissions
 from constant to mutable is not allowed for safety.</p>
 
 <div class="codehilite">
@@ -1291,9 +1291,10 @@ at tests/test.s line 5 column 12
 </div>
 
 <p>Use <code>any</code> as the type to mark functions with type-agnostic
-operations. The original type cannot be retrieved back while
-those functions are running, but this operation is useful for writing
-generic code. If you run a 
+buffer operations. The original type cannot be retrieved back while
+those functions are running, but this operation is still 
+useful for writing generic code that depends on memory contents
+and data sizes packed within buffer metadata. If you run a 
 function with such generic typing, the compiler identifies
 the correct output types for buffers of pointers. For example,
 the abovedescribed allocation mechanism is implemented
@@ -1313,7 +1314,7 @@ the input buffer type.</p>
 </code></pre>
 </div>
 
-<p>For function arguments that need to be spacialized
+<p>For function arguments that need to be specialized
 on a buffer type, declare an intermediate
 type like below.</p>
 
@@ -1821,8 +1822,8 @@ But, importantly, they <em>are</em> obtained from deferred statements triggered 
 
 <p>Where effects are the most useful is overloading operations that require
 external resources. The next example demonstrates this using vectors
-from the corresponding standard library <a href="#vectors">section</a>, where
-the <em>allocator</em> effect is used to pass a shared preallocated memory buffer
+from the corresponding standard library <a href="#vectors">section</a>.
+The <em>FLOATS</em> effect is used to pass a shared preallocated memory buffer
 to all needed vector construction. Effects do not propagate outwards,
 so you can only look at function signatures to know which effects can
 be declared. For example, one of the possible
@@ -1835,7 +1836,7 @@ is declared as <code>add(effect edit vec_allocator allocator, vec v1, vec v2)</c
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">allocator</span>  <span class="o">=</span> <span class="n">arena</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="n">FLOATS</span> <span class="o">=</span> <span class="n">arena</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="n">v1</span> <span class="o">=</span> <span class="n">vec</span> <span class="mi">10</span> <span class="c1"># vector of 10 elements</span>
     <span class="n">v2</span> <span class="o">=</span> <span class="n">vec</span> <span class="mi">10</span>
     <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -1999,9 +2000,9 @@ This creates errors on failure.</p>
 </div>
 
 <p>Strings can be copied on a pair of buffer and mutable position inside it <code>char[], mut nat</code>.
-This structure is used a lot when creating buffers for memory management.
-Thus, for more compact code, the structure can be constructed and initialized to start from the zero 
-position with the <code>arena</code> (buffer-position) function.</p>
+This structure is used a lot when creating buffers for memory management and is called an
+<code>arena</code>. In general, arenas are just buffer and position pairs of a specific type. Later we
+will also use them to store <code>float</code> vector contents.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -2014,7 +2015,9 @@ position with the <code>arena</code> (buffer-position) function.</p>
 </code></pre>
 </div>
 
-<p>To make code read more naturally, this can be converted to a CHARS effect.</p>
+<p>To make code read more naturally, character arenas can be set to a CHARS effect.
+Recall that effects are arguments that are automatically retrieved from the calling
+location based on their name.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -2077,7 +2080,7 @@ There also exists the variation <code>str(char[] buffer, nat start, "to", nat le
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">CHARS</span><span class="o">.</span><span class="n">pos</span>
     <span class="n">copy</span> <span class="s2">&quot;hello&quot;</span>
     <span class="n">copy</span> <span class="s2">&quot; &quot;</span>
@@ -2526,14 +2529,14 @@ which can be caught afterwards to check for successful termination.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">256</span>
     <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;./tests/passing/&quot;</span>
-    <span class="n">bp</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">256</span> <span class="c1"># buffer and mutable position pair</span>
-    <span class="n">bp</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;./smoll &quot;</span>
-    <span class="n">bp</span><span class="o">.</span><span class="n">copy</span> <span class="n">path</span>
+    <span class="n">copy</span> <span class="s2">&quot;./smoll &quot;</span>
+    <span class="n">copy</span> <span class="n">path</span>
     <span class="n">test_dir</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">:</span><span class="n">read</span> <span class="n">path</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">test_dir</span> <span class="c1"># do not move the position</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="o">.</span><span class="n">ends_with</span> <span class="s2">&quot;.s&quot;</span> <span class="k">continue</span>
-        <span class="n">command</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">buf</span><span class="o">.</span><span class="n">str</span><span class="p">((</span><span class="n">local</span> <span class="n">bp</span><span class="p">)</span><span class="o">.</span><span class="n">copy_null_terminated</span><span class="p">(</span><span class="nb">str</span> <span class="n">entry</span><span class="p">)</span><span class="o">.</span><span class="n">endpos</span><span class="p">())</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">CHARS</span><span class="o">.</span><span class="n">buf</span><span class="o">.</span><span class="n">str</span> <span class="n">endpos</span> <span class="n">copy_null_terminated</span><span class="p">(</span><span class="n">local</span> <span class="n">CHARS</span><span class="p">,</span> <span class="nb">str</span> <span class="n">entry</span><span class="p">)</span>
         <span class="nb">print</span> <span class="n">command</span>
         <span class="n">run</span> <span class="n">command</span>
 </code></pre>

@@ -1,6 +1,7 @@
-import "std/core.s"
+local import "std/core.s"
 import "std/sci/vec.s"
 local import "std/sci/unsafe.s"
+local import "std/unsafe.s" as unsafe
 
 def rows(mat m)
     doc "number of rows"
@@ -10,18 +11,22 @@ def cols(mat m)
     doc "number of columns"
     return m.cols
 
-def mat(effect edit new FLOATS, nat rows, nat cols)
+def mat(effect edit new FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
     doc "matrix on a fresh buffer"
-    buf = float[].alloc rows*cols
+    buf = float[].alloc(rows*cols dirty)
+    if clear_policy is blank
+        buf.unsafe_ptr.unsafe:zero(0, 8*len buf)
     return mat(buf.unsafe_ptr, 0, rows, cols, cols)
 
-def mat(effect edit float_arena FLOATS, nat rows, nat cols)
+def mat(effect edit float_arena FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
     doc "matrix on an existing vecpos"
     if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
     if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place matrices on buffer offsets"
     if FLOATS.pos+rows*cols>len FLOATS.buf fail "matrix exceeds buffer limits"
     start = const FLOATS.pos
     FLOATS.pos = FLOATS.pos+rows*cols
+    if clear_policy is blank
+        FLOATS.buf.unsafe_ptr.unsafe:zero(8*start, 8*FLOATS.pos)
     return mat(FLOATS.buf.unsafe_ptr, start, rows, cols, cols)
 
 def constmat(float[] buf, nat rows)
@@ -36,7 +41,7 @@ def mat(edit float[] buf, nat rows)
     if cols*rows!=len buf fail "buffer size not divisible by vector rows"
     return mat(buf, mut 0, rows, cols)
 
-def mat(effect edit circular FLOATS, nat rows, nat cols)
+def mat(effect edit circular FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
     doc "matrix on a circular buffer"
     if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
     if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place matrices on buffer offsets"
@@ -46,6 +51,8 @@ def mat(effect edit circular FLOATS, nat rows, nat cols)
     if FLOATS.pos>=FLOATS.length
         FLOATS.pos = rows*cols+0
         start = 0
+    if clear_policy is blank
+        FLOATS.buf.unsafe_ptr.unsafe:zero(8*start, 8*FLOATS.pos)
     return mat(FLOATS.buf.unsafe_ptr, start, rows, cols, cols)
 
 def mutget(edit mat m, nat i, nat j)

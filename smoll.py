@@ -1293,7 +1293,7 @@ class ImplementedType:
                         if len(values) != 2: self.at.error("malformed smollC", "'pow' requires two arguments")
                         if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'pow'")
                         if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'pow'")
-                        return values[0]**value[1]
+                        return values[0]**values[1]
 
                     if candidate_name == "cos":
                         if len(values) != 1: self.at.error("malformed smollC", "'cos' requires one argument")
@@ -1819,13 +1819,14 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
                 buffer2 = variation.vars[variation.args[i]].type.is_buffer_of
                 if buffer1 is not None and buffer2 is not None and match_structure_with(buffer1, buffer2):
                     is_available = True
-                if buffer2 is None and buffer2 is not None:
+                if (buffer1 is None or buffer1==ANY_TYPE) and (buffer2 is not None and buffer2!=ANY_TYPE):
                     is_available = False
                 if not is_available: break
             if not variation.vars[variation.args[i]].immutable and vars[i].immutable:
                 is_available = False
                 break
         # first check for pointer mismatches (this is a safety error)
+        if not is_available: continue
         for varpos, var in enumerate(vars):
             if var.type!=POINTER_TYPE: continue
             var_pointer_type = impl.get_pointer_type(var)
@@ -1843,7 +1844,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         if not alternative_list: alternative_list = method.variations
         error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature() for t in alternative_list])#+([] if alternative_list==method.variations else ["or one of "+str(len(method.variations)-len(alternative_list))+" overloads"]))
     if len(available_types)>1:
-        error_token.error("type", "more than one conflicting call '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature()+(" defined in "+t.at.file.path if t.at else " from compiler definitions") for t in available_types])
+        error_token.error("type", "more than one conflicting call '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature()+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in available_types])
 
     callee: ImplementedType = available_types[0]
 
@@ -2360,8 +2361,11 @@ def find_unique_variations(variations: list[ImplementedType]):
             is_same = len(variation.rets)==len(impl.rets)
             if is_same:
                 for variation_arg, impl_arg in zip(variation.rets, impl.rets):
-                    if variation.vars[variation_arg].type!=impl.vars[impl_arg].type:# or variation.vars[variation_arg].type.is_buffer_of!=impl.vars[impl_arg].type.is_buffer_of:
+                    vv = variation.vars[variation_arg]
+                    iv = impl.vars[impl_arg]
+                    if vv.type != iv.type or vv.immutable != iv.immutable or vv.isprivate != iv.isprivate:
                         is_same = False
+                        break
             if is_same:
                 already_parsed = True
                 break
@@ -3741,7 +3745,6 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             else: 
                 if not is_type_resolution: current_token = get(tokens, pos-1)
                 pos, vars = await process_statement(file, tokens, pos, impl, current_operator_priority, for_call=True)
-            
             #call_token = current_token
             if start_call.file==call_token.file and start_call.row==call_token.row: 
                 call_token = Token(" "*(call_token.col-start_call.col+len(call_token.text)), start_call.file, start_call.row, start_call.col)
@@ -4258,7 +4261,7 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
             new_type = UnionType(type_name, at=name_token)
             new_type.variations.extend(existing.variations)
             new_type.variations.extend(type_value.variations)
-            new_type.variations = list(set(new_type.variations))
+            new_type.variations = list(dict.fromkeys(new_type.variations))#list(set(new_type.variations))
             type_value = new_type
         if is_local:
             for variation in type_value.variations: file.localdefs.add(variation)
@@ -4594,14 +4597,14 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
 
     # now that we have processed everything, remove all localdefs
     file.namespaces = {k:v for k,v in file.namespaces.items() if v not in file.localdefs}
-    new_types = dict()
-    for k,v in file.types.items():
-        u = UnionType(v.name, at=v.at)
-        for variation in v.variations:
-            if variation not in file.localdefs:
-                u.variations.append(variation)
-        if u.variations: new_types[k] = u
-    file.types = new_types
+    # new_types = dict()
+    # for k,v in file.types.items():
+    #     u = UnionType(v.name, at=v.at)
+    #     for variation in v.variations:
+    #         if variation not in file.localdefs:
+    #             u.variations.append(variation)
+    #     if u.variations: new_types[k] = u
+    # file.types = new_types
     if debug_mode:
         for k,v in file.types.items():
             for variation in v.variations:
@@ -5127,7 +5130,7 @@ async def main():
                     docs_file.write("### "+callee.name.replace("_", "\\_"))
                     if callee.doc: docs_file.write(" - "+strip_quotes(callee.doc[0])+"\n")
                     else: docs_file.write("\n")
-                    if callee.at: docs_file.write("*Defined in: "+callee.at.file.path+"*\n")
+                    if callee.at: docs_file.write("*Defined in: "+callee.at.file.path+" line "+str(callee.at.row)+"*\n")
                     else: docs_file.write("*Defined by the compiler*\n")
                     if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                     docs_file.write("\n```rust\n"+callee.signature()+"\n```\n")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))

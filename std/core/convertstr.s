@@ -108,7 +108,7 @@ def float(console console)
             if "\n\r".contains c break
             eof = not try c=char console
         fail "user input was not a float"
-    return number
+    return const number
 
 def str(edit char[] buf, mut nat pos, console console)
     doc "reads a string from the console into buf at pos, returns the read slice"

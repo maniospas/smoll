@@ -21,6 +21,14 @@ def console()
     doc "references the system console"
     return singleton()
 
+def unsafe_console()
+    doc "references the system console unsafely"
+    doc "This is convenient for print debugging by writing `unsafe_console().print ...`"
+    doc "without needing to evoke an effect to pass the normally singleton console."
+    CLI = console()
+    debug:unsafe_singletons()
+    return CLI
+
 def flush(effect console CLI)
     doc "flushes the print buffer on the console"
     {fflush(stdout);}

@@ -820,7 +820,7 @@ initialization is used to ensure that a printable console exists.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;hello world&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -954,9 +954,9 @@ can be a string or number literal.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">VERSION</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="n">effect</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">)</span> <span class="c1"># just a literal type</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">)</span> <span class="c1"># just a literal type</span>
     <span class="nb">print</span> <span class="s2">&quot;version one&quot;</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="n">effect</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;version two&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -1067,7 +1067,7 @@ as the standard library&#8217;s core. Below is an example of a conditional check
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">typed_print</span><span class="p">(</span><span class="n">effect</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">nat</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="o">|</span><span class="n">cstr</span> <span class="n">value</span><span class="p">)</span> 
+<span class="k">def</span><span class="w"> </span><span class="nf">typed_print</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">nat</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="o">|</span><span class="n">cstr</span> <span class="n">value</span><span class="p">)</span> 
     <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">nat</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span>
         <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;this is a number: &quot;</span>
     <span class="k">else</span>
@@ -1350,7 +1350,7 @@ is used to make the allocation.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">cstr</span><span class="p">[]</span> <span class="n">sentences</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">cstr</span><span class="p">[]</span> <span class="n">sentences</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span>
         <span class="nb">print</span> <span class="n">sentence</span>
 
@@ -1568,7 +1568,7 @@ You can manually <code>fail</code> like so:</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">always_fail</span><span class="p">(</span><span class="n">effect</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">always_fail</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;we are failing&quot;</span>
     <span class="n">fail</span> <span class="s2">&quot;we failed!&quot;</span>
 

@@ -1,19 +1,16 @@
-# smoλ (smoll)
+<h1 class="smoll-name">sm<img src="docs/smoll.png" style="width:1.5rem"></img><span>λ</span></h1>
 
 This is a small compiled language that you can pick up in
 an afternoon to make fast programs that are safe to run.
+Once in a while, some of its deeper features come in handy for fast yet safe code.
 
-Ideal for those who enjoy both safe low-level programming (with
-some C unsafety sprinkled in on-demand) and scripting syntax 
-ergonomics. Safety is achieved through compiler analysis, 
-immutable pointers, and references that remain stable even when
-resizing.
+Ideal for those who enjoy both safe low-level programming (with C integration) and scripting syntax 
+ergonomics. Safety is achieved through compiler analysis and movement of deferred resource-releasing to function callers.
 
 The core tenet is that there should be less "magic"
 about how a program is lowered to source code, how types
-are resolved, and so on. In short: reading a program 
-explains the program and you don't need to read lengthy
-manuals to onboard. Conversely, everything is safe until
+are resolved, and so on. In short: reading a program *sequentially*
+explains the program. Conversely, everything is safe until
 the compiler stops you from doing unsafe stuff.
 
 ## 🚀 Features
@@ -22,7 +19,7 @@ the compiler stops you from doing unsafe stuff.
 - Predictable tuple-based type system (reads sequentially, resolves in finite time)
 - Function and type overloading
 - Script into zero-cost abstractions and minimized memory indirections
-- Immutability by default (can still define mutables)
+- Immutability by default (can still easily define mutables)
 - Can opt in to constness for memory contents
 - C integration
 

@@ -207,8 +207,9 @@
 <em>3.6.</em> <a href="#random">random</a><br>
 <em>3.7.</em> <a href="#mini-and-bits">{mini and bits}</a><br>
 <em>3.8.</em> <a href="#vectors">vectors</a><br>
-<em>3.9.</em> <a href="#graphics">graphics</a><br>
-<em>3.10.</em> <a href="#process-and-web">process and web</a><br></p>
+<em>3.9.</em> <a href="#matrices-and-graphs">matrices and graphs</a><br>
+<em>3.10.</em> <a href="#graphics">graphics</a><br>
+<em>3.11.</em> <a href="#process-and-web">process and web</a><br></p>
 
 <p>{&#8230;} are advanced functionality</p>
 
@@ -1157,8 +1158,7 @@ and is initiated with the <code>compt</code> keyword. Next is an example.</p>
 <p>Next is a more complicated scenario where several functions
 build a temporary <code>cstr</code> to be used during exectuion. The interpreter
 is robust against even unsafe functions by showing errors when
-things go wrong. Normal pointers cannot be literals and therefore
-we could not just pack a <code>str</code>.</p>
+things go wrong.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1366,69 +1366,85 @@ is used to make the allocation.</p>
 
 <p>Pointers reference specific memory locations in buffers. Use them 
 to quickly move data around while sharing only one memory address. 
-Pointers are unstable in that, for safety, they become invalid whenever 
-any buffer is resized. Being invalid means that they can not be read 
-from or copy data to them. This holds true mainly for safe pointers
-used in practical use. New C resources can added using unsafe pointer
-semantics that will be covered in a future section about C extensibility.</p>
+This abstraction remains safe as long as you do not deliberately
+inject unsafe C code.</p>
 
-<p>Obtain a <code>const</code> pointer from a buffer whose
-pointed memory location cannot be modified per <code>ptr = buf[element]&amp;</code>, and
-a <code>mut</code> pointer per <code>ptr = buf[element]&amp;&amp;</code>. Constness means that pointer
-contents cannot be overwritten.</p>
+<p>Obtain a <code>const</code> pointer from a buffer, including a buffer whose
+pointed memory location cannot be modified, per <code>ptr = buf[element]&amp;</code>,
+and a <code>mut</code> pointer -if permissions allow it- per <code>ptr = buf[element]&amp;&amp;</code>. 
+Constness means that pointer contents cannot be overwritten. To set a 
+new value to a mutable pointer use <code>&amp;</code> after the value again per 
+<code>old_ptr = new_ptr&amp;</code>. Otherwise, assignment copies a compatible
+structure&#8217;s contents onto a mutable pointer&#8217;s memory location.</p>
 
 <p><code>ptr..</code> dereferences pointers onto local objects. 
 For example, <code>ptr...field</code> gets a field from an object stored 
 in a pointer by following up the dereferenced data with field
-access notation. Move values onto pointed locations
-of mutable pointers per <code>ptr &lt;&lt; value</code>. Given all these operators
-it is now possible to explain that <code>buffer[pos]=value</code> desugares 
-to the pointer notations <code>buffer[pos]&amp;&amp;&lt;&lt;value</code>.</p>
+access notation. Given all these operators
+it is now possible to explain that <code>buffer[pos]=value</code> desugars 
+to the pointer notation <code>buffer[pos]&amp;&amp; = value</code> that first
+retrieves a mutable pointer and then assigns to it.</p>
 
-<p><em>Smoλ</em>&#8217;s compiler checks on pointer safety and creates error if
+<p><em>Smoλ</em>&#8217;s compiler checks on pointer safety and creates errors if
 it cannot prove safe behavior. By not relying on programmatic
-semantics, a wide breadth of programs is allowed. It will mainly
-ask you to return together all values whose internal pointers may
-have become tangled due to function calling and returning. For example,
-if you allocate a character buffer to place strings inside that you store on 
-a second buffer of strings, the compiler requires that the two buffers
+semantics other than mutability, a wide breadth of programs is allowed. 
+The compiler will mainly ask to return together all values whose internal pointers may
+have become tangled in that they could depend on each other. This tangling
+would be the result of function calling and returning, but rarely gets in the way. </p>
+
+<p>For example, if you allocate a character buffer to place strings inside and then store 
+those strings on second buffer, the compiler requires that the two buffers
 are returned together.
-Or you may be asked to not invalidate with <code>del</code> memory that is used elsewhere.</p>
+Or you may be asked to not invalidate pointers with <code>del</code>, if that would free memory
+that is used elsewhere.</p>
 
 <p>Functions declare pointer arguments per <code>any ptr</code>, <code>float ptr</code>, etc.
-Below is an example.</p>
+Contrary to buffers, the type remains only a pure <code>ptr</code> to enable several type system conveniences,
+and the associated pointer contents are tracked separately.
+Usually, functions implementing pointers should be specialized to a specific type that
+needs to be moved quickly. Use buffers otherwise. </p>
+
+<p>Below is an example that creates a buffer of one element and immediately retrieves
+a pointer to it. Then that is moved around via its memory address. </p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">mut</span> <span class="nb">float</span> <span class="n">ptr</span> <span class="n">element</span><span class="p">)</span>
+    <span class="n">element</span> <span class="o">=</span> <span class="n">element</span><span class="o">..+</span><span class="mf">1.0</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">1</span>
-    <span class="n">element</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&amp;&amp;</span>
-    <span class="nb">print</span> <span class="n">element</span><span class="o">..</span> <span class="c1"># prints 0 as buffers are zero-initialized</span>
-    <span class="n">element</span> <span class="o">&lt;&lt;</span> <span class="mf">1.0</span>
-    <span class="nb">print</span> <span class="n">element</span><span class="o">..</span> <span class="c1"># prints 1 by dereferencing</span>
-    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="c1"># prints 1 from the same memory </span>
+    <span class="n">element</span> <span class="o">=</span> <span class="n">mutlast</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="c1"># equivalent to element = [0.0][0]&amp;&amp; </span>
+    <span class="nb">print</span> <span class="n">element</span><span class="o">..</span> <span class="c1"># prints 0.0</span>
+    <span class="n">inc</span> <span class="n">element</span>
+    <span class="nb">print</span> <span class="n">element</span><span class="o">..</span> <span class="c1"># prints 1,0</span>
 </code></pre>
 </div>
 
-<p>If, in the above example, a new line 
-<code>buf.resize 2</code> was applied before the
-last two prints, <code>element</code> would become invalidated and the code would
-need to re-obtained it from the buffer. Use references to avoid such 
-scenarios and, in general, try to work with buffers and only use pointers
-for rapidly moving temporary data around.</p>
+<p>Creating many pointers this way is inefficient in that it produce a lot of small allocations.
+Many languages allow this by imposing a ton of restructions, but <em>smoλ</em> heavily discourages the practice
+naturally, as returning pointers cannot be done without the associated buffer that contains all the
+necessary information of how to deallocate memory.</p>
 
 <h2 id="substructures">substructures</h2>
 
 <div class="notice-box box-warning"><strong>Warning:</strong> This is an advanced feature, mainly useful for iterating through complicatedly packed data. You can skip it.</div>
 
-<p>You can work with &#8220;horizontal&#8221; data from buffers and pointers by
-obtaining or setting to specific items. However, you can also
-work with &#8220;vertical&#8221; data by being able to obtain sub-buffers
-or sub-pointers for their fields.</p>
+<p>You can move around date from buffers without copying them by retrieving
+pointers to buffer elements.To ensure safety, normal code only lets
+pointers explitly reference buffer data. Unsafe code
+is either inlined C, or has <em>unsafe</em> in its import path or name.</p>
 
-<p>The method to do so is by using the <code>buf@field</code> or <code>ptr@field</code> notation, 
+<p>All pointers are associated with types. That is not part of the
+pointer&#8217;s type so that the few but really important unsafe parts
+can run wild. However, what is worth mentioning is that, given
+a pointer or buffer, it is possible to retrieve a respective
+pointer or type to a substructure within its data type. For example,
+say that you have a pointer <code>p</code> to a <code>(float x,float y)</code> structure. 
+You can get a pointer to its <code>x</code> field with the dot notation per <code>p.x</code>.</p>
+
+<p>In general, use the <code>buf.field</code> or <code>ptr.field</code> notation, 
 where the field refers to a known field of the attached structure. This
 operator helps write very safe yet fast and memory-efficient code by
 obtaining necessary offsets within allocated memory. Below is
@@ -1448,8 +1464,8 @@ an example:</p>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">points</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">10</span>
     <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">)</span>
-    <span class="n">plane</span> <span class="o">=</span> <span class="n">points</span><span class="nd">@plane</span> <span class="c1"># can move this around</span>
-    <span class="nb">print</span> <span class="n">plane</span><span class="nd">@x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">plane</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">plane</span> <span class="c1"># can move this around as if it were a buffer</span>
+    <span class="nb">print</span> <span class="n">plane</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="nb">print</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">x</span> <span class="c1"># equivalent data path</span>
 </code></pre>
 </div>
@@ -1955,9 +1971,9 @@ one place while returning a pointer to the last element.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">li</span> <span class="o">=</span> <span class="n">ref</span> <span class="nb">list</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
-    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
-    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
-    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span>
+    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.1</span>
 
     <span class="n">li</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
     <span class="nb">print</span> <span class="n">li</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -2431,6 +2447,57 @@ implemented.</p>
 </code></pre>
 </div>
 
+<h2 id="matrices-and-graphs">matrices and graphs</h2>
+
+<p>We are not yet done with the science stuff. And, yes, there is more to matrices,
+namely sparse matrices.</p>
+
+<p>Sparse matrices are used when there are a lot of zeroes, For example, if we 
+consider a graph (a collection of vertices linked through edges - like a social network
+where the vertices are the users and the edges their friendships), it can be
+analyzed by organizing its edges into a square adjacency matrix. In the simplest case,
+the matrix&#8217;s elements would be <code>1.0</code> at position <code>(row,col)</code> if the edge between
+<code>row</code> and <code>col</code> exists, and zero otherwise. Edges can also be weighed.</p>
+
+<p>Sparse matrices in smoλ are usually stored in <code>coo</code> format that is speedy for linear algebra
+and graph algorithms. This format is stored on buffers of the tuple 
+<code>def sparse_element(nat row, nat col, float value)</code>. Sparse matrices do implement multiplication
+with dense matrices, as well as with vectors from bot the left and the right side. Similar
+to dense matrices.</p>
+
+<p>There are a number of operations available for the analysis of graphs stored onto sparse
+matrices. These include graph filters that allow the &#8220;diffusion&#8221; of vertex weights through
+the graph structure. An example is presented next, where <code>ppr</code> (standing for personalized PageRank - the
+algorithm Google introduced for analyzing web hyperlinks) is the most well-known filter. <code>0.9</code>
+is a diffusion parameter in the range <em>[0.0,1.0]</em> that determines how far away the initial vertex
+values on <code>p0</code> should be diffused.</p>
+
+<p>In the example below, notice use of the <code>matrix</code> union, which automatically applies whatever matrix
+type suites the provided data. This makes code more portable if you want to switch things up in
+the future.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">compt</span> <span class="n">new</span><span class="p">()</span><span class="o">.</span><span class="n">graph</span><span class="p">:</span><span class="n">normalize</span> <span class="n">matrix</span> <span class="p">[</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">FLOATS</span> <span class="o">=</span> <span class="n">new</span><span class="p">()</span>
+    <span class="n">p0</span> <span class="o">=</span> <span class="n">vec</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">graph</span><span class="p">:</span><span class="n">ppr</span><span class="p">(</span><span class="mf">0.9</span><span class="p">)</span><span class="o">.</span><span class="n">graph</span><span class="p">:</span><span class="nb">filter</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">p0</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;iterations: &quot;</span>
+    <span class="nb">print</span> <span class="n">result</span><span class="o">.</span><span class="n">iter</span>
+    <span class="nb">print</span> <span class="n">result</span><span class="o">.</span><span class="n">p</span>
+</code></pre>
+</div>
+
+<div class="notice-box box-info"><strong>Info:</strong> more graph algorithms and details will be provided in the future, likely as a separate tutorial.</div>
+
 <h2 id="graphics">graphics</h2>
 
 <p>Graphics for games of desktop applications are supported
@@ -2466,7 +2533,7 @@ around in a window.</p>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">&gt;</span> <span class="mf">600.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">=</span> <span class="mf">600.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vy</span> <span class="o">=</span> <span class="mf">0.0</span><span class="o">-</span><span class="p">(</span><span class="n">sci</span><span class="p">:</span><span class="nb">abs</span> <span class="bp">self</span><span class="o">.</span><span class="n">vy</span><span class="p">)</span>
-    <span class="n">_self</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span>
+    <span class="n">_self</span> <span class="o">=</span> <span class="bp">self</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="n">Circle</span> <span class="bp">self</span><span class="p">,</span> <span class="n">edit</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Window</span> <span class="n">win</span><span class="p">)</span>
     <span class="n">white</span>  <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
@@ -2485,7 +2552,7 @@ around in a window.</p>
     <span class="n">circles</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">N</span>
     <span class="k">for</span> <span class="n">create_circle</span><span class="o">&amp;&amp;</span> <span class="ow">in</span> <span class="n">circles</span>
         <span class="n">i</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">compiler</span><span class="p">:</span><span class="n">for_counter</span><span class="p">()</span> <span class="c1"># builtin way of enumerating</span>
-        <span class="n">create_circle</span> <span class="o">&lt;&lt;</span> <span class="n">Circle</span><span class="p">(</span><span class="mf">400.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="o">-</span><span class="n">i</span><span class="p">,</span> <span class="mf">160.0</span><span class="o">+</span><span class="n">i</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
+        <span class="n">create_circle</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">(</span><span class="mf">400.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="o">-</span><span class="n">i</span><span class="p">,</span> <span class="mf">160.0</span><span class="o">+</span><span class="n">i</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
 
     <span class="k">while</span> <span class="n">graphics</span><span class="p">:</span><span class="n">is_open</span> <span class="n">win</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">dt</span><span class="p">()</span>

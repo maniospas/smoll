@@ -3,9 +3,9 @@ import "std/core.s"
 def main()
     CLI = console()
     li = list ref mut float[]
-    (push li) << 0.1
-    (push li) << 0.1
-    (push li) << 0.1
+    (push li) = 0.1
+    (push li) = 0.1
+    (push li) = 0.1
 
     li[1] = 0.2
     print li[0]

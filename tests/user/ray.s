@@ -26,7 +26,7 @@ def process(mut Circle ptr _self, float dt)
     if self.cy + self.radius > 600.0
         self.cy = 600.0 - self.radius
         self.vy = 0.0-(sci:abs self.vy)
-    _self << self
+    _self = self
 
 def draw(Circle self, edit graphics:Window win)
     white  = graphics:Color(255, 255, 255)
@@ -45,7 +45,7 @@ def main()
     circles = Circle[].alloc N
     for create_circle&& in circles
         i = float compiler:for_counter() # builtin way of enumerating
-        create_circle << Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
+        create_circle = Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
 
     while graphics:is_open win
         dt = graphics:dt()

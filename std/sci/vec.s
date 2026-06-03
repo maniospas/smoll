@@ -258,7 +258,7 @@ def copy(effect edit vec_allocator FLOATS, vec v)
 
 def storage(edit vec v)
     buf = mut float[]
-    buf.unsafe_ptr = v.unsafe_ptr
+    buf.unsafe_ptr = v.unsafe_ptr&
     buf.unsafe_size = v.pos+len v
     pos = mut v.pos
     return (buf, pos)

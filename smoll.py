@@ -451,6 +451,7 @@ def signature_like(vars: list[Variable], impl=None):
         arg_name = vars[i].name[common_prefix_length:]
         if arg_name.startswith("__t") or "____" in arg_name: arg_name = ""
         else: arg_name = " "+arg_name.replace("__", ".")
+        arg_name = arg_name.strip()
         if type.builtin: 
             if not vars[i].immutable: ret += "mut "
             if type==POINTER_TYPE and impl: 
@@ -459,8 +460,11 @@ def signature_like(vars: list[Variable], impl=None):
                 else: ret += pointer_type.name+" "
             ret += type.name+arg_name
             if type==POINTER_TYPE and impl:
+                if pointer_type and pointer_type != ANY_TYPE: ret += " {"+signature_like([pointer_type.vars[ret] for ret in pointer_type.rets], pointer_type)+"}"
                 dependency = impl.follow_pointer_dependency(vars[i])
-                if dependency and dependency!=vars[i]: ret += " {follows "+(impl.get_pointer_type(dependency) if impl.get_pointer_type(dependency) else ANY_TYPE).name+" ptr "+pretty_name(dependency.name)+"}"
+                if dependency and dependency!=vars[i]: 
+                    dep = impl.get_pointer_type(dependency) 
+                    if not dep or dep==ANY_TYPE: ret += " {follows "+(dep if dep else ANY_TYPE).name+" ptr "+pretty_name(dependency.name)+"}"
             i += 1
         elif type.is_literal_of: 
             ret += type.at.text
@@ -470,10 +474,13 @@ def signature_like(vars: list[Variable], impl=None):
             elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): pass#ret += "const "
             elif any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "edit "
             element_size = type.is_buffer_of.memory_size()
-            ret += type.is_buffer_of.name+"[]"+arg_name+" {element size "+(str(element_size) if element_size else "?")+"}"
+            ret += type.is_buffer_of.name+"[]"+arg_name #+" {element size "+(str(element_size) if element_size else "?")+"}"
             if impl:
+                if type.is_buffer_of and type.is_buffer_of != ANY_TYPE: ret += " {"+signature_like([type.is_buffer_of.vars[ret] for ret in type.is_buffer_of.rets], type.is_buffer_of)+"}"
                 dependency = impl.follow_pointer_dependency(vars[i+1])
-                if dependency and dependency!=vars[i+1]: ret += " {follows "+(impl.get_pointer_type(dependency) if impl.get_pointer_type(dependency) else ANY_TYPE).name+" ptr "+pretty_name(dependency.name)+"}"
+                if dependency and dependency!=vars[i+1]: 
+                    dep = impl.get_pointer_type(dependency) 
+                    if not dep or dep==ANY_TYPE: ret += " {follows "+(dep if dep else ANY_TYPE).name+" ptr "+pretty_name(dependency.name)+"}"
             i += len(type.rets)
         else:
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
@@ -819,7 +826,8 @@ class ImplementedType:
                 for i in range(len(value)): self.assign(found[i].name, [value[i]], error_token, perform_immutability_checks, top_entry=False)
                 return None
         if existing is not None and existing.type!=value[0].type: 
-            if existing.type == POINTER_TYPE: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'\nPerhaps you meant to place a value on a pointer with the pattern '"+existing.name+"&& = ...'")
+            if existing.type == POINTER_TYPE:
+                error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'\nPerhaps you meant to place a value on a pointer with the pattern '"+existing.name+" = ...'")
             if existing.type.is_buffer_of and value[0].type.is_buffer_of and match_structure_with(existing.type.is_buffer_of, value[0].type.is_buffer_of): 
                 pass
             else: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'")
@@ -1724,11 +1732,11 @@ class Token:
                 if suggestions:
                     printid("    with alternatives:")
                     for suggestion in suggestions:
-                        if "->" in suggestion: 
+                        if "(" in suggestion: 
                             suggestion_splits = suggestion.split("defined in")
                             printid("```rust\n"+suggestion_splits[0]+"\n```")
                             #if len(suggestion_splits)>1: print("defined in "+suggestion_splits[1])
-                        else: printid("\n    -", suggestion)
+                        else: printid("\n    - "+suggestion)
             if is_lsp and self.file.is_main_file and errtype=="safety": return
             raise FatalException
 
@@ -2529,7 +2537,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 elif tok.text=="rec" and peek_text(tokens, tokpos+1)==name:
                     tokens[pos].error("type", "usage of 'rec "+name+"' before its definition") 
 
-            if name[0] in symbols: tokens[pos].error("syntax", "previous expression ended before operator '"+name+"'")
+            if name[0] in symbols and name[0]!="&": tokens[pos].error("syntax", "previous expression ended before operator '"+name+"'")
             candidates: list[ImplementedType] = list()
             max_candidate_common_length = 0
             for type in file.types.values():
@@ -2541,7 +2549,8 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                         max_candidate_common_length = common_length
                     if common_length==max_candidate_common_length: 
                         candidates.append(variation)
-            if file==tokens[pos].file: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\":"+k for k in file.namespaces])
+            if file==tokens[pos].file: 
+                tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\":"+k for k in file.namespaces])
             
             namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
             if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\":"+k for k in file.namespaces])
@@ -2592,7 +2601,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                     print(at.row)
                     print(at.col)
                     # message (may span multiple lines))
-                    printid("```rust\n"+variation.signature()+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
+                    printid("```rust\n"+signature_like([variation.vars[ret] for ret in variation.rets], variation)+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
 
             return pos+3, buffer_type
         # if not reduce_to_unique_variations:  # TODO: determine what we should do
@@ -2617,7 +2626,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 print(at.row)
                 print(at.col)
                 # message (may span multiple lines))
-                printid("```rust\n"+variation.signature()+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
+                printid("```rust\n"+(signature_like([variation.vars[ret] for ret in variation.rets], variation) if reduce_to_unique_variations else variation.signature())+"\n```")#+(" defined in "+at.file.path if variation.at else " from compiler definitions"))
 
         return pos+1, type
     namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
@@ -2684,8 +2693,8 @@ def skip_statement(file: File, tokens: list[Token], pos: int):
     return pos
 
 operators = {
-    ">>": (">>", 11),
-    "<<": ("<<", 11),
+    # ">>": (">>", 11),
+    # "<<": ("<<", 11),
     "=": ("=", 11),
     "and": ("and", 10),
     "or": ("or", 9),
@@ -2704,7 +2713,6 @@ operators = {
     "%": ("mod",4),
     "[": ("get", 0.5),
     ".": ("dot", 0.5),
-    "@": ("@", 0.5),
     "->": ("access",-1),
 }
 
@@ -2722,11 +2730,11 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
         if current_operator_priority and current_operator_priority<op_priority:
             return pos, rets
         op_token = tokens[pos]
-        if current_operator_priority==7 and op_priority==7: 
+        if current_operator_priority==7 and op_priority==7:
             op_token.error("safety", "there is no clear priority order between multiple equalities and inequalities; be explicit with parentheses")
-
-        if op_name==">>" or op_name=="<<" or op_name=="=":
-            if op_name=="=" and peek_text(tokens, pos-1)!="]": tokens[pos].error("safety", "unexpected '=' in the middle of expression", suggestions=["use 'buffer[item] = value' when supported by 'mutget' (for buffers, this is equivalent to buffer[item]&&<<value)", "use '<<' to move data to a mutable pointer", "fix syntax to assign to a variable or variable item instead"])
+        peek_next = peek_text(tokens, pos+1)
+        if op_name=="=": #op_name==">>" or op_name=="<<" or 
+            if op_name=="=" and peek_text(tokens, pos-1)!="]" and (len(rets)!=1 or rets[0].type!=POINTER_TYPE): tokens[pos].error("safety", "unexpected '=' in the middle of expression", suggestions=["use 'buffer[item] = value' when supported by 'mutget' (for buffers, this is equivalent to buffer[item]&&<<value)", "use '<<' to move data to a mutable pointer", "fix syntax to assign to a variable or variable item instead"])
             err_token = op_token
             pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0) # don't touch rets
             pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
@@ -2998,9 +3006,118 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 return pos, rets
             pos, rets = await process_is(pos, rets)
             continue
-        if op=="@":
+        if op=="." and (
+            (len(rets)==5 and rets[0].type.is_buffer_of
+                and not peek_text(tokens, pos+1) in ["unsafe_ptr", "unsafe_size", "unsafe_align", "unsafe_offset"] 
+                and any(preview==peek_next or preview.startswith(peek_next+"__") for preview in rets[0].type.is_buffer_of.rets)) 
+            or (len(rets)==1 and rets[0].type==POINTER_TYPE 
+                and impl.get_pointer_type(rets[0]) not in [None, ANY_TYPE] 
+                and any(preview==peek_next or preview.startswith(peek_next+"__") for preview in impl.get_pointer_type(rets[0]).rets))
+        ):
+            if is_lsp and op_token.file.is_main_file: print_lsp_keyword(op_token, "**memory field**\n\nRetrieves a safe offset to a buffer or pointer based on its type's content layout.")
             def process_substructure(pos: int, rets: list[Variable]):
                 associated_type: ImplementedType|None = None
+                if len(rets)==1 and rets[0].type==POINTER_TYPE:
+                    associated_type = impl.get_pointer_type(rets[0])
+                    if associated_type is None or associated_type==ANY_TYPE: tokens[pos].error("type", "cannot apply the @ notation on 'any ptr', as an explicit type is needed to compute offsets")
+                    assert associated_type is not None
+                    pos += 1
+                    field_token = get(tokens, pos)
+                    pos += 1
+                    field_name = field_token.text
+                    min_pos = len(associated_type.rets)
+                    max_pos_plus_one = 0 # non-inclusive
+                    count = 0
+                    prefix = field_name+"__"
+                    for i, rname in enumerate(associated_type.rets):
+                        if field_name==rname:
+                            min_pos = i
+                            max_pos_plus_one = i+1
+                            count = 1
+                            break
+                        if rname.startswith(prefix):
+                            min_pos = min(min_pos, i)
+                            max_pos_plus_one = max(max_pos_plus_one, i+1)
+                            count += 1
+                    offset = 0
+                    for i in range(min_pos):
+                        var = associated_type.vars[associated_type.rets[i]]
+                        mem_size = var.type.memory_size() if var.type.builtin else 0
+                        offset += mem_size
+                    len_common_prefix = 0
+                    temp_type = ImplementedType(associated_type.name+"."+field_name)
+                    associated_len_common_prefix = len(longest_common_prefix([var for var in associated_type.rets[min_pos:max_pos_plus_one]]))
+                    for j in range(min_pos, max_pos_plus_one):
+                        new_name = associated_type.rets[j][associated_len_common_prefix:]
+                        temp_type.rets.append(new_name)
+                        temp_type.vars[new_name] = associated_type.vars[associated_type.rets[j]].renamed_copy(new_name)
+                    new_var = Variable(create_temp(), POINTER_TYPE, immutable=rets[0].immutable, isprivate=rets[0].isprivate, token=op_token)
+                    impl.vars[var.name] = new_var
+                    impl.set_pointer_type(new_var, temp_type)
+                    if is_lsp and field_token.file.is_main_file: print_lsp_var(field_token, signature_like([new_var], impl))
+
+                    impl.implementation.extend([
+                        CODEWORD_IF,
+                        CODEWORD_LPAR,
+                        CodeWord("!"),
+                        rets[0],
+                        CODEWORD_RPAR,
+                        CODEWORD_LBRACKET,
+                    ])
+                    if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: op_token.error("safety", "the matching 'try' has already handled a different failure")
+                    try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
+                    if try_var is not None:
+                        impl.has_any_complaint = True
+                        impl.implementation.extend([
+                            CodeWord("__t_complain"),
+                            CODEWORD_EQUALS,
+                            CodeWord("2"),
+                            CODEWORD_SEMICOLON,
+                            CODEWORD_RBRACKET,
+                            CodeWord("else"),
+                            CODEWORD_LBRACKET
+                        ])
+                        impl.spawned_error_codes.add(2)
+                        impl.count_handled_tries[-1] += 1
+                    else:
+                        # non-allocation check is mandatory unfortunately
+                        if debug_mode:
+                            text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
+                            text += "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
+                            impl.implementation.extend([
+                                CODEWORD_PRINTF,
+                                CODEWORD_LPAR,
+                                CodeWord('"%s"'),
+                                CODEWORD_COMMA,
+                                CodeWord('"'+text.replace('"', '\\"')+'"'),
+                                CODEWORD_RPAR,
+                                CODEWORD_SEMICOLON,
+                            ])
+                        impl.implementation.extend([
+                            CodeWord("__t_errcode"),
+                            CODEWORD_EQUALS,
+                            CodeWord("2"),
+                            CODEWORD_SEMICOLON
+                        ])
+                        impl.spawned_error_codes.add(2)
+                        impl.implementation.extend([
+                            CODEWORD_GOTO,
+                            CodeWord("__t_failure"),
+                            CODEWORD_SEMICOLON,
+                            CODEWORD_RBRACKET
+                        ])
+                        impl.needs_failure_mode = op_token
+                    impl.implementation.extend([
+                        new_var,
+                        CODEWORD_EQUALS,
+                        rets[0],
+                        CODEWORD_ADD,
+                        CodeWord(str(offset)),
+                        CODEWORD_SEMICOLON
+                    ])
+                    impl.dependent_assignments[new_var.name] = rets[0].name
+                    return pos, [new_var]
+
                 count = 0
                 for ret in rets:
                     if ret.type.is_buffer_of:
@@ -3013,8 +3130,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     #     if next_associated_type==associated_type: continue
                     #     associated_type = next_associated_type
                     #     count += 1
-                if count!=1 or associated_type is None: tokens[pos].error("type", "can only apply '@' on a buffer, not '"+signature_like(rets)+"'")
-                if associated_type==ANY_TYPE: tokens[pos].error("type", "cannot apply the @ notation on 'any[]'")
+                if count!=1 or associated_type is None: tokens[pos].error("type", "can only apply '@' on a buffer or pointer, not '"+signature_like(rets)+"'")
+                if associated_type==ANY_TYPE: tokens[pos].error("type", "cannot apply the . notation on 'any[]', as an explicit type is needed to compute offsets")
                 assert associated_type is not None
                 pos += 1
                 field_token = get(tokens, pos)
@@ -3176,10 +3293,12 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 deref = True
                 also_assign = False
                 if peek_text(tokens, pos)=="&" and peek_text(tokens, pos+1)=="&":
+                    #if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_var(get(tokens, pos), "mut ptr {"+signature_like(rets+additional_rets, impl)+"}")
                     get_func_name = "mutget"
                     deref = False
                     pos += 2
                 elif peek_text(tokens, pos)=="&":
+                    #if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_var(get(tokens, pos), "ptr {"+signature_like(rets+additional_rets, impl)+"}")
                     deref = False
                     pos += 1
                 elif peek_text(tokens, pos)=="=":
@@ -3561,7 +3680,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
     #     pos, ret = process_deref(file, pos, ret, impl, current_token)
     #     return await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
     if current == "class":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "packs into a type class unique to this function")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**class declaration**\n\npacks into a type class unique to this function")
         if impl.has_retrieved_singleton: current_token.error("safety", "cannot create both a singleton and a class for the same function", reason=impl.has_retrieved_singleton, raason_message="due to")
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         tmp = create_temp()
@@ -3571,7 +3690,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         return await process_statement_operator(file, tokens, impl, pos, [var_class]+[r.private_copy() if r.immutable else r for r in ret], current_operator_priority)
 
     if current == "singleton":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "packs into a type class unique to this function, while further setting this function as a singleton resource")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**singleton class declaration**\n\npacks into a type class unique to this function, while further setting this function as a singleton resource")
         if impl.has_retrieved_class: current_token.error("safety", "cannot create both a singleton (class with a single instance) and a class for the same function", reason=impl.has_retrieved_class, raason_message="due to")
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         tmp = create_temp()
@@ -3595,7 +3714,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 continue
             littype = literal_types.get("\""+peek+"\"", None)
             if littype is None: get(tokens, prev_pos).error("syntax", "expecting comma, closing parenthesis, or keyword derived from a cstr literal type")
-            if is_lsp and get(tokens, pos).file==file: print_lsp_keyword(get(tokens, pos), "**literal type**\n\nThis is a shorthand to adding a 'type \""+peek+"\"' argument here.")
+            if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_keyword(get(tokens, pos), "**literal type**\n\nThis is a shorthand to adding a 'type \""+peek+"\"' argument here.")
             litvar = Variable(create_temp(), littype.variations[0])
             impl.vars[litvar.name] = litvar
             ret.append(litvar)
@@ -3618,10 +3737,114 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
     
     if peek_text(tokens, pos+1) == "=":
         var_token = get(tokens, pos)
+        op_token = get(tokens, pos+1)
         if var is not None and var.isprivate: tokens[pos].error("type", "cannot set to immutable class field: '"+pretty_name(current)+"'")
         current_prefix = current+"__"
         pos, ret = await process_statement(file, tokens, pos+2, impl, current_operator_priority=0)
         pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+
+        skip_next_pointer_interior_assignment = False
+        if len(ret)==1 and ret[0].type==POINTER_TYPE and peek_text(tokens, pos)=="&":
+            pos += 1
+            skip_next_pointer_interior_assignment = True
+        if var and var.type==POINTER_TYPE and not skip_next_pointer_interior_assignment:
+            rets = [var]
+            err_token = var_token
+            op_name = op_token.text
+            if op_name ==">>": ret, rets = rets, ret
+            if len(rets)!=1: err_token.error("type", "cannot apply '"+op_name+"' to non-pointer '"+signature_like(rets)+"'")
+            rets = impl.stabilize(rets)
+            var = rets[0]
+            if var is not None and var.isprivate: err_token.error("type", "cannot set to immutable class field: '"+pretty_name(var.name)+"'")
+            if var is None: err_token.error("type", "can only set a value to an existing pointer with '"+op_name+"' but found '"+signature_like(rets)+"'")
+            if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but found '"+signature_like(rets)+"'")
+            if var.stabilized_name() in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
+            if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&&' from a buffer (or mutget) if you are working with std", "remove 'const' qualitifier"])
+            pointer_type: ImplementedType|None = impl.get_pointer_type(var)
+            if pointer_type is None or pointer_type==ANY_TYPE: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type."+(" Perhaps you meant to add && after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
+            assert pointer_type is not None
+            if len(pointer_type.rets)!=len(ret): err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'"+(". Perhaps you meant to add && after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
+            for pr, r in zip(pointer_type.rets, ret):
+                if pointer_type.vars[pr].type != r.type: err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'"+(". Perhaps you meant to add && after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
+            # we now have a contract that we can place our data on the pointer
+            impl.implementation.extend([
+                CODEWORD_IF,
+                CODEWORD_LPAR,
+                CodeWord("!"),
+                var,
+                CODEWORD_RPAR,
+                CODEWORD_LBRACKET,
+            ])
+            if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: op_token.error("safety", "the matching 'try' has already handled a different failure")
+            try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
+            if try_var is not None:
+                impl.has_any_complaint = True
+                impl.implementation.extend([
+                    CodeWord("__t_complain"),
+                    CODEWORD_EQUALS,
+                    CodeWord("2"),
+                    CODEWORD_SEMICOLON,
+                    CODEWORD_RBRACKET,
+                    CodeWord("else"),
+                    CODEWORD_LBRACKET
+                ])
+                impl.spawned_error_codes.add(2)
+                impl.count_handled_tries[-1] += 1
+            else:
+                # non-allocation check is mandatory unfortunately
+                if debug_mode:
+                    text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
+                    text += "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
+                    impl.implementation.extend([
+                        CODEWORD_PRINTF,
+                        CODEWORD_LPAR,
+                        CodeWord('"%s"'),
+                        CODEWORD_COMMA,
+                        CodeWord('"'+text.replace('"', '\\"')+'"'),
+                        CODEWORD_RPAR,
+                        CODEWORD_SEMICOLON,
+                    ])
+                impl.implementation.extend([
+                    CodeWord("__t_errcode"),
+                    CODEWORD_EQUALS,
+                    CodeWord("2"),
+                    CODEWORD_SEMICOLON
+                ])
+                impl.spawned_error_codes.add(2)
+                impl.implementation.extend([
+                    CODEWORD_GOTO,
+                    CodeWord("__t_failure"),
+                    CODEWORD_SEMICOLON,
+                    CODEWORD_RBRACKET
+                ])
+                impl.needs_failure_mode = op_token
+
+            progress = 0
+            for r in ret:
+                mem_size = r.type.memory_size() if r.type.builtin else 0
+                if not mem_size: continue
+                impl.implementation.extend(
+                    [CodeWord("memcpy"), CODEWORD_LPAR]
+                    +[var]
+                    + ([CODEWORD_ADD, CodeWord(str(progress))] if progress else [])
+                    + [CODEWORD_COMMA, CODEWORD_AMP]
+                    + [impl.vars[r.stabilized_name()]]
+                    + [CODEWORD_COMMA, CodeWord(str(mem_size))]
+                    + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
+                )
+                if impl.vars[r.stabilized_name()].type==POINTER_TYPE:
+                    for other_var in impl.get_required_accompany(var):
+                        impl.add_required_accompany(other_var, impl.vars[r.stabilized_name()])
+                    impl.add_required_accompany(var, impl.vars[r.stabilized_name()])
+                progress += mem_size
+            if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
+            found: list[Variable] = [] 
+            if is_lsp and var_token.file.is_main_file: print_lsp_var(var_token, signature_like([var],impl))
+            return pos, found
+
+
+
+
         previous = [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
         if len(previous)!=len(ret) and previous: current_token.error("type", "cannot set an incompatible type on '"+pretty_name(current)+"' previous type was '"+signature_like(previous, impl)+"' and cannot be replaced by '"+signature_like(ret, impl)+"'")
         if previous:
@@ -3993,7 +4216,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 ret = resolve_call(file, impl, type, iterator_object+[indexor], get(tokens, in_pos)) 
                 if not as_pointer and not as_mutpointer:
                     _, ret = process_deref(file, pos, ret, impl, get(tokens, in_pos), explicit=False)
-                if is_lsp and vartok.file==file: print_lsp_var(vartok, signature_like(ret, impl))
+                if is_lsp and vartok.file.is_main_file: print_lsp_var(vartok, signature_like(ret, impl))
                 impl.assign(varname, ret, current_token)
                 if impl.count_handled_tries[-1]==0: current_token.error("safety", "this 'try' statement does not guard against anything")
                 impl.count_handled_tries.pop()

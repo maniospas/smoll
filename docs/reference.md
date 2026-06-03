@@ -37,8 +37,9 @@ _3.5._ [processes](#processes)<br>
 _3.6._ [random](#random)<br>
 _3.7._ [{mini and bits}](#mini-and-bits)<br>
 _3.8._ [vectors](#vectors)<br>
-_3.9._ [graphics](#graphics)<br>
-_3.10._ [process and web](#process-and-web)<br>
+_3.9._ [matrices and graphs](#matrices-and-graphs)<br>
+_3.10._ [graphics](#graphics)<br>
+_3.11._ [process and web](#process-and-web)<br>
 
 {...} are advanced functionality
 
@@ -960,8 +961,7 @@ def main()
 Next is a more complicated scenario where several functions
 build a temporary `cstr` to be used during exectuion. The interpreter
 is robust against even unsafe functions by showing errors when
-things go wrong. Normal pointers cannot be literals and therefore
-we could not just pack a `str`.
+things go wrong.
 
 ```python
 import "std/core.s"
@@ -1162,69 +1162,84 @@ def main()
 
 Pointers reference specific memory locations in buffers. Use them 
 to quickly move data around while sharing only one memory address. 
-Pointers are unstable in that, for safety, they become invalid whenever 
-any buffer is resized. Being invalid means that they can not be read 
-from or copy data to them. This holds true mainly for safe pointers
-used in practical use. New C resources can added using unsafe pointer
-semantics that will be covered in a future section about C extensibility.
+This abstraction remains safe as long as you do not deliberately
+inject unsafe C code.
 
-Obtain a `const` pointer from a buffer whose
-pointed memory location cannot be modified per `ptr = buf[element]&`, and
-a `mut` pointer per `ptr = buf[element]&&`. Constness means that pointer
-contents cannot be overwritten.
+Obtain a `const` pointer from a buffer, including a buffer whose
+pointed memory location cannot be modified, per `ptr = buf[element]&`,
+and a `mut` pointer -if permissions allow it- per `ptr = buf[element]&&`. 
+Constness means that pointer contents cannot be overwritten. To set a 
+new value to a mutable pointer use `&` after the value again per 
+`old_ptr = new_ptr&`. Otherwise, assignment copies a compatible
+structure's contents onto a mutable pointer's memory location.
 
 `ptr..` dereferences pointers onto local objects. 
 For example, `ptr...field` gets a field from an object stored 
 in a pointer by following up the dereferenced data with field
-access notation. Move values onto pointed locations
-of mutable pointers per `ptr << value`. Given all these operators
-it is now possible to explain that `buffer[pos]=value` desugares 
-to the pointer notations `buffer[pos]&&<<value`.
+access notation. Given all these operators
+it is now possible to explain that `buffer[pos]=value` desugars 
+to the pointer notation `buffer[pos]&& = value` that first
+retrieves a mutable pointer and then assigns to it.
 
-*Smoλ*'s compiler checks on pointer safety and creates error if
+*Smoλ*'s compiler checks on pointer safety and creates errors if
 it cannot prove safe behavior. By not relying on programmatic
-semantics, a wide breadth of programs is allowed. It will mainly
-ask you to return together all values whose internal pointers may
-have become tangled due to function calling and returning. For example,
-if you allocate a character buffer to place strings inside that you store on 
-a second buffer of strings, the compiler requires that the two buffers
+semantics other than mutability, a wide breadth of programs is allowed. 
+The compiler will mainly ask to return together all values whose internal pointers may
+have become tangled in that they could depend on each other. This tangling
+would be the result of function calling and returning, but rarely gets in the way. 
+
+For example, if you allocate a character buffer to place strings inside and then store 
+those strings on second buffer, the compiler requires that the two buffers
 are returned together.
-Or you may be asked to not invalidate with `del` memory that is used elsewhere.
+Or you may be asked to not invalidate pointers with `del`, if that would free memory
+that is used elsewhere.
 
 Functions declare pointer arguments per `any ptr`, `float ptr`, etc.
-Below is an example.
+Contrary to buffers, the type remains only a pure `ptr` to enable several type system conveniences,
+and the associated pointer contents are tracked separately.
+Usually, functions implementing pointers should be specialized to a specific type that
+needs to be moved quickly. Use buffers otherwise. 
+
+Below is an example that creates a buffer of one element and immediately retrieves
+a pointer to it. Then that is moved around via its memory address. 
 
 ```python
 import "std/core.s"
 
+def inc(mut float ptr element)
+    element = element..+1.0
+
 def main()
     CLI = console()
-    buf = float[].alloc 1
-    element = buf[0]&&
-    print element.. # prints 0 as buffers are zero-initialized
-    element << 1.0
-    print element.. # prints 1 by dereferencing
-    print buf[0]    # prints 1 from the same memory 
+    element = mutlast [0.0] # equivalent to element = [0.0][0]&& 
+    print element.. # prints 0.0
+    inc element
+    print element.. # prints 1,0
 ```
 
-If, in the above example, a new line 
-`buf.resize 2` was applied before the
-last two prints, `element` would become invalidated and the code would
-need to re-obtained it from the buffer. Use references to avoid such 
-scenarios and, in general, try to work with buffers and only use pointers
-for rapidly moving temporary data around.
-
+Creating many pointers this way is inefficient in that it produce a lot of small allocations.
+Many languages allow this by imposing a ton of restructions, but *smoλ* heavily discourages the practice
+naturally, as returning pointers cannot be done without the associated buffer that contains all the
+necessary information of how to deallocate memory.
 
 ## substructures
 
 *Warning: This is an advanced feature, mainly useful for iterating through complicatedly packed data. You can skip it.*
 
-You can work with "horizontal" data from buffers and pointers by
-obtaining or setting to specific items. However, you can also
-work with "vertical" data by being able to obtain sub-buffers
-or sub-pointers for their fields.
+You can move around date from buffers without copying them by retrieving
+pointers to buffer elements.To ensure safety, normal code only lets
+pointers explitly reference buffer data. Unsafe code
+is either inlined C, or has *unsafe* in its import path or name.
 
-The method to do so is by using the `buf@field` or `ptr@field` notation, 
+All pointers are associated with types. That is not part of the
+pointer's type so that the few but really important unsafe parts
+can run wild. However, what is worth mentioning is that, given
+a pointer or buffer, it is possible to retrieve a respective
+pointer or type to a substructure within its data type. For example,
+say that you have a pointer `p` to a `(float x,float y)` structure. 
+You can get a pointer to its `x` field with the dot notation per `p.x`.
+
+In general, use the `buf.field` or `ptr.field` notation, 
 where the field refers to a known field of the attached structure. This
 operator helps write very safe yet fast and memory-efficient code by
 obtaining necessary offsets within allocated memory. Below is
@@ -1245,8 +1260,8 @@ def main()
     CLI = console()
     points = Point3D[].alloc 10
     points[0] = Point3D(1.0,2.0,3.0)
-    plane = points@plane # can move this around
-    print plane@x[0]
+    plane = points.plane # can move this around as if it were a buffer
+    print plane.x[0]
     print points[0].plane.x # equivalent data path
 ```
 
@@ -1740,9 +1755,9 @@ import "std/core.s"
 def main()
     CLI = console()
     li = ref list mut float[]
-    (push li) << 0.1
-    (push li) << 0.1
-    (push li) << 0.1
+    (push li) = 0.1
+    (push li) = 0.1
+    (push li) = 0.1
 
     li[1] = 0.2
     print li[0]
@@ -2195,6 +2210,56 @@ def main()
     print a*b
 ```
 
+## matrices and graphs
+
+We are not yet done with the science stuff. And, yes, there is more to matrices,
+namely sparse matrices.
+
+Sparse matrices are used when there are a lot of zeroes, For example, if we 
+consider a graph (a collection of vertices linked through edges - like a social network
+where the vertices are the users and the edges their friendships), it can be
+analyzed by organizing its edges into a square adjacency matrix. In the simplest case,
+the matrix's elements would be `1.0` at position `(row,col)` if the edge between
+`row` and `col` exists, and zero otherwise. Edges can also be weighed.
+
+Sparse matrices in smoλ are usually stored in `coo` format that is speedy for linear algebra
+and graph algorithms. This format is stored on buffers of the tuple 
+`def sparse_element(nat row, nat col, float value)`. Sparse matrices do implement multiplication
+with dense matrices, as well as with vectors from bot the left and the right side. Similar
+to dense matrices.
+
+There are a number of operations available for the analysis of graphs stored onto sparse
+matrices. These include graph filters that allow the "diffusion" of vertex weights through
+the graph structure. An example is presented next, where `ppr` (standing for personalized PageRank - the
+algorithm Google introduced for analyzing web hyperlinks) is the most well-known filter. `0.9`
+is a diffusion parameter in the range *[0.0,1.0]* that determines how far away the initial vertex
+values on `p0` should be diffused.
+
+In the example below, notice use of the `matrix` union, which automatically applies whatever matrix
+type suites the provided data. This makes code more portable if you want to switch things up in
+the future.
+
+```python
+import "std/core.s"
+import "std/sci.s"
+
+def main()
+    CLI = console()
+    m = compt new().graph:normalize matrix [
+        (1,1, 1.0),
+        (2,2, 2.0),
+        (1,2, 1.0)
+    ].any(3,3)
+    FLOATS = new()
+    p0 = vec [1.0,2.0,3.0]
+    result = graph:ppr(0.9).graph:filter(m, p0)
+    print nn "iterations: "
+    print result.iter
+    print result.p
+```
+
+*Info: more graph algorithms and details will be provided in the future, likely as a separate tutorial.*
+
 ## graphics
 
 Graphics for games of desktop applications are supported
@@ -2231,7 +2296,7 @@ def process(mut Circle ptr _self, float dt)
     if self.cy + self.radius > 600.0
         self.cy = 600.0 - self.radius
         self.vy = 0.0-(sci:abs self.vy)
-    _self << self
+    _self = self
 
 def draw(Circle self, edit graphics:Window win)
     white  = graphics:Color(255, 255, 255)
@@ -2250,7 +2315,7 @@ def main()
     circles = Circle[].alloc N
     for create_circle&& in circles
         i = float compiler:for_counter() # builtin way of enumerating
-        create_circle << Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
+        create_circle = Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
 
     while graphics:is_open win
         dt = graphics:dt()

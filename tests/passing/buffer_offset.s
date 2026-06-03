@@ -22,7 +22,7 @@ def main()
     points = (mut Point3D[]).alloc 10
     points[0] = Point3D(1.0,2.0,3.0)
     points[1] = Point3D(1.0,2.0,3.0)
-    plane = points@plane
+    plane = points.plane
     #points.resize 20 # would invalidate plane
     sums = sum plane
     print sums.x

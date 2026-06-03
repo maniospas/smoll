@@ -83,8 +83,8 @@ def normalize(effect edit vec_allocator FLOATS, edit coo m)
     doc "Symmetrically normalizes matrix edge weights by dividing with the geometric"
     doc "mean of its degrees."
     degrees = sum(m row).pow 0.5
-    for entry&& in m
-        row = entry...row
-        col = entry...col
-        entry << (row, col, entry...value/degrees[row]*degrees[col])
+    for entry_ptr&& in m
+        entry = entry_ptr..
+        denom = degrees[entry.row]*degrees[entry.col]
+        entry_ptr.value = entry.value/denom
     return m

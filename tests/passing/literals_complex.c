@@ -4,8 +4,8 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
+const char* const __t2091t="one";
 const char* const __t382t="\n";
-const char* const __t2087t="one";
 static const char* __t_all_errcodes[37] = {"noerr",
 "error",
 "null pointer",
@@ -57,50 +57,50 @@ static inline __attribute__((always_inline)) void print__t380t(const char* value
   printf("%s%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void which__t2085t() {
-  print__t380t(__t2087t);
+static inline __attribute__((always_inline)) void which__t2089t() {
+  print__t380t(__t2091t);
 }
 
-static inline __attribute__((always_inline)) void false__t10t(int* __t2107t) {
+static inline __attribute__((always_inline)) void false__t10t(int* __t2111t) {
   int value=0;
-  *__t2107t=value;
+  *__t2111t=value;
 }
 
-static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t2108t) {
+static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t2112t) {
   int __t38t__=0;
   false__t10t(&__t38t__);
   goto __t_return;
   __t_return:
-  *__t2108t=__t38t__;
+  *__t2112t=__t38t__;
 }
 
-static inline __attribute__((always_inline)) void is_different__t95t(uint64_t x, uint64_t y, int* __t2109t) {
+static inline __attribute__((always_inline)) void is_different__t95t(uint64_t x, uint64_t y, int* __t2113t) {
   int __t96t=0;
   int __t97t__=0;
   not__t37t(__t96t,&__t97t__);
   goto __t_return;
   __t_return:
-  *__t2109t=__t97t__;
+  *__t2113t=__t97t__;
 }
 
-static inline __attribute__((always_inline)) void add__t175t(uint64_t x, uint64_t y, uint64_t* __t2110t) {
+static inline __attribute__((always_inline)) void add__t175t(uint64_t x, uint64_t y, uint64_t* __t2114t) {
   int __t176t__=0;
   uint64_t z=0;
   is_different__t95t(x,y,&__t176t__);
   z=x+y;
   goto __t_return;
   __t_return:
-  *__t2110t=z;
+  *__t2114t=z;
 }
 
-static inline __attribute__((always_inline)) void inc__t2072t(uint64_t x, uint64_t* __t2111t) {
-  uint64_t __t2073t=0;
-  uint64_t __t2074t__=0;
-  __t2073t=1;
-  add__t175t(x,__t2073t,&__t2074t__);
+static inline __attribute__((always_inline)) void inc__t2076t(uint64_t x, uint64_t* __t2115t) {
+  uint64_t __t2077t=0;
+  uint64_t __t2078t__=0;
+  __t2077t=1;
+  add__t175t(x,__t2077t,&__t2078t__);
   goto __t_return;
   __t_return:
-  *__t2111t=__t2074t__;
+  *__t2115t=__t2078t__;
 }
 
 static inline __attribute__((always_inline)) void print__t393t(uint64_t value) {
@@ -110,44 +110,44 @@ static inline __attribute__((always_inline)) void print__t393t(uint64_t value) {
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void inc__t2075t(uint64_t x, uint64_t* __t2112t) {
-  uint64_t __t2076t=0;
-  uint64_t __t2077t__=0;
-  __t2076t=1;
-  add__t175t(x,__t2076t,&__t2077t__);
+static inline __attribute__((always_inline)) void inc__t2079t(uint64_t x, uint64_t* __t2116t) {
+  uint64_t __t2080t=0;
+  uint64_t __t2081t__=0;
+  __t2080t=1;
+  add__t175t(x,__t2080t,&__t2081t__);
   goto __t_return;
   __t_return:
-  *__t2112t=__t2077t__;
+  *__t2116t=__t2081t__;
 }
 
-static inline __attribute__((always_inline)) void inc__t2078t(uint64_t x, uint64_t* __t2113t) {
-  uint64_t __t2079t=0;
-  uint64_t __t2080t__=0;
-  __t2079t=2;
-  add__t175t(x,__t2079t,&__t2080t__);
+static inline __attribute__((always_inline)) void inc__t2082t(uint64_t x, uint64_t* __t2117t) {
+  uint64_t __t2083t=0;
+  uint64_t __t2084t__=0;
+  __t2083t=2;
+  add__t175t(x,__t2083t,&__t2084t__);
   goto __t_return;
   __t_return:
-  *__t2113t=__t2080t__;
+  *__t2117t=__t2084t__;
 }
 
-static inline __attribute__((always_inline)) void main__t2093t() {
-  uint64_t __t2097t=0;
-  uint64_t __t2098t__=0;
-  uint64_t __t2100t=0;
-  uint64_t __t2101t__=0;
-  uint64_t __t2103t=0;
+static inline __attribute__((always_inline)) void main__t2097t() {
+  uint64_t __t2101t=0;
+  uint64_t __t2102t__=0;
+  uint64_t __t2104t=0;
   uint64_t __t2105t__=0;
+  uint64_t __t2107t=0;
+  uint64_t __t2109t__=0;
   console__t366t();
-  which__t2085t();
-  __t2097t=0;
-  inc__t2072t(__t2097t,&__t2098t__);
-  print__t393t(__t2098t__);
-  __t2100t=0;
-  inc__t2075t(__t2100t,&__t2101t__);
-  print__t393t(__t2101t__);
-  __t2103t=0;
-  inc__t2078t(__t2103t,&__t2105t__);
+  which__t2089t();
+  __t2101t=0;
+  inc__t2076t(__t2101t,&__t2102t__);
+  print__t393t(__t2102t__);
+  __t2104t=0;
+  inc__t2079t(__t2104t,&__t2105t__);
   print__t393t(__t2105t__);
+  __t2107t=0;
+  inc__t2082t(__t2107t,&__t2109t__);
+  print__t393t(__t2109t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t2093t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t2097t();return 0;}

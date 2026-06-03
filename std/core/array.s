@@ -44,7 +44,7 @@ def alloc(edit any[] buffer, nat|blank size, "dirty"|blank clear_policy)
     bytes = buffer.unsafe_align.nat()*size
     if bytes==0 fail "cannot allocate a buffer of unsized type"
     buffer.unsafe_size = size
-    buffer.unsafe_ptr = unsafe_mut unsafe:alloc(bytes)&
+    buffer.unsafe_ptr = unsafe_mut unsafe:alloc(bytes)&&
     if clear_policy is blank
         buffer.unsafe_ptr.unsafe:zero(0, bytes)
     return buffer
@@ -65,7 +65,7 @@ def resize(edit any[] buffer, nat size)
     prev_bytes = buffer.unsafe_size*buffer.unsafe_align.nat()
     buffer.unsafe_size = size
     bytes = buffer.unsafe_align.nat()*size
-    buffer.unsafe_ptr = unsafe_mut buffer.unsafe_ptr.unsafe:realloc(bytes)&#.compiler:attach_type(_buffer__unsafe_ptr)
+    buffer.unsafe_ptr = unsafe_mut buffer.unsafe_ptr.unsafe:realloc(bytes)&&#.compiler:attach_type(_buffer__unsafe_ptr)
     if prev_bytes<bytes
         buffer.unsafe_ptr.unsafe:zero(prev_bytes, bytes)
     return buffer

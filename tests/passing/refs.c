@@ -47,36 +47,36 @@ static inline __attribute__((always_inline)) void console__t366t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void false__t10t(int* __t1558t) {
+static inline __attribute__((always_inline)) void false__t10t(int* __t1562t) {
   int value=0;
-  *__t1558t=value;
+  *__t1562t=value;
 }
 
-static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t1559t) {
+static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t1563t) {
   int __t38t__=0;
   false__t10t(&__t38t__);
   goto __t_return;
   __t_return:
-  *__t1559t=__t38t__;
+  *__t1563t=__t38t__;
 }
 
-static inline __attribute__((always_inline)) void is_different__t95t(uint64_t x, uint64_t y, int* __t1560t) {
+static inline __attribute__((always_inline)) void is_different__t95t(uint64_t x, uint64_t y, int* __t1564t) {
   int __t96t=0;
   int __t97t__=0;
   not__t37t(__t96t,&__t97t__);
   goto __t_return;
   __t_return:
-  *__t1560t=__t97t__;
+  *__t1564t=__t97t__;
 }
 
-static inline __attribute__((always_inline)) void add__t175t(uint64_t x, uint64_t y, uint64_t* __t1561t) {
+static inline __attribute__((always_inline)) void add__t175t(uint64_t x, uint64_t y, uint64_t* __t1565t) {
   int __t176t__=0;
   uint64_t z=0;
   is_different__t95t(x,y,&__t176t__);
   z=x+y;
   goto __t_return;
   __t_return:
-  *__t1561t=z;
+  *__t1565t=z;
 }
 
 static inline __attribute__((always_inline)) void print__t393t(uint64_t value) {
@@ -86,22 +86,22 @@ static inline __attribute__((always_inline)) void print__t393t(uint64_t value) {
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__t1551t() {
-  uint64_t __t1553t=0;
-  uint64_t __t1554t=0;
+static inline __attribute__((always_inline)) void main__t1555t() {
+  uint64_t __t1557t=0;
+  uint64_t __t1558t=0;
   uint64_t x=0;
   uint64_t y=0;
   uint64_t z=0;
-  uint64_t __t1555t=0;
-  uint64_t __t1556t__=0;
+  uint64_t __t1559t=0;
+  uint64_t __t1560t__=0;
   console__t366t();
-  __t1553t=1;
-  __t1554t=__t1553t;
-  x=__t1554t;
-  __t1555t=2;
-  x=__t1555t;
-  add__t175t(x,x,&__t1556t__);
-  print__t393t(__t1556t__);
+  __t1557t=1;
+  __t1558t=__t1557t;
+  x=__t1558t;
+  __t1559t=2;
+  x=__t1559t;
+  add__t175t(x,x,&__t1560t__);
+  print__t393t(__t1560t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1551t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1555t();return 0;}

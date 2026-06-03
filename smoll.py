@@ -3052,7 +3052,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         temp_type.rets.append(new_name)
                         temp_type.vars[new_name] = associated_type.vars[associated_type.rets[j]].renamed_copy(new_name)
                     new_var = Variable(create_temp(), POINTER_TYPE, immutable=rets[0].immutable, isprivate=rets[0].isprivate, token=op_token)
-                    impl.vars[var.name] = new_var
+                    impl.vars[new_var.name] = new_var
                     impl.set_pointer_type(new_var, temp_type)
                     if is_lsp and field_token.file.is_main_file: print_lsp_var(field_token, signature_like([new_var], impl))
 
@@ -3744,9 +3744,12 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
 
         skip_next_pointer_interior_assignment = False
-        if len(ret)==1 and ret[0].type==POINTER_TYPE and peek_text(tokens, pos)=="&":
-            pos += 1
-            skip_next_pointer_interior_assignment = True
+        if len(ret)==1 and ret[0].type==POINTER_TYPE:
+            if peek_text(tokens, pos)=="&" and peek_text(tokens, pos+1)=="&":
+                pos += 2
+                skip_next_pointer_interior_assignment = True
+            elif peek_text(tokens, pos-1)=="&" and peek_text(tokens, pos-2)=="&":
+                skip_next_pointer_interior_assignment = True
         if var and var.type==POINTER_TYPE and not skip_next_pointer_interior_assignment:
             rets = [var]
             err_token = var_token

@@ -108,7 +108,7 @@ def str(cstr c)
     doc "Subsequent comparisons no longer use the underlying pointer value."
     buf = mut char[]  # mut to create, convert to const on return to prevent resizing
     {buf__unsafe_ptr = c;}
-    buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler:attach_type(c)&
+    buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler:attach_type(c)&&
     {if(c){builtins:nat length = strlen(c);}} # length initializes to zero
     buf.unsafe_size = length+1  # account for null termination
     return str(buf,0 lento length)

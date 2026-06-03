@@ -82,10 +82,19 @@ function remapTokenPaths(tokens: CompilerToken[], tmpPath: string, realPath: str
 function parseCompilerOutput(stdout: string): CompilerToken[] {
   const tokens: CompilerToken[] = [];
   const seenErrorPos = new Set<string>();
+  const defDictionary = new Map<number, string>();
   const chunks = stdout.split(/^---\r?\n/m).filter(c => c.trim() !== '');
   log(`parser: got ${chunks.length} chunks from ${stdout.length} bytes of output`);
   for(const chunk of chunks) {
-    const lines = chunk.split(/\r?\n/);
+    const rawLines = chunk.split(/\r?\n/);
+    const lines: string[] = [];
+    for (let rawLine of rawLines) {
+      const defMatch = rawLine.match(/^def:\s*(\d+),\s*(.*)$/);
+      if (defMatch) { defDictionary.set(parseInt(defMatch[1], 10), defMatch[2]); continue; }
+      const refMatch = rawLine.match(/^:(\d+)\s*$/);
+      if (refMatch) { rawLine = defDictionary.get(parseInt(refMatch[1], 10)) ?? rawLine; }
+      lines.push(...rawLine.split('\t'));
+    }
     if(lines.length<8) continue;
     const tokenType = lines[0].trim() as TokenType;
     const file      = lines[1].trim();

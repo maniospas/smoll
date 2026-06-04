@@ -5,7 +5,7 @@
 int __t_argc;
 char** __t_argv;
 const char* const __t382t="\n";
-const char* const __t1614t="123";
+const char* const __t1846t="123";
 static const char* __t_all_errcodes[35] = {"noerr",
 "error",
 "null pointer",
@@ -48,12 +48,12 @@ static inline __attribute__((always_inline)) void console__t366t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void eq__t931t(const char* x, const char* y, char* __t1617t) {
+static inline __attribute__((always_inline)) void eq__t931t(const char* x, const char* y, char* __t1849t) {
   char z=0;
   z=(x==y);
   goto __t_return;
   __t_return:
-  *__t1617t=z;
+  *__t1849t=z;
 }
 
 static inline __attribute__((always_inline)) void print__t397t(char value) {
@@ -68,11 +68,11 @@ static inline __attribute__((always_inline)) void print__t397t(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__t1612t() {
-  char __t1615t__=0;
+static inline __attribute__((always_inline)) void main__t1844t() {
+  char __t1847t__=0;
   console__t366t();
-  eq__t931t(__t1614t,__t1614t,&__t1615t__);
-  print__t397t(__t1615t__);
+  eq__t931t(__t1846t,__t1846t,&__t1847t__);
+  print__t397t(__t1847t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1612t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1844t();return 0;}

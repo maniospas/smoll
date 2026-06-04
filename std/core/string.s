@@ -302,9 +302,11 @@ def nn(str value)
     doc "to print without a new line."
     return (value, "")
 
-def char_allocator(effect edit char_arena CHARS, str|cstr s1, str|cstr s2)
-    start = CHARS.pos
-    copy(CHARS, s1)
-    copy(CHARS, s2)
-    endpos = CHARS.pos+0 # this is pretty important to decouple a pressumed equality in position when referencing
-    return str(CHARS.buf, start to endpos)
+def add(effect edit char_allocator CHARS, str|cstr _s1, str|cstr _s2)
+    s1 = str _s1
+    s2 = str _s2
+    surface = arena unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
+    start = surface.pos+0
+    copy(surface, s1)
+    copy(surface, s2)
+    return str(status surface from start)

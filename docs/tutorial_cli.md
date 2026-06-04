@@ -120,7 +120,7 @@ But enough talking. Here is some code.
 ```python
 import "std/core.s"
 
-def greet(str name)
+def greet(effect edit console CLI, str name)
     print nn "hello "
     print nn name
     print "!"
@@ -267,7 +267,7 @@ def main()
 ```
 
 Or, just rewrite the whole thing as a helper function that
-concatenates a string list. There exists an extract cost for such a generalization; 
+concatenates a string list. There exists an extra cost for such a generalization; 
 allocating the list of strings. Evaluate your practical needs accordingly. For example,
 you may prefer to just ... print the strings instead of concatenating them beforehand.
 
@@ -296,12 +296,12 @@ def main()
     ]
 ```
 
-## literals
+## zero-cost type checking
 
 Above we saw the convenient syntax `str(status CHARS from 0)`, so now is a
 good time to mention some stuff about *smoλ*'s type system - you will see why 
 momentarily. The whole system is deep, but on a day-to-day use the most
-important features are m unions, type checking at compile time, and
+important features are unions, type checking at compile time, and
 literal types. The mystery `from` that comes out of nowhere is a string
 literally treated as a keyword, but to understand and fully appreciate this statement 
 we need to understand the rest.
@@ -369,7 +369,7 @@ def main()
 ```
 
 What actually needs mentioning is you can change
-how a function behaves depending on its inpus using
+how a function behaves depending on its inputs using
 the `is` operator to make a check. This check is 
 resolved during compilation, meaning that it does
 not affect runtime performance whatsoever.
@@ -411,6 +411,8 @@ def main()
     print inc (1.0, 4.0) # prints 5.0
 ```
 
+## literals
+
 You can name type unions by writing with this mixture of assignment 
 and function definition syntax: `def Num = nat|float`. And the same
 syntax can be used to defined what was mentioned previously: literal
@@ -430,14 +432,16 @@ def main()
 Easy? 
 
 Ok, the language goes to great pains to be intuitive, so this looks like a constant
-declaration. But `def name = ...` is actually used to declare *unions*. ONLY. So where's the type?
+declaration. But `def name ...` is actually used to declare *types*. ONLY. So where's the type?
 
-Each string literal is a type onto itself when treated as part of a union.
+Each string literal is a type onto itself during any sort of type parsing.
 There is just the convention that, when used
-within code, it is automatically lowered to its equivalent `cstr` representation. But
-you can do something like the following. See how the string literal is the type of the
-argument. Furthermore, `type "hello"` can be used to reference a string literal type 
-within code.
+within code, literal types are automatically lowered to their equivalent `cstr` representations. 
+But you can do something like the following, where a string literal is the *type* of the
+argument. Then, `type "hello"` can be used to reference a string literal type 
+within code and therefore calls the appropriate function. It is important, so it
+is worth stressing: *only the same literal types are matched* when resolving
+polymorphic functions.
 
 ```python
 import "std/core.s"
@@ -472,10 +476,11 @@ def main()
     print message type "bye"
 ```
 
-Variaables associated with literal types can only be matched to literals
+Variables associated with literal types can only be matched to literals
 of the same type. But use the `compiler:literal` function to retrieve the
 actual value from the compiler. Remember that this is all done during compilation 
-with no runtime overhead. Oh, and you can also type-check with `is` normally!
+with no runtime overhead. Oh, and you can also type-check with `is` normally! The 
+same mechanism as above grants us zero-cost literal comparison.
 
 ```python
 import "std/core.s"
@@ -483,7 +488,7 @@ import "std/core.s"
 def greet(effect edit console CLI, "hello"|"hi" greeting)
     print nn compiler:literal greeting
     if greeting is "hello" # 'is' starts type parsing
-        print " world"
+        print nn " world"
     print "!"
 
 def main()
@@ -527,3 +532,26 @@ the expression we investigating first unpacks the arena back to a buffer
 and position pair with `status CHARS`, passes those as the first two
 arguments, and then uses `"from"` as a type literal to select the
 appropriate string creation function.
+
+As a final remark, literal-backed keywords can be the last tuple 
+element. But not the first because there is no way to tell if a 
+comma was meant to be used there. But you can leverage the blank
+type, for example constructed via `blank()` or `()`, to match literals.
+Due to the way literal keywords occur, you can only find them
+within parentheses. Use the same trick to separate consecutive literals
+(though binary operators take precedence in being resolved).
+
+```python
+import "std/core.s"
+
+def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
+    print nn compiler:literal greeting
+    if punctuation is blank
+        print ""
+    else
+        print compiler:literal punctuation
+
+def main()
+    CLI = console()
+    greet (hi !) # prints hi!
+```

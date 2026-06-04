@@ -5,9 +5,10 @@ def strstrmap(nat size)
     return strmap alloc(mut str[], size)
 
 def test(effect mut console CLI, edit char_arena buf)
-    map = ref mut strmap str[].alloc 128
+    map = strmap str[].alloc 128
     map["hello"] = buf.copy str "hello world!"
     map["manio"] = buf.copy str "it's a me, manio."
+    
     it = (map.keys, mut 0)
     while try key=next it
         print key

@@ -1,9 +1,24 @@
 import "std/core.s"
-import "std/io.s"
+import "std/map.s"
+
+def strstr()
+    return strmap str[]
+
+def create_map()
+    CHARS = arena char[].alloc KB 4
+    map = strmap str[].alloc 128
+    map["hello"] = copy "hello world!"
+    map["manio"] = copy "it's a me, manio."
+    return (map, CHARS)
+
+def test2(strstr s)
+    return s
+
+def test()
+    return test2 create_map().map
 
 def main()
     CLI = console()
-    print process:os_name()
-    for arg in process:args()
-        if arg=="--hello" print "hello world!"
-    print "ended"
+    map = test()
+    print map["hello"]
+    print map["manio"]

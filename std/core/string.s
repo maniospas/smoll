@@ -134,7 +134,7 @@ def copy(effect edit char_allocator CHARS, str|cstr _other)
     other = str _other
     surface = alloc(CHARS, len other)
     {memcpy(surface__buf__unsafe_ptr+surface__pos+surface__buf__unsafe_offset, other__unsafe_ptr+other__dat__pos, other__dat__length);}
-    return str(surface.buf, 0, other.dat.length, other.dat.first)
+    return str(surface.buf, surface.pos, other.dat.length, other.dat.first)
 
 def copy_null_terminated(effect new CHARS, str other)
     doc "create null terminated string"

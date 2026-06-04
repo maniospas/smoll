@@ -40,7 +40,7 @@ def main()
 ```
 
 Automatically passing arguments can be done for your own functions too, as in
-the net snippet with the `greet` function. To unpack what its one argument means, it first
+the next snippet with the `greet` function. To unpack what its one argument means, it first
 declares an effect, meaning that it automatically gathers a variable called `CLI`
 from its calling scope based on its name. It can be called by also manually passing a first
 console variable.
@@ -88,7 +88,7 @@ If you run the above program and provide something that is not a number as input
 it will just terminate. This is NOT a crash, but an error that can be intercepted
 and handled. Preface error-prone expressions with a `try` keyword. This actually
 evaluates to true/false depending on whether execution was successful or an error
-occurred. Use it like below. 
+occurred. Use it like below.
 
 At the very end of our function, the `debug:nocatch()`
 function is called to ensure that we have enclosed all potential errors in a `try`
@@ -100,10 +100,14 @@ for debugging and more dynamic programs.
 ```python
 import "std/core.s"
 
+def read_number(effect mut console CLI, cstr message)
+    print nn message
+    return float CLI # floats not intercepted by try just cascede to caller
+
 def main()
     CLI = console()
     print nn "give a number: "
-    if try x = float CLI
+    if try x = read_number CLI
         print nn "its square is: "
         print x*x
     else
@@ -179,7 +183,7 @@ in general.
 A character buffer by itself is not enough to serve as an allocator,
 because we don't know how much memory we have consumed inside it.
 Attach a tracker position by further passing the result through the
-`arena` function. That will keep using the buffer unti it's full,
+`arena` function. That will keep using the buffer until it is full,
 at which point an error will be created.
 
 ```python
@@ -546,7 +550,7 @@ def main()
 ```
 
 Armed with this knowledge, we can now learn that the standard library's core, which
-have been importing so far, also provides a string initialization
+we have been importing so far, also provides a string initialization
 in the form `def str(char[] buf, nat end, "from" nat start)`. So
 the expression we are investigating unpacks the `CHARS` arena back 
 to an untyped buffer and position pair per `status CHARS`, and passes 
@@ -558,10 +562,10 @@ be the last tuple element. But not the first because there
 is no way to tell if a comma was meant to be used there. 
 But you can leverage the blank type, for example constructed via 
 `blank()` or `()`, to create an expression that does not add
-arguments or runtime cost but which would sill require commas
+arguments or runtime cost but which would still require commas
 afterwards, hence enabling literal keyword usage. 
 
-Find en example below, where the same trick is used to
+Find an example below, where the same trick is used to
 set `()` a literal separator.
 Due to literal keywords being only comma replacements, 
 you can only find them within parentheses.
@@ -656,7 +660,7 @@ def receive(effect mut console CLI, str|cstr _message)
     if _message=="hello"
         print "they said hello!"
     else
-        print nn "indicipherable message of length"
+        print nn "indecipherable message of length"
         print len message
 
 def main()
@@ -690,9 +694,9 @@ def main()
 You can also access string slices without copying any
 memory like below. Usually, functions that deal with
 index ranges accept a starting and non-inclusive end
-positions. The `of` function can be used to more
-construct the position range using an explicit
-string literal qualifier, like below.
+positions. The `of` function can
+construct the proper position range using an explicit
+string literal qualifier to convey intent, like below.
 
 ```python
 import "std/core.s"
@@ -730,4 +734,105 @@ def main()
 
 ## maps
 
-As 
+Many string manipulation programs require some form of hashmap that
+provide O(1) access and read times for string keys. *Smoλ* implements
+such a map for string keys, as well as for natural number keys. Other
+data structures can be encoded to those formats.
+
+*Info: Future versions will also support custom hash functions, but this implementation will remain as the most efficient option that avoids inlining.*
+
+The simplest map structures are of fixed size and can be found under
+`"std/map.s"`. Creating them requires passing an allocated buffer
+to the map, that will be used to store map values. The map is hereby
+constructed on the heap with keys that match its number of values.
+Note that all values could be used with gaps between them.
+
+You can access and set map elements as if they were buffer entries.
+This is shown below. In this particular example, we also use a `CHARS`
+buffer to place strings there.
+
+```python
+import "std/core.s"
+import "std/map.s"
+
+def main()
+    CLI = console()
+    CHARS = arena char[].alloc KB 4
+    map = strmap str[].alloc 128
+    map["hello"] = copy "hello world!"
+    map["manio"] = copy "it's a me, manio."
+    print map["hello"]
+    print map["manio"]
+```
+
+Now, you might ask: how could a language even ensure that we safely
+store on a map data that are stored elsewhere (on the character buffer)
+without a ton of runtime computations, like copying the data on small runtime
+allocations? And all the while creating no use-after-free segfaults or data leaks?
+
+The answer lies in *smoλ*'s compiler analysis, which prevents us from accidentally
+moving maps around without their accompanying data. For example,
+let us say that we were creating the same map within a function and returning that.
+The compiler would immediately complain, because we also need to return the `CHARS`
+arena allocated in that function, or at least its enclosing buffer. Thus, we can
+either pass the arena as an argument or just *return* it alongside the map.
+
+Below is an example of how to do this. See the main idea? By returning the 
+character buffer alongside the map, in the `main` function, we also delay the
+automatic release of the allocated `CHARS` memory until that function ends.
+In fact, the the map forms a dependency to that memory and cannot be moved 
+to other functions without that company.
+
+```python
+import "std/core.s"
+import "std/map.s"
+
+def create_map()
+    CHARS = arena char[].alloc KB 4
+    map = strmap str[].alloc 128
+    map["hello"] = copy "hello world!"
+    map["manio"] = copy "it's a me, manio."
+    return (map, CHARS)
+
+def main()
+    CLI = console()
+    map = create_map().map
+    print map["hello"]
+    print map["manio"]
+```
+
+Last but not least, you might want to annotate the explicit
+type of a string map with string values. You can do it by
+creating a never-called dummy function that constructs an empty 
+map, like below.
+
+```python
+import "std/core.s"
+import "std/map.s"
+
+def create_map()
+    CHARS = arena char[].alloc KB 4
+    map = strmap str[].alloc 128
+    map["hello"] = copy "hello world!"
+    map["manio"] = copy "it's a me, manio."
+    return (map, CHARS)
+
+def strstrmap()
+    return strmap str[]
+
+def print(effect mut console CLI, strstrmap map)
+    # do not forget the CLI effect for printing
+    print map["hello"]
+    print map["manio"]
+    if not try map["other"]
+        print "'other' not found"
+        print "actual keys (empty string is always the first key and skipped):"
+        for key in map.keys:
+            if 0==len key continue
+            print key
+
+def main()
+    CLI = console()
+    map = create_map().map
+    print map
+```

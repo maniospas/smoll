@@ -271,7 +271,7 @@ must start at a fixed number of tabs inwards for visual alignment.</p>
 </div>
 
 <p>Automatically passing arguments can be done for your own functions too, as in
-the net snippet with the <code>greet</code> function. To unpack what its one argument means, it first
+the next snippet with the <code>greet</code> function. To unpack what its one argument means, it first
 declares an effect, meaning that it automatically gathers a variable called <code>CLI</code>
 from its calling scope based on its name. It can be called by also manually passing a first
 console variable.
@@ -321,7 +321,7 @@ from the console is not an automatic effect, to avoid doing so accidentally.</p>
 it will just terminate. This is NOT a crash, but an error that can be intercepted
 and handled. Preface error-prone expressions with a <code>try</code> keyword. This actually
 evaluates to true/false depending on whether execution was successful or an error
-occurred. Use it like below. </p>
+occurred. Use it like below.</p>
 
 <p>At the very end of our function, the <code>debug:nocatch()</code>
 function is called to ensure that we have enclosed all potential errors in a <code>try</code>
@@ -333,10 +333,14 @@ for debugging and more dynamic programs.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
+<span class="k">def</span><span class="w"> </span><span class="nf">read_number</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">message</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">message</span>
+    <span class="k">return</span> <span class="nb">float</span> <span class="n">CLI</span> <span class="c1"># floats not intercepted by try just cascede to caller</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;give a number: &quot;</span>
-    <span class="k">if</span> <span class="k">try</span> <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">CLI</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">x</span> <span class="o">=</span> <span class="n">read_number</span> <span class="n">CLI</span>
         <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;its square is: &quot;</span>
         <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
     <span class="k">else</span>
@@ -415,7 +419,7 @@ in general.</p>
 <p>A character buffer by itself is not enough to serve as an allocator,
 because we don&#8217;t know how much memory we have consumed inside it.
 Attach a tracker position by further passing the result through the
-<code>arena</code> function. That will keep using the buffer unti it&#8217;s full,
+<code>arena</code> function. That will keep using the buffer until it is full,
 at which point an error will be created.</p>
 
 <div class="codehilite">
@@ -791,7 +795,7 @@ as an argument. Here is a simple example.</p>
 </div>
 
 <p>Armed with this knowledge, we can now learn that the standard library&#8217;s core, which
-have been importing so far, also provides a string initialization
+we have been importing so far, also provides a string initialization
 in the form <code>def str(char[] buf, nat end, "from" nat start)</code>. So
 the expression we are investigating unpacks the <code>CHARS</code> arena back 
 to an untyped buffer and position pair per <code>status CHARS</code>, and passes 
@@ -803,10 +807,10 @@ be the last tuple element. But not the first because there
 is no way to tell if a comma was meant to be used there. 
 But you can leverage the blank type, for example constructed via 
 <code>blank()</code> or <code>()</code>, to create an expression that does not add
-arguments or runtime cost but which would sill require commas
+arguments or runtime cost but which would still require commas
 afterwards, hence enabling literal keyword usage. </p>
 
-<p>Find en example below, where the same trick is used to
+<p>Find an example below, where the same trick is used to
 set <code>()</code> a literal separator.
 Due to literal keywords being only comma replacements, 
 you can only find them within parentheses.</p>
@@ -904,7 +908,7 @@ for <code>cstr</code> and repeating it can be a hidden expense.</p>
     <span class="k">if</span> <span class="n">_message</span><span class="o">==</span><span class="s2">&quot;hello&quot;</span>
         <span class="nb">print</span> <span class="s2">&quot;they said hello!&quot;</span>
     <span class="k">else</span>
-        <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;indicipherable message of length&quot;</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;indecipherable message of length&quot;</span>
         <span class="nb">print</span> <span class="nb">len</span> <span class="n">message</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -940,9 +944,9 @@ will be created.</p>
 <p>You can also access string slices without copying any
 memory like below. Usually, functions that deal with
 index ranges accept a starting and non-inclusive end
-positions. The <code>of</code> function can be used to more
-construct the position range using an explicit
-string literal qualifier, like below.</p>
+positions. The <code>of</code> function can
+construct the proper position range using an explicit
+string literal qualifier to convey intent, like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -981,7 +985,111 @@ Below is an example.</p>
 
 <h2 id="maps">maps</h2>
 
-<p>As </p>
+<p>Many string manipulation programs require some form of hashmap that
+provide O(1) access and read times for string keys. <em>Smoλ</em> implements
+such a map for string keys, as well as for natural number keys. Other
+data structures can be encoded to those formats.</p>
+
+<div class="notice-box box-info"><strong>Info:</strong> Future versions will also support custom hash functions, but this implementation will remain as the most efficient option that avoids inlining.</div>
+
+<p>The simplest map structures are of fixed size and can be found under
+<code>"std/map.s"</code>. Creating them requires passing an allocated buffer
+to the map, that will be used to store map values. The map is hereby
+constructed on the heap with keys that match its number of values.
+Note that all values could be used with gaps between them.</p>
+
+<p>You can access and set map elements as if they were buffer entries.
+This is shown below. In this particular example, we also use a <code>CHARS</code>
+buffer to place strings there.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
+    <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<p>Now, you might ask: how could a language even ensure that we safely
+store on a map data that are stored elsewhere (on the character buffer)
+without a ton of runtime computations, like copying the data on small runtime
+allocations? And all the while creating no use-after-free segfaults or data leaks?</p>
+
+<p>The answer lies in <em>smoλ</em>&#8217;s compiler analysis, which prevents us from accidentally
+moving maps around without their accompanying data. For example,
+let us say that we were creating the same map within a function and returning that.
+The compiler would immediately complain, because we also need to return the <code>CHARS</code>
+arena allocated in that function, or at least its enclosing buffer. Thus, we can
+either pass the arena as an argument or just <em>return</em> it alongside the map.</p>
+
+<p>Below is an example of how to do this. See the main idea? By returning the 
+character buffer alongside the map, in the <code>main</code> function, we also delay the
+automatic release of the allocated <code>CHARS</code> memory until that function ends.
+In fact, the the map forms a dependency to that memory and cannot be moved 
+to other functions without that company.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_map</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">map</span><span class="p">,</span> <span class="n">CHARS</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">create_map</span><span class="p">()</span><span class="o">.</span><span class="n">map</span>
+    <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<p>Last but not least, you might want to annotate the explicit
+type of a string map with string values. You can do it by
+creating a never-called dummy function that constructs an empty 
+map, like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_map</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">map</span><span class="p">,</span> <span class="n">CHARS</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">strstrmap</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">strstrmap</span> <span class="nb">map</span><span class="p">)</span>
+    <span class="c1"># do not forget the CLI effect for printing</span>
+    <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="k">try</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]</span>
+        <span class="nb">print</span> <span class="s2">&quot;&#39;other&#39; not found&quot;</span>
+        <span class="nb">print</span> <span class="s2">&quot;actual keys (empty string is always the first key and skipped):&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">map</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="mi">0</span><span class="o">==</span><span class="nb">len</span> <span class="n">key</span> <span class="k">continue</span>
+            <span class="nb">print</span> <span class="n">key</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">create_map</span><span class="p">()</span><span class="o">.</span><span class="n">map</span>
+    <span class="nb">print</span> <span class="nb">map</span>
+</code></pre>
+</div>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {

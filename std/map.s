@@ -20,7 +20,7 @@ def get(hash:robinhood_str_entry[] keys, any[] values, cstr|str key)
     doc "Implemented for string or cstr keys but buffer of any values."
     unsafe_return values[keys.hash:find hash:raw key]&
 
-def mutget(edit hash:robinhood_str_entry[] keys, mut any[] values, cstr|str key)
+def mutget(edit hash:robinhood_str_entry[] keys, edit any[] values, cstr|str key)
     doc "get a mutable hash map entry"
     doc "Implemented for string or cstr keys but buffer of any values."
     return values[keys.hash:at str key]&&
@@ -30,7 +30,7 @@ def get(hash:robinhood_nat_entry[] keys, any[] values, nat key)
     doc "Implemented for string or cstr keys but buffer of any values."
     return values[keys.hash:find key]&
 
-def mutget(edit hash:robinhood_nat_entry[] keys, mut any[] values, nat key)
+def mutget(edit hash:robinhood_nat_entry[] keys, edit any[] values, nat key)
     doc "get a mutable hash map entry"
     doc "Implemented for string or cstr keys but buffer of any values."
     return values[keys.hash:at key]&&

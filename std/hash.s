@@ -52,6 +52,7 @@ def is_zero(nat k)
     return 0==k
 
 def find(robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
+    doc "find an item in a robinhood_entry list"
     k = raw _k
     if is_zero k
         return 0
@@ -71,6 +72,7 @@ def find(robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
     fail "index not found"
 
 def at(edit robinhood_entry[] data, cstr|str|nat _k)
+    doc "find or add an item in a robinhood_entry list"
     k = unsafe_mut raw _k
     if is_zero k
         return 0

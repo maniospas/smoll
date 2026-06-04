@@ -231,6 +231,19 @@
         </nav>
     <h1 id="command-line-apps">Command line apps</h1>
 
+<div class="toc">
+
+<p><strong>Command line apps</strong><br>
+<a href="#print">print</a> <br>
+<a href="#input-and-error-check">input and error check</a> <br>
+<a href="#character-buffers">character buffers</a> <br>
+<a href="#zero-cost-type-checking">zero-cost type checking</a> <br>
+<a href="#literals">literals</a> <br>
+<a href="#string-manipulation">string manipulation</a> <br>
+<a href="#memory-dependencies">memory dependencies</a> <br></p>
+
+</div>
+
 <h2 id="print">print</h2>
 
 <p>The main functionality needed to build a command line app is reading arguments 
@@ -257,9 +270,10 @@ automatically passed to console reading and printing functions. </p>
 the net snippet. To unpack what the <code>greet</code> function&#8217;s argument means, it first
 declares an effect, meaning that it automatically gathers a variable called <code>CLI</code>
 from its calling scope. Its caller can also manually passe such a variable.
-The rest of the argument definition requires that what is passed should have <code>edit</code>
-permission (should not be constant) because we are going to modify some internal
-state. Finally, the <code>console</code> type of the argument is declared, followed by its name.</p>
+The rest of the argument definition requires that what is passed should have <code>mut</code>
+permission (should not be constant) because we are not merely going to edit it -by printing-
+but also potentially overwrite it by destructing and recreating it.
+Finally, the <code>console</code> type of the argument is declared, followed by its name.</p>
 
 <h2 id="input-and-error-check">input and error check</h2>
 
@@ -271,7 +285,7 @@ comma-separated values.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -354,7 +368,7 @@ But enough talking. Here is some code.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="nb">str</span> <span class="n">name</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="nb">str</span> <span class="n">name</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;hello &quot;</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">name</span>
     <span class="nb">print</span> <span class="s2">&quot;!&quot;</span>
@@ -506,7 +520,7 @@ elements.</p>
 </div>
 
 <p>Or, just rewrite the whole thing as a helper function that
-concatenates a string list. There exists an extract cost for such a generalization; 
+concatenates a string list. There exists an extra cost for such a generalization; 
 allocating the list of strings. Evaluate your practical needs accordingly. For example,
 you may prefer to just &#8230; print the strings instead of concatenating them beforehand.</p>
 
@@ -536,12 +550,12 @@ you may prefer to just &#8230; print the strings instead of concatenating them b
 </code></pre>
 </div>
 
-<h2 id="literals">literals</h2>
+<h2 id="zero-cost-type-checking">zero-cost type checking</h2>
 
 <p>Above we saw the convenient syntax <code>str(status CHARS from 0)</code>, so now is a
 good time to mention some stuff about <em>smoλ</em>&#8217;s type system - you will see why 
 momentarily. The whole system is deep, but on a day-to-day use the most
-important features are m unions, type checking at compile time, and
+important features are unions, type checking at compile time, and
 literal types. The mystery <code>from</code> that comes out of nowhere is a string
 literally treated as a keyword, but to understand and fully appreciate this statement 
 we need to understand the rest.</p>
@@ -610,7 +624,7 @@ it is more of a curio than a frequently occuring pattern.</p>
 </div>
 
 <p>What actually needs mentioning is you can change
-how a function behaves depending on its inpus using
+how a function behaves depending on its inputs using
 the <code>is</code> operator to make a check. This check is 
 resolved during compilation, meaning that it does
 not affect runtime performance whatsoever.</p>
@@ -653,6 +667,8 @@ be overwritten by convention.</p>
 </code></pre>
 </div>
 
+<h2 id="literals">literals</h2>
+
 <p>You can name type unions by writing with this mixture of assignment 
 and function definition syntax: <code>def Num = nat|float</code>. And the same
 syntax can be used to defined what was mentioned previously: literal
@@ -672,14 +688,16 @@ useful. First get a glimpse of how they work.</p>
 <p>Easy? </p>
 
 <p>Ok, the language goes to great pains to be intuitive, so this looks like a constant
-declaration. But <code>def name = ...</code> is actually used to declare <em>unions</em>. ONLY. So where&#8217;s the type?</p>
+declaration. But <code>def name ...</code> is actually used to declare <em>types</em>. ONLY. So where&#8217;s the type?</p>
 
-<p>Each string literal is a type onto itself when treated as part of a union.
+<p>Each string literal is a type onto itself during any sort of type parsing.
 There is just the convention that, when used
-within code, it is automatically lowered to its equivalent <code>cstr</code> representation. But
-you can do something like the following. See how the string literal is the type of the
-argument. Furthermore, <code>type "hello"</code> can be used to reference a string literal type 
-within code.</p>
+within code, literal types are automatically lowered to their equivalent <code>cstr</code> representations. 
+But you can do something like the following, where a string literal is the <em>type</em> of the
+argument. Then, <code>type "hello"</code> can be used to reference a string literal type 
+within code and therefore calls the appropriate function. It is important, so it
+is worth stressing: <em>only the same literal types are matched</em> when resolving
+polymorphic functions.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -716,18 +734,19 @@ the above like so.</p>
 </code></pre>
 </div>
 
-<p>Variaables associated with literal types can only be matched to literals
+<p>Variables associated with literal types can only be matched to literals
 of the same type. But use the <code>compiler:literal</code> function to retrieve the
 actual value from the compiler. Remember that this is all done during compilation 
-with no runtime overhead. Oh, and you can also type-check with <code>is</code> normally!</p>
+with no runtime overhead. Oh, and you can also type-check with <code>is</code> normally! The 
+same mechanism as above grants us zero-cost literal comparison.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="o">|</span><span class="s2">&quot;hi&quot;</span> <span class="n">greeting</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="o">|</span><span class="s2">&quot;hi&quot;</span> <span class="n">greeting</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">greeting</span>
     <span class="k">if</span> <span class="n">greeting</span> <span class="ow">is</span> <span class="s2">&quot;hello&quot;</span> <span class="c1"># &#39;is&#39; starts type parsing</span>
-        <span class="nb">print</span> <span class="s2">&quot; world&quot;</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot; world&quot;</span>
     <span class="nb">print</span> <span class="s2">&quot;!&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -745,19 +764,19 @@ as an argument. Here is a simple example.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="nb">float</span> <span class="n">start</span><span class="p">,</span> <span class="s2">&quot;upto&quot;</span><span class="p">,</span> <span class="nb">float</span> <span class="n">end</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="nb">float</span> <span class="n">start</span><span class="p">,</span> <span class="s2">&quot;upto&quot;</span><span class="p">,</span> <span class="nb">float</span> <span class="n">end</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;[&quot;</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">start</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;,&quot;</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">end</span>
-    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;]&quot;</span> <span class="c1"># inclusive range</span>
+    <span class="nb">print</span> <span class="s2">&quot;]&quot;</span> <span class="c1"># inclusive range</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="nb">float</span> <span class="n">start</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="nb">float</span> <span class="n">end</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="nb">float</span> <span class="n">start</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="nb">float</span> <span class="n">end</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;[&quot;</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">start</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;,&quot;</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">end</span>
-    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;)&quot;</span> <span class="c1"># exclusive range</span>
+    <span class="nb">print</span> <span class="s2">&quot;)&quot;</span> <span class="c1"># exclusive range</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
@@ -766,12 +785,52 @@ as an argument. Here is a simple example.</p>
 </code></pre>
 </div>
 
-<p>Now, we can just tell that there exists a string initialization
+<p>Armed with this knowledge, there exists a string initialization
 in the form <code>def str(char[] buf, nat end, "from" nat start)</code>. So
-the expression we investigating first unpacks the arena back to a buffer
-and position pair with <code>status CHARS</code>, passes those as the first two
-arguments, and then uses <code>"from"</code> as a type literal to select the
-appropriate string creation function.</p>
+the expression we are investigating unpacks the <code>CHARS</code> arena back 
+to an untyped buffer and position pair per <code>status CHARS</code>, and passes 
+the pair as the first two arguments, followed by the <code>"from"</code> literal type
+to select the appropriate string creation function.</p>
+
+<p>As a final remark, literal-backed keywords are allowed to 
+be the last tuple element. But not the first because there 
+is no way to tell if a comma was meant to be used there. 
+But you can leverage the blank type, for example constructed via 
+<code>blank()</code> or <code>()</code>, to create an expression that does not add
+arguments or runtime cost but which would sill require commas
+afterwards, hence enabling literal keyword usage. </p>
+
+<p>Find en example below, where the same trick is used to
+set <code>()</code> a literal separator.
+Due to literal keywords being only comma replacements, 
+you can only find them within parentheses.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="o">|</span><span class="s2">&quot;hi&quot;</span> <span class="n">greeting</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="s2">&quot;world&quot;</span> <span class="n">world</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="s2">&quot;.&quot;</span><span class="o">|</span><span class="s2">&quot;!&quot;</span> <span class="n">punctuation</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">greeting</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">world</span> <span class="ow">is</span> <span class="n">blank</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot; &quot;</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">world</span>
+    <span class="k">if</span> <span class="n">punctuation</span> <span class="ow">is</span> <span class="n">blank</span>
+        <span class="nb">print</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span>
+        <span class="nb">print</span> <span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">punctuation</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="c1"># the next line prints &#39;hi world!&#39; while validating it as a chosen pattern</span>
+    <span class="n">greet</span> <span class="p">(()</span> <span class="n">hi</span> <span class="p">()</span> <span class="n">world</span> <span class="p">()</span> <span class="err">!</span><span class="p">)</span>
+    <span class="c1"># two equivalents</span>
+    <span class="n">greet</span> <span class="p">((),</span> <span class="nb">type</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="nb">type</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="nb">type</span> <span class="s2">&quot;!&quot;</span><span class="p">)</span>
+    <span class="n">grett</span> <span class="p">(</span><span class="nb">type</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="nb">type</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="nb">type</span> <span class="s2">&quot;!&quot;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>All examples above are resolved as zero-cost abstractions during compilation.
+For example, while the program is running, it uses only the version(s) of <code>greet</code>
+that are type-determined during compilation.</p>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {

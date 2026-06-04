@@ -1,6 +1,20 @@
 
 # Command line apps
 
+<div class="toc" markdown="1">
+
+**Command line apps**<br>
+[print](#print) <br>
+[input and error check](#input-and-error-check) <br>
+[character buffers](#character-buffers) <br>
+[zero-cost type checking](#zero-cost-type-checking) <br>
+[literals](#literals) <br>
+[colors](#colors) <br>
+[string manipulation](#string-manipulation) <br>
+[memory dependencies](#memory-dependencies) <br>
+
+</div>
+
 ## print
 
 The main functionality needed to build a command line app is reading arguments 
@@ -26,9 +40,10 @@ Automatically passing arguments can also be done for your own functions too, as 
 the net snippet. To unpack what the `greet` function's argument means, it first
 declares an effect, meaning that it automatically gathers a variable called `CLI`
 from its calling scope. Its caller can also manually passe such a variable.
-The rest of the argument definition requires that what is passed should have `edit`
-permission (should not be constant) because we are going to modify some internal
-state. Finally, the `console` type of the argument is declared, followed by its name.
+The rest of the argument definition requires that what is passed should have `mut`
+permission (should not be constant) because we are not merely going to edit it -by printing-
+but also potentially overwrite it by destructing and recreating it.
+Finally, the `console` type of the argument is declared, followed by its name.
 
 ## input and error check
 
@@ -40,7 +55,7 @@ comma-separated values.
 ```python
 import "std/core.s"
 
-def greet(effect edit console CLI)
+def greet(effect mut console CLI)
     print "hello world!"
 
 def main()
@@ -120,7 +135,7 @@ But enough talking. Here is some code.
 ```python
 import "std/core.s"
 
-def greet(effect edit console CLI, str name)
+def greet(effect mut console CLI, str name)
     print nn "hello "
     print nn name
     print "!"
@@ -485,7 +500,7 @@ same mechanism as above grants us zero-cost literal comparison.
 ```python
 import "std/core.s"
 
-def greet(effect edit console CLI, "hello"|"hi" greeting)
+def greet(effect mut console CLI, "hello"|"hi" greeting)
     print nn compiler:literal greeting
     if greeting is "hello" # 'is' starts type parsing
         print nn " world"
@@ -506,19 +521,19 @@ as an argument. Here is a simple example.
 ```python
 import "std/core.s"
 
-def print(effect edit console CLI, float start, "upto", float end)
+def print(effect mut console CLI, float start, "upto", float end)
     print nn "["
     print nn start
     print nn ","
     print nn end
-    print nn "]" # inclusive range
+    print "]" # inclusive range
 
-def print(effect edit console CLI, float start, "to", float end)
+def print(effect mut console CLI, float start, "to", float end)
     print nn "["
     print nn start
     print nn ","
     print nn end
-    print nn ")" # exclusive range
+    print ")" # exclusive range
 
 def main()
     CLI = console()
@@ -526,26 +541,34 @@ def main()
     print(0.0 to 1.0)   # prints '[0.0,1.0)'
 ```
 
-Now, we can just tell that there exists a string initialization
+Armed with this knowledge, there exists a string initialization
 in the form `def str(char[] buf, nat end, "from" nat start)`. So
-the expression we investigating first unpacks the arena back to a buffer
-and position pair with `status CHARS`, passes those as the first two
-arguments, and then uses `"from"` as a type literal to select the
-appropriate string creation function.
+the expression we are investigating unpacks the `CHARS` arena back 
+to an untyped buffer and position pair per `status CHARS`, and passes 
+the pair as the first two arguments, followed by the `"from"` literal type
+to select the appropriate string creation function.
 
-As a final remark, literal-backed keywords can be the last tuple 
-element. But not the first because there is no way to tell if a 
-comma was meant to be used there. But you can leverage the blank
-type, for example constructed via `blank()` or `()`, to match literals.
-Due to the way literal keywords occur, you can only find them
-within parentheses. Use the same trick to separate consecutive literals
-(though binary operators take precedence in being resolved).
+As a final remark, literal-backed keywords are allowed to 
+be the last tuple element. But not the first because there 
+is no way to tell if a comma was meant to be used there. 
+But you can leverage the blank type, for example constructed via 
+`blank()` or `()`, to create an expression that does not add
+arguments or runtime cost but which would sill require commas
+afterwards, hence enabling literal keyword usage. 
+
+Find en example below, where the same trick is used to
+set `()` a literal separator.
+Due to literal keywords being only comma replacements, 
+you can only find them within parentheses.
 
 ```python
 import "std/core.s"
 
-def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
+def greet(effect mut console CLI, "hello"|"hi" greeting, blank|"world" world, blank|"."|"!" punctuation)
     print nn compiler:literal greeting
+    if not world is blank
+        print nn " "
+        print nn compiler:literal world
     if punctuation is blank
         print ""
     else
@@ -553,5 +576,13 @@ def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"."|"!" punctuat
 
 def main()
     CLI = console()
-    greet (hi !) # prints hi!
+    # the next line prints 'hi world!' while validating it as a chosen pattern
+    greet (() hi () world () !)
+    # two equivalents
+    greet ((), type "hi", (), type "world", (), type "!")
+    grett (type "hi", type "world", type "!")
 ```
+
+All examples above are resolved as zero-cost abstractions during compilation.
+For example, while the program is running, it uses only the version(s) of `greet`
+that are type-determined during compilation.

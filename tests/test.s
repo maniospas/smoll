@@ -1,9 +1,14 @@
 import "std/core.s"
 
-def double_it(nat|float x)
-    return x*(type (nat|float)->x 2)
+def greet(effect mut console CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
+    print nn compiler:literal greeting
+    if punctuation is blank
+        print ""
+    else
+        print compiler:literal punctuation
 
 def main()
     CLI = console()
-    print double_it 1.0 # prints 2.0
-    print double_it 1   # prints 2
+    colors = colors CLI
+    print(colors yellow)
+    greet(() hi () !) # prints 'hi!' while validating it as a pattern

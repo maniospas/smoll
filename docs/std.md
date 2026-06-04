@@ -31,6 +31,9 @@
 [flush](#flush) 
 [nn](#nn) 
 [print](#print) 
+[supports\_ansi](#supports\_ansi) 
+[colors](#colors) 
+[set](#set) 
 [exists](#exists) 
 [bits](#bits) 
 [lshift](#lshift) 
@@ -38,6 +41,7 @@
 [xor](#xor) 
 [band](#band) 
 [bor](#bor) 
+[of](#of) 
 [range](#range) 
 [next](#next) 
 [get](#get) 
@@ -182,6 +186,15 @@ int() -> (int)
 ```
 
 ### int - cast to int
+*Defined in: std/core/convert.s line 89*
+
+Converts a bit representation to the corresponding integer.
+
+```rust
+int(bits) -> (int)
+```
+
+### int - cast to int
 *Defined in: std/core/convert.s line 29*
 
 Overflows are mapped to negative integers and are not protected against.
@@ -206,15 +219,6 @@ May lose information due to truncating.
 
 ```rust
 int(float) -> (int)
-```
-
-### int - cast to int
-*Defined in: std/core/convert.s line 89*
-
-Converts a bit representation to the corresponding integer.
-
-```rust
-int(bits) -> (int)
 ```
 
 ### int - converts a string to an integer
@@ -273,6 +277,22 @@ Represents values in the range `0 to 2^64-1`.
 nat() -> (nat)
 ```
 
+### nat
+*Defined in: std/core/array.s line 24*
+
+```rust
+nat(nat16) -> (nat)
+```
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 84*
+
+Converts a bit representation to the corresponding natural number.
+
+```rust
+nat(bits) -> (nat)
+```
+
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 51*
 
@@ -319,22 +339,6 @@ Potential errors:
 
 6. cannot convert negative float to id
 
-### nat - cast to nat
-*Defined in: std/core/convert.s line 84*
-
-Converts a bit representation to the corresponding natural number.
-
-```rust
-nat(bits) -> (nat)
-```
-
-### nat
-*Defined in: std/core/array.s line 24*
-
-```rust
-nat(nat16) -> (nat)
-```
-
 ### nat - converts a string to an unsigned integer
 *Defined in: std/core/convertstr.s line 150*
 
@@ -357,8 +361,8 @@ nat(cstr) -> (nat)
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 8. iteration end
 29. invalid nat conversion from empty string
 30. invalid nat conversion from non-number string
@@ -373,13 +377,13 @@ nat(console) -> (nat)
 Potential errors:
 
 2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+23. unexpected end of console read
+24. user input was not a float
 8. iteration end
 9. iterator range
 15. out of bounds
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-23. unexpected end of console read
-24. user input was not a float
 
 ### nat - retrieved unsigned number from 32 bits
 *Defined in: std/mini.s line 30*
@@ -458,13 +462,6 @@ Potential errors:
 55. nat value too large to pack in nat8
 
 # float
-### float
-*Defined by the compiler*
-
-```rust
-float() -> (float)
-```
-
 ### float - cast to float
 *Defined in: std/core/convert.s line 20*
 
@@ -474,13 +471,20 @@ Serves as a tautology function for code that parses on multiple number types.
 float(float) -> (float)
 ```
 
-### float - cast to float
-*Defined in: std/core/convert.s line 20*
-
-May lose information because floats are not exact representation of all integers.
+### float
+*Defined by the compiler*
 
 ```rust
-float(int) -> (float)
+float() -> (float)
+```
+
+### float - cast to float
+*Defined in: std/core/convert.s line 95*
+
+Converts a bit representation to the corresponding float number.
+
+```rust
+float(bits) -> (float)
 ```
 
 ### float - cast to float
@@ -493,12 +497,12 @@ float(nat) -> (float)
 ```
 
 ### float - cast to float
-*Defined in: std/core/convert.s line 95*
+*Defined in: std/core/convert.s line 20*
 
-Converts a bit representation to the corresponding float number.
+May lose information because floats are not exact representation of all integers.
 
 ```rust
-float(bits) -> (float)
+float(int) -> (float)
 ```
 
 ### float - converts a string to a float
@@ -627,13 +631,6 @@ any() -> ()
 
 # eq
 ### eq - equals
-*Defined in: std/core/bool.s line 20*
-
-```rust
-eq(bool x, bool y) -> (bool)
-```
-
-### eq - equals
 *Defined in: std/core/numbers.s line 56*
 
 Compares the address of two pointers.
@@ -736,6 +733,13 @@ This is a compile-time operations that does not evoke any runtime booleans.
 
 ```rust
 eq(true t_anon0, true t_anon1) -> (true)
+```
+
+### eq - equals
+*Defined in: std/core/bool.s line 20*
+
+```rust
+eq(bool x, bool y) -> (bool)
 ```
 
 ### eq - equals
@@ -1116,6 +1120,298 @@ Adds a natural number offset to a pointer.
 add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
 ```
 
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(list, cstr _s1, cstr _s2) -> (str) with effects CHARS
+```
+Potential errors:
+
+2. null pointer
+3. division by zero 
+5. nat subtraction would yield a negative
+11. reallocation failed
+14. cannot resize an unallocated or freed buffer
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(list, cstr _s1, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+2. null pointer
+3. division by zero 
+5. nat subtraction would yield a negative
+11. reallocation failed
+14. cannot resize an unallocated or freed buffer
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(list, str, cstr _s2) -> (str) with effects CHARS
+```
+Potential errors:
+
+2. null pointer
+3. division by zero 
+5. nat subtraction would yield a negative
+11. reallocation failed
+14. cannot resize an unallocated or freed buffer
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(list, str, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+2. null pointer
+3. division by zero 
+5. nat subtraction would yield a negative
+11. reallocation failed
+14. cannot resize an unallocated or freed buffer
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(circular, cstr _s1, cstr _s2) -> (str) with effects CHARS
+```
+Potential errors:
+
+16. arena is out of space
+17. does not fit in circular arena
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(circular, cstr _s1, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+16. arena is out of space
+17. does not fit in circular arena
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(circular, str, cstr _s2) -> (str) with effects CHARS
+```
+Potential errors:
+
+16. arena is out of space
+17. does not fit in circular arena
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(circular, str, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+16. arena is out of space
+17. does not fit in circular arena
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(arena, cstr _s1, cstr _s2) -> (str) with effects CHARS
+```
+Potential errors:
+
+16. arena is out of space
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(arena, cstr _s1, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+16. arena is out of space
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(arena, str, cstr _s2) -> (str) with effects CHARS
+```
+Potential errors:
+
+16. arena is out of space
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(arena, str, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
+15. out of bounds
+
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(new CHARS, cstr _s1, cstr _s2) -> (str) with effects CHARS
+```
+Potential errors:
+
+2. null pointer
+5. nat subtraction would yield a negative
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(new CHARS, cstr _s1, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+2. null pointer
+5. nat subtraction would yield a negative
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(new CHARS, str, cstr _s2) -> (str) with effects CHARS
+```
+Potential errors:
+
+2. null pointer
+5. nat subtraction would yield a negative
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### add
+*Defined in: std/core/string.s line 305*
+
+```rust
+add(new CHARS, str, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+2. null pointer
+5. nat subtraction would yield a negative
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
 ### add - vector addition
 *Defined in: std/sci/vec.s line 74*
 
@@ -1241,14 +1537,14 @@ add(arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
 Potential errors:
 
+16. arena is out of space
 2. null pointer
 8. iteration end
 9. iterator range
-15. out of bounds
-16. arena is out of space
 58. can only place vectors on contiguous buffers
 59. cannot place vectors on buffer offsets
 60. different vector sizes
+15. out of bounds
 
 ### add - vector addition
 *Defined in: std/sci/vec.s line 64*
@@ -1285,13 +1581,13 @@ add(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 Potential errors:
 
 2. null pointer
+13. cannot allocate a buffer of unsized type
 8. iteration end
 9. iterator range
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
 60. different vector sizes
+12. cannot resize buffers with alloc; it promises no data reallocation
+15. out of bounds
 
 
 Returned values defer use of the following functions:
@@ -1452,14 +1748,14 @@ mul(arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
 Potential errors:
 
+16. arena is out of space
 2. null pointer
 8. iteration end
 9. iterator range
-15. out of bounds
-16. arena is out of space
 58. can only place vectors on contiguous buffers
 59. cannot place vectors on buffer offsets
 60. different vector sizes
+15. out of bounds
 
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s line 97*
@@ -1496,63 +1792,12 @@ mul(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 Potential errors:
 
 2. null pointer
+13. cannot allocate a buffer of unsized type
 8. iteration end
 9. iterator range
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
 60. different vector sizes
-
-
-Returned values defer use of the following functions:
-```rust
-exists(any ptr) -> (bool)
-free(mut any ptr) -> ()
-```
-### mul - sparse matrix*vector multiplication
-*Defined in: std/sci/coo.s line 53*
-
-```rust
-mul(circular, coo, vec) -> (mut vec) with effects FLOATS
-```
-Potential errors:
-
-17. does not fit in circular arena
-66. matrix columns must match vector length
-2. null pointer
-58. can only place vectors on contiguous buffers
-59. cannot place vectors on buffer offsets
-15. out of bounds
-
-### mul - sparse matrix*vector multiplication
-*Defined in: std/sci/coo.s line 53*
-
-```rust
-mul(arena, coo, vec) -> (mut vec) with effects FLOATS
-```
-Potential errors:
-
-16. arena is out of space
-66. matrix columns must match vector length
-2. null pointer
-58. can only place vectors on contiguous buffers
-59. cannot place vectors on buffer offsets
-15. out of bounds
-
-### mul - sparse matrix*vector multiplication
-*Defined in: std/sci/coo.s line 53*
-
-```rust
-mul(new FLOATS, coo, vec) -> (mut vec) with effects FLOATS
-```
-Potential errors:
-
-66. matrix columns must match vector length
-2. null pointer
-10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
 15. out of bounds
 
 
@@ -1561,155 +1806,6 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
-### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 106*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(circular, mat, mat) -> (mut mat) with effects FLOATS
-```
-Potential errors:
-
-64. row out of bounds
-65. column out of bounds
-2. null pointer
-17. does not fit in circular arena
-68. inner dimensions must agree
-8. iteration end
-61. can only place matrices on contiguous buffers
-62. cannot place matrices on buffer offsets
-
-### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 106*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(arena, mat, mat) -> (mut mat) with effects FLOATS
-```
-Potential errors:
-
-64. row out of bounds
-65. column out of bounds
-2. null pointer
-68. inner dimensions must agree
-8. iteration end
-16. arena is out of space
-61. can only place matrices on contiguous buffers
-62. cannot place matrices on buffer offsets
-
-### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 106*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(new FLOATS, mat, mat) -> (mut mat) with effects FLOATS
-```
-Potential errors:
-
-64. row out of bounds
-65. column out of bounds
-2. null pointer
-68. inner dimensions must agree
-8. iteration end
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-
-
-Returned values defer use of the following functions:
-```rust
-exists(any ptr) -> (bool)
-free(mut any ptr) -> ()
-```
-### mul - vector-matrix multiplication
-*Defined in: std/sci/mat.s line 92*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(circular, vec, mat) -> (mut vec) with effects FLOATS
-```
-Potential errors:
-
-64. row out of bounds
-65. column out of bounds
-2. null pointer
-67. vector length must match matrix rows
-8. iteration end
-15. out of bounds
-17. does not fit in circular arena
-58. can only place vectors on contiguous buffers
-59. cannot place vectors on buffer offsets
-
-### mul - vector-matrix multiplication
-*Defined in: std/sci/mat.s line 92*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(arena, vec, mat) -> (mut vec) with effects FLOATS
-```
-Potential errors:
-
-64. row out of bounds
-65. column out of bounds
-2. null pointer
-67. vector length must match matrix rows
-8. iteration end
-15. out of bounds
-16. arena is out of space
-58. can only place vectors on contiguous buffers
-59. cannot place vectors on buffer offsets
-
-### mul - vector-matrix multiplication
-*Defined in: std/sci/mat.s line 92*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(new FLOATS, vec, mat) -> (mut vec) with effects FLOATS
-```
-Potential errors:
-
-64. row out of bounds
-65. column out of bounds
-2. null pointer
-67. vector length must match matrix rows
-8. iteration end
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
-
-
-Returned values defer use of the following functions:
-```rust
-exists(any ptr) -> (bool)
-free(mut any ptr) -> ()
-```
-### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s line 78*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(circular, mat, vec) -> (mut vec) with effects FLOATS
-```
-Potential errors:
-
-64. row out of bounds
-65. column out of bounds
-66. matrix columns must match vector length
-2. null pointer
-8. iteration end
-15. out of bounds
-17. does not fit in circular arena
-58. can only place vectors on contiguous buffers
-59. cannot place vectors on buffer offsets
-
 ### mul - matrix-vector multiplication
 *Defined in: std/sci/mat.s line 78*
 
@@ -1873,6 +1969,206 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
+### mul - sparse matrix*vector multiplication
+*Defined in: std/sci/coo.s line 53*
+
+```rust
+mul(circular, coo, vec) -> (mut vec) with effects FLOATS
+```
+Potential errors:
+
+17. does not fit in circular arena
+66. matrix columns must match vector length
+2. null pointer
+58. can only place vectors on contiguous buffers
+59. cannot place vectors on buffer offsets
+15. out of bounds
+
+### mul - sparse matrix*vector multiplication
+*Defined in: std/sci/coo.s line 53*
+
+```rust
+mul(arena, coo, vec) -> (mut vec) with effects FLOATS
+```
+Potential errors:
+
+16. arena is out of space
+66. matrix columns must match vector length
+2. null pointer
+58. can only place vectors on contiguous buffers
+59. cannot place vectors on buffer offsets
+15. out of bounds
+
+### mul - sparse matrix*vector multiplication
+*Defined in: std/sci/coo.s line 53*
+
+```rust
+mul(new FLOATS, coo, vec) -> (mut vec) with effects FLOATS
+```
+Potential errors:
+
+66. matrix columns must match vector length
+2. null pointer
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+15. out of bounds
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### mul - matrix-matrix multiplication
+*Defined in: std/sci/mat.s line 106*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(circular, mat, mat) -> (mut mat) with effects FLOATS
+```
+Potential errors:
+
+64. row out of bounds
+65. column out of bounds
+2. null pointer
+68. inner dimensions must agree
+8. iteration end
+17. does not fit in circular arena
+61. can only place matrices on contiguous buffers
+62. cannot place matrices on buffer offsets
+
+### mul - matrix-matrix multiplication
+*Defined in: std/sci/mat.s line 106*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(arena, mat, mat) -> (mut mat) with effects FLOATS
+```
+Potential errors:
+
+64. row out of bounds
+65. column out of bounds
+2. null pointer
+16. arena is out of space
+68. inner dimensions must agree
+8. iteration end
+61. can only place matrices on contiguous buffers
+62. cannot place matrices on buffer offsets
+
+### mul - matrix-matrix multiplication
+*Defined in: std/sci/mat.s line 106*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(new FLOATS, mat, mat) -> (mut mat) with effects FLOATS
+```
+Potential errors:
+
+64. row out of bounds
+65. column out of bounds
+2. null pointer
+68. inner dimensions must agree
+8. iteration end
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### mul - vector-matrix multiplication
+*Defined in: std/sci/mat.s line 92*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(circular, vec, mat) -> (mut vec) with effects FLOATS
+```
+Potential errors:
+
+64. row out of bounds
+65. column out of bounds
+2. null pointer
+67. vector length must match matrix rows
+8. iteration end
+15. out of bounds
+17. does not fit in circular arena
+58. can only place vectors on contiguous buffers
+59. cannot place vectors on buffer offsets
+
+### mul - vector-matrix multiplication
+*Defined in: std/sci/mat.s line 92*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(arena, vec, mat) -> (mut vec) with effects FLOATS
+```
+Potential errors:
+
+64. row out of bounds
+65. column out of bounds
+2. null pointer
+67. vector length must match matrix rows
+8. iteration end
+15. out of bounds
+16. arena is out of space
+58. can only place vectors on contiguous buffers
+59. cannot place vectors on buffer offsets
+
+### mul - vector-matrix multiplication
+*Defined in: std/sci/mat.s line 92*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(new FLOATS, vec, mat) -> (mut vec) with effects FLOATS
+```
+Potential errors:
+
+64. row out of bounds
+65. column out of bounds
+2. null pointer
+67. vector length must match matrix rows
+8. iteration end
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+15. out of bounds
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### mul - matrix-vector multiplication
+*Defined in: std/sci/mat.s line 78*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(circular, mat, vec) -> (mut vec) with effects FLOATS
+```
+Potential errors:
+
+64. row out of bounds
+65. column out of bounds
+66. matrix columns must match vector length
+2. null pointer
+8. iteration end
+15. out of bounds
+17. does not fit in circular arena
+58. can only place vectors on contiguous buffers
+59. cannot place vectors on buffer offsets
+
 # div
 ### div - divide by
 *Defined in: std/core/numbers.s line 89*
@@ -1919,37 +2215,18 @@ Potential errors:
 Grabs an FLOATS for the result as an effect.
 
 ```rust
-div(circular, float v1, vec) -> (mut vec) with effects FLOATS
-```
-Potential errors:
-
-2. null pointer
-3. division by zero 
-8. iteration end
-9. iterator range
-15. out of bounds
-17. does not fit in circular arena
-58. can only place vectors on contiguous buffers
-59. cannot place vectors on buffer offsets
-
-### div - vector division
-*Defined in: std/sci/vec.s line 142*
-
-Grabs an FLOATS for the result as an effect.
-
-```rust
 div(arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 Potential errors:
 
+16. arena is out of space
 2. null pointer
 3. division by zero 
 8. iteration end
 9. iterator range
-15. out of bounds
-16. arena is out of space
 58. can only place vectors on contiguous buffers
 59. cannot place vectors on buffer offsets
+15. out of bounds
 
 ### div - vector division
 *Defined in: std/sci/vec.s line 142*
@@ -2025,14 +2302,14 @@ div(arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 Potential errors:
 
+16. arena is out of space
 2. null pointer
 3. division by zero 
 8. iteration end
 9. iterator range
-15. out of bounds
-16. arena is out of space
 58. can only place vectors on contiguous buffers
 59. cannot place vectors on buffer offsets
+15. out of bounds
 
 ### div - vector division
 *Defined in: std/sci/vec.s line 131*
@@ -2105,6 +2382,25 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
+### div - vector division
+*Defined in: std/sci/vec.s line 142*
+
+Grabs an FLOATS for the result as an effect.
+
+```rust
+div(circular, float v1, vec) -> (mut vec) with effects FLOATS
+```
+Potential errors:
+
+2. null pointer
+3. division by zero 
+8. iteration end
+9. iterator range
+15. out of bounds
+17. does not fit in circular arena
+58. can only place vectors on contiguous buffers
+59. cannot place vectors on buffer offsets
+
 # mod
 ### mod - modulo by
 *Defined in: std/core/numbers.s line 101*
@@ -2125,7 +2421,7 @@ Potential errors:
 Compares two numbers of the same type. This is an overload for the < operator.
 
 ```rust
-lt(float x, float y) -> (bool)
+lt(int x, int y) -> (bool)
 ```
 
 ### lt - less than
@@ -2134,7 +2430,7 @@ lt(float x, float y) -> (bool)
 Compares two numbers of the same type. This is an overload for the < operator.
 
 ```rust
-lt(int x, int y) -> (bool)
+lt(float x, float y) -> (bool)
 ```
 
 ### lt - less than
@@ -2153,6 +2449,15 @@ lt(nat x, nat y) -> (bool)
 greater than
 
 ```rust
+gt(float x, float y) -> (bool)
+```
+
+### gt - Compares two numbers of the same type. This is an overload for the > operator.
+*Defined in: std/core/numbers.s line 118*
+
+greater than
+
+```rust
 gt(int x, int y) -> (bool)
 ```
 
@@ -2165,25 +2470,7 @@ greater than
 gt(nat x, nat y) -> (bool)
 ```
 
-### gt - Compares two numbers of the same type. This is an overload for the > operator.
-*Defined in: std/core/numbers.s line 118*
-
-greater than
-
-```rust
-gt(float x, float y) -> (bool)
-```
-
 # le
-### le - less than or equal to
-*Defined in: std/core/numbers.s line 126*
-
-Compares two numbers of the same type. This is an overload for the <= operator.
-
-```rust
-le(float x, float y) -> (bool)
-```
-
 ### le - less than or equal to
 *Defined in: std/core/numbers.s line 126*
 
@@ -2202,6 +2489,15 @@ Compares two numbers of the same type. This is an overload for the <= operator.
 le(nat x, nat y) -> (bool)
 ```
 
+### le - less than or equal to
+*Defined in: std/core/numbers.s line 126*
+
+Compares two numbers of the same type. This is an overload for the <= operator.
+
+```rust
+le(float x, float y) -> (bool)
+```
+
 # ge
 ### ge - greater than or equal to
 *Defined in: std/core/numbers.s line 134*
@@ -2218,7 +2514,7 @@ ge(nat x, nat y) -> (bool)
 Compares two numbers of the same type. This is an overload for the >= operator.
 
 ```rust
-ge(int x, int y) -> (bool)
+ge(float x, float y) -> (bool)
 ```
 
 ### ge - greater than or equal to
@@ -2227,10 +2523,23 @@ ge(int x, int y) -> (bool)
 Compares two numbers of the same type. This is an overload for the >= operator.
 
 ```rust
-ge(float x, float y) -> (bool)
+ge(int x, int y) -> (bool)
 ```
 
 # sub
+### sub - subtract by
+*Defined in: std/core/numbers.s line 142*
+
+Subtracts two numbers of the same type. This is an overload for the - operator.
+Natural numbers are safeguarded against acquiring negative results, which would overflow.
+
+```rust
+sub(nat x, nat y) -> (nat)
+```
+Potential errors:
+
+5. nat subtraction would yield a negative
+
 ### sub - subtract by
 *Defined in: std/core/numbers.s line 142*
 
@@ -2248,19 +2557,6 @@ Subtracts two numbers of the same type. This is an overload for the - operator.
 ```rust
 sub(float x, float y) -> (float)
 ```
-
-### sub - subtract by
-*Defined in: std/core/numbers.s line 142*
-
-Subtracts two numbers of the same type. This is an overload for the - operator.
-Natural numbers are safeguarded against acquiring negative results, which would overflow.
-
-```rust
-sub(nat x, nat y) -> (nat)
-```
-Potential errors:
-
-5. nat subtraction would yield a negative
 
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 89*
@@ -2387,14 +2683,14 @@ sub(arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
 Potential errors:
 
+16. arena is out of space
 2. null pointer
 8. iteration end
 9. iterator range
-15. out of bounds
-16. arena is out of space
 58. can only place vectors on contiguous buffers
 59. cannot place vectors on buffer offsets
 60. different vector sizes
+15. out of bounds
 
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 79*
@@ -2431,13 +2727,13 @@ sub(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 Potential errors:
 
 2. null pointer
+13. cannot allocate a buffer of unsized type
 8. iteration end
 9. iterator range
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
 60. different vector sizes
+12. cannot resize buffers with alloc; it promises no data reallocation
+15. out of bounds
 
 
 Returned values defer use of the following functions:
@@ -2453,6 +2749,13 @@ Exponentiates a natural number by another.
 
 ```rust
 pow(nat x, nat y) -> (mut nat)
+```
+
+### pow
+*Defined in: std/sci/math.s line 58*
+
+```rust
+pow(float x, float y) -> (float)
 ```
 
 ### pow - vector exponentiation
@@ -2580,14 +2883,14 @@ pow(arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
 Potential errors:
 
+16. arena is out of space
 2. null pointer
 8. iteration end
 9. iterator range
-15. out of bounds
-16. arena is out of space
 58. can only place vectors on contiguous buffers
 59. cannot place vectors on buffer offsets
 60. different vector sizes
+15. out of bounds
 
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 113*
@@ -2624,13 +2927,13 @@ pow(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 Potential errors:
 
 2. null pointer
+13. cannot allocate a buffer of unsized type
 8. iteration end
 9. iterator range
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
 60. different vector sizes
+12. cannot resize buffers with alloc; it promises no data reallocation
+15. out of bounds
 
 
 Returned values defer use of the following functions:
@@ -2638,13 +2941,6 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
-### pow
-*Defined in: std/sci/math.s line 58*
-
-```rust
-pow(float x, float y) -> (float)
-```
-
 # console
 ### console - references the system console
 *Defined in: std/core/print.s line 20*
@@ -2748,6 +3044,15 @@ nn(vec) -> (vec, cstr)
 ```
 
 # print
+### print - prints an integer
+*Defined in: std/core/print.s line 65*
+
+Automatically ends the line too.
+
+```rust
+print(mut console CLI, int value) -> () with effects CLI
+```
+
 ### print - prints an unsigned integer
 *Defined in: std/core/print.s line 72*
 
@@ -2788,12 +3093,12 @@ print(mut console CLI, true, cstr endl) -> () with effects CLI
 ```
 
 ### print - prints a boolean
-*Defined in: std/core/print.s line 86*
+*Defined in: std/core/print.s line 93*
 
 Automatically ends the line too.
 
 ```rust
-print(mut console CLI, true) -> () with effects CLI
+print(mut console CLI, false) -> () with effects CLI
 ```
 
 ### print - prints a boolean
@@ -2804,21 +3109,12 @@ print(mut console CLI, false, cstr endl) -> () with effects CLI
 ```
 
 ### print - prints a boolean
-*Defined in: std/core/print.s line 93*
+*Defined in: std/core/print.s line 86*
 
 Automatically ends the line too.
 
 ```rust
-print(mut console CLI, false) -> () with effects CLI
-```
-
-### print - prints an integer
-*Defined in: std/core/print.s line 65*
-
-Automatically ends the line too.
-
-```rust
-print(mut console CLI, int value) -> () with effects CLI
+print(mut console CLI, true) -> () with effects CLI
 ```
 
 ### print - prints an integer
@@ -2958,38 +3254,6 @@ Potential errors:
 48. failed to write to file
 47. failed to write to closed file
 
-### print - print a matrix with aligned brackets
-*Defined in: std/sci/mat.s line 122*
-
-single-row matrices stay on one line; taller ones get top/mid/bottom brackets
-
-```rust
-print(mut console CLI, mat) -> () with effects CLI
-```
-Potential errors:
-
-64. row out of bounds
-65. column out of bounds
-2. null pointer
-5. nat subtraction would yield a negative
-8. iteration end
-
-### print - print a matrix with aligned brackets
-*Defined in: std/sci/mat.s line 122*
-
-single-row matrices stay on one line; taller ones get top/mid/bottom brackets
-
-```rust
-print(mut console CLI, mat, cstr endl) -> () with effects CLI
-```
-Potential errors:
-
-64. row out of bounds
-65. column out of bounds
-2. null pointer
-5. nat subtraction would yield a negative
-8. iteration end
-
 ### print - print a vector
 *Defined in: std/sci/vec.s line 216*
 
@@ -3046,19 +3310,318 @@ No failing errors, but can catch these intercepted ones:
 
 2. null pointer
 
-# exists
-### exists - checks that a pointer exists
-*Defined in: std/core/convert.s line 58*
+### print - print a matrix with aligned brackets
+*Defined in: std/sci/mat.s line 122*
+
+single-row matrices stay on one line; taller ones get top/mid/bottom brackets
 
 ```rust
-exists(any ptr) -> (bool)
+print(mut console CLI, mat) -> () with effects CLI
+```
+Potential errors:
+
+64. row out of bounds
+65. column out of bounds
+2. null pointer
+5. nat subtraction would yield a negative
+8. iteration end
+
+### print - print a matrix with aligned brackets
+*Defined in: std/sci/mat.s line 122*
+
+single-row matrices stay on one line; taller ones get top/mid/bottom brackets
+
+```rust
+print(mut console CLI, mat, cstr endl) -> () with effects CLI
+```
+Potential errors:
+
+64. row out of bounds
+65. column out of bounds
+2. null pointer
+5. nat subtraction would yield a negative
+8. iteration end
+
+# supports\_ansi
+### supports\_ansi
+*Defined in: std/core/print.s line 100*
+
+```rust
+supports_ansi(console) -> (bool)
 ```
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `[supports_ansi()]`*
+# colors
+### colors
+*Defined in: std/core/print.s line 105*
+
+```rust
+colors(mut console) -> (colors)
+```
+
+
+Returned values defer use of the following functions:
+```rust
+```
+# set
+### set
+*Defined in: std/core/print.s line 178*
+
+```rust
+set(colors, "reset_underline") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 176*
+
+```rust
+set(colors, "reset_bold") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 174*
+
+```rust
+set(colors, "reset_bg") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 172*
+
+```rust
+set(colors, "reset_color") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 170*
+
+```rust
+set(colors, "reset") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 168*
+
+```rust
+set(colors, "strikethrough") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 166*
+
+```rust
+set(colors, "reverse") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 164*
+
+```rust
+set(colors, "blink") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 162*
+
+```rust
+set(colors, "underline") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 160*
+
+```rust
+set(colors, "italic") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 158*
+
+```rust
+set(colors, "dim") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 156*
+
+```rust
+set(colors, "bold") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 154*
+
+```rust
+set(colors, "bg_black") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 152*
+
+```rust
+set(colors, "bg_white") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 150*
+
+```rust
+set(colors, "bg_cyan") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 148*
+
+```rust
+set(colors, "bg_magenta") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 146*
+
+```rust
+set(colors, "bg_blue") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 144*
+
+```rust
+set(colors, "bg_yellow") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 142*
+
+```rust
+set(colors, "bg_green") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 140*
+
+```rust
+set(colors, "bg_red") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 138*
+
+```rust
+set(colors, "bright_white") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 136*
+
+```rust
+set(colors, "bright_cyan") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 134*
+
+```rust
+set(colors, "bright_magenta") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 132*
+
+```rust
+set(colors, "bright_blue") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 130*
+
+```rust
+set(colors, "bright_yellow") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 128*
+
+```rust
+set(colors, "bright_green") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 126*
+
+```rust
+set(colors, "bright_red") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 124*
+
+```rust
+set(colors, "black") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 122*
+
+```rust
+set(colors, "white") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 120*
+
+```rust
+set(colors, "cyan") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 118*
+
+```rust
+set(colors, "magenta") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 116*
+
+```rust
+set(colors, "blue") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 114*
+
+```rust
+set(colors, "yellow") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 112*
+
+```rust
+set(colors, "green") -> ()
+```
+
+### set
+*Defined in: std/core/print.s line 110*
+
+```rust
+set(colors, "red") -> ()
+```
+
+# exists
 ### exists - checks whether a cstr is not zero-initialized
 *Defined in: std/core/string.s line 33*
 
 ```rust
 exists(cstr) -> (bool)
+```
+
+### exists - checks that a pointer exists
+*Defined in: std/core/convert.s line 58*
+
+```rust
+exists(any ptr) -> (bool)
 ```
 
 # bits
@@ -3132,18 +3695,46 @@ band(bits, bits) -> (bits)
 bor(bits, bits) -> (bits)
 ```
 
-# range
-### range - constructs a range
-*Defined in: std/core/range.s line 25*
+# of
+### of - yields a pair of nats
+*Defined in: std/core/range.s line 34*
 
-Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration.
+Represents the range [from, from+length] where 'from' and 'length' are the arguments.
 
 ```rust
-range(nat) -> (range)
+of(nat from, "lento", nat length) -> (nat from, nat)
 ```
 
-### range - constructs a range
+### of - yields a pair of nats
+*Defined in: std/core/range.s line 29*
+
+Represents the range [from, to] where 'from' and 'to' are the arguments.
+
+```rust
+of(nat from, "upto", nat to) -> (nat from, nat)
+```
+
+### of - yields a pair of nats
+*Defined in: std/core/range.s line 24*
+
+Represents the range [from, to) where 'from' and 'to' are the arguments.
+
+```rust
+of(nat from, "to", nat to) -> (nat from, nat to)
+```
+
+### of - yields a pair of nats
 *Defined in: std/core/range.s line 19*
+
+Represents the range [0, to) where 'to' its  its arguments.
+
+```rust
+of(nat) -> (nat, nat to)
+```
+
+# range
+### range - constructs a range
+*Defined in: std/core/range.s line 39*
 
 Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration.
 
@@ -3153,7 +3744,7 @@ range(nat _from, nat to) -> (range)
 
 # next
 ### next - next range number
-*Defined in: std/core/range.s line 30*
+*Defined in: std/core/range.s line 45*
 
 This increments the r.from position and returns the previous one.
 
@@ -3168,7 +3759,7 @@ Potential errors:
 *Defined in: std/map.s line 38*
 
 ```rust
-next(robinhood_str_entry[] {str, nat cost}, mut nat pos) -> (mut str)
+next(robinhood_nat_entry[] {nat s, nat cost}, mut nat pos) -> (mut nat)
 ```
 Potential errors:
 
@@ -3179,7 +3770,7 @@ Potential errors:
 *Defined in: std/map.s line 38*
 
 ```rust
-next(robinhood_nat_entry[] {nat s, nat cost}, mut nat pos) -> (mut nat)
+next(robinhood_str_entry[] {str, nat cost}, mut nat pos) -> (mut str)
 ```
 Potential errors:
 
@@ -3225,7 +3816,7 @@ Potential errors:
 15. out of bounds
 
 ### get - assert that a number lies in the range
-*Defined in: std/core/range.s line 39*
+*Defined in: std/core/range.s line 54*
 
 The item itself is returned. This lets the range be used as an iterator
 per a pattern like `for i in range 10 ...`.
@@ -3244,233 +3835,6 @@ Potential errors:
 ```rust
 get(str, nat i) -> (char ptr {char})
 ```
-
-### get - get a hash map entry
-*Defined in: std/map.s line 28*
-
-Implemented for string or cstr keys but buffer of any values.
-
-```rust
-get(robinhood_nat_entry[] {nat s, nat cost}, any[], nat key) -> (any ptr {follows any ptr values.unsafe_ptr})
-```
-Potential errors:
-
-2. null pointer
-4. modulo by zero 
-5. nat subtraction would yield a negative
-53. index not found
-8. iteration end
-15. out of bounds
-
-### get - get a hash map entry
-*Defined in: std/map.s line 18*
-
-Implemented for string or cstr keys but buffer of any values.
-
-```rust
-get(robinhood_str_entry[] {str, nat cost}, any[], str) -> (any ptr {follows any ptr values.unsafe_ptr})
-```
-Potential errors:
-
-2. null pointer
-4. modulo by zero 
-53. index not found
-5. nat subtraction would yield a negative
-8. iteration end
-15. out of bounds
-
-### get - get a hash map entry
-*Defined in: std/map.s line 18*
-
-Implemented for string or cstr keys but buffer of any values.
-
-```rust
-get(robinhood_str_entry[] {str, nat cost}, any[], cstr key) -> (any ptr {follows any ptr values.unsafe_ptr})
-```
-Potential errors:
-
-2. null pointer
-4. modulo by zero 
-5. nat subtraction would yield a negative
-8. iteration end
-15. out of bounds
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-53. index not found
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, read, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, terminal, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-46. not open file
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, write, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-46. not open file
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, write, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-46. not open file
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, read, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-46. not open file
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, mut nat pos, read, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, mut nat pos, terminal, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-46. not open file
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, mut nat pos, write, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-46. not open file
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, mut nat pos, write, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-46. not open file
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, mut nat pos, read, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-46. not open file
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit char[] {char}, mut nat pos, read, nat) -> (str)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-37. end of file
-5. nat subtraction would yield a negative
-46. not open file
-15. out of bounds
 
 ### get
 *Defined in: std/io.s line 7*
@@ -3649,6 +4013,75 @@ Potential errors:
 *Defined in: std/io.s line 10*
 
 ```rust
+get(edit char[] {char}, write, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
+46. not open file
+15. out of bounds
+
+### get - get a hash map entry
+*Defined in: std/map.s line 28*
+
+Implemented for string or cstr keys but buffer of any values.
+
+```rust
+get(robinhood_nat_entry[] {nat s, nat cost}, any[], nat key) -> (any ptr {follows any ptr values.unsafe_ptr})
+```
+Potential errors:
+
+2. null pointer
+4. modulo by zero 
+53. index not found
+5. nat subtraction would yield a negative
+8. iteration end
+15. out of bounds
+
+### get - get a hash map entry
+*Defined in: std/map.s line 18*
+
+Implemented for string or cstr keys but buffer of any values.
+
+```rust
+get(robinhood_str_entry[] {str, nat cost}, any[], str) -> (any ptr {follows any ptr values.unsafe_ptr})
+```
+Potential errors:
+
+2. null pointer
+4. modulo by zero 
+53. index not found
+5. nat subtraction would yield a negative
+8. iteration end
+15. out of bounds
+
+### get - get a hash map entry
+*Defined in: std/map.s line 18*
+
+Implemented for string or cstr keys but buffer of any values.
+
+```rust
+get(robinhood_str_entry[] {str, nat cost}, any[], cstr key) -> (any ptr {follows any ptr values.unsafe_ptr})
+```
+Potential errors:
+
+2. null pointer
+4. modulo by zero 
+5. nat subtraction would yield a negative
+8. iteration end
+15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+53. index not found
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
 get(edit char[] {char}, read, nat) -> (str)
 ```
 Potential errors:
@@ -3656,8 +4089,166 @@ Potential errors:
 2. null pointer
 19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-37. end of file
 5. nat subtraction would yield a negative
+37. end of file
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
+get(edit char[] {char}, terminal, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
+46. not open file
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
+get(edit char[] {char}, write, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
+46. not open file
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
+get(edit char[] {char}, read, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
+46. not open file
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
+get(edit char[] {char}, read, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
+46. not open file
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
+get(edit char[] {char}, mut nat pos, read, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
+get(edit char[] {char}, mut nat pos, terminal, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
+46. not open file
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
+get(edit char[] {char}, mut nat pos, write, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
+46. not open file
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
+get(edit char[] {char}, mut nat pos, write, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
+46. not open file
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
+get(edit char[] {char}, mut nat pos, read, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
+46. not open file
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 10*
+
+```rust
+get(edit char[] {char}, mut nat pos, read, nat) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+37. end of file
 46. not open file
 15. out of bounds
 
@@ -3666,16 +4257,6 @@ Potential errors:
 
 ```rust
 get(vec, nat i) -> (float ptr {float})
-```
-Potential errors:
-
-15. out of bounds
-
-### get - get a sparse element
-*Defined in: std/sci/coo.s line 43*
-
-```rust
-get(coo, nat k) -> (sparse_element ptr {nat row, nat col, float value})
 ```
 Potential errors:
 
@@ -3691,6 +4272,16 @@ Potential errors:
 
 64. row out of bounds
 65. column out of bounds
+
+### get - get a sparse element
+*Defined in: std/sci/coo.s line 43*
+
+```rust
+get(coo, nat k) -> (sparse_element ptr {nat row, nat col, float value})
+```
+Potential errors:
+
+15. out of bounds
 
 # KB
 ### KB - kilobytes to bytes
@@ -3717,28 +4308,6 @@ GB(nat) -> (nat)
 ```
 
 # alloc
-### alloc - circular arena allocation
-*Defined in: std/core/allocators.s line 71*
-
-```rust
-alloc(circular, nat length) -> (allocated)
-```
-Potential errors:
-
-17. does not fit in circular arena
-
-### alloc - circular arena allocation
-*Defined in: std/core/allocators.s line 71*
-
-Creates room for one element.
-
-```rust
-alloc(circular) -> (allocated)
-```
-Potential errors:
-
-17. does not fit in circular arena
-
 ### alloc
 *Defined in: std/core/string.s line 29*
 
@@ -3782,6 +4351,28 @@ Potential errors:
 3. division by zero 
 11. reallocation failed
 14. cannot resize an unallocated or freed buffer
+
+### alloc - circular arena allocation
+*Defined in: std/core/allocators.s line 71*
+
+Creates room for one element.
+
+```rust
+alloc(circular) -> (allocated)
+```
+Potential errors:
+
+17. does not fit in circular arena
+
+### alloc - circular arena allocation
+*Defined in: std/core/allocators.s line 71*
+
+```rust
+alloc(circular, nat length) -> (allocated)
+```
+Potential errors:
+
+17. does not fit in circular arena
 
 ### alloc - arena allocation
 *Defined in: std/core/allocators.s line 60*
@@ -4069,16 +4660,6 @@ Potential errors:
 
 15. out of bounds
 
-### mutget - mutable reference to a sparse element
-*Defined in: std/sci/coo.s line 48*
-
-```rust
-mutget(coo, nat k) -> (mut sparse_element ptr {nat row, nat col, float value})
-```
-Potential errors:
-
-15. out of bounds
-
 ### mutget - mutable reference to matrix element (i,j)
 *Defined in: std/sci/mat.s line 43*
 
@@ -4089,6 +4670,16 @@ Potential errors:
 
 64. row out of bounds
 65. column out of bounds
+
+### mutget - mutable reference to a sparse element
+*Defined in: std/sci/coo.s line 48*
+
+```rust
+mutget(coo, nat k) -> (mut sparse_element ptr {nat row, nat col, float value})
+```
+Potential errors:
+
+15. out of bounds
 
 # len
 ### len - string length
@@ -4164,7 +4755,7 @@ This unpacking is used to pass an arena's state or allocated
 memory data as part of structural input.
 
 ```rust
-status(allocated) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat t665t)
+status(allocated) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat t823t)
 ```
 
 ### status - convert to a nameless buffer and position pair
@@ -4174,7 +4765,7 @@ This unpacking is used to pass an arena's state or allocated
 memory data as part of structural input.
 
 ```rust
-status(arena) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat t662t)
+status(arena) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat t820t)
 ```
 
 # circular
@@ -4222,21 +4813,6 @@ Potential errors:
 *Defined in: std/hash.s line 73*
 
 ```rust
-at(edit robinhood_nat_entry[] {nat s, nat cost}, nat _k) -> (mut nat)
-```
-Potential errors:
-
-2. null pointer
-4. modulo by zero 
-5. nat subtraction would yield a negative
-54. string buffer is full
-8. iteration end
-15. out of bounds
-
-### at
-*Defined in: std/hash.s line 73*
-
-```rust
 at(edit robinhood_str_entry[] {str, nat cost}, cstr _k) -> (mut nat)
 ```
 Potential errors:
@@ -4255,6 +4831,21 @@ Potential errors:
 
 ```rust
 at(edit robinhood_str_entry[] {str, nat cost}, str) -> (mut nat)
+```
+Potential errors:
+
+2. null pointer
+4. modulo by zero 
+5. nat subtraction would yield a negative
+54. string buffer is full
+8. iteration end
+15. out of bounds
+
+### at
+*Defined in: std/hash.s line 73*
+
+```rust
+at(edit robinhood_nat_entry[] {nat s, nat cost}, nat _k) -> (mut nat)
 ```
 Potential errors:
 
@@ -4357,66 +4948,6 @@ char_arena() -> (arena)
 ```rust
 new() -> (new)
 ```
-
-### char\_allocator
-*Defined in: std/core/string.s line 305*
-
-```rust
-char_allocator(arena, cstr s1, cstr s2) -> (str) with effects CHARS
-```
-Potential errors:
-
-16. arena is out of space
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-5. nat subtraction would yield a negative
-15. out of bounds
-
-### char\_allocator
-*Defined in: std/core/string.s line 305*
-
-```rust
-char_allocator(arena, cstr s1, str) -> (str) with effects CHARS
-```
-Potential errors:
-
-16. arena is out of space
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-15. out of bounds
-
-### char\_allocator
-*Defined in: std/core/string.s line 305*
-
-```rust
-char_allocator(arena, str, cstr s2) -> (str) with effects CHARS
-```
-Potential errors:
-
-16. arena is out of space
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-15. out of bounds
-
-### char\_allocator
-*Defined in: std/core/string.s line 305*
-
-```rust
-char_allocator(arena, str, str) -> (str) with effects CHARS
-```
-Potential errors:
-
-16. arena is out of space
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-2. null pointer
-5. nat subtraction would yield a negative
-15. out of bounds
 
 # strdat
 ### strdat - string data without the buffer storage
@@ -4574,12 +5105,12 @@ str(edit char[] {char}, mut nat pos, console console) -> (str)
 ```
 Potential errors:
 
-2. null pointer
-5. nat subtraction would yield a negative
-15. out of bounds
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
 25. read string does not fit on buffer
+15. out of bounds
 
 ### str - create a compact str
 *Defined in: std/mini.s line 54*
@@ -4616,14 +5147,68 @@ Potential errors:
 *Defined in: std/core/string.s line 132*
 
 ```rust
-copy(list, cstr _other) -> (str) with effects CHARS
+copy(arena, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### copy - copy a string to a new buffer
+*Defined in: std/core/string.s line 132*
+
+```rust
+copy(new CHARS, cstr _other) -> (str) with effects CHARS
 ```
 Potential errors:
 
 2. null pointer
 19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+15. out of bounds
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### copy - copy a string to a new buffer
+*Defined in: std/core/string.s line 132*
+
+```rust
+copy(new CHARS, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### copy - copy a string to a new buffer
+*Defined in: std/core/string.s line 132*
+
+```rust
+copy(list, cstr _other) -> (str) with effects CHARS
+```
+Potential errors:
+
+2. null pointer
 3. division by zero 
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 11. reallocation failed
 14. cannot resize an unallocated or freed buffer
 15. out of bounds
@@ -4682,60 +5267,6 @@ Potential errors:
 18. can only define strings on contiguous buffers
 15. out of bounds
 
-### copy - copy a string to a new buffer
-*Defined in: std/core/string.s line 132*
-
-```rust
-copy(arena, str) -> (str) with effects CHARS
-```
-Potential errors:
-
-16. arena is out of space
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-
-### copy - copy a string to a new buffer
-*Defined in: std/core/string.s line 132*
-
-```rust
-copy(new CHARS, cstr _other) -> (str) with effects CHARS
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
-
-
-Returned values defer use of the following functions:
-```rust
-exists(any ptr) -> (bool)
-free(mut any ptr) -> ()
-```
-### copy - copy a string to a new buffer
-*Defined in: std/core/string.s line 132*
-
-```rust
-copy(new CHARS, str) -> (str) with effects CHARS
-```
-Potential errors:
-
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-
-
-Returned values defer use of the following functions:
-```rust
-exists(any ptr) -> (bool)
-free(mut any ptr) -> ()
-```
 ### copy - copy a vector
 *Defined in: std/sci/vec.s line 227*
 
@@ -4797,29 +5328,6 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 # copy\_null\_terminated
-### copy\_null\_terminated - create null terminated string
-*Defined in: std/core/string.s line 139*
-
-Copies a string to a new buffer while ensuring null termination.
-This is mainly useful for supporting 'cstr unsafe_temp'.
-
-```rust
-copy_null_terminated(new CHARS, str) -> (str) with effects CHARS
-```
-Potential errors:
-
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-
-
-Returned values defer use of the following functions:
-```rust
-exists(any ptr) -> (bool)
-free(mut any ptr) -> ()
-```
 ### copy\_null\_terminated - copy a string while adding null termination
 *Defined in: std/core/string.s line 220*
 
@@ -4854,7 +5362,45 @@ Potential errors:
 19. can only define strings on non-offset buffers
 21. string buffer out of memory
 
+### copy\_null\_terminated - create null terminated string
+*Defined in: std/core/string.s line 139*
+
+Copies a string to a new buffer while ensuring null termination.
+This is mainly useful for supporting 'cstr unsafe_temp'.
+
+```rust
+copy_null_terminated(new CHARS, str) -> (str) with effects CHARS
+```
+Potential errors:
+
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
 # unsafe\_temp
+### unsafe\_temp - tautology function for cstr
+*Defined in: std/core/string.s line 171*
+
+This is mainly used as a stt-input counterpart for converting str|cstr to cstr.
+
+```rust
+unsafe_temp(cstr) -> (cstr cstr, str)
+```
+Potential errors:
+
+19. can only define strings on non-offset buffers
+2. null pointer
+18. can only define strings on contiguous buffers
+15. out of bounds
+
 ### unsafe\_temp - convert a string to a temporary null-terminated (cstr,str) pair
 *Defined in: std/core/string.s line 149*
 
@@ -4891,21 +5437,6 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
-### unsafe\_temp - tautology function for cstr
-*Defined in: std/core/string.s line 171*
-
-This is mainly used as a stt-input counterpart for converting str|cstr to cstr.
-
-```rust
-unsafe_temp(cstr) -> (cstr cstr, str)
-```
-Potential errors:
-
-19. can only define strings on non-offset buffers
-2. null pointer
-18. can only define strings on contiguous buffers
-15. out of bounds
-
 # endpos
 ### endpos - the end position of a string
 *Defined in: std/core/string.s line 183*
@@ -4923,6 +5454,21 @@ endpos(str) -> (nat)
 
 ```rust
 slice(str, nat from, nat to) -> (str)
+```
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+5. nat subtraction would yield a negative
+22. slice out of string bounds
+15. out of bounds
+
+### slice
+*Defined in: std/core/string.s line 255*
+
+```rust
+slice(cstr _s, nat from, nat to) -> (str)
 ```
 Potential errors:
 
@@ -5144,9 +5690,9 @@ contains(cstr _stack, char needle) -> (bool)
 ```
 Potential errors:
 
-18. can only define strings on contiguous buffers
 2. null pointer
 19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 8. iteration end
 9. iterator range
 15. out of bounds
@@ -5221,22 +5767,6 @@ Rand(nat) -> (Rand)
 ```
 
 # Hashable
-### nat - an unsigned integer value
-*Defined by the compiler*
-
-Represents values in the range `0 to 2^64-1`.
-
-```rust
-nat() -> (nat)
-```
-
-### float
-*Defined by the compiler*
-
-```rust
-float() -> (float)
-```
-
 ### cstr - constant string
 *Defined by the compiler*
 
@@ -5253,86 +5783,20 @@ Serves as a tautology function for code that parses on multiple number types.
 float(float) -> (float)
 ```
 
-### float - cast to float
-*Defined in: std/core/convert.s line 20*
+### nat - an unsigned integer value
+*Defined by the compiler*
 
-May lose information because floats are not exact representation of all integers.
+Represents values in the range `0 to 2^64-1`.
 
 ```rust
-float(int) -> (float)
+nat() -> (nat)
 ```
 
-### nat - cast to nat
-*Defined in: std/core/convert.s line 51*
-
-Converting a character to a natural number considers
-its bit representation interpreted as an unsigned number.
+### float
+*Defined by the compiler*
 
 ```rust
-nat(char) -> (nat)
-```
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
-
-Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
-
-```rust
-nat(nat) -> (nat)
-```
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
-
-Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
-
-```rust
-nat(int) -> (nat)
-```
-Potential errors:
-
-7. cannot convert negative int to id
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
-
-Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
-
-```rust
-nat(float) -> (nat)
-```
-Potential errors:
-
-6. cannot convert negative float to id
-
-### float - cast to float
-*Defined in: std/core/convert.s line 20*
-
-May lose information because floats are not exact representation of all integers.
-
-```rust
-float(nat) -> (float)
-```
-
-### float - cast to float
-*Defined in: std/core/convert.s line 95*
-
-Converts a bit representation to the corresponding float number.
-
-```rust
-float(bits) -> (float)
-```
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 84*
-
-Converts a bit representation to the corresponding natural number.
-
-```rust
-nat(bits) -> (nat)
+float() -> (float)
 ```
 
 ### str - convert to string
@@ -5471,6 +5935,88 @@ str(char ptr unsafe_ptr {char}, nat dat.pos, nat dat.length, char dat.first) -> 
 nat(nat16) -> (nat)
 ```
 
+### float - cast to float
+*Defined in: std/core/convert.s line 95*
+
+Converts a bit representation to the corresponding float number.
+
+```rust
+float(bits) -> (float)
+```
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 84*
+
+Converts a bit representation to the corresponding natural number.
+
+```rust
+nat(bits) -> (nat)
+```
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 51*
+
+Converting a character to a natural number considers
+its bit representation interpreted as an unsigned number.
+
+```rust
+nat(char) -> (nat)
+```
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 40*
+
+Converting to natural numbers loses information.
+ Failed on negative input because it typically indicates a later error in buffer indexing.
+
+```rust
+nat(nat) -> (nat)
+```
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 40*
+
+Converting to natural numbers loses information.
+ Failed on negative input because it typically indicates a later error in buffer indexing.
+
+```rust
+nat(int) -> (nat)
+```
+Potential errors:
+
+7. cannot convert negative int to id
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 40*
+
+Converting to natural numbers loses information.
+ Failed on negative input because it typically indicates a later error in buffer indexing.
+
+```rust
+nat(float) -> (nat)
+```
+Potential errors:
+
+6. cannot convert negative float to id
+
+### float - cast to float
+*Defined in: std/core/convert.s line 20*
+
+May lose information because floats are not exact representation of all integers.
+
+```rust
+float(nat) -> (float)
+```
+
+### float - cast to float
+*Defined in: std/core/convert.s line 20*
+
+May lose information because floats are not exact representation of all integers.
+
+```rust
+float(int) -> (float)
+```
+
 ### cstr - a cstr description of an error code
 *Defined in: std/core/error.s line 19*
 
@@ -5494,12 +6040,12 @@ str(edit char[] {char}, mut nat pos, console console) -> (str)
 ```
 Potential errors:
 
-2. null pointer
-5. nat subtraction would yield a negative
-15. out of bounds
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
+2. null pointer
+5. nat subtraction would yield a negative
 25. read string does not fit on buffer
+15. out of bounds
 
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s line 177*
@@ -5679,6 +6225,21 @@ is_zero(str) -> (bool)
 *Defined in: std/hash.s line 54*
 
 ```rust
+find(nat[] {nat}, nat _k) -> (mut nat)
+```
+Potential errors:
+
+2. null pointer
+4. modulo by zero 
+53. index not found
+5. nat subtraction would yield a negative
+8. iteration end
+15. out of bounds
+
+### find
+*Defined in: std/hash.s line 54*
+
+```rust
 find(str[] {str}, str) -> (mut nat)
 ```
 Potential errors:
@@ -5717,23 +6278,8 @@ Potential errors:
 
 2. null pointer
 4. modulo by zero 
-5. nat subtraction would yield a negative
 53. index not found
-8. iteration end
-15. out of bounds
-
-### find
-*Defined in: std/hash.s line 54*
-
-```rust
-find(nat[] {nat}, nat _k) -> (mut nat)
-```
-Potential errors:
-
-2. null pointer
-4. modulo by zero 
 5. nat subtraction would yield a negative
-53. index not found
 8. iteration end
 15. out of bounds
 
@@ -5961,18 +6507,6 @@ isinf(float) -> (bool)
 *Defined in: std/sci/vec.s line 34*
 
 ```rust
-vec(arena, nat length) -> (mut vec) with effects FLOATS
-```
-Potential errors:
-
-16. arena is out of space
-58. can only place vectors on contiguous buffers
-59. cannot place vectors on buffer offsets
-
-### vec - vector allocation
-*Defined in: std/sci/vec.s line 34*
-
-```rust
 vec(circular, nat length) -> (mut vec) with effects FLOATS
 ```
 Potential errors:
@@ -5990,6 +6524,18 @@ vec(circular, nat length, "dirty") -> (mut vec) with effects FLOATS
 Potential errors:
 
 17. does not fit in circular arena
+58. can only place vectors on contiguous buffers
+59. cannot place vectors on buffer offsets
+
+### vec - vector allocation
+*Defined in: std/sci/vec.s line 34*
+
+```rust
+vec(arena, nat length) -> (mut vec) with effects FLOATS
+```
+Potential errors:
+
+16. arena is out of space
 58. can only place vectors on contiguous buffers
 59. cannot place vectors on buffer offsets
 
@@ -6102,32 +6648,6 @@ to indicate the new matrix's orientation.
 mat(vec, "row") -> (mut mat)
 ```
 
-### mat - matrix on an existing float[] buffer
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit float[] {float}, nat rows) -> (mut mat)
-```
-Potential errors:
-
-16. arena is out of space
-3. division by zero 
-61. can only place matrices on contiguous buffers
-62. cannot place matrices on buffer offsets
-63. buffer size not divisible by vector rows
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 21*
-
-```rust
-mat(circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
-```
-Potential errors:
-
-17. does not fit in circular arena
-61. can only place matrices on contiguous buffers
-62. cannot place matrices on buffer offsets
-
 ### mat - matrix on an existing vecpos
 *Defined in: std/sci/mat.s line 21*
 
@@ -6200,6 +6720,32 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
+### mat - matrix on an existing float[] buffer
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit float[] {float}, nat rows) -> (mut mat)
+```
+Potential errors:
+
+16. arena is out of space
+3. division by zero 
+61. can only place matrices on contiguous buffers
+62. cannot place matrices on buffer offsets
+63. buffer size not divisible by vector rows
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 21*
+
+```rust
+mat(circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
+```
+Potential errors:
+
+17. does not fit in circular arena
+61. can only place matrices on contiguous buffers
+62. cannot place matrices on buffer offsets
+
 # sparse\_element
 ### sparse\_element
 *Defined in: std/sci/unsafe.s line 13*
@@ -6325,235 +6871,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
 
 ```rust
-reduce(vec, "mul", "l2") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", "sqr") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", "abs") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "add", "l2") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "add", "sqr") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "add", "abs") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "add") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "l2") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sqr") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "abs") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec) -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec) -> (float)
+reduce(vec, "rel", vec, "mul", "abs") -> (float)
 ```
 Potential errors:
 
@@ -6573,7 +6891,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
 
 ```rust
-reduce(vec, "rel", vec, "abs") -> (float)
+reduce(vec, "rel", vec, "mul") -> (float)
 ```
 Potential errors:
 
@@ -6593,67 +6911,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
 
 ```rust
-reduce(vec, "rel", vec, "sqr") -> (float)
-```
-Potential errors:
-
-2. null pointer
-3. division by zero 
-8. iteration end
-9. iterator range
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "l2") -> (float)
-```
-Potential errors:
-
-2. null pointer
-3. division by zero 
-8. iteration end
-9. iterator range
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "add") -> (float)
-```
-Potential errors:
-
-2. null pointer
-3. division by zero 
-8. iteration end
-9. iterator range
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "add", "abs") -> (float)
+reduce(vec, "rel", vec, "add", "l2") -> (float)
 ```
 Potential errors:
 
@@ -6693,7 +6951,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
 
 ```rust
-reduce(vec, "rel", vec, "add", "l2") -> (float)
+reduce(vec, "rel", vec, "add", "abs") -> (float)
 ```
 Potential errors:
 
@@ -6701,6 +6959,239 @@ Potential errors:
 3. division by zero 
 8. iteration end
 9. iterator range
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "add") -> (float)
+```
+Potential errors:
+
+2. null pointer
+3. division by zero 
+8. iteration end
+9. iterator range
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "l2") -> (float)
+```
+Potential errors:
+
+2. null pointer
+3. division by zero 
+8. iteration end
+9. iterator range
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "sqr") -> (float)
+```
+Potential errors:
+
+2. null pointer
+3. division by zero 
+8. iteration end
+9. iterator range
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "abs") -> (float)
+```
+Potential errors:
+
+2. null pointer
+3. division by zero 
+8. iteration end
+9. iterator range
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec) -> (float)
+```
+Potential errors:
+
+2. null pointer
+3. division by zero 
+8. iteration end
+9. iterator range
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul", "l2") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul", "sqr") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul", "abs") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add", "l2") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add", "sqr") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
 15. out of bounds
 
 ### reduce - reduce a vector to one value
@@ -6751,25 +7242,6 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
 
 ```rust
-reduce(vec, "sub", vec, "abs") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
 reduce(vec, "sub", vec) -> (float)
 ```
 Potential errors:
@@ -6789,414 +7261,13 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
 
 ```rust
-reduce(vec, "sub", vec, "add") -> (float)
+reduce(vec, "sub", vec, "abs") -> (float)
 ```
 Potential errors:
 
 8. iteration end
 9. iterator range
 2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add", "sqr") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add", "l2") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul", "abs") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul", "sqr") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul", "l2") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "abs") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "l2") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "sqr") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "abs") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec) -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "sqr") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "l2") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add", "abs") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "abs") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "sqr") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "l2") -> (float)
-```
-Potential errors:
-
-8. iteration end
-9. iterator range
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "mul") -> (float)
-```
-Potential errors:
-
-2. null pointer
-3. division by zero 
-8. iteration end
-9. iterator range
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 151*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "mul", "abs") -> (float)
-```
-Potential errors:
-
-2. null pointer
-3. division by zero 
-8. iteration end
-9. iterator range
 15. out of bounds
 
 ### reduce - reduce a vector to one value
@@ -7237,6 +7308,253 @@ Potential errors:
 3. division by zero 
 8. iteration end
 9. iterator range
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "l2") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "sqr") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "abs") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add", "abs") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "l2") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "sqr") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "abs") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec) -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "abs") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "sqr") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "l2") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
 15. out of bounds
 
 ### reduce - reduce a vector to one value
@@ -7467,6 +7785,234 @@ Potential errors:
 2. null pointer
 15. out of bounds
 
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", "l2") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", "sqr") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", "abs") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "add", "l2") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "add", "sqr") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "add", "abs") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "add") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "l2") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sqr") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "abs") -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 151*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec) -> (float)
+```
+Potential errors:
+
+8. iteration end
+9. iterator range
+2. null pointer
+15. out of bounds
+
 # sum
 ### sum - sum
 *Defined in: std/sci/vec.s line 184*
@@ -7642,32 +8188,32 @@ self(vec) -> (arena, vec)
 
 # rows
 ### rows - number of rows
-*Defined in: std/sci/coo.s line 22*
-
-```rust
-rows(coo) -> (nat)
-```
-
-### rows - number of rows
 *Defined in: std/sci/mat.s line 6*
 
 ```rust
 rows(mat) -> (nat)
 ```
 
-# cols
-### cols - number of columns
-*Defined in: std/sci/coo.s line 26*
+### rows - number of rows
+*Defined in: std/sci/coo.s line 22*
 
 ```rust
-cols(coo) -> (nat)
+rows(coo) -> (nat)
 ```
 
+# cols
 ### cols - number of columns
 *Defined in: std/sci/mat.s line 10*
 
 ```rust
 cols(mat) -> (nat)
+```
+
+### cols - number of columns
+*Defined in: std/sci/coo.s line 26*
+
+```rust
+cols(coo) -> (nat)
 ```
 
 # constmat
@@ -7722,9 +8268,9 @@ todense(circular, coo) -> (mut mat) with effects FLOATS
 Potential errors:
 
 64. row out of bounds
-17. does not fit in circular arena
-2. null pointer
 65. column out of bounds
+2. null pointer
+17. does not fit in circular arena
 61. can only place matrices on contiguous buffers
 62. cannot place matrices on buffer offsets
 15. out of bounds
@@ -7737,10 +8283,10 @@ todense(arena, coo) -> (mut mat) with effects FLOATS
 ```
 Potential errors:
 
-16. arena is out of space
 64. row out of bounds
-2. null pointer
 65. column out of bounds
+2. null pointer
+16. arena is out of space
 61. can only place matrices on contiguous buffers
 62. cannot place matrices on buffer offsets
 15. out of bounds
@@ -7786,33 +8332,6 @@ Warning: directly calling this constructor without safety checks is unsafe.
 mat(float ptr unsafe_ptr {float}, nat pos, nat rows, nat cols, nat stride) -> (mut mat)
 ```
 
-### coo
-*Defined in: std/sci/coo.s line 40*
-
-```rust
-coo(sparse_element[] {nat row, nat col, float value}, nat rows, nat cols) -> (mut coo)
-```
-
-### coo - allocate a sparse matrix
-*Defined in: std/sci/coo.s line 34*
-
-This creates a new buffer of sparse elements for convenience.
-
-```rust
-coo(nat rows, nat cols, nat nnz) -> (mut coo)
-```
-Potential errors:
-
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-
-
-Returned values defer use of the following functions:
-```rust
-exists(any ptr) -> (bool)
-free(mut any ptr) -> ()
-```
 ### mat - view a vector as a matrix on the same memory
 *Defined in: std/sci/mat.s line 55*
 
@@ -7832,32 +8351,6 @@ to indicate the new matrix's orientation.
 ```rust
 mat(vec, "row") -> (mut mat)
 ```
-
-### mat - matrix on an existing float[] buffer
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit float[] {float}, nat rows) -> (mut mat)
-```
-Potential errors:
-
-16. arena is out of space
-3. division by zero 
-61. can only place matrices on contiguous buffers
-62. cannot place matrices on buffer offsets
-63. buffer size not divisible by vector rows
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 21*
-
-```rust
-mat(circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
-```
-Potential errors:
-
-17. does not fit in circular arena
-61. can only place matrices on contiguous buffers
-62. cannot place matrices on buffer offsets
 
 ### mat - matrix on an existing vecpos
 *Defined in: std/sci/mat.s line 21*
@@ -7918,6 +8411,59 @@ free(mut any ptr) -> ()
 
 ```rust
 mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
+```
+Potential errors:
+
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### mat - matrix on an existing float[] buffer
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit float[] {float}, nat rows) -> (mut mat)
+```
+Potential errors:
+
+16. arena is out of space
+3. division by zero 
+61. can only place matrices on contiguous buffers
+62. cannot place matrices on buffer offsets
+63. buffer size not divisible by vector rows
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 21*
+
+```rust
+mat(circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
+```
+Potential errors:
+
+17. does not fit in circular arena
+61. can only place matrices on contiguous buffers
+62. cannot place matrices on buffer offsets
+
+### coo
+*Defined in: std/sci/coo.s line 40*
+
+```rust
+coo(sparse_element[] {nat row, nat col, float value}, nat rows, nat cols) -> (mut coo)
+```
+
+### coo - allocate a sparse matrix
+*Defined in: std/sci/coo.s line 34*
+
+This creates a new buffer of sparse elements for convenience.
+
+```rust
+coo(nat rows, nat cols, nat nnz) -> (mut coo)
 ```
 Potential errors:
 

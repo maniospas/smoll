@@ -17,15 +17,23 @@
 local import "std/core/numbers.s"
 
 def of(nat to)
+    doc "yields a pair of nats"
+    doc "Represents the range [0, to) where 'to' its  its arguments."
     return (0, to)
 
 def of(nat from, "to", nat to)
+    doc "yields a pair of nats"
+    doc "Represents the range [from, to) where 'from' and 'to' are the arguments."
     return (from, to)
 
 def of(nat from, "upto", nat to)
+    doc "yields a pair of nats"
+    doc "Represents the range [from, to] where 'from' and 'to' are the arguments."
     return (from, to+1)
 
 def of(nat from, "lento", nat length)
+    doc "yields a pair of nats"
+    doc "Represents the range [from, from+length] where 'from' and 'length' are the arguments."
     return (from, from+length)
 
 def range(nat _from, nat to)

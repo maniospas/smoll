@@ -80,10 +80,10 @@ def mul(effect edit float_allocator FLOATS, mat m, vec v)
     doc "Grabs an allocator for the result as an effect."
     if m.cols!=v.length fail "matrix columns must match vector length"
     result = vec m.rows
-    it_i = range m.rows
+    it_i = range of m.rows
     while try i=next it_i
         acc = mut 0.0
-        it_j = range m.cols
+        it_j = range of m.cols
         while try j=next it_j
             acc = acc+m[i,j]*v[j]
         result[i] = acc
@@ -94,10 +94,10 @@ def mul(effect edit float_allocator FLOATS, vec v, mat m)
     doc "Grabs an allocator for the result as an effect."
     if v.length!=m.rows fail "vector length must match matrix rows"
     result = vec m.cols
-    it_j = range m.cols
+    it_j = range of m.cols
     while try j=next it_j
         acc = mut 0.0
-        it_i = range m.rows
+        it_i = range of m.rows
         while try i=next it_i
             acc = acc+v[i]*m[i,j]
         result[j] = acc
@@ -108,12 +108,12 @@ def mul(effect edit float_allocator FLOATS, mat m1, mat m2)
     doc "Grabs an allocator for the result as an effect."
     if m1.cols!=m2.rows fail "inner dimensions must agree"
     result = mat(m1.rows, m2.cols)
-    it_i = range m1.rows
+    it_i = range of m1.rows
     while try i=next it_i
-        it_j = range m2.cols
+        it_j = range of m2.cols
         while try j=next it_j
             acc = mut 0.0
-            it_k = range m1.cols
+            it_k = range of m1.cols
             while try k=next it_k
                 acc = acc+m1[i,k]*m2[k,j]
             result[i,j] = acc
@@ -124,13 +124,13 @@ def print(effect mut console CLI, mat m, cstr|blank endl)
     doc "single-row matrices stay on one line; taller ones get top/mid/bottom brackets"
     if endl is blank
         endl = "\n"
-    it_i = range m.rows
+    it_i = range of m.rows
     while try i=next it_i
         if m.rows==1  print ("[ ", "")
         if m.rows>1 and i==0 print ("⎡ ", "")
         if m.rows>1 and i>0 and i<m.rows-1 print ("⎢ ", "")
         if m.rows>1 and i==m.rows-1 print ("⎣ ", "")
-        it_j = range m.cols
+        it_j = range of m.cols
         while try j=next it_j
             print (m[i,j], "")
             if j<m.cols-1 print ("  ", "")

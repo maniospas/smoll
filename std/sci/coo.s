@@ -73,7 +73,7 @@ def mul(effect edit float_allocator FLOATS, coo m1, mat m2)
     if m1.cols!=m2.rows fail "inner dimensions must agree"
     result = mat(m1.rows, m2.cols)
     for entry in m1
-        it_j = range m2.cols
+        it_j = range of m2.cols
         while try j=next it_j
             result[entry.row,j] = result[entry.row,j]+entry.value*m2[entry.col,j]
     return result

@@ -10,7 +10,7 @@ local def raw_get(effect mut console CLI, str url, str path)
     buf.copy url
     buf.copy postfix
     buf.copy path
-    process:system str buf
+    process:system str status buf
 
 def get(effect mut console CLI, str|cstr url, str|cstr|blank path)
     doc "GET with system curl"

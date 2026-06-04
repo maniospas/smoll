@@ -21,12 +21,12 @@ static const char* __t_all_errcodes[35] = {"noerr",
 "cannot allocate a buffer of unsized type",
 "cannot resize an unallocated or freed buffer",
 "out of bounds",
+"arena is out of space",
+"does not fit in circular arena",
 "can only define strings on contiguous buffers",
 "can only define strings on non-offset buffers",
 "string does not fit on buffer",
-"character copy does not fit on buffer",
 "string buffer out of memory",
-"cannot copy onto the same buffer",
 "slice out of string bounds",
 "unexpected end of console read",
 "user input was not a float",
@@ -47,36 +47,36 @@ static inline __attribute__((always_inline)) void console__t366t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void false__t10t(int* __t1562t) {
+static inline __attribute__((always_inline)) void false__t10t(int* __t1619t) {
   int value=0;
-  *__t1562t=value;
+  *__t1619t=value;
 }
 
-static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t1563t) {
+static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t1620t) {
   int __t38t__=0;
   false__t10t(&__t38t__);
   goto __t_return;
   __t_return:
-  *__t1563t=__t38t__;
+  *__t1620t=__t38t__;
 }
 
-static inline __attribute__((always_inline)) void is_different__t95t(uint64_t x, uint64_t y, int* __t1564t) {
+static inline __attribute__((always_inline)) void is_different__t95t(uint64_t x, uint64_t y, int* __t1621t) {
   int __t96t=0;
   int __t97t__=0;
   not__t37t(__t96t,&__t97t__);
   goto __t_return;
   __t_return:
-  *__t1564t=__t97t__;
+  *__t1621t=__t97t__;
 }
 
-static inline __attribute__((always_inline)) void add__t175t(uint64_t x, uint64_t y, uint64_t* __t1565t) {
+static inline __attribute__((always_inline)) void add__t175t(uint64_t x, uint64_t y, uint64_t* __t1622t) {
   int __t176t__=0;
   uint64_t z=0;
   is_different__t95t(x,y,&__t176t__);
   z=x+y;
   goto __t_return;
   __t_return:
-  *__t1565t=z;
+  *__t1622t=z;
 }
 
 static inline __attribute__((always_inline)) void print__t393t(uint64_t value) {
@@ -86,22 +86,22 @@ static inline __attribute__((always_inline)) void print__t393t(uint64_t value) {
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__t1555t() {
-  uint64_t __t1557t=0;
-  uint64_t __t1558t=0;
+static inline __attribute__((always_inline)) void main__t1612t() {
+  uint64_t __t1614t=0;
+  uint64_t __t1615t=0;
   uint64_t x=0;
   uint64_t y=0;
   uint64_t z=0;
-  uint64_t __t1559t=0;
-  uint64_t __t1560t__=0;
+  uint64_t __t1616t=0;
+  uint64_t __t1617t__=0;
   console__t366t();
-  __t1557t=1;
-  __t1558t=__t1557t;
-  x=__t1558t;
-  __t1559t=2;
-  x=__t1559t;
-  add__t175t(x,x,&__t1560t__);
-  print__t393t(__t1560t__);
+  __t1614t=1;
+  __t1615t=__t1614t;
+  x=__t1615t;
+  __t1616t=2;
+  x=__t1616t;
+  add__t175t(x,x,&__t1617t__);
+  print__t393t(__t1617t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1555t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1612t();return 0;}

@@ -18,42 +18,27 @@ def mat(effect edit new FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
         buf.unsafe_ptr.unsafe:zero(0, 8*len buf)
     return mat(buf.unsafe_ptr, 0, rows, cols, cols)
 
-def mat(effect edit float_arena FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
+def mat(effect edit float_allocator\new FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
     doc "matrix on an existing vecpos"
     if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
     if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place matrices on buffer offsets"
-    if FLOATS.pos+rows*cols>len FLOATS.buf fail "matrix exceeds buffer limits"
-    start = const FLOATS.pos
-    FLOATS.pos = FLOATS.pos+rows*cols
+    size = rows*cols
+    surface = FLOATS.alloc size
     if clear_policy is blank
-        FLOATS.buf.unsafe_ptr.unsafe:zero(8*start, 8*FLOATS.pos)
-    return mat(FLOATS.buf.unsafe_ptr, start, rows, cols, cols)
+        surface.buf.unsafe_ptr.unsafe:zero(8*surface.pos, 8*(surface.pos+size))
+    return mat(FLOATS.buf.unsafe_ptr, surface.pos, rows, cols, cols)
 
 def constmat(float[] buf, nat rows)
     doc "immutable matrix on an immutable float[] buffer"
     cols = len(buf)/rows
     if cols*rows!=len buf fail "buffer size not divisible by vector rows"
-    return const mat(unsafe_mut buf, mut 0, rows, cols)
+    return const mat(arena unsafe_mut buf, rows, cols)
 
 def mat(edit float[] buf, nat rows)
     doc "matrix on an existing float[] buffer"
     cols = len(buf)/rows
     if cols*rows!=len buf fail "buffer size not divisible by vector rows"
-    return mat(buf, mut 0, rows, cols)
-
-def mat(effect edit circular FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
-    doc "matrix on a circular buffer"
-    if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
-    if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place matrices on buffer offsets"
-    if rows*cols>len FLOATS.buf fail "matrix exceeds buffer limits"
-    start = mut FLOATS.pos
-    FLOATS.pos = FLOATS.pos+rows*cols
-    if FLOATS.pos>=FLOATS.length
-        FLOATS.pos = rows*cols+0
-        start = 0
-    if clear_policy is blank
-        FLOATS.buf.unsafe_ptr.unsafe:zero(8*start, 8*FLOATS.pos)
-    return mat(FLOATS.buf.unsafe_ptr, start, rows, cols, cols)
+    return mat(arena unsafe_mut buf, rows, cols)
 
 def mutget(edit mat m, nat i, nat j)
     doc "mutable reference to matrix element (i,j)"
@@ -90,7 +75,7 @@ def row(mat m, nat i)
     if i>=m.rows fail "row out of bounds"
     return vec(m.unsafe_ptr, m.pos+i*m.stride, m.cols)
 
-def mul(effect edit vec_allocator FLOATS, mat m, vec v)
+def mul(effect edit float_allocator FLOATS, mat m, vec v)
     doc "matrix-vector multiplication"
     doc "Grabs an allocator for the result as an effect."
     if m.cols!=v.length fail "matrix columns must match vector length"
@@ -104,7 +89,7 @@ def mul(effect edit vec_allocator FLOATS, mat m, vec v)
         result[i] = acc
     return result
 
-def mul(effect edit vec_allocator FLOATS, vec v, mat m)
+def mul(effect edit float_allocator FLOATS, vec v, mat m)
     doc "vector-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
     if v.length!=m.rows fail "vector length must match matrix rows"
@@ -118,7 +103,7 @@ def mul(effect edit vec_allocator FLOATS, vec v, mat m)
         result[j] = acc
     return result
 
-def mul(effect edit vec_allocator FLOATS, mat m1, mat m2)
+def mul(effect edit float_allocator FLOATS, mat m1, mat m2)
     doc "matrix-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
     if m1.cols!=m2.rows fail "inner dimensions must agree"

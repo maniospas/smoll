@@ -89,12 +89,51 @@ def export(path, target):
             font-size: 0.9rem;
             justify-content: center;
         }
-        .topbar a {
+        .topbar > a, .topbar > .dropdown > a {
             text-decoration: none;
             font-weight: 500;
             color: #444;
         }
-        .topbar a:hover { color: #58a6ff; }
+        .topbar > a:hover, .topbar > .dropdown > a:hover { color: #58a6ff; }
+        .dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        .dropdown > a::after {
+            content: " ▾";
+            font-size: 0.75em;
+            opacity: 0.6;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 6px 0;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 3000;
+        }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a {
+            display: block;
+            padding: 7px 18px;
+            font-weight: 400;
+            white-space: nowrap;
+            color: #444;
+        }
+        .dropdown-menu a:hover { color: #58a6ff; background: #f5f5f5; }
+        .dropdown-menu hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 4px 0;
+        }
         .toc {
             position:fixed;
             padding-top:50px;
@@ -123,12 +162,18 @@ def export(path, target):
                 background:#1f1f1f;
                 border-bottom: 1px solid #444;
             }
-            .topbar a {color:#dddddd;}
+            .topbar > a, .topbar > .dropdown > a {color:#dddddd;}
             .toc {
                 color:#eeeeee;
                 background:#1f1f1f;
             }
-            
+            .dropdown-menu {
+                background: #1f1f1f;
+                border-color: #444;
+            }
+            .dropdown-menu a { color: #ddd; }
+            .dropdown-menu a:hover { background: #2f2f2f; color: #58a6ff; }
+            .dropdown-menu hr { border-color: #444; }
         }
         @media (max-width: 1380px) {
             body {margin:10px;}
@@ -211,20 +256,30 @@ def export(path, target):
         <nav class="topbar">
             <a href="index.html" style="position:absolute;left:20px;font-weight:{'900' if 'index' in target else '500'}">Smoλ</a>
             <a href="install.html" style="font-weight:{'900' if 'install' in target else '500'}">Install</a>
-            <a href="reference.html" style="font-weight:{'900' if 'reference' in target else '500'}">Learn</a>
+            <div class="dropdown">
+                <a href="#" style="font-weight:{'900' if any(t in target for t in ['tutorial_cli', 'tutorial_web', 'tutorial_game', 'tutorial_data', 'tutorial_graph']) else '500'}">Tutorials</a>
+                <div class="dropdown-menu">
+                    <a href="tutorial_cli.html" style="font-weight:{'900' if 'tutorial_cli' in target else '400'}">Command line app</a>
+                    <a href="tutorial_web.html" style="font-weight:{'900' if 'tutorial_web' in target else '400'}">Web server</a>
+                    <a href="tutorial_game.html" style="font-weight:{'900' if 'tutorial_game' in target else '400'}">Game dev</a>
+                    <a href="tutorial_data.html" style="font-weight:{'900' if 'tutorial_data' in target else '400'}">Data analysis</a>
+                    <a href="tutorial_graph.html" style="font-weight:{'900' if 'tutorial_graph' in target else '400'}">Graph mining</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" style="font-weight:{'900' if 'reference' in target or 'std' in target else '500'}">Documentation</a>
+                <div class="dropdown-menu">
+                    <a href="reference.html" style="font-weight:{'900' if 'reference' in target else '400'}">Learn</a>
+                    <a href="std.html" style="font-weight:{'900' if 'std' in target else '400'}">Standard library</a>
+                </div>
+            </div>
             <a href="playground.html" style="font-weight:{'900' if 'playground' in target else '500'}">Playground</a>
-            <a href="std.html" style="font-weight:{'900' if 'std' in target else '500'}">Standard library</a>
             <a href="https://github.com/maniospas/smoll">GitHub</a>
         </nav>
     """ + html + run_button_script + """
     </body>
     </html>
     """
-
-    # repl = """const resp = await fetch('https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/smoll.py');if (!resp.ok) throw new Error('HTTP ' + resp.status);const raw = await resp.text();"""
-    # if repl in html:
-    #     with open("smoll.py") as src: src = src.read()
-    #     html = html.replace(repl, "const raw = `"+src.replace("\\","\\\\").replace("`", "\`").replace("{", "\{")+"`;")
 
     with open(target, "w") as file:
         file.write(html)
@@ -236,3 +291,8 @@ export("docs/tutorial.md", "docs/tutorial.html")
 export("docs/reference.md", "docs/reference.html")
 export("docs/playground.md", "docs/playground.html")
 export("docs/std.md", "docs/std.html")
+export("docs/tutorial_cli.md", "docs/tutorial_cli.html")
+export("docs/tutorial_web.md", "docs/tutorial_web.html")
+export("docs/tutorial_graph.md", "docs/tutorial_graph.html")
+export("docs/tutorial_game.md", "docs/tutorial_game.html")
+export("docs/tutorial_data.md", "docs/tutorial_data.html")

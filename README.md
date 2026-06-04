@@ -35,13 +35,6 @@ the compiler stops you from doing unsafe stuff.
 ## ⚡ Quickstart
 
 An example that shows several language features follows.
-Cheat sheet:
-- `import` brings functions from other files, and potentially organizes them in namespaces
-- `def` defines functions; functions also define types
-- `mut` denotes mutable values that can be overwritten in code
-- `.` pipes a value at the beginning of a function's arguments (e.g., `1.add 2`), or accesses a field (e.g., `point.x`)
-- `try` evaluates to boolean, depending on whether an expression failed (failures are safe)
-- calling parentheses are optional for one argument
 
 ```python
 # test.s
@@ -69,7 +62,15 @@ Download the executable from the
 ./smoll test.s
 ```
 
-Or experiment with the online playground linked above.
+Or experiment with the online playground linked above. Cheat sheet:
+- `repo` renames a path to another online or local resource
+- `import` brings functions from other files, and potentially organizes them in namespaces
+- `def` defines functions; functions also define types
+- `mut` denotes mutable values that can be overwritten in code
+- `edit` denotes that mutable internals can change
+- `.` pipes a value at the beginning of a function's arguments (e.g., `1.add 2`), or accesses a field (e.g., `point.x`)
+- `try` evaluates to boolean, depending on whether an expression failed (failures are safe)
+- calling parentheses are optional for one argument
 
 ## 🏷️ License
 

@@ -42,12 +42,51 @@
             font-size: 0.9rem;
             justify-content: center;
         }
-        .topbar a {
+        .topbar > a, .topbar > .dropdown > a {
             text-decoration: none;
             font-weight: 500;
             color: #444;
         }
-        .topbar a:hover { color: #58a6ff; }
+        .topbar > a:hover, .topbar > .dropdown > a:hover { color: #58a6ff; }
+        .dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        .dropdown > a::after {
+            content: " ▾";
+            font-size: 0.75em;
+            opacity: 0.6;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 6px 0;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 3000;
+        }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a {
+            display: block;
+            padding: 7px 18px;
+            font-weight: 400;
+            white-space: nowrap;
+            color: #444;
+        }
+        .dropdown-menu a:hover { color: #58a6ff; background: #f5f5f5; }
+        .dropdown-menu hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 4px 0;
+        }
         .toc {
             position:fixed;
             padding-top:50px;
@@ -76,12 +115,18 @@
                 background:#1f1f1f;
                 border-bottom: 1px solid #444;
             }
-            .topbar a {color:#dddddd;}
+            .topbar > a, .topbar > .dropdown > a {color:#dddddd;}
             .toc {
                 color:#eeeeee;
                 background:#1f1f1f;
             }
-            
+            .dropdown-menu {
+                background: #1f1f1f;
+                border-color: #444;
+            }
+            .dropdown-menu a { color: #ddd; }
+            .dropdown-menu a:hover { background: #2f2f2f; color: #58a6ff; }
+            .dropdown-menu hr { border-color: #444; }
         }
         @media (max-width: 1380px) {
             body {margin:10px;}
@@ -164,9 +209,24 @@
         <nav class="topbar">
             <a href="index.html" style="position:absolute;left:20px;font-weight:500">Smoλ</a>
             <a href="install.html" style="font-weight:500">Install</a>
-            <a href="reference.html" style="font-weight:900">Learn</a>
+            <div class="dropdown">
+                <a href="#" style="font-weight:500">Tutorials</a>
+                <div class="dropdown-menu">
+                    <a href="tutorial_cli.html" style="font-weight:400">Command line app</a>
+                    <a href="tutorial_web.html" style="font-weight:400">Web server</a>
+                    <a href="tutorial_game.html" style="font-weight:400">Game dev</a>
+                    <a href="tutorial_data.html" style="font-weight:400">Data analysis</a>
+                    <a href="tutorial_graph.html" style="font-weight:400">Graph mining</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" style="font-weight:900">Documentation</a>
+                <div class="dropdown-menu">
+                    <a href="reference.html" style="font-weight:900">Learn</a>
+                    <a href="std.html" style="font-weight:400">Standard library</a>
+                </div>
+            </div>
             <a href="playground.html" style="font-weight:500">Playground</a>
-            <a href="std.html" style="font-weight:500">Standard library</a>
             <a href="https://github.com/maniospas/smoll">GitHub</a>
         </nav>
     <div class="toc">
@@ -1958,28 +2018,39 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
 
 <h2 id="lists">lists</h2>
 
-<p>Manage buffers by adding push and pop operations, as well
-as a capacity-based growth strategy. This is done by calling the 
-<code>list</code> function on a mutable buffer or -preferably- on a reference 
-of a mutable buffer like the following example. List elements are accessed like 
-buffers, and there exists a <code>push</code> function that grows the list by
-one place while returning a pointer to the last element.</p>
+<p>Manage growing buffers by packing them into lists <code>alloc</code> function.
+This is done by calling the <code>list</code> function on a mutable buffer or -preferably- 
+on a reference of a mutable buffer as inthe following example. This may resize 
+the buffer to make room for at least one element. </p>
+
+<p>List elements are accessed like buffers. However, they can be used as allocators
+by calling the <code>alloc(list, nat size)</code> function, where the default size to create
+is one. Allocation returns a class instance containin a buffer and constant position,
+and that can be further cast onto a mutable pointer via an <code>at</code> function; this combination
+alongside pointer data assignment allows for quick pushing of elements at the end of 
+growing lists.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">li</span> <span class="o">=</span> <span class="n">ref</span> <span class="nb">list</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
-    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.1</span>
-    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.1</span>
-    <span class="p">(</span><span class="n">push</span> <span class="n">li</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">ref</span> <span class="n">mut</span> <span class="nb">float</span><span class="p">[]</span>
+    <span class="p">(</span><span class="n">at</span> <span class="n">alloc</span> <span class="n">mem</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="p">(</span><span class="n">at</span> <span class="n">alloc</span> <span class="n">mem</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="p">(</span><span class="n">at</span> <span class="n">alloc</span> <span class="n">mem</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.1</span>
 
-    <span class="n">li</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
-    <span class="nb">print</span> <span class="n">li</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="nb">print</span> <span class="n">li</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">mem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="nb">print</span> <span class="n">mem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="n">mem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 </code></pre>
 </div>
+
+<p>By the way, the <code>alloc</code> function can also be called on arenas and circular buffers,
+that can be similarly used once constructed per <code>mem = arena float[].alloc 3</code> 
+and <code>mem = circular float[].alloc 3</code>. These structures are more stable than lists
+in that they do not reallocate; the arena creates an error when out of size, and
+the circular buffer is an arena that restarts once full.</p>
 
 <h2 id="strings">strings</h2>
 
@@ -2129,7 +2200,7 @@ like below. Map initialization takes any allocated buffer and creates a similarl
     <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span>
     <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span>
 
-    <span class="n">it</span> <span class="o">=</span> <span class="n">arena</span> <span class="nb">map</span><span class="o">.</span><span class="n">keys</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="p">(</span><span class="nb">map</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">mut</span> <span class="mi">0</span><span class="p">)</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">key</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
         <span class="nb">print</span> <span class="n">key</span>
 </code></pre>
@@ -2145,7 +2216,7 @@ pretend that they are null-terminated, a copy may be made.</p>
 
 <p>Read a file by opening it and iterating line by
 line, like below. This needs a <code>char[]</code> buffer 
--or a <code>arena</code> on that charcater buffer- on which to 
+-or an allocator on a charcater buffer like an arena- on which to 
 store lines.</p>
 
 <div class="codehilite">
@@ -2620,15 +2691,14 @@ C code injection, but is left outside of the standard library for now.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">4096</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">README</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">mem</span> <span class="o">=</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">CHUNK_SIZE</span> <span class="c1"># pipe argument with dot, parentheses optional for one argument</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span>  <span class="c1"># save to .tmp with system curl and read it</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="n">alloc</span> <span class="mi">4096</span> <span class="c1"># parentheses optional for one argument</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="c1"># iterator defined over a (memory buffer, file) tuple</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="c1"># iterator defined for this kind of tuple</span>
         <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">+</span><span class="nb">len</span> <span class="n">line</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="s2">&quot; bytes downloaded</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre>

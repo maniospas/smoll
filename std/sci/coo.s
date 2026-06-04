@@ -50,7 +50,7 @@ def mutget(edit coo m, nat k)
     if k>=m.nnz fail "out of bounds"
     return unsafe_mut m.unsafe_ptr+k*24
 
-def mul(effect edit vec_allocator FLOATS, coo m, vec v)
+def mul(effect edit float_allocator FLOATS, coo m, vec v)
     doc "sparse matrix*vector multiplication"
     if m.cols!=v.length fail "matrix columns must match vector length"
     result = vec m.rows
@@ -58,7 +58,7 @@ def mul(effect edit vec_allocator FLOATS, coo m, vec v)
         result[entry.row] = result[entry.row]+entry.value*v[entry.col]
     return result
 
-def mul(effect edit vec_allocator FLOATS, vec v, coo m)
+def mul(effect edit float_allocator FLOATS, vec v, coo m)
     doc "vector*sparse matrix multiplication"
     doc "*Warning: the expression `self(v)*m` yields wrong values"
     "because the vector is not modified element-by-element."
@@ -68,7 +68,7 @@ def mul(effect edit vec_allocator FLOATS, vec v, coo m)
         result[entry.col] = result[entry.col]+v[entry.row]*entry.value
     return result
 
-def mul(effect edit vec_allocator FLOATS, coo m1, mat m2)
+def mul(effect edit float_allocator FLOATS, coo m1, mat m2)
     doc "sparse*dense matrix multiplication"
     if m1.cols!=m2.rows fail "inner dimensions must agree"
     result = mat(m1.rows, m2.cols)
@@ -78,7 +78,7 @@ def mul(effect edit vec_allocator FLOATS, coo m1, mat m2)
             result[entry.row,j] = result[entry.row,j]+entry.value*m2[entry.col,j]
     return result
 
-def todense(effect edit vec_allocator FLOATS, coo m)
+def todense(effect edit float_allocator FLOATS, coo m)
     doc "convert to dense mat"
     result = mat(m.rows, m.cols)
     for entry in m
@@ -86,7 +86,8 @@ def todense(effect edit vec_allocator FLOATS, coo m)
     return result
 
 def print(effect mut console CLI, coo m, cstr|blank endl)
-    doc "print sparse matrix as coordinate list: (i, j): v"
+    doc "print sparse matrix"
+    doc "Prints it as coordinate as list: (i, j): v"
     if endl is blank
         endl = "\n"
     for entry in m
@@ -98,15 +99,17 @@ def print(effect mut console CLI, coo m, cstr|blank endl)
         print (entry.value, "")
         print ("", endl)
 
-def sum(effect edit vec_allocator FLOATS, coo m, "row")
-    doc "sum of each row; result[i] = sum of all stored values in row i"
+def sum(effect edit float_allocator FLOATS, coo m, "row")
+    doc "sum of each row"
+    doc "result[i] = sum of all stored values in row i"
     result = vec m.rows
     for entry in m
         result[entry.row] = result[entry.row]+entry.value
     return result
 
-def sum(effect edit vec_allocator FLOATS, coo m, "col")
-    doc "sum of each column; result[j] = sum of all stored values in column j"
+def sum(effect edit float_allocator FLOATS, coo m, "col")
+    doc "sum of each column"
+    doc "result[j] = sum of all stored values in column j"
     result = vec m.cols
     for entry in m
         result[entry.col] = result[entry.col]+entry.value

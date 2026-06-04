@@ -1,0 +1,797 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>smoλ</title>
+        <link rel="stylesheet" href="index.css"> 
+        <style>
+        body {
+            max-width:800px;
+            margin:40px auto;
+            padding:0 10px;
+            font:18px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            color:#444;
+        }
+        h1:first-child {font-size:4rem}
+        h2,
+        h3 {
+        line-height:1.2
+        }
+        h1 {margin-top:60px}
+        a {
+            color:#888;
+            text-decoration: none;
+        }
+        a:hover {
+            color:#58a6ff
+        }
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 28px;
+            z-index: 2000;
+            font-size: 0.9rem;
+            justify-content: center;
+        }
+        .topbar > a, .topbar > .dropdown > a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #444;
+        }
+        .topbar > a:hover, .topbar > .dropdown > a:hover { color: #58a6ff; }
+        .dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        .dropdown > a::after {
+            content: " ▾";
+            font-size: 0.75em;
+            opacity: 0.6;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 6px 0;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 3000;
+        }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a {
+            display: block;
+            padding: 7px 18px;
+            font-weight: 400;
+            white-space: nowrap;
+            color: #444;
+        }
+        .dropdown-menu a:hover { color: #58a6ff; background: #f5f5f5; }
+        .dropdown-menu hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 4px 0;
+        }
+        .toc {
+            position:fixed;
+            padding-top:50px;
+            left:0;
+            top:0;
+            padding-left:20px;
+            width:200px;
+            overflow-y:auto;
+            font-size:0.9rem;
+            z-index:1000;
+        }
+        .toc i {color: #888}
+        pre {
+            color: #2f2f2f;
+        }
+        @media (prefers-color-scheme: dark) {
+            a {
+                color:#aaa;
+            }
+            body {
+                color:#eeeeee;
+                background:#1f1f1f;
+            }
+            .topbar {
+                color:#eeeeee;
+                background:#1f1f1f;
+                border-bottom: 1px solid #444;
+            }
+            .topbar > a, .topbar > .dropdown > a {color:#dddddd;}
+            .toc {
+                color:#eeeeee;
+                background:#1f1f1f;
+            }
+            .dropdown-menu {
+                background: #1f1f1f;
+                border-color: #444;
+            }
+            .dropdown-menu a { color: #ddd; }
+            .dropdown-menu a:hover { background: #2f2f2f; color: #58a6ff; }
+            .dropdown-menu hr { border-color: #444; }
+        }
+        @media (max-width: 1380px) {
+            body {margin:10px;}
+            .toc {
+                background:white!important;
+                position:static;
+                width:90%;
+                margin: 0;
+                border:0;
+            }
+        }
+        .console {
+            background: #1F1F1F; color:#EEEEEE;padding:0px 10px;font-size:0.8rem;border-radius: 8px;border:1px solid #444
+        }
+        .output {
+            white-space: pre-wrap;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .notice-box {
+            border-left: 4px solid;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-style: normal;
+        }
+        .box-warning {
+            border-color: #c0392b;
+            background: #fff0f0;
+            color: #7a1a1a;
+        }
+        .box-info {
+            border-color: #388bfd;
+            background: #e6f0ff;
+            color: #0a3069;
+        }
+        .button {
+            text-decoration: none;
+            font-weight: 500;
+            padding: 1rem;
+            padding-right: 1.5rem;
+            margin-right: 0.5rem;
+            border: 1px solid #aaa;
+            border-radius: 15px;
+            width: 200px!important;
+            font-size: 1.4rem;
+        }
+        .button:hover {
+            background: #fafae3;
+        }
+        .runbutton {
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border: 1px solid #444;
+            border-radius: 5px;
+        }
+        .runbutton:hover {
+            background: #fafafa;
+            color: #58a6ff;
+        }
+        .step {border: 1px solid #444; padding-left:20px; border-radius: 15px;background: #fafafa;margin-bottom:2rem;}
+        .button {background: white;color:#58a6ff}
+        @media (prefers-color-scheme: dark) {
+            .box-warning {
+                background: #272115;
+                color: #e3b341;
+            }
+            .box-info {
+                background: #0d1f3c;
+                color: #79c0ff;
+            }
+            .step {background: #2f2f2f;border: 1px solid #444;}
+            .button {background: #fafae3;color:black}
+        }
+        </style>
+    </head>
+    <body>
+        <nav class="topbar">
+            <a href="index.html" style="position:absolute;left:20px;font-weight:500">Smoλ</a>
+            <a href="install.html" style="font-weight:500">Install</a>
+            <div class="dropdown">
+                <a href="#" style="font-weight:900">Tutorials</a>
+                <div class="dropdown-menu">
+                    <a href="tutorial_cli.html" style="font-weight:900">Command line app</a>
+                    <a href="tutorial_web.html" style="font-weight:400">Web server</a>
+                    <a href="tutorial_game.html" style="font-weight:400">Game dev</a>
+                    <a href="tutorial_data.html" style="font-weight:400">Data analysis</a>
+                    <a href="tutorial_graph.html" style="font-weight:400">Graph mining</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" style="font-weight:500">Documentation</a>
+                <div class="dropdown-menu">
+                    <a href="reference.html" style="font-weight:400">Learn</a>
+                    <a href="std.html" style="font-weight:400">Standard library</a>
+                </div>
+            </div>
+            <a href="playground.html" style="font-weight:500">Playground</a>
+            <a href="https://github.com/maniospas/smoll">GitHub</a>
+        </nav>
+    <h1 id="command-line-apps">Command line apps</h1>
+
+<h2 id="print">print</h2>
+
+<p>The main functionality needed to build a command line app is reading arguments 
+and user input, and manipulating strings. The input-output device is the console,
+which can be declared per <code>CLI = console()</code> inside the program&#8217;s <code>main</code> function
+serving as an entry point.</p>
+
+<p>Notice the &#8220;the&#8221; in &#8220;the console&#8221;. You can have only one console in your program;
+this is called a <em>singleton</em>. If you name the console <code>CLI</code>, like below, it is 
+automatically passed to console reading and printing functions. </p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="c1"># this is a line comment</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;hello &quot;</span> <span class="c1"># adds an empty string isntead of new line at end of print </span>
+    <span class="nb">print</span> <span class="s2">&quot;world!&quot;</span>
+</code></pre>
+</div>
+
+<p>Automatically passing arguments can also be done for your own functions too, as in
+the net snippet. To unpack what the <code>greet</code> function&#8217;s argument means, it first
+declares an effect, meaning that it automatically gathers a variable called <code>CLI</code>
+from its calling scope. Its caller can also manually passe such a variable.
+The rest of the argument definition requires that what is passed should have <code>edit</code>
+permission (should not be constant) because we are going to modify some internal
+state. Finally, the <code>console</code> type of the argument is declared, followed by its name.</p>
+
+<h2 id="input-and-error-check">input and error check</h2>
+
+<p>Functions in <em>smoλ</em> are need to be followed by their input tuple, with effects
+added automatically if needed. <code>()</code> is an empty tuple, for tuples with one element
+parentheses are optional, and tuples of more elements can be built from multiple
+comma-separated values.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span> 
+    <span class="n">greet</span><span class="p">()</span> <span class="c1"># equivalent to CLI.greet()</span>
+</code></pre>
+</div>
+
+<p>Let us say that we want to read some user input, now. For numbers, this can be 
+done by passing the console as an argument to the number type name. This calls
+a corresponding function. Sidenote that operations are valid only between numbers 
+of the same type. So we need to write &#8216;1.0&#8217; with the dot to indicate a float number
+(as opposed to, say, <code>1</code> that is a natural non-negative number). Reading
+from the console is not an automatic effect, to avoid doing so accidentally.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;give a number: &quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">CLI</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;its square is: &quot;</span>
+    <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+</code></pre>
+</div>
+
+<p>If you run the above program and provide something that is not a number as input,
+it will just terminate. This is NOT a crash, but an error that can be intercepted
+and handled. Preface error-prone expressions with a <code>try</code> keyword. This actually
+evaluates to true/false depending on whether execution was successful or an error
+occurred. Use it like below. </p>
+
+<p>At the very end of our function, the <code>debug:nocatch()</code>
+function is called to ensure that we have enclosed all potential errors in a <code>try</code>
+statement. This is recognized during compilation, with the language helping us 
+identify missed errors up to that point. In general, there are several helper functions
+under the <code>debug:</code> and <code>compiler:</code> namespaces that help us interact with the compiler
+for debugging and more dynamic programs.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;give a number: &quot;</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">CLI</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;its square is: &quot;</span>
+        <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+    <span class="k">else</span>
+        <span class="nb">print</span> <span class="s2">&quot;failed to read number&quot;</span>
+    <span class="n">debug</span><span class="p">:</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
+</code></pre>
+</div>
+
+<h2 id="character-buffers">character buffers</h2>
+
+<p>Now we are ready to take one big step and learn about strings.
+So far, we used expressions within quotations, which are of the <code>cstr</code> type;
+they are null-terminated constant strings known at compile-time and packed into 
+the data segment of our programs. </p>
+
+<p>We can also work with dynamic strings of the <code>str</code> type. These track more data,
+including the first character and size for fast cache-friendly comparisons.</p>
+
+<p>Working with strings requires that we build some memory to store them,
+namely a buffer of characters. Four types of memory managment are available, 
+the simplest of which is <code>CHARS = new()</code> to force each string to 
+allocate its own memory on the heap. Such small allocations should be avoided
+however, as they are prone to create memory leaks when repeated in loops. Do
+not worry about accidentally leaking memory, however: the compiler will not let 
+you. </p>
+
+<p>Notice the capital letters in <code>CHARS</code>? Like in <code>CLI</code>? All-capitals is a convention to<br />
+indicate effects in general. Since they are passed as arguments automatically and 
+repeatedly, this draws attention without being disruptive. 
+This time, we are passing the allocator automatically to string creation methods.
+But enough talking. Here is some code.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="nb">str</span> <span class="n">name</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;hello &quot;</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">name</span>
+    <span class="nb">print</span> <span class="s2">&quot;!&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">new</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="s2">&quot;what&#39;s your name?&quot;</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;&gt;&gt; &quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span> <span class="n">CLI</span>
+    <span class="n">greet</span> <span class="n">name</span>
+</code></pre>
+</div>
+
+<p>Concatenate strings by &#8220;adding&#8221; them together. Like below.
+Notice the conversion of <code>cstr</code> quoted literals to the string 
+type. This does not allocate memory at all.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">new</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;hello &quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;world!&quot;</span>
+    <span class="nb">print</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span>
+</code></pre>
+</div>
+
+<p>Better string allocators should be placed on buffers, that is,
+regions in the heap memory (a fancy name for most RAM) that are
+allocated once and hold a bunch of data together. Declare and allocate
+buffers with patterns like <code>buf = char[].alloc 4096</code>. Or, if we were
+not fancy in using the dot notation and skipping parentheses,  <code>buf = alloc(char[], 4096)</code>.
+This declares an empty buffer of characters in <code>char[]</code> and then resizes
+it to contain <code>4096</code> elements. You can construct buffers for any type,
+in general.</p>
+
+<p>A character buffer by itself is not enough to serve as an allocator,
+because we don&#8217;t know how much memory we have consumed inside it.
+Attach a tracker position by further passing the result through the
+<code>arena</code> function. That will keep using the buffer unti it&#8217;s full,
+at which point an error will be created.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">copy</span> <span class="nb">str</span> <span class="s2">&quot;hello &quot;</span> <span class="c1"># also copy the string onto CHARS For fun</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">copy</span> <span class="nb">str</span> <span class="s2">&quot;world!&quot;</span> <span class="c1"># also copy the string onto CHARS For fun</span>
+    <span class="nb">print</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span>
+</code></pre>
+</div>
+
+<p>You might want to mix things up memory management a little. 
+For example, you may want the large cumbersome buffer to not persist 
+as we go on with our lives. Manually pass
+an allocator argument to functions to override whatever effect they
+are automatically grabbing. The next example adds <code>cstr</code> directly to 
+treat them as strings, thus creating several intermediate addition
+outcomes stored in a large buffer. But the result can be copied on
+a new memory location via the -you guessed it- <code>new()</code> allocator.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_greeting</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
+    <span class="k">return</span> <span class="n">new</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello&quot;</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="s2">&quot;world&quot;</span><span class="o">+</span><span class="s2">&quot;!&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">create_greeting</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p>At this point, we need to have &#8230; <em>the talk</em>. About memory management.
+First of all, if you want programs to be truly efficient, it is important
+to understand when copying memory is just not needed. For example, say
+that we want to rewrite the above snippet to use the minimum memory (and
+maximum speed!) possible. </p>
+
+<p>Ideally, we would declare an arena of appropriate size, copy data onto it once,
+and finally treat the whole arena buffer as a string. And below is how to
+implement this ideal scenario.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_greeting</span><span class="p">()</span>
+    <span class="c1"># create str representation of cstr to get their length with &#39;len&#39;</span>
+    <span class="c1"># this has no cost because the sizes would be computed later and</span>
+    <span class="c1"># useless data (like the first string character) are discarded automatically</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;hello&quot;</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot; &quot;</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;world&quot;</span>
+    <span class="n">s4</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;!&quot;</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="nb">len</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">s3</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">s4</span><span class="p">)</span>
+    <span class="n">copy</span> <span class="n">s1</span>
+    <span class="n">copy</span> <span class="n">s2</span>
+    <span class="n">copy</span> <span class="n">s2</span>
+    <span class="n">copy</span> <span class="n">s4</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">status</span> <span class="n">CHARS</span> <span class="kn">from</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span> <span class="c1"># from 0 to end of allocated characters</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">create_greeting</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p>Let us ignore what exactly the details of the syntax for declaring a string
+up to the current allocated characters. For something more important: the above code 
+has a lot of repetition and thus is prone to typographical error bugs (did you notice 
+that <code>copy s2</code> appearing twice by accident?) and code extensibility issues. 
+Can we generalize it? The answer should be obvious: create a
+buffer <em>of strings</em> and place the elements there. <em>Smoλ</em> gives is a shorthand
+for the allocation too by comma-separating items inside square brackets.</p>
+
+<p>Note that this is merely a string buffer. Buffer elements can be accessed 
+or set at specific positions, using <code>buf[position]=value</code> but this syntax
+is not used below. Instead a <code>for</code> loop goes through all buffer
+elements.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_greeting</span><span class="p">()</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="nb">str</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+        <span class="nb">str</span> <span class="s2">&quot; &quot;</span><span class="p">,</span>
+        <span class="nb">str</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span>
+        <span class="nb">str</span> <span class="s2">&quot;!&quot;</span>
+    <span class="p">]</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span> <span class="c1"># mutable value = allows overwriting it</span>
+    <span class="k">for</span> <span class="n">counter_part</span> <span class="ow">in</span> <span class="n">parts</span> 
+        <span class="n">size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">+</span> <span class="nb">len</span> <span class="n">counter_part</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">size</span>
+    <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span>
+        <span class="n">copy</span> <span class="n">part</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">status</span> <span class="n">CHARS</span> <span class="kn">from</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">create_greeting</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p>Or, just rewrite the whole thing as a helper function that
+concatenates a string list. There exists an extract cost for such a generalization; 
+allocating the list of strings. Evaluate your practical needs accordingly. For example,
+you may prefer to just &#8230; print the strings instead of concatenating them beforehand.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">total_length</span><span class="p">(</span><span class="nb">str</span><span class="p">[]</span> <span class="n">parts</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">counter_part</span> <span class="ow">in</span> <span class="n">parts</span> 
+        <span class="n">size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">+</span> <span class="nb">len</span> <span class="n">counter_part</span>
+    <span class="k">return</span> <span class="n">size</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="nb">str</span><span class="p">[]</span> <span class="n">parts</span><span class="p">)</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">total_length</span> <span class="n">parts</span>
+    <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span>
+        <span class="n">copy</span> <span class="n">part</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">status</span> <span class="n">CHARS</span> <span class="kn">from</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">concat</span> <span class="p">[</span>
+        <span class="nb">str</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+        <span class="nb">str</span> <span class="s2">&quot; &quot;</span><span class="p">,</span>
+        <span class="nb">str</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span>
+        <span class="nb">str</span> <span class="s2">&quot;!&quot;</span>
+    <span class="p">]</span>
+</code></pre>
+</div>
+
+<h2 id="literals">literals</h2>
+
+<p>Above we saw the convenient syntax <code>str(status CHARS from 0)</code>, so now is a
+good time to mention some stuff about <em>smoλ</em>&#8217;s type system - you will see why 
+momentarily. The whole system is deep, but on a day-to-day use the most
+important features are m unions, type checking at compile time, and
+literal types. The mystery <code>from</code> that comes out of nowhere is a string
+literally treated as a keyword, but to understand and fully appreciate this statement 
+we need to understand the rest.</p>
+
+<p>To begin with, you can have functions with different arguments but the same names. 
+This is known as polymorphism. Here is an example, though usually we assign the
+same conceptual name to similar operations.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">double_it</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span> <span class="c1"># natural numbers = unsigned integers</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">double_it</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mf">2.0</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">double_it</span> <span class="mf">1.0</span> <span class="c1"># prints 2.0</span>
+    <span class="nb">print</span> <span class="n">double_it</span> <span class="mi">1</span>   <span class="c1"># prints 2</span>
+</code></pre>
+</div>
+
+<p>Type unions can be written as <code>type1|type2|...</code> and express
+alternatives. That is, the above implementation can be rewritten
+like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">double_it</span><span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">x</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">double_it</span> <span class="mf">1.0</span> <span class="c1"># prints 2.0</span>
+    <span class="nb">print</span> <span class="n">double_it</span> <span class="mi">1</span>   <span class="c1"># prints 2</span>
+</code></pre>
+</div>
+
+<p>This code &#8220;cheats&#8221; that it does not show how to
+obtain a properly typed value of &#8220;2&#8221;. 
+This is surprisingly non-trivial in that we need to 
+obtain, among all the natural and float number converters,
+the ones that <em>could</em> have output <code>x</code>. The set of those functions is
+<code>type (nat|float)-&gt;x</code>. Then, we pass <code>2</code> as an argument to select
+the converter that actually can convert it to the same type as <code>x</code>.
+This is shown below, but let us not take up some time here because
+it is more of a curio than a frequently occuring pattern.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">like</span><span class="p">(</span><span class="n">nat</span> <span class="n">value</span><span class="p">,</span> <span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">prototype</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">type</span> <span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="nb">float</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">prototype</span> <span class="n">value</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">double_it</span><span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mf">2.</span><span class="n">like</span> <span class="n">x</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">double_it</span> <span class="mf">1.0</span> <span class="c1"># prints 2.0</span>
+    <span class="nb">print</span> <span class="n">double_it</span> <span class="mi">1</span>   <span class="c1"># prints 2</span>
+</code></pre>
+</div>
+
+<p>What actually needs mentioning is you can change
+how a function behaves depending on its inpus using
+the <code>is</code> operator to make a check. This check is 
+resolved during compilation, meaning that it does
+not affect runtime performance whatsoever.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">double_nat</span><span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">x</span><span class="p">)</span>
+    <span class="c1"># this function only doubles naturals</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="n">nat</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">double_nat</span> <span class="mf">1.0</span> <span class="c1"># prints 1.0</span>
+    <span class="nb">print</span> <span class="n">double_nat</span> <span class="mi">1</span>   <span class="c1"># prints 2</span>
+</code></pre>
+</div>
+
+<p>Main usage of this mechanism is to have
+optional arguments by checking against 
+the <code>blank</code> type, corresponding to the
+outcome of the <code>()</code> expression. Like in
+the next snippet. Blank variables can
+be overwritten by convention.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="o">|</span><span class="n">blank</span> <span class="n">by</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">by</span> <span class="ow">is</span> <span class="n">blank</span>
+        <span class="n">by</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">by</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="mf">1.0</span>        <span class="c1"># prints 2.0</span>
+    <span class="nb">print</span> <span class="n">inc</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span> <span class="c1"># prints 5.0</span>
+</code></pre>
+</div>
+
+<p>You can name type unions by writing with this mixture of assignment 
+and function definition syntax: <code>def Num = nat|float</code>. And the same
+syntax can be used to defined what was mentioned previously: literal
+types. We will cover here only string literals, which is what&#8217;s mainly
+useful. First get a glimpse of how they work.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">greeting</span> <span class="o">=</span> <span class="s2">&quot;hello world!&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">greeting</span>
+</code></pre>
+</div>
+
+<p>Easy? </p>
+
+<p>Ok, the language goes to great pains to be intuitive, so this looks like a constant
+declaration. But <code>def name = ...</code> is actually used to declare <em>unions</em>. ONLY. So where&#8217;s the type?</p>
+
+<p>Each string literal is a type onto itself when treated as part of a union.
+There is just the convention that, when used
+within code, it is automatically lowered to its equivalent <code>cstr</code> representation. But
+you can do something like the following. See how the string literal is the type of the
+argument. Furthermore, <code>type "hello"</code> can be used to reference a string literal type 
+within code.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span> <span class="n">_useless_var</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;hello world!&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="s2">&quot;bye&quot;</span> <span class="n">_useless_var</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;goodbye&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">message</span> <span class="nb">type</span> <span class="s2">&quot;hello&quot;</span>
+    <span class="nb">print</span> <span class="n">message</span> <span class="nb">type</span> <span class="s2">&quot;bye&quot;</span>
+</code></pre>
+</div>
+
+<p>Actually, variable names are optional in function signatures, so you can rewrite 
+the above like so.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;hello world!&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="s2">&quot;bye&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;goodbye&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">message</span> <span class="nb">type</span> <span class="s2">&quot;hello&quot;</span>
+    <span class="nb">print</span> <span class="n">message</span> <span class="nb">type</span> <span class="s2">&quot;bye&quot;</span>
+</code></pre>
+</div>
+
+<p>Variaables associated with literal types can only be matched to literals
+of the same type. But use the <code>compiler:literal</code> function to retrieve the
+actual value from the compiler. Remember that this is all done during compilation 
+with no runtime overhead. Oh, and you can also type-check with <code>is</code> normally!</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="o">|</span><span class="s2">&quot;hi&quot;</span> <span class="n">greeting</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">greeting</span>
+    <span class="k">if</span> <span class="n">greeting</span> <span class="ow">is</span> <span class="s2">&quot;hello&quot;</span> <span class="c1"># &#39;is&#39; starts type parsing</span>
+        <span class="nb">print</span> <span class="s2">&quot; world&quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;!&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">greet</span> <span class="nb">type</span> <span class="s2">&quot;hi&quot;</span> <span class="c1"># prints hi!</span>
+</code></pre>
+</div>
+
+<p>Fine, so we saw how we can run a bunch of stuff. How does this relate
+to the <code>str(status CHARS from 0)</code> syntax? We are actually allowed to
+use string literals as keywords within tuples/function arguments by replacing
+the comma. This counts as interweaving the keyword&#8217;s corresponding literal
+as an argument. Here is a simple example.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="nb">float</span> <span class="n">start</span><span class="p">,</span> <span class="s2">&quot;upto&quot;</span><span class="p">,</span> <span class="nb">float</span> <span class="n">end</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;[&quot;</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">start</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;,&quot;</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">end</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;]&quot;</span> <span class="c1"># inclusive range</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="nb">float</span> <span class="n">start</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="nb">float</span> <span class="n">end</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;[&quot;</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">start</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;,&quot;</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">end</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;)&quot;</span> <span class="c1"># exclusive range</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="mf">0.0</span> <span class="n">upto</span> <span class="mf">1.0</span><span class="p">)</span> <span class="c1"># prints &#39;[0.0,1.0]&#39;, equivalent to print(0.0, type &quot;upto&quot;, 1.0)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="mf">0.0</span> <span class="n">to</span> <span class="mf">1.0</span><span class="p">)</span>   <span class="c1"># prints &#39;[0.0,1.0)&#39;</span>
+</code></pre>
+</div>
+
+<p>Now, we can just tell that there exists a string initialization
+in the form <code>def str(char[] buf, nat end, "from" nat start)</code>. So
+the expression we investigating first unpacks the arena back to a buffer
+and position pair with <code>status CHARS</code>, passes those as the first two
+arguments, and then uses <code>"from"</code> as a type literal to select the
+appropriate string creation function.</p>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("pre").forEach(pre => {
+            if(pre.className==="skiptry") return;
+            pre.style.position = "relative";
+            const btn = document.createElement("a");
+            btn.textContent = "▶ try it";
+            btn.className = "runbutton";
+            btn.style.cssText = "position:absolute;bottom:8px;right:8px;cursor:pointer;";
+            btn.addEventListener("click", () => {
+                const code = pre.querySelector("code")?.innerText ?? pre.innerText;
+                const encoded = btoa(unescape(encodeURIComponent(code)));
+                window.location.href = "playground.html?contents=" + encoded;
+            });
+            pre.appendChild(btn);
+        });
+    });
+    </script>
+    
+    </body>
+    </html>
+    

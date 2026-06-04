@@ -42,12 +42,51 @@
             font-size: 0.9rem;
             justify-content: center;
         }
-        .topbar a {
+        .topbar > a, .topbar > .dropdown > a {
             text-decoration: none;
             font-weight: 500;
             color: #444;
         }
-        .topbar a:hover { color: #58a6ff; }
+        .topbar > a:hover, .topbar > .dropdown > a:hover { color: #58a6ff; }
+        .dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        .dropdown > a::after {
+            content: " ▾";
+            font-size: 0.75em;
+            opacity: 0.6;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 6px 0;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 3000;
+        }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a {
+            display: block;
+            padding: 7px 18px;
+            font-weight: 400;
+            white-space: nowrap;
+            color: #444;
+        }
+        .dropdown-menu a:hover { color: #58a6ff; background: #f5f5f5; }
+        .dropdown-menu hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 4px 0;
+        }
         .toc {
             position:fixed;
             padding-top:50px;
@@ -76,12 +115,18 @@
                 background:#1f1f1f;
                 border-bottom: 1px solid #444;
             }
-            .topbar a {color:#dddddd;}
+            .topbar > a, .topbar > .dropdown > a {color:#dddddd;}
             .toc {
                 color:#eeeeee;
                 background:#1f1f1f;
             }
-            
+            .dropdown-menu {
+                background: #1f1f1f;
+                border-color: #444;
+            }
+            .dropdown-menu a { color: #ddd; }
+            .dropdown-menu a:hover { background: #2f2f2f; color: #58a6ff; }
+            .dropdown-menu hr { border-color: #444; }
         }
         @media (max-width: 1380px) {
             body {margin:10px;}
@@ -164,9 +209,24 @@
         <nav class="topbar">
             <a href="index.html" style="position:absolute;left:20px;font-weight:900">Smoλ</a>
             <a href="install.html" style="font-weight:500">Install</a>
-            <a href="reference.html" style="font-weight:500">Learn</a>
+            <div class="dropdown">
+                <a href="#" style="font-weight:500">Tutorials</a>
+                <div class="dropdown-menu">
+                    <a href="tutorial_cli.html" style="font-weight:400">Command line app</a>
+                    <a href="tutorial_web.html" style="font-weight:400">Web server</a>
+                    <a href="tutorial_game.html" style="font-weight:400">Game dev</a>
+                    <a href="tutorial_data.html" style="font-weight:400">Data analysis</a>
+                    <a href="tutorial_graph.html" style="font-weight:400">Graph mining</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" style="font-weight:500">Documentation</a>
+                <div class="dropdown-menu">
+                    <a href="reference.html" style="font-weight:400">Learn</a>
+                    <a href="std.html" style="font-weight:400">Standard library</a>
+                </div>
+            </div>
             <a href="playground.html" style="font-weight:500">Playground</a>
-            <a href="std.html" style="font-weight:500">Standard library</a>
             <a href="https://github.com/maniospas/smoll">GitHub</a>
         </nav>
     <div>
@@ -205,27 +265,25 @@
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">4096</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">README</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md&quot;</span>
-
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="c1"># use the CLI effect to direct reads and prints to the console</span>
-    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span> 
-    <span class="n">mem</span> <span class="o">=</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">CHUNK_SIZE</span> <span class="c1"># pipe argument with dot, parentheses optional for one argument</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span>  <span class="c1"># save to .tmp with system curl and read it</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="n">alloc</span> <span class="mi">4096</span> <span class="c1"># parentheses optional for one argument</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="c1"># iterator defined over a (memory buffer, file) tuple</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
         <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">+</span><span class="nb">len</span> <span class="n">line</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="s2">&quot; bytes downloaded</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre>
 </div>
 
 
+
 <p class="smoll-section-label">Features</p>
 <div class="smoll-features">
   <div class="smoll-feature"><h3>Safe</h3><p>Automatically apply and guard resources. Opt into unsafe C only explicitly.</p></div>
   <div class="smoll-feature"><h3>Finite</h3><p>Tuple-based type system reads sequentially. Less wading through magic.</p></div>
-  <div class="smoll-feature"><h3>Ergonomic</h3><p>Easy function calling (see above). Interceptable errors get out of the way.</p></div>
+  <div class="smoll-feature"><h3>Ergonomic</h3><p>High-level syntax. Interceptable errors get out of the way.</p></div>
   <div class="smoll-feature"><h3>Fast</h3><p>Scripting abstractions yet minimal memory indirection.</p></div>
   <div class="smoll-feature"><h3>Duck and linear types</h3><p>Functions define types. Interact with those with zero runtime overhead.</p></div>
   <div class="smoll-feature"><h3>Supported</h3><p>Compiler, LSP, interpreter to test unsafe code, web import, web playground.</p></div>

@@ -21,12 +21,12 @@ static const char* __t_all_errcodes[35] = {"noerr",
 "cannot allocate a buffer of unsized type",
 "cannot resize an unallocated or freed buffer",
 "out of bounds",
+"arena is out of space",
+"does not fit in circular arena",
 "can only define strings on contiguous buffers",
 "can only define strings on non-offset buffers",
 "string does not fit on buffer",
-"character copy does not fit on buffer",
 "string buffer out of memory",
-"cannot copy onto the same buffer",
 "slice out of string bounds",
 "unexpected end of console read",
 "user input was not a float",
@@ -47,47 +47,47 @@ static inline __attribute__((always_inline)) void console__t366t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void false__t10t(int* __t1586t) {
+static inline __attribute__((always_inline)) void false__t10t(int* __t1643t) {
   int value=0;
-  *__t1586t=value;
+  *__t1643t=value;
 }
 
-static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t1587t) {
+static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t1644t) {
   int __t38t__=0;
   false__t10t(&__t38t__);
   goto __t_return;
   __t_return:
-  *__t1587t=__t38t__;
+  *__t1644t=__t38t__;
 }
 
-static inline __attribute__((always_inline)) void is_different__t95t(uint64_t x, uint64_t y, int* __t1588t) {
+static inline __attribute__((always_inline)) void is_different__t95t(uint64_t x, uint64_t y, int* __t1645t) {
   int __t96t=0;
   int __t97t__=0;
   not__t37t(__t96t,&__t97t__);
   goto __t_return;
   __t_return:
-  *__t1588t=__t97t__;
+  *__t1645t=__t97t__;
 }
 
-static inline __attribute__((always_inline)) void add__t175t(uint64_t x, uint64_t y, uint64_t* __t1589t) {
+static inline __attribute__((always_inline)) void add__t175t(uint64_t x, uint64_t y, uint64_t* __t1646t) {
   int __t176t__=0;
   uint64_t z=0;
   is_different__t95t(x,y,&__t176t__);
   z=x+y;
   goto __t_return;
   __t_return:
-  *__t1589t=z;
+  *__t1646t=z;
 }
 
-static inline __attribute__((always_inline)) void inc__t1561t(uint64_t x, uint64_t* __t1590t) {
-  int __t1562t=0;
-  uint64_t __t1565t=0;
-  uint64_t __t1566t__=0;
-  __t1565t=1;
-  add__t175t(x,__t1565t,&__t1566t__);
+static inline __attribute__((always_inline)) void inc__t1618t(uint64_t x, uint64_t* __t1647t) {
+  int __t1619t=0;
+  uint64_t __t1622t=0;
+  uint64_t __t1623t__=0;
+  __t1622t=1;
+  add__t175t(x,__t1622t,&__t1623t__);
   goto __t_return;
   __t_return:
-  *__t1590t=__t1566t__;
+  *__t1647t=__t1623t__;
 }
 
 static inline __attribute__((always_inline)) void print__t393t(uint64_t value) {
@@ -97,29 +97,29 @@ static inline __attribute__((always_inline)) void print__t393t(uint64_t value) {
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void inc__t1572t(uint64_t x, uint64_t* __t1591t) {
-  int __t1573t=0;
-  uint64_t __t1575t=0;
-  uint64_t __t1576t__=0;
-  __t1575t=2;
-  add__t175t(x,__t1575t,&__t1576t__);
+static inline __attribute__((always_inline)) void inc__t1629t(uint64_t x, uint64_t* __t1648t) {
+  int __t1630t=0;
+  uint64_t __t1632t=0;
+  uint64_t __t1633t__=0;
+  __t1632t=2;
+  add__t175t(x,__t1632t,&__t1633t__);
   goto __t_return;
   __t_return:
-  *__t1591t=__t1576t__;
+  *__t1648t=__t1633t__;
 }
 
-static inline __attribute__((always_inline)) void main__t1577t() {
-  uint64_t __t1579t=0;
-  uint64_t __t1580t__=0;
-  uint64_t __t1582t=0;
-  uint64_t __t1584t__=0;
+static inline __attribute__((always_inline)) void main__t1634t() {
+  uint64_t __t1636t=0;
+  uint64_t __t1637t__=0;
+  uint64_t __t1639t=0;
+  uint64_t __t1641t__=0;
   console__t366t();
-  __t1579t=0;
-  inc__t1561t(__t1579t,&__t1580t__);
-  print__t393t(__t1580t__);
-  __t1582t=0;
-  inc__t1572t(__t1582t,&__t1584t__);
-  print__t393t(__t1584t__);
+  __t1636t=0;
+  inc__t1618t(__t1636t,&__t1637t__);
+  print__t393t(__t1637t__);
+  __t1639t=0;
+  inc__t1629t(__t1639t,&__t1641t__);
+  print__t393t(__t1641t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1577t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1634t();return 0;}

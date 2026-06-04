@@ -4,8 +4,8 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t1557t="123";
 const char* const __t382t="\n";
+const char* const __t1614t="123";
 static const char* __t_all_errcodes[35] = {"noerr",
 "error",
 "null pointer",
@@ -22,12 +22,12 @@ static const char* __t_all_errcodes[35] = {"noerr",
 "cannot allocate a buffer of unsized type",
 "cannot resize an unallocated or freed buffer",
 "out of bounds",
+"arena is out of space",
+"does not fit in circular arena",
 "can only define strings on contiguous buffers",
 "can only define strings on non-offset buffers",
 "string does not fit on buffer",
-"character copy does not fit on buffer",
 "string buffer out of memory",
-"cannot copy onto the same buffer",
 "slice out of string bounds",
 "unexpected end of console read",
 "user input was not a float",
@@ -48,12 +48,12 @@ static inline __attribute__((always_inline)) void console__t366t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void eq__t819t(const char* x, const char* y, char* __t1560t) {
+static inline __attribute__((always_inline)) void eq__t931t(const char* x, const char* y, char* __t1617t) {
   char z=0;
   z=(x==y);
   goto __t_return;
   __t_return:
-  *__t1560t=z;
+  *__t1617t=z;
 }
 
 static inline __attribute__((always_inline)) void print__t397t(char value) {
@@ -68,11 +68,11 @@ static inline __attribute__((always_inline)) void print__t397t(char value) {
   }
 }
 
-static inline __attribute__((always_inline)) void main__t1555t() {
-  char __t1558t__=0;
+static inline __attribute__((always_inline)) void main__t1612t() {
+  char __t1615t__=0;
   console__t366t();
-  eq__t819t(__t1557t,__t1557t,&__t1558t__);
-  print__t397t(__t1558t__);
+  eq__t931t(__t1614t,__t1614t,&__t1615t__);
+  print__t397t(__t1615t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1555t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1612t();return 0;}

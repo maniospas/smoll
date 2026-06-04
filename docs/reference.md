@@ -1736,33 +1736,43 @@ def main()
 ```
 
 
-
-
 # Section 3. Standard Library
 
 ## lists
 
-Manage buffers by adding push and pop operations, as well
-as a capacity-based growth strategy. This is done by calling the 
-`list` function on a mutable buffer or -preferably- on a reference 
-of a mutable buffer like the following example. List elements are accessed like 
-buffers, and there exists a `push` function that grows the list by
-one place while returning a pointer to the last element.
+Manage growing buffers by packing them into lists `alloc` function.
+This is done by calling the `list` function on a mutable buffer or -preferably- 
+on a reference of a mutable buffer as inthe following example. This may resize 
+the buffer to make room for at least one element. 
+
+List elements are accessed like buffers. However, they can be used as allocators
+by calling the `alloc(list, nat size)` function, where the default size to create
+is one. Allocation returns a class instance containin a buffer and constant position,
+and that can be further cast onto a mutable pointer via an `at` function; this combination
+alongside pointer data assignment allows for quick pushing of elements at the end of 
+growing lists.
 
 ```python
 import "std/core.s"
 
 def main()
     CLI = console()
-    li = ref list mut float[]
-    (push li) = 0.1
-    (push li) = 0.1
-    (push li) = 0.1
+    mem = list ref mut float[]
+    (at alloc mem) = 0.1
+    (at alloc mem) = 0.1
+    (at alloc mem) = 0.1
 
-    li[1] = 0.2
-    print li[0]
-    print li[1]
+    mem[1] = 0.2
+    print mem[0]
+    print mem[1]
 ```
+
+By the way, the `alloc` function can also be called on arenas and circular buffers,
+that can be similarly used once constructed per `mem = arena float[].alloc 3` 
+and `mem = circular float[].alloc 3`. These structures are more stable than lists
+in that they do not reallocate; the arena creates an error when out of size, and
+the circular buffer is an arena that restarts once full.
+
 
 ## strings
 
@@ -1905,7 +1915,7 @@ def main()
     print map["hello"]
     print map["manio"]
     
-    it = arena map.keys
+    it = (map.keys, mut 0)
     while try key=next it
         print key
 ```
@@ -1921,7 +1931,7 @@ pretend that they are null-terminated, a copy may be made.
 
 Read a file by opening it and iterating line by
 line, like below. This needs a `char[]` buffer 
--or a `arena` on that charcater buffer- on which to 
+-or an allocator on a charcater buffer like an arena- on which to 
 store lines.
 
 ```python
@@ -2381,15 +2391,14 @@ C code injection, but is left outside of the standard library for now.
 import "std/core.s"
 import "std/io.s"
 
-def CHUNK_SIZE = 4096
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 
 def main()
     CLI = console()
-    mem = char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
-    f = file:read web:get README  # save to .tmp with system curl and read it
+    mem = alloc 4096 # parentheses optional for one argument
+    f = file:read web:get README
     size = mut 0
-    for line in (mem, f) # iterator defined over a (memory buffer, file) tuple
+    for line in (mem, f) # iterator defined for this kind of tuple
         size = size+len line
     print(size, " bytes downloaded\n")
 ```

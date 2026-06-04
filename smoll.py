@@ -452,6 +452,7 @@ def signature_like(vars: list[Variable], impl=None):
         if arg_name.startswith("__t") or "____" in arg_name: arg_name = ""
         else: arg_name = " "+arg_name.replace("__", ".")
         arg_name = arg_name.strip()
+        if arg_name: arg_name = " "+arg_name
         if type.builtin: 
             if not vars[i].immutable: ret += "mut "
             if type==POINTER_TYPE and impl: 
@@ -2734,7 +2735,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             op_token.error("safety", "there is no clear priority order between multiple equalities and inequalities; be explicit with parentheses")
         peek_next = peek_text(tokens, pos+1)
         if op_name=="=": #op_name==">>" or op_name=="<<" or 
-            if op_name=="=" and peek_text(tokens, pos-1)!="]" and (len(rets)!=1 or rets[0].type!=POINTER_TYPE): tokens[pos].error("safety", "unexpected '=' in the middle of expression", suggestions=["use 'buffer[item] = value' when supported by 'mutget' (for buffers, this is equivalent to buffer[item]&&<<value)", "use '<<' to move data to a mutable pointer", "fix syntax to assign to a variable or variable item instead"])
+            if op_name=="=" and peek_text(tokens, pos-1)!="]" and (len(rets)!=1 or rets[0].type!=POINTER_TYPE): tokens[pos].error("safety", "unexpected '=' in the middle of expression", suggestions=["use 'buffer[item] = value' when supported by 'mutget' (for buffers, this is equivalent to buffer[item]&&<<value)"])
             err_token = op_token
             pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0) # don't touch rets
             pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)

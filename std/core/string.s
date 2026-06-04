@@ -16,30 +16,19 @@
 
 local import "std/core/builtinsext.s"
 local import "std/core/array.s"
+local import "std/core/allocators.s"
 local import "std/unsafe.s" as unsafe
 
-def new()
-    doc "allocations on new buffers"
-    return class()
 
-def arena(edit any[] buf)
-    doc "a buffer and mutable position pair"
-    doc "The position starts from 0. This structure is often used"
-    doc "to maintain stable references within the buffer."
-    pos = mut 0
-    return (buf, pos)
-
-def char_arena(edit char[] buf)
-    doc "arena specialized for char[] buffers"
-    doc "This is used to indicate a pair of a character buffer and a mutable position."
-    doc "It is used as a string allocator so that they new ones can be created or copied"
-    doc "at the buffer at the given position and the position then progresses to accomodate"
-    doc "further string additions."
-    return arena buf
-
-def circular(any[] buf, mut nat pos, nat length)
-    doc "circular buffer"
-    return class(buf, pos, length)
+local def char_arena()
+    return arena char[]
+local def char_circular()
+    return circular char[]
+local def char_list()
+    return list mut char[]
+local def alloc(effect edit new CHARS, nat length)
+    return allocated(char[].alloc length, 0)
+def char_allocator = new|char_arena|char_circular|char_list
 
 def exists(cstr c)
     doc "checks whether a cstr is not zero-initialized"
@@ -140,12 +129,12 @@ def neq(char x, char y)
     {builtins:bool z = (x!=y);}
     return z
 
-def copy(effect new CHARS, str|cstr _other)
+def copy(effect edit char_allocator CHARS, str|cstr _other)
     doc "copy a string to a new buffer"
     other = str _other
-    buf = alloc(mut char[], len other)
-    {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
-    return str(buf, 0, other.dat.length, other.dat.first)
+    surface = alloc(CHARS, len other)
+    {memcpy(surface__buf__unsafe_ptr+surface__pos+surface__buf__unsafe_offset, other__unsafe_ptr+other__dat__pos, other__dat__length);}
+    return str(surface.buf, 0, other.dat.length, other.dat.first)
 
 def copy_null_terminated(effect new CHARS, str other)
     doc "create null terminated string"
@@ -191,17 +180,6 @@ def cstr(unsafe_temp value)
     doc "or to comptime returns with the pattern 'cstr unsafe_temp string_value'."
     return value.cstr
 
-def copy(effect edit char_arena CHARS, char character, nat|blank repeat)
-    doc "copies a character as a string"
-    doc "Copies a new character at a given buffer a number of times"
-    doc "Then, returns a string corresponding to the copied region."
-    if repeat is blank
-        doc "The character is automatically set to be repeated one time."
-        repeat = 1
-    if CHARS.pos+repeat>len CHARS.buf fail "character copy does not fit on buffer"
-    {memset(CHARS__buf__unsafe_ptr+CHARS__pos, character, repeat);}
-    return str(CHARS.buf, CHARS.pos lento repeat)
-
 def endpos(const str s)
     doc "the end position of a string"
     doc "This position is computed relative to its start in its"
@@ -239,19 +217,6 @@ def neq(str|cstr x, str|cstr y)
     doc "not equals"
     return not x==y
 
-def copy(effect edit char_arena CHARS, str|cstr _other)
-    doc "copy a string"
-    doc "Constructs the copy on the buffer at a given position and returns it."
-    doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
-    doc "This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead."
-    other = str _other
-    next_pos = CHARS.pos+len other
-    if next_pos>len CHARS.buf fail "string buffer out of memory"
-    {memcpy(CHARS__buf__unsafe_ptr+CHARS__pos, other__unsafe_ptr+other__dat__pos, other__dat__length);}
-    prev_pos = CHARS.pos+0 # this is pretty important to decouple a pressumed equality in position when referencing
-    CHARS.pos = next_pos
-    return str(CHARS.buf, prev_pos, other.dat.length, other.dat.first)
-
 def copy_null_terminated(effect edit char_arena CHARS, str|cstr _other)
     doc "copy a string while adding null termination"
     doc "Constructs the copy on the buffer at a given position and returns it."
@@ -275,27 +240,6 @@ def print(effect mut console CLI, str s, cstr|blank endl)
         doc "Ends the line too."
         endl = "\n"
     {printf("%.*s%s", s__dat__length, s__dat__pos+s__unsafe_ptr, endl);}
-
-local def charlist()
-    return list mut char[]
-
-def str(charlist li)
-    doc "declare a string on a list's char[] buffer"
-    return str li.buffer
-
-def copy(effect edit charlist CHARS, str|cstr _other)
-    doc "copy a string"
-    doc "Constructs the copy on a buffer managed by a list."
-    doc "The list may automatically resize its managed buffer to fit the new string."
-    doc "This operation therefore destabilizes memory, and the `.dat` segment of strings should be obtained."
-    other = str _other
-    prev_prev_length = mut CHARS.length
-    prev_length = CHARS.length + len other
-    if other.unsafe_ptr==CHARS.buffer.unsafe_ptr fail "cannot copy onto the same buffer"
-    if prev_length >= len CHARS.buffer
-        CHARS.buffer = CHARS.buffer.resize(prev_length+prev_length/2+1)
-    CHARS.length = prev_length
-    return copy(CHARS.buffer, prev_prev_length, unsafe_valid other)
 
 def get(str s, nat i)
     doc "a character in a string"
@@ -358,9 +302,9 @@ def nn(str value)
     doc "to print without a new line."
     return (value, "")
 
-def add(effect edit char_arena CHARS, str|cstr s1, str|cstr s2)
+def char_allocator(effect edit char_arena CHARS, str|cstr s1, str|cstr s2)
     start = CHARS.pos
-    copy(CHARS.buf, CHARS.pos, s1)
-    copy(CHARS.buf, CHARS.pos, s2)
+    copy(CHARS, s1)
+    copy(CHARS, s2)
     endpos = CHARS.pos+0 # this is pretty important to decouple a pressumed equality in position when referencing
     return str(CHARS.buf, start to endpos)

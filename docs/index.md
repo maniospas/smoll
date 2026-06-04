@@ -34,25 +34,23 @@ repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as
 import "std/core.s"
 import "std/io.s"
 
-def CHUNK_SIZE = 4096
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
-
 def main()
-    # use the CLI effect to direct reads and prints to the console
-    CLI = console() 
-    mem = char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
-    f = file:read web:get README  # save to .tmp with system curl and read it
+    CLI = console()
+    mem = alloc 4096 # parentheses optional for one argument
+    f = file:read web:get README
     size = mut 0
-    for line in (mem, f) # iterator defined over a (memory buffer, file) tuple
+    for line in (mem, f)
         size = size+len line
     print(size, " bytes downloaded\n")
 ```
+
 
 <p class="smoll-section-label">Features</p>
 <div class="smoll-features">
   <div class="smoll-feature"><h3>Safe</h3><p>Automatically apply and guard resources. Opt into unsafe C only explicitly.</p></div>
   <div class="smoll-feature"><h3>Finite</h3><p>Tuple-based type system reads sequentially. Less wading through magic.</p></div>
-  <div class="smoll-feature"><h3>Ergonomic</h3><p>Easy function calling (see above). Interceptable errors get out of the way.</p></div>
+  <div class="smoll-feature"><h3>Ergonomic</h3><p>High-level syntax. Interceptable errors get out of the way.</p></div>
   <div class="smoll-feature"><h3>Fast</h3><p>Scripting abstractions yet minimal memory indirection.</p></div>
   <div class="smoll-feature"><h3>Duck and linear types</h3><p>Functions define types. Interact with those with zero runtime overhead.</p></div>
   <div class="smoll-feature"><h3>Supported</h3><p>Compiler, LSP, interpreter to test unsafe code, web import, web playground.</p></div>

@@ -6,7 +6,7 @@
 int __t_argc;
 char** __t_argv;
 const char* const __t382t="\n";
-static const char* __t_all_errcodes[48] = {"noerr",
+static const char* __t_all_errcodes[46] = {"noerr",
 "error",
 "null pointer",
 "division by zero ",
@@ -22,12 +22,12 @@ static const char* __t_all_errcodes[48] = {"noerr",
 "cannot allocate a buffer of unsized type",
 "cannot resize an unallocated or freed buffer",
 "out of bounds",
+"arena is out of space",
+"does not fit in circular arena",
 "can only define strings on contiguous buffers",
 "can only define strings on non-offset buffers",
 "string does not fit on buffer",
-"character copy does not fit on buffer",
 "string buffer out of memory",
-"cannot copy onto the same buffer",
 "slice out of string bounds",
 "unexpected end of console read",
 "user input was not a float",
@@ -43,11 +43,9 @@ static const char* __t_all_errcodes[48] = {"noerr",
 "invalid float conversion from string without a value after the dot",
 "can only place vectors on contiguous buffers",
 "cannot place vectors on buffer offsets",
-"vector exceeeds buffer limits",
 "different vector sizes",
 "can only place matrices on contiguous buffers",
 "cannot place matrices on buffer offsets",
-"matrix exceeds buffer limits",
 "buffer size not divisible by vector rows",
 "row out of bounds",
 "column out of bounds",
@@ -61,29 +59,29 @@ static inline __attribute__((always_inline)) void console__t366t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void false__t10t(int* __t5608t) {
+static inline __attribute__((always_inline)) void false__t10t(int* __t5570t) {
   int value=0;
-  *__t5608t=value;
+  *__t5570t=value;
 }
 
-static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t5609t) {
+static inline __attribute__((always_inline)) void not__t37t(int __t_anon0, int* __t5571t) {
   int __t38t__=0;
   false__t10t(&__t38t__);
   goto __t_return;
   __t_return:
-  *__t5609t=__t38t__;
+  *__t5571t=__t38t__;
 }
 
-static inline __attribute__((always_inline)) void is_different__t71t(double x, double y, int* __t5610t) {
+static inline __attribute__((always_inline)) void is_different__t71t(double x, double y, int* __t5572t) {
   int __t72t=0;
   int __t73t__=0;
   not__t37t(__t72t,&__t73t__);
   goto __t_return;
   __t_return:
-  *__t5610t=__t73t__;
+  *__t5572t=__t73t__;
 }
 
-static inline __attribute__((always_inline)) void sub__t326t(double x, double y, double* __t5611t) {
+static inline __attribute__((always_inline)) void sub__t326t(double x, double y, double* __t5573t) {
   int __t327t__=0;
   int __t328t=0;
   int __t329t=0;
@@ -92,16 +90,16 @@ static inline __attribute__((always_inline)) void sub__t326t(double x, double y,
   z=x-y;
   goto __t_return;
   __t_return:
-  *__t5611t=z;
+  *__t5573t=z;
 }
 
-static inline __attribute__((always_inline)) void bits__t448t(uint64_t value, uint64_t* __t5612t) {
+static inline __attribute__((always_inline)) void bits__t448t(uint64_t value, uint64_t* __t5574t) {
   goto __t_return;
   __t_return:
-  *__t5612t=value;
+  *__t5574t=value;
 }
 
-static inline __attribute__((always_inline)) void bits__t452t(double x, uint64_t* __t5613t) {
+static inline __attribute__((always_inline)) void bits__t452t(double x, uint64_t* __t5575t) {
   uint64_t z=0;
   uint64_t __t453t__value=0;
   z=0;
@@ -109,52 +107,52 @@ static inline __attribute__((always_inline)) void bits__t452t(double x, uint64_t
   bits__t448t(z,&__t453t__value);
   goto __t_return;
   __t_return:
-  *__t5613t=__t453t__value;
+  *__t5575t=__t453t__value;
 }
 
-static inline __attribute__((always_inline)) void bits__t450t(int64_t x, uint64_t* __t5614t) {
+static inline __attribute__((always_inline)) void bits__t450t(int64_t x, uint64_t* __t5576t) {
   uint64_t z=0;
   uint64_t __t451t__value=0;
   z=x;
   bits__t448t(z,&__t451t__value);
   goto __t_return;
   __t_return:
-  *__t5614t=__t451t__value;
+  *__t5576t=__t451t__value;
 }
 
-static inline __attribute__((always_inline)) void band__t464t(uint64_t x__value, uint64_t y__value, uint64_t* __t5615t) {
+static inline __attribute__((always_inline)) void band__t464t(uint64_t x__value, uint64_t y__value, uint64_t* __t5577t) {
   uint64_t z=0;
   uint64_t __t465t__value=0;
   z=(x__value&y__value);
   bits__t448t(z,&__t465t__value);
   goto __t_return;
   __t_return:
-  *__t5615t=__t465t__value;
+  *__t5577t=__t465t__value;
 }
 
-static inline __attribute__((always_inline)) void float__t457t(uint64_t x__value, double* __t5616t) {
+static inline __attribute__((always_inline)) void float__t457t(uint64_t x__value, double* __t5578t) {
   double z=0;
   z=0;
   memcpy(&z,&x__value,8);
   goto __t_return;
   __t_return:
-  *__t5616t=z;
+  *__t5578t=z;
 }
 
-static inline __attribute__((always_inline)) void abs__t1555t(double x, double* __t5617t) {
+static inline __attribute__((always_inline)) void abs__t1612t(double x, double* __t5579t) {
   int64_t c=0;
-  uint64_t __t1556t__value=0;
-  uint64_t __t1557t__value=0;
-  uint64_t __t1558t__value=0;
-  double __t1559t__=0;
+  uint64_t __t1613t__value=0;
+  uint64_t __t1614t__value=0;
+  uint64_t __t1615t__value=0;
+  double __t1616t__=0;
   c=0x7FFFFFFFFFFFFFFF;
-  bits__t452t(x,&__t1556t__value);
-  bits__t450t(c,&__t1557t__value);
-  band__t464t(__t1556t__value,__t1557t__value,&__t1558t__value);
-  float__t457t(__t1558t__value,&__t1559t__);
+  bits__t452t(x,&__t1613t__value);
+  bits__t450t(c,&__t1614t__value);
+  band__t464t(__t1613t__value,__t1614t__value,&__t1615t__value);
+  float__t457t(__t1615t__value,&__t1616t__);
   goto __t_return;
   __t_return:
-  *__t5617t=__t1559t__;
+  *__t5579t=__t1616t__;
 }
 
 static inline __attribute__((always_inline)) void print__t385t(double value) {
@@ -164,17 +162,17 @@ static inline __attribute__((always_inline)) void print__t385t(double value) {
   printf("%.6f%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__t5601t() {
-  double __t5603t=0;
-  double __t5604t=0;
-  double __t5605t__=0;
-  double __t5606t__=0;
+static inline __attribute__((always_inline)) void main__t5563t() {
+  double __t5565t=0;
+  double __t5566t=0;
+  double __t5567t__=0;
+  double __t5568t__=0;
   console__t366t();
-  __t5603t=0.0;
-  __t5604t=1000023.2423;
-  sub__t326t(__t5603t,__t5604t,&__t5605t__);
-  abs__t1555t(__t5605t__,&__t5606t__);
-  print__t385t(__t5606t__);
+  __t5565t=0.0;
+  __t5566t=1000023.2423;
+  sub__t326t(__t5565t,__t5566t,&__t5567t__);
+  abs__t1612t(__t5567t__,&__t5568t__);
+  print__t385t(__t5568t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t5601t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t5563t();return 0;}

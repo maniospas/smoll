@@ -93,32 +93,3 @@ def get(any[] buffer, nat i)
 def len(any[] buffer)
     doc "the number of buffer elements"
     return buffer.unsafe_size
-
-def list(mut any[] _buffer)
-    doc "list of buffer"
-    doc "List defined over a mutable buffer that is automatically managed and resized."
-    doc "A capacity is maintained so that resizes are not performed too frequently."
-    buffer = _buffer.alloc 1
-    length = mut len buffer
-    return class(buffer, length)
-
-def get(list l, nat pos)
-    doc "get a list element pointer"
-    if pos>=l.length fail "out of bounds"
-    return get(l.buffer,pos)
-
-def mutget(edit list l, nat pos)
-    doc "get a mutable list element pointer"
-    if pos>=l.length fail "out of bounds"
-    ret = l.buffer.mutget pos
-    return ret
-
-def push(edit list l)
-    doc "get a mutable pointer to a new list element"
-    doc "Grows the list and returns a mutable pointer to the newlly created last element."
-    prev_length = l.length
-    if prev_length >= len l.buffer
-        l.buffer = l.buffer.resize(prev_length+prev_length/2+1)
-    l.length = prev_length + 1
-    val = l.buffer.mutget(prev_length)
-    return val

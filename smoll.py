@@ -55,6 +55,25 @@ debug_mode = True
 repositories: dict[str, str] = dict()
 externals: list["File"] = list()
 
+import sys
+import os
+
+def supports_ansi() -> bool:
+    if is_pyodide: return True
+    if not hasattr(sys.stdout, "isatty") or not sys.stdout.isatty(): return False
+    if sys.platform == "win32":
+        if os.environ.get("WT_SESSION") or os.environ.get("TERM_PROGRAM"):
+            return True
+        try:
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            # Enable ENABLE_VIRTUAL_TERMINAL_PROCESSING (0x0004)
+            return kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7) != 0
+        except Exception:  return False
+    term = os.environ.get("TERM", "")
+    if term == "dumb": return False
+    return True
+
 def log_async_calls(func):
     async def wrapper(*args, **kwargs):
         task_name = f"{func.__name__} {id(asyncio.current_task())} {str(args)}"

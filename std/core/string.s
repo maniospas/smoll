@@ -252,7 +252,7 @@ def print(effect mut console CLI, char c, cstr|blank endl)
         endl = "\n"
     {printf("%c%s", c, endl);}
 
-def slice(str _s, nat from, nat to)
+def slice(cstr|str _s, nat from, nat to)
     s = str _s
     if from==to return str ""
     if from>to or to>s.dat.length fail "slice out of string bounds"
@@ -280,7 +280,7 @@ def ends_with(cstr|str _stack, cstr|str _needle)
 def contains(cstr|str _stack, char needle)
     stack = str _stack
     if stack.dat.first==needle return true
-    for i in range len stack
+    for i in range of len stack
         if stack[i]==needle return true
     return false
 
@@ -290,7 +290,7 @@ def contains(cstr|str _stack, cstr|str _needle)
     if stack.dat.length<needle.dat.length return false
     d = len needle
     n = len(stack)-d
-    for i in range n
+    for i in range of n
         if stack.slice(i,i+d)==needle
             return true
     return false

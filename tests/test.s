@@ -1,14 +1,9 @@
 import "std/core.s"
-
-def greet(effect mut console CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
-    print nn compiler:literal greeting
-    if punctuation is blank
-        print ""
-    else
-        print compiler:literal punctuation
+import "std/io.s"
 
 def main()
     CLI = console()
-    colors = colors CLI
-    print(colors yellow)
-    greet(() hi () !) # prints 'hi!' while validating it as a pattern
+    print process:os_name()
+    for arg in process:args()
+        if arg=="--hello" print "hello world!"
+    print "ended"

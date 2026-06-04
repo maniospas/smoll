@@ -97,78 +97,83 @@ def print(effect mut console CLI, compiler:false, cstr|blank endl)
         endl = "\n"
     {printf("true%s", endl);}
 
+def supports_ansi(console CLI)
+    VM "[supports_ansi()]"
+    {builtins:bool supports = __smo_ansi_supported();}
+    return supports
+
 def colors(mut console CLI)
-    {builtins:bool initialized = __smo_ansi_supported();}
+    initialized = supports_ansi CLI
     defer
         if initialized {printf("\033[0m");}
     return singleton(CLI, initialized)
-def print(colors colors, "red")        
+def set(colors colors, "red")        
     if colors.initialized {printf("\033[31m");}
-def print(colors colors, "green")      
+def set(colors colors, "green")      
     if colors.initialized {printf("\033[32m");}
-def print(colors colors, "yellow")     
+def set(colors colors, "yellow")     
     if colors.initialized {printf("\033[33m");}
-def print(colors colors, "blue")       
+def set(colors colors, "blue")       
     if colors.initialized {printf("\033[34m");}
-def print(colors colors, "magenta")    
+def set(colors colors, "magenta")    
     if colors.initialized {printf("\033[35m");}
-def print(colors colors, "cyan")       
+def set(colors colors, "cyan")       
     if colors.initialized {printf("\033[36m");}
-def print(colors colors, "white")      
+def set(colors colors, "white")      
     if colors.initialized {printf("\033[37m");}
-def print(colors colors, "black")      
+def set(colors colors, "black")      
     if colors.initialized {printf("\033[30m");}
-def print(colors colors, "bright_red")    
+def set(colors colors, "bright_red")    
     if colors.initialized {printf("\033[91m");}
-def print(colors colors, "bright_green")  
+def set(colors colors, "bright_green")  
     if colors.initialized {printf("\033[92m");}
-def print(colors colors, "bright_yellow") 
+def set(colors colors, "bright_yellow") 
     if colors.initialized {printf("\033[93m");}
-def print(colors colors, "bright_blue")   
+def set(colors colors, "bright_blue")   
     if colors.initialized {printf("\033[94m");}
-def print(colors colors, "bright_magenta")
+def set(colors colors, "bright_magenta")
     if colors.initialized {printf("\033[95m");}
-def print(colors colors, "bright_cyan")   
+def set(colors colors, "bright_cyan")   
     if colors.initialized {printf("\033[96m");}
-def print(colors colors, "bright_white")  
+def set(colors colors, "bright_white")  
     if colors.initialized {printf("\033[97m");}
-def print(colors colors, "bg_red")    
+def set(colors colors, "bg_red")    
     if colors.initialized {printf("\033[41m");}
-def print(colors colors, "bg_green")  
+def set(colors colors, "bg_green")  
     if colors.initialized {printf("\033[42m");}
-def print(colors colors, "bg_yellow") 
+def set(colors colors, "bg_yellow") 
     if colors.initialized {printf("\033[43m");}
-def print(colors colors, "bg_blue")   
+def set(colors colors, "bg_blue")   
     if colors.initialized {printf("\033[44m");}
-def print(colors colors, "bg_magenta")
+def set(colors colors, "bg_magenta")
     if colors.initialized {printf("\033[45m");}
-def print(colors colors, "bg_cyan")   
+def set(colors colors, "bg_cyan")   
     if colors.initialized {printf("\033[46m");}
-def print(colors colors, "bg_white")  
+def set(colors colors, "bg_white")  
     if colors.initialized {printf("\033[47m");}
-def print(colors colors, "bg_black")  
+def set(colors colors, "bg_black")  
     if colors.initialized {printf("\033[40m");}
-def print(colors colors, "bold")         
+def set(colors colors, "bold")         
     if colors.initialized {printf("\033[1m");}
-def print(colors colors, "dim")          
+def set(colors colors, "dim")          
     if colors.initialized {printf("\033[2m");}
-def print(colors colors, "italic")       
+def set(colors colors, "italic")       
     if colors.initialized {printf("\033[3m");}
-def print(colors colors, "underline")    
+def set(colors colors, "underline")    
     if colors.initialized {printf("\033[4m");}
-def print(colors colors, "blink")        
+def set(colors colors, "blink")        
     if colors.initialized {printf("\033[5m");}
-def print(colors colors, "reverse")      
+def set(colors colors, "reverse")      
     if colors.initialized {printf("\033[7m");}
-def print(colors colors, "strikethrough")
+def set(colors colors, "strikethrough")
     if colors.initialized {printf("\033[9m");}
-def print(colors colors, "reset")          
+def set(colors colors, "reset")          
     if colors.initialized {printf("\033[0m");}
-def print(colors colors, "reset_color")    
+def set(colors colors, "reset_color")    
     if colors.initialized {printf("\033[39m");}
-def print(colors colors, "reset_bg")       
+def set(colors colors, "reset_bg")       
     if colors.initialized {printf("\033[49m");}
-def print(colors colors, "reset_bold")     
+def set(colors colors, "reset_bold")     
     if colors.initialized {printf("\033[22m");}
-def print(colors colors, "reset_underline")
+def set(colors colors, "reset_underline")
     if colors.initialized {printf("\033[24m");}

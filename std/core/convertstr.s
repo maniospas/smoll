@@ -152,7 +152,7 @@ def nat(cstr|str _s)
     s = str _s
     if 0==len s fail "invalid nat conversion from empty string"
     number = mut nat 0
-    it = mut range len s
+    it = mut range of len s
     while try i=next it
         c = s[i]
         {builtins:bool is_digit=c>='0' && c<='9'; builtins:nat digit=c-'0';}

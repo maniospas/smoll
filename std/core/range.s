@@ -16,16 +16,23 @@
 
 local import "std/core/numbers.s"
 
+def of(nat to)
+    return (0, to)
+
+def of(nat from, "to", nat to)
+    return (from, to)
+
+def of(nat from, "upto", nat to)
+    return (from, to+1)
+
+def of(nat from, "lento", nat length)
+    return (from, from+length)
+
 def range(nat _from, nat to)
     doc "constructs a range"
     doc "Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration."
     from = mut _from
     return class(from, to)
-
-def range(nat to)
-    doc "constructs a range"
-    doc "Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration."
-    return range(0,to)
 
 def next(edit range r)
     doc "next range number"

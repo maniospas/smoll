@@ -1,9 +1,9 @@
 
-# Command line apps
+<h1>Command line apps with sm<img style="width:1.5rem" src="smoll.png"></img>λ</h1>
 
 <div class="toc" markdown="1">
 
-**Command line apps**<br>
+**Contents**<br>
 [print](#print) <br>
 [input and error check](#input-and-error-check) <br>
 [character buffers](#character-buffers) <br>
@@ -11,7 +11,8 @@
 [literals](#literals) <br>
 [colors](#colors) <br>
 [string manipulation](#string-manipulation) <br>
-[memory dependencies](#memory-dependencies) <br>
+[maps](#maps) <br>
+[files](#files)
 
 </div>
 
@@ -24,7 +25,9 @@ serving as an entry point.
 
 Notice the "the" in "the console". You can have only one console in your program;
 this is called a *singleton*. If you name the console `CLI`, like below, it is 
-automatically passed to console reading and printing functions. 
+automatically passed to console reading and printing functions. By the way, the
+language uses indentation to mark code blocks. That is, the contents of a function
+must start at a fixed number of tabs inwards for visual alignment.
 
 ```python
 import "std/core.s"
@@ -32,17 +35,17 @@ import "std/core.s"
 def main()
     # this is a line comment
     CLI = console()
-    print nn "hello " # adds an empty string isntead of new line at end of print 
+    print nn "hello " # adds an empty string instead of new line at end of print 
     print "world!"
 ```
 
-Automatically passing arguments can also be done for your own functions too, as in
-the net snippet. To unpack what the `greet` function's argument means, it first
+Automatically passing arguments can be done for your own functions too, as in
+the net snippet with the `greet` function. To unpack what its one argument means, it first
 declares an effect, meaning that it automatically gathers a variable called `CLI`
-from its calling scope. Its caller can also manually passe such a variable.
-The rest of the argument definition requires that what is passed should have `mut`
-permission (should not be constant) because we are not merely going to edit it -by printing-
-but also potentially overwrite it by destructing and recreating it.
+from its calling scope based on its name. It can be called by also manually passing a first
+console variable.
+The rest of the argument definition requires that the input should have `mut`
+permission, meaning that it is not a constant -the default- but that we may mutate it.
 Finally, the `console` type of the argument is declared, followed by its name.
 
 ## input and error check
@@ -185,8 +188,8 @@ import "std/core.s"
 def main()
     CLI = console()
     CHARS = arena char[].alloc 4096
-    x = copy str "hello " # also copy the string onto CHARS For fun
-    y = copy str "world!" # also copy the string onto CHARS For fun
+    x = copy str "hello " # also copy the string onto CHARS for fun
+    y = copy str "world!" # also copy the string onto CHARS for fun
     print x+y
 ```
 
@@ -296,6 +299,7 @@ def total_length(str[] parts)
     return size
 
 def concat(str[] parts)
+    # we don't need to grab effects from elsewhere if they are not singletons
     CHARS = arena char[].alloc total_length parts
     for part in parts
         copy part
@@ -383,10 +387,10 @@ def main()
     print double_it 1   # prints 2
 ```
 
-What actually needs mentioning is you can change
+You can change
 how a function behaves depending on its inputs using
-the `is` operator to make a check. This check is 
-resolved during compilation, meaning that it does
+the `is` operator within a conditional statement. 
+This check is resolved during compilation, meaning that it does
 not affect runtime performance whatsoever.
 
 ```python
@@ -541,7 +545,8 @@ def main()
     print(0.0 to 1.0)   # prints '[0.0,1.0)'
 ```
 
-Armed with this knowledge, there exists a string initialization
+Armed with this knowledge, we can now learn that the standard library's core, which
+have been importing so far, also provides a string initialization
 in the form `def str(char[] buf, nat end, "from" nat start)`. So
 the expression we are investigating unpacks the `CHARS` arena back 
 to an untyped buffer and position pair per `status CHARS`, and passes 
@@ -580,9 +585,149 @@ def main()
     greet (() hi () world () !)
     # two equivalents
     greet ((), type "hi", (), type "world", (), type "!")
-    grett (type "hi", type "world", type "!")
+    greet (type "hi", type "world", type "!")
 ```
 
 All examples above are resolved as zero-cost abstractions during compilation.
 For example, while the program is running, it uses only the version(s) of `greet`
 that are type-determined during compilation.
+
+## colors
+
+The standard library also allows us to colorize console inputs, at least for
+consoles with explicit support of this functionality. This is by default done via
+[ANSI](https://en.wikipedia.org/wiki/ANSI_escape_code) color codes, but the
+functionality is abstracted away so that it is easier to read and write, and
+can potentially change according to different console implementations. 
+
+Below is an example of how to color. We obtain a colorization scheme
+for the console that is also a singleton -but not an effect- meaning that it
+can be constructed only at one point. This is done to automatically
+reset the console to printing black-and-white once colorization ends,
+even in case of failures.
+
+```python
+import "std/core.s"
+
+def main()
+    CLI = console()
+    color = colors CLI
+    set(color red)
+    print "hello red"
+    set(color reset)
+    print "hello white"
+    set(color cyan)
+    print "hello cyan"
+```
+
+## string manipulation
+
+There are various means of manipulating strings in *smολ*. In general,
+functionality discussed applied to both `cstr` and `str` data. We already
+saw how strings can be concatenated/added together, but they can also be
+compared to check if they are the same, like below. Comparisons
+involving only `cstr` are exceptionally slow, as the language ensures that
+the the same representations are stored in the same addressed, and therefore
+equality lower to just a memory address comparison underneath.
+
+```python
+import "std/core.s"
+
+def main()
+    print "hello"=="hello"
+```
+
+But even strings or mixtures of strings and `cstr` can be compared. The language
+tries to be smart about it by tracking the first string character so that, in
+combination with the string length, comparisons can be exited early, likely
+without bringing useless data in the processor's L1 cache at all. Below is an
+example. The conversion to `str` from `cstr|str` alternatives is a fine way
+to create reusable libraries, but use only as needed. 
+
+By convention, arguments that will be immediately converted into a common type start
+with an underscore. Only strings admit a `len` operation, as implementing the latter
+for `cstr` and repeating it can be a hidden expense.
+
+```python
+import "std/core.s"
+
+def receive(effect mut console CLI, str|cstr _message)
+    message = str _message
+    if _message=="hello"
+        print "they said hello!"
+    else
+        print nn "indicipherable message of length"
+        print len message
+
+def main()
+    CHARS = new()
+    print nn ">> "
+    message = str CLI
+    receive message
+```
+
+Several functions can be used to check if strings start with, end with, or just
+contain other strings or characters. By the way, retrieve the first character of
+a string per `char "mystring"`. You can also retrieve any character by providing
+its index per `"mystring"[idx]`. Everything remains safe in that at most errors
+will be created.
+
+```python
+import "std/core.s"
+
+def main()
+    CLI = console()
+    test_string = "I like bananas!"
+    print test_string.starts_with "I like"
+    print test_string.ends_with "!"
+    print test_string.contains "apple"
+
+    end_symbols = ")}].,!?"
+    if not end_symbols.contains(test_string.str()[0])
+        print "valid start"
+```
+
+You can also access string slices without copying any
+memory like below. Usually, functions that deal with
+index ranges accept a starting and non-inclusive end
+positions. The `of` function can be used to more
+construct the position range using an explicit
+string literal qualifier, like below.
+
+```python
+import "std/core.s"
+
+def main()
+    CLI = console()
+    test_string = "I like bananas!"
+    print test_string.slice(2, 9)
+    print test_string.slice of(2 to 9)    # equivalent
+    print test_string.slice of(9)         # 0 to 9
+    print test_string.slice of(2 upto 9)  # inclusive range (one more character)
+    print test_string.slice of(2 lento 4) # start and length
+```
+
+Since we are in the subject of string manipulation, now is a good time
+to mention that we can import some more command line functionality from the
+process namespace that is part of `"std/io.s"`. That gives access
+to the ability to run system commands per `process:system "ls"` or even
+read their outputs as if you would files. But the relevant part is 
+that we can retrieve the operating system name as a `cstr` value, as well
+as command line arguments passed to the running program as a `cstr[]` buffer.
+Below is an example.
+
+```python
+import "std/core.s"
+import "std/io.s"
+
+def main()
+    CLI = console()
+    print system:os_name()
+    for arg in system:args()
+        if arg=="--hello" print "hello world!"
+```
+
+
+## maps
+
+As 

@@ -3,7 +3,7 @@ import "std/core/range.s" as range
 
 def main()
     CLI = console()
-    r = range:range(10)
+    r = range:range range:of(10)
     while try value = mut r.range:next()
         print value
     value = value+1

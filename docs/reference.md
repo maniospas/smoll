@@ -203,8 +203,10 @@ That is, you can use the function's name to refer to data with
 equivalent structure. Below is an example, where the
 `nat` type represents to natural numbers/non-negative integers.
  Other builtin types are `bool`, `int`, `float`, and `cstr` for
-string literals. It bears stressing that, when you see integer
-numbers in the code, these are always natural numbers. This is 
+string literals (string literals are lightweight but can not 
+be dynamically constructed or edited: use `str` covered later 
+for this). It bears stressing that, when you see integer numbers 
+in the code, these are always natural numbers. This is 
 a deliberate choise to enforce memory safety later.
 
 ```python
@@ -244,10 +246,6 @@ You will mainly want to do so when the relations between class
 field values (e.g., a character buffer and its used size) is
 important to safeguard.
 
-Further prefer class definitions when declaring types with some
-construction contract; such contracts should
-not be violated by matching with arbitrary data.
-
 
 ```python
 import "std/core.s"
@@ -264,8 +262,48 @@ def main()
     print sum p 
 ```
 
+Further prefer class definitions when declaring types with some
+construction contract; such contracts should
+not be violated by matching with arbitrary data. For example,
+below is a data type that can track the sum and 
+sum of squares of some floats, as well as the number of floats. 
+This can be used to register more floats, or compute the standard 
+deviation of all encounted floats, but not any `(float, float, nat)` 
+triple should be allowed.
+
+
+```python
+
+import "std/core.s"
+import "std/sci.s" # for pow
+
+def std_data()
+    sum = mut 0.0
+    sqr_sum = mut 0.0
+    num = mut 0
+    return class(sum, sqr_sum, num)
+
+def register(edit std_data data, float value)
+    data.sum = data.sum + value
+    data.sqr_sum = data.sqr_sum + value*value
+    data.num = data.num + 1
+
+def std(std_data data)
+    sqr_mean = data.sqr_sum/float data.num
+    mean = data.sum/float data.num
+    return pow(sqr_mean-mean*mean, 0.5)
+
+def main()
+    CLI = console() 
+    data = std_data()
+    data.register 1.0
+    data.register 1.0
+    data.register 2.3
+    print std data # prints 0.612826
+```
+
 Use `singleton` instead of `class` to further
-ensure that the function runs at most one time in your program.
+ensure that the function runs at most once in your program.
 On the other hand, a shorthand for defining a structural type that would
 immediately return all its fields is to omit its body, like next.
 
@@ -587,13 +625,13 @@ mean never.
 ```python
 import "std/core.s"
 
-rec wooo()
-    CLI = console()
+rec wooo(mut console CLI) # not the ideal way to pass the console - see next section
     if false return blank()
-    print "wooo"
+    CLI.print "wooo"
+    wooo CLI
 
 def main()
-    wooo()
+    wooo console()
 ```
 
 
@@ -1723,25 +1761,50 @@ Even infinite recursive loops might be merely *unbounded* due to some terminatio
 failure. In fact, it can be argued that all such loops would be bounded by compute
 resources and available running time, given that they run on finite computers.
 
-The snippet exemplifies this by adding a recursion safety
+The next snippet exemplifies this by adding a recursion safety
 mechanism as an effect. This mechanism is still rough, but the language marks 
 all recursive functions as potentially failing. This way, future versions can have 
 platform-dependent error codes for unbounded recursion that exceeds system resource limits.
 
+
 ```python
 import "std/core.s"
 
-rec wooo(effect edit range recursion_safety, nat i)
-    next recursion_safety
+rec wooo(effect edit range SAFETY, nat i)
+    next SAFETY
     if false return blank() # do not return anything
     return wooo(i+1)
 
 def main()
     CLI = console()
-    recursion_safety = range of 14 # recursive depth limit in playground
+    SAFETY = range of 14 # recursive depth limit in playground
     try wooo 0
     if try error = compiler:catch()
         print cstr error # prints 'iteration end'
+```
+
+A mechanism that already exists for *smoλ* programs is that the SIGINT signal,
+which is produced by the user pressing ctrl+C, requires manual handling. The
+signal handler is imported from the `"std/io.s"` module and requires a mutable 
+`console CLI` effect to listen to the console interrupt. Then, the `process:interrupt_point()`
+function creates an error if it is called after such an interrupt. For safety,
+this function asks for user input on whether the program should be terminated.
+
+
+```python
+import "std/core.s"
+import "std/io.s"
+
+rec wooo(effect mut console CLI)
+    if false return blank()
+    process:interrupt_point()
+    print "wooo"
+    wooo()
+
+def main()
+    CLI = console()
+    try wooo()
+    print "\rthe end" # \r go to the start of the console line to remive ^C
 ```
 
 

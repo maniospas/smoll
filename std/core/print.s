@@ -106,7 +106,7 @@ def colors(mut console CLI)
     initialized = supports_ansi CLI
     defer
         if initialized {printf("\033[0m");}
-    return singleton(CLI, initialized)
+    return class(CLI, initialized)
 def set(colors colors, "red")        
     if colors.initialized {printf("\033[31m");}
 def set(colors colors, "green")      

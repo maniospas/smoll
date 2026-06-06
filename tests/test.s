@@ -1,24 +1,27 @@
+
 import "std/core.s"
-import "std/map.s"
+import "std/sci.s" # for pow
 
-def strstr()
-    return strmap str[]
+def std_data()
+    sum = mut 0.0
+    sqr_sum = mut 0.0
+    num = mut 0
+    return class(sum, sqr_sum, num)
 
-def create_map()
-    CHARS = arena char[].alloc KB 4
-    map = strmap str[].alloc 128
-    map["hello"] = copy "hello world!"
-    map["manio"] = copy "it's a me, manio."
-    return (map, CHARS)
+def register(edit std_data data, float value)
+    data.sum = data.sum + value
+    data.sqr_sum = data.sqr_sum + value*value
+    data.num = data.num + 1
 
-def test2(strstr s)
-    return s
-
-def test()
-    return test2 create_map().map
+def std(std_data data)
+    sqr_mean = data.sqr_sum/float data.num
+    mean = data.sum/float data.num
+    return pow(sqr_mean-mean*mean, 0.5)
 
 def main()
-    CLI = console()
-    map = test()
-    print map["hello"]
-    print map["manio"]
+    CLI = console() 
+    data = std_data()
+    data.register 1.0
+    data.register 1.0
+    data.register 2.3
+    print std data

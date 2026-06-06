@@ -23,3 +23,17 @@ int __smo_ansi_supported() {
     return 1;
 #endif
 }
+
+
+#include <signal.h>
+static volatile sig_atomic_t __t_interrupted = 0;
+static void __t_handle_sigint(int sig) {
+    (void)sig;
+    __t_interrupted = 1;
+}
+#define DECLARE_HANDLERS struct sigaction __t_sa = { .sa_handler = __t_handle_sigint };\
+    sigemptyset(&__t_sa.sa_mask);\
+    __t_sa.sa_flags = 0;\
+    sigaction(SIGINT, &__t_sa, NULL);
+
+    

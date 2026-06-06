@@ -20,7 +20,7 @@ local import "std/core/allocators.s"
 local import "std/unsafe.s" as unsafe
 
 
-local def char_arena()
+def char_arena()
     return arena char[]
 local def char_circular()
     return circular char[]

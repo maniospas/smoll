@@ -106,8 +106,7 @@ def read_number(effect mut console CLI, cstr message)
 
 def main()
     CLI = console()
-    print nn "give a number: "
-    if try x = read_number CLI
+    if try x = read_number "give a number: "
         print nn "its square is: "
         print x*x
     else
@@ -251,8 +250,8 @@ def main()
     print create_greeting()
 ```
 
-Let us ignore what exactly the details of the syntax for declaring a string
-up to the current allocated characters. For something more important: the above code 
+Ignore the details of the string declaration syntax for now, because there
+is something more important to address first: the above code 
 has a lot of repetition and thus is prone to typographical error bugs (did you notice 
 that `copy s2` appearing twice by accident?) and code extensibility issues. 
 Can we generalize it? The answer should be obvious: create a
@@ -260,9 +259,9 @@ buffer *of strings* and place the elements there. *Smoλ* gives is a shorthand
 for the allocation too by comma-separating items inside square brackets.
 
 Note that this is merely a string buffer. Buffer elements can be accessed 
-or set at specific positions, using `buf[position]=value` but this syntax
-is not used below. Instead a `for` loop goes through all buffer
-elements.
+or set at specific positions, using `buf[position]=value`. This syntax
+is mentioned for completeness but not used in our running example. Instead, below 
+a `for` loop goes through all buffer elements.
 
 
 ```python
@@ -322,13 +321,13 @@ def main()
 ## zero-cost type checking
 
 Above we saw the convenient syntax `str(status CHARS from 0)`, so now is a
-good time to mention some stuff about *smoλ*'s type system - you will see why 
-momentarily. The whole system is deep, but on a day-to-day use the most
+good time to mention some stuff about *smoλ*'s type system - you will see how
+thic culminates in the unknown syntax 
+momentarily. Type declarations can be expressive, but for typical language usage the most
 important features are unions, type checking at compile time, and
-literal types. The mystery `from` that comes out of nowhere is a string
+literal types. The mystery `from` is a string
 literally treated as a keyword, but to understand and fully appreciate this statement 
 we need to understand the rest.
-
 
 To begin with, you can have functions with different arguments but the same names. 
 This is known as polymorphism. Here is an example, though usually we assign the
@@ -371,10 +370,10 @@ obtain a properly typed value of "2".
 This is surprisingly non-trivial in that we need to 
 obtain, among all the natural and float number converters,
 the ones that *could* have output `x`. The set of those functions is
-`type (nat|float)->x`. Then, we pass `2` as an argument to select
+`type (nat|float)->x`. Once those are selected, pass `2` as an argument to select
 the converter that actually can convert it to the same type as `x`.
-This is shown below, but let us not take up some time here because
-it is more of a curio than a frequently occuring pattern.
+This is shown below, but let us not take up time here because
+this is more of a curio than a frequently occuring pattern.
 
 ```python
 import "std/core.s"
@@ -439,8 +438,11 @@ def main()
 You can name type unions by writing with this mixture of assignment 
 and function definition syntax: `def Num = nat|float`. And the same
 syntax can be used to defined what was mentioned previously: literal
-types. We will cover here only string literals, which is what's mainly
-useful. First get a glimpse of how they work.
+types. Remember the `from` from earlier? This is defined via literals too! 
+
+
+We will cover here only string literals, which is what's mainly
+useful. First get a glimpse of what they look like.
 
 
 ```python
@@ -455,11 +457,14 @@ def main()
 Easy? 
 
 Ok, the language goes to great pains to be intuitive, so this looks like a constant
-declaration. But `def name ...` is actually used to declare *types*. ONLY. So where's the type?
+declaration. But *smoλ* has no constants! And `def name ...` is used to declare *types*. ONLY.  
+So where's the type?
 
-Each string literal is a type onto itself during any sort of type parsing.
+Each string literal (`cstr`s encounred during type parsing) is a type onto itself.
 There is just the convention that, when used
-within code, literal types are automatically lowered to their equivalent `cstr` representations. 
+within code in place of variables, literal type names are automatically lowered to their 
+equivalent `cstr` representations. 
+
 But you can do something like the following, where a string literal is the *type* of the
 argument. Then, `type "hello"` can be used to reference a string literal type 
 within code and therefore calls the appropriate function. It is important, so it
@@ -499,9 +504,14 @@ def main()
     print message type "bye"
 ```
 
-Variables associated with literal types can only be matched to literals
-of the same type. But use the `compiler:literal` function to retrieve the
-actual value from the compiler. Remember that this is all done during compilation 
+Variables associated with literal types can only be assigned to literals
+of the same type and are therefore useless for runtime code, where they do
+not appear, even if they are pretty usefule
+for type checks. Use the `compiler:literal` function to retrieve the actual 
+value from the compiler to write polymorphic functions whose runtime data depend
+on which polymorphic function variation is used.
+
+Remember that this is all done during compilation 
 with no runtime overhead. Oh, and you can also type-check with `is` normally! The 
 same mechanism as above grants us zero-cost literal comparison.
 
@@ -519,7 +529,7 @@ def main()
     greet type "hi" # prints hi!
 ```
 
-Fine, so we saw how we can run a bunch of stuff. How does this relate
+Fine, so we saw that type literals exist. How does this relate
 to the `str(status CHARS from 0)` syntax? We are actually allowed to
 use string literals as keywords within tuples/function arguments by replacing
 the comma. This counts as interweaving the keyword's corresponding literal

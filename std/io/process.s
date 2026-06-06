@@ -16,6 +16,21 @@ def args()
     {ret__unsafe_size=__t_argc;}
     return ret
 
+def breakpoint(effect mut console CLI)
+    VM "[False]" # not implemented interrupts yet for the VM
+    doc "checks for SIGINT"
+    {builtins:bool has_failed = __t_interrupted;}
+    if not has_failed return ()
+    color = colors CLI
+    set(color red)
+    print nn "SIGINT: "
+    set(color yellow)
+    print nn "Create a safe failure (F), or unsafely crash (C)?\n"
+    del color
+    {while(true){builtins:char c = getchar(); if(c=='F'){has_failed=0;break;}if(c=='f'){has_failed=0;break;}if(c=='C'){break;}if(c=='c'){break;}}}
+    if has_failed {_exit(1);}
+    fail "interrupted by user"
+
 local def pclose(any ptr unsafe_ptr)
     VM "[(lambda proc=memory.get_foreign($unsafe_ptr),memory=memory:not memory.close_foreign($unsafe_ptr) or proc.wait() or proc.returncode)()]"
     {char buf[1024]; while(fread(buf, 1, sizeof(buf), (FILE*)unsafe_ptr)) {}}

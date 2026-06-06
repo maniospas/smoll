@@ -4,10 +4,9 @@ import "std/mini.s" as mini
 
 def concat(mini:str[] buff)
   mem = arena ref char[].alloc KB 4
-  iter = range of len buff
   start = mem.pos
-  while try i=next iter
-    mem.copy mini:unpack(buff[i])
+  for element in buff
+    mem.copy mini:unpack element
     mem.copy " "
   return str(mem.buf,start to mem.pos)
 
@@ -21,7 +20,7 @@ def main()
   buff[3] = mini:str "is"
   buff[4] = mini:str "manios"
   buff[5] = mini:str concat(buff)
-  full_iter = range len buff
-  while try j=next full_iter
+  for j in range of len buff
     print (j," ")
     print mini:unpack buff[j]
+  

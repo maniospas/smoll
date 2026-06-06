@@ -53,14 +53,15 @@ def alloc(nat size)
     doc "allocate a char[] buffer"
     return alloc(edit char[], size)
 
-def resize(edit any[] buffer, nat size)
+def resize(edit any[] buffer, nat size, "unsafe"|blank prunning)
     doc "resize the buffer"
-    doc "This does nothing if the previous size is the same or less, frees the buffer if new size is zero."
+    doc "For stability of data structures, this does nothing if the previous size is the same or less."
     doc "If old size was zero, an error is created instead of allocating so that this does not leak"
     doc "resources."
-    if buffer.unsafe_size>=size 
-        return buffer
-    if buffer.unsafe_size==0 fail "cannot resize an unallocated or freed buffer"
+    if prunning is blank
+        if buffer.unsafe_size>=size 
+            return buffer
+        if buffer.unsafe_size==0 fail "cannot resize an unallocated or freed buffer"
     #if buffer.unsafe_offset.nat()!=0 fail "cannot resize a buffer with offset"
     prev_bytes = buffer.unsafe_size*buffer.unsafe_align.nat()
     buffer.unsafe_size = size

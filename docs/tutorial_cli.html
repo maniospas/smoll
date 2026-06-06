@@ -339,8 +339,7 @@ for debugging and more dynamic programs.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;give a number: &quot;</span>
-    <span class="k">if</span> <span class="k">try</span> <span class="n">x</span> <span class="o">=</span> <span class="n">read_number</span> <span class="n">CLI</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">x</span> <span class="o">=</span> <span class="n">read_number</span> <span class="s2">&quot;give a number: &quot;</span>
         <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;its square is: &quot;</span>
         <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
     <span class="k">else</span>
@@ -490,8 +489,8 @@ implement this ideal scenario.</p>
 </code></pre>
 </div>
 
-<p>Let us ignore what exactly the details of the syntax for declaring a string
-up to the current allocated characters. For something more important: the above code 
+<p>Ignore the details of the string declaration syntax for now, because there
+is something more important to address first: the above code 
 has a lot of repetition and thus is prone to typographical error bugs (did you notice 
 that <code>copy s2</code> appearing twice by accident?) and code extensibility issues. 
 Can we generalize it? The answer should be obvious: create a
@@ -499,9 +498,9 @@ buffer <em>of strings</em> and place the elements there. <em>Smoλ</em> gives is
 for the allocation too by comma-separating items inside square brackets.</p>
 
 <p>Note that this is merely a string buffer. Buffer elements can be accessed 
-or set at specific positions, using <code>buf[position]=value</code> but this syntax
-is not used below. Instead a <code>for</code> loop goes through all buffer
-elements.</p>
+or set at specific positions, using <code>buf[position]=value</code>. This syntax
+is mentioned for completeness but not used in our running example. Instead, below 
+a <code>for</code> loop goes through all buffer elements.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -562,10 +561,11 @@ you may prefer to just &#8230; print the strings instead of concatenating them b
 <h2 id="zero-cost-type-checking">zero-cost type checking</h2>
 
 <p>Above we saw the convenient syntax <code>str(status CHARS from 0)</code>, so now is a
-good time to mention some stuff about <em>smoλ</em>&#8217;s type system - you will see why 
-momentarily. The whole system is deep, but on a day-to-day use the most
+good time to mention some stuff about <em>smoλ</em>&#8217;s type system - you will see how
+thic culminates in the unknown syntax 
+momentarily. Type declarations can be expressive, but for typical language usage the most
 important features are unions, type checking at compile time, and
-literal types. The mystery <code>from</code> that comes out of nowhere is a string
+literal types. The mystery <code>from</code> is a string
 literally treated as a keyword, but to understand and fully appreciate this statement 
 we need to understand the rest.</p>
 
@@ -611,10 +611,10 @@ obtain a properly typed value of &#8220;2&#8221;.
 This is surprisingly non-trivial in that we need to 
 obtain, among all the natural and float number converters,
 the ones that <em>could</em> have output <code>x</code>. The set of those functions is
-<code>type (nat|float)-&gt;x</code>. Then, we pass <code>2</code> as an argument to select
+<code>type (nat|float)-&gt;x</code>. Once those are selected, pass <code>2</code> as an argument to select
 the converter that actually can convert it to the same type as <code>x</code>.
-This is shown below, but let us not take up some time here because
-it is more of a curio than a frequently occuring pattern.</p>
+This is shown below, but let us not take up time here because
+this is more of a curio than a frequently occuring pattern.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -681,8 +681,10 @@ be overwritten by convention.</p>
 <p>You can name type unions by writing with this mixture of assignment 
 and function definition syntax: <code>def Num = nat|float</code>. And the same
 syntax can be used to defined what was mentioned previously: literal
-types. We will cover here only string literals, which is what&#8217;s mainly
-useful. First get a glimpse of how they work.</p>
+types. Remember the <code>from</code> from earlier? This is defined via literals too! </p>
+
+<p>We will cover here only string literals, which is what&#8217;s mainly
+useful. First get a glimpse of what they look like.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -697,12 +699,15 @@ useful. First get a glimpse of how they work.</p>
 <p>Easy? </p>
 
 <p>Ok, the language goes to great pains to be intuitive, so this looks like a constant
-declaration. But <code>def name ...</code> is actually used to declare <em>types</em>. ONLY. So where&#8217;s the type?</p>
+declaration. But <em>smoλ</em> has no constants! And <code>def name ...</code> is used to declare <em>types</em>. ONLY.<br />
+So where&#8217;s the type?</p>
 
-<p>Each string literal is a type onto itself during any sort of type parsing.
+<p>Each string literal (<code>cstr</code>s encounred during type parsing) is a type onto itself.
 There is just the convention that, when used
-within code, literal types are automatically lowered to their equivalent <code>cstr</code> representations. 
-But you can do something like the following, where a string literal is the <em>type</em> of the
+within code in place of variables, literal type names are automatically lowered to their 
+equivalent <code>cstr</code> representations. </p>
+
+<p>But you can do something like the following, where a string literal is the <em>type</em> of the
 argument. Then, <code>type "hello"</code> can be used to reference a string literal type 
 within code and therefore calls the appropriate function. It is important, so it
 is worth stressing: <em>only the same literal types are matched</em> when resolving
@@ -743,9 +748,14 @@ the above like so.</p>
 </code></pre>
 </div>
 
-<p>Variables associated with literal types can only be matched to literals
-of the same type. But use the <code>compiler:literal</code> function to retrieve the
-actual value from the compiler. Remember that this is all done during compilation 
+<p>Variables associated with literal types can only be assigned to literals
+of the same type and are therefore useless for runtime code, where they do
+not appear, even if they are pretty usefule
+for type checks. Use the <code>compiler:literal</code> function to retrieve the actual 
+value from the compiler to write polymorphic functions whose runtime data depend
+on which polymorphic function variation is used.</p>
+
+<p>Remember that this is all done during compilation 
 with no runtime overhead. Oh, and you can also type-check with <code>is</code> normally! The 
 same mechanism as above grants us zero-cost literal comparison.</p>
 
@@ -764,7 +774,7 @@ same mechanism as above grants us zero-cost literal comparison.</p>
 </code></pre>
 </div>
 
-<p>Fine, so we saw how we can run a bunch of stuff. How does this relate
+<p>Fine, so we saw that type literals exist. How does this relate
 to the <code>str(status CHARS from 0)</code> syntax? We are actually allowed to
 use string literals as keywords within tuples/function arguments by replacing
 the comma. This counts as interweaving the keyword&#8217;s corresponding literal

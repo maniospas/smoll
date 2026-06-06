@@ -1002,6 +1002,7 @@ class ImplementedType:
         if self.fast_return_exception: 
             self.force_not_inline = True
             self.has_returned_once = True
+            self.needs_failure_mode = True
             raise FastReturnException
     
     async def interpret(self, values: list[int|float], memory: MemoryEmulator, recursion_budget) -> list:
@@ -1622,7 +1623,6 @@ class ImplementedType:
         if arg_code and ret_code: arg_code += ", "
         arg_code += ret_code
         doinline = (self.complexity<500 or self.num_calls<=1) and not self.force_not_inline
-
         if not for_inlining:
             ret = ("static inline __attribute__((always_inline)) " if doinline else "")+("int " if self.needs_failure_mode else "void ")+self.monomorphic_name+"("+arg_code+") {\n  "
             ret += ret_body_start
@@ -1890,8 +1890,9 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
 
         if is_available: available_types.append(variation)
     if len(available_types)==0:
+        if len(method.variations)<10: alternative_list = method.variations
         if not alternative_list: alternative_list = method.variations
-        error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature() for t in alternative_list])#+([] if alternative_list==method.variations else ["or one of "+str(len(method.variations)-len(alternative_list))+" overloads"]))
+        error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature() for t in alternative_list])#+([] if alternative_list==method.variations else ["or one of "+str(len(method.variations)-len(alternative_list))+" other overloads"]))
     if len(available_types)>1:
         error_token.error("type", "more than one conflicting call '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature()+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in available_types])
 
@@ -4168,7 +4169,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 if not to_remove:
                     name.error("safety", "does nothing because it does not call any active 'defer' for '"+signature_like(ret, impl)+"'")
                 for v in invalidated:
-                    if v.name in impl.args and not v.immutable:
+                    if v.name in impl.args and not v.immutable and v.type.builtin:
                         impl.implementation.extend([
                             v, 
                             CODEWORD_EQUALS,
@@ -5323,7 +5324,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         generated_c_funcs.append(transpiled)
     if entry_point: 
         header += "int __t_argc;\nchar** __t_argv;\n"
-        generated_c_funcs.append(f"""int main(int argc, char** argv) {{__t_argc = argc;__t_argv = argv;{entry_point}();return 0;}}""")
+        generated_c_funcs.append(f"""int main(int argc, char** argv) {{__t_argc = argc;__t_argv = argv;DECLARE_HANDLERS;{entry_point}();return 0;}}""")
     body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
     src_path.write_text(header + globs + set_errcodes + define_errors + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")
@@ -5449,8 +5450,10 @@ async def main():
                 if extra_args_str: extra_args_str = " "+extra_args_str
                 if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); errexit()
                 print(f"[{YELLOW}+{RESET}] run          ./{exe_path}{extra_args_str}")
-                result = subprocess.run("./"+str(exe_path)+extra_args_str, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
-                if result.returncode != 0: os._exit(result.returncode)
+                try: 
+                    result = subprocess.run("./"+str(exe_path)+extra_args_str, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+                    if result.returncode != 0: os._exit(result.returncode)
+                except KeyboardInterrupt: os._exit(1)
             os._exit(0) # not in lsp or pyodide case, as it inteferes with the stdout pipe
 
 if is_pyodide: main()

@@ -435,8 +435,10 @@ That is, you can use the function&#8217;s name to refer to data with
 equivalent structure. Below is an example, where the
 <code>nat</code> type represents to natural numbers/non-negative integers.
  Other builtin types are <code>bool</code>, <code>int</code>, <code>float</code>, and <code>cstr</code> for
-string literals. It bears stressing that, when you see integer
-numbers in the code, these are always natural numbers. This is 
+string literals (string literals are lightweight but can not 
+be dynamically constructed or edited: use <code>str</code> covered later 
+for this). It bears stressing that, when you see integer numbers 
+in the code, these are always natural numbers. This is 
 a deliberate choise to enforce memory safety later.</p>
 
 <div class="codehilite">
@@ -477,10 +479,6 @@ You will mainly want to do so when the relations between class
 field values (e.g., a character buffer and its used size) is
 important to safeguard.</p>
 
-<p>Further prefer class definitions when declaring types with some
-construction contract; such contracts should
-not be violated by matching with arbitrary data.</p>
-
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
@@ -497,8 +495,47 @@ not be violated by matching with arbitrary data.</p>
 </code></pre>
 </div>
 
+<p>Further prefer class definitions when declaring types with some
+construction contract; such contracts should
+not be violated by matching with arbitrary data. For example,
+below is a data type that can track the sum and 
+sum of squares of some floats, as well as the number of floats. 
+This can be used to register more floats, or compute the standard 
+deviation of all encounted floats, but not any <code>(float, float, nat)</code> 
+triple should be allowed.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span> <span class="c1"># for pow</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">std_data</span><span class="p">()</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="n">mut</span> <span class="mf">0.0</span>
+    <span class="n">sqr_sum</span> <span class="o">=</span> <span class="n">mut</span> <span class="mf">0.0</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="nb">sum</span><span class="p">,</span> <span class="n">sqr_sum</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">edit</span> <span class="n">std_data</span> <span class="n">data</span><span class="p">,</span> <span class="nb">float</span> <span class="n">value</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">sum</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sum</span> <span class="o">+</span> <span class="n">value</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">sqr_sum</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sqr_sum</span> <span class="o">+</span> <span class="n">value</span><span class="o">*</span><span class="n">value</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">num</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">std</span><span class="p">(</span><span class="n">std_data</span> <span class="n">data</span><span class="p">)</span>
+    <span class="n">sqr_mean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sqr_sum</span><span class="o">/</span><span class="nb">float</span> <span class="n">data</span><span class="o">.</span><span class="n">num</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="o">/</span><span class="nb">float</span> <span class="n">data</span><span class="o">.</span><span class="n">num</span>
+    <span class="k">return</span> <span class="nb">pow</span><span class="p">(</span><span class="n">sqr_mean</span><span class="o">-</span><span class="n">mean</span><span class="o">*</span><span class="n">mean</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span> 
+    <span class="n">data</span> <span class="o">=</span> <span class="n">std_data</span><span class="p">()</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">register</span> <span class="mf">1.0</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">register</span> <span class="mf">1.0</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">register</span> <span class="mf">2.3</span>
+    <span class="nb">print</span> <span class="n">std</span> <span class="n">data</span> <span class="c1"># prints 0.612826</span>
+</code></pre>
+</div>
+
 <p>Use <code>singleton</code> instead of <code>class</code> to further
-ensure that the function runs at most one time in your program.
+ensure that the function runs at most once in your program.
 On the other hand, a shorthand for defining a structural type that would
 immediately return all its fields is to omit its body, like next.</p>
 
@@ -675,10 +712,21 @@ Here is a simple example. Please do not write code like this.</p>
 <p>A more efficient way to write loops, is with the <code>for variable in iterator</code>
 pattern, which uses iterators that have the means to
 obtain the next element. The <code>range</code> iterator, for example, 
-takes an end number or a pair of start and end numbers and allows
+takes a pair of start and non-inclusive end numbers and allows
 calling <code>next</code> to retrieve the next value until the end
-is reached (non-inclusively). Iterators safely try to keep producting new
-elements until they fail to do so (any kind of failure stops them).
+is reached (non-inclusively). Use the <code>of</code> function to support
+various means of expressing such value pairs. Here are some examples, 
+which se <a href="#literal-types">literals</a> for explicitness:</p>
+
+<ul>
+<li><code>range of 10</code> becomes <code>range(0,10)</code> </li>
+<li><code>range of (1 to 10)</code> becomes <code>range(1,10)</code> </li>
+<li><code>range of (1 upto 10)</code> becomes <code>range(1,11)</code> </li>
+<li><code>range of (2 lento 10)</code> becomes <code>range(2,12)</code> </li>
+</ul>
+
+<p>Iterators safely try to keep producting new elements until they
+fail to do so (any kind of failure stops them).
 Underneath, they desugar to <a href="#try-and-fail">error code semantics</a>.
 More on iterators later.</p>
 
@@ -687,7 +735,7 @@ More on iterators later.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span> 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="mi">10</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="n">of</span> <span class="mi">10</span>
         <span class="nb">print</span> <span class="n">i</span>
 </code></pre>
 </div>
@@ -823,13 +871,13 @@ mean never.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="n">rec</span> <span class="n">wooo</span><span class="p">()</span>
-    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+<span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span> <span class="c1"># not the ideal way to pass the console - see next section</span>
     <span class="k">if</span> <span class="n">false</span> <span class="k">return</span> <span class="n">blank</span><span class="p">()</span>
-    <span class="nb">print</span> <span class="s2">&quot;wooo&quot;</span>
+    <span class="n">CLI</span><span class="o">.</span><span class="n">print</span> <span class="s2">&quot;wooo&quot;</span>
+    <span class="n">wooo</span> <span class="n">CLI</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">wooo</span><span class="p">()</span>
+    <span class="n">wooo</span> <span class="n">console</span><span class="p">()</span>
 </code></pre>
 </div>
 
@@ -1703,16 +1751,16 @@ an error is intercepted. Below is an example that safeguards against failing all
 </div>
 
 <p>Since failure is a fast abstraction in <em>smoλ</em>, it is also the implementation
-mechanism for trying to produce next values. Below is an example, 
-where <code>for</code> loops are syntactic desugar to something similar.</p>
+mechanism for trying to produce next values. Below is an example.
+<code>for</code> loops are syntactic desugar to something similar.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">5</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="n">of</span> <span class="mi">5</span>
+    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span> <span class="c1"># equivalent to &#39;for i in range of 5&#39;</span>
         <span class="nb">print</span> <span class="n">i</span>
 </code></pre>
 </div>
@@ -1734,7 +1782,7 @@ is converted into a <code>while try</code>.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="mi">10</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="n">of</span> <span class="mi">10</span>
         <span class="nb">print</span> <span class="n">i</span>   <span class="c1"># prints 0,1,2...,9</span>
 </code></pre>
 </div>
@@ -1743,14 +1791,14 @@ is converted into a <code>while try</code>.</p>
 but instead employ the <code>get(data, nat index)</code> function 
 that overloads the <code>data[index]</code> operator for indexes
 that are natural numbers. In truth, the range ieration
-examples is equivalent like the next one.</p>
+examples is equivalent to the next one.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">iterator</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">10</span>
+    <span class="n">iterator</span> <span class="o">=</span> <span class="nb">range</span> <span class="n">of</span> <span class="mi">10</span>
     <span class="n">hidden_index</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="n">iterator</span><span class="p">[</span><span class="n">hidden_index</span><span class="p">]</span>
         <span class="n">hidden_index</span> <span class="o">=</span> <span class="n">hidden_index</span><span class="o">+</span><span class="mi">1</span>
@@ -1992,7 +2040,7 @@ it is not meaningless to guarantee a return statement type.</p>
 failure. In fact, it can be argued that all such loops would be bounded by compute
 resources and available running time, given that they run on finite computers.</p>
 
-<p>The snippet exemplifies this by adding a recursion safety
+<p>The next snippet exemplifies this by adding a recursion safety
 mechanism as an effect. This mechanism is still rough, but the language marks 
 all recursive functions as potentially failing. This way, future versions can have 
 platform-dependent error codes for unbounded recursion that exceeds system resource limits.</p>
@@ -2000,17 +2048,41 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="nb">range</span> <span class="n">recursion_safety</span><span class="p">,</span> <span class="n">nat</span> <span class="n">i</span><span class="p">)</span>
-    <span class="nb">next</span> <span class="n">recursion_safety</span>
+<span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="nb">range</span> <span class="n">SAFETY</span><span class="p">,</span> <span class="n">nat</span> <span class="n">i</span><span class="p">)</span>
+    <span class="nb">next</span> <span class="n">SAFETY</span>
     <span class="k">if</span> <span class="n">false</span> <span class="k">return</span> <span class="n">blank</span><span class="p">()</span> <span class="c1"># do not return anything</span>
     <span class="k">return</span> <span class="n">wooo</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">recursion_safety</span> <span class="o">=</span> <span class="nb">range</span> <span class="mi">14</span> <span class="c1"># recursive depth limit in playground</span>
+    <span class="n">SAFETY</span> <span class="o">=</span> <span class="nb">range</span> <span class="n">of</span> <span class="mi">14</span> <span class="c1"># recursive depth limit in playground</span>
     <span class="k">try</span> <span class="n">wooo</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span> <span class="c1"># prints &#39;iteration end&#39;</span>
+</code></pre>
+</div>
+
+<p>A mechanism that already exists for <em>smoλ</em> programs is that the SIGINT signal,
+which is produced by the user pressing ctrl+C, requires manual handling. The
+signal handler is imported from the <code>"std/io.s"</code> module and requires a mutable 
+<code>console CLI</code> effect to listen to the console interrupt. Then, the <code>process:interrupt_point()</code>
+function creates an error if it is called after such an interrupt. For safety,
+this function asks for user input on whether the program should be terminated.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+
+<span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">false</span> <span class="k">return</span> <span class="n">blank</span><span class="p">()</span>
+    <span class="n">process</span><span class="p">:</span><span class="n">interrupt_point</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="s2">&quot;wooo&quot;</span>
+    <span class="n">wooo</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="k">try</span> <span class="n">wooo</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">the end&quot;</span> <span class="c1"># \r go to the start of the console line to remive ^C</span>
 </code></pre>
 </div>
 
@@ -2375,7 +2447,7 @@ Floats and ints can also be converted to bits.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hash</span><span class="p">(</span><span class="nb">str</span> <span class="n">k</span><span class="p">,</span> <span class="n">nat</span> <span class="n">size</span><span class="p">)</span>
     <span class="n">h</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">5381</span>
-    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">k</span>
+    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="n">of</span> <span class="nb">len</span> <span class="n">k</span>
     <span class="k">while</span> <span class="k">try</span> <span class="n">i</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">iter</span>
         <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">bits</span><span class="p">()</span><span class="o">.</span><span class="n">lshift</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">nat</span><span class="p">()</span> <span class="o">+</span> <span class="n">h</span> <span class="o">+</span> <span class="n">nat</span> <span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">mod</span> <span class="n">size</span>
@@ -2402,10 +2474,9 @@ when organized in a string buffer.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[]</span> <span class="n">buff</span><span class="p">)</span>
     <span class="n">mem</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
-    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">pos</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="nb">iter</span>
-        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">buff</span>
+        <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">element</span>
         <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot; &quot;</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">buf</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">mem</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
 
@@ -2419,10 +2490,8 @@ when organized in a string buffer.</p>
     <span class="n">buff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;is&quot;</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="s2">&quot;manios&quot;</span>
     <span class="n">buff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">mini</span><span class="p">:</span><span class="nb">str</span> <span class="n">concat</span> <span class="n">buff</span>
-    <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span> <span class="nb">len</span> <span class="n">buff</span>
-    <span class="k">while</span> <span class="k">try</span> <span class="n">i</span><span class="o">=</span><span class="nb">next</span> <span class="n">it</span>
-        <span class="nb">print</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
-        <span class="nb">print</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">buff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">buff</span>
+        <span class="nb">print</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">element</span>
 </code></pre>
 </div>
 

@@ -110,19 +110,39 @@ def float(console console)
         fail "user input was not a float"
     return const number
 
-def str(edit char[] buf, mut nat pos, console console)
-    doc "reads a string from the console into buf at pos, returns the read slice"
-    if buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
-    if buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
-    start = const pos
+def str(effect edit char_allocator CHARS, mut console console)
+    doc "reads a string from the console"
+    if CHARS is char_arena
+        doc "The read string is placed on an arena while consuming only the necessarily minimum size."
+        ch = CHARS
+    else 
+        if CHARS is new
+            doc "The read string is placed onto memory that keeps being reallocated to accommodate its size."
+            doc "The resulting memory will consume exactly the required size in bytes."
+            ch = arena ref char[].alloc 8
+        else
+            compiler:skip()
+    if ch.buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
+    if ch.buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
+    start = const ch.pos
     while true
         {builtins:int _c = getchar();}
         {if(_c=='\n'||_c=='\r'||_c==EOF){break;}}
-        if pos>=buf.unsafe_size fail "read string does not fit on buffer"
-        {builtins:compiler:ptr ptr_pos = buf__unsafe_ptr+pos;}
+        if ch.pos>=ch.buf.unsafe_size 
+            if CHARS is new
+                ch.buf = ch.buf.resize ch.buf.unsafe_size*3/2
+            else
+                fail "read string does not fit on buffer"
+        ptr_pos = ch.buf.unsafe_ptr+ch.pos
         {*ptr_pos=_c;}
-        pos = pos+1
-    return str(buf, start lento pos-start)
+        ch.pos = ch.pos+1
+    if CHARS is char_arena
+        CHARS.pos = ch.pos
+    if CHARS is new
+        if ch.pos==0
+            ch.pos = ch.pos+1
+        ch.buf = ch.buf.resize(ch.pos unsafe)
+    return str(ch.buf, start to ch.pos)
 
 def int(cstr|str _s)
     doc "converts a string to an integer"

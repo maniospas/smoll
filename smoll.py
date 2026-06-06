@@ -55,15 +55,11 @@ debug_mode = True
 repositories: dict[str, str] = dict()
 externals: list["File"] = list()
 
-import sys
-import os
-
 def supports_ansi() -> bool:
     if is_pyodide: return True
     if not hasattr(sys.stdout, "isatty") or not sys.stdout.isatty(): return False
     if sys.platform == "win32":
-        if os.environ.get("WT_SESSION") or os.environ.get("TERM_PROGRAM"):
-            return True
+        if os.environ.get("WT_SESSION") or os.environ.get("TERM_PROGRAM"): return True
         try:
             import ctypes
             kernel32 = ctypes.windll.kernel32
@@ -74,7 +70,8 @@ def supports_ansi() -> bool:
     if term == "dumb": return False
     return True
 
-def log_async_calls(func):
+def log_async_calls(func): 
+    # helper for debugging - currently unused
     async def wrapper(*args, **kwargs):
         task_name = f"{func.__name__} {id(asyncio.current_task())} {str(args)}"
         print(f"Starting {task_name}")
@@ -88,6 +85,7 @@ def log_async_calls(func):
     return wrapper
 
 def safeguard(fn, exc): 
+    # helper for debugging - currently unused
     try: return fn()
     except Exception: raise exc
 
@@ -567,7 +565,7 @@ class ImplementedType:
         self.is_buffer_of: ImplementedType|None = None
         self.is_forced_pointer_type_of: ImplementedType|None = None
         self.used_globals: set[str] = set()
-        self.dependent_implementations: list[ImplementedType] = list() # deoendent pointer TYPES
+        self.dependent_implementations: list[ImplementedType] = list() # dependent pointer TYPES
         self.dependent_assignments: dict[str, str] = dict() # e.g., dependent memory regions
         self.defers: list[list[CodeSegment]] = list() # release code for specific variables
         self.returned_defers: list[list[CodeSegment]] = list()
@@ -978,13 +976,14 @@ class ImplementedType:
         if is_safe:
             defer_vars = {var for defer in self.defers+self.returned_defers for var in defer if isinstance(var, Variable)}
             defer_var_names = [r.name for r in defer_vars]
+            defer_var_names = list(set(defer_var_names))
             for ret in self.rets+[arg for arg in self.args if not self.vars[arg].immutable]: 
                 v = self.vars[ret]
                 if v.type.invalidated_by==POINTER_TYPE:
                     for accompanying in self.get_required_accompany(v):
                         to_defer = self.get_assignment(accompanying.stabilized_name(), defer_var_names)
                         if to_defer and accompanying!=v and not self.get_assignment(to_defer, self.rets):
-                            error_token.error("safety", "returning '"+pretty_name(v.stabilized_name())+"' requires return '"+pretty_name(accompanying.stabilized_name())+"'", reason=accompanying.token)
+                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' requires to also return '"+pretty_name(accompanying.stabilized_name())+"'", reason=accompanying.token)
                 if v.stabilized_name() in self.invalidated:
                     error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' has been invalidated", reason=self.invalidated[v.stabilized_name()], raason_message="due to")
 
@@ -1748,7 +1747,7 @@ class Token:
                 print(at.row)
                 print(at.col)
                 # message (may span multiple lines))
-                printid(errtype+" error: "+message+" "+(raason_message+" "+reason.file.resolved_path if reason else ""))
+                printid(errtype+" error: "+message+" "+(raason_message+" "+(reason.file.resolved_path+" " if reason.file!=self.file else "")+"line "+str(reason.row)  if reason else ""))
                 if suggestions:
                     printid("    with alternatives:")
                     for suggestion in suggestions:
@@ -2128,7 +2127,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     # we are next going to go through all the actual pointer compliance checks
     # so it is correct (actually, mandatory) to promote the return result to the 
     # corresponding input buffer type - we will do so by detecting pointers attached to buffers,
-    # which have a known structure, with the pointers as the first argument.
+    # which have a known structure, with the pointers as the first return after the type.
 
     prefix = longest_common_prefix(callee.rets)
     prefix_length = len(prefix)
@@ -2165,6 +2164,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
 
     impl.implementation.append(CODEWORD_SEMICOLON)
 
+    # we are now coming to the point where we bundle variables together
+    # so that we are forced to be returned together
     all_rets = [impl.vars[tmp+"__"+ret[prefix_length:]] for ret in callee.rets]
     all_args = vars+all_rets
     callee_all_args = callee.args+callee.rets
@@ -2178,6 +2179,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             # t2 = impl.get_pointer_type(r)
             # if t1 is None or t2 is None or t1==ANY_TYPE or t2==ANY_TYPE or t1==t2 or t1==POINTER_TYPE or t2==POINTER_TYPE:
             #if callee.vars[ac] in callee.get_required_accompany(callee.vars[rc]):
+            for accompany in impl.get_required_accompany(a):
+                impl.add_required_accompany(r, accompany)
             impl.add_required_accompany(r, a)
 
     for var in add_to_invalidators:

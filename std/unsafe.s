@@ -23,7 +23,7 @@ def alloc(nat bytes)
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
     {builtins:compiler:ptr allocated = malloc(bytes);}
     if not exists allocated fail "allocation failed"
-    return allocated
+    return unsafe_mut allocated
 
 def realloc(any ptr allocated, nat bytes)
     doc "reallocate memory"

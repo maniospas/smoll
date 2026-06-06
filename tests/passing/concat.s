@@ -4,7 +4,7 @@ import "std/mini.s" as mini
 
 def concat(mini:str[] buff)
   mem = arena ref char[].alloc KB 4
-  iter = range len buff
+  iter = range of len buff
   start = mem.pos
   while try i=next iter
     mem.copy mini:unpack(buff[i])

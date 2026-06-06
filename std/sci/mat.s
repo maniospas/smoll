@@ -32,13 +32,13 @@ def constmat(float[] buf, nat rows)
     doc "immutable matrix on an immutable float[] buffer"
     cols = len(buf)/rows
     if cols*rows!=len buf fail "buffer size not divisible by vector rows"
-    return const mat(arena unsafe_mut buf, rows, cols)
+    return const mat(arena unsafe_mut buf, rows, cols dirty)
 
 def mat(edit float[] buf, nat rows)
     doc "matrix on an existing float[] buffer"
     cols = len(buf)/rows
     if cols*rows!=len buf fail "buffer size not divisible by vector rows"
-    return mat(arena unsafe_mut buf, rows, cols)
+    return mat(arena unsafe_mut buf, rows, cols dirty)
 
 def mutget(edit mat m, nat i, nat j)
     doc "mutable reference to matrix element (i,j)"

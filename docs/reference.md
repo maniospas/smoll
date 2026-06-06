@@ -435,10 +435,19 @@ def main()
 A more efficient way to write loops, is with the `for variable in iterator`
 pattern, which uses iterators that have the means to
 obtain the next element. The `range` iterator, for example, 
-takes an end number or a pair of start and end numbers and allows
+takes a pair of start and non-inclusive end numbers and allows
 calling `next` to retrieve the next value until the end
-is reached (non-inclusively). Iterators safely try to keep producting new
-elements until they fail to do so (any kind of failure stops them).
+is reached (non-inclusively). Use the `of` function to support
+various means of expressing such value pairs. Here are some examples, 
+which se [literals](#literal-types) for explicitness:
+
+-  `range of 10` becomes `range(0,10)` 
+-  `range of (1 to 10)` becomes `range(1,10)` 
+-  `range of (1 upto 10)` becomes `range(1,11)` 
+-  `range of (2 lento 10)` becomes `range(2,12)` 
+
+Iterators safely try to keep producting new elements until they
+fail to do so (any kind of failure stops them).
 Underneath, they desugar to [error code semantics](#try-and-fail).
 More on iterators later.
 
@@ -447,7 +456,7 @@ import "std/core.s"
 
 def main()
     CLI = console() 
-    for i in range 10
+    for i in range of 10
         print i
 ```
 
@@ -1433,16 +1442,16 @@ def main()
 ```
 
 Since failure is a fast abstraction in *smoλ*, it is also the implementation
-mechanism for trying to produce next values. Below is an example, 
-where `for` loops are syntactic desugar to something similar.
+mechanism for trying to produce next values. Below is an example.
+`for` loops are syntactic desugar to something similar.
 
 ```python
 import "std/core.s"
 
 def main()
     CLI = console()
-    it = range 5
-    while try i=next it
+    it = range of 5
+    while try i=next it # equivalent to 'for i in range of 5'
         print i
 ```
 
@@ -1463,7 +1472,7 @@ import "std/core.s"
 
 def main()
     CLI = console()
-    for i in range 10
+    for i in range of 10
         print i   # prints 0,1,2...,9
 ```
 
@@ -1471,14 +1480,14 @@ However, iterators do not apply arbitary functions
 but instead employ the `get(data, nat index)` function 
 that overloads the `data[index]` operator for indexes
 that are natural numbers. In truth, the range ieration
-examples is equivalent like the next one.
+examples is equivalent to the next one.
 
 ```python
 import "std/core.s"
 
 def main()
     CLI = console()
-    iterator = range 10
+    iterator = range of 10
     hidden_index = mut 0
     while try i=iterator[hidden_index]
         hidden_index = hidden_index+1
@@ -1729,7 +1738,7 @@ rec wooo(effect edit range recursion_safety, nat i)
 
 def main()
     CLI = console()
-    recursion_safety = range 14 # recursive depth limit in playground
+    recursion_safety = range of 14 # recursive depth limit in playground
     try wooo 0
     if try error = compiler:catch()
         print cstr error # prints 'iteration end'
@@ -2082,7 +2091,7 @@ Floats and ints can also be converted to bits.
 ```python
 def hash(str k, nat size)
     h = mut 5381
-    iter = range len k
+    iter = range of len k
     while try i = next iter
         h = h.bits().lshift(5).nat() + h + nat k[i]
     return h.mod size
@@ -2108,10 +2117,9 @@ import "std/mini.s" as mini
 
 def concat(mini:str[] buff)
     mem = arena char[].alloc KB 4
-    iter = range len buff
     start = mem.pos
-    while try i=next iter
-        mem.copy mini:unpack buff[i]
+    for element in buff
+        mem.copy mini:unpack element
         mem.copy " "
     return str(mem.buf,start,mem.pos)
 
@@ -2125,10 +2133,8 @@ def main()
     buff[3] = mini:str "is"
     buff[4] = mini:str "manios"
     buff[5] = mini:str concat buff
-    it = range len buff
-    while try i=next it
-        print (i," ")
-        print mini:unpack buff[i]
+    for element in buff
+        print mini:unpack element
 ```
 
 ## vectors

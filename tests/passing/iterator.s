@@ -6,7 +6,7 @@ def print(effect mut console CLI, cstr[] sentences)
 
 def main()
     CLI = console()
-    for i in range 10
+    for i in range of 10
         print i
 
     print ["hello world!", "... and goodbye for now."]

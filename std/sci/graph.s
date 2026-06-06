@@ -57,7 +57,7 @@ def filter(ppr config, matrix m, vec p0)
     doc "This requires the graph filter, a (normalized) adjacency matrix, and a personalization vector."
     doc "The filter runs until convergence or until its iteration schema's end is reached."
     p0norm = reduce(p0 abs)
-    FLOATS = arena float[].alloc 100*len p0 
+    FLOATS = arena ref float[].alloc 5*len p0 
     normalized_p0 = p0*((1.0-config.alpha)/p0norm)
     prev_p = mut copy normalized_p0
     p = mut copy normalized_p0

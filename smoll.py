@@ -594,13 +594,19 @@ class ImplementedType:
 
     def get_required_accompany(self, var: Variable):
         assert isinstance(var, Variable)
-        return [self.vars[acc] for acc in self.required_accompany.get(var.stabilized_name(), [])]
+        var_stabilized_name = var.stabilized_name()
+        ret = set()
+        for acc in self.required_accompany.get(var_stabilized_name, []):
+            var = self.vars[acc]
+            if var not in ret: ret.add(var)
+        return list(ret)
 
     def add_required_accompany(self, var: Variable, requirement: Variable):
         assert isinstance(var, Variable)
         assert isinstance(requirement, Variable)
-        if var.stabilized_name() not in self.required_accompany: self.required_accompany[var.stabilized_name()] = list()
-        self.required_accompany[var.stabilized_name()].append(requirement.stabilized_name())
+        var_stabilized_name = var.stabilized_name()
+        if var_stabilized_name not in self.required_accompany: self.required_accompany[var.stabilized_name()] = list()
+        self.required_accompany[var_stabilized_name].append(requirement.stabilized_name())
 
     def gather_spawned_error_codes(self, discovered: set["ImplementedType"]):
         ret = set()
@@ -951,11 +957,17 @@ class ImplementedType:
                 normalized_defer: list[CodeSegment] = list()
                 for segment in defer:
                     if isinstance(segment, Variable) and segment.name not in global_var2cstr:
-                        ret = self.get_assignment(segment.stabilized_name(), self.rets) # we have computed these now (DO NOT MOVE EARLIER)
+                        segment_stabilized_name = segment.stabilized_name()
+                        ret = self.get_assignment(segment_stabilized_name, self.rets) # we have computed these now (DO NOT MOVE EARLIER)
+                        # if ret==segment_stabilized_name:
+                        #     for r in self.rets:
+                        #         tried = self.get_assignment(r, [segment_stabilized_name])
+                        #         if tried!=segment_stabilized_name:
+                        #             ret = tried
+                        #             break
                         normalized_defer.append(self.vars[ret] if ret else segment)
                         #print(self.name, ret, "Returned as", segment.tostring())
-                    else: 
-                        normalized_defer.append(segment)
+                    else: normalized_defer.append(segment)
                 defer = normalized_defer
                 has_any_returned_value = any(u.tostring()==v.name for v in value for u in defer)
                 if not has_any_returned_value: continue
@@ -972,7 +984,6 @@ class ImplementedType:
                 to_remove.append(orignal_defer)
             for defer in to_remove: self.defers.remove(defer)
 
-
         if is_safe:
             defer_vars = {var for defer in self.defers+self.returned_defers for var in defer if isinstance(var, Variable)}
             defer_var_names = [r.name for r in defer_vars]
@@ -982,8 +993,8 @@ class ImplementedType:
                 if v.type.invalidated_by==POINTER_TYPE:
                     for accompanying in self.get_required_accompany(v):
                         to_defer = self.get_assignment(accompanying.stabilized_name(), defer_var_names)
-                        if to_defer and accompanying!=v and not self.get_assignment(to_defer, self.rets):
-                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' requires to also return '"+pretty_name(accompanying.stabilized_name())+"'", reason=accompanying.token)
+                        if to_defer and accompanying!=v and not self.get_assignment(to_defer, self.rets):# and not any(self.get_assignment(ret, defer_var_names) for ret in self.rets):
+                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' requires to also return '"+pretty_name(accompanying.stabilized_name())+"' so that its resource release is defered further", reason=accompanying.token, raason_message="due to", suggestions=["return the accompanying variable", "returns a structure containing the accompanying variable", "consider creating a ref to the accompanying variable"])
                 if v.stabilized_name() in self.invalidated:
                     error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' has been invalidated", reason=self.invalidated[v.stabilized_name()], raason_message="due to")
 
@@ -3105,6 +3116,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     else:
                         # non-allocation check is mandatory unfortunately
                         if debug_mode:
+                            err_token = op_token
                             text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
                             text += "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
                             impl.implementation.extend([
@@ -4020,7 +4032,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
     def skip_statement(file: File, tokens: list[Token], pos: int):
         get(tokens, pos).error("safety", "this statement needs to start in a new line because it could be skipped (for now, skipping relies on code block indentation to properly end)")
 
-    if peek_text(tokens, pos)!=START_TOKEN and not one_line: tokens[pos].error("syntax", "expecting indentation")
+    if peek_text(tokens, pos)!=START_TOKEN and not one_line: get(tokens,pos).error("syntax", "expecting indentation")
     pos += 1
     start_pos = pos
     while pos<len(tokens):
@@ -4219,6 +4231,8 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 indexor,
                 CODEWORD_EQUALS,
                 CodeWord("0"),
+                CodeWord("-"),
+                CodeWord("1"),
                 CODEWORD_SEMICOLON
             ])
             
@@ -4256,7 +4270,6 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                     CODEWORD_SEMICOLON
                 ])
                 return pos, [var]
-            pos, ret = await process_for_get(pos)
             impl.implementation.extend([
                 indexor,
                 CODEWORD_EQUALS,
@@ -4265,6 +4278,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 CodeWord("1"),
                 CODEWORD_SEMICOLON
             ])
+            pos, ret = await process_for_get(pos)
             if ret[0].type!=BOOL_TYPE: get(tokens, in_pos).error("type", "internal error - conditions can only evaluate to 'bool' or be constantly true/false")
             if ret[0].type==TRUE_TYPE:
                 if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)

@@ -67,8 +67,9 @@ def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     if v2 is vec and v1.length!=v2.length
         fail "different vector sizes"
     v = vec(v1.length dirty)
-    for i in range of v1.length
-        v[i] = v1[i]+v2.at i
+    for value in v1
+        i = compiler:for_counter()
+        v[i] = value+v2.at i
     return v
 
 def add(effect edit float_allocator FLOATS, float v1, vec v2)
@@ -82,16 +83,17 @@ def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
     v = vec(v1.length dirty)
-    for i in range of v.length
-        v[i] = v1[i]-v2.at i
+    for value in v1
+        i = compiler:for_counter()
+        v[i] = value-v2.at i
     return v
 
 def sub(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector subtraction"
     doc "Grabs an FLOATS for the result as an effect."
     v = vec v2.length
-    for i in range of v.length
-        v[i] = v1-v2[i]
+    for value in v2
+        v[compiler:for_counter()] = v1-value
     return v
 
 def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
@@ -100,8 +102,9 @@ def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
     v = vec(v1.length dirty)
-    for i in range of v.length
-        v[i] = v1[i]*v2.at i
+    for value in v1
+        i = compiler:for_counter()
+        v[i] = value*v2.at i
     return v
 
 def mul(effect edit float_allocator FLOATS, float v1, vec v2)
@@ -116,16 +119,17 @@ def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
     v = vec(v1.length dirty)
-    for i in range of v.length
-        v[i] = pow(v1[i], v2.at i)
+    for value in v1
+        i = compiler:for_counter()
+        v[i] = pow(value, v2.at i)
     return v
 
 def pow(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector exponentiation"
     doc "Grabs an FLOATS for the result as an effect."
     v = vec(v2.length dirty)
-    for i in range of v.length
-        v[i] = pow(v1, v2[i])
+    for value in v2
+        v[compiler:for_counter()] = pow(v1, value)
     return v
 
 def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
@@ -135,17 +139,17 @@ def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
         fail "different vector sizes"
     v = vec(v1.length dirty)
     p1 = v1.unsafe_ptr
-    for i in range of v.length
-        v[i] = v1[i]/v2.at i
+    for value in v1
+        i = compiler:for_counter()
+        v[i] = value/v2.at i
     return v
 
 def div(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector division"
     doc "Grabs an FLOATS for the result as an effect."
     v = vec(v2.length dirty)
-    it = range of v2.length
-    for i in range of v.length
-        v[i] = v1/v2[i]
+    for value in v2
+        v[compiler:for_counter()] = v1/value
     return v
     
 def reduce(vec v, blank|"mul"|"sub"|"rel" comparison, blank|vec v2, blank|"add"|"mul" reduction, blank|"abs"|"sqr"|"l2" transform)
@@ -161,13 +165,16 @@ def reduce(vec v, blank|"mul"|"sub"|"rel" comparison, blank|vec v2, blank|"add"|
         ret = mut 1.0
     if (v2 is blank) and (not comparison is blank)
         compiler:skip()
-    for i in range of len v
-        value = mut v[i]
+    for _value in v
+        value = mut _value
         if comparison is "sub"
+            i = compiler:for_counter()
             value = value-v2[i]
         if comparison is "mul"
+            i = compiler:for_counter()
             value = value-v2[i]
         if comparison is "rel"
+            i = compiler:for_counter()
             value = (value-v2[i])*2.0/(abs(value)+abs(v2[i]))
         if transform is "abs"
             value = abs(value)
@@ -193,9 +200,7 @@ def var(vec v)
     doc "variance"
     sumsqr = mut 0.0
     sum = mut 0.0
-    it = range of len v
-    while try i=next it
-        value = v[i]
+    for value in v
         sum = sum+value
         sumsqr = sumsqr+value*value
     n = float len v
@@ -227,9 +232,9 @@ def print(effect mut console CLI, vec v, cstr|blank endl)
 def copy(effect edit float_allocator FLOATS, vec v)
     doc "copy a vector"
     doc "Grabs a FLOATS for the result as an effect."
-    result = vec v.length
-    for i in range of v.length
-        result[i] = v[i]
+    result = vec(v.length dirty)
+    for value in v
+        result[compiler:for_counter()] = value
     return result
 
 def arena(edit vec v)

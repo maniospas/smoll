@@ -4,13 +4,13 @@
 #include "std/extern/extern.h"
 int __t_argc;
 char** __t_argv;
-const char* const __t1880t=" minutes\n";
-const char* const __t1870t="B";
-const char* const __t1878t=" ";
-const char* const __t1873t="answered: ";
-const char* const __t1865t="A";
-const char* const __t1871t="C";
-const char* const __t1877t="in";
+const char* const __t2047t=" minutes\n";
+const char* const __t2040t="answered: ";
+const char* const __t2037t="B";
+const char* const __t2032t="A";
+const char* const __t2045t=" ";
+const char* const __t2044t="in";
+const char* const __t2038t="C";
 const char* const __t382t="\n";
 static const char* __t_all_errcodes[36] = {"noerr",
 "error",
@@ -55,20 +55,20 @@ static inline __attribute__((always_inline)) void console__t366t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void answers__t1862t(const char* first, const char* second, uint64_t minutes_to_answer, const char** __t1882t, const char** __t1883t, uint64_t* __t1884t) {
-  *__t1882t=first;
-  *__t1883t=second;
-  *__t1884t=minutes_to_answer;
+static inline __attribute__((always_inline)) void answers__t2029t(const char* first, const char* second, uint64_t minutes_to_answer, const char** __t2049t, const char** __t2050t, uint64_t* __t2051t) {
+  *__t2049t=first;
+  *__t2050t=second;
+  *__t2051t=minutes_to_answer;
 }
 
-static inline __attribute__((always_inline)) void not__t28t(char value, char* __t1885t) {
+static inline __attribute__((always_inline)) void not__t28t(char value, char* __t2052t) {
   char z=0;
   if(!value){
   z=1;
   }
   goto __t_return;
   __t_return:
-  *__t1885t=z;
+  *__t2052t=z;
 }
 
 static inline __attribute__((always_inline)) void print__t380t(const char* value) {
@@ -88,125 +88,125 @@ static inline __attribute__((always_inline)) void print__t391t(uint64_t value, c
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) int main__t1863t() {
-  uint64_t __t1866t=0;
-  const char* __t1867t__first=0;
-  const char* __t1867t__second=0;
-  uint64_t __t1867t__minutes_to_answer=0;
+static inline __attribute__((always_inline)) int main__t2030t() {
+  uint64_t __t2033t=0;
+  const char* __t2034t__first=0;
+  const char* __t2034t__second=0;
+  uint64_t __t2034t__minutes_to_answer=0;
   const char* answers__first=0;
   const char* answers__second=0;
   uint64_t answers__minutes_to_answer=0;
-  char __t1868t=0;
-  char __t1869t=0;
-  char __t1872t__=0;
+  char __t2035t=0;
+  char __t2036t=0;
+  char __t2039t__=0;
   int __t_errcode=0;
   int __t_complain=0;
   console__t366t();
-  __t1866t=60;
-  answers__t1862t(__t1865t,__t1865t,__t1866t,&__t1867t__first,&__t1867t__second,&__t1867t__minutes_to_answer);
-  answers__first=__t1867t__first;
-  answers__second=__t1867t__second;
-  answers__minutes_to_answer=__t1867t__minutes_to_answer;
-  __t1869t=1;
-  if(__t1865t!=answers__first){
-  __t1869t=0;
+  __t2033t=60;
+  answers__t2029t(__t2032t,__t2032t,__t2033t,&__t2034t__first,&__t2034t__second,&__t2034t__minutes_to_answer);
+  answers__first=__t2034t__first;
+  answers__second=__t2034t__second;
+  answers__minutes_to_answer=__t2034t__minutes_to_answer;
+  __t2036t=1;
+  if(__t2032t!=answers__first){
+  __t2036t=0;
   }
-  if(__t1865t!=answers__second){
-  __t1869t=0;
+  if(__t2032t!=answers__second){
+  __t2036t=0;
   }
-  if(__t1869t){
-  __t1868t=1;
+  if(__t2036t){
+  __t2035t=1;
   }
-  __t1869t=1;
-  if(__t1865t!=answers__first){
-  __t1869t=0;
+  __t2036t=1;
+  if(__t2032t!=answers__first){
+  __t2036t=0;
   }
-  if(__t1870t!=answers__second){
-  __t1869t=0;
+  if(__t2037t!=answers__second){
+  __t2036t=0;
   }
-  if(__t1869t){
-  __t1868t=1;
+  if(__t2036t){
+  __t2035t=1;
   }
-  __t1869t=1;
-  if(__t1865t!=answers__first){
-  __t1869t=0;
+  __t2036t=1;
+  if(__t2032t!=answers__first){
+  __t2036t=0;
   }
-  if(__t1871t!=answers__second){
-  __t1869t=0;
+  if(__t2038t!=answers__second){
+  __t2036t=0;
   }
-  if(__t1869t){
-  __t1868t=1;
+  if(__t2036t){
+  __t2035t=1;
   }
-  __t1869t=1;
-  if(__t1870t!=answers__first){
-  __t1869t=0;
+  __t2036t=1;
+  if(__t2037t!=answers__first){
+  __t2036t=0;
   }
-  if(__t1865t!=answers__second){
-  __t1869t=0;
+  if(__t2032t!=answers__second){
+  __t2036t=0;
   }
-  if(__t1869t){
-  __t1868t=1;
+  if(__t2036t){
+  __t2035t=1;
   }
-  __t1869t=1;
-  if(__t1870t!=answers__first){
-  __t1869t=0;
+  __t2036t=1;
+  if(__t2037t!=answers__first){
+  __t2036t=0;
   }
-  if(__t1870t!=answers__second){
-  __t1869t=0;
+  if(__t2037t!=answers__second){
+  __t2036t=0;
   }
-  if(__t1869t){
-  __t1868t=1;
+  if(__t2036t){
+  __t2035t=1;
   }
-  __t1869t=1;
-  if(__t1870t!=answers__first){
-  __t1869t=0;
+  __t2036t=1;
+  if(__t2037t!=answers__first){
+  __t2036t=0;
   }
-  if(__t1871t!=answers__second){
-  __t1869t=0;
+  if(__t2038t!=answers__second){
+  __t2036t=0;
   }
-  if(__t1869t){
-  __t1868t=1;
+  if(__t2036t){
+  __t2035t=1;
   }
-  __t1869t=1;
-  if(__t1871t!=answers__first){
-  __t1869t=0;
+  __t2036t=1;
+  if(__t2038t!=answers__first){
+  __t2036t=0;
   }
-  if(__t1865t!=answers__second){
-  __t1869t=0;
+  if(__t2032t!=answers__second){
+  __t2036t=0;
   }
-  if(__t1869t){
-  __t1868t=1;
+  if(__t2036t){
+  __t2035t=1;
   }
-  __t1869t=1;
-  if(__t1871t!=answers__first){
-  __t1869t=0;
+  __t2036t=1;
+  if(__t2038t!=answers__first){
+  __t2036t=0;
   }
-  if(__t1870t!=answers__second){
-  __t1869t=0;
+  if(__t2037t!=answers__second){
+  __t2036t=0;
   }
-  if(__t1869t){
-  __t1868t=1;
+  if(__t2036t){
+  __t2035t=1;
   }
-  __t1869t=1;
-  if(__t1871t!=answers__first){
-  __t1869t=0;
+  __t2036t=1;
+  if(__t2038t!=answers__first){
+  __t2036t=0;
   }
-  if(__t1871t!=answers__second){
-  __t1869t=0;
+  if(__t2038t!=answers__second){
+  __t2036t=0;
   }
-  if(__t1869t){
-  __t1868t=1;
+  if(__t2036t){
+  __t2035t=1;
   }
-  not__t28t(__t1868t,&__t1872t__);
-  if(__t1872t__){
+  not__t28t(__t2035t,&__t2039t__);
+  if(__t2039t__){
   __t_errcode=35;
   goto __t_failure;
   }
-  print__t380t(__t1873t);
+  print__t380t(__t2040t);
   print__t380t(answers__first);
   print__t380t(answers__second);
-  print__t378t(__t1877t,__t1878t);
-  print__t391t(answers__minutes_to_answer,__t1880t);
+  print__t378t(__t2044t,__t2045t);
+  print__t391t(answers__minutes_to_answer,__t2047t);
   
   __t_failure:
   goto __t_skip_returns;
@@ -214,4 +214,4 @@ static inline __attribute__((always_inline)) int main__t1863t() {
   return __t_errcode;
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1863t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t2030t();return 0;}

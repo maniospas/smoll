@@ -13,7 +13,7 @@ def create_map()
 
 def test2(strstr s)
     return s
- 
+
 def test()
     map = create_map().map
     ret = test2 map

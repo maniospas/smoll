@@ -47,7 +47,7 @@ static inline __attribute__((always_inline)) void console__t366t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void splitmix64__t1847t(uint64_t* __t1872t) {
+static inline __attribute__((always_inline)) void splitmix64__t2014t(uint64_t* __t2039t) {
   char* ts=0;
   uint64_t seed=0;
   ts=alloca(sizeof(struct timespec));
@@ -55,14 +55,14 @@ static inline __attribute__((always_inline)) void splitmix64__t1847t(uint64_t* _
   seed=(unsigned long long)((struct timespec*)ts)->tv_sec*(unsigned long long)1000000000+((struct timespec*)ts)->tv_nsec;
   goto __t_return;
   __t_return:
-  *__t1872t=seed;
+  *__t2039t=seed;
 }
 
-static inline __attribute__((always_inline)) void splitmix64__t1845t(uint64_t* __t1873t, uint64_t* __t1874t) {
-  uint64_t x=*__t1873t;
+static inline __attribute__((always_inline)) void splitmix64__t2012t(uint64_t* __t2040t, uint64_t* __t2041t) {
+  uint64_t x=*__t2040t;
   uint64_t z=0;
   uint64_t rot=0;
-  uint64_t __t1846t=0;
+  uint64_t __t2013t=0;
   x=x+0x9E3779B97F4A7C15ULL;
   z=x;
   rot=z>>30;
@@ -73,68 +73,68 @@ static inline __attribute__((always_inline)) void splitmix64__t1845t(uint64_t* _
   z=z*0x94D049BB133111EBULL;
   rot=z>>31;
   z=z^rot;
-  __t1846t=z;
+  __t2013t=z;
   goto __t_return;
   __t_return:
-  *__t1873t=x;
-  *__t1874t=__t1846t;
+  *__t2040t=x;
+  *__t2041t=__t2013t;
 }
 
-static inline __attribute__((always_inline)) void Rand__t1848t(uint64_t seed, uint64_t* __t1875t, uint64_t* __t1876t, uint64_t* __t1877t, uint64_t* __t1878t) {
-  int __t1849t=0;
-  uint64_t __t1850t=0;
+static inline __attribute__((always_inline)) void Rand__t2015t(uint64_t seed, uint64_t* __t2042t, uint64_t* __t2043t, uint64_t* __t2044t, uint64_t* __t2045t) {
+  int __t2016t=0;
+  uint64_t __t2017t=0;
   uint64_t modifying_seed=0;
-  uint64_t __t1851t__=0;
-  uint64_t __t1852t=0;
+  uint64_t __t2018t__=0;
+  uint64_t __t2019t=0;
   uint64_t s0=0;
-  uint64_t __t1853t__=0;
-  uint64_t __t1854t=0;
+  uint64_t __t2020t__=0;
+  uint64_t __t2021t=0;
   uint64_t s1=0;
-  uint64_t __t1855t__=0;
-  uint64_t __t1856t=0;
+  uint64_t __t2022t__=0;
+  uint64_t __t2023t=0;
   uint64_t s2=0;
-  uint64_t __t1857t__=0;
-  uint64_t __t1858t=0;
+  uint64_t __t2024t__=0;
+  uint64_t __t2025t=0;
   uint64_t s3=0;
-  __t1850t=seed;
-  modifying_seed=__t1850t;
-  splitmix64__t1845t(&modifying_seed,&__t1851t__);
-  __t1852t=__t1851t__;
-  s0=__t1852t;
-  splitmix64__t1845t(&modifying_seed,&__t1853t__);
-  __t1854t=__t1853t__;
-  s1=__t1854t;
-  splitmix64__t1845t(&modifying_seed,&__t1855t__);
-  __t1856t=__t1855t__;
-  s2=__t1856t;
-  splitmix64__t1845t(&modifying_seed,&__t1857t__);
-  __t1858t=__t1857t__;
-  s3=__t1858t;
+  __t2017t=seed;
+  modifying_seed=__t2017t;
+  splitmix64__t2012t(&modifying_seed,&__t2018t__);
+  __t2019t=__t2018t__;
+  s0=__t2019t;
+  splitmix64__t2012t(&modifying_seed,&__t2020t__);
+  __t2021t=__t2020t__;
+  s1=__t2021t;
+  splitmix64__t2012t(&modifying_seed,&__t2022t__);
+  __t2023t=__t2022t__;
+  s2=__t2023t;
+  splitmix64__t2012t(&modifying_seed,&__t2024t__);
+  __t2025t=__t2024t__;
+  s3=__t2025t;
   goto __t_return;
   __t_return:
-  *__t1875t=s0;
-  *__t1876t=s1;
-  *__t1877t=s2;
-  *__t1878t=s3;
+  *__t2042t=s0;
+  *__t2043t=s1;
+  *__t2044t=s2;
+  *__t2045t=s3;
 }
 
-static inline __attribute__((always_inline)) void Rand__t1860t(uint64_t* __t1879t, uint64_t* __t1880t, uint64_t* __t1881t, uint64_t* __t1882t) {
-  uint64_t __t1861t__=0;
-  uint64_t __t1862t__s0=0;
-  uint64_t __t1862t__s1=0;
-  uint64_t __t1862t__s2=0;
-  uint64_t __t1862t__s3=0;
-  splitmix64__t1847t(&__t1861t__);
-  Rand__t1848t(__t1861t__,&__t1862t__s0,&__t1862t__s1,&__t1862t__s2,&__t1862t__s3);
+static inline __attribute__((always_inline)) void Rand__t2027t(uint64_t* __t2046t, uint64_t* __t2047t, uint64_t* __t2048t, uint64_t* __t2049t) {
+  uint64_t __t2028t__=0;
+  uint64_t __t2029t__s0=0;
+  uint64_t __t2029t__s1=0;
+  uint64_t __t2029t__s2=0;
+  uint64_t __t2029t__s3=0;
+  splitmix64__t2014t(&__t2028t__);
+  Rand__t2015t(__t2028t__,&__t2029t__s0,&__t2029t__s1,&__t2029t__s2,&__t2029t__s3);
   goto __t_return;
   __t_return:
-  *__t1879t=__t1862t__s0;
-  *__t1880t=__t1862t__s1;
-  *__t1881t=__t1862t__s2;
-  *__t1882t=__t1862t__s3;
+  *__t2046t=__t2029t__s0;
+  *__t2047t=__t2029t__s1;
+  *__t2048t=__t2029t__s2;
+  *__t2049t=__t2029t__s3;
 }
 
-static inline __attribute__((always_inline)) void rotl__t1844t(uint64_t x, uint64_t k, uint64_t* __t1883t) {
+static inline __attribute__((always_inline)) void rotl__t2011t(uint64_t x, uint64_t k, uint64_t* __t2050t) {
   uint64_t left=0;
   uint64_t compk=0;
   uint64_t right=0;
@@ -145,18 +145,18 @@ static inline __attribute__((always_inline)) void rotl__t1844t(uint64_t x, uint6
   z=left|right;
   goto __t_return;
   __t_return:
-  *__t1883t=z;
+  *__t2050t=z;
 }
 
-static inline __attribute__((always_inline)) void next__t1863t(uint64_t* __t1884t, uint64_t* __t1885t, uint64_t* __t1886t, uint64_t* __t1887t, double* __t1888t) {
-  uint64_t self__s0=*__t1884t;
-  uint64_t self__s1=*__t1885t;
-  uint64_t self__s2=*__t1886t;
-  uint64_t self__s3=*__t1887t;
+static inline __attribute__((always_inline)) void next__t2030t(uint64_t* __t2051t, uint64_t* __t2052t, uint64_t* __t2053t, uint64_t* __t2054t, double* __t2055t) {
+  uint64_t self__s0=*__t2051t;
+  uint64_t self__s1=*__t2052t;
+  uint64_t self__s2=*__t2053t;
+  uint64_t self__s3=*__t2054t;
   uint64_t result=0;
   uint64_t t=0;
-  uint64_t __t1864t=0;
-  uint64_t __t1865t__=0;
+  uint64_t __t2031t=0;
+  uint64_t __t2032t__=0;
   double denom=0;
   double nom=0;
   double value=0;
@@ -167,19 +167,19 @@ static inline __attribute__((always_inline)) void next__t1863t(uint64_t* __t1884
   self__s1=self__s1^self__s2;
   self__s0=self__s0^self__s3;
   self__s2=self__s2^t;
-  __t1864t=45;
-  rotl__t1844t(self__s3,__t1864t,&__t1865t__);
-  self__s3=__t1865t__;
+  __t2031t=45;
+  rotl__t2011t(self__s3,__t2031t,&__t2032t__);
+  self__s3=__t2032t__;
   denom=0x0020000000000000ULL;
   nom=result>>11;
   value=nom/denom;
   goto __t_return;
   __t_return:
-  *__t1884t=self__s0;
-  *__t1885t=self__s1;
-  *__t1886t=self__s2;
-  *__t1887t=self__s3;
-  *__t1888t=value;
+  *__t2051t=self__s0;
+  *__t2052t=self__s1;
+  *__t2053t=self__s2;
+  *__t2054t=self__s3;
+  *__t2055t=value;
 }
 
 static inline __attribute__((always_inline)) void print__t385t(double value) {
@@ -189,32 +189,32 @@ static inline __attribute__((always_inline)) void print__t385t(double value) {
   printf("%.6f%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__t1866t() {
-  uint64_t __t1868t__s0=0;
-  uint64_t __t1868t__s1=0;
-  uint64_t __t1868t__s2=0;
-  uint64_t __t1868t__s3=0;
-  uint64_t __t1869t__s0=0;
-  uint64_t __t1869t__s1=0;
-  uint64_t __t1869t__s2=0;
-  uint64_t __t1869t__s3=0;
+static inline __attribute__((always_inline)) void main__t2033t() {
+  uint64_t __t2035t__s0=0;
+  uint64_t __t2035t__s1=0;
+  uint64_t __t2035t__s2=0;
+  uint64_t __t2035t__s3=0;
+  uint64_t __t2036t__s0=0;
+  uint64_t __t2036t__s1=0;
+  uint64_t __t2036t__s2=0;
+  uint64_t __t2036t__s3=0;
   uint64_t rand__s0=0;
   uint64_t rand__s1=0;
   uint64_t rand__s2=0;
   uint64_t rand__s3=0;
-  double __t1870t__=0;
+  double __t2037t__=0;
   console__t366t();
-  Rand__t1860t(&__t1868t__s0,&__t1868t__s1,&__t1868t__s2,&__t1868t__s3);
-  __t1869t__s0=__t1868t__s0;
-  __t1869t__s1=__t1868t__s1;
-  __t1869t__s2=__t1868t__s2;
-  __t1869t__s3=__t1868t__s3;
-  rand__s0=__t1869t__s0;
-  rand__s1=__t1869t__s1;
-  rand__s2=__t1869t__s2;
-  rand__s3=__t1869t__s3;
-  next__t1863t(&rand__s0,&rand__s1,&rand__s2,&rand__s3,&__t1870t__);
-  print__t385t(__t1870t__);
+  Rand__t2027t(&__t2035t__s0,&__t2035t__s1,&__t2035t__s2,&__t2035t__s3);
+  __t2036t__s0=__t2035t__s0;
+  __t2036t__s1=__t2035t__s1;
+  __t2036t__s2=__t2035t__s2;
+  __t2036t__s3=__t2035t__s3;
+  rand__s0=__t2036t__s0;
+  rand__s1=__t2036t__s1;
+  rand__s2=__t2036t__s2;
+  rand__s3=__t2036t__s3;
+  next__t2030t(&rand__s0,&rand__s1,&rand__s2,&rand__s3,&__t2037t__);
+  print__t385t(__t2037t__);
 }
 
-int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t1866t();return 0;}
+int main(int argc, char** argv) {__t_argc = argc;__t_argv = argv;main__t2033t();return 0;}

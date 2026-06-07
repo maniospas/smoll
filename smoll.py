@@ -5363,12 +5363,14 @@ parser.add_argument("source", metavar="SOURCE", help="Path to the .s source file
 parser.add_argument("--lsp", action="store_true", help="No compilation, and output is meant for the lsp to read.",)
 parser.add_argument("--build", action="store_true", help="Build without running.",)
 parser.add_argument("--docs", action="store_true", help="Export to a markdown file.",)
+parser.add_argument("--cleanup", action="store_true", help="Clean up generated .C files and executables.",)
 parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
 parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang, none (the last option only creates a C file).",)
 parser.add_argument("--vmkb", action="store", type=int, default=256, help="VM memory in kilobytes.",)
 parser.add_argument("--vmrec", action="store", type=int, default=16, help="VM recursion budget.",)
 args, extra_args = parser.parse_known_args()
 debug_mode = args.debug
+cleanup_mode = args.cleanup
 docs_mode = args.docs
 chosen_compiler = args.back or "auto"
 is_lsp = args.lsp
@@ -5439,7 +5441,7 @@ async def main():
             memory = MemoryEmulator(1024*vm_memory_kb)
             await main_type_variations[0].interpret([], memory, recursion_budget=vm_recursion_budget) # emulate 16kb memory
             for pos in memory.must_free:
-                if pos in memory.alloc_sizes: 
+                if pos in memory.alloc_sizes:
                     try: print(("non-freed memory at "+str(pos)+":\t ").ljust(15)+memory.as_cstr(pos))
                     except: print(("non-freed memory at "+str(pos)+":\t ").ljust(15)+str(memory.read_int64(pos)))
             for k,v in memory.foreign_objects.items(): print("non-freed foreign object"+v[1])
@@ -5452,8 +5454,15 @@ async def main():
                 print(f"[{YELLOW}+{RESET}] run          ./{exe_path}{extra_args_str}")
                 try: 
                     result = subprocess.run("./"+str(exe_path)+extra_args_str, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+                    if cleanup_mode: 
+                        os.remove(str(exe_path)+".c")
+                        os.remove(str(exe_path))
                     if result.returncode != 0: os._exit(result.returncode)
-                except KeyboardInterrupt: os._exit(1)
+                except KeyboardInterrupt: 
+                    if cleanup_mode: 
+                        os.remove(str(exe_path)+".c")
+                        os.remove(str(exe_path))
+                    os._exit(1)
             os._exit(0) # not in lsp or pyodide case, as it inteferes with the stdout pipe
 
 if is_pyodide: main()

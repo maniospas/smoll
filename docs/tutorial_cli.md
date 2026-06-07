@@ -102,7 +102,7 @@ import "std/core.s"
 
 def read_number(effect mut console CLI, cstr message)
     print nn message
-    return float CLI # floats not intercepted by try just cascede to caller
+    return float CLI # errors not intercepted by try just cascede to caller
 
 def main()
     CLI = console()
@@ -111,6 +111,25 @@ def main()
         print x*x
     else
         print "failed to read number"
+    debug:nocatch() # fails compilation if we leave unhandled errors
+```
+
+The above can also be converted into a safe loop that waits for successful user
+input by substituting the `if` with a `while` loop, like below.
+
+```python
+import "std/core.s"
+
+def read_number(effect mut console CLI, cstr message)
+    print nn message
+    return float CLI Z
+
+def main()
+    CLI = console()
+    while not try x = read_number "give a number: "
+        print "invalid format"
+    print nn "its square is: "
+    print x*x
     debug:nocatch() # fails compilation if we leave unhandled errors
 ```
 
@@ -846,3 +865,8 @@ def main()
     map = create_map().map
     print map
 ```
+
+## files
+
+Gain access to the file system by import `"std/io.s"`, which creates
+namespaces for file, directory, and process handling.

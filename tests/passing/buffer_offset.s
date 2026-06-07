@@ -6,7 +6,7 @@ def Point2D(float x, float y)
 def sum(Point2D[] v)
     x = mut 0.0
     y = mut 0.0
-    it = range len v
+    it = range of len v
     while try i=next it
         x = x+v[i].x
         y = y+v[i].y

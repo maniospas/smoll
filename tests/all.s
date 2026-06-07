@@ -12,7 +12,7 @@ def main()
     CLI = console()
     CHARS = arena char[].alloc 256
     path = "./tests/passing/"
-    copy "./smoll "
+    copy "./smoll --cleanup "
     copy path
     test_dir = dir:read path
     for entry in test_dir # do not move the position

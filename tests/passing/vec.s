@@ -9,7 +9,7 @@ def safe_main(effect mut console CLI)
     v1[0] = 1.0
     v2[0] = 2.0
     
-    it = range 5
+    it = range of 5
     v = mut vec 10
     while try i=next it
         v = 2.0*(v1+v2+v)

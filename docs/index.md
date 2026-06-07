@@ -36,11 +36,12 @@ import "std/io.s"
 
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 def main()
+    f = file:open web:get README # parentheses optional for one argument
+    # effects to automatically pass around (some functions grab these by name)
     CLI = console()
-    mem = alloc 4096 # parentheses optional for one argument
-    f = file:read web:get README
+    CHARS = circular alloc 4096 
     size = mut 0
-    for line in (mem, f)
+    for line in f
         size = size+len line
     print(size, " bytes downloaded\n")
 ```

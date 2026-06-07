@@ -2414,7 +2414,7 @@ other programs to form an ecosystem in each machine. For example, why should som
 [CURL](https://curl.se/) and corresponding security features in their executable when they
 can have the battle-tested command line tool at their disposal?
 
-*This is not static linking!* It is actively encouraged to communicate with operating system
+When your application can afford it, it is actively encouraged to communicate with operating system
 processes when the latter are longer-running. Then, system error codes are propagated as
 normal failure. Of course, this vision requires a robust way of communicating with the operating
 system. This is done via the `process` namespace under the `std.io.s` include like below that is
@@ -2430,7 +2430,7 @@ import "std/core.s"
 import "std/io.s"
 
 def run(cstr|str command)
-    proc = mut process:read command
+    proc = mut process:open command
     del proc # force resource deallocation = end the process
     if try error = compiler:catch()
         print cstr error
@@ -2441,7 +2441,7 @@ def main()
     path = "./tests/passing/"
     copy "./smoll "
     copy path
-    test_dir = dir:read path
+    test_dir = dir:open path
     for entry in test_dir # do not move the position
         if not entry.ends_with ".s" continue
         command = CHARS.buf.str endpos copy_null_terminated(local CHARS, str entry)
@@ -2456,6 +2456,13 @@ to create a temporary file. The function returns the remporary file's path.
 Of course, programmatic integration of libCURL functionality is still viable via 
 C code injection, but is left outside of the standard library for now.
 
+The iterator defined over files uses a `line(CHARS, f)` function undeneath, where the first
+argument is an arena or circular buffer effect on which to read line contents. Of the two, 
+the circular buffer version always positions new contens at the start of the buffer. 
+Reading lines consumes at most the rest of available space, and if a new line is not reached
+until that point the `"\n"` character may not be present at the line's ending. Preffer the 
+circular buffer reader for temprarily read lines, as it can go through arbitarily-sized files.
+
 ```python
 import "std/core.s"
 import "std/io.s"
@@ -2464,12 +2471,14 @@ def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/
 
 def main()
     CLI = console()
-    mem = alloc 4096 # parentheses optional for one argument
-    f = file:read web:get README
+    CHARS = circular alloc KB 4
+    f = file:open web:get README
     size = mut 0
-    for line in (mem, f) # iterator defined for this kind of tuple
+    for line in f
         size = size+len line
     print(size, " bytes downloaded\n")
 ```
 
-*Info: The above pattern incurs some overhead in saving the file but will be further optimized in future language versions, for example with memory mapped files. Safety will remain the main concern of smoλ in all deployment settings.*
+You can always set a custom character buffer allocator instead of automatically passing a `CHARS` effect,
+for example by writing `for line in (circular alloc KB 4, f)` to pass the allocator-file pair as explicit
+arguments to the iterator. This is useful when interweaving other kinds of string manipulation code.

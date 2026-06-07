@@ -28,7 +28,7 @@ def is_dir(str|cstr path)
     return is_dir cstr unsafe_temp path
 
 def create_dir(cstr path)
-    doc "creates a directory at a cstr path, fails if it already exists or cannot be created"
+    doc "creates a directory at a cstr path, fails if it alopeny exists or cannot be created"
     VM "[os.path.mkdir($path)]"
     {builtins:bool result = __smo_create_dir(path);}
     if not result fail "failed to create directory"
@@ -52,8 +52,8 @@ local def closedir(any ptr unsafe_ptr) # super unsafe to expose
     VM "memory.get_foreign($unsafe_ptr).close() or memory.close_foreign($unsafe_ptr)"
     {if(unsafe_ptr) {closedir((DIR*)unsafe_ptr); unsafe_ptr=0;}}
 
-def read(cstr path)
-    doc "loads a cstr path as a readable directory"
+def open(cstr path)
+    doc "loads a cstr path as a openable directory"
     VM "[memory.register_foreign(os.scandir($path), 'dir '+$path)]"
     {builtins:compiler:ptr unsafe_ptr = (char*)opendir(path);}
     defer
@@ -61,10 +61,10 @@ def read(cstr path)
     if not exists unsafe_ptr fail "failed to open file"
     return class(unsafe_mut unsafe_ptr)
 
-def read(str path)
-    return read cstr unsafe_temp path
+def open(str path)
+    return open cstr unsafe_temp path
 
-local def raw_entry(edit read f) # this function returns a content pointer, but this does not allow safe comparisons
+local def raw_entry(edit open f) # this function returns a content pointer, but this does not allow safe comparisons
     VM "[safeguard(lambda memory=memory: memory.write_cstr(next(memory.get_foreign($f__unsafe_ptr)).name), ExpectedException('end of dir'))]"
     if not exists f.unsafe_ptr
         fail "not open dir"
@@ -74,8 +74,8 @@ local def raw_entry(edit read f) # this function returns a content pointer, but 
     {builtins:cstr dirname=((struct dirent*)de)->d_name;}
     return dirname
 
-def entry(edit read f)
+def entry(edit open f)
     doc "the next entry of an open dir"
-    doc "This value is modified as you continue reading"
+    doc "This value is modified as you continue opening"
     doc "from the same directory."
     return str raw_entry f

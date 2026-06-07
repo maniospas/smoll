@@ -17,8 +17,8 @@
 local import "std/core.s"
 local import "std/unsafe.s" as unsafe
 
-def read(str|cstr _path)
-    doc "loads a path as a readable file"
+def open(str|cstr _path)
+    doc "loads a path as a openable file"
     doc "The file name is not maintained and must be tracked externally, if needed."
     path = cstr unsafe_temp _path
     {builtins:compiler:ptr unsafe_ptr = (char*)fopen(path, "r");}
@@ -29,7 +29,7 @@ def read(str|cstr _path)
 
 def write(str|cstr _path)
     path = cstr unsafe_temp _path
-    doc "creates a new file at cstr path as a writable object, fails if it already exists"
+    doc "creates a new file at cstr path as a writable object, fails if it alopeny exists"
     {builtins:compiler:ptr unsafe_ptr = (char*)fopen(path, "wx+");}
     defer
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
@@ -46,17 +46,17 @@ def terminal()
     if not exists unsafe_ptr fail "failed to open new terminal"
     return class(unsafe_mut unsafe_ptr)
 
-def File = read|write|terminal
+def File = open|write|terminal
 
 def to_start(edit File f)
     doc "move to file start"
-    doc "Moves the file reading position to the start of the file."
+    doc "Moves the file opening position to the start of the file."
     if not exists f.unsafe_ptr fail "failed to move to start of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_SET);}
 
 def to_end(edit File f)
     doc "move to file end"
-    doc "Moves the file reading position to the end of the file"
+    doc "Moves the file opening position to the end of the file"
     doc "but does not close it."
     if not exists f.unsafe_ptr fail "failed to move to end of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_END);}
@@ -73,24 +73,26 @@ def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     if not exists buf.unsafe_ptr fail "not open file"
     contents = unsafe:add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos
-    {builtins:nat bytes_read = f__unsafe_ptr?fread((char*)contents, 1, size, (FILE*)f__unsafe_ptr):0;}
-    if bytes_read==0 fail "end of file"
+    {builtins:nat bytes_open = f__unsafe_ptr?fread((char*)contents, 1, size, (FILE*)f__unsafe_ptr):0;}
+    if bytes_open==0 fail "end of file"
     prev_pos = const pos
-    pos = pos+bytes_read
-    return str(buf, prev_pos, type "lento", bytes_read)
-    
-def line(edit char[] buf, mut nat|blank pos, edit File f)
+    pos = pos+bytes_open
+    return str(buf, prev_pos, type "lento", bytes_open)
+
+def line(effect edit char_arena|char_circular CHARS, edit File f)
     doc "next line"
     doc "Retrieves the next line from a file,"
-    doc "and stores it on a char[] buffer at a given position."
+    doc "and stores it on a CHARS storage effect."
     doc "A string representation of the stored data are returned."
     doc "The result may not end at a"
     doc "new line character, in case the line does not fit onto the buffer"
-    doc "at once, in which case it requires multiple reads, or at the"
+    doc "at once, in which case it requires multiple opens, or at the"
     doc "output stream's end."
-    if pos is blank
-        doc "The starting position is the buffer's beginning."
-        pos = mut 0
+    if CHARS is char_arena
+        pos = CHARS.pos
+    if CHARS is char_circular
+        pos = 0
+    buf = ref CHARS.buf
     if not exists buf.unsafe_ptr
         fail "not open file"
     contents = unsafe:add(buf.unsafe_ptr, pos)
@@ -98,10 +100,9 @@ def line(edit char[] buf, mut nat|blank pos, edit File f)
     {if(f__unsafe_ptr){builtins:compiler:ptr obtained = fgets(contents, size, (FILE*)f__unsafe_ptr);}}
     if not exists obtained
         fail "end of file"
-    {builtins:nat bytes_read = strlen(contents);}
-    prev_pos = const pos
-    pos = pos+bytes_read
-    return str(buf, prev_pos, type "lento", bytes_read)
+    {builtins:nat bytes_open = strlen(contents);}
+    CHARS.pos = pos+bytes_open
+    return str(buf, pos to CHARS.pos)
 
 def print(edit terminal|write f, str text)
     doc "writes a string to a write file"

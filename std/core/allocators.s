@@ -74,11 +74,12 @@ def alloc(edit circular allocator, nat|blank length)
         length = 1
         doc "Creates room for one element."
     if length>= len allocator.buf fail "does not fit in circular arena"
-    next_pos = mut length + len allocator.buf
+    next_pos = mut length + allocator.pos
     if next_pos > len allocator.buf
-        next_pos = 0
+        next_pos = length
         pos = 0
     else pos = allocator.pos+0
+    allocator.pos = next_pos
     return allocated(allocator.buf, pos)
 
 def alloc(edit list allocator, nat|blank length)

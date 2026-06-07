@@ -6,7 +6,9 @@
 **Contents**<br>
 [print](#print) <br>
 [input and error check](#input-and-error-check) <br>
+[more on types](#more-on-types) <br>
 [character buffers](#character-buffers) <br>
+[allocators](#allocators) <br>
 [zero-cost type checking](#zero-cost-type-checking) <br>
 [literals](#literals) <br>
 [colors](#colors) <br>
@@ -50,7 +52,7 @@ Finally, the `console` type of the argument is declared, followed by its name.
 
 ## input and error check
 
-Functions in *smoλ* are need to be followed by their input tuple, with effects
+Functions in *smoλ* are called by following them with an input tuple, with effects
 added automatically if needed. `()` is an empty tuple, for tuples with one element
 parentheses are optional, and tuples of more elements can be built from multiple
 comma-separated values.
@@ -102,7 +104,7 @@ import "std/core.s"
 
 def read_number(effect mut console CLI, cstr message)
     print nn message
-    return float CLI # errors not intercepted by try just cascede to caller
+    return float CLI # errors not intercepted by try just cascade to caller
 
 def main()
     CLI = console()
@@ -122,7 +124,7 @@ import "std/core.s"
 
 def read_number(effect mut console CLI, cstr message)
     print nn message
-    return float CLI Z
+    return float CLI
 
 def main()
     CLI = console()
@@ -131,6 +133,52 @@ def main()
     print nn "its square is: "
     print x*x
     debug:nocatch() # fails compilation if we leave unhandled errors
+```
+
+## more on types
+
+You can declare functions of your own, and their result becomes a type. Next is
+an example. Use parentheses and comma-separated items inside to create named tuples.
+Also use the dot notation to access type fields per `data.field`. In the example, `cstr`
+is the type of quoted text; see the next section about more dynamic strings.
+
+```python
+import "std/core.s"
+
+def employee(cstr name, cstr surname)
+    return (name, surname)
+
+def is_a_me(employee e)
+    return e.name=="manio"
+
+def main()
+    CLI = console()
+    e = employee("manio", "unknown")
+    print e.name
+    print e.surname
+    print is_a_me e # returns true 
+```
+
+In the above example, you can actually use any pair of `cstr` as 
+input to the function `is_a_me`. This is because *smoλ* defaults
+to a so-called *structural* typing. You can make types *nominal*, that is,
+tied to their name identifier, by using the `class` notation like below.
+This notation is zero cost in that it does not affect runtime.
+
+
+```python
+import "std/core.s"
+
+def employee(cstr name, cstr surname)
+    return class(name, surname)
+
+def is_a_me(employee e)
+    return e.name=="manio"
+
+def main()
+    CLI = console()
+    e = employee("manio", "unknown")
+    print is_a_me e # returns true 
 ```
 
 ## character buffers
@@ -192,16 +240,37 @@ def main()
 Better string allocators should be placed on buffers, that is,
 regions in the heap memory (a fancy name for most RAM) that are
 allocated once and hold a bunch of data together. Declare and allocate
-buffers with patterns like `buf = char[].alloc 4096`. Or, if we were
-not fancy in using the dot notation and skipping parentheses,  `buf = alloc(char[], 4096)`.
+buffers with patterns like `buf = char[].alloc 4096`. Or, if for those that do
+not fancy usage of the dot notation and skipping parentheses,  `buf = alloc(char[], 4096)`.
 This declares an empty buffer of characters in `char[]` and then resizes
-it to contain `4096` elements. You can construct buffers for any type,
-in general.
+it to contain `4096` elements. 
 
-A character buffer by itself is not enough to serve as an allocator,
-because we don't know how much memory we have consumed inside it.
-Attach a tracker position by further passing the result through the
-`arena` function. That will keep using the buffer until it is full,
+You can construct buffers for any type,
+in general, like below. Unset contents are in a valid zero-initialized state 
+(zero numbers, empty strings, etc.).
+
+```python
+import "std/core.s"
+
+def employee(cstr name, cstr surname)
+    return class(name, surname)
+
+def main()
+    CLI = console()
+    buf = employee[].alloc 5
+    buf[0] = employee("manio", "unknown")
+    buf[1] = employee("john", "smith")
+    print buf[0].name
+    print buf[1].name
+```
+
+
+## allocators
+
+A character buffer by itself is not enough to serve as an allocator like `new()`,
+because we do not know how much memory we have consumed inside memory that is
+created in batches. Attach a tracker position by further passing the result through 
+the `arena` function. That will keep using the buffer until it is full,
 at which point an error will be created.
 
 ```python
@@ -337,11 +406,41 @@ def main()
     ]
 ```
 
+Finally, take note that *smoλ*'s standard library also implements
+circular arenas. These restart on the buffer when full, thus
+corrupting previous data instead of creating new ones.
+Such data corruptions are predictable and do not introduce runtime 
+checks or invalid class relations. Still, the main argument for
+their usage is that old data stored on buffers are likely no longer useful.
+The example below runs in only 80 bytes, whereas any less size than `CHARS = arena char[].alloc 130` 
+would create an error.
+
+
+```python
+import "std/core.s"
+
+def main()
+    CLI = console()
+    CHARS = circular char[].alloc 80
+    s1 = "hello world!"
+    s2 = "hello world too!"
+    s3 = "hello world two!"
+    s = s1+"\n"+s2+"\n"+s3
+    print s
+```
+
+By the way, the circular arena above could be reduced to only `47` bytes and 
+produce the correct result if the computation was `(s1+"\n")+(s2+"\n")+s3`. In general, 
+these arenas are highly efficient and complicated for squeezing the maximum performance.
+To see why, try reducing `80` to even one less and see that the program still
+successfully runs but the exact output is wrong, even if it still a valid string.
+
+
 ## zero-cost type checking
 
 Above we saw the convenient syntax `str(status CHARS from 0)`, so now is a
 good time to mention some stuff about *smoλ*'s type system - you will see how
-thic culminates in the unknown syntax 
+this culminates in the unknown syntax 
 momentarily. Type declarations can be expressive, but for typical language usage the most
 important features are unions, type checking at compile time, and
 literal types. The mystery `from` is a string
@@ -479,7 +578,7 @@ Ok, the language goes to great pains to be intuitive, so this looks like a const
 declaration. But *smoλ* has no constants! And `def name ...` is used to declare *types*. ONLY.  
 So where's the type?
 
-Each string literal (`cstr`s encounred during type parsing) is a type onto itself.
+Each string literal (`cstr`s encountered during type parsing) is a type onto itself.
 There is just the convention that, when used
 within code in place of variables, literal type names are automatically lowered to their 
 equivalent `cstr` representations. 
@@ -525,7 +624,7 @@ def main()
 
 Variables associated with literal types can only be assigned to literals
 of the same type and are therefore useless for runtime code, where they do
-not appear, even if they are pretty usefule
+not appear, even if they are pretty useful
 for type checks. Use the `compiler:literal` function to retrieve the actual 
 value from the compiler to write polymorphic functions whose runtime data depend
 on which polymorphic function variation is used.
@@ -616,7 +715,7 @@ def main()
     CLI = console()
     # the next line prints 'hi world!' while validating it as a chosen pattern
     greet (() hi () world () !)
-    # two equivalents
+    # two equivalents, which is how it's parsed by the compiler
     greet ((), type "hi", (), type "world", (), type "!")
     greet (type "hi", type "world", type "!")
 ```
@@ -655,13 +754,13 @@ def main()
 
 ## string manipulation
 
-There are various means of manipulating strings in *smολ*. In general,
-functionality discussed applied to both `cstr` and `str` data. We already
-saw how strings can be concatenated/added together, but they can also be
+There are various means of manipulating strings in *smoλ*. In general,
+functionality discussed everywhere in this tutorial applies to both `cstr` and `str` data. 
+We already saw how strings can be concatenated/added together, but they can also be
 compared to check if they are the same, like below. Comparisons
 involving only `cstr` are exceptionally slow, as the language ensures that
-the the same representations are stored in the same addressed, and therefore
-equality lower to just a memory address comparison underneath.
+the same representations are stored in the same addresses, and therefore
+equality lowers to just a memory address comparison underneath.
 
 ```python
 import "std/core.s"
@@ -693,6 +792,7 @@ def receive(effect mut console CLI, str|cstr _message)
         print len message
 
 def main()
+    CLI = console()
     CHARS = new()
     print nn ">> "
     message = str CLI
@@ -786,7 +886,7 @@ import "std/map.s"
 
 def main()
     CLI = console()
-    CHARS = arena char[].alloc KB 4
+    CHARS = arena char[].alloc 4096
     map = strmap str[].alloc 128
     map["hello"] = copy "hello world!"
     map["manio"] = copy "it's a me, manio."
@@ -809,7 +909,7 @@ either pass the arena as an argument or just *return* it alongside the map.
 Below is an example of how to do this. See the main idea? By returning the 
 character buffer alongside the map, in the `main` function, we also delay the
 automatic release of the allocated `CHARS` memory until that function ends.
-In fact, the the map forms a dependency to that memory and cannot be moved 
+In fact, the map forms a dependency to that memory and cannot be moved 
 to other functions without that company.
 
 ```python
@@ -817,7 +917,7 @@ import "std/core.s"
 import "std/map.s"
 
 def create_map()
-    CHARS = arena char[].alloc KB 4
+    CHARS = arena char[].alloc 4096
     map = strmap str[].alloc 128
     map["hello"] = copy "hello world!"
     map["manio"] = copy "it's a me, manio."
@@ -840,7 +940,7 @@ import "std/core.s"
 import "std/map.s"
 
 def create_map()
-    CHARS = arena char[].alloc KB 4
+    CHARS = arena char[].alloc 4096
     map = strmap str[].alloc 128
     map["hello"] = copy "hello world!"
     map["manio"] = copy "it's a me, manio."
@@ -868,5 +968,31 @@ def main()
 
 ## files
 
-Gain access to the file system by import `"std/io.s"`, which creates
-namespaces for file, directory, and process handling.
+Gain access to the file system by importing `"std/io.s"`, which creates
+namespaces for file, directory, and process handling. Open files and iterate
+through their lines like below. Notice usage of a `CHARS` effect to tell
+the iterator where to place read lines. This can only be an arena or a circular
+arena, where the former creates an error when out of space, and latter places all
+newly read lines only at the managed buffer.
+
+
+```python
+import "std/core.s"
+import "std/io.s"
+
+def main()
+    CLI = console()
+    CHARS = circular char[].alloc 4096
+    if not try f = file:open "README.md" # reminder: checks for opening success
+        print "could not find file"
+        fail "could not find file" # create an error ourselves to stop the program
+    for line in f
+        print nn "line "
+        print compiler:for_counter()
+        print line
+```
+
+By the way, the `for varname in iterable` in general is a means of going through
+all elements of an iterable. It desugars to a `while` loop under-the-hood,
+and also grants access to `compiler:for_counter()` variable to automatically 
+enumerate the iteration's progress.

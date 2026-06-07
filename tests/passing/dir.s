@@ -3,8 +3,7 @@ import "std/io.s" as io
 
 def main()
     CLI = console()
-    dir = mut io:dir:read("./std")
-    buf = char[].alloc 128
+    dir = mut io:dir:open "./std"
     while try entry=io:dir:entry dir
         print entry
     

@@ -22,7 +22,7 @@ local import "std/unsafe.s" as unsafe
 
 def char_arena()
     return arena char[]
-local def char_circular()
+def char_circular()
     return circular char[]
 local def char_list()
     return list mut char[]

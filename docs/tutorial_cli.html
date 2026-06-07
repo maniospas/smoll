@@ -236,7 +236,9 @@
 <p><strong>Contents</strong><br>
 <a href="#print">print</a> <br>
 <a href="#input-and-error-check">input and error check</a> <br>
+<a href="#more-on-types">more on types</a> <br>
 <a href="#character-buffers">character buffers</a> <br>
+<a href="#allocators">allocators</a> <br>
 <a href="#zero-cost-type-checking">zero-cost type checking</a> <br>
 <a href="#literals">literals</a> <br>
 <a href="#colors">colors</a> <br>
@@ -281,7 +283,7 @@ Finally, the <code>console</code> type of the argument is declared, followed by 
 
 <h2 id="input-and-error-check">input and error check</h2>
 
-<p>Functions in <em>smoλ</em> are need to be followed by their input tuple, with effects
+<p>Functions in <em>smoλ</em> are called by following them with an input tuple, with effects
 added automatically if needed. <code>()</code> is an empty tuple, for tuples with one element
 parentheses are optional, and tuples of more elements can be built from multiple
 comma-separated values.</p>
@@ -335,7 +337,7 @@ for debugging and more dynamic programs.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">read_number</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">message</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">message</span>
-    <span class="k">return</span> <span class="nb">float</span> <span class="n">CLI</span> <span class="c1"># floats not intercepted by try just cascede to caller</span>
+    <span class="k">return</span> <span class="nb">float</span> <span class="n">CLI</span> <span class="c1"># errors not intercepted by try just cascade to caller</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
@@ -345,6 +347,73 @@ for debugging and more dynamic programs.</p>
     <span class="k">else</span>
         <span class="nb">print</span> <span class="s2">&quot;failed to read number&quot;</span>
     <span class="n">debug</span><span class="p">:</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
+</code></pre>
+</div>
+
+<p>The above can also be converted into a safe loop that waits for successful user
+input by substituting the <code>if</code> with a <code>while</code> loop, like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">read_number</span><span class="p">(</span><span class="n">effect</span> <span class="n">mut</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">message</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">message</span>
+    <span class="k">return</span> <span class="nb">float</span> <span class="n">CLI</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="k">try</span> <span class="n">x</span> <span class="o">=</span> <span class="n">read_number</span> <span class="s2">&quot;give a number: &quot;</span>
+        <span class="nb">print</span> <span class="s2">&quot;invalid format&quot;</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;its square is: &quot;</span>
+    <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+    <span class="n">debug</span><span class="p">:</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
+</code></pre>
+</div>
+
+<h2 id="more-on-types">more on types</h2>
+
+<p>You can declare functions of your own, and their result becomes a type. Next is
+an example. Use parentheses and comma-separated items inside to create named tuples.
+Also use the dot notation to access type fields per <code>data.field</code>. In the example, <code>cstr</code>
+is the type of quoted text; see the next section about more dynamic strings.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">employee</span><span class="p">(</span><span class="n">cstr</span> <span class="n">name</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">surname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">surname</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">is_a_me</span><span class="p">(</span><span class="n">employee</span> <span class="n">e</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="s2">&quot;manio&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">employee</span><span class="p">(</span><span class="s2">&quot;manio&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">e</span><span class="o">.</span><span class="n">name</span>
+    <span class="nb">print</span> <span class="n">e</span><span class="o">.</span><span class="n">surname</span>
+    <span class="nb">print</span> <span class="n">is_a_me</span> <span class="n">e</span> <span class="c1"># returns true </span>
+</code></pre>
+</div>
+
+<p>In the above example, you can actually use any pair of <code>cstr</code> as 
+input to the function <code>is_a_me</code>. This is because <em>smoλ</em> defaults
+to a so-called <em>structural</em> typing. You can make types <em>nominal</em>, that is,
+tied to their name identifier, by using the <code>class</code> notation like below.
+This notation is zero cost in that it does not affect runtime.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">employee</span><span class="p">(</span><span class="n">cstr</span> <span class="n">name</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">surname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">surname</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">is_a_me</span><span class="p">(</span><span class="n">employee</span> <span class="n">e</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="s2">&quot;manio&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">employee</span><span class="p">(</span><span class="s2">&quot;manio&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">is_a_me</span> <span class="n">e</span> <span class="c1"># returns true </span>
 </code></pre>
 </div>
 
@@ -409,16 +478,37 @@ type. This does not allocate memory at all.</p>
 <p>Better string allocators should be placed on buffers, that is,
 regions in the heap memory (a fancy name for most RAM) that are
 allocated once and hold a bunch of data together. Declare and allocate
-buffers with patterns like <code>buf = char[].alloc 4096</code>. Or, if we were
-not fancy in using the dot notation and skipping parentheses,  <code>buf = alloc(char[], 4096)</code>.
+buffers with patterns like <code>buf = char[].alloc 4096</code>. Or, if for those that do
+not fancy usage of the dot notation and skipping parentheses,  <code>buf = alloc(char[], 4096)</code>.
 This declares an empty buffer of characters in <code>char[]</code> and then resizes
-it to contain <code>4096</code> elements. You can construct buffers for any type,
-in general.</p>
+it to contain <code>4096</code> elements. </p>
 
-<p>A character buffer by itself is not enough to serve as an allocator,
-because we don&#8217;t know how much memory we have consumed inside it.
-Attach a tracker position by further passing the result through the
-<code>arena</code> function. That will keep using the buffer until it is full,
+<p>You can construct buffers for any type,
+in general, like below. Unset contents are in a valid zero-initialized state 
+(zero numbers, empty strings, etc.).</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">employee</span><span class="p">(</span><span class="n">cstr</span> <span class="n">name</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">surname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">surname</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">employee</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">5</span>
+    <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">employee</span><span class="p">(</span><span class="s2">&quot;manio&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+    <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">employee</span><span class="p">(</span><span class="s2">&quot;john&quot;</span><span class="p">,</span> <span class="s2">&quot;smith&quot;</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+    <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+</code></pre>
+</div>
+
+<h2 id="allocators">allocators</h2>
+
+<p>A character buffer by itself is not enough to serve as an allocator like <code>new()</code>,
+because we do not know how much memory we have consumed inside memory that is
+created in batches. Attach a tracker position by further passing the result through 
+the <code>arena</code> function. That will keep using the buffer until it is full,
 at which point an error will be created.</p>
 
 <div class="codehilite">
@@ -558,11 +648,40 @@ you may prefer to just &#8230; print the strings instead of concatenating them b
 </code></pre>
 </div>
 
+<p>Finally, take note that <em>smoλ</em>&#8217;s standard library also implements
+circular arenas. These restart on the buffer when full, thus
+corrupting previous data instead of creating new ones.
+Such data corruptions are predictable and do not introduce runtime 
+checks or invalid class relations. Still, the main argument for
+their usage is that old data stored on buffers are likely no longer useful.
+The example below runs in only 80 bytes, whereas any less size than <code>CHARS = arena char[].alloc 130</code> 
+would create an error.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">circular</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">80</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="s2">&quot;hello world too!&quot;</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="s2">&quot;hello world two!&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s1</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">s2</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">s3</span>
+    <span class="nb">print</span> <span class="n">s</span>
+</code></pre>
+</div>
+
+<p>By the way, the circular arena above could be reduced to only <code>47</code> bytes and 
+produce the correct result if the computation was <code>(s1+"\n")+(s2+"\n")+s3</code>. In general, 
+these arenas are highly efficient and complicated for squeezing the maximum performance.
+To see why, try reducing <code>80</code> to even one less and see that the program still
+successfully runs but the exact output is wrong, even if it still a valid string.</p>
+
 <h2 id="zero-cost-type-checking">zero-cost type checking</h2>
 
 <p>Above we saw the convenient syntax <code>str(status CHARS from 0)</code>, so now is a
 good time to mention some stuff about <em>smoλ</em>&#8217;s type system - you will see how
-thic culminates in the unknown syntax 
+this culminates in the unknown syntax 
 momentarily. Type declarations can be expressive, but for typical language usage the most
 important features are unions, type checking at compile time, and
 literal types. The mystery <code>from</code> is a string
@@ -702,7 +821,7 @@ useful. First get a glimpse of what they look like.</p>
 declaration. But <em>smoλ</em> has no constants! And <code>def name ...</code> is used to declare <em>types</em>. ONLY.<br />
 So where&#8217;s the type?</p>
 
-<p>Each string literal (<code>cstr</code>s encounred during type parsing) is a type onto itself.
+<p>Each string literal (<code>cstr</code>s encountered during type parsing) is a type onto itself.
 There is just the convention that, when used
 within code in place of variables, literal type names are automatically lowered to their 
 equivalent <code>cstr</code> representations. </p>
@@ -750,7 +869,7 @@ the above like so.</p>
 
 <p>Variables associated with literal types can only be assigned to literals
 of the same type and are therefore useless for runtime code, where they do
-not appear, even if they are pretty usefule
+not appear, even if they are pretty useful
 for type checks. Use the <code>compiler:literal</code> function to retrieve the actual 
 value from the compiler to write polymorphic functions whose runtime data depend
 on which polymorphic function variation is used.</p>
@@ -842,7 +961,7 @@ you can only find them within parentheses.</p>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
     <span class="c1"># the next line prints &#39;hi world!&#39; while validating it as a chosen pattern</span>
     <span class="n">greet</span> <span class="p">(()</span> <span class="n">hi</span> <span class="p">()</span> <span class="n">world</span> <span class="p">()</span> <span class="err">!</span><span class="p">)</span>
-    <span class="c1"># two equivalents</span>
+    <span class="c1"># two equivalents, which is how it&#39;s parsed by the compiler</span>
     <span class="n">greet</span> <span class="p">((),</span> <span class="nb">type</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="nb">type</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="nb">type</span> <span class="s2">&quot;!&quot;</span><span class="p">)</span>
     <span class="n">greet</span> <span class="p">(</span><span class="nb">type</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="nb">type</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="nb">type</span> <span class="s2">&quot;!&quot;</span><span class="p">)</span>
 </code></pre>
@@ -883,13 +1002,13 @@ even in case of failures.</p>
 
 <h2 id="string-manipulation">string manipulation</h2>
 
-<p>There are various means of manipulating strings in <em>smολ</em>. In general,
-functionality discussed applied to both <code>cstr</code> and <code>str</code> data. We already
-saw how strings can be concatenated/added together, but they can also be
+<p>There are various means of manipulating strings in <em>smoλ</em>. In general,
+functionality discussed everywhere in this tutorial applies to both <code>cstr</code> and <code>str</code> data. 
+We already saw how strings can be concatenated/added together, but they can also be
 compared to check if they are the same, like below. Comparisons
 involving only <code>cstr</code> are exceptionally slow, as the language ensures that
-the the same representations are stored in the same addressed, and therefore
-equality lower to just a memory address comparison underneath.</p>
+the same representations are stored in the same addresses, and therefore
+equality lowers to just a memory address comparison underneath.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -922,6 +1041,7 @@ for <code>cstr</code> and repeating it can be a hidden expense.</p>
         <span class="nb">print</span> <span class="nb">len</span> <span class="n">message</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">CHARS</span> <span class="o">=</span> <span class="n">new</span><span class="p">()</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;&gt;&gt; &quot;</span>
     <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span> <span class="n">CLI</span>
@@ -1018,7 +1138,7 @@ buffer to place strings there.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
     <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
@@ -1042,7 +1162,7 @@ either pass the arena as an argument or just <em>return</em> it alongside the ma
 <p>Below is an example of how to do this. See the main idea? By returning the 
 character buffer alongside the map, in the <code>main</code> function, we also delay the
 automatic release of the allocated <code>CHARS</code> memory until that function ends.
-In fact, the the map forms a dependency to that memory and cannot be moved 
+In fact, the map forms a dependency to that memory and cannot be moved 
 to other functions without that company.</p>
 
 <div class="codehilite">
@@ -1050,7 +1170,7 @@ to other functions without that company.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_map</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
     <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
@@ -1074,7 +1194,7 @@ map, like below.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_map</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
     <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
@@ -1100,6 +1220,37 @@ map, like below.</p>
     <span class="nb">print</span> <span class="nb">map</span>
 </code></pre>
 </div>
+
+<h2 id="files">files</h2>
+
+<p>Gain access to the file system by importing <code>"std/io.s"</code>, which creates
+namespaces for file, directory, and process handling. Open files and iterate
+through their lines like below. Notice usage of a <code>CHARS</code> effect to tell
+the iterator where to place read lines. This can only be an arena or a circular
+arena, where the former creates an error when out of space, and latter places all
+newly read lines only at the managed buffer.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">circular</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="k">try</span> <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="nb">open</span> <span class="s2">&quot;README.md&quot;</span> <span class="c1"># reminder: checks for opening success</span>
+        <span class="nb">print</span> <span class="s2">&quot;could not find file&quot;</span>
+        <span class="n">fail</span> <span class="s2">&quot;could not find file&quot;</span> <span class="c1"># create an error ourselves to stop the program</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;line &quot;</span>
+        <span class="nb">print</span> <span class="n">compiler</span><span class="p">:</span><span class="n">for_counter</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="n">line</span>
+</code></pre>
+</div>
+
+<p>By the way, the <code>for varname in iterable</code> in general is a means of going through
+all elements of an iterable. It desugars to a <code>while</code> loop under-the-hood,
+and also grants access to <code>compiler:for_counter()</code> variable to automatically 
+enumerate the iteration&#8217;s progress.</p>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {

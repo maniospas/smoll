@@ -2713,7 +2713,7 @@ other programs to form an ecosystem in each machine. For example, why should som
 <a href="https://curl.se/">CURL</a> and corresponding security features in their executable when they
 can have the battle-tested command line tool at their disposal?</p>
 
-<p><em>This is not static linking!</em> It is actively encouraged to communicate with operating system
+<p>When your application can afford it, it is actively encouraged to communicate with operating system
 processes when the latter are longer-running. Then, system error codes are propagated as
 normal failure. Of course, this vision requires a robust way of communicating with the operating
 system. This is done via the <code>process</code> namespace under the <code>std.io.s</code> include like below that is
@@ -2729,7 +2729,7 @@ which can be caught afterwards to check for successful termination.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">cstr</span><span class="o">|</span><span class="nb">str</span> <span class="n">command</span><span class="p">)</span>
-    <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">:</span><span class="n">read</span> <span class="n">command</span>
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">:</span><span class="nb">open</span> <span class="n">command</span>
     <span class="k">del</span> <span class="n">proc</span> <span class="c1"># force resource deallocation = end the process</span>
     <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">:</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span>
@@ -2740,7 +2740,7 @@ which can be caught afterwards to check for successful termination.</p>
     <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;./tests/passing/&quot;</span>
     <span class="n">copy</span> <span class="s2">&quot;./smoll &quot;</span>
     <span class="n">copy</span> <span class="n">path</span>
-    <span class="n">test_dir</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">:</span><span class="n">read</span> <span class="n">path</span>
+    <span class="n">test_dir</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">:</span><span class="nb">open</span> <span class="n">path</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">test_dir</span> <span class="c1"># do not move the position</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="o">.</span><span class="n">ends_with</span> <span class="s2">&quot;.s&quot;</span> <span class="k">continue</span>
         <span class="n">command</span> <span class="o">=</span> <span class="n">CHARS</span><span class="o">.</span><span class="n">buf</span><span class="o">.</span><span class="n">str</span> <span class="n">endpos</span> <span class="n">copy_null_terminated</span><span class="p">(</span><span class="n">local</span> <span class="n">CHARS</span><span class="p">,</span> <span class="nb">str</span> <span class="n">entry</span><span class="p">)</span>
@@ -2756,6 +2756,13 @@ to create a temporary file. The function returns the remporary file&#8217;s path
 Of course, programmatic integration of libCURL functionality is still viable via 
 C code injection, but is left outside of the standard library for now.</p>
 
+<p>The iterator defined over files uses a <code>line(CHARS, f)</code> function undeneath, where the first
+argument is an arena or circular buffer effect on which to read line contents. Of the two, 
+the circular buffer version always positions new contens at the start of the buffer. 
+Reading lines consumes at most the rest of available space, and if a new line is not reached
+until that point the <code>"\n"</code> character may not be present at the line&#8217;s ending. Preffer the 
+circular buffer reader for temprarily read lines, as it can go through arbitarily-sized files.</p>
+
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
@@ -2764,16 +2771,18 @@ C code injection, but is left outside of the standard library for now.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">mem</span> <span class="o">=</span> <span class="n">alloc</span> <span class="mi">4096</span> <span class="c1"># parentheses optional for one argument</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="n">read</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">circular</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="nb">open</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="c1"># iterator defined for this kind of tuple</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span>
         <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">+</span><span class="nb">len</span> <span class="n">line</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="s2">&quot; bytes downloaded</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre>
 </div>
 
-<div class="notice-box box-info"><strong>Info:</strong> The above pattern incurs some overhead in saving the file but will be further optimized in future language versions, for example with memory mapped files. Safety will remain the main concern of smoλ in all deployment settings.</div>
+<p>You can always set a custom character buffer allocator instead of automatically passing a <code>CHARS</code> effect,
+for example by writing <code>for line in (circular alloc KB 4, f)</code> to pass the allocator-file pair as explicit
+arguments to the iterator. This is useful when interweaving other kinds of string manipulation code.</p>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {

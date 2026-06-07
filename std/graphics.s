@@ -19,15 +19,15 @@ def Window(Size size, cstr title)
     {"-lraylib"}
     {"-lGL"}
     {SetTraceLogLevel(LOG_WARNING); InitWindow(size__width, size__height, title); }
-    ready = mut false
-    return singleton(size, title, ready)
+    openy = mut false
+    return singleton(size, title, openy)
 
 def is_open(Window)
     {builtins:bool ret = WindowShouldClose(); }
     return not ret
 
 def draw(edit Window window)
-    if window.ready fail "already drawing on window"
+    if window.openy fail "alopeny drawing on window"
     is_drawing = true
     {BeginDrawing();}
     defer
@@ -59,7 +59,7 @@ def Texture(TextureData _data)
 def exists(Texture tex)
     return 0!=len tex.data
 
-def read(cstr path)
+def open(cstr path)
     {
         builtins:nat id = 0;
         builtins:float width = 0;

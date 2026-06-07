@@ -25,11 +25,13 @@ and user input, and manipulating strings. The input-output device is the console
 which can be declared per `CLI = console()` inside the program's `main` function
 serving as an entry point.
 
-Notice the "the" in "the console". You can have only one console in your program;
-this is called a *singleton*. If you name the console `CLI`, like below, it is 
+We are talking about *the* console, because you can have only one of them in your program;
+this pattern is called a *singleton*. If you name the console `CLI`, like below, it is 
 automatically passed to console reading and printing functions. By the way, the
 language uses indentation to mark code blocks. That is, the contents of a function
-must start at a fixed number of tabs inwards for visual alignment.
+must start at a fixed number of tabs inwards for visual alignment. For debugging purposes,
+you may also create an `unsafe_console()` anywhere but that is unsafe in the face of race 
+conditions.
 
 ```python
 import "std/core.s"
@@ -268,10 +270,10 @@ def main()
 ## allocators
 
 A character buffer by itself is not enough to serve as an allocator like `new()`,
-because we do not know how much memory we have consumed inside memory that is
-created in batches. Attach a tracker position by further passing the result through 
-the `arena` function. That will keep using the buffer until it is full,
-at which point an error will be created.
+because we do not know how much memory of its alloted memory we have currently consumed. 
+Attach a tracker position by further passing the result through 
+the `arena` function. Allocators produced this way will keep using the buffer for new operations
+until it is full, at which point an error will be created.
 
 ```python
 import "std/core.s"
@@ -284,7 +286,7 @@ def main()
     print x+y
 ```
 
-You might want to mix things up memory management a little. 
+You might want to mix up memory management a little. 
 For example, you may want the large cumbersome buffer to not persist 
 as we go on with our lives. Manually pass
 an allocator argument to functions to override whatever effect they
@@ -491,7 +493,7 @@ the ones that *could* have output `x`. The set of those functions is
 `type (nat|float)->x`. Once those are selected, pass `2` as an argument to select
 the converter that actually can convert it to the same type as `x`.
 This is shown below, but let us not take up time here because
-this is more of a curio than a frequently occuring pattern.
+this is more of a curio than a frequently occurring pattern.
 
 ```python
 import "std/core.s"

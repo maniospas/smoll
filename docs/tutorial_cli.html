@@ -506,10 +506,10 @@ in general, like below. Unset contents are in a valid zero-initialized state
 <h2 id="allocators">allocators</h2>
 
 <p>A character buffer by itself is not enough to serve as an allocator like <code>new()</code>,
-because we do not know how much memory we have consumed inside memory that is
-created in batches. Attach a tracker position by further passing the result through 
-the <code>arena</code> function. That will keep using the buffer until it is full,
-at which point an error will be created.</p>
+because we do not know how much memory of its alloted memory we have currently consumed. 
+Attach a tracker position by further passing the result through 
+the <code>arena</code> function. Allocators produced this way will keep using the buffer for new operations
+until it is full, at which point an error will be created.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -523,7 +523,7 @@ at which point an error will be created.</p>
 </code></pre>
 </div>
 
-<p>You might want to mix things up memory management a little. 
+<p>You might want to mix up memory management a little. 
 For example, you may want the large cumbersome buffer to not persist 
 as we go on with our lives. Manually pass
 an allocator argument to functions to override whatever effect they
@@ -733,7 +733,7 @@ the ones that <em>could</em> have output <code>x</code>. The set of those functi
 <code>type (nat|float)-&gt;x</code>. Once those are selected, pass <code>2</code> as an argument to select
 the converter that actually can convert it to the same type as <code>x</code>.
 This is shown below, but let us not take up time here because
-this is more of a curio than a frequently occuring pattern.</p>
+this is more of a curio than a frequently occurring pattern.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>

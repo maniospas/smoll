@@ -53,67 +53,65 @@ Here is how to import the entire contents of another source code
 file. The `print` and `console` functions are imported from the core. 
 Assigning to the CLI variable tells the program to print to the
 command line interface, that is, the currently open terminal. 
-This is actually an [effect](#effects), though up until learning about
-those just treat it as boilerplate for most simple programs.
+The `edit` before the console call tells the program that we intent
+to modify console contents, and not merely perform some diagnostic
+action. This is an [effect](#effects), though before learning about
+those just treat it as boilerplate for simple programs.
 
 ```python
 import "std/core.s"
 
 def main()
     # this is a line comment, by the way
-    CLI = console() 
+    CLI = edit console() 
     print "hello world!"
 ```
 
-If you are new to the language, now is a good point to mention
-that you need only the executable (and a local C compiler) to start working. Once
+You need only the executable (and a local C compiler) to start working. Once
 you download the language's executable, you can reference local or **online** directories 
-in your code. The second type are automatically downloaded. Below is an example,
+in your code. Online dependencies are automatically downloaded. Below is an example,
 where the theoretical *std/* location is grabbed from the development repository. 
-For safety, imported files other than the one you run can only make suggestions about repos, 
-and fail to compile if these are not present.
+For safety, repositories in other than the main file only make suggestions, 
+and fail to compile if they are not permitted in the main file too.
 
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import "std/core.s"
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     print "hello world!"
 ```
 
-
 You can also import a file as a namespace to access its
 contents with the `:` notation. This is more verbose
-but unambiguous, like below. You can even access child
+but unambiguous, like below. You can also access child
 namespaces.
 
 ```python
 import "std/core.s" as core
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     core:print "hello world!"
 ```
 
-If you want to import something specific, use `:` within
-the import statement. You can use the path instead of the
-namespace name too, for example to bring a single function 
-from a file.
+If you want to import something specific from a namespace, 
+use `:` within the import statement. Using the path instead of the
+namespace name is also allowed.
+Finally, have imports -or function definitions- be preceded by `local` to avoid 
+exposing definition to files up the import chain. 
+This is used for isolating which functionality
+is introduced in each file.
 
 ```python
-import "std/core.s":print
+local import "std/core.s":print
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     print "hello world!"
 ```
 
-
-Finally, you can have imports
--or function definitions- be preceded by `local` to avoid exposing
-unnecessary contents. This is used for isolating which functionality
-is introduced in each file, so that it can be uniquely referenced.
 
 ## calling notation
 
@@ -128,7 +126,7 @@ tuples.
 import "std/core.s"
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     p = (1,2)
     print add p
     print add(1,2)
@@ -145,27 +143,31 @@ within namespaces.
 import "std/core.s" as core
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     x1 = 1
     x2 = x1.core:add 1
     core:print x2.core:add 2
 ```
 
-In general, avoid needless parentheses,
-as the snippet below does (`f1 f2 ... args` is a chain of 
-function calls). One particularly useful function
+Avoid needless parentheses,
+as the snippet below does; `f1 f2 ... args` is a chain of 
+function calls, read left to right. Always read function calls 
+from left to right, considering all the subsequent contents
+to be part of the call. 
+
+One particularly useful function
 from the standard library's core is `nn`, standing
-for *no \n* that basically takes numbers or strings
-as inputs and outputs a tuple of the same value accompanied 
-by *""*. This is passed into the `print` function, 
-whose optional second argument determines the line ending; *"\n"* 
-by default but this time we prevent that to no end the line.
+for *no \n*; it takes numbers or strings and outputs 
+a tuple of the original value accompanied 
+by *""*. When passed to the `print` function, 
+this tuple also sets the optional second argument determinin line ending.
+The default ending is otherwise *"\n"*.
 
 ```python
 import "std/core.s"
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     print nn "hello " # equivalent to print("hello", "")
     print "world!" 
 ```
@@ -173,22 +175,28 @@ def main()
 
 ## mutability
 
-Values cannot normally be overwritten. To enable this,
-place `mut` just after the assignment. 
-You can keep overwriting mutable values.
+Varaibles cannot normally be overwritten. For example,
+if you set `x=1`, you cannot set a new value on `x`. This
+property is called immutability.
+To allow oeverwriting, place `mut` just after the first assignment
+to indicate that the variable can be *mutated*.
 
-Below is an example, where no further
-mutations to the value are accepted after the third assignment,
-if we wanted to make sure that we are done editing it.
+You can keep overwriting mutable variables. This is much more
+intrusive than `edit`, which we have been using to edit the console.
+For example, primitive types -like numbers- cannot be edited but only
+replaced by being made mutable. Below is an example.
 Even if a value is mutable, it can only be overwritten by
 others of the same type.
 
+In most code, variables will remain immutable. Prefer using `edit` 
+when possible, as it is the more restrictive of the two permission
+levels. You will see more on the latter [momentarily](#type-mutability).
 
 ```python
 import "std/core.s"
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     x = mut 1  # mutable - we want to mutate it further
     x = x+2
     x = x+3
@@ -202,7 +210,7 @@ All functions declare corresponding types via their returned values.
 That is, you can use the function's name to refer to data with
 equivalent structure. Below is an example, where the
 `nat` type represents to natural numbers/non-negative integers.
- Other builtin types are `bool`, `int`, `float`, and `cstr` for
+Other builtin types are `bool`, `int`, `float`, and `cstr` for
 string literals (string literals are lightweight but can not 
 be dynamically constructed or edited: use `str` covered later 
 for this). It bears stressing that, when you see integer numbers 
@@ -216,11 +224,11 @@ def toinfinity(nat start)
     pos = mut start
     return (start, pos)
 
-def next(edit toinfinity r)
+def next(edit toinfinity r) # allow modification of mut fields only
     r.pos = r.pos+1
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     r = toinfinity 0
     next r # proper loops later
     print r.pos
@@ -257,7 +265,7 @@ def sum(Point p)
     return p.x+p.y
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     p = Point(1.0, 2.0)
     print sum p 
 ```
@@ -294,7 +302,7 @@ def std(std_data data)
     return pow(sqr_mean-mean*mean, 0.5)
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     data = std_data()
     data.register 1.0
     data.register 1.0
@@ -314,7 +322,7 @@ def Point(float x, float y) # structural definition needs no body
 def Field(Point a, Point b)
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     f = Field(1.0, 2.0, 3.0, 4.0)
     print f.a.x+f.b.y # prints 5.0
 ```
@@ -330,7 +338,7 @@ methods exist for reading strings on buffers, or other number types.
 import "std/core.s"
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     print nn "Give a number: "
     x = float CLI
     print nn "Its square is: "
@@ -344,7 +352,9 @@ Normal mutability rules apply when overwriting whole objects. For example,
 `t` below needs to be made mutable so that it can be overwritten. This
 does not mean that field immutability can be violated. 
 That is, even if `t` is mutable, we would not
-be able to overwrite the immutable `t.y` field by itself.
+be able to overwrite the immutable `t.y` field by itself. In fact,
+we can modify modify mutable fields only if `t` has mutation or edit
+permissions.
 
 ```python
 import "std/core.s"
@@ -355,13 +365,16 @@ def Test()
     return class(x, y)
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     t = mut Test()
-    t = Test()
+    t = Test() # overwrite 't' completely - remains mutable
     print(t.x) 
 ```
 
-Strip away any mutation capabilities by using `const` like `mut`.
+If you do not use a mutation identifier like `mut` or `edit`,
+then variables -including their fields- are considered fully immutable.
+That is, they cannot be modified or be the source of memory content
+modifications.
 
 ```python
 import "std/core.s"
@@ -372,7 +385,7 @@ def Test()
     return class(x, y)
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     t = Test()
     print t.x # prints 1
     t.x = 0
@@ -380,9 +393,8 @@ def main()
     print t.y # prints 2
 ```
 
-All function arguments are considered `const`.
-If you want to preserve their type's mutable fields
-without allowing a full rewrite use `edit`.
+It has been already mentioned, but is worth repeating: to preserve mutation for
+mutable fields without allowing a full variable rewrite use `edit`.
 
 ```python
 import "std/core.s"
@@ -397,7 +409,7 @@ def test(edit Test t)
     print t.x
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     t = Test()
     t.x = 5
     test t
@@ -417,7 +429,7 @@ be prematurely terminated with `break` or skipped with
 import "std/core.s"
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     x = 1.0-2.0
     if x<0.0
         print "x is negative"
@@ -431,7 +443,7 @@ like the following version.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     x = 1.0-2.0
     if x<0.0 print "x is negative"
     else if x==0.0 print "x is zero"
@@ -442,7 +454,7 @@ def main()
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     x = 1.0-2.0
     if x<0.0 sgn = "-" else sgn = "+"
     print nn "sign is: "
@@ -458,7 +470,7 @@ Here is a simple example. Please do not write code like this.
 import "std/core.s"
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     i = mut 0
     while true # overengineered
         if i==5 
@@ -482,7 +494,7 @@ which se [literals](#literal-types) for explicitness:
 -  `range of 10` becomes `range(0,10)` 
 -  `range of (1 to 10)` becomes `range(1,10)` 
 -  `range of (1 upto 10)` becomes `range(1,11)` 
--  `range of (2 lento 10)` becomes `range(2,12)` 
+-  `range of (2 len 10)` becomes `range(2,12)`
 
 Iterators safely try to keep producting new elements until they
 fail to do so (any kind of failure stops them).
@@ -493,7 +505,7 @@ More on iterators later.
 import "std/core.s"
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     for i in range of 10
         print i
 ```
@@ -517,7 +529,7 @@ def all_positives(point p)
 def not(point p)
     return point(1.0-p.x, 1.0-p.y)
 def main()
-    CLI = console() 
+    CLI = edit console() 
     p = mut point(10.0, 20.0)
     # 'neg' to make numbers negative
     p = (all_positives p) and add(p, neg 30.0, neg 30.0) 
@@ -559,7 +571,7 @@ does not work; the programmer needs to reason about unbounded problems.
 import "std/core.s"
 
 def wooo() # CREATES AN ERROR - should have been 'rec'
-    CLI = console()
+    CLI = edit console()
     print "wooo"
     return wooo()
 
@@ -610,7 +622,7 @@ def call_fib(nat n)
     return fib(n)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print fib(10) # prints 89
 ```
 
@@ -625,7 +637,7 @@ mean never.
 ```python
 import "std/core.s"
 
-rec wooo(mut console CLI) # not the ideal way to pass the console - see next section
+rec wooo(edit console CLI) # not the ideal way to pass the console - see next section
     if false return blank()
     CLI.print "wooo"
     wooo CLI
@@ -643,7 +655,7 @@ No, don't run!
 *Smoλ* deliberately avoids a complicated effect system; it just presents the ability to pass
 some arguments implicitly from the calling scope. In the standard library later, this mechanism
 is mainly used for passing memory allocators around. However, we have already seen a much more 
-fundamental usage in declaring `CLI = console()` in almost all our main functions.
+fundamental usage in declaring `CLI = edit console()` in almost all our main functions.
 
 You can have the `effect` keyword before an argument in a function's signature to
 declare an effect. There is no other difference in how you would write or call the function.
@@ -666,7 +678,7 @@ def inc(effect nat INCREMENT, effect mut nat COUNTER, nat number)
     return number+INCREMENT
 
 def main()
-    CLI = console()
+    CLI = edit console()
     COUNTER = mut 0
     INCREMENT = 1
     print inc inc inc 9      # prints 12
@@ -684,11 +696,11 @@ initialization is used to ensure that a printable console exists.
 ```python
 import "std/core.s"
 
-def greet(effect mut console CLI)
+def greet(effect edit console CLI)
     print "hello world"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     greet()
 ```
 
@@ -719,7 +731,7 @@ def unsafe_add(float x, float|int y)
     return z
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print unsafe_add (1.0, int 2)
 ```
 
@@ -738,7 +750,7 @@ def unsafe_add(Number x, Number y)
     return z
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print unsafe_add (1.0, 2)
 ```
 
@@ -776,14 +788,14 @@ def inc(float\Number a) # define for float definitions that are not in Number
     return (x,y)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print inc(1.0)  # print 2.0
     print inc(4.0,4.0).x # prints 5.0
 ```
 
 ## literal types
 
-Often there is a need to distinguish functionality based on some exact
+Often, there is a need to distinguish functionality based on some exact
 literal value. Or you may want to have some constant that is used everywhere
 in your code. This is done by having literal types, as in, types that
 are attached to specific values.
@@ -802,7 +814,7 @@ def inc(nat x)
     return x+INCREMENT
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print inc 0  # prints 1
 ```
 
@@ -815,13 +827,13 @@ can be a string or number literal.
 import "std/core.s"
 
 def VERSION = "two"
-def version(effect mut console CLI, "one") # just a literal type
+def version(effect edit console CLI, "one") # just a literal type
     print "version one"
-def version(effect mut console CLI, "two")
+def version(effect edit console CLI, "two")
     print "version two"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     v = type "two"
     version v # calls the correct version
     version type VERSION # calls the same version
@@ -846,7 +858,7 @@ def inc(nat x, blank|1|2 inc)
     return x+compiler:literal inc
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print inc 0           # prints 1
     print inc (0, type 2) # prints 2
 ```
@@ -866,7 +878,7 @@ def answer_schemas(ENUM first, ENUM second, nat minutes_to_answer)
 def answers(cstr first, cstr second, nat minutes_to_answer)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     answers = answers("A", "F", 60)
     if not answers is answer_schemas 
         print "not a valid answer" 
@@ -898,7 +910,7 @@ def modify(mut nat x, "add", nat y)
 def modify(mut nat x, "sub", nat y)
     x = x-y
 def main()
-    CLI = console()
+    CLI = edit console()
     x = mut 5
     modify(x add 3)
     modify(x add blank() one)
@@ -924,7 +936,7 @@ as the standard library's core. Below is an example of a conditional check.
 ```python
 import "std/core.s"
 
-def typed_print(effect mut console CLI, nat|int|float|cstr value) 
+def typed_print(effect edit console CLI, nat|int|float|cstr value) 
     if value is nat|int|float
         print nn "this is a number: "
     else
@@ -932,7 +944,7 @@ def typed_print(effect mut console CLI, nat|int|float|cstr value)
     print value
 
 def main()
-    CLI = console()
+    CLI = edit console()
     typed_print 1
     typed_print 2.0
     typed_print "test"
@@ -955,18 +967,19 @@ def inc(nat x, nat|blank value)
     return x+value
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print inc 2    # prints 3
     print inc(2,2) # prints 4
 ```
 
 Here is a much more complicated scenario, where `compiler:skip()` 
 prevents certain versions of the function from being
-created (e.g. there is no `inc(float,int)`). The example also shows 
-two type inference constructs: 
+created (e.g. there is no `inc(float,int)`). The example also reveals 
+three type inference constructs.
 
-- Obtain functions among alternatives `T` that could have produced value `x` (can be a tuple) per `type T->x`. This is a specialization of the `type T` syntax, which itself is a more verbose way of writing `T` but also works with literals without devolving them into values. The alternatives are needed because the language allows structural typing, meaning that there is not necessarily a unique way to infer a function from its output structure. For example, `type Num->x 1` can be used to cast the value 1 to the same number format as the variable `x` by calling one of the functions in the `Num` union that would output the same output as the variable. The same pattern could have been used to also run an appropriate string-to-number converter like `type Num->x "1"`.
-- Compare against the exact structural type of `x` (that can be an expression) use `value is type x`. This is a short-circuit for a different compilation branch and is always inferred at compile time.
+- Use `type expression` within type parsing run an expression and retrieve its type.
+- Use `->output_type` after an ambiguous function call to select the call variation producting the desired `output_type`. For example, `Num 1` includes -among other functions- all casts from the natural number `1` to various number formats. So `Num 1->type x` forces the function cast that retrieves exactly the type of `x`.
+- Compare against the exact structural type of `x` (that can be an expression) using `value is type x`.
   
 In total, the compiler investigates 3*4=12
 variations and eventually keeps 6 of them. Both conditional checks in the example
@@ -978,13 +991,13 @@ import "std/core.s"
 def Num = float|int|nat
 def inc(Num x, Num|blank value) # equivalent: def inc(float|int|nat x, float|int|nat|blank value) 
     if value is blank
-        value = type Num->x 1 # one with the same number format as x
+        value = Num 1->type x # one with the same number format as x
     if not value is type x
         compiler:skip() # skip invalid 'inc' definitions
     return x+value
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print inc 2.0  # prints 3.0
     print inc(2,2) # prints 4
 ```
@@ -1001,7 +1014,7 @@ import "std/core.s"
 
 def VALUES = compt (1,2)
 def main()
-    CLI = console()
+    CLI = edit console()
     print add VALUES
 ```
 
@@ -1015,7 +1028,7 @@ import "std/core.s"
 
 def CONSTANT = compt cstr unsafe_temp add(arena alloc 128, "hello", " world!")
 def main()
-    CLI = console()
+    CLI = edit console()
     print CONSTANT
     print CONSTANT=="hello world!" # 'true'
     # the above check is correct even if the
@@ -1034,7 +1047,7 @@ import "std/sci.s"
 
 def ones = compt vec [1.0, 1.0]
 def main()
-    CLI = console()
+    CLI = edit console()
     v = mut vec [5.0, 10.0]
     allocator = arena float[].alloc 128
     v = v+ones
@@ -1087,7 +1100,7 @@ with negative indexes. Next is an example of buffer usage.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     buf = float[].alloc 10 # allocate 10 elements
     print buf[0] # prints 0, as buffers are zero-initialized
     buf[1] = 1.0
@@ -1117,7 +1130,7 @@ def create()
     return const buf
 
 def main()
-    CLI = console()
+    CLI = edit console()
     buf = create()
     print buf[0]
     buf[1] = 1.0 # CREATES AN ERROR
@@ -1151,7 +1164,7 @@ the input buffer type.
 import "std/core.s"
 
 def print(any[] buffer)
-    CLI = console()
+    CLI = edit console()
     print(len buffer, " elements in buffer\n")
 
 def main()
@@ -1177,7 +1190,7 @@ def populate(edit named_strbuffer named) # for str[] only
     named.buf[1] = str "world"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     elements = named_buffer(str "greeting", str[])
     elements.buf = elements.buf.alloc 2
     populate elements
@@ -1194,12 +1207,12 @@ is used to make the allocation.
 ```python
 import "std/core.s"
 
-def print(effect mut console CLI, cstr[] sentences)
+def print(effect edit console CLI, cstr[] sentences)
     for sentence in sentences
         print sentence
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print ["hello world!", "... and goodbye for now."]
 ```
 
@@ -1216,14 +1229,13 @@ Obtain a `const` pointer from a buffer, including a buffer whose
 pointed memory location cannot be modified, per `ptr = buf[element]&`,
 and a `mut` pointer -if permissions allow it- per `ptr = buf[element]&&`. 
 Constness means that pointer contents cannot be overwritten. To set a 
-new value to a mutable pointer use `&` after the value again per 
-`old_ptr = new_ptr&`. Otherwise, assignment copies a compatible
+new value to a mutable pointer use `&&` after the value again per 
+`old_ptr = new_ptr&&`. Otherwise, assignment copies a compatible
 structure's contents onto a mutable pointer's memory location.
 
-`ptr..` dereferences pointers onto local objects. 
-For example, `ptr...field` gets a field from an object stored 
-in a pointer by following up the dereferenced data with field
-access notation. Given all these operators
+The `compiler:deref` function dereferences pointers onto local objects. 
+For example, `compiler.deref(ptr).field` gets a field from an object, after
+dereferencing the latter. Given all these operators
 it is now possible to explain that `buffer[pos]=value` desugars 
 to the pointer notation `buffer[pos]&& = value` that first
 retrieves a mutable pointer and then assigns to it.
@@ -1254,27 +1266,27 @@ a pointer to it. Then that is moved around via its memory address.
 import "std/core.s"
 
 def inc(mut float ptr element)
-    element = element..+1.0
+    element = 1.0+compiler:deref element
 
 def main()
-    CLI = console()
-    element = mutlast [0.0] # equivalent to element = [0.0][0]&& 
-    print element.. # prints 0.0
+    CLI = edit console()
+    element = [0.0]& # equivalent to element = [0.0][0]&& 
+    print compiler:deref element # prints 0.0
     inc element
-    print element.. # prints 1,0
+    print compiler:deref element # prints 1,0
 ```
 
 Creating many pointers this way is inefficient in that it produce a lot of small allocations.
-Many languages allow this by imposing a ton of restructions, but *smoλ* heavily discourages the practice
-naturally, as returning pointers cannot be done without the associated buffer that contains all the
+Many languages allow this by imposing a ton of restructions, but *smoλ* heavily discourages the practice, 
+as returning pointers cannot be done without the associated buffer that contains all the
 necessary information of how to deallocate memory.
 
 ## substructures
 
 *Warning: This is an advanced feature, mainly useful for iterating through complicatedly packed data. You can skip it.*
 
-You can move around date from buffers without copying them by retrieving
-pointers to buffer elements.To ensure safety, normal code only lets
+You can move around date from buffers and pointers 
+without copying by retrieving offsets. To ensure safety, normal code only lets
 pointers explitly reference buffer data. Unsafe code
 is either inlined C, or has *unsafe* in its import path or name.
 
@@ -1304,7 +1316,7 @@ def Point3D(float x, float y, float z)
     return (plane,class(z))
 
 def main()
-    CLI = console()
+    CLI = edit console()
     points = Point3D[].alloc 10
     points[0] = Point3D(1.0,2.0,3.0)
     plane = points.plane # can move this around as if it were a buffer
@@ -1332,7 +1344,7 @@ syntax like below.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     x = mut 0
     y = ref x
     z = ref x
@@ -1369,7 +1381,7 @@ this requires stable handling through `ref`.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     buf = ref alloc (mut float[], 10) # 'ref' is mandatory to resize later
     buf[1] = 1.0
     buf.resize 20
@@ -1396,7 +1408,7 @@ def test()
     return (s1,s2)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     s = test()
     print s.s1
     print s.s2
@@ -1424,12 +1436,12 @@ You can manually `fail` like so:
 ```python
 import "std/core.s"
 
-def always_fail(effect mut console CLI)
+def always_fail(effect edit console CLI)
     print "we are failing"
     fail "we failed!"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     always_fail()
     print "this line is never printed"
 ```
@@ -1445,7 +1457,7 @@ assertion. There are various other compiler assertions too, which are covered la
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     try x = alloc KB 4  # buffer of chars
     try x[0] = char "a" # still needs a try for buffer elements - though checks can be optimized away
     try print x[0]
@@ -1473,7 +1485,7 @@ def vector(nat size)
     return float[].alloc size
 
 def main()
-    CLI = console()
+    CLI = edit console()
     if not try v = vector pow(1024,6)
         print "failed to allocate"
     print(len v, " numbers allocated\n")
@@ -1487,7 +1499,7 @@ mechanism for trying to produce next values. Below is an example.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     it = range of 5
     while try i=next it # equivalent to 'for i in range of 5'
         print i
@@ -1509,7 +1521,7 @@ is converted into a `while try`.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     for i in range of 10
         print i   # prints 0,1,2...,9
 ```
@@ -1524,7 +1536,7 @@ examples is equivalent to the next one.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     iterator = range of 10
     hidden_index = mut 0
     while try i=iterator[hidden_index]
@@ -1540,7 +1552,7 @@ like below.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     for i in [1,2,3]
         print i
 ```
@@ -1563,7 +1575,7 @@ def get(edit solution s, nat) # skip the iteration index argument
     return s.y-s.x
 
 def main()
-    CLI = console()
+    CLI = edit console()
     sol = solution(mut 32, mut 19)
     for diff in sol 
         print nn "difference "
@@ -1593,7 +1605,7 @@ Below is a simple example.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     defer
         print "third"
     print "first"
@@ -1610,7 +1622,7 @@ import "std/core.s"
 import "std/io.s":process as process
 
 def main()
-    CLI = console()
+    CLI = edit console()
     proc = mut process:read "echo \"hello world!\""
     del proc # runs the process's defer, which waits for completion
     print "bye!"
@@ -1631,7 +1643,7 @@ import "std/core.s"
 import "std/io.s" as io
 
 def main()
-    CLI = console()
+    CLI = edit console()
     try print 2*3-20 # nat cannot become negative
     if try error = compiler:catch()
         print "cannot substract two nat numbers and obtain a negative result"
@@ -1655,7 +1667,7 @@ def bye_error()
     fail "bye!" 
 
 def main()
-    CLI = console()
+    CLI = edit console()
     proc = mut process:read "echo \"hello world!\""
     try bye_error()
     del proc
@@ -1682,8 +1694,8 @@ import "std/core.s"
 import "std/sci.s"
 
 def main()
-    CLI = console()
-    FLOATS = arena float[].alloc 128
+    CLI = edit console()
+    FLOATS = edit arena float[].alloc 128
     v1 = vec 10 # vector of 10 elements
     v2 = vec 10
     v1[0] = 1.0
@@ -1716,7 +1728,7 @@ For example, one pattern usable for debuggining is the following.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     s1 = str "s1"
     s2 = str "s2"
     debug:print type "--- main ---" # prints '"--- main ---"' at compile time
@@ -1725,7 +1737,9 @@ def main()
 ```
 
 Finally, assert that a specific point in a function does not lie within a loop
-or condition with the `debug:branchless()` check. This asserts that there is no 
+or condition with the `debug:branchless()` check. Or, if you have set up VSCode or 
+another means of accessing the language service,
+simply check on the satements by hovering over the `if`. This asserts that there is no 
 conditional compilation going on, with the compiler creating an error otherwis, 
 and can be used to ensure that conditions not accidentally evaluated at runtime. 
 The next example uses it to verify that  there is no runtime overhead from a particularly
@@ -1739,7 +1753,7 @@ def test1(nat a, nat b, "one"|"two")
 def test2(float a, float b, "one"|"two")
 
 def main()
-    CLI = console()
+    CLI = edit console()
     a = 1
     b = 2.0
     c = "one"
@@ -1776,7 +1790,7 @@ rec wooo(effect edit range SAFETY, nat i)
     return wooo(i+1)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     SAFETY = range of 14 # recursive depth limit in playground
     try wooo 0
     if try error = compiler:catch()
@@ -1795,14 +1809,14 @@ this function asks for user input on whether the program should be terminated.
 import "std/core.s"
 import "std/io.s"
 
-rec wooo(effect mut console CLI)
+rec wooo(effect edit console CLI)
     if false return blank()
     process:interrupt_point()
     print "wooo"
     wooo()
 
 def main()
-    CLI = console()
+    CLI = edit console()
     try wooo()
     print "\rthe end" # \r go to the start of the console line to remive ^C
 ```
@@ -1828,7 +1842,7 @@ growing lists.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     mem = list ref mut float[]
     (at alloc mem) = 0.1
     (at alloc mem) = 0.1
@@ -1863,7 +1877,7 @@ character too, but such data are ignored if not needed.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print str "hello world!"
 ```
 You can convert string contents to numeric types. 
@@ -1873,7 +1887,7 @@ This creates errors on failure.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print float "123"
 ```
 
@@ -1886,7 +1900,7 @@ will also use them to store `float` vector contents.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     buf = arena alloc KB 4 # equivalent to buf = (alloc KB 4, mut 0)
     s = buf.copy "hello world!"
     print s
@@ -1900,7 +1914,7 @@ location based on their name.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = arena alloc KB 4 # effect for placing string data
     s = copy "hello world!"
     print s
@@ -1917,7 +1931,7 @@ on an erroneous program.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = ref list mut char[]
     s1 = copy "hello world!" # would have been invalidated if we did not use `ref`
     s2 = copy "hello world!"
@@ -1934,7 +1948,7 @@ as a `+` operation like below.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = arena char[].alloc KB 4
     s1 = copy "hello"
     s2 = copy "world!"
@@ -1953,7 +1967,7 @@ There also exists the variation `str(char[] buffer, nat start, "to", nat length)
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = arena alloc KB 4
     start = CHARS.pos
     copy "hello"
@@ -1980,7 +1994,7 @@ import "std/core.s"
 import "std/map.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     map = mut strmap str[].alloc 128
     map["hello"] = str "hello world!"
     map["manio"] = str "it's a me, manio."
@@ -2011,7 +2025,7 @@ import "std/core.s"
 import "std/io.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     f = file:read "README.md"
     mem = char[].alloc KB 4 # max 4 KB chunk size, on char[] by default
     for line in (mem, f)
@@ -2028,7 +2042,7 @@ import "std/core.s"
 import "std/io.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     f = file:write "tmp.txt"
     f.print "hello world"
     defer 
@@ -2046,7 +2060,7 @@ import "std/core.s"
 import "std/io.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     dir = mut dir:read "."
     for entry in dir
         print(entry, " ")
@@ -2064,7 +2078,7 @@ import "std/core.s"
 import "std/io.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     success = try system "echo \"hello world!\""
     print success
 ```
@@ -2077,7 +2091,7 @@ import "std/core.s"
 import "std/io.s":process as proc
 
 def main()
-    CLI = console()
+    CLI = edit console()
     process = proc:process "ls"
     buf = arena char[].alloc KB 4 # example with growing position
     for line in (buf, process)
@@ -2094,7 +2108,7 @@ import "std/core.s"
 import "std/io.s":process as proc
 
 def main()
-    CLI = console()
+    CLI = edit console()
     process = proc:process "ls"
     del process
     if try error = compiler:catch()
@@ -2118,7 +2132,7 @@ import "std/core.s"
 import "std/rand.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     seed = mut splitmix64()
     print splitmix64 seed 
     print splitmix64 seed
@@ -2134,7 +2148,7 @@ import "std/core.s"
 import "std/rand.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     rand = mut Rand()
     print next rand
     print next rand
@@ -2187,7 +2201,7 @@ def concat(mini:str[] buff)
     return str(mem.buf,start,mem.pos)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     buff = mini:str[].alloc 6
     debug:print buff # print the buffer type during compilation
     buff[0] = mini:str "hi"
@@ -2213,7 +2227,7 @@ import "std/core.s"
 import "std/sci.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     v = vec [1.0, 2.0, 0.0, 0.0, 0.0]
     print ("(sum, mean, std) = (", "")
     print (sum v, ", ")
@@ -2244,7 +2258,7 @@ def safe_main()
     print v[0]
     
 def main()
-    CLI = console()
+    CLI = edit console()
     try safe_main()
     if try error=compiler:catch()
         print cstr error
@@ -2261,8 +2275,8 @@ import "std/core.s"
 import "std/sci.s"
 
 def main()
-    CLI = console()
-    FLOATS = new() # allocate to new memory whenever needed
+    CLI = edit console()
+    FLOATS = mut new() # allocate to new memory whenever needed
 
     a = mat [
         1.0, 0.0, 2.0,
@@ -2323,13 +2337,13 @@ import "std/core.s"
 import "std/sci.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     m = compt new().graph:normalize matrix [
         (1,1, 1.0),
         (2,2, 2.0),
         (1,2, 1.0)
     ].any(3,3)
-    FLOATS = new()
+    FLOATS = mut new()
     p0 = vec [1.0,2.0,3.0]
     result = graph:ppr(0.9).graph:filter(m, p0)
     print nn "iterations: "
@@ -2360,7 +2374,7 @@ def Circle(float _cx, float _cy, float _vx, float _vy, float _radius)
     return (cx,cy,vx,vy,radius)
 
 def process(mut Circle ptr _self, float dt)
-    self = _self.. # unpack
+    self = compiler:deref _self
     self.cx = self.cx + self.vx * dt
     self.cy = self.cy + self.vy * dt
     if self.cx - self.radius < 0.0
@@ -2436,7 +2450,7 @@ def run(cstr|str command)
         print cstr error
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = arena char[].alloc 256
     path = "./tests/passing/"
     copy "./smoll "
@@ -2470,7 +2484,7 @@ import "std/io.s"
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = circular alloc KB 4
     f = file:open web:get README
     size = mut 0

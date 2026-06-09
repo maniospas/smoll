@@ -5,14 +5,14 @@ def strmap(edit any[] values)
     doc "a string map"
     doc "Maps string indexes to the buffer provided using a robinhood scheme."
     doc "Map size is static and cannot be adjusted after initialization."
-    keys = alloc(mut hash:robinhood_str_entry[], len values) 
+    keys = mut alloc(hash:robinhood_str_entry[], len values) 
     unsafe_return (keys, values)
 
 def natmap(edit any[] values)
     doc "a natural number map"
     doc "Maps number indexes to the buffer provided using a robinhood scheme."
     doc "Map size is static and cannot be adjusted after initialization."
-    keys = alloc(mut hash:robinhood_nat_entry[], len values) 
+    keys = mut alloc(hash:robinhood_nat_entry[], len values) 
     unsafe_return (keys, values)
 
 def get(hash:robinhood_str_entry[] keys, any[] values, cstr|str key)

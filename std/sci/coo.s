@@ -53,7 +53,7 @@ def mutget(edit coo m, nat k)
 def mul(effect edit float_allocator FLOATS, coo m, vec v)
     doc "sparse matrix*vector multiplication"
     if m.cols!=v.length fail "matrix columns must match vector length"
-    result = vec m.rows
+    result = edit vec m.rows
     for entry in m
         result[entry.row] = result[entry.row]+entry.value*v[entry.col]
     return result
@@ -63,7 +63,7 @@ def mul(effect edit float_allocator FLOATS, vec v, coo m)
     doc "*Warning: the expression `self(v)*m` yields wrong values"
     "because the vector is not modified element-by-element."
     if v.length!=m.rows fail "vector length must match matrix rows"
-    result = vec m.cols
+    result = edit vec m.cols
     for entry in m
         result[entry.col] = result[entry.col]+v[entry.row]*entry.value
     return result
@@ -71,21 +71,20 @@ def mul(effect edit float_allocator FLOATS, vec v, coo m)
 def mul(effect edit float_allocator FLOATS, coo m1, mat m2)
     doc "sparse*dense matrix multiplication"
     if m1.cols!=m2.rows fail "inner dimensions must agree"
-    result = mat(m1.rows, m2.cols)
+    result = edit mat(m1.rows, m2.cols)
     for entry in m1
-        it_j = range of m2.cols
-        while try j=next it_j
+        for j in range of m2.cols
             result[entry.row,j] = result[entry.row,j]+entry.value*m2[entry.col,j]
     return result
 
 def todense(effect edit float_allocator FLOATS, coo m)
     doc "convert to dense mat"
-    result = mat(m.rows, m.cols)
+    result = edit mat(m.rows, m.cols)
     for entry in m
         result[entry.row, entry.col] = entry.value
     return result
 
-def print(effect mut console CLI, coo m, cstr|blank endl)
+def print(effect edit console CLI, coo m, cstr|blank endl)
     doc "print sparse matrix"
     doc "Prints it as coordinate as list: (i, j): v"
     if endl is blank
@@ -102,7 +101,7 @@ def print(effect mut console CLI, coo m, cstr|blank endl)
 def sum(effect edit float_allocator FLOATS, coo m, "row")
     doc "sum of each row"
     doc "result[i] = sum of all stored values in row i"
-    result = vec m.rows
+    result = edit vec m.rows
     for entry in m
         result[entry.row] = result[entry.row]+entry.value
     return result
@@ -110,7 +109,7 @@ def sum(effect edit float_allocator FLOATS, coo m, "row")
 def sum(effect edit float_allocator FLOATS, coo m, "col")
     doc "sum of each column"
     doc "result[j] = sum of all stored values in column j"
-    result = vec m.cols
+    result = edit vec m.cols
     for entry in m
         result[entry.col] = result[entry.col]+entry.value
     return result

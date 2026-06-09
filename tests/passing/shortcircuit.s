@@ -8,7 +8,7 @@ def all_positives(point p)
 def not(point p)
     return point(0.0, 0.0)
 def main()
-    CLI = console()
+    CLI = edit console()
     p = mut point(10.0, 20.0)
     # 'neg' to make numbers negative
     p = (all_positives p) and add(p, neg 30.0, neg 30.0) 

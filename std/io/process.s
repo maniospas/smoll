@@ -16,7 +16,7 @@ def args()
     {ret__unsafe_size=__t_argc;}
     return ret
 
-def breakpoint(effect mut console CLI)
+def breakpoint(effect edit console CLI)
     VM "[False]" # not implemented interrupts yet for the VM
     doc "checks for SIGINT"
     {builtins:bool has_failed = __t_interrupted;}
@@ -74,7 +74,7 @@ def chunk(char[] buf, mut nat|blank pos, open f)
     if bytes_open==0 fail "end of file"
     prev_pos = const pos
     pos = pos+bytes_open
-    return str(buf, prev_pos, type "lento", bytes_open)
+    return str(buf, prev_pos, type "len", bytes_open)
 
 def line(effect edit char_arena|char_circular CHARS, open f)
     doc "next line"
@@ -113,7 +113,7 @@ def safe(cstr cmd)
     if unsafe_chars fail "unsanitized command: shell metacharacter detected"
     return cmd
 
-def system(effect mut console CLI, cstr|str _cmd)
+def system(effect edit console CLI, cstr|str _cmd)
     doc "system command"
     doc "Runs a system command and waits until that completes."
     doc "Fails if the return code is non-zero, but does not expose that code."

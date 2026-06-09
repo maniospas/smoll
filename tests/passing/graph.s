@@ -2,7 +2,7 @@ import "std/core.s"
 import "std/sci.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     m = compt new().graph:normalize matrix [
         (1,1, 1.0),
         (2,2, 2.0),

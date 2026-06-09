@@ -1,7 +1,7 @@
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = new()
     print "what's your name"
     name = str CLI

@@ -79,12 +79,10 @@ def mul(effect edit float_allocator FLOATS, mat m, vec v)
     doc "matrix-vector multiplication"
     doc "Grabs an allocator for the result as an effect."
     if m.cols!=v.length fail "matrix columns must match vector length"
-    result = vec m.rows
-    it_i = range of m.rows
-    while try i=next it_i
+    result = edit vec m.rows
+    for i in range of m.rows
         acc = mut 0.0
-        it_j = range of m.cols
-        while try j=next it_j
+        for j in range of m.cols
             acc = acc+m[i,j]*v[j]
         result[i] = acc
     return result
@@ -93,12 +91,10 @@ def mul(effect edit float_allocator FLOATS, vec v, mat m)
     doc "vector-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
     if v.length!=m.rows fail "vector length must match matrix rows"
-    result = vec m.cols
-    it_j = range of m.cols
-    while try j=next it_j
+    result = edit vec m.cols
+    for j in range of m.cols
         acc = mut 0.0
-        it_i = range of m.rows
-        while try i=next it_i
+        for i in range of m.rows
             acc = acc+v[i]*m[i,j]
         result[j] = acc
     return result
@@ -107,31 +103,27 @@ def mul(effect edit float_allocator FLOATS, mat m1, mat m2)
     doc "matrix-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
     if m1.cols!=m2.rows fail "inner dimensions must agree"
-    result = mat(m1.rows, m2.cols)
-    it_i = range of m1.rows
-    while try i=next it_i
-        it_j = range of m2.cols
-        while try j=next it_j
+    result = edit mat(m1.rows, m2.cols)
+    for i in range of m1.rows
+        for j in range of m2.cols
             acc = mut 0.0
             it_k = range of m1.cols
-            while try k=next it_k
+            for k in range of m1.cols
                 acc = acc+m1[i,k]*m2[k,j]
             result[i,j] = acc
     return result
 
-def print(effect mut console CLI, mat m, cstr|blank endl)
+def print(effect edit console CLI, mat m, cstr|blank endl)
     doc "print a matrix with aligned brackets"
     doc "single-row matrices stay on one line; taller ones get top/mid/bottom brackets"
     if endl is blank
         endl = "\n"
-    it_i = range of m.rows
-    while try i=next it_i
+    for i in range of m.rows
         if m.rows==1  print ("[ ", "")
         if m.rows>1 and i==0 print ("⎡ ", "")
         if m.rows>1 and i>0 and i<m.rows-1 print ("⎢ ", "")
         if m.rows>1 and i==m.rows-1 print ("⎣ ", "")
-        it_j = range of m.cols
-        while try j=next it_j
+        for j in range of m.cols
             print (m[i,j], "")
             if j<m.cols-1 print ("  ", "")
         if m.rows==1 print (" ]", "")

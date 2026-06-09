@@ -7,13 +7,13 @@ def total_length(str[] parts)
     return size
 
 def concat(str[] parts)
-    CHARS = arena char[].alloc total_length parts
+    CHARS = mut arena char[].alloc total_length parts
     for part in parts
         copy part
     return str(status CHARS from 0)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print concat [
         str "hello",
         str " ",

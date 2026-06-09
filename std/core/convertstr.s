@@ -110,16 +110,16 @@ def float(console console)
         fail "user input was not a float"
     return const number
 
-def str(effect edit char_allocator CHARS, mut console console)
+def str(effect edit char_allocator CHARS, edit console console)
     doc "reads a string from the console"
     if CHARS is char_arena
         doc "The read string is placed on an arena while consuming only the necessarily minimum size."
-        ch = CHARS
+        ch = edit CHARS
     else 
         if CHARS is new
             doc "The read string is placed onto memory that keeps being reallocated to accommodate its size."
             doc "The resulting memory will consume exactly the required size in bytes."
-            ch = arena ref char[].alloc 8
+            ch = edit arena ref char[].alloc 8
         else
             compiler:skip()
     if ch.buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"

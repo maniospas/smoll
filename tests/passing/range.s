@@ -2,8 +2,8 @@ import "std/core.s"
 import "std/core/range.s" as range
 
 def main()
-    CLI = console()
-    r = range:range range:of(10)
+    CLI = edit console()
+    r = mut range:range range:of(10)
     while try value = mut r.range:next()
         print value
     value = value+1

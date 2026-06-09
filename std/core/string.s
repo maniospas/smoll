@@ -25,7 +25,7 @@ def char_arena()
 def char_circular()
     return circular char[]
 local def char_list()
-    return list mut char[]
+    return list char[]
 local def alloc(effect edit new CHARS, nat length)
     return allocated(char[].alloc length, 0)
 def char_allocator = new|char_arena|char_circular|char_list
@@ -67,7 +67,7 @@ def str(str other)
     doc "tautology function for strings"
     return other
 
-def str(char[] buf, nat pos, "lento", nat length)
+def str(char[] buf, nat pos, "len", nat length)
     doc "a string residing on a buffer"
     doc "The string automatically detects the first character,"
     doc "which is generally tracked for fewer negative indirections"
@@ -89,7 +89,7 @@ def str(char[] buf, nat endpos, "from", nat pos)
     doc "The string automatically detects the first character,"
     doc "which is generally tracked for fewer negative indirections"
     doc "on negative comparisons."
-    return str(buf, pos lento endpos-pos)
+    return str(buf, pos len endpos-pos)
 
 def str(cstr c)
     doc "convert to string"
@@ -100,7 +100,7 @@ def str(cstr c)
     buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler:attach_type(c)&&
     {if(c){builtins:nat length = strlen(c);}} # length initializes to zero
     buf.unsafe_size = length+1  # account for null termination
-    return str(buf,0 lento length)
+    return str(buf,0 len length)
 
 def len(str s)
     doc "string length"
@@ -140,7 +140,7 @@ def copy_null_terminated(effect new CHARS, str other)
     doc "create null terminated string"
     doc "Copies a string to a new buffer while ensuring null termination."
     doc "This is mainly useful for supporting 'cstr unsafe_temp'."
-    buf = alloc(mut char[], 1+len other)
+    buf = alloc(char[], 1+len other)
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     {builtins:compiler:ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}
@@ -234,7 +234,7 @@ def copy_null_terminated(effect edit char_arena CHARS, str|cstr _other)
     CHARS.pos = next_pos
     return str(CHARS.buf, prev_pos, other.dat.length, other.dat.first)
 
-def print(effect mut console CLI, str s, cstr|blank endl)
+def print(effect edit console CLI, str s, cstr|blank endl)
     doc "print a string"
     if endl is blank
         doc "Ends the line too."
@@ -245,7 +245,7 @@ def get(str s, nat i)
     doc "a character in a string"
     return s.unsafe_ptr.unsafe:add(s.dat.pos+i)
 
-def print(effect mut console CLI, char c, cstr|blank endl)
+def print(effect edit console CLI, char c, cstr|blank endl)
     doc "print a character"
     if endl is blank
         doc "Ends the line too."
@@ -305,7 +305,7 @@ def nn(str value)
 def add(effect edit char_allocator CHARS, str|cstr _s1, str|cstr _s2)
     s1 = str _s1
     s2 = str _s2
-    surface = arena unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
+    surface = mut arena unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
     start = surface.pos+0
     copy(surface, s1)
     copy(surface, s2)

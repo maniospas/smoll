@@ -12,7 +12,7 @@ def transform(matrix m, vec x, float offset)
     return p
 
 def main()
-    CLI = console()
+    CLI = edit console()
     m = matrix [
         1.0, 1.0,
         1.0, 1.0

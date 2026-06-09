@@ -51,7 +51,7 @@ def alloc(edit any[] buffer, nat|blank size, "dirty"|blank clear_policy)
 
 def alloc(nat size)
     doc "allocate a char[] buffer"
-    return alloc(edit char[], size)
+    return alloc(char[], size)
 
 def resize(edit any[] buffer, nat size, "unsafe"|blank prunning)
     doc "resize the buffer"

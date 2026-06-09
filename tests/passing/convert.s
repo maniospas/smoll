@@ -1,5 +1,5 @@
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print float "123"

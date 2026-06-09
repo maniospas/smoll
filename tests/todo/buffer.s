@@ -7,10 +7,10 @@ def test1()
     return x
 
 def test2(mut float[] x)
-    mut x.resize(2).mutlast() = 2.0
+    x.resize(2).mutlast() = 2.0
 
 def main()
-    CLI = console()
+    CLI = edit console()
     x = ref test1()
     test2(x)
     print x[0]+x[1]

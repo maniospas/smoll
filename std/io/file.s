@@ -77,7 +77,7 @@ def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     if bytes_open==0 fail "end of file"
     prev_pos = const pos
     pos = pos+bytes_open
-    return str(buf, prev_pos, type "lento", bytes_open)
+    return str(buf, prev_pos, type "len", bytes_open)
 
 def line(effect edit char_arena|char_circular CHARS, edit File f)
     doc "next line"

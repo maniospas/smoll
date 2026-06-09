@@ -41,11 +41,11 @@ def circular(edit any[] buf)
     pos = mut 0
     return class(buf, pos)
 
-def list(mut any[] _buf)
+def list(edit any[] _buf)
     doc "list of buf"
     doc "List defined over a mutable buf that is automatically managed and resized."
     doc "A capacity is maintained so that resizes are not performed too frequently."
-    buf = _buf.alloc 1
+    buf = mut _buf.alloc 1
     length = mut len buf
     return class(buf, length)
 

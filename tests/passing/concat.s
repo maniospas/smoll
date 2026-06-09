@@ -3,7 +3,7 @@ import "std/mini.s" as mini
 
 
 def concat(mini:str[] buff)
-  mem = arena ref char[].alloc KB 4
+  mem = mut arena ref char[].alloc KB 4
   start = mem.pos
   for element in buff
     mem.copy mini:unpack element
@@ -11,8 +11,8 @@ def concat(mini:str[] buff)
   return str(mem.buf,start to mem.pos)
 
 def main()
-  CLI = console()
-  buff = (mut mini:str[]).alloc 6
+  CLI = edit console()
+  buff = mut mini:str[].alloc 6
   debug:print buff
   buff[0] = mini:str "hi"
   buff[1] = mini:str "my"

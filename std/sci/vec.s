@@ -8,7 +8,7 @@ def float_arena()
 local def float_circular()
     return circular float[]
 local def float_list()
-    return list mut float[]
+    return list float[]
 local def float_allocator = new|float_arena|float_circular
 
 def vec(effect new FLOATS, nat length, "dirty"|blank clear_policy)
@@ -66,7 +66,7 @@ def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length
         fail "different vector sizes"
-    v = vec(v1.length dirty)
+    v = edit vec(v1.length dirty)
     for value in v1
         i = compiler:for_counter()
         v[i] = value+v2.at i
@@ -82,7 +82,7 @@ def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = vec(v1.length dirty)
+    v = edit vec(v1.length dirty)
     for value in v1
         i = compiler:for_counter()
         v[i] = value-v2.at i
@@ -91,7 +91,7 @@ def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 def sub(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector subtraction"
     doc "Grabs an FLOATS for the result as an effect."
-    v = vec v2.length
+    v = edit vec v2.length
     for value in v2
         v[compiler:for_counter()] = v1-value
     return v
@@ -101,7 +101,7 @@ def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = vec(v1.length dirty)
+    v = edit vec(v1.length dirty)
     for value in v1
         i = compiler:for_counter()
         v[i] = value*v2.at i
@@ -118,7 +118,7 @@ def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = vec(v1.length dirty)
+    v = edit vec(v1.length dirty)
     for value in v1
         i = compiler:for_counter()
         v[i] = pow(value, v2.at i)
@@ -127,7 +127,7 @@ def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 def pow(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector exponentiation"
     doc "Grabs an FLOATS for the result as an effect."
-    v = vec(v2.length dirty)
+    v = edit vec(v2.length dirty)
     for value in v2
         v[compiler:for_counter()] = pow(v1, value)
     return v
@@ -137,7 +137,7 @@ def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs an FLOATS for the result as an effect."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = vec(v1.length dirty)
+    v = edit vec(v1.length dirty)
     p1 = v1.unsafe_ptr
     for value in v1
         i = compiler:for_counter()
@@ -147,7 +147,7 @@ def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 def div(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector division"
     doc "Grabs an FLOATS for the result as an effect."
-    v = vec(v2.length dirty)
+    v = edit vec(v2.length dirty)
     for value in v2
         v[compiler:for_counter()] = v1/value
     return v
@@ -218,7 +218,7 @@ def nn(vec value)
     doc "to print without a new line."
     return (value, "")
 
-def print(effect mut console CLI, vec v, cstr|blank endl)
+def print(effect edit console CLI, vec v, cstr|blank endl)
     doc "print a vector"
     doc "Prints as a row, such as [ 1.0  2.0  3.0 ]"
     if endl is blank
@@ -232,13 +232,13 @@ def print(effect mut console CLI, vec v, cstr|blank endl)
 def copy(effect edit float_allocator FLOATS, vec v)
     doc "copy a vector"
     doc "Grabs a FLOATS for the result as an effect."
-    result = vec(v.length dirty)
+    result = edit vec(v.length dirty)
     for value in v
         result[compiler:for_counter()] = value
     return result
 
 def arena(edit vec v)
-    buf = mut float[]
+    buf = edit float[]
     buf.unsafe_ptr = v.unsafe_ptr&&
     buf.unsafe_size = v.pos+len v
     pos = mut v.pos

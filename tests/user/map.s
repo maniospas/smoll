@@ -20,7 +20,7 @@ def test()
     return ret # should complain
     
 def main()
-    CLI = console()
+    CLI = edit console()
     map = test()
     print map["hello"]
     print map["manio"]

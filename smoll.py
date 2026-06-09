@@ -505,7 +505,8 @@ def signature_like(vars: list[Variable], impl=None):
             elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): pass#ret += "const "
             ret += type.name+arg_name
             i += len(type.rets)
-        assert len(type.rets)
+        if not len(type.rets): i += 1
+        #assert len(type.rets)
     return ret
 
 def code_summary(tokens: list[CodeSegment], impl: "ImplementedType") -> str:
@@ -563,6 +564,7 @@ class ImplementedType:
         self.needs_failure_mode: Optional["Token"] = None
         self.has_any_complaint = False
         self.is_buffer_of: ImplementedType|None = None
+        self.is_functor_of: ImplementedType|None = None
         self.is_forced_pointer_type_of: ImplementedType|None = None
         self.used_globals: set[str] = set()
         self.dependent_implementations: list[ImplementedType] = list() # dependent pointer TYPES
@@ -822,7 +824,7 @@ class ImplementedType:
         rets = signature_like([self.vars[arg] for arg in self.rets], impl=self)
         return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" with effects "+','.join(self.effect_names) if self.effect_names else "")
 
-    def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True):
+    def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True, strip_mutability: bool=False):
         # for segment in varname.split("--"):
         #     if segment in ["def", "repo", "import", "return", "mut", "unsafe_mut", "const"]:
         #         error_token.error("safety", "keyword '"+segment+"' cannot be assigned to")
@@ -835,7 +837,7 @@ class ImplementedType:
             if top_entry and "__" in varname and not varname.startswith("__t"):
                 if not any(v.startswith(varname) for v in self.vars.keys()):
                     error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'")
-            for var in value: self.assign(varname+"__"+var.name[len_common_prefix:], [var], error_token, perform_immutability_checks, False)
+            for var in value: self.assign(varname+"__"+var.name[len_common_prefix:], [var], error_token, perform_immutability_checks, False, strip_mutability)
             return None
             error_token.error("type", "cannot assign more than one values to variable '"+varname+"'")
         existing = self.vars.get(varname, None)
@@ -847,7 +849,7 @@ class ImplementedType:
             found = [val for varname, val in self.vars.items() if varname.startswith(current_prefix)]
             if found:
                 if len(found)!=len(value): error_token.error("type", "cannot overwrite tuple with one of different length")
-                for i in range(len(value)): self.assign(found[i].name, [value[i]], error_token, perform_immutability_checks, top_entry=False)
+                for i in range(len(value)): self.assign(found[i].name, [value[i]], error_token, perform_immutability_checks, top_entry=False, strip_mutability=strip_mutability)
                 return None
         if existing is not None and existing.type!=value[0].type: 
             if existing.type == POINTER_TYPE:
@@ -872,7 +874,9 @@ class ImplementedType:
             value[0] = value[0].mutable_copy(error_token)
             #error_token.error("type", "cannot overwrite mutable variable with immutable one '"+varname+"'")
         #if existing is None: # force the following two lines so that we can revoke mutability
-        existing = value[0].renamed_copy(varname, error_token)
+
+        if strip_mutability and not existing: existing = value[0].renamed_copy(varname, error_token).immutable_copy()
+        else: existing = value[0].renamed_copy(varname, error_token)
         self.vars[varname] = existing
         if existing.type==POINTER_TYPE:
             if existing.stabilized_name() in self.invalidated: del self.invalidated[existing.stabilized_name()]
@@ -1838,11 +1842,13 @@ def match_structure_with(x: ImplementedType, y: ImplementedType):
         #if x.vars[rx].isprivate!=y.vars[ry].isprivate: return False
     return True
 
-def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_vars: list[Variable], error_token: Token) -> ImplementedType:
+def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_vars: list[Variable], error_token: Token, out_format=Optional[list[Variable]]) -> ImplementedType:
     available_types: list[ImplementedType] = list()
     alternative_list: list[ImplementedType] = list()
     for variation in method.variations:
         if variation in available_types: continue
+        if out_format is not None:
+            if len(out_format)!=len(variation.rets): continue
         if len(argument_vars)<len(variation.args):
             vars: list[Variable] = list()
             for effect_var in variation.effect_names: 
@@ -1852,26 +1858,29 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
             vars.extend(argument_vars)
         else: vars = argument_vars
         if len(variation.args)!=len(vars): continue
-
+        variation_args = variation.args
+        if out_format is not None:
+            variation_args = variation_args+variation.rets
+            vars = vars+out_format
         # most signature mistakes will be from mutablity or simple type errors, so have a preferred list for quickly resolving such issues
         if not variation in alternative_list: alternative_list.append(variation)
 
         is_available = True
         for i in range(len(vars)):
             # we can allow lowering buffers to generic any
-            if vars[i].type!=variation.vars[variation.args[i]].type and vars[i].type.is_buffer_of is None:
+            if vars[i].type!=variation.vars[variation_args[i]].type and vars[i].type.is_buffer_of is None:
                 is_available = False
                 break
-            if vars[i].type!=variation.vars[variation.args[i]].type and variation.vars[variation.args[i]].type.is_buffer_of!=ANY_TYPE:
+            if vars[i].type!=variation.vars[variation_args[i]].type and variation.vars[variation_args[i]].type.is_buffer_of!=ANY_TYPE:
                 is_available = False
                 buffer1 = vars[i].type.is_buffer_of
-                buffer2 = variation.vars[variation.args[i]].type.is_buffer_of
+                buffer2 = variation.vars[variation_args[i]].type.is_buffer_of
                 if buffer1 is not None and buffer2 is not None and match_structure_with(buffer1, buffer2):
                     is_available = True
                 if (buffer1 is None or buffer1==ANY_TYPE) and (buffer2 is not None and buffer2!=ANY_TYPE):
                     is_available = False
                 if not is_available: break
-            if not variation.vars[variation.args[i]].immutable and vars[i].immutable:
+            if not variation.vars[variation_args[i]].immutable and vars[i].immutable:
                 is_available = False
                 break
         # first check for pointer mismatches (this is a safety error)
@@ -1879,7 +1888,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         for varpos, var in enumerate(vars):
             if var.type!=POINTER_TYPE: continue
             var_pointer_type = impl.get_pointer_type(var)
-            other_pointer_type = variation.get_pointer_type(variation.vars[variation.args[varpos]])
+            other_pointer_type = variation.get_pointer_type(variation.vars[variation_args[varpos]])
             if var_pointer_type is not None and other_pointer_type is not None and var_pointer_type!=ANY_TYPE and other_pointer_type!=ANY_TYPE and not match_structure_with(var_pointer_type, other_pointer_type):
                 is_available = False
                 # TODO: make a proper is_available check, that also accounts for internal pointer types but allows structural equivalence
@@ -1890,11 +1899,13 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
 
         if is_available: available_types.append(variation)
     if len(available_types)==0:
+        out_format_signature = "any" if out_format is None else signature_like(out_format, impl)
         if len(method.variations)<10: alternative_list = method.variations
         if not alternative_list: alternative_list = method.variations
-        error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature() for t in alternative_list])#+([] if alternative_list==method.variations else ["or one of "+str(len(method.variations)-len(alternative_list))+" other overloads"]))
+        error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature() for t in alternative_list])#+([] if alternative_list==method.variations else ["or one of "+str(len(method.variations)-len(alternative_list))+" other overloads"]))
     if len(available_types)>1:
-        error_token.error("type", "more than one conflicting call '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> any'", suggestions=[t.signature()+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in available_types])
+        out_format_signature = "any" if out_format is None else signature_like(out_format, impl)
+        error_token.error("type", "more than one conflicting calls '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature()+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in available_types])
 
     callee: ImplementedType = available_types[0]
 
@@ -1925,10 +1936,10 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
         if singletons: printid("\nThe following singletons are initialized:")
         for singleton in singletons: printid("```rust\n"+singletons.signature()+"\n```")
-        if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*")
+        if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*")
     return callee
 
-def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token) -> list[Variable]:
+def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token, out_format: Optional[list[Variable]]=None) -> list[Variable]:
     if ANY_TYPE in method.variations:
         return vars
     if DEBUG_TYPE in method.variations:
@@ -1972,7 +1983,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             CODEWORD_SEMICOLON
         ])
         return [var]
-    callee = _select_call(file, impl, method, vars, error_token)
+    callee = _select_call(file, impl, method, vars, error_token, out_format)
     for link in callee.linker:
         if link not in impl.linker: impl.linker.append(link)
     if len(vars)<len(callee.args):
@@ -1986,7 +1997,10 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             if len(vars)+len(gathered_vars)>=len(callee.args): break
         gathered_vars.extend(vars)
         vars = gathered_vars
-
+    if callee==DEREF_TYPE:
+        if len(vars)==1 and vars[0].type==POINTER_TYPE:
+            return process_deref(file, None, vars, impl, error_token)[1]
+        error_token.error("syntax", "can dereference only a pointer but got '"+signature_like(vars, impl)+"'")
     if callee==NOCATCH_TYPE:
         if impl.needs_failure_mode: error_token.error("safety", "there are potential errors that can occur up to here that have not been intercepted with `try`", reason=impl.needs_failure_mode, raason_message="due to")
         #return [TRUE_TYPE if impl.needs_failure_mode else FALSE_TYPE]
@@ -2403,6 +2417,8 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
         )
         progress += mem_size
     if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
+    if is_lsp and current_token.file.is_main_file: print_lsp_var(current_token, signature_like(new_vars, impl))
+    if ret[0].immutable: new_vars = [r.immutable_copy() for r in new_vars]
     return pos, new_vars
 
 buffer_types: dict[UnionType|ImplementedType, UnionType] = dict()
@@ -2476,9 +2492,20 @@ def create_literal_type(literal_tok: Token, type: ImplementedType, allow_cache: 
     if allow_cache: literal_types[text] = uret
     return uret
 
-async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False, reduce_to_unique_variations: bool=True) -> tuple[int, File|UnionType]:
+async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False, reduce_to_unique_variations: bool=True, impl: Optional[ImplementedType]=None) -> tuple[int, File|UnionType]:
     type_start = get(tokens, pos)
     name = type_start.text
+    if impl is not None and name=="type":
+        pos, values = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
+        pos, values = await process_statement_operator(file, tokens, impl, pos, values, current_operator_priority=0)
+        variation = ImplementedType("", at=type_start)
+        for r in values:
+            variation.rets.append(r.name)
+            variation.vars[r.name] = r
+        type = UnionType("", at=type_start)
+        type.variations.append(variation)
+        if is_lsp and type_start.file.is_main_file and show_lsp: print_lsp_keyword(type_start, signature_like(values, impl))
+        return pos, type
     #if name=="literal":
         # if is_lsp and type_start.file.is_main_file: print_lsp_keyword(type_start, "denotes a data literal")
         # pos += 1
@@ -2588,10 +2615,10 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\":"+k for k in file.namespaces])
             
             namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
-            if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\":"+k for k in file.namespaces])
+            if namespace is None: tokens[pos].error("import", "unknown namespace or type '"+name+"'", suggestions=["\""+file.path+"\":"+k for k in file.namespaces])
             assert namespace is not None
             if peek_text(tokens, pos+3)==":":
-                return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations)
+                return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)
             return pos+1, namespace
             
             #tokens[pos].error("type", "unknown type '\""+file.path+"\":"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\":"+k for k in file.namespaces])
@@ -2667,21 +2694,42 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
     namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
     if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\":"+k for k in file.namespaces])
     assert namespace is not None
-    return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations)
+    return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)
+ 
+def create_functor(input_type: UnionType, output_type: UnionType, token: Token):
+    type = UnionType("functor "+input_type.name+"->"+output_type.name, at=token)
+    for input_variation in find_unique_variations(input_type.variations):
+        for output_variation in find_unique_variations(output_type.variations):
+            variation = ImplementedType(create_temp(), at=token)
+            # var = Variable(create_temp(), variation)
+            # variation.args.append(var.name)
+            # variation.vars[var.name] = var
+            for arg in input_variation.rets:
+                var = input_variation.vars[arg].renamed_copy(create_temp())
+                variation.args.append(var.name)
+                variation.vars[var.name] = var
+            for arg in output_variation.rets:
+                var = output_variation.vars[arg].renamed_copy(create_temp())
+                variation.rets.append(var.name)
+                variation.vars[var.name] = var
+            functor_variation = ImplementedType(variation.signature(), "char*", memory_size=8, at=token)
+            functor_variation.is_functor_of = variation
+            type.variations.append(functor_variation)
+    return type
 
-async def process_linear_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False, reduce_to_unique_variations: bool=True) -> tuple[int, UnionType]:
+async def process_linear_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False, reduce_to_unique_variations: bool=True, impl: Optional[ImplementedType]=None) -> tuple[int, UnionType]:
     parentheses = peek_text(tokens, pos)=="("
     if parentheses: pos += 1
     start_pos = pos
     prev_pos = pos
-    pos, tmptype = await process_type(file, tokens, pos, show_lsp, reduce_to_unique_variations=reduce_to_unique_variations)
+    pos, tmptype = await process_type(file, tokens, pos, show_lsp, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)
     if not isinstance(tmptype, UnionType): tokens[prev_pos].error("type", "expecting a type instead of namespace")
     assert isinstance(tmptype, UnionType)
     type: UnionType = tmptype
     if peek_text(tokens, pos) == "|":
         if is_lsp and get(tokens, pos).file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "either of the types")
         prev_pos = pos
-        pos, alternatives = await process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=reduce_to_unique_variations)
+        pos, alternatives = await process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)
         ret = UnionType(type.name+"|"+alternatives.name, at=get(tokens, prev_pos))
         ret.variations.extend(type.variations)
         ret.variations.extend(alternatives.variations)
@@ -2691,7 +2739,7 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
     elif peek_text(tokens, pos) == "&":
         if is_lsp and get(tokens, pos).file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "common elements of the type unions")
         prev_pos = pos
-        pos, alternatives = await process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=False)
+        pos, alternatives = await process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=False, impl=impl)
         ret = UnionType(type.name+"&"+alternatives.name, at=get(tokens, prev_pos))
         alternative_variations = set(alternatives.variations)
         ret.variations = [variation for variation in type.variations if variation in alternative_variations]
@@ -2699,7 +2747,7 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
     elif peek_text(tokens, pos) == "\\":
         if is_lsp and get(tokens, pos).file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "exclude elements of the right type union from the left")
         prev_pos = pos
-        pos, alternatives = await process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=False)
+        pos, alternatives = await process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=False, impl=impl)
         ret = UnionType(type.name+"\\"+alternatives.name, at=get(tokens, prev_pos))
         alternative_variations = set(alternatives.variations)
         ret.variations = [variation for variation in type.variations if variation not in alternative_variations]
@@ -2707,6 +2755,11 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
     if parentheses:
         if peek_text(tokens, pos)!=")": get(tokens, start_pos-1).error("type", "unclosed type definition parenthesis")
         pos += 1
+    if peek_text(tokens, pos)=="->":
+        pos += 1
+        functor_token = get(tokens, pos)
+        pos, output_type = await process_linear_type(file, tokens, pos, show_lsp, reduce_to_unique_variations, impl=impl)
+        type = create_functor(type, output_type, functor_token)
     return pos, type
 
 def skip_statement(file: File, tokens: list[Token], pos: int):
@@ -2748,7 +2801,7 @@ operators = {
     "%": ("mod",4),
     "[": ("get", 0.5),
     ".": ("dot", 0.5),
-    "->": ("access",-1),
+    #"->": ("access",-1),
 }
 
 
@@ -2937,8 +2990,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 type = file.types.get(get_func_name, None)
                 if type is None: op_token.error("type", "missing implementation for '"+get_func_name+"'")
                 assert type is not None
-                new_rets = resolve_call(file, impl, type, rets, op_token)
-                if len(new_rets)!=len(rets): op_token.error("type", "not did not return the same type")
+                new_rets = resolve_call(file, impl, type, rets, op_token, out_format=rets)
+                if len(new_rets)!=len(rets): op_token.error("type", "'not' did not return the same type")
                 for r,nr in zip(rets, new_rets):
                     impl.assign(r.name, [nr], op_token, perform_immutability_checks=False, top_entry=False)
             impl.implementation.append(CODEWORD_RBRACKET)
@@ -2951,18 +3004,18 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 pos += 1
                 # first parse type extraction statements
                 found_variations: list[ImplementedType] = list()
-                if peek_text(tokens, pos)=="type":
-                    pos, processed_rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
-                    matched = len(processed_rets)==len(rets)
-                    if matched:
-                        for processed_ret, rets_ret in zip(processed_rets, rets):
-                            if processed_ret.type!=rets_ret.type and processed_ret.type.is_literal_of!=rets_ret.type:
-                                matched = False
-                                break
-                    rets = [Variable(create_temp(), TRUE_TYPE) if matched else Variable(create_temp(), FALSE_TYPE)]
-                    impl.vars[rets[0].name] = rets[0]
-                    return pos, rets
-                pos, type = await process_linear_type(file, tokens, pos, reduce_to_unique_variations=False, show_lsp=True)
+                # if peek_text(tokens, pos)=="type":
+                #     pos, processed_rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
+                #     matched = len(processed_rets)==len(rets)
+                #     if matched:
+                #         for processed_ret, rets_ret in zip(processed_rets, rets):
+                #             if processed_ret.type!=rets_ret.type and processed_ret.type.is_literal_of!=rets_ret.type:
+                #                 matched = False
+                #                 break
+                #     rets = [Variable(create_temp(), TRUE_TYPE) if matched else Variable(create_temp(), FALSE_TYPE)]
+                #     impl.vars[rets[0].name] = rets[0]
+                #     return pos, rets
+                pos, type = await process_linear_type(file, tokens, pos, reduce_to_unique_variations=False, show_lsp=True, impl=impl)
                 count_with_literals = 0
                 for variation in type.variations:
                     matched = len(variation.rets)==len(rets)
@@ -3245,12 +3298,12 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
         elif op==".":
             async def process_access(pos: int, rets: list[Variable]):
                 current_token = tokens[pos]
-                if peek_text(tokens, pos+1)==".":
-                    if len(rets)==1 and rets[0].type==POINTER_TYPE:
-                        pos, rets = process_deref(file, pos, rets, impl, current_token)
-                        pos += 2
-                        return pos, rets
-                    current_token.error("syntax", "can dereference only a pointer")
+                # if peek_text(tokens, pos+1)==".":
+                #     if len(rets)==1 and rets[0].type==POINTER_TYPE:
+                #         pos, rets = process_deref(file, pos, rets, impl, current_token)
+                #         pos += 2
+                #         return pos, rets
+                #     current_token.error("syntax", "can dereference only a pointer or functor but got '"+signature_like(rets, impl)+"'")
                 current = longest_common_prefix([r.name for r in rets])
                 if current.endswith("__"): current=current[:-2]
                 pos -= 1
@@ -3275,7 +3328,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     if rets and is_lsp and get(tokens, pos-1).file.is_main_file: print_lsp_var(get(tokens, pos-1), signature_like(rets,impl))
                     if rets and call_continuation:
                         start_call = get(tokens,pos+1)
-                        pos, type = await process_type(file, tokens, pos+1)
+                        pos, type = await process_type(file, tokens, pos+1, impl=impl)
                         call_token = get(tokens,pos-1)
                         if start_call.file==call_token.file and start_call.row==call_token.row: 
                             call_token = Token(" "*(call_token.col-start_call.col+len(call_token.text)), start_call.file, start_call.row, start_call.col)
@@ -3303,7 +3356,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 if is_lsp and get(tokens, pos-1).file.is_main_file: print_lsp_var(get(tokens, pos-1), signature_like(rets,impl))
                 if call_continuation:
                     start_call = get(tokens,pos+1)
-                    pos, type = await process_type(file, tokens, pos+1)
+                    pos, type = await process_type(file, tokens, pos+1, impl=impl)
                     call_token = get(tokens,pos-1)
                     if start_call.file==call_token.file and start_call.row==call_token.row: 
                         call_token = Token(" "*(call_token.col-start_call.col+len(call_token.text)), start_call.file, start_call.row, start_call.col)
@@ -3344,7 +3397,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 if type is None: err_token.error("type", "missing implementation for '"+get_func_name+"'")
                 assert type is not None
                 args = rets+additional_rets
-                rets = resolve_call(file, impl, type, args, err_token)
+                rets = resolve_call(file, impl, type, args, err_token, [Variable(create_temp(), POINTER_TYPE, immutable=get_func_name!="mutget")])
                 if deref:
                     pos, rets = process_deref(file, pos, rets, impl, err_token, explicit=False)
                 else:
@@ -3356,12 +3409,12 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 return pos, rets
             pos, rets = await process_get(pos, rets)
             continue
-        elif op_priority==-1:
-            op_token.error("syntax", "'->' has been deprecated")
-            pos, type = await process_type(file, tokens, pos+1)
-            if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
-            pos -= 1
-            op_priority = -0.5
+        # elif op_priority==-1:
+        #     op_token.error("syntax", "'->' has been deprecated")
+        #     pos, type = await process_type(file, tokens, pos+1, impl=impl)
+        #     if not isinstance(type, UnionType): op_token.error("type", "resolved to a file but not a type")
+        #     pos -= 1
+        #     op_priority = -0.5
         else: 
             tmp_type = file.types.get(op_name, None)
             if tmp_type is None: op_token.error("type", "missing implementation for '"+op_name+"'")
@@ -3569,9 +3622,14 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 if rx.type!=temp_type.vars[ry].type: get(tokens, pos).error("type", "mismatching buffer contents")
                 if rx.immutable and not temp_type.vars[ry].immutable: get(tokens, pos).error("type", "mismatching buffer contents")
         if peek_text(tokens, pos)!="]": get(tokens, pos).error("syntax", "expecting closing ']' for 'args' here")
+        should_ref = peek_text(tokens, pos+1)=="&"
+        should_mut_ref = False
+        if should_ref:
+            pos += 1
+            should_mut_ref = peek_text(tokens, pos+1)=="&"
+            if should_mut_ref: pos += 1
         created_buffer = resolve_call(file, impl, buffer_type_method, [], current_token)
         #total_size = temp_type.memory_size()*len(variables_sets)
-
         alloc_type = file.types.get("alloc", None)
         if alloc_type is None: get(tokens, pos).error("syntax", "no valid 'alloc' allocator for buffer")
         size_var = Variable(create_temp(), UINT_TYPE)
@@ -3602,11 +3660,16 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
                 )
                 progress += mem_size
+        if should_ref:
+            if should_mut_ref:created_buffer = [created_buffer[1]]
+            else: created_buffer = [created_buffer[1].immutable_copy()]
+            if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_var(get(tokens, pos), signature_like(created_buffer, impl))
         return await process_statement_operator(file, tokens, impl, pos+1, created_buffer, current_operator_priority)
 
 
     if current=="mut":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable. This means that variables, fields and pointer contents may modified. This creates an error if mutable treatment is unsafe.")
+        if peek_text(tokens, pos-1) not in ["=", "return"]: current_token.error("safety", "'mut' can only follow an assignment or 'return' symbol (temporary variables retain 'edit' status)")
         prev_pos = pos
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         if len(ret)==0:
@@ -3617,19 +3680,35 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'mut' but the current value consists only of references")
         mutated = [r.mutable_copy(tokens[prev_pos]) if r.stabilized_name()==r.name else r for r in ret]
         return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
+    
     if current=="edit":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable. This means that variables, fields and pointer contents may modified. This creates an error if mutable treatment is unsafe.")
+        if peek_text(tokens, pos-1) not in ["=", "return"]: current_token.error("safety", "'edit' can only follow an assignment or 'return' symbol (temporary variables retain 'edit' status)")
         prev_pos = pos
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         if len(ret)==0:
             current_token.error("safety", "next value is blank")
         tmp = create_temp()
+        #prev_ret = ret
         impl.assign(tmp, ret, current_token)
         ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
+        if not any(r.immutable or r.isprivate for r in ret): 
+            current_token.error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
         if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'edit' but the current value consists only of references")
         mutated = [r.editable_copy() if r.stabilized_name()==r.name else r for r in ret]
         return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
     
+    # if current=="functor":
+    #     pos, all_variations = await process_linear_type(file, tokens, pos+1, reduce_to_unique_variations=False, show_lsp=True, impl=impl)
+    #     for variation in all_variations:
+    #         if not variation.is_functor_of: current_token.error("type", "functor missing output type; try the syntax '(input type) -> (output type)'")
+    #     if peek_text(tokens, pos)=="&":
+    #         if len(all_variations)!=1: current_token.error("type", "more than one variations for retrieving a uniquely callable functor retrieved with '&'")
+            
+    #     pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
+    #     pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+                
+            
     if current=="try":
         async def process_try(pos: int):
             if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**try**\n\nTries to execute the rest of the statement without failing. The result is a true or false boolean value, depending on whether an error occurred or not; the error's value is retrieved by the next 'compiler:caught()'.")
@@ -3661,9 +3740,11 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         tmp = create_temp()
         impl.assign(tmp, ret, current_token)
         ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
+        ret = impl.stabilize(ret)
         return await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
     if current=="ref":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**reference**\n\nTracks changes to the referenced value, such as buffer modifications, and makes all subsequent usage of the value (even implicit usage) use the referenced value. References are unpacked into actual independent values during returns.")
+        #if peek_text(tokens, pos-1) not in ["="]: current_token.error("safety", "'ref' can only follow an assignment symbol")
         prev_pos = pos
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         ret = impl.stabilize(ret)
@@ -3692,12 +3773,12 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 del impl.invalidated[r]
         return await process_statement_operator(file, tokens, impl, pos+2, ret, current_operator_priority)
     if current=="const":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**constant value or memory**\n\nDeclares that the following value will be treated as fully immatuble (it cannot be the reason why fields and pointer contents are modified). This strips away any class membership information too. Do note that this does NOT mean that memory cannot be modified elsewhere - just that the yielded value cannot anymore be the source of modifications.")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**constant value or memory**\n\nDeclares that the following value will be treated as fully immutable (it cannot be the reason why fields and pointer contents are modified). This strips away any class membership information too. Do note that this does NOT mean that memory cannot be modified elsewhere - just that the yielded value cannot anymore be the source of modifications.")
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return await process_statement_operator(file, tokens, impl, pos, [r.immutable_copy() for r in ret], current_operator_priority)
     if current == "INVALIDATE":
         if is_lsp and current_token.file.is_main_file: print_lsp_keyword(current_token, "**INVALIDATE**\n\nInvalides all data of the subsequent type that are not __unsafe_ptr; DO NOT USE THIS KEYWORD unless you are trying to enforce some safety patterns on exceptionally unsafe code, such as pointer invalidation whenever memory is reallocated or freed.")
-        pos, type = await process_linear_type(file, tokens, pos+1)
+        pos, type = await process_linear_type(file, tokens, pos+1, impl=impl)
         for varname, val in impl.vars.items():
             if val.type in type.variations:# and not varname.endswith("__unsafe_ptr"):
                 impl.invalidated[val.stabilized_name()] = current_token
@@ -3755,7 +3836,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             impl.vars[litvar.name] = litvar
             ret.append(litvar)
         pos += 1 # skip closing parenthesis
-        if peek_text(tokens, pos)=="->" or peek_text(tokens, pos)=="." or peek_text(tokens, pos)=="[" or (peek_text(tokens, pos) in operators and for_call): return pos, ret  # manual left-to-right piping
+        if peek_text(tokens, pos)=="as" or peek_text(tokens, pos)=="." or peek_text(tokens, pos)=="[" or (peek_text(tokens, pos) in operators and for_call): return pos, ret  # manual left-to-right piping
         return await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
     is_field = False
     while peek_text(tokens, pos+1) == ".":
@@ -3772,6 +3853,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
     #    var = impl.stabilize([var])[0]
     
     if peek_text(tokens, pos+1) == "=":
+        is_mutable_assignment = peek_text(tokens, pos+2)=="mut" or peek_text(tokens, pos+2)=="unsafe_mut" or peek_text(tokens, pos+2)=="edit" or peek_text(tokens, pos+2)=="ref"
         var_token = get(tokens, pos)
         op_token = get(tokens, pos+1)
         if var is not None and var.isprivate: tokens[pos].error("type", "cannot set to immutable class field: '"+pretty_name(current)+"'")
@@ -3882,13 +3964,12 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             return pos, found
 
 
-
-
         previous = [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
         if len(previous)!=len(ret) and previous: current_token.error("type", "cannot set an incompatible type on '"+pretty_name(current)+"' previous type was '"+signature_like(previous, impl)+"' and cannot be replaced by '"+signature_like(ret, impl)+"'")
         if previous:
             for p, r in zip(previous, ret): impl.assign(p.name, [r], current_token)
-        else: impl.assign(current, ret, current_token)
+        else:
+            impl.assign(current, ret, current_token, strip_mutability=not is_mutable_assignment)
 
         if is_lsp and var_token.file.is_main_file: print_lsp_var(var_token, signature_like(ret,impl))
 
@@ -3931,24 +4012,11 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         start_call = get(tokens,pos)
         has_literals = False
         if is_type_resolution:
-            pos, all_variations = await process_linear_type(file, tokens, pos+1, reduce_to_unique_variations=False, show_lsp=True)
-            if peek_text(tokens, pos)!="->": 
-                method = all_variations
-                pos -= 1
-            else:
-                pos, typevars = await process_statement(file, tokens, pos+1, impl, current_operator_priority, for_call=True)
-                method = UnionType(signature_like(typevars, impl)+" ", at=current_token)
-                for variation in all_variations.variations:
-                    matches = len(variation.rets)==len(typevars)
-                    if not matches: continue
-                    for rv, rt in zip(variation.rets, typevars):
-                        if variation.vars[rv].type!=rt.type:
-                            matches = False
-                            break
-                    if matches: method.variations.append(variation)
+            pos, method = await process_linear_type(file, tokens, pos+1, reduce_to_unique_variations=False, show_lsp=True, impl=impl)
+            pos -= 1
         else:
             # then resolve to a call based on type
-            pos, method = await process_linear_type(file, tokens, pos, reduce_to_unique_variations=False)
+            pos, method = await process_linear_type(file, tokens, pos, reduce_to_unique_variations=False, impl=impl)
         call_token = get(tokens, pos-1)
         if all(variation.is_literal_of is not None for variation in method.variations):
             if len(method.variations)!=1: call_token.error("type", "cannot have multiple literal type alternatives")
@@ -4025,7 +4093,14 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             #call_token = current_token
             if start_call.file==call_token.file and start_call.row==call_token.row: 
                 call_token = Token(" "*(call_token.col-start_call.col+len(call_token.text)), start_call.file, start_call.row, start_call.col)
-            varsret = resolve_call(file, impl, method, vars, call_token)
+            out_format: Optional[list[Variable]] = None
+            if peek_text(tokens, pos)=="->":
+                out_type_token = get(tokens, pos)
+                if is_lsp and out_type_token.file.is_main_file: print_lsp_keyword(out_type_token, "**select function based on output**\n\nSelects from all available calls one that matches the designated type. This helps specialize when there are more than one valid calls.")
+                pos, out_type = await process_linear_type(file, tokens, pos+1, True, impl=impl)
+                if len(out_type.variations)!=1: out_type_token.error("type", "failed to resolve to a unique desired output type")
+                out_format = [out_type.variations[0].vars[r].renamed_copy(create_temp()) for r in out_type.variations[0].rets]
+            varsret = resolve_call(file, impl, method, vars, call_token, out_format=out_format)
         return await process_statement_operator(file, tokens, impl, pos, varsret, current_operator_priority)
     return await process_statement_operator(file, tokens, impl, pos+1, [var], current_operator_priority)
 
@@ -4075,7 +4150,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                     impl.implementation.append(variable)
                 elif tok.text=="builtins" and peek_text(tokens, pos+1)==":":
                     pos += 2
-                    pos, type = await process_type(file_cache["builtins"], tokens, pos)
+                    pos, type = await process_type(file_cache["builtins"], tokens, pos, impl=impl)
                     if not isinstance(type, UnionType): get(tokens, pos).error("type", "only builtin types can be unpacked here but found file '"+pretty_name(type.path)+"'")
                     assert isinstance(type, UnionType)
                     variations = [variation for variation in type.variations if variation.builtin]
@@ -4372,10 +4447,12 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             continue
         if name.text=="if":
             if_pos = pos-1
-            if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**if**\n\nStart a conditional statement and run a code block if it is true.")
             pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
-            if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool' but found '"+signature_like(ret)+"'")
+            if len(ret)!=1: 
+                if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**if**\n\nStart a conditional statement and run a code block if it is true.")
+                name.error("type", "conditions can only evaluate to 'bool' but found '"+signature_like(ret)+"'")
             if ret[0].type==TRUE_TYPE:
+                if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**branchless if**\n\nStart a conditional statement and run a code block if it is true. This statement's truth value is determined during compilation.")
                 if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
                 else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
                 if peek_text(tokens, pos)=="else":
@@ -4392,6 +4469,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                             pos += 1
                 continue
             if ret[0].type==FALSE_TYPE:
+                if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**branchless if**\n\nStart a conditional statement and run a code block if it is true. This statement's truth value is determined during compilation.")
                 if peek_text(tokens,pos)!=START_TOKEN: pos = skip_statement(file, tokens, pos)
                 else:
                     depth = 1
@@ -4407,6 +4485,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                     if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
                     else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
                 continue
+            if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**if**\n\nStart a conditional statement and run a code block if it is true.")
             if ret[0].type!=BOOL_TYPE: name.error("type", "conditions can only evaluate to 'true', 'false', or 'bool' (the first two refer to compile-time known literals)")
             impl.implementation.extend([
                 CODEWORD_IF, 
@@ -4742,7 +4821,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
                         if singletons: printid("\nThe following singletons are initialized:")
                         for singleton in singletons: printid("```rust\n"+singleton.signature()+"\n```")
-                        if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*")
+                        if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*")
             except FastReturnException: 
                 assert fast_return_exception
             #if not impl.force_not_inline and fast_return_exception: continue # register only forcefully RECURSIVE variations
@@ -5183,6 +5262,14 @@ SUCCESS_TYPE.doc.append("Branchless code refers loops or conditions that are eli
 UNSAFE_EFFECTS_TYPE = ImplementedType("unsafe_singletons")
 UNSAFE_EFFECTS_TYPE.doc.append("remove singleton safety")
 UNSAFE_EFFECTS_TYPE.doc.append("Removes all currently accumulated singleton information. Mainly useful for creating unsafe singletons for debug purposes.")
+DEREF_TYPE = ImplementedType("deref")
+DEREF_TYPE.doc.append("dereference a pointer")
+DEREF_TYPE.doc.append("Dereferences a pointer by unpacking it to local data.")
+DEREF_TYPE.doc.append("This function is automatically overloaded for all pointer types.")
+DEREF_TYPE.doc.append("Cannot do so fo `any ptr` data, as their type becomes unknown in their processing context.")
+DEREF_TYPE.vars["ptr"] = Variable("ptr", POINTER_TYPE)
+DEREF_TYPE.args.append("ptr")
+
 NOCATCH_TYPE = ImplementedType("nocatch")
 NOCATCH_TYPE.doc.append("verify no errors up to now")
 NOCATCH_TYPE.doc.append("Creates a compiler error if it is possible to have seen an error outside a 'try' statement that would have terminate this function before this point.")
@@ -5258,6 +5345,7 @@ fixed_namespace.types["catch"] = UnionType("catch", at=compiler_token).append(CA
 fixed_namespace.types["for_counter"] = UnionType("for_counter", at=compiler_token).append(FOR_COUNTER_TYPE)
 fixed_namespace.types["size"] = UnionType("size", at=compiler_token).append(SIZEOF_TYPE)
 fixed_namespace.types["literal"] = UnionType("literal", at=compiler_token).append(RESOLVE_LITERAL_TYPE)
+fixed_namespace.types["deref"] = UnionType("deref", at=compiler_token).append(DEREF_TYPE)
 
 smol_namespace.namespaces["compiler"] = fixed_namespace
 
@@ -5428,7 +5516,7 @@ async def main():
                     singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
                     if singletons: docs_file.write("\nThe following singletons are initialized:\n")
                     for singleton in singletons: docs_file.write("```rust\n"+singleton.signature()+"\n```\n")
-                    if callee.VM: docs_file.write("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencues! The executed code is: `"+callee.VM[1:-1]+"`*\n")
+                    if callee.VM: docs_file.write("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*\n")
     elif not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)
         if not main_type: print(f"{RED}error{RESET}: missing main type"); errexit()

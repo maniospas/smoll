@@ -22,12 +22,16 @@
 
 The main functionality needed to build a command line app is reading arguments 
 and user input, and manipulating strings. The input-output device is the console,
-which can be declared per `CLI = console()` inside the program's `main` function
-serving as an entry point.
+which can be declared per `CLI = edit console()` inside the program's `main` function
+serving as an entry point. The `edit` identifier tells us that we will be actively
+modifying the console's contents (by reading and writing to it).
 
-We are talking about *the* console, because you can have only one of them in your program;
-this pattern is called a *singleton*. If you name the console `CLI`, like below, it is 
-automatically passed to console reading and printing functions. By the way, the
+We are talking about *the* console, because there is only one of them controlling each program.
+This pattern of having only one of something called a *singleton*, and you can call it only
+once in each program. To help write concise code, if you name the console `CLI`, like below, it is 
+automatically passed to its reading and printing functions. 
+
+By the way, the
 language uses indentation to mark code blocks. That is, the contents of a function
 must start at a fixed number of tabs inwards for visual alignment. For debugging purposes,
 you may also create an `unsafe_console()` anywhere but that is unsafe in the face of race 
@@ -38,19 +42,10 @@ import "std/core.s"
 
 def main()
     # this is a line comment
-    CLI = console()
+    CLI = edit console()
     print nn "hello " # adds an empty string instead of new line at end of print 
     print "world!"
 ```
-
-Automatically passing arguments can be done for your own functions too, as in
-the next snippet with the `greet` function. To unpack what its one argument means, it first
-declares an effect, meaning that it automatically gathers a variable called `CLI`
-from its calling scope based on its name. It can be called by also manually passing a first
-console variable.
-The rest of the argument definition requires that the input should have `mut`
-permission, meaning that it is not a constant -the default- but that we may mutate it.
-Finally, the `console` type of the argument is declared, followed by its name.
 
 ## input and error check
 
@@ -59,14 +54,24 @@ added automatically if needed. `()` is an empty tuple, for tuples with one eleme
 parentheses are optional, and tuples of more elements can be built from multiple
 comma-separated values.
 
+Automatically passing arguments can be done for your own functions too, as in
+the next snippet with the `greet` function. To unpack what its one argument means, it first
+declares an effect, meaning that it automatically gathers a variable called `CLI`
+from its calling scope based on its name. It can be called by also manually passing a first
+console variable.
+
+The rest of the argument definition requires that the input should have `mut`
+permission, meaning that it is not a constant -the default- but that we may mutate it.
+Finally, the `console` type of the argument is declared, followed by its name.
+
 ```python
 import "std/core.s"
 
-def greet(effect mut console CLI)
+def greet(effect edit console CLI)
     print "hello world!"
 
 def main()
-    CLI = console() 
+    CLI = edit console() 
     greet() # equivalent to CLI.greet()
 ```
 
@@ -81,7 +86,7 @@ from the console is not an automatic effect, to avoid doing so accidentally.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print nn "give a number: "
     x = float CLI
     print nn "its square is: "
@@ -104,12 +109,12 @@ for debugging and more dynamic programs.
 ```python
 import "std/core.s"
 
-def read_number(effect mut console CLI, cstr message)
+def read_number(effect edit console CLI, cstr message)
     print nn message
     return float CLI # errors not intercepted by try just cascade to caller
 
 def main()
-    CLI = console()
+    CLI = edit console()
     if try x = read_number "give a number: "
         print nn "its square is: "
         print x*x
@@ -124,12 +129,12 @@ input by substituting the `if` with a `while` loop, like below.
 ```python
 import "std/core.s"
 
-def read_number(effect mut console CLI, cstr message)
+def read_number(effect edit console CLI, cstr message)
     print nn message
     return float CLI
 
 def main()
-    CLI = console()
+    CLI = edit console()
     while not try x = read_number "give a number: "
         print "invalid format"
     print nn "its square is: "
@@ -154,7 +159,7 @@ def is_a_me(employee e)
     return e.name=="manio"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     e = employee("manio", "unknown")
     print e.name
     print e.surname
@@ -178,7 +183,7 @@ def is_a_me(employee e)
     return e.name=="manio"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     e = employee("manio", "unknown")
     print is_a_me e # returns true 
 ```
@@ -210,13 +215,13 @@ But enough talking. Here is some code.
 ```python
 import "std/core.s"
 
-def greet(effect mut console CLI, str name)
+def greet(effect edit console CLI, str name)
     print nn "hello "
     print nn name
     print "!"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = new()
     print "what's your name?"
     print nn ">> "
@@ -232,7 +237,7 @@ type. This does not allocate memory at all.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = new()
     x = str "hello "
     y = str "world!"
@@ -258,7 +263,7 @@ def employee(cstr name, cstr surname)
     return class(name, surname)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     buf = employee[].alloc 5
     buf[0] = employee("manio", "unknown")
     buf[1] = employee("john", "smith")
@@ -279,7 +284,7 @@ until it is full, at which point an error will be created.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = arena char[].alloc 4096
     x = copy str "hello " # also copy the string onto CHARS for fun
     y = copy str "world!" # also copy the string onto CHARS for fun
@@ -303,7 +308,7 @@ def create_greeting()
     return new().copy "hello"+" "+"world"+"!"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print create_greeting()
 ```
 
@@ -336,7 +341,7 @@ def create_greeting()
     return str(status CHARS from 0) # from 0 to end of allocated characters
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print create_greeting()
 ```
 
@@ -373,7 +378,7 @@ def create_greeting()
     return str(status CHARS from 0)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print create_greeting()
 ```
 
@@ -399,7 +404,7 @@ def concat(str[] parts)
     return str(status CHARS from 0)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print concat [
         str "hello",
         str " ",
@@ -422,7 +427,7 @@ would create an error.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = circular char[].alloc 80
     s1 = "hello world!"
     s2 = "hello world too!"
@@ -464,7 +469,7 @@ def double_it(float x)
     return x*2.0
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print double_it 1.0 # prints 2.0
     print double_it 1   # prints 2
 ```
@@ -480,7 +485,7 @@ def double_it(nat|float x)
     return x+x
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print double_it 1.0 # prints 2.0
     print double_it 1   # prints 2
 ```
@@ -505,7 +510,7 @@ def double_it(nat|float x)
     return x*2.like x
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print double_it 1.0 # prints 2.0
     print double_it 1   # prints 2
 ```
@@ -526,7 +531,7 @@ def double_nat(nat|float x)
     return x
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print double_nat 1.0 # prints 1.0
     print double_nat 1   # prints 2
 ```
@@ -548,7 +553,7 @@ def inc(float x, float|blank by)
     return x+by
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print inc 1.0        # prints 2.0
     print inc (1.0, 4.0) # prints 5.0
 ```
@@ -570,7 +575,7 @@ import "std/core.s"
 
 def greeting = "hello world!"
 def main()
-    CLI = console()
+    CLI = edit console()
     print greeting
 ```
 
@@ -601,7 +606,7 @@ def message("bye" _useless_var)
     return "goodbye"
     
 def main()
-    CLI = console()
+    CLI = edit console()
     print message type "hello"
     print message type "bye"
 ```
@@ -619,7 +624,7 @@ def message("bye")
     return "goodbye"
     
 def main()
-    CLI = console()
+    CLI = edit console()
     print message type "hello"
     print message type "bye"
 ```
@@ -638,14 +643,14 @@ same mechanism as above grants us zero-cost literal comparison.
 ```python
 import "std/core.s"
 
-def greet(effect mut console CLI, "hello"|"hi" greeting)
+def greet(effect edit console CLI, "hello"|"hi" greeting)
     print nn compiler:literal greeting
     if greeting is "hello" # 'is' starts type parsing
         print nn " world"
     print "!"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     greet type "hi" # prints hi!
 ```
 
@@ -659,14 +664,14 @@ as an argument. Here is a simple example.
 ```python
 import "std/core.s"
 
-def print(effect mut console CLI, float start, "upto", float end)
+def print(effect edit console CLI, float start, "upto", float end)
     print nn "["
     print nn start
     print nn ","
     print nn end
     print "]" # inclusive range
 
-def print(effect mut console CLI, float start, "to", float end)
+def print(effect edit console CLI, float start, "to", float end)
     print nn "["
     print nn start
     print nn ","
@@ -674,7 +679,7 @@ def print(effect mut console CLI, float start, "to", float end)
     print ")" # exclusive range
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print(0.0 upto 1.0) # prints '[0.0,1.0]', equivalent to print(0.0, type "upto", 1.0)
     print(0.0 to 1.0)   # prints '[0.0,1.0)'
 ```
@@ -703,7 +708,7 @@ you can only find them within parentheses.
 ```python
 import "std/core.s"
 
-def greet(effect mut console CLI, "hello"|"hi" greeting, blank|"world" world, blank|"."|"!" punctuation)
+def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"world" world, blank|"."|"!" punctuation)
     print nn compiler:literal greeting
     if not world is blank
         print nn " "
@@ -714,7 +719,7 @@ def greet(effect mut console CLI, "hello"|"hi" greeting, blank|"world" world, bl
         print compiler:literal punctuation
 
 def main()
-    CLI = console()
+    CLI = edit console()
     # the next line prints 'hi world!' while validating it as a chosen pattern
     greet (() hi () world () !)
     # two equivalents, which is how it's parsed by the compiler
@@ -744,7 +749,7 @@ even in case of failures.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     color = colors CLI
     set(color red)
     print "hello red"
@@ -785,7 +790,7 @@ for `cstr` and repeating it can be a hidden expense.
 ```python
 import "std/core.s"
 
-def receive(effect mut console CLI, str|cstr _message)
+def receive(effect edit console CLI, str|cstr _message)
     message = str _message
     if _message=="hello"
         print "they said hello!"
@@ -794,7 +799,7 @@ def receive(effect mut console CLI, str|cstr _message)
         print len message
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = new()
     print nn ">> "
     message = str CLI
@@ -811,7 +816,7 @@ will be created.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     test_string = "I like bananas!"
     print test_string.starts_with "I like"
     print test_string.ends_with "!"
@@ -833,13 +838,13 @@ string literal qualifier to convey intent, like below.
 import "std/core.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     test_string = "I like bananas!"
     print test_string.slice(2, 9)
     print test_string.slice of(2 to 9)    # equivalent
     print test_string.slice of(9)         # 0 to 9
     print test_string.slice of(2 upto 9)  # inclusive range (one more character)
-    print test_string.slice of(2 lento 4) # start and length
+    print test_string.slice of(2 len 4) # start and length
 ```
 
 Since we are in the subject of string manipulation, now is a good time
@@ -856,7 +861,7 @@ import "std/core.s"
 import "std/io.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     print system:os_name()
     for arg in system:args()
         if arg=="--hello" print "hello world!"
@@ -887,7 +892,7 @@ import "std/core.s"
 import "std/map.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = arena char[].alloc 4096
     map = strmap str[].alloc 128
     map["hello"] = copy "hello world!"
@@ -926,7 +931,7 @@ def create_map()
     return (map, CHARS)
 
 def main()
-    CLI = console()
+    CLI = edit console()
     map = create_map().map
     print map["hello"]
     print map["manio"]
@@ -951,7 +956,7 @@ def create_map()
 def strstrmap()
     return strmap str[]
 
-def print(effect mut console CLI, strstrmap map)
+def print(effect edit console CLI, strstrmap map)
     # do not forget the CLI effect for printing
     print map["hello"]
     print map["manio"]
@@ -963,7 +968,7 @@ def print(effect mut console CLI, strstrmap map)
             print key
 
 def main()
-    CLI = console()
+    CLI = edit console()
     map = create_map().map
     print map
 ```
@@ -983,7 +988,7 @@ import "std/core.s"
 import "std/io.s"
 
 def main()
-    CLI = console()
+    CLI = edit console()
     CHARS = circular char[].alloc 4096
     if not try f = file:open "README.md" # reminder: checks for opening success
         print "could not find file"

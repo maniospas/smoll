@@ -1,8 +1,8 @@
 import "std/core.s"
 
 def main()
-    CLI = console()
-    li = list ref mut float[]
+    CLI = edit console()
+    li = ref list float[]
     (at alloc li) = 0.1
     (at alloc li) = 0.1
     (at alloc li) = 0.1

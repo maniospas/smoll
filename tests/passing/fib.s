@@ -5,5 +5,5 @@ rec fib(nat n)
   return fib(n-1)+fib(n-2)
 
 def main()
-  CLI = console()
+  CLI = edit console()
   print fib 10

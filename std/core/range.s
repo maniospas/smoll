@@ -31,7 +31,7 @@ def of(nat from, "upto", nat to)
     doc "Represents the range [from, to] where 'from' and 'to' are the arguments."
     return (from, to+1)
 
-def of(nat from, "lento", nat length)
+def of(nat from, "len", nat length)
     doc "yields a pair of nats"
     doc "Represents the range [from, from+length] where 'from' and 'length' are the arguments."
     return (from, from+length)

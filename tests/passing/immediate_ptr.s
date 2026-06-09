@@ -1,8 +1,8 @@
 import "std/core.s"
 
 def main()
-    CLI = console()
-    element = [1.0][0]&& # mutable 
-    print element.. # prints 1.0
+    CLI = edit console()
+    element = mut [1.0]&& # mutable ptr
+    print compiler:deref element # prints 1.0
     element = 2.0
-    print element.. # prints 2.0
+    print compiler:deref element # prints 2.0

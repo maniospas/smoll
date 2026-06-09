@@ -6,8 +6,7 @@ def Hashable = nat|float|cstr|str
 
 def hash(str k, nat size)
     h = mut 5381
-    iter = range of len k
-    while try i = next iter
+    for i in range of len k
         h = h.bits().lshift(5).nat().add(h) + nat k[i]
     return h.mod size
 
@@ -60,8 +59,7 @@ def find(robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
         compiler:skip()
     n = len data
     pos = hash(k, n)
-    iter = range of n
-    while try i=next iter
+    for i in range of n
         idx = mut (pos+i)
         if idx>=n idx = idx-n
         if idx==0 continue
@@ -80,8 +78,7 @@ def at(edit robinhood_entry[] data, cstr|str|nat _k)
         compiler:skip()
     n = len data
     pos = hash(k, n)
-    iter = range of n
-    while try i=next iter
+    for i in range of n
         idx = mut (pos+i)
         if idx>=n idx = idx-n
         if idx==0 continue

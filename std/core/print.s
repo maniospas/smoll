@@ -22,21 +22,23 @@ def console()
     doc "As a singleton for program safety, the console should usually be instantiated"
     doc "in the `main()` function and then passed to dependent calls, for example via an"
     doc "an effect for convenience. Standard library functions provide the CLI effect"
-    doc "and you can propagate to this by prepending `effect mut console CLI` to function"
+    doc "and you can propagate to this by prepending `effect edit console CLI` to function"
     doc "arguments. This is a zero-cost abstraction in that it does not transfer any data"
     doc "but only works alongside the safety of the compiler."
     doc "To quickly print internals for debugging, use `unsafe_console()` instead."
-    return mut singleton()
+    # this trick of going through a mut, allows edit console to be an available action
+    handler = mut singleton()
+    return const handler 
 
 def unsafe_console()
     doc "references the system console unsafely"
     doc "This is convenient for print debugging by writing `unsafe_console().print ...`"
     doc "without needing to evoke an effect to pass the normally singleton console."
-    CLI = console()
+    CLI = edit console()
     debug:unsafe_singletons()
     return CLI
 
-def flush(effect mut console CLI)
+def flush(effect edit console CLI)
     doc "flushes the print buffer on the console"
     {fflush(stdout);}
 
@@ -47,14 +49,14 @@ def nn(cstr|float|int|nat value)
     doc "to print without automatically adding a new line."
     return (value, "")
 
-def print(effect mut console CLI, cstr value, cstr|blank endl)
+def print(effect edit console CLI, cstr value, cstr|blank endl)
     doc "prints a cstr"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%s%s", value, endl);}
 
-def print(effect mut console CLI, float value, cstr|blank endl)
+def print(effect edit console CLI, float value, cstr|blank endl)
     doc "prints a float"
     doc "To pre-specified 6 decimal digits."
     if endl is blank 
@@ -62,35 +64,35 @@ def print(effect mut console CLI, float value, cstr|blank endl)
         endl = "\n"
     {printf("%.6f%s", value, endl);}
 
-def print(effect mut console CLI, int value, cstr|blank endl)
+def print(effect edit console CLI, int value, cstr|blank endl)
     doc "prints an integer"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%lld%s", value, endl);}
 
-def print(effect mut console CLI, nat value, cstr|blank endl)
+def print(effect edit console CLI, nat value, cstr|blank endl)
     doc "prints an unsigned integer"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%llu%s", value, endl);}
 
-def print(effect mut console CLI, bool value, cstr|blank endl)
+def print(effect edit console CLI, bool value, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
     {if(value){printf("%s%s", "true", endl);}else{printf("%s%s", "false", endl);}}
 
-def print(effect mut console CLI, compiler:true, cstr|blank endl)
+def print(effect edit console CLI, compiler:true, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("true%s", endl);}
     
-def print(effect mut console CLI, compiler:false, cstr|blank endl)
+def print(effect edit console CLI, compiler:false, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
@@ -102,78 +104,78 @@ def supports_ansi(console CLI)
     {builtins:bool supports = __smo_ansi_supported();}
     return supports
 
-def colors(mut console CLI)
+def colors(edit console CLI)
     initialized = supports_ansi CLI
     defer
         if initialized {printf("\033[0m");}
     return class(CLI, initialized)
-def set(colors colors, "red")        
+def set(edit colors colors, "red")
     if colors.initialized {printf("\033[31m");}
-def set(colors colors, "green")      
+def set(edit colors colors, "green")      
     if colors.initialized {printf("\033[32m");}
-def set(colors colors, "yellow")     
+def set(edit colors colors, "yellow")     
     if colors.initialized {printf("\033[33m");}
-def set(colors colors, "blue")       
+def set(edit colors colors, "blue")       
     if colors.initialized {printf("\033[34m");}
-def set(colors colors, "magenta")    
+def set(edit colors colors, "magenta")    
     if colors.initialized {printf("\033[35m");}
-def set(colors colors, "cyan")       
+def set(edit colors colors, "cyan")       
     if colors.initialized {printf("\033[36m");}
-def set(colors colors, "white")      
+def set(edit colors colors, "white")      
     if colors.initialized {printf("\033[37m");}
-def set(colors colors, "black")      
+def set(edit colors colors, "black")      
     if colors.initialized {printf("\033[30m");}
-def set(colors colors, "bright_red")    
+def set(edit colors colors, "bright_red")    
     if colors.initialized {printf("\033[91m");}
-def set(colors colors, "bright_green")  
+def set(edit colors colors, "bright_green")  
     if colors.initialized {printf("\033[92m");}
-def set(colors colors, "bright_yellow") 
+def set(edit colors colors, "bright_yellow") 
     if colors.initialized {printf("\033[93m");}
-def set(colors colors, "bright_blue")   
+def set(edit colors colors, "bright_blue")   
     if colors.initialized {printf("\033[94m");}
-def set(colors colors, "bright_magenta")
+def set(edit colors colors, "bright_magenta")
     if colors.initialized {printf("\033[95m");}
-def set(colors colors, "bright_cyan")   
+def set(edit colors colors, "bright_cyan")   
     if colors.initialized {printf("\033[96m");}
-def set(colors colors, "bright_white")  
+def set(edit colors colors, "bright_white")  
     if colors.initialized {printf("\033[97m");}
-def set(colors colors, "bg_red")    
+def set(edit colors colors, "bg_red")    
     if colors.initialized {printf("\033[41m");}
-def set(colors colors, "bg_green")  
+def set(edit colors colors, "bg_green")  
     if colors.initialized {printf("\033[42m");}
-def set(colors colors, "bg_yellow") 
+def set(edit colors colors, "bg_yellow") 
     if colors.initialized {printf("\033[43m");}
-def set(colors colors, "bg_blue")   
+def set(edit colors colors, "bg_blue")   
     if colors.initialized {printf("\033[44m");}
-def set(colors colors, "bg_magenta")
+def set(edit colors colors, "bg_magenta")
     if colors.initialized {printf("\033[45m");}
-def set(colors colors, "bg_cyan")   
+def set(edit colors colors, "bg_cyan")   
     if colors.initialized {printf("\033[46m");}
-def set(colors colors, "bg_white")  
+def set(edit colors colors, "bg_white")  
     if colors.initialized {printf("\033[47m");}
-def set(colors colors, "bg_black")  
+def set(edit colors colors, "bg_black")  
     if colors.initialized {printf("\033[40m");}
-def set(colors colors, "bold")         
+def set(edit colors colors, "bold")         
     if colors.initialized {printf("\033[1m");}
-def set(colors colors, "dim")          
+def set(edit colors colors, "dim")          
     if colors.initialized {printf("\033[2m");}
-def set(colors colors, "italic")       
+def set(edit colors colors, "italic")       
     if colors.initialized {printf("\033[3m");}
-def set(colors colors, "underline")    
+def set(edit colors colors, "underline")    
     if colors.initialized {printf("\033[4m");}
-def set(colors colors, "blink")        
+def set(edit colors colors, "blink")        
     if colors.initialized {printf("\033[5m");}
-def set(colors colors, "reverse")      
+def set(edit colors colors, "reverse")      
     if colors.initialized {printf("\033[7m");}
-def set(colors colors, "strikethrough")
+def set(edit colors colors, "strikethrough")
     if colors.initialized {printf("\033[9m");}
-def set(colors colors, "reset")          
+def set(edit colors colors, "reset")          
     if colors.initialized {printf("\033[0m");}
-def set(colors colors, "reset_color")    
+def set(edit colors colors, "reset_color")    
     if colors.initialized {printf("\033[39m");}
-def set(colors colors, "reset_bg")       
+def set(edit colors colors, "reset_bg")       
     if colors.initialized {printf("\033[49m");}
-def set(colors colors, "reset_bold")     
+def set(edit colors colors, "reset_bold")     
     if colors.initialized {printf("\033[22m");}
-def set(colors colors, "reset_underline")
+def set(edit colors colors, "reset_underline")
     if colors.initialized {printf("\033[24m");}

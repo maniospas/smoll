@@ -43,7 +43,7 @@ local def popen(cstr cmd)
     return unsafe_ptr
 
 def open(cstr cmd)
-    doc "create a openable system process"
+    doc "create a system process"
     unsafe_ptr = unsafe_mut popen cmd
     if not exists unsafe_ptr fail "failed to start process"
     defer
@@ -55,7 +55,7 @@ def open(cstr cmd)
     return class(unsafe_ptr)
 
 def open(str cmd)
-    doc "create a openable system process"
+    doc "create a system process"
     return open cstr unsafe_temp cmd
 
 def chunk(char[] buf, mut nat|blank pos, open f)

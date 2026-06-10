@@ -291,6 +291,7 @@ def longest_common_prefix(strings: list[str]) -> str:
             found = i+1
         i += 1
     prefix = first[:found]
+    if prefix=="__": prefix = ""
     if "____t" in prefix: prefix = prefix[:prefix.rfind("____t")+2]
     return prefix
 #from mypy_extensions import mypyc_attr
@@ -324,6 +325,7 @@ CODEWORD_IF = CodeWord("if")
 
 lsp_text_ids: dict[str, int] = dict()
 def printid(text: int|str):
+    text = text.replace("'", "`")
     found_id = lsp_text_ids.get(text)
     if found_id is None: 
         found_id = len(lsp_text_ids)
@@ -394,7 +396,7 @@ def print_lsp_definition(tok: "Token", description: str):
 
 def print_lsp_decorator(tok: "Token", description: str):
     print("---")
-    print("decorator")
+    print("keyword")
     printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
@@ -457,53 +459,62 @@ class Variable(CodeSegment):
 
 
 
-def signature_like(vars: list[Variable], impl=None):
-    common_prefix_length = len(longest_common_prefix([var.name for var in vars]))
+def signature_like(vars: list[Variable], impl=None, monomorphic=False):
+    if monomorphic: common_prefix_length = 0
+    else:
+        common_prefix = longest_common_prefix([var.name for var in vars])
+        common_prefix_length = len(common_prefix)
     ret = ""
     i = 0
     where: list[str] = list()
+    def toname(checked: ImplementedType):
+        if monomorphic: return checked.monomorphic_name
+        return checked.name
     while i<len(vars):
         if ret: ret += ", "
         type = vars[i].type
-        arg_name = vars[i].name[common_prefix_length:]
-        if arg_name.startswith("__t") or "____" in arg_name: arg_name = ""
-        else: arg_name = " "+arg_name.replace("__", ".")
-        arg_name = arg_name.strip()
-        if arg_name: arg_name = " "+arg_name
+        if monomorphic: arg_name = ""
+        else:
+            arg_name = vars[i].name[common_prefix_length:]
+            if arg_name.startswith("__t") or "____" in arg_name: arg_name = ""
+            else: arg_name = " "+arg_name.replace("__", ".")
+            arg_name = arg_name.strip()
+            if arg_name: arg_name = " "+arg_name
         if type.builtin: 
             if not vars[i].immutable: ret += "mut "
             if type==POINTER_TYPE and impl: 
                 pointer_type = impl.get_pointer_type(vars[i])
                 if pointer_type is None: ret += "any "
-                else: ret += pointer_type.name+" "
-            ret += type.name+arg_name
+                else: ret += toname(pointer_type)+" "
+            ret += toname(type)+arg_name
             if type==POINTER_TYPE and impl:
                 if pointer_type and pointer_type != ANY_TYPE: ret += " {"+signature_like([pointer_type.vars[ret] for ret in pointer_type.rets], pointer_type)+"}"
                 dependency = impl.follow_pointer_dependency(vars[i])
                 if dependency and dependency!=vars[i]: 
                     dep = impl.get_pointer_type(dependency) 
-                    if not dep or dep==ANY_TYPE: ret += " {follows "+(dep if dep else ANY_TYPE).name+" ptr "+pretty_name(dependency.name)+"}"
+                    if not dep or dep==ANY_TYPE: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name)+"}"
             i += 1
         elif type.is_literal_of: 
             ret += type.at.text
             i += len(type.rets)
         elif type.is_buffer_of: 
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
-            elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): pass#ret += "const "
+            elif all(vars[k].immutable or vars[k].isprivate for k in range(i, min(len(vars),i+len(type.rets)))): pass#ret += "const "
             elif any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "edit "
             element_size = type.is_buffer_of.memory_size()
-            ret += type.is_buffer_of.name+"[]"+arg_name #+" {element size "+(str(element_size) if element_size else "?")+"}"
+            ret += toname(type.is_buffer_of)+"[]"+arg_name #+" {element size "+(str(element_size) if element_size else "?")+"}"
             if impl:
                 if type.is_buffer_of and type.is_buffer_of != ANY_TYPE: ret += " {"+signature_like([type.is_buffer_of.vars[ret] for ret in type.is_buffer_of.rets], type.is_buffer_of)+"}"
                 dependency = impl.follow_pointer_dependency(vars[i+1])
                 if dependency and dependency!=vars[i+1]: 
                     dep = impl.get_pointer_type(dependency) 
-                    if not dep or dep==ANY_TYPE: ret += " {follows "+(dep if dep else ANY_TYPE).name+" ptr "+pretty_name(dependency.name)+"}"
+                    if not dep or dep==ANY_TYPE: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name)+"}"
             i += len(type.rets)
         else:
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
-            elif all(vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): pass#ret += "const "
-            ret += type.name+arg_name
+            elif all(vars[k].immutable or vars[k].isprivate for k in range(i, min(len(vars),i+len(type.rets)))): pass#ret += "const "
+            elif any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "edit "
+            ret += toname(type)+arg_name
             i += len(type.rets)
         if not len(type.rets): i += 1
         #assert len(type.rets)
@@ -536,7 +547,7 @@ class ImplementedType:
         self.name = name
         self.invalidated_by = self # which type's invalidation cause invalidation of this - right now helps invalidate pointer buffers
         self.is_literal_of: Optional["ImplementedType"] = None
-        self.monomorphic_name = name.replace(",","__")+create_temp()
+        self.monomorphic_name = name.replace(",","__").replace(" ","_").replace("(","_").replace(")","_").replace("->","__")+create_temp()
         self.has_retrieved_class: Optional["Token"] = None
         self.has_retrieved_singleton: Optional["Token"] = None
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
@@ -563,6 +574,7 @@ class ImplementedType:
         self.has_returned_once = False
         self.needs_failure_mode: Optional["Token"] = None
         self.has_any_complaint = False
+        self.never_implement = False # prevent implementation of the method
         self.is_buffer_of: ImplementedType|None = None
         self.is_functor_of: ImplementedType|None = None
         self.is_forced_pointer_type_of: ImplementedType|None = None
@@ -824,6 +836,12 @@ class ImplementedType:
         rets = signature_like([self.vars[arg] for arg in self.rets], impl=self)
         return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" with effects "+','.join(self.effect_names) if self.effect_names else "")
 
+    def canonical_signature(self, source=None):
+        if self.is_buffer_of: return "buffer of "+signature_like([self.is_buffer_of.vars[arg] for arg in self.is_buffer_of.rets], self.is_buffer_of, monomorphic=True)
+        args = signature_like([self.vars[arg] for arg in self.args], impl=self, monomorphic=True)
+        rets = signature_like([self.vars[arg] for arg in self.rets], impl=self, monomorphic=True)
+        return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" with effects "+','.join(self.effect_names) if self.effect_names else "")
+
     def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True, strip_mutability: bool=False):
         # for segment in varname.split("--"):
         #     if segment in ["def", "repo", "import", "return", "mut", "unsafe_mut", "const"]:
@@ -1006,7 +1024,7 @@ class ImplementedType:
         if self.fast_return_exception: 
             self.force_not_inline = True
             self.has_returned_once = True
-            self.needs_failure_mode = True
+            self.needs_failure_mode = error_token
             raise FastReturnException
     
     async def interpret(self, values: list[int|float], memory: MemoryEmulator, recursion_budget) -> list:
@@ -1598,6 +1616,8 @@ class ImplementedType:
         #print(len(self.defers))
         #print(len(self.returned_defers))
         #self.simplify()
+        if self.never_implement: return ""
+        if not self.needs_failure_mode and self.force_not_inline: self.needs_failure_mode = self.at
 
         ret_body_start = ""
         ret_body_end = ""
@@ -1899,13 +1919,40 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
 
         if is_available: available_types.append(variation)
     if len(available_types)==0:
+        same_shapes: list[ImplementedType] = list()
+        for variation in alternative_list:
+            # bring effects here again
+            if len(argument_vars)<len(variation.args):
+                vars: list[Variable] = list()
+                for effect_var in variation.effect_names: 
+                    for var in impl.vars.values():
+                        if var.name==effect_var or var.name.startswith(effect_var+"__"): vars.append(var)
+                    if len(vars)+len(argument_vars)>=len(variation.args): break
+                vars.extend(argument_vars)
+            else: vars = argument_vars
+            variation_args = variation.args
+            if out_format is not None:
+                variation_args = variation_args+variation.rets
+                vars = vars+out_format
+            # most signature mistakes wi
+            # check variable types without any permissions
+            almost_similar = True
+            for i in range(len(vars)):
+                if vars[i].type!=variation.vars[variation_args[i]].type:
+                    almost_similar = False
+                    break
+            if almost_similar: same_shapes.append(variation)
+        if same_shapes: alternative_list = same_shapes
         out_format_signature = "any" if out_format is None else signature_like(out_format, impl)
-        if len(method.variations)<10: alternative_list = method.variations
+        #if len(method.variations)<5: alternative_list = method.variations
         if not alternative_list: alternative_list = method.variations
-        error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature() for t in alternative_list])#+([] if alternative_list==method.variations else ["or one of "+str(len(method.variations)-len(alternative_list))+" other overloads"]))
+        if len(alternative_list)==1: 
+            available_types = alternative_list
+            error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"' even though there is only one option", suggestions=[t.signature() for t in alternative_list])
+        else: error_token.error("type", "could not resolve any call for '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature() for t in alternative_list])#+([] if alternative_list==method.variations else ["or one of "+str(len(method.variations)-len(alternative_list))+" other overloads"]))
     if len(available_types)>1:
         out_format_signature = "any" if out_format is None else signature_like(out_format, impl)
-        error_token.error("type", "more than one conflicting calls '"+("" if "__" in method.name else method.name)+"("+signature_like(vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature()+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in available_types])
+        error_token.error("type", "more than one conflicting calls '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature()+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in available_types])
 
     callee: ImplementedType = available_types[0]
 
@@ -1939,7 +1986,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*")
     return callee
 
-def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token, out_format: Optional[list[Variable]]=None) -> list[Variable]:
+def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token, out_format: Optional[list[Variable]]=None, _callee:Optional[ImplementedType]=None) -> list[Variable]:
     if ANY_TYPE in method.variations:
         return vars
     if DEBUG_TYPE in method.variations:
@@ -1983,7 +2030,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             CODEWORD_SEMICOLON
         ])
         return [var]
-    callee = _select_call(file, impl, method, vars, error_token, out_format)
+    if _callee is not None: callee = _callee
+    else: callee = _select_call(file, impl, method, vars, error_token, out_format)
     for link in callee.linker:
         if link not in impl.linker: impl.linker.append(link)
     if len(vars)<len(callee.args):
@@ -2372,7 +2420,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
         impl.count_handled_tries[-1] += 1
     else:
         if debug_mode:
-            text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
+            text = "\\033[31mmemory error\\033[0m null pointer\\n"
             text += "\\033[31mat\\033[0m "+current_token.file.path.replace('"','\\"')+" line "+str(current_token.row)+" column "+str(current_token.col)+"\\n"
             impl.implementation.extend([
                 CODEWORD_PRINTF,
@@ -2525,6 +2573,17 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
     if literal_tok.is_float():
         if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "a float value")
         return pos+1, create_literal_type(literal_tok, FLOAT_TYPE)
+    if literal_tok.text=="call":
+        if is_lsp and literal_tok.file.is_main_file: print_lsp_keyword(literal_tok, "**call functor**\n\nEvalutes a functor, or an expression that results to a functor, to a function. The result is a callable type. The conversion from functor to function may fail at runtime if a zero-initialized functor is provided.")
+        pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
+        pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+        if len(ret)!=1 or ret[0].type.is_functor_of is None:
+            literal_tok.error("type", "only a function or functor can be 'call'-ed here but got '"+signature_like(ret, impl)+"'")
+        functor_var = ret[0] 
+        method = convert_functor_to_method_type(impl, functor_var, literal_tok)
+        union_type = UnionType(method.name, at=method.at)
+        union_type.variations.append(method)
+        return pos, union_type
     if literal_tok.text=="compt":
         if is_lsp and literal_tok.file.is_main_file: print_lsp_keyword(literal_tok, "**compile time evaluation**\n\nEvaluates the following expression to a literal value during compilation. This requires that the VM is able to axecute all of the expression's dependent code.")
         temporary_implementation = ImplementedType("compt", at=literal_tok)
@@ -2611,7 +2670,17 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                         max_candidate_common_length = common_length
                     if common_length==max_candidate_common_length: 
                         candidates.append(variation)
-            if file==tokens[pos].file: 
+            if file==tokens[pos].file:
+                if impl:
+                    varname = name
+                    var = impl.vars.get(varname, None)
+                    if var is not None:
+                        if var.type.is_functor_of:
+                            tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local functor variable with the same name exists; use 'call' to call that variable as if it were a type '"+signature_like([var], impl)+"'")
+                        tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local variable with the same name exists '"+signature_like([var], impl)+"'")
+                    varname = name+"__"
+                    vars = [r for r in impl.vars.values() if r.name.startswith(varname)]
+                    if vars: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local variable with the same name exists '"+signature_like(vars, impl)+"'")
                 tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\":"+k for k in file.namespaces])
             
             namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
@@ -2696,11 +2765,15 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
     assert namespace is not None
     return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)
  
+cached_factors_for_comparison: dict[str, ImplementedType] = dict()
 def create_functor(input_type: UnionType, output_type: UnionType, token: Token):
     type = UnionType("functor "+input_type.name+"->"+output_type.name, at=token)
     for input_variation in find_unique_variations(input_type.variations):
         for output_variation in find_unique_variations(output_type.variations):
             variation = ImplementedType(create_temp(), at=token)
+            variation.never_implement = True
+            variation.force_not_inline = True # all functors must have an address
+            variation.needs_failure_mode = token # all functors have a failure mode
             # var = Variable(create_temp(), variation)
             # variation.args.append(var.name)
             # variation.vars[var.name] = var
@@ -2712,10 +2785,137 @@ def create_functor(input_type: UnionType, output_type: UnionType, token: Token):
                 var = output_variation.vars[arg].renamed_copy(create_temp())
                 variation.rets.append(var.name)
                 variation.vars[var.name] = var
-            functor_variation = ImplementedType(variation.signature(), "char*", memory_size=8, at=token)
-            functor_variation.is_functor_of = variation
+            canonical_signature = variation.canonical_signature()
+            functor_variation = cached_factors_for_comparison.get(canonical_signature)
+            if functor_variation is None:
+                functor_variation = ImplementedType(variation.signature(), "__smoll_func_ptr_type", memory_size=8, at=token)
+                functor_variation.is_functor_of = variation
+                cached_factors_for_comparison[canonical_signature] = functor_variation
             type.variations.append(functor_variation)
     return type
+
+def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable, err_token: Token):
+    assert functor_var.type.is_functor_of is not None
+    if functor_var.type not in impl.dependent_implementations:
+        impl.dependent_implementations.append(functor_var.type)
+
+    ret_type = ImplementedType("", at=err_token) # perfect copy of the functor
+    for a in functor_var.type.is_functor_of.__dict__:
+        setattr(ret_type, a, getattr(functor_var.type.is_functor_of, a))
+
+    impl.implementation.extend([
+        CODEWORD_IF,
+        CODEWORD_LPAR,
+        CodeWord("!"),
+        functor_var,
+        CODEWORD_RPAR,
+        CODEWORD_LBRACKET,
+    ])
+    if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: err_token.error("safety", "the matching 'try' has already handled a different failure")
+    try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
+    if try_var is not None:
+        impl.has_any_complaint = True
+        impl.implementation.extend([
+            CodeWord("__t_complain"),
+            CODEWORD_EQUALS,
+            CodeWord("2"),
+            CODEWORD_SEMICOLON,
+            CODEWORD_RBRACKET,
+            CodeWord("else"),
+            CODEWORD_LBRACKET
+        ])
+        impl.spawned_error_codes.add(2)
+        impl.count_handled_tries[-1] += 1
+    else:
+        # non-allocation check is mandatory unfortunately
+        if debug_mode:
+            text = "\\033[31mmemory error\\033[0m null pointer\\n"
+            text += "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
+            impl.implementation.extend([
+                CODEWORD_PRINTF,
+                CODEWORD_LPAR,
+                CodeWord('"%s"'),
+                CODEWORD_COMMA,
+                CodeWord('"'+text.replace('"', '\\"')+'"'),
+                CODEWORD_RPAR,
+                CODEWORD_SEMICOLON,
+            ])
+        impl.implementation.extend([
+            CodeWord("__t_errcode"),
+            CODEWORD_EQUALS,
+            CodeWord("2"),
+            CODEWORD_SEMICOLON
+        ])
+        impl.spawned_error_codes.add(2)
+        impl.implementation.extend([
+            CODEWORD_GOTO,
+            CodeWord("__t_failure"),
+            CODEWORD_SEMICOLON,
+            CODEWORD_RBRACKET
+        ])
+        impl.needs_failure_mode = err_token
+
+    # only change the name in the ret_type
+    self = functor_var.type.is_functor_of
+    signature_ret = "int" if self.force_not_inline or self.needs_failure_mode else "void" # always int
+    arg_code = ""
+    for arg in self.args:
+        # other args are just class alignment
+        arg_type_builtin = self.vars[arg].type.builtin
+        if arg_type_builtin: 
+            if arg_code: arg_code += ", "
+            if self.vars[arg].immutable: arg_code += arg_type_builtin+" "
+            else: arg_code += arg_type_builtin+"* "
+    ret_code = ""
+    for arg in self.rets:
+        arg_type_builtin = self.vars[arg].type.builtin
+        if arg_type_builtin:
+            if ret_code: ret_code += ", "
+            ret_code += arg_type_builtin+"* "
+    if arg_code and ret_code: arg_code += ", "
+    ret_type.monomorphic_name = "(("+signature_ret+" (*)("+arg_code+ret_code+"))"+functor_var.name+")"
+    return ret_type
+
+def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_token: Token):
+    if len(_method.variations)!=1: err_token.error("type", "cannot convert multiple variations to a functor", suggestions=[t.signature() for t in _method.variations])
+    method = _method.variations[0]
+    if not method.needs_failure_mode or not method.force_not_inline:
+        new_method = ImplementedType(method.name, at=method.at)
+        new_method.args = [arg for arg in method.args]
+        for arg in method.args: new_method.vars[arg] = method.vars[arg]
+        rets = resolve_call(err_token.file, new_method, _method, [new_method.vars[arg] for arg in new_method.args], err_token, _callee=method)
+        new_method.returns(rets, err_token, False) # don't do reduendant error checks
+        new_method.implementation.extend([CODEWORD_GOTO, CodeWord("__t_return"), CODEWORD_SEMICOLON])
+        new_method.needs_failure_mode = err_token
+        new_method.force_not_inline = True
+        method = new_method
+
+    input_variation = ImplementedType("", at=method.at)
+    output_variation = ImplementedType("", at=method.at)
+    for ret in method.args:
+        input_variation.rets.append(ret)
+        input_variation.vars[ret] = method.vars[ret]
+    for ret in method.rets:
+        output_variation.rets.append(ret)
+        output_variation.vars[ret] = method.vars[ret]
+    input_type = UnionType(input_variation.name, at=method.at)
+    input_type.variations.append(input_variation)
+    output_type = UnionType(output_variation.name, at=method.at)
+    output_type.variations.append(output_variation)
+    var = Variable(create_temp(), create_functor(input_type, output_type, err_token).variations[0])
+    impl.vars[var.name] = var
+    if method not in impl.dependent_implementations:
+        impl.dependent_implementations.append(method)
+    impl.implementation.extend([
+        var,
+        CODEWORD_EQUALS,
+        CODEWORD_LPAR,
+        CodeWord("__smoll_func_ptr_type"),
+        CODEWORD_RPAR,
+        CodeWord(method.monomorphic_name),
+        CODEWORD_SEMICOLON
+    ]);
+    return [var]
 
 async def process_linear_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False, reduce_to_unique_variations: bool=True, impl: Optional[ImplementedType]=None) -> tuple[int, UnionType]:
     parentheses = peek_text(tokens, pos)=="("
@@ -2868,7 +3068,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             else:
                 # non-allocation check is mandatory unfortunately
                 if debug_mode:
-                    text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
+                    text = "\\033[31mmemory error\\033[0m null pointer\\n"
                     text += "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
                     impl.implementation.extend([
                         CODEWORD_PRINTF,
@@ -3171,7 +3371,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         # non-allocation check is mandatory unfortunately
                         if debug_mode:
                             err_token = op_token
-                            text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
+                            text = "\\033[31mmemory error\\033[0m null pointer\\n"
                             text += "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
                             impl.implementation.extend([
                                 CODEWORD_PRINTF,
@@ -3425,7 +3625,6 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
         rets = resolve_call(file, impl, type, rets+additional_rets, op_token)
     return pos, rets
 
-
 async def process_statement(file: File, tokens: list[Token], pos: int, impl: ImplementedType, current_operator_priority: float, for_call: bool=False) -> tuple[int, list[Variable]]:
     current_token = get(tokens, pos)
     current = current_token.text
@@ -3668,7 +3867,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
 
 
     if current=="mut":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable. This means that variables, fields and pointer contents may modified. This creates an error if mutable treatment is unsafe.")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable, meaning that it can be overwritten with a value of the same type, and that its fields and pointer contents may be modified. This also means that variables, fields and pointer contents may modified. Creates an error if such treatment is unsafe.")
         if peek_text(tokens, pos-1) not in ["=", "return"]: current_token.error("safety", "'mut' can only follow an assignment or 'return' symbol (temporary variables retain 'edit' status)")
         prev_pos = pos
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
@@ -3682,7 +3881,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
     
     if current=="edit":
-        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable. This means that variables, fields and pointer contents may modified. This creates an error if mutable treatment is unsafe.")
+        if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**editable**\n\nDeclares that the following value cannot be overwritten, but its fields and pointer contents may be modified. Creates an error if such treatment is unsafe.")
         if peek_text(tokens, pos-1) not in ["=", "return"]: current_token.error("safety", "'edit' can only follow an assignment or 'return' symbol (temporary variables retain 'edit' status)")
         prev_pos = pos
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
@@ -3914,7 +4113,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             else:
                 # non-allocation check is mandatory unfortunately
                 if debug_mode:
-                    text = "\\033[31mmemory error\\033[0m unallocated pointer\\n"
+                    text = "\\033[31mmemory error\\033[0m null pointer\\n"
                     text += "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
                     impl.implementation.extend([
                         CODEWORD_PRINTF,
@@ -4008,11 +4207,13 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     varname = pretty_name(varname)
                     field_candidates.append(varname)
             current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=[candidate for candidate in field_candidates]) 
-        is_type_resolution = peek_text(tokens, pos)=="type"
         start_call = get(tokens,pos)
-        has_literals = False
+        is_type_resolution = start_call.text=="type"
         if is_type_resolution:
+            if is_lsp and start_call.file.is_main_file: print_lsp_decorator(start_call, "**literal or function type**\n\nConverts a literal value into a literal type or a function into a functor.")
             pos, method = await process_linear_type(file, tokens, pos+1, reduce_to_unique_variations=False, show_lsp=True, impl=impl)
+            if all(variation.is_literal_of is None for variation in method.variations): 
+                return pos, convert_method_to_functor(impl, method, start_call)
             pos -= 1
         else:
             # then resolve to a call based on type
@@ -5410,6 +5611,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         transpiled = next_def.transpile()
         if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
         generated_c_funcs.append(transpiled)
+    header += "typedef void (*__smoll_func_ptr_type)(void);\n"
     if entry_point: 
         header += "int __t_argc;\nchar** __t_argv;\n"
         generated_c_funcs.append(f"""int main(int argc, char** argv) {{__t_argc = argc;__t_argv = argv;DECLARE_HANDLERS;{entry_point}();return 0;}}""")

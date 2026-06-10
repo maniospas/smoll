@@ -502,7 +502,7 @@ in general, like below. Unset contents are in a valid zero-initialized state
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">employee</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">5</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">employee</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">5</span>
     <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">employee</span><span class="p">(</span><span class="s2">&quot;manio&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
     <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">employee</span><span class="p">(</span><span class="s2">&quot;john&quot;</span><span class="p">,</span> <span class="s2">&quot;smith&quot;</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
@@ -523,7 +523,7 @@ until it is full, at which point an error will be created.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">copy</span> <span class="nb">str</span> <span class="s2">&quot;hello &quot;</span> <span class="c1"># also copy the string onto CHARS for fun</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">copy</span> <span class="nb">str</span> <span class="s2">&quot;world!&quot;</span> <span class="c1"># also copy the string onto CHARS for fun</span>
     <span class="nb">print</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span>
@@ -543,7 +543,7 @@ a new memory location via the -you guessed it- <code>new()</code> allocator.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_greeting</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
     <span class="k">return</span> <span class="n">new</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello&quot;</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="s2">&quot;world&quot;</span><span class="o">+</span><span class="s2">&quot;!&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -573,7 +573,7 @@ implement this ideal scenario.</p>
     <span class="n">s2</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot; &quot;</span>
     <span class="n">s3</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;world&quot;</span>
     <span class="n">s4</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;!&quot;</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="nb">len</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">s3</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">s4</span><span class="p">)</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="nb">len</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">s3</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">s4</span><span class="p">)</span>
     <span class="n">copy</span> <span class="n">s1</span>
     <span class="n">copy</span> <span class="n">s2</span>
     <span class="n">copy</span> <span class="n">s2</span>
@@ -612,7 +612,7 @@ a <code>for</code> loop goes through all buffer elements.</p>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span> <span class="c1"># mutable value = allows overwriting it</span>
     <span class="k">for</span> <span class="n">counter_part</span> <span class="ow">in</span> <span class="n">parts</span> 
         <span class="n">size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">+</span> <span class="nb">len</span> <span class="n">counter_part</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">size</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">size</span>
     <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span>
         <span class="n">copy</span> <span class="n">part</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">status</span> <span class="n">CHARS</span> <span class="kn">from</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
@@ -639,7 +639,7 @@ you may prefer to just &#8230; print the strings instead of concatenating them b
 
 <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="nb">str</span><span class="p">[]</span> <span class="n">parts</span><span class="p">)</span>
     <span class="c1"># we don&#39;t need to grab effects from elsewhere if they are not singletons</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">total_length</span> <span class="n">parts</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">total_length</span> <span class="n">parts</span>
     <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span>
         <span class="n">copy</span> <span class="n">part</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">status</span> <span class="n">CHARS</span> <span class="kn">from</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
@@ -669,7 +669,7 @@ would create an error.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">circular</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">80</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">circular</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">80</span>
     <span class="n">s1</span> <span class="o">=</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="s2">&quot;hello world too!&quot;</span>
     <span class="n">s3</span> <span class="o">=</span> <span class="s2">&quot;hello world two!&quot;</span>
@@ -736,17 +736,20 @@ like below.</p>
 obtain a properly typed value of &#8220;2&#8221;. 
 This is surprisingly non-trivial in that we need to 
 obtain, among all the natural and float number converters,
-the ones that <em>could</em> have output <code>x</code>. The set of those functions is
-<code>type (nat|float)-&gt;x</code>. Once those are selected, pass <code>2</code> as an argument to select
-the converter that actually can convert it to the same type as <code>x</code>.
-This is shown below, but let us not take up time here because
+the ones that <em>could</em> have output <code>x</code>. The set of cancidate functions is
+<code>nat|float</code>. Once those are selected, pass and argument followed by
+<code>-&gt; output_type</code> to select a call based on its output type. Do note that
+<code>type expression</code> computes an expression and yields its resulting type.</p>
+
+<p>The combination these two mechanisms is shown below, 
+but let us not take up time here because
 this is more of a curio than a frequently occurring pattern.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">like</span><span class="p">(</span><span class="n">nat</span> <span class="n">value</span><span class="p">,</span> <span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">prototype</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">type</span> <span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="nb">float</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">prototype</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">value</span><span class="o">-&gt;</span><span class="nb">type</span> <span class="n">prototype</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">double_it</span><span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mf">2.</span><span class="n">like</span> <span class="n">x</span>
@@ -1145,8 +1148,8 @@ buffer to place strings there.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
-    <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
     <span class="nb">print</span> <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span>
@@ -1177,8 +1180,8 @@ to other functions without that company.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_map</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
-    <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
     <span class="k">return</span> <span class="p">(</span><span class="nb">map</span><span class="p">,</span> <span class="n">CHARS</span><span class="p">)</span>
@@ -1201,8 +1204,8 @@ map, like below.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_map</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
-    <span class="nb">map</span> <span class="o">=</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">strmap</span> <span class="nb">str</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">map</span><span class="p">[</span><span class="s2">&quot;manio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;it&#39;s a me, manio.&quot;</span>
     <span class="k">return</span> <span class="p">(</span><span class="nb">map</span><span class="p">,</span> <span class="n">CHARS</span><span class="p">)</span>
@@ -1243,10 +1246,10 @@ newly read lines only at the managed buffer.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">circular</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">circular</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="k">try</span> <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="nb">open</span> <span class="s2">&quot;README.md&quot;</span> <span class="c1"># reminder: checks for opening success</span>
         <span class="nb">print</span> <span class="s2">&quot;could not find file&quot;</span>
-        <span class="n">fail</span> <span class="s2">&quot;could not find file&quot;</span> <span class="c1"># create an error ourselves to stop the program</span>
+        <span class="n">fail</span> <span class="s2">&quot;could not find file&quot;</span> <span class="c1"># create an error manually to stop the program</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span>
         <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;line &quot;</span>
         <span class="nb">print</span> <span class="n">compiler</span><span class="p">:</span><span class="n">for_counter</span><span class="p">()</span>

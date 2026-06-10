@@ -255,8 +255,9 @@
 <em>2.7.</em> <a href="#defer">{defer}</a><br>
 <em>2.8.</em> <a href="#catching-errors">catching errors</a><br>
 <em>2.9.</em> <a href="#allocator-effects">allocator-effects</a><br>
-<em>2.10.</em> <a href="#debugging-tools">{debugging tools}</a><br>
-<em>2.11.</em> <a href="#bounded-compute">{bounded compute}</a><br></p>
+<em>2.10.</em> <a href="#functors">funnctors</a><br>
+<em>2.11.</em> <a href="#debugging-tools">{debugging tools}</a><br>
+<em>2.12.</em> <a href="#bounded-compute">{bounded compute}</a><br></p>
 
 <p><strong>Section 3. Standard Library</strong><br>
 <em>3.1.</em> <a href="#lists">lists</a><br>
@@ -417,8 +418,8 @@ to indicate that the variable can be <em>mutated</em>.</p>
 
 <p>You can keep overwriting mutable variables. This is much more
 intrusive than <code>edit</code>, which we have been using to edit the console.
-For example, primitive types -like numbers- cannot be edited but only
-replaced by being made mutable. Below is an example.
+For example, primitive types -like numbers- cannot be edited. You can only
+set them as <code>mut</code> to overwrite them with a different value, like below.
 Even if a value is mutable, it can only be overwritten by
 others of the same type.</p>
 
@@ -659,7 +660,7 @@ mutable fields without allowing a full variable rewrite use <code>edit</code>.</
 are distinguished by indentation. The same holds true
 for code blocks of <code>if-else</code> conditions and <code>while</code> loops.
 Both behave like how you would expect, and loops can also
-be prematurely terminated with <code>break</code> or skipped with
+be prematurely terminated with <code>break</code>, or skipped with
 <code>continue</code>.</p>
 
 <div class="codehilite">
@@ -675,7 +676,8 @@ be prematurely terminated with <code>break</code> or skipped with
 </div>
 
 <p>You can have one-liners for conditions and loops,
-like the following version.</p>
+like in the following version. These one-liners parse
+exactly one statement (one expression, or one condition, etc).</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1183,8 +1185,11 @@ these values are significant because they let <em>smoλ</em> identify
 whether conditions will always be true or false and <strong>eliminate code without parsing it</strong>.</p>
 
 <p>In other words, you can make <code>is</code> checks to determine conditionally which code
-segment to compile. This incurs <em>zero</em> runtime overhead. 
-At the same time, you can mingle them together with other condition checking,
+segment to compile. This incurs <em>zero</em> runtime overhead. However, conditions
+that involve such checks must start at new lines to avoid ambiguity in case their
+body is not parsed.</p>
+
+<p>At the same time, you can mingle them together with other condition checking,
 as the standard library&#8217;s core. Below is an example of a conditional check.</p>
 
 <div class="codehilite">
@@ -1981,6 +1986,71 @@ is declared as <code>add(effect edit vec_allocator allocator, vec v1, vec v2)</c
     <span class="n">v2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">v1</span><span class="o">+</span><span class="n">v2</span>
     <span class="nb">print</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<h2 id="functors">functors</h2>
+
+<p>We have so far seen a lot of details about <em>smoλ</em>&#8217;s type system.
+However, there is one final piece missing that brings a lot of
+dynamism in programs while adhering to safety guarantees. That
+is, ways of passing functions around as dynamically determined 
+arguments. </p>
+
+<p>This way of calling different variations not the default,
+because it can incur overheads
+for each function call compared to direct-to-the-metal code.
+That said, such overheads can often be ignored compare to the
+actual complexity of practical code.</p>
+
+<p>The means of creating placeholder arguments that allow for dynamically
+provided functions is by changing its type to <code>input_type-&gt;output_type</code>,
+as demonstrated in the example below. This lets the implementation prepare
+for functions of the required input and output characters that may be 
+only encountered later. The shape of such functions will always be the required
+one. It is assumed that any such functions may fail when called, and their effects
+will <em>not</em> be automatically gathered.</p>
+
+<p>The example below also also uses <code>type inc</code> to retrieve the functor type
+of the function <code>inc</code>, as well as <code>call c</code> to convert the functor <code>c</code> to 
+a function call. The retrieval into a factor should be unique.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">two</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">one</span> <span class="o">=</span> <span class="n">call</span> <span class="n">c</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">call</span> <span class="n">c</span> <span class="n">one</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">two</span><span class="p">(</span><span class="nb">type</span> <span class="n">inc</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Here is a different example.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">pair</span><span class="p">(</span><span class="n">nat</span><span class="p">,</span> <span class="n">nat</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">least</span><span class="p">(</span><span class="n">nat</span><span class="p">[]</span> <span class="n">numbers</span><span class="p">,</span> <span class="n">pair</span><span class="o">-&gt;</span><span class="nb">bool</span> <span class="n">order</span><span class="p">)</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">numbers</span>
+        <span class="k">if</span> <span class="n">call</span> <span class="n">order</span><span class="p">(</span><span class="n">number</span><span class="p">,</span><span class="n">ret</span><span class="p">)</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">number</span>
+    <span class="k">return</span> <span class="n">ret</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">min</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="n">y</span> <span class="k">return</span> <span class="n">true</span>
+    <span class="k">return</span> <span class="n">false</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">two</span><span class="p">(</span><span class="nb">type</span> <span class="n">inc</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">least</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="nb">type</span> <span class="nb">min</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2788,7 +2858,7 @@ circular buffer reader for temprarily read lines, as it can go through arbitaril
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">CHARS</span> <span class="o">=</span> <span class="n">circular</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="nb">open</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">file</span><span class="p">:</span><span class="nb">open</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span>
         <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">+</span><span class="nb">len</span> <span class="n">line</span>

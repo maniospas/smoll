@@ -25,8 +25,9 @@ _2.6._ [{iterators}](#iterators)<br>
 _2.7._ [{defer}](#defer)<br>
 _2.8._ [catching errors](#catching-errors)<br>
 _2.9._ [allocator-effects](#allocator-effects)<br>
-_2.10._ [{debugging tools}](#debugging-tools)<br>
-_2.11._ [{bounded compute}](#bounded-compute)<br>
+_2.10._ [funnctors](#functors)<br>
+_2.11._ [{debugging tools}](#debugging-tools)<br>
+_2.12._ [{bounded compute}](#bounded-compute)<br>
 
 **Section 3. Standard Library**<br>
 _3.1._ [lists](#lists)<br>
@@ -183,8 +184,8 @@ to indicate that the variable can be *mutated*.
 
 You can keep overwriting mutable variables. This is much more
 intrusive than `edit`, which we have been using to edit the console.
-For example, primitive types -like numbers- cannot be edited but only
-replaced by being made mutable. Below is an example.
+For example, primitive types -like numbers- cannot be edited. You can only
+set them as `mut` to overwrite them with a different value, like below.
 Even if a value is mutable, it can only be overwritten by
 others of the same type.
 
@@ -422,7 +423,7 @@ As you have likely noticed so far, *smoλ* code blocks
 are distinguished by indentation. The same holds true
 for code blocks of `if-else` conditions and `while` loops.
 Both behave like how you would expect, and loops can also
-be prematurely terminated with `break` or skipped with
+be prematurely terminated with `break`, or skipped with
 `continue`.
 
 ```python
@@ -437,7 +438,8 @@ def main()
 ```
 
 You can have one-liners for conditions and loops,
-like the following version.
+like in the following version. These one-liners parse
+exactly one statement (one expression, or one condition, etc).
 
 ```python
 import "std/core.s"
@@ -929,7 +931,10 @@ these values are significant because they let *smoλ* identify
 whether conditions will always be true or false and **eliminate code without parsing it**.
 
 In other words, you can make `is` checks to determine conditionally which code
-segment to compile. This incurs *zero* runtime overhead. 
+segment to compile. This incurs *zero* runtime overhead. However, conditions
+that involve such checks must start at new lines to avoid ambiguity in case their
+body is not parsed.
+
 At the same time, you can mingle them together with other condition checking,
 as the standard library's core. Below is an example of a conditional check.
 
@@ -1702,6 +1707,69 @@ def main()
     v2[0] = 2.0
     result = v1+v2
     print result[0]
+```
+
+## functors
+
+We have so far seen a lot of details about *smoλ*'s type system.
+However, there is one final piece missing that brings a lot of
+dynamism in programs while adhering to safety guarantees. That
+is, ways of passing functions around as dynamically determined 
+arguments. 
+
+This way of calling different variations not the default,
+because it can incur overheads
+for each function call compared to direct-to-the-metal code.
+That said, such overheads can often be ignored compare to the
+actual complexity of practical code.
+
+The means of creating placeholder arguments that allow for dynamically
+provided functions is by changing its type to `input_type->output_type`,
+as demonstrated in the example below. This lets the implementation prepare
+for functions of the required input and output characters that may be 
+only encountered later. The shape of such functions will always be the required
+one. It is assumed that any such functions may fail when called, and their effects
+will *not* be automatically gathered.
+
+The example below also also uses `type inc` to retrieve the functor type
+of the function `inc`, as well as `call c` to convert the functor `c` to 
+a function call. The retrieval into a factor should be unique.
+
+```python
+import "std/core.s"
+
+def two(nat->nat c)
+    one = call c 0
+    return call c one
+
+def inc(nat x)
+    return x+1
+
+def main()
+    CLI = edit console()
+    print two(type inc)
+```
+
+Here is a different example.
+
+```python
+import "std/core.s"
+
+def pair(nat, nat)
+def least(nat[] numbers, pair->bool order)
+    ret = mut numbers[0]
+    for number in numbers
+        if call order(number,ret) ret = number
+    return ret
+
+def min(nat x, nat y)
+    if x<y return true
+    return false
+
+def main()
+    CLI = edit console()
+    print two(type inc)
+    print least([5,4,1,3,2], type min)
 ```
 
 
@@ -2486,7 +2554,7 @@ def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/
 def main()
     CLI = edit console()
     CHARS = circular alloc KB 4
-    f = file:open web:get README
+    f = edit file:open web:get README
     size = mut 0
     for line in f
         size = size+len line

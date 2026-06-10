@@ -1,13 +1,16 @@
 import "std/core.s"
-import "std/net.s"
 
-def inc(float f)
-    return f+1.0
+def pair(nat, nat)
+def least(nat[] numbers, pair->bool order)
+    ret = mut numbers[0]
+    for number in numbers
+        if call order(number,ret) ret = number
+    return ret
 
-def foo(float->float c)
-    return c(0.0)
+def min(nat x, nat y)
+    if x<y return true
+    return false
 
 def main()
     CLI = edit console()
-    print foo(type inc->0.0)
-    
+    print least([5,4,1,3,2], type min)

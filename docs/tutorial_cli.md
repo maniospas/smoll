@@ -264,7 +264,7 @@ def employee(cstr name, cstr surname)
 
 def main()
     CLI = edit console()
-    buf = employee[].alloc 5
+    buf = edit employee[].alloc 5
     buf[0] = employee("manio", "unknown")
     buf[1] = employee("john", "smith")
     print buf[0].name
@@ -285,7 +285,7 @@ import "std/core.s"
 
 def main()
     CLI = edit console()
-    CHARS = arena char[].alloc 4096
+    CHARS = edit arena char[].alloc 4096
     x = copy str "hello " # also copy the string onto CHARS for fun
     y = copy str "world!" # also copy the string onto CHARS for fun
     print x+y
@@ -304,7 +304,7 @@ a new memory location via the -you guessed it- `new()` allocator.
 import "std/core.s"
 
 def create_greeting()
-    CHARS = arena char[].alloc 4096
+    CHARS = edit arena char[].alloc 4096
     return new().copy "hello"+" "+"world"+"!"
 
 def main()
@@ -333,7 +333,7 @@ def create_greeting()
     s2 = str " "
     s3 = str "world"
     s4 = str "!"
-    CHARS = arena char[].alloc len(s1)+len(s2)+len(s3)+len(s4)
+    CHARS = edit arena char[].alloc len(s1)+len(s2)+len(s3)+len(s4)
     copy s1
     copy s2
     copy s2
@@ -372,7 +372,7 @@ def create_greeting()
     size = mut 0 # mutable value = allows overwriting it
     for counter_part in parts 
         size = size + len counter_part
-    CHARS = arena char[].alloc size
+    CHARS = edit arena char[].alloc size
     for part in parts
         copy part
     return str(status CHARS from 0)
@@ -398,7 +398,7 @@ def total_length(str[] parts)
 
 def concat(str[] parts)
     # we don't need to grab effects from elsewhere if they are not singletons
-    CHARS = arena char[].alloc total_length parts
+    CHARS = edit arena char[].alloc total_length parts
     for part in parts
         copy part
     return str(status CHARS from 0)
@@ -428,7 +428,7 @@ import "std/core.s"
 
 def main()
     CLI = edit console()
-    CHARS = circular char[].alloc 80
+    CHARS = edit circular char[].alloc 80
     s1 = "hello world!"
     s2 = "hello world too!"
     s3 = "hello world two!"
@@ -494,17 +494,20 @@ This code "cheats" that it does not show how to
 obtain a properly typed value of "2". 
 This is surprisingly non-trivial in that we need to 
 obtain, among all the natural and float number converters,
-the ones that *could* have output `x`. The set of those functions is
-`type (nat|float)->x`. Once those are selected, pass `2` as an argument to select
-the converter that actually can convert it to the same type as `x`.
-This is shown below, but let us not take up time here because
+the ones that *could* have output `x`. The set of cancidate functions is
+`nat|float`. Once those are selected, pass and argument followed by
+`-> output_type` to select a call based on its output type. Do note that
+`type expression` computes an expression and yields its resulting type.
+
+The combination these two mechanisms is shown below, 
+but let us not take up time here because
 this is more of a curio than a frequently occurring pattern.
 
 ```python
 import "std/core.s"
 
 def like(nat value, nat|float prototype)
-    return type (nat|float)->prototype value
+    return nat|float value->type prototype
 
 def double_it(nat|float x)
     return x*2.like x
@@ -893,8 +896,8 @@ import "std/map.s"
 
 def main()
     CLI = edit console()
-    CHARS = arena char[].alloc 4096
-    map = strmap str[].alloc 128
+    CHARS = edit arena char[].alloc 4096
+    map = edit strmap str[].alloc 128
     map["hello"] = copy "hello world!"
     map["manio"] = copy "it's a me, manio."
     print map["hello"]
@@ -924,8 +927,8 @@ import "std/core.s"
 import "std/map.s"
 
 def create_map()
-    CHARS = arena char[].alloc 4096
-    map = strmap str[].alloc 128
+    CHARS = edit arena char[].alloc 4096
+    map = edit strmap str[].alloc 128
     map["hello"] = copy "hello world!"
     map["manio"] = copy "it's a me, manio."
     return (map, CHARS)
@@ -947,8 +950,8 @@ import "std/core.s"
 import "std/map.s"
 
 def create_map()
-    CHARS = arena char[].alloc 4096
-    map = strmap str[].alloc 128
+    CHARS = edit arena char[].alloc 4096
+    map = edit strmap str[].alloc 128
     map["hello"] = copy "hello world!"
     map["manio"] = copy "it's a me, manio."
     return (map, CHARS)
@@ -989,10 +992,10 @@ import "std/io.s"
 
 def main()
     CLI = edit console()
-    CHARS = circular char[].alloc 4096
+    CHARS = edit circular char[].alloc 4096
     if not try f = file:open "README.md" # reminder: checks for opening success
         print "could not find file"
-        fail "could not find file" # create an error ourselves to stop the program
+        fail "could not find file" # create an error manually to stop the program
     for line in f
         print nn "line "
         print compiler:for_counter()

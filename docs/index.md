@@ -36,10 +36,10 @@ import "std/io.s"
 
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 def main()
-    f = file:open web:get README # parentheses optional for one argument
     # effects to automatically pass around (some functions grab these by name)
     CLI = edit console()
     CHARS = circular alloc 4096 
+    f = edit file:open web:get README # parentheses optional for one argument
     size = mut 0
     for line in f
         size = size+len line

@@ -32,9 +32,10 @@ import platform
 import math
 import urllib.request
 import urllib.parse
+import re
 from pathlib import Path
 from collections import deque
-from typing import Optional
+from typing import Optional, Any
 #import gc
 #gc.set_threshold(150000)
 
@@ -175,9 +176,9 @@ class MemoryEmulator:
         del self.alloc_sizes[original]
         return 0
     
-    def named_alloc_value(self, text: str, contents: str):
+    def named_alloc_value(self, text: str, _contents: str):
         if text not in self.named_locs: 
-            contents = contents.encode('raw_unicode_escape').decode('unicode_escape').encode('utf-8')
+            contents = _contents.encode('raw_unicode_escape').decode('unicode_escape').encode('utf-8')
             size = len(contents)
             addr = self.alloc(size+1)
             self.named_locs[text] = addr
@@ -255,7 +256,7 @@ class MemoryEmulator:
 
 
 def pretty_name(name: str):
-    parts = name.split("__")
+    parts = name.split("__") # re.split(r'__(?!t)', name)
     last_good_part = 0
     while last_good_part<len(parts):
         if not parts[last_good_part]: break
@@ -298,9 +299,9 @@ def longest_common_prefix(strings: list[str]) -> str:
 
 #@mypyc_attr(acyclic=True)
 class CodeSegment:
-    def tostring(self): return ""
+    def tostring(self)->str: return ""
     def copy(self, prefix: str): return self
-    def is_temp(self): return False
+    def is_temp(self)->bool: return False
 
 #@mypyc_attr(acyclic=True)
 class CodeWord(CodeSegment):
@@ -325,7 +326,7 @@ CODEWORD_IF = CodeWord("if")
 
 lsp_text_ids: dict[str, int] = dict()
 def printid(text: int|str):
-    text = text.replace("'", "`")
+    text = str(text).replace("'", "`")
     found_id = lsp_text_ids.get(text)
     if found_id is None: 
         found_id = len(lsp_text_ids)
@@ -495,7 +496,9 @@ def signature_like(vars: list[Variable], impl=None, monomorphic=False):
                     if not dep or dep==ANY_TYPE: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name if not monomorphic else "")+"}"
             i += 1
         elif type.is_literal_of: 
-            ret += type.at.text
+            at = type.at
+            assert at is not None
+            ret += at.text
             i += len(type.rets)
         elif type.is_buffer_of: 
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
@@ -552,7 +555,7 @@ class ImplementedType:
         self.has_retrieved_singleton: Optional["Token"] = None
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
         self.doc: list[str] = list()
-        self.required_accompany: dist[str,str] = dict()
+        self.required_accompany: dict[str,list[str]] = dict()
         self.VM: str|None = None # an equivalent python implementation for the VM
         self.effect_names: list[str] = list()
         self.args: list[str] = list()
@@ -633,7 +636,7 @@ class ImplementedType:
         for other in self.used_error_codes: ret = ret.union(other.gather_spawned_error_codes(discovered))
         return ret
 
-    def stabilize(self, rets: list[str]):
+    def stabilize(self, rets: list[Variable]):
         return [self.vars[ret._references] if ret._references else ret for ret in rets]
 
     def set_pointer_type(self, var: Variable, type: "ImplementedType"):
@@ -653,10 +656,11 @@ class ImplementedType:
             visited.add(varname)
         return self.vars[varname]
 
-    def get_pointer_type(self, var: Variable) -> Optional["ImplementedType"]:
-        assert isinstance(var, Variable)
-        if var.type.is_forced_pointer_type_of: return var.type.is_forced_pointer_type_of
+    def get_pointer_type(self, _var: Variable) -> Optional["ImplementedType"]:
+        assert isinstance(_var, Variable)
+        if _var.type.is_forced_pointer_type_of: return _var.type.is_forced_pointer_type_of
         visited: set[str] = set()
+        var: Variable|None = _var
         while True:
             ret = self._pointer_types.get(var.name, None)
             if ret is not None: return ret
@@ -849,10 +853,17 @@ class ImplementedType:
             for ret in self.rets+[arg for arg in self.args if not self.vars[arg].immutable]: 
                 v = self.vars[ret]
                 if v.type.invalidated_by==POINTER_TYPE:
-                    for accompanying in self.get_required_accompany(v):
+                    required_accompany = self.get_required_accompany(v)
+                    # if not required_accompany:
+                    #     error_token.error("safety", "the source of '"+pretty_name(v.stabilized_name())+"' cannot be uniquely determined to guarantee safety")
+                    for accompanying in required_accompany:
+                        if accompanying==v: continue
                         to_defer = self.get_assignment(accompanying.stabilized_name(), defer_var_names)
-                        if to_defer and accompanying!=v and not self.get_assignment(to_defer, self.rets):# and not any(self.get_assignment(ret, defer_var_names) for ret in self.rets):
-                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' requires to also return '"+pretty_name(accompanying.stabilized_name())+"' so that its resource release is defered further", reason=accompanying.token, raason_message="due to", suggestions=["return the accompanying variable", "returns a structure containing the accompanying variable", "consider creating a ref to the accompanying variable"])
+                        if to_defer is None and self.defers and not self.get_assignment(accompanying.stabilized_name(), self.args):
+                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' cannot be done, because the variable comes from '"+pretty_name(accompanying.stabilized_name())+"' for which equality-based analysis is cut short (e.g., passes through allocated memory) and therefore cannot be proven to *not* be associated with a defer not accompanying the return", reason=accompanying.token, suggestions=["create a copy on new memory and return that", "return all variables with associated defers, to let those defers accompany the function's return", "return a container/buffer and position pair and reconstruct necessary pointers at the return site", "return the non-pointer section of your data and reconstruct the object at the calling site"])
+                    
+                        if (to_defer and not self.get_assignment(to_defer, self.rets)):# and not any(self.get_assignment(ret, defer_var_names) for ret in self.rets):
+                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' requires to also return '"+pretty_name(accompanying.stabilized_name())+"' so that its resource release is defered further", reason=accompanying.token, raason_message="due to", suggestions=["return the accompanying variable", "return a structure containing the accompanying variable", "create a ref to the accompanying variable"])
                 if v.stabilized_name() in self.invalidated:
                     error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' has been invalidated", reason=self.invalidated[v.stabilized_name()], raason_message="due to")
 
@@ -877,7 +888,7 @@ class ImplementedType:
         #print(self.name, values)
         self.can_try_interpreter = False
 
-        async def process_expression(impl: list["Token"], pos: int, end: int):
+        async def process_expression(impl: list[CodeSegment], pos: int, end: int):
             if pos>end: return
             if impl[pos].tostring()=="(" and pos<end-3 and impl[pos+2].tostring()=="*" and impl[pos+3].tostring()==")":
                 pos += 4 # skip pointer casts
@@ -2058,6 +2069,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 for varpos, varname in enumerate(callee.args):
                     if varname!=original_pointer_dependency.name: continue
                     impl.set_pointer_depedency(variable, vars[varpos])
+                    found_dependency = True
                     # if impl.name=="push":
                     #     print(variable.name, " ~ ", vars[varpos].name)
                     pointer_type: ImplementedType|None = impl.get_pointer_type(vars[varpos])
@@ -2313,7 +2325,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     r = ret[0]
     for var in new_vars:
         if var.type==POINTER_TYPE:
-            for other_var in impl.get_required_accompany(var):
+            for other_var in impl.get_required_accompany(impl.vars[r.stabilized_name()]):
                 impl.add_required_accompany(var, other_var)
             impl.add_required_accompany(var, impl.vars[r.stabilized_name()])
     return pos, new_vars
@@ -5327,6 +5339,8 @@ async def load(path, is_main_file=False, err_token=None):
 
 POINTER_TYPE = ImplementedType("ptr", "char*", memory_size=8)
 POINTER_TYPE.vars[POINTER_TYPE.rets[0]].immutable = False
+
+#UNKNOWN_SOURCE_VARIABLE = Variable("const __t_source_unknown", POINTER_TYPE)
 CSTR_TYPE = ImplementedType("cstr", "const char*", memory_size=8)
 CSTR_TYPE.doc.append("constant string")
 BOOL_TYPE = ImplementedType("bool", "char", memory_size=1)

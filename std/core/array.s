@@ -47,7 +47,7 @@ def alloc(edit any[] buffer, nat|blank size, "dirty"|blank clear_policy)
     buffer.unsafe_ptr = ref unsafe:alloc(bytes)&&
     if clear_policy is blank
         buffer.unsafe_ptr.unsafe:zero(0, bytes)
-    return buffer
+    unsafe_return buffer
 
 def alloc(nat size)
     doc "allocate a char[] buffer"

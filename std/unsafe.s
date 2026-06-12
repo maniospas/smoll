@@ -35,7 +35,7 @@ def realloc(any ptr allocated, nat bytes)
     {else{new_allocated=malloc(bytes);}}
     if not exists new_allocated fail "reallocation failed"
     {allocated=new_allocated;}
-    return new_allocated.compiler:attach_type(allocated)
+    return new_allocated.compiler:unsafe_attach_type(allocated)
 
 def free(mut any ptr allocated)
     doc "free memory"
@@ -57,4 +57,4 @@ def add(any ptr allocated, nat offset)
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
     {builtins:compiler:ptr element = allocated + offset;}
-    return element.compiler:attach_type(allocated)
+    return element.compiler:unsafe_attach_type(allocated)

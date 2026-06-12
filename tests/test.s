@@ -1,16 +1,23 @@
 import "std/core.s"
 
-def pair(nat, nat)
-def least(nat[] numbers, pair->bool order)
-    ret = mut numbers[0]
-    for number in numbers
-        if call order(number,ret) ret = number
+def test(char_arena->str creator)
+    CHARS = arena char[].alloc 128
+    ret = creator.compiler:call CHARS
     return ret
 
-def min(nat x, nat y)
-    if x<y return true
-    return false
+def string_creator(char_arena _CHARS)
+    CHARS = unsafe_mut _CHARS
+    strings = [copy "created"]
+    return strings[0]
 
 def main()
-    CLI = edit console()
-    print least([5,4,1,3,2], type min)
+    CLI = console()
+    print test(type string_creator)
+
+# def fp(float ptr x)
+#     return x
+    
+# def main()
+#     CLI = console()
+#     x = edit fp[].alloc 4
+#     x[0] = [1.0]&

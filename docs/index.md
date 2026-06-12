@@ -38,7 +38,7 @@ def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/
 def main()
     # effects to automatically pass around (some functions grab these by name)
     CLI = edit console()
-    CHARS = circular alloc 4096 
+    CHARS = edit circular alloc 4096 
     f = edit file:open web:get README # parentheses optional for one argument
     size = mut 0
     for line in f

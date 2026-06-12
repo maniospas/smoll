@@ -488,11 +488,11 @@ def signature_like(vars: list[Variable], impl=None, monomorphic=False):
                 else: ret += toname(pointer_type)+" "
             ret += toname(type)+arg_name
             if type==POINTER_TYPE and impl:
-                if pointer_type and pointer_type != ANY_TYPE: ret += " {"+signature_like([pointer_type.vars[ret] for ret in pointer_type.rets], pointer_type)+"}"
+                #if pointer_type and pointer_type != ANY_TYPE: ret += " {"+signature_like([pointer_type.vars[ret] for ret in pointer_type.rets], pointer_type)+"}"
                 dependency = impl.follow_pointer_dependency(vars[i])
                 if dependency and dependency!=vars[i]: 
                     dep = impl.get_pointer_type(dependency) 
-                    if not dep or dep==ANY_TYPE: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name)+"}"
+                    if not dep or dep==ANY_TYPE: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name if not monomorphic else "")+"}"
             i += 1
         elif type.is_literal_of: 
             ret += type.at.text
@@ -504,11 +504,11 @@ def signature_like(vars: list[Variable], impl=None, monomorphic=False):
             element_size = type.is_buffer_of.memory_size()
             ret += toname(type.is_buffer_of)+"[]"+arg_name #+" {element size "+(str(element_size) if element_size else "?")+"}"
             if impl:
-                if type.is_buffer_of and type.is_buffer_of != ANY_TYPE: ret += " {"+signature_like([type.is_buffer_of.vars[ret] for ret in type.is_buffer_of.rets], type.is_buffer_of)+"}"
+                #if type.is_buffer_of and type.is_buffer_of != ANY_TYPE: ret += " {"+signature_like([type.is_buffer_of.vars[ret] for ret in type.is_buffer_of.rets], type.is_buffer_of)+"}"
                 dependency = impl.follow_pointer_dependency(vars[i+1])
                 if dependency and dependency!=vars[i+1]: 
                     dep = impl.get_pointer_type(dependency) 
-                    if not dep or dep==ANY_TYPE: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name)+"}"
+                    if not dep or dep==ANY_TYPE: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name if not monomorphic else "")+"}"
             i += len(type.rets)
         else:
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
@@ -547,7 +547,7 @@ class ImplementedType:
         self.name = name
         self.invalidated_by = self # which type's invalidation cause invalidation of this - right now helps invalidate pointer buffers
         self.is_literal_of: Optional["ImplementedType"] = None
-        self.monomorphic_name = name.replace(",","__").replace(" ","_").replace("(","_").replace(")","_").replace("->","__")+create_temp()
+        self.monomorphic_name = name.replace(",","__").replace(" ","_").replace(".","_").replace("[","_").replace("]","_").replace("{","_").replace("}","_").replace("(","_").replace(")","_").replace("->","__")+create_temp()
         self.has_retrieved_class: Optional["Token"] = None
         self.has_retrieved_singleton: Optional["Token"] = None
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
@@ -576,6 +576,7 @@ class ImplementedType:
         self.has_any_complaint = False
         self.never_implement = False # prevent implementation of the method
         self.is_buffer_of: ImplementedType|None = None
+        self.is_pointer_of: ImplementedType|None = None
         self.is_functor_of: ImplementedType|None = None
         self.is_forced_pointer_type_of: ImplementedType|None = None
         self.used_globals: set[str] = set()
@@ -635,148 +636,6 @@ class ImplementedType:
     def stabilize(self, rets: list[str]):
         return [self.vars[ret._references] if ret._references else ret for ret in rets]
 
-    def simplify(self) -> None:
-        impl = self.implementation
-
-        if (len(impl) >= 3
-                and impl[-3].tostring() == "goto"
-                and impl[-2].tostring() == "__t_return"
-                and impl[-1].tostring() == ";") and not self.needs_failure_mode:
-            self.implementation = impl[:-3]
-            impl = self.implementation
-
-        # ── 2. count assignments with loop awareness ──────────────────────
-        # Variables assigned inside a while body get weight 2, making them
-        # ineligible for substitution. Without this, a temp written once per
-        # iteration looks "set once" in a flat scan and gets substituted away,
-        # deleting the call that produced it.
-        variable_sets: dict[str, int] = dict()
-
-        # First pass: find which token positions are inside a while body.
-        loop_positions: set[int] = set()
-        brace_depth = 0
-        loop_brace_depths: list[int] = []  # stack: brace depths that open a loop
-        pending_loop = False               # saw 'while', waiting for the opening '{'
-        for i, tok in enumerate(impl):
-            t = tok.tostring()
-            if t == "while":
-                pending_loop = True
-            elif t == "{":
-                brace_depth += 1
-                if pending_loop:
-                    loop_brace_depths.append(brace_depth)
-                pending_loop = False
-            elif t == "}":
-                if loop_brace_depths and loop_brace_depths[-1] == brace_depth:
-                    loop_brace_depths.pop()
-                brace_depth -= 1
-            else:
-                if t not in ("(", ")"):   # '(' and ')' are part of while(cond)
-                    pending_loop = False  # anything else resets (shouldn't happen)
-            if loop_brace_depths:
-                loop_positions.add(i)
-
-        # Second pass: count, weighting loop-body assignments so they are ≥ 2.
-        for pos, tok in enumerate(impl):
-            t = tok.tostring()
-            if t in ("=", "&") and pos > 0:
-                var = impl[pos - 1].tostring()
-                weight = 2 if pos in loop_positions else 1
-                variable_sets[var] = variable_sets.get(var, 0) + weight
-
-        # ── 3. remove "goto L ; L :" (jump to the immediately following label) ─
-        new_impl: list = []
-        pos = 0
-        while pos < len(impl):
-            if (impl[pos].tostring() == "goto"
-                    and pos + 4 < len(impl)
-                    and impl[pos + 2].tostring() == ";"
-                    and impl[pos + 3].tostring() == impl[pos + 1].tostring()
-                    and impl[pos + 4].tostring() == ":"):
-                pos += 3  # skip "goto L ;" — the "L :" stays so other gotos land
-                continue
-            new_impl.append(impl[pos])
-            pos += 1
-        self.implementation = new_impl
-        impl = self.implementation
-
-        # ── 4. pin rets, args, and defer-referenced vars ──────────────────
-        for var in self.rets:
-            variable_sets[var] = variable_sets.get(var, 0) + 2
-        for var in self.args:
-            variable_sets[var] = variable_sets.get(var, 0) + 2
-        for defer in self.returned_defers:
-            for seg in defer:
-                if isinstance(seg, Variable):
-                    variable_sets[seg.name] = variable_sets.get(seg.name, 0) + 2
-
-        # ── 5. build substitution map ─────────────────────────────────────
-        # Pattern: "lhs = rhs ;" where lhs is a __t set exactly once.
-        # rhs must also be a Variable in scope so we know its type is valid.
-        # Chain-follow: if rhs itself is already substituted, track through it.
-        substitute: dict[str, Variable] = dict()
-        pos = 0
-        while pos < len(impl):
-            if (impl[pos].tostring() == "="
-                    and pos > 0
-                    and pos + 2 < len(impl)
-                    and isinstance(impl[pos - 1], Variable)
-                    and isinstance(impl[pos + 1], Variable)
-                    and impl[pos + 2].tostring() == ";"):
-                lhs: str = impl[pos - 1].tostring()
-                rhs_seg: Variable = impl[pos + 1]
-                rhs_name: str = rhs_seg.tostring()
-                if (variable_sets.get(lhs, 0) == 1
-                        and lhs not in self.args
-                        and lhs not in self.rets
-                        and rhs_name in self.vars):
-                    substitute[lhs] = substitute.get(rhs_name, rhs_seg)
-            pos += 1
-
-        # ── 6. rename mangled temp-field vars to clean temps ─────────────
-        # e.g. __t3v____field → __tNv  (cosmetic, but shrinks C output)
-        for var in list(self.vars.keys()):
-            if (var.startswith("__t") and "____" in var
-                    and var not in substitute
-                    and var not in self.args
-                    and var not in self.rets):
-                new_val = self.vars[var].renamed_copy(create_temp())
-                substitute[var] = new_val
-                self.vars[new_val.name] = new_val
-
-        # ── 7. apply substitutions everywhere ────────────────────────────
-        self.implementation = rename(self.implementation, substitute)
-        self.defers = [rename(d, substitute) for d in self.defers]
-        self.returned_defers = [rename(d, substitute) for d in self.returned_defers]
-
-        # ── 8. remove no-op assignments "x = x ;" ────────────────────────
-        def remove_noop(seq: list) -> list:
-            result = []
-            pos = 0
-            while pos < len(seq):
-                if (pos + 3 < len(seq)
-                        and seq[pos + 1].tostring() == "="
-                        and seq[pos].tostring() == seq[pos + 2].tostring()
-                        and seq[pos + 3].tostring() == ";"):
-                    pos += 4
-                    continue
-                result.append(seq[pos])
-                pos += 1
-            return result
-
-        self.implementation = remove_noop(self.implementation)
-        self.defers = [remove_noop(d) for d in self.defers]
-        self.returned_defers = [remove_noop(d) for d in self.returned_defers]
-
-        # ── 9. prune vars dict to only live names ────────────────────────
-        varset: set[str] = set(self.args) | set(self.rets)
-        for seq in [self.implementation] + self.defers + self.returned_defers:
-            for seg in seq:
-                if isinstance(seg, Variable):
-                    varset.add(seg.name)
-        self.vars = {k: v for k, v in self.vars.items() if k in varset}
-        
-
     def set_pointer_type(self, var: Variable, type: "ImplementedType"):
         assert var.type == POINTER_TYPE
         assert var.name not in self._pointer_type_dependencies
@@ -832,19 +691,21 @@ class ImplementedType:
 
     def signature(self):
         if self.is_buffer_of: return "buffer of "+signature_like([self.is_buffer_of.vars[arg] for arg in self.is_buffer_of.rets], self.is_buffer_of)
+        if self.is_pointer_of: return "pointer of "+signature_like([self.is_pointer_of.vars[arg] for arg in self.is_pointer_of.rets], self.is_pointer_of)
         args = signature_like([self.vars[arg] for arg in self.args], impl=self)
         rets = signature_like([self.vars[arg] for arg in self.rets], impl=self)
         return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" with effects "+','.join(self.effect_names) if self.effect_names else "")
 
     def canonical_signature(self, source=None):
         if self.is_buffer_of: return "buffer of "+signature_like([self.is_buffer_of.vars[arg] for arg in self.is_buffer_of.rets], self.is_buffer_of, monomorphic=True)
+        if self.is_pointer_of: return "pointer of "+signature_like([self.is_pointer_of.vars[arg] for arg in self.is_pointer_of.rets], self.is_pointer_of, monomorphic=True)
         args = signature_like([self.vars[arg] for arg in self.args], impl=self, monomorphic=True)
         rets = signature_like([self.vars[arg] for arg in self.rets], impl=self, monomorphic=True)
         return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" with effects "+','.join(self.effect_names) if self.effect_names else "")
 
     def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True, strip_mutability: bool=False):
         # for segment in varname.split("--"):
-        #     if segment in ["def", "repo", "import", "return", "mut", "unsafe_mut", "const"]:
+        #     if segment in ["def", "repo", "import", "return", "mut", "unsafe_mut", "const", "edit", "rec"]:
         #         error_token.error("safety", "keyword '"+segment+"' cannot be assigned to")
         #     if segment in operators:
         #         error_token.error("safety", "operator '"+segment+"' cannot be assigned to")
@@ -882,17 +743,8 @@ class ImplementedType:
             else: error_token.error("safety", "cannot overwrite immutable variable '"+pretty_name(varname)+"' unless with itself or a directly equal value")
         if existing and existing._references is not None and value[0]._references!=existing._references and perform_immutability_checks:
             error_token.error("safety", "variable '"+pretty_name(existing.name.split("____")[0])+"' is an in-scope reference to '"+pretty_name(existing._references.split("____")[0])+"' and can only get assigned another reference to the same variable (this does nothing but is handy for handling tuples that contain references)")
-        if existing and not existing.immutable and value[0].immutable: 
-            # if value[0].type == POINTER_TYPE:
-            #     if not any(self.get_assignment(value[0].name, [arg]) for arg in self.args):
-            #         value[0] = value[0].mutable_copy(None)
-            #     else:
-            #         value[0] = value[0].mutable_copy(error_token)
-            # else: 
+        if existing and not existing.immutable and value[0].immutable:
             value[0] = value[0].mutable_copy(error_token)
-            #error_token.error("type", "cannot overwrite mutable variable with immutable one '"+varname+"'")
-        #if existing is None: # force the following two lines so that we can revoke mutability
-
         if strip_mutability and not existing: existing = value[0].renamed_copy(varname, error_token).immutable_copy()
         else: existing = value[0].renamed_copy(varname, error_token)
         self.vars[varname] = existing
@@ -900,12 +752,11 @@ class ImplementedType:
             if existing.stabilized_name() in self.invalidated: del self.invalidated[existing.stabilized_name()]
             existing_pointer_type = self.get_pointer_type(existing)
             other_pointer_type = self.get_pointer_type(value[0])
-            #print(existing.name, existing_pointer_type.name if existing_pointer_type else None, value[0].name, other_pointer_type.name if other_pointer_type else None)
             if existing_pointer_type is not None:
                 if existing_pointer_type!=other_pointer_type and (other_pointer_type is None or not match_structure_with(existing_pointer_type, other_pointer_type)):
                     error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
-            else: self.set_pointer_depedency(existing, value[0])
-
+            else: 
+                self.set_pointer_depedency(existing, value[0])
         accumulated_defer = self.accumulating_defers[-1].get(existing.name, None)
         if accumulated_defer is not None: # important to do this before setting dependent_assignments
             if not self.get_assignment(existing.name, [value[0].name]):
@@ -913,20 +764,12 @@ class ImplementedType:
         accumulated_defer = self.accumulating_defers[-1].get(value[0].stabilized_name(), None)
         if accumulated_defer is not None:
             self.accumulating_defers[-1][existing.name] = accumulated_defer
-
-        # TODO: this is risky but a huge optimization for code size if it can be made to work somehow (e.g., delegate to future invalidations by setting to dependent_assignments)
-        already_assigned = False#self.get_assignment(existing.stabilized_name(), [value[0].stabilized_name()])# or self.get_assignment(value[0].stabilized_name(), [existing.stabilized_name()])
-        
+        already_assigned = False
         if value[0].stabilized_name() in self.required_accompany: self.required_accompany[existing.stabilized_name()] = self.required_accompany[value[0].stabilized_name()]
         self.dependent_assignments[existing.name] = value[0].stabilized_name()
         if not already_assigned and existing.type.builtin and (existing._references is None or not perform_immutability_checks): 
             if existing.name in self.refargs: self.refargs.remove(existing.name)
             self.implementation.extend([existing, CODEWORD_EQUALS, value[0], CODEWORD_SEMICOLON])
-        # if self.name=="push" and existing.type.builtin:
-        #     self.set_pointer_depedency(existing, value[0])
-        #     print(self.follow_pointer_dependency(existing).name)
-        #     print(signature_like([existing], self), " = ", signature_like([value[0]], self), value[0].name)
-        #     print(self.follow_pointer_dependency(value[0]))
 
 
     def get_assignment(self, from_name: str, _to_name: list[str]):
@@ -981,14 +824,7 @@ class ImplementedType:
                     if isinstance(segment, Variable) and segment.name not in global_var2cstr:
                         segment_stabilized_name = segment.stabilized_name()
                         ret = self.get_assignment(segment_stabilized_name, self.rets) # we have computed these now (DO NOT MOVE EARLIER)
-                        # if ret==segment_stabilized_name:
-                        #     for r in self.rets:
-                        #         tried = self.get_assignment(r, [segment_stabilized_name])
-                        #         if tried!=segment_stabilized_name:
-                        #             ret = tried
-                        #             break
                         normalized_defer.append(self.vars[ret] if ret else segment)
-                        #print(self.name, ret, "Returned as", segment.tostring())
                     else: normalized_defer.append(segment)
                 defer = normalized_defer
                 has_any_returned_value = any(u.tostring()==v.name for v in value for u in defer)
@@ -1458,17 +1294,11 @@ class ImplementedType:
 
                 if not callee:
                     self.at.error("interpreter", "failed to interpret C function '"+candidate_name+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
-                #inputs = [v for v in values]
                 if recursion_budget<=1 and self.force_not_inline:
                     self.at.error("interpreter", "recursion budget reached at: "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)]))
                 retcode = await callee.interpret(values, memory, recursion_budget-1 if self.force_not_inline else recursion_budget) # may modify values
-                #rets = ""
                 for ismut, value, k in zip(gathered_args_by_pointer, values, gathered_args):
                     if ismut: local_vars[k] = value
-                    #rets += k+"="+str(value)+"\n"
-                #print(self.name, callee.name)
-                #print(self.name, callee.name, inputs, "->", values)#, gathered_args)
-                #print(rets)
                 return retcode
             else:
                 self.at.error("interpreter", "failed to interpret C code: "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)]))
@@ -1610,12 +1440,6 @@ class ImplementedType:
         return local_vars.get("__t_errcode", 0)
             
     def transpile(self, for_inlining=False) -> str:
-        #print(self.signature())
-        #for k,v in self.dependent_assignments.items():
-        #    print("  ", v, "->", k)
-        #print(len(self.defers))
-        #print(len(self.returned_defers))
-        #self.simplify()
         if self.never_implement: return ""
         if not self.needs_failure_mode and self.force_not_inline: self.needs_failure_mode = self.at
 
@@ -1989,6 +1813,16 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token, out_format: Optional[list[Variable]]=None, _callee:Optional[ImplementedType]=None) -> list[Variable]:
     if ANY_TYPE in method.variations:
         return vars
+    if  CALL_TYPE in method.variations:
+        if len(vars)==0 or vars[0].type.is_functor_of is None:
+            error_token.error("type", "only a functor followed by arguments can be 'call'-ed here but got '"+signature_like(vars, impl)+"'")
+        functor_var = impl.stabilize([vars[0]])[0]
+        functor_method = convert_functor_to_method_type(impl, functor_var, error_token)
+        union_type = UnionType(method.name, at=method.at)
+        union_type.variations.append(functor_method)
+        return resolve_call(file, impl, union_type, vars[1:], error_token, out_format)
+
+
     if DEBUG_TYPE in method.variations:
         if not is_lsp: print(signature_like(vars, impl))
         return vars
@@ -2375,6 +2209,15 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             new_defer.append(new_v)
             impl.vars[new_v.name] = new_v
         impl.defers.append(new_defer)
+
+    # at this point we have resolved everything succcessfully for normal functions
+    # however, we need to port over pointer types from functors that may have missed the
+    # associations
+    # for i, ret in enumerate(rets):
+    #     if i<len(rets)-2 and ret.type.is_buffer_of is not None and ret.type.is_buffer_of!=ANY_TYPE:
+    #         found_type = impl.get_pointer_type(rets[i+1])
+    #         if found_type is None or found_type==ANY_TYPE:
+    #             impl.set_pointer_type(rets[i+1], ret.type.is_buffer_of)
     return rets
 
 def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token, explicit: bool=True):
@@ -2467,6 +2310,12 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
     if is_lsp and current_token.file.is_main_file: print_lsp_var(current_token, signature_like(new_vars, impl))
     if ret[0].immutable: new_vars = [r.immutable_copy() for r in new_vars]
+    r = ret[0]
+    for var in new_vars:
+        if var.type==POINTER_TYPE:
+            for other_var in impl.get_required_accompany(var):
+                impl.add_required_accompany(var, other_var)
+            impl.add_required_accompany(var, impl.vars[r.stabilized_name()])
     return pos, new_vars
 
 buffer_types: dict[UnionType|ImplementedType, UnionType] = dict()
@@ -2544,6 +2393,8 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
     type_start = get(tokens, pos)
     name = type_start.text
     if impl is not None and name=="type":
+        if impl is None:
+            literal_tok.error("type", "can only use 'type' within function bodies")
         pos, values = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
         pos, values = await process_statement_operator(file, tokens, impl, pos, values, current_operator_priority=0)
         variation = ImplementedType("", at=type_start)
@@ -2573,17 +2424,19 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
     if literal_tok.is_float():
         if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "a float value")
         return pos+1, create_literal_type(literal_tok, FLOAT_TYPE)
-    if literal_tok.text=="call":
-        if is_lsp and literal_tok.file.is_main_file: print_lsp_keyword(literal_tok, "**call functor**\n\nEvalutes a functor, or an expression that results to a functor, to a function. The result is a callable type. The conversion from functor to function may fail at runtime if a zero-initialized functor is provided.")
-        pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
-        pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
-        if len(ret)!=1 or ret[0].type.is_functor_of is None:
-            literal_tok.error("type", "only a function or functor can be 'call'-ed here but got '"+signature_like(ret, impl)+"'")
-        functor_var = ret[0] 
-        method = convert_functor_to_method_type(impl, functor_var, literal_tok)
-        union_type = UnionType(method.name, at=method.at)
-        union_type.variations.append(method)
-        return pos, union_type
+    # if literal_tok.text=="call":
+    #     if impl is None:
+    #         literal_tok.error("type", "can only use 'call' within function bodies")
+    #     if is_lsp and literal_tok.file.is_main_file: print_lsp_keyword(literal_tok, "**call functor**\n\nEvalutes a functor, or an expression that results to a functor, to a function. The result is a callable type. The conversion from functor to function may fail at runtime if a zero-initialized functor is provided.")
+    #     pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
+    #     pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+    #     if len(ret)!=1 or ret[0].type.is_functor_of is None:
+    #         literal_tok.error("type", "only a function or functor can be 'call'-ed here but got '"+signature_like(ret, impl)+"'")
+    #     functor_var = ret[0] 
+    #     method = convert_functor_to_method_type(impl, functor_var, literal_tok)
+    #     union_type = UnionType(method.name, at=method.at)
+    #     union_type.variations.append(method)
+    #     return pos, union_type
     if literal_tok.text=="compt":
         if is_lsp and literal_tok.file.is_main_file: print_lsp_keyword(literal_tok, "**compile time evaluation**\n\nEvaluates the following expression to a literal value during compilation. This requires that the VM is able to axecute all of the expression's dependent code.")
         temporary_implementation = ImplementedType("compt", at=literal_tok)
@@ -2780,12 +2633,22 @@ def create_functor(input_type: UnionType, output_type: UnionType, token: Token):
             for arg in input_variation.rets:
                 var = input_variation.vars[arg].renamed_copy(create_temp())
                 variation.args.append(var.name)
-                variation.vars[var.name] = var
+                variation.vars[var.name] = var.immutable_copy()
+                if var.type==POINTER_TYPE:
+                    existing_pointer_type = input_variation.get_pointer_type(input_variation.vars[arg])
+                    if existing_pointer_type is None or existing_pointer_type==ANY_TYPE:
+                        pass#token.error("safety", "return with generic pointer type not allowed in functor input '"+signature_like([input_variation.vars[r] for r in input_variation.rets], input_variation)+"'")
+                    else: variation.set_pointer_type(var, existing_pointer_type)
             for arg in output_variation.rets:
                 var = output_variation.vars[arg].renamed_copy(create_temp())
                 variation.rets.append(var.name)
-                variation.vars[var.name] = var
-            canonical_signature = variation.canonical_signature()
+                variation.vars[var.name] = var.immutable_copy()
+                if var.type==POINTER_TYPE:
+                    existing_pointer_type = output_variation.get_pointer_type(output_variation.vars[arg])
+                    if existing_pointer_type is None or existing_pointer_type==ANY_TYPE:
+                        pass#token.error("safety", "return with generic pointer type not allowed in functor output '"+signature_like([output_variation.vars[r] for r in output_variation.rets], output_variation)+"'")
+                    else: variation.set_pointer_type(var, existing_pointer_type)
+            canonical_signature = variation.signature()
             functor_variation = cached_factors_for_comparison.get(canonical_signature)
             if functor_variation is None:
                 functor_variation = ImplementedType(variation.signature(), "__smoll_func_ptr_type", memory_size=8, at=token)
@@ -2879,25 +2742,52 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
 def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_token: Token):
     if len(_method.variations)!=1: err_token.error("type", "cannot convert multiple variations to a functor", suggestions=[t.signature() for t in _method.variations])
     method = _method.variations[0]
+    if method.at is None: err_token.error("type", "cannot retrieve functors from functions defined by the compiler, as these require interaction with the compilation state that is unavailable at runtime", suggestions=["create a wrapper for the desired functionality"])
+    if method.returned_defers: err_token.error("safety", "the function '"+method.signature()+"' attaches 'defer' to its returns and therefore cannot be converted to a functor (the calling site does not know this)")
+    # pos = 0 # TODO: relax this
+    # while pos<len(method.args):
+    #     var = method.vars[method.args[pos]]
+    #     if var.type==POINTER_TYPE: err_token.error("safety", "the function '"+method.signature()+"' cantains raw pointer arguments and therefore cannot be converted into a functor (future language versions may relax this)")
+    #     if len(var.type.rets)==0: pos += 1
+    #     else: pos += len(var.type.rets)
+    # pos = 0 # TODO: relax this
+    # while pos<len(method.rets):
+    #     var = method.vars[method.rets[pos]]
+    #     if var.type==POINTER_TYPE: err_token.error("safety", "the function '"+method.signature()+"' cantains raw pointer returns and therefore cannot be converted into a functor (future language versions may relax this)")
+    #     if len(var.type.rets)==0: pos += 1
+    #     else: pos += len(var.type.rets)
+    for arg in method.args:
+        if not method.vars[arg].immutable: err_token.error("safety", "the function '"+method.signature()+"' has 'edit' or 'mut' in its arguments and therefore cannot become a functor; only pure functions can be functors")
     if not method.needs_failure_mode or not method.force_not_inline:
         new_method = ImplementedType(method.name, at=method.at)
         new_method.args = [arg for arg in method.args]
-        for arg in method.args: new_method.vars[arg] = method.vars[arg]
+        for arg in method.args: 
+            new_method.vars[arg] = method.vars[arg]
+            existing_pointer_type = method.get_pointer_type(method.vars[arg])
+            if existing_pointer_type is not None and existing_pointer_type!=ANY_TYPE:
+                new_method.set_pointer_type(method.vars[arg], existing_pointer_type)
         rets = resolve_call(err_token.file, new_method, _method, [new_method.vars[arg] for arg in new_method.args], err_token, _callee=method)
         new_method.returns(rets, err_token, False) # don't do reduendant error checks
         new_method.implementation.extend([CODEWORD_GOTO, CodeWord("__t_return"), CODEWORD_SEMICOLON])
         new_method.needs_failure_mode = err_token
         new_method.force_not_inline = True
         method = new_method
-
     input_variation = ImplementedType("", at=method.at)
     output_variation = ImplementedType("", at=method.at)
     for ret in method.args:
         input_variation.rets.append(ret)
         input_variation.vars[ret] = method.vars[ret]
+        if method.vars[ret].type==POINTER_TYPE:
+            existing_pointer_type = method.get_pointer_type(method.vars[ret])
+            if existing_pointer_type is not None and existing_pointer_type!=ANY_TYPE:
+                input_variation.set_pointer_type(method.vars[ret], existing_pointer_type)
     for ret in method.rets:
         output_variation.rets.append(ret)
         output_variation.vars[ret] = method.vars[ret]
+        if method.vars[ret].type==POINTER_TYPE:
+            existing_pointer_type = method.get_pointer_type(method.vars[ret])
+            if existing_pointer_type is not None and existing_pointer_type!=ANY_TYPE:
+                output_variation.set_pointer_type(method.vars[ret], existing_pointer_type)
     input_type = UnionType(input_variation.name, at=method.at)
     input_type.variations.append(input_variation)
     output_type = UnionType(output_variation.name, at=method.at)
@@ -2981,8 +2871,6 @@ def skip_statement(file: File, tokens: list[Token], pos: int):
     return pos
 
 operators = {
-    # ">>": (">>", 11),
-    # "<<": ("<<", 11),
     "=": ("=", 11),
     "and": ("and", 10),
     "or": ("or", 9),
@@ -3001,9 +2889,7 @@ operators = {
     "%": ("mod",4),
     "[": ("get", 0.5),
     ".": ("dot", 0.5),
-    #"->": ("access",-1),
 }
-
 
 async def process_statement_operator(file: File, tokens: list[Token], impl: ImplementedType, pos: int, rets: list[Variable], current_operator_priority: float) -> tuple[int, list[Variable]]:
     # apply this when returning from await process_statement
@@ -3109,6 +2995,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 )
                 if impl.vars[r.stabilized_name()].type==POINTER_TYPE:
                     for other_var in impl.get_required_accompany(var):
+                        for source_var in impl.get_required_accompany(impl.vars[r.stabilized_name()]):
+                            impl.add_required_accompany(other_var, source_var)
                         impl.add_required_accompany(other_var, impl.vars[r.stabilized_name()])
                     impl.add_required_accompany(var, impl.vars[r.stabilized_name()])
                 progress += mem_size
@@ -3799,15 +3687,23 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if not any(element.type.builtin for element in buffer_element): 
             current_token.error("type", "cannot create a buffer on empty data - it would not perform any allocation")
         # find temp type for data on the buffer
-        temp_type = ImplementedType(create_temp())
-        total_name = ""
-        for j, element in enumerate(buffer_element):
-            new_name = "__"+str(j)
-            temp_type.rets.append(new_name)
-            temp_type.vars[new_name] = element.renamed_copy(new_name)
-            if total_name: total_name += ","
-            total_name += element.type.name
-        temp_type.name = total_name
+
+        if buffer_element and len(buffer_element[0].type.rets)==len(buffer_element):
+            temp_type = buffer_element[0].type
+        else:
+            temp_type = ImplementedType(create_temp())
+            total_name = ""
+            j = 0
+            for element in buffer_element:
+                new_name = element.name
+                while new_name in temp_type.vars: 
+                    j = j+1
+                    new_name = new_name+str(j)
+                temp_type.rets.append(new_name)
+                temp_type.vars[new_name] = element.renamed_copy(new_name)
+                if total_name: total_name += ","
+                total_name += element.type.name
+            temp_type.name = total_name
         buffer_type = create_buffer_type(temp_type.name+"____buffer", str(temp_type.memory_size()), temp_type, current_token)
         buffer_type_method = UnionType(temp_type.name+"____t_buffer", at=current_token)
         buffer_type_method.variations.append(buffer_type)
@@ -3859,6 +3755,11 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
                 )
                 progress += mem_size
+                if r_var.type==POINTER_TYPE:
+                    impl.add_required_accompany(created_buffer[1], r_var)
+                    for v in impl.get_required_accompany(r_var):
+                        impl.add_required_accompany(created_buffer[1], v)
+        
         if should_ref:
             if should_mut_ref:created_buffer = [created_buffer[1]]
             else: created_buffer = [created_buffer[1].immutable_copy()]
@@ -4210,7 +4111,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         start_call = get(tokens,pos)
         is_type_resolution = start_call.text=="type"
         if is_type_resolution:
-            if is_lsp and start_call.file.is_main_file: print_lsp_decorator(start_call, "**literal or function type**\n\nConverts a literal value into a literal type or a function into a functor.")
+            if is_lsp and start_call.file.is_main_file: print_lsp_decorator(start_call, "**literal or function type**\n\nConverts a literal value into a literal type, or a function into a functor.")
             pos, method = await process_linear_type(file, tokens, pos+1, reduce_to_unique_variations=False, show_lsp=True, impl=impl)
             if all(variation.is_literal_of is None for variation in method.variations): 
                 return pos, convert_method_to_functor(impl, method, start_call)
@@ -5463,6 +5364,10 @@ SUCCESS_TYPE.doc.append("Branchless code refers loops or conditions that are eli
 UNSAFE_EFFECTS_TYPE = ImplementedType("unsafe_singletons")
 UNSAFE_EFFECTS_TYPE.doc.append("remove singleton safety")
 UNSAFE_EFFECTS_TYPE.doc.append("Removes all currently accumulated singleton information. Mainly useful for creating unsafe singletons for debug purposes.")
+CALL_TYPE = ImplementedType("call")
+CALL_TYPE.doc.append("calls a functor with arguments")
+CALL_TYPE.doc.append("Uses the first argument functor as a function and calls that, using the rest of the arguments as inputs.")
+
 DEREF_TYPE = ImplementedType("deref")
 DEREF_TYPE.doc.append("dereference a pointer")
 DEREF_TYPE.doc.append("Dereferences a pointer by unpacking it to local data.")
@@ -5501,7 +5406,7 @@ FOR_COUNTER_TYPE.rets.append("counter")
 
 RESOLVE_LITERAL_TYPE = ImplementedType("literal")
 
-SAME_CONTENTS_TYPE = ImplementedType("attach_type")
+SAME_CONTENTS_TYPE = ImplementedType("unsafe_attach_type")
 SAME_CONTENTS_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
 SAME_CONTENTS_TYPE.vars["from"] = Variable("from", POINTER_TYPE)
 SAME_CONTENTS_TYPE.rets.append("to")
@@ -5511,7 +5416,7 @@ SAME_CONTENTS_TYPE.set_pointer_depedency(SAME_CONTENTS_TYPE.vars["to"], SAME_CON
 SAME_CONTENTS_TYPE.doc.append("pointer references the same type as another")
 SAME_CONTENTS_TYPE.doc.append("Forces the first pointer to reference the same type of object as another. The function returns the first one to enable chain notation.")
 
-SAME_CONTENTS_TYPE_CSTR = ImplementedType("attach_type")
+SAME_CONTENTS_TYPE_CSTR = ImplementedType("unsafe_attach_type")
 SAME_CONTENTS_TYPE_CSTR.vars["to"] = Variable("to", POINTER_TYPE)
 SAME_CONTENTS_TYPE_CSTR.vars["from"] = Variable("from", CSTR_TYPE)
 SAME_CONTENTS_TYPE_CSTR.rets.append("to")
@@ -5541,11 +5446,12 @@ fixed_namespace.types["skip"] = UnionType("skip", at=compiler_token).append(FAIL
 fixed_namespace.types["true"] = UnionType("true", at=compiler_token).append(TRUE_TYPE)
 fixed_namespace.types["false"] = UnionType("false", at=compiler_token).append(FALSE_TYPE)
 fixed_namespace.types["ptr"] = UnionType("ptr", at=compiler_token).append(POINTER_TYPE)
-fixed_namespace.types["attach_type"] = UnionType("attach_type", at=compiler_token).append(SAME_CONTENTS_TYPE).append(SAME_CONTENTS_TYPE_CSTR)
+fixed_namespace.types["unsafe_attach_type"] = UnionType("unsafe_attach_type", at=compiler_token).append(SAME_CONTENTS_TYPE).append(SAME_CONTENTS_TYPE_CSTR)
 fixed_namespace.types["catch"] = UnionType("catch", at=compiler_token).append(CAUGHT_TYPE)
 fixed_namespace.types["for_counter"] = UnionType("for_counter", at=compiler_token).append(FOR_COUNTER_TYPE)
 fixed_namespace.types["size"] = UnionType("size", at=compiler_token).append(SIZEOF_TYPE)
 fixed_namespace.types["literal"] = UnionType("literal", at=compiler_token).append(RESOLVE_LITERAL_TYPE)
+fixed_namespace.types["call"] = UnionType("call", at=compiler_token).append(CALL_TYPE)
 fixed_namespace.types["deref"] = UnionType("deref", at=compiler_token).append(DEREF_TYPE)
 
 smol_namespace.namespaces["compiler"] = fixed_namespace
@@ -5620,22 +5526,8 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")
     if chosen_compiler=="none": return
     gcc_cmd = {
-        "gcc": [
-            "gcc",
-            "-O3",
-            str(src_path),
-            "-o",
-            str(exe_path),
-            "-I."
-        ]+linker,
-        "antcc": [
-            "./antcc",
-            "-O2",
-            str(src_path),
-            "-o",
-            str(exe_path),
-            "-I."
-        ]+linker
+        "gcc": [ "gcc", "-O3", str(src_path), "-o", str(exe_path), "-I."]+linker,
+        "antcc": [ "./antcc", "-O2", str(src_path), "-o", str(exe_path), "-I."]+linker
     }.get(chosen_compiler, None)
     if gcc_cmd is None:
         print("[✗] "+chosen_compiler+" not found")

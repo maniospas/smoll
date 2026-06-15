@@ -94,7 +94,6 @@ def alloc(edit list allocator, nat|blank length)
     allocator.length = prev_length
     return allocated(allocator.buf, pos)
 
-
 def at(edit allocated surface)
     doc "get a mutable pointer to the last buffer element"
     return surface.buf[surface.pos]&&

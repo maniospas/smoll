@@ -48,10 +48,11 @@ symbols = "=\\/+-*@<>!%&#!(){}[]:.,;|^"
 END_TOKEN = "...]" # impossible for something else to be tokenized as this
 START_TOKEN = "[..." # impossible for something else to be tokenized as this
 err_code_table: dict[str,int] = dict()
-err_code_list = ["\"noerr\"", "\"error\"", "\"null pointer\""]
+err_code_list = ["\"noerr\"", "\"error\"", "\"null pointer\"", "\"assertion error\""]
 err_code_table["noerr"] = 0
 err_code_table["error"] = 1
 err_code_table["null pointer"] = 2
+err_code_table["assertion error"] = 3
 debug_mode = True
 repositories: dict[str, str] = dict()
 externals: list["File"] = list()
@@ -719,7 +720,8 @@ class ImplementedType:
             len_common_prefix = len(common_prefix)
             if top_entry and "__" in varname and not varname.startswith("__t"):
                 if not any(v.startswith(varname) for v in self.vars.keys()):
-                    error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'")
+                    split = varname.rsplit("__",1)[0]
+                    error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'", suggestions=[pretty_name(v) for v in self.vars if v.startswith(split)] if split else None)
             for var in value: self.assign(varname+"__"+var.name[len_common_prefix:], [var], error_token, perform_immutability_checks, False, strip_mutability)
             return None
             error_token.error("type", "cannot assign more than one values to variable '"+varname+"'")
@@ -727,7 +729,8 @@ class ImplementedType:
         if not existing:
             if top_entry and "__" in varname and not varname.startswith("__t"):
                 if not any(v.startswith(varname) for v in self.vars.keys()):
-                    error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'")
+                    split = varname.rsplit("__",1)[0]
+                    error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'", suggestions=[pretty_name(v) for v in self.vars if v.startswith(split)] if split else None)
             current_prefix = varname+"__"
             found = [val for varname, val in self.vars.items() if varname.startswith(current_prefix)]
             if found:
@@ -860,7 +863,7 @@ class ImplementedType:
                         if accompanying==v: continue
                         to_defer = self.get_assignment(accompanying.stabilized_name(), defer_var_names)
                         if to_defer is None and self.defers and not self.get_assignment(accompanying.stabilized_name(), self.args):
-                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' cannot be done, because the variable comes from '"+pretty_name(accompanying.stabilized_name())+"' for which equality-based analysis is cut short (e.g., passes through allocated memory) and therefore cannot be proven to *not* be associated with a defer not accompanying the return", reason=accompanying.token, suggestions=["create a copy on new memory and return that", "return all variables with associated defers, to let those defers accompany the function's return", "return a container/buffer and position pair and reconstruct necessary pointers at the return site", "return the non-pointer section of your data and reconstruct the object at the calling site"])
+                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' cannot be done, because the variable comes from '"+pretty_name(accompanying.stabilized_name())+"' for which equality-based analysis is cut short (e.g., passes through allocated memory) and therefore cannot be proven to *not* be associated with a defer not accompanying the return", reason=accompanying.token, suggestions=["use 'compiler:assert_eq' to verify memory region equality and thus properly transfer deferred values", "create a copy on new memory and return that", "return all variables with associated defers, to let those defers accompany the function's return", "return a container/buffer and position pair and reconstruct necessary pointers at the return site", "return the non-pointer section of your data and reconstruct the object at the calling site"])
                     
                         if (to_defer and not self.get_assignment(to_defer, self.rets)):# and not any(self.get_assignment(ret, defer_var_names) for ret in self.rets):
                             error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' requires to also return '"+pretty_name(accompanying.stabilized_name())+"' so that its resource release is defered further", reason=accompanying.token, raason_message="due to", suggestions=["return the accompanying variable", "return a structure containing the accompanying variable", "create a ref to the accompanying variable"])
@@ -2230,6 +2233,11 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     #         found_type = impl.get_pointer_type(rets[i+1])
     #         if found_type is None or found_type==ANY_TYPE:
     #             impl.set_pointer_type(rets[i+1], ret.type.is_buffer_of)
+    if callee==ASSERT_SAME_TYPE:
+        try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
+        if try_var is not None:
+            error_token.error("safety", "intercepting the compiler's pointer equality assertion violates preconditions that cannot be recovered during runtime")
+        impl.assign(vars[0].name, [vars[1]], error_token, perform_immutability_checks=False)
     return rets
 
 def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token, explicit: bool=True):
@@ -5456,6 +5464,36 @@ smol_namespace.types["any"] = UnionType("any", at=builtin_token).append(ANY_TYPE
 
 fixed_namespace = File("compiler")
 compiler_token = Token("compiler", fixed_namespace, 1, 1)
+ASSERT_SAME_TYPE = ImplementedType("assert_eq")
+ASSERT_SAME_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
+ASSERT_SAME_TYPE.vars["from"] = Variable("from", POINTER_TYPE)
+ASSERT_SAME_TYPE.args.extend(["to", "from"])
+ASSERT_SAME_TYPE.set_pointer_type(ASSERT_SAME_TYPE.vars["from"], ANY_TYPE)
+ASSERT_SAME_TYPE.set_pointer_depedency(ASSERT_SAME_TYPE.vars["to"], ASSERT_SAME_TYPE.vars["from"])
+ASSERT_SAME_TYPE.implementation.extend([
+    CODEWORD_IF,
+    CODEWORD_LPAR,
+    ASSERT_SAME_TYPE.vars["to"],
+    CodeWord("!="),
+    ASSERT_SAME_TYPE.vars["from"],
+    CODEWORD_RPAR,
+    CODEWORD_LBRACKET,
+    CodeWord("__t_errcode"),
+    CODEWORD_EQUALS,
+    CodeWord("3"),
+    CODEWORD_SEMICOLON,
+    CODEWORD_GOTO,
+    CodeWord("__t_failure"),
+    CODEWORD_SEMICOLON,
+    CODEWORD_RBRACKET,
+])
+ASSERT_SAME_TYPE.spawned_error_codes.add(3)
+ASSERT_SAME_TYPE.needs_failure_mode = compiler_token
+ASSERT_SAME_TYPE.doc.append("pointer is equal to another")
+ASSERT_SAME_TYPE.doc.append("Equivalent to assigning to the first argument the value of the second after checking that the two memories are the same.")
+ASSERT_SAME_TYPE.doc.append("This reinstates compiler awareness between two memory regions, for example that would have been lost due to types passing through opaque functors or buffer contents.")
+
+
 fixed_namespace.types["skip"] = UnionType("skip", at=compiler_token).append(FAIL_TYPE)
 fixed_namespace.types["true"] = UnionType("true", at=compiler_token).append(TRUE_TYPE)
 fixed_namespace.types["false"] = UnionType("false", at=compiler_token).append(FALSE_TYPE)
@@ -5467,6 +5505,7 @@ fixed_namespace.types["size"] = UnionType("size", at=compiler_token).append(SIZE
 fixed_namespace.types["literal"] = UnionType("literal", at=compiler_token).append(RESOLVE_LITERAL_TYPE)
 fixed_namespace.types["call"] = UnionType("call", at=compiler_token).append(CALL_TYPE)
 fixed_namespace.types["deref"] = UnionType("deref", at=compiler_token).append(DEREF_TYPE)
+fixed_namespace.types["assert_eq"] = UnionType("assert_eq", at=compiler_token).append(ASSERT_SAME_TYPE)
 
 smol_namespace.namespaces["compiler"] = fixed_namespace
 

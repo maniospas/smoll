@@ -78,13 +78,14 @@ def filter(ppr config, matrix m, vec p0)
     p = self(p)*p0norm
     return (p,err,iter)
 
-def normalize(effect edit float_allocator FLOATS, edit coo m)
+def normalize(effect edit float_allocator FLOATS, edit coo _m)
     doc "summetric matrix normalization"
     doc "Symmetrically normalizes matrix edge weights by dividing with the geometric"
     doc "mean of its degrees."
+    m = edit _m
     degrees = sum(m row).pow 0.5
     for entry_ptr&& in m
         entry = compiler:deref entry_ptr
         denom = degrees[entry.row]*degrees[entry.col]
         entry_ptr.value = entry.value/denom
-    return m
+    return _m

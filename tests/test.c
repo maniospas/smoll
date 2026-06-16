@@ -849,7 +849,7 @@ static inline __attribute__((always_inline)) int assert_eq__t28t(char* to, char*
   int __t_errcode=0;
   int __t_complain=0;
   if(to!=from){
-  __t_errcode=3;
+  __t_errcode==3;
   goto __t_failure;
   }
   
@@ -920,7 +920,7 @@ static inline __attribute__((always_inline)) int test__t2140t(__smoll_func_ptr_t
   __t_errcode=2;
   goto __t_failure;
   }
-  __t_errcode=((int (*)(char* , uint64_t , uint16_t , uint16_t , uint64_t , char** , uint64_t* , uint64_t* , char* ))creator)(CHARS__buf__unsafe_ptr,CHARS__buf__unsafe_size,CHARS__buf__unsafe_offset,CHARS__buf__unsafe_align,CHARS__pos,&__t2150t____t2135t,&__t2150t____t2136t,&__t2150t____t2137t,&__t2150t____t2138t);
+  __t_errcode=__smoll_func_cast((int (*)(char* , uint64_t , uint16_t , uint16_t , uint64_t , char** , uint64_t* , uint64_t* , char* ))creator)(CHARS__buf__unsafe_ptr,CHARS__buf__unsafe_size,CHARS__buf__unsafe_offset,CHARS__buf__unsafe_align,CHARS__pos,&__t2150t____t2135t,&__t2150t____t2136t,&__t2150t____t2137t,&__t2150t____t2138t);
   if(__t_errcode){
   goto __t_failure;
   }
@@ -930,10 +930,10 @@ static inline __attribute__((always_inline)) int test__t2140t(__smoll_func_ptr_t
   ret__dat__length=__t2151t__dat__length;
   ret__dat__first=__t2151t__dat__first;
   __t_errcode=assert_eq__t28t(ret__unsafe_ptr,CHARS__buf__unsafe_ptr);
+  ret__unsafe_ptr=CHARS__buf__unsafe_ptr;
   if(__t_errcode){
   goto __t_failure;
   }
-  ret__unsafe_ptr=CHARS__buf__unsafe_ptr;
   goto __t_return;
   
   __t_failure:exists__t604t(ret__unsafe_ptr,&__t2146t____t705t__);

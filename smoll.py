@@ -552,6 +552,7 @@ class ImplementedType:
         self.invalidated_by = self # which type's invalidation cause invalidation of this - right now helps invalidate pointer buffers
         self.is_literal_of: Optional["ImplementedType"] = None
         self.monomorphic_name = name.replace(",","__").replace(" ","_").replace(".","_").replace("[","_").replace("]","_").replace("{","_").replace("}","_").replace("(","_").replace(")","_").replace("->","__")+create_temp()
+        self.functor_var_name: Optional[str] = None # used only when wrapping vars as functors
         self.has_retrieved_class: Optional["Token"] = None
         self.has_retrieved_singleton: Optional["Token"] = None
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
@@ -893,6 +894,15 @@ class ImplementedType:
 
         async def process_expression(impl: list[CodeSegment], pos: int, end: int):
             if pos>end: return
+            if impl[pos].tostring()=="(" and pos<=end-3 and impl[pos+1].tostring()=="__smoll_func_ptr_type" and impl[pos+2].tostring()==")":
+                found_func = None
+                candidate_name = impl[pos+3].tostring()
+                for candidate in self.dependent_implementations:
+                    if candidate.monomorphic_name==candidate_name:
+                        found_func = candidate
+                if found_func is None: self.at.error("interpreter", "failed to retrieve functor '"+candidate_name+"'")
+                assert found_func
+                return memory.register_foreign(found_func, "") # no free check
             if impl[pos].tostring()=="(" and pos<end-3 and impl[pos+2].tostring()=="*" and impl[pos+3].tostring()==")":
                 pos += 4 # skip pointer casts
             if pos>end: return
@@ -985,6 +995,7 @@ class ImplementedType:
                     if self.vars[k].type==FLOAT_TYPE: return 0.0
                     return 0
                 if k == "__t_complain": return 0 # may not be a var yet
+                if k == "__t_errcode": return 0 # no error code set
                 return self.at.error("interpreter", "failed to parse '"+k+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
             elif impl[pos+1].tostring()=="=":
                 varname = impl[pos].tostring()
@@ -1310,6 +1321,13 @@ class ImplementedType:
                     self.at.error("interpreter", "failed to interpret C function '"+candidate_name+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
                 if recursion_budget<=1 and self.force_not_inline:
                     self.at.error("interpreter", "recursion budget reached at: "+" ".join([impl[i].tostring() for i in range(expr_pos,end+1)]))
+                if callee.functor_var_name is not None: # this is a functor variable
+                    varname = callee.functor_var_name
+                    varvalue = local_vars.get(varname, None)
+                    if varvalue is None: self.at.error("interpreter", "failed to retrieve a local functor: "+varname)
+                    assert varvalue is not None
+                    callee = memory.get_foreign(varvalue)
+                    if callee is None: self.at.error("interpreter", "failed to retrieve a local functor: "+varname)
                 retcode = await callee.interpret(values, memory, recursion_budget-1 if self.force_not_inline else recursion_budget) # may modify values
                 for ismut, value, k in zip(gathered_args_by_pointer, values, gathered_args):
                     if ismut: local_vars[k] = value
@@ -1456,7 +1474,6 @@ class ImplementedType:
     def transpile(self, for_inlining=False) -> str:
         if self.never_implement: return ""
         if not self.needs_failure_mode and self.force_not_inline: self.needs_failure_mode = self.at
-
         ret_body_start = ""
         ret_body_end = ""
         arg_code = ""
@@ -2129,6 +2146,17 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if callee.needs_failure_mode and impl.is_parsing_a_try:
         if impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the 'try' mechanism has already matched one function call")
         impl.count_handled_tries[-1] += 1
+
+    if callee==ASSERT_SAME_TYPE:
+        if impl.is_parsing_a_try: error_token.error("safety", "intercepting the compiler's pointer equality assertion violates preconditions that cannot be recovered during runtime")
+
+    if callee==ASSERT_SAME_TYPE: 
+        # it is imperative that we insert this assignment here:
+        # we have just actualled called the method but need a
+        # window to transfer pointer values, in case those are
+        # used by defers
+        impl.assign(vars[0].name, [vars[1]], error_token, perform_immutability_checks=False)
+
     if callee.needs_failure_mode and not impl.is_parsing_a_try:
         if impl.is_parsing_a_defer: error_token.error("safety", "cannot call a function with unhandled failure within 'defer'", reason=callee.at)
         impl.implementation.extend([
@@ -2233,11 +2261,6 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     #         found_type = impl.get_pointer_type(rets[i+1])
     #         if found_type is None or found_type==ANY_TYPE:
     #             impl.set_pointer_type(rets[i+1], ret.type.is_buffer_of)
-    if callee==ASSERT_SAME_TYPE:
-        try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
-        if try_var is not None:
-            error_token.error("safety", "intercepting the compiler's pointer equality assertion violates preconditions that cannot be recovered during runtime")
-        impl.assign(vars[0].name, [vars[1]], error_token, perform_immutability_checks=False)
     return rets
 
 def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token, explicit: bool=True):
@@ -2757,6 +2780,7 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
             ret_code += arg_type_builtin+"* "
     if arg_code and ret_code: arg_code += ", "
     ret_type.monomorphic_name = "(("+signature_ret+" (*)("+arg_code+ret_code+"))"+functor_var.name+")"
+    ret_type.functor_var_name = functor_var.name
     return ret_type
 
 def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_token: Token):
@@ -5464,7 +5488,7 @@ smol_namespace.types["any"] = UnionType("any", at=builtin_token).append(ANY_TYPE
 
 fixed_namespace = File("compiler")
 compiler_token = Token("compiler", fixed_namespace, 1, 1)
-ASSERT_SAME_TYPE = ImplementedType("assert_eq")
+ASSERT_SAME_TYPE = ImplementedType("assert_eq", at=compiler_token)
 ASSERT_SAME_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
 ASSERT_SAME_TYPE.vars["from"] = Variable("from", POINTER_TYPE)
 ASSERT_SAME_TYPE.args.extend(["to", "from"])
@@ -5479,7 +5503,7 @@ ASSERT_SAME_TYPE.implementation.extend([
     CODEWORD_RPAR,
     CODEWORD_LBRACKET,
     CodeWord("__t_errcode"),
-    CODEWORD_EQUALS,
+    CodeWord("=="),
     CodeWord("3"),
     CODEWORD_SEMICOLON,
     CODEWORD_GOTO,
@@ -5677,9 +5701,10 @@ async def main():
             await main_type_variations[0].interpret([], memory, recursion_budget=vm_recursion_budget) # emulate 16kb memory
             for pos in memory.must_free:
                 if pos in memory.alloc_sizes:
-                    try: print(("non-freed memory at "+str(pos)+":\t ").ljust(15)+memory.as_cstr(pos))
-                    except: print(("non-freed memory at "+str(pos)+":\t ").ljust(15)+str(memory.read_int64(pos)))
-            for k,v in memory.foreign_objects.items(): print("non-freed foreign object"+v[1])
+                    try: print(("non-freed memory at "+str(pos)+" size "+str(memory.alloc_sizes[pos])+": ").ljust(20)+memory.as_cstr(pos))
+                    except: print(("non-freed memory at "+str(pos)+" size "+str(memory.alloc_sizes[pos])+": ").ljust(20)+str(memory.read_int64(pos)))
+            for k,v in memory.foreign_objects.items(): 
+                if v[1]: print("non-freed foreign object "+v[1])
         else:
             write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0].monomorphic_name)
             if not args.build and chosen_compiler!="none":

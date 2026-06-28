@@ -26,43 +26,43 @@ def is_different(Number x, Number y)
 def eq(Number x, Number y)
     doc "equals"
     if is_different(x,y)
-        compiler:skip()
-    {builtins:bool z = x==y;}
+        compiler::skip()
+    {builtins::bool z = x==y;}
     return z
 
 def neq(Number x, Number y)
     doc "not equal"
     if is_different(x,y)
-        compiler:skip()
-    {builtins:bool z = x!=y;}
+        compiler::skip()
+    {builtins::bool z = x!=y;}
     return z
 
-def eq(compiler:catch x, compiler:catch y)
+def eq(compiler::catch x, compiler::catch y)
     doc "eqqual to"
     doc "Compares two error messages. This comparison is"
     doc "used only for comparing error messages produced"
     doc "by the same running program."
-    {builtins:bool z=(x==y);}
+    {builtins::bool z=(x==y);}
     return z
 
-def neq(compiler:catch x, compiler:catch y)
+def neq(compiler::catch x, compiler::catch y)
     doc "not equal"
     doc "Compares two error messages. This comparison is"
     doc "used only for comparing error messages produced"
     doc "by the same running program."
-    {builtins:bool z=(x!=y);}
+    {builtins::bool z=(x!=y);}
     return z
 
 def eq(any ptr x, any ptr y)
     doc "equals"
     doc "Compares the address of two pointers."
-    {builtins:bool z=(x==y);}
+    {builtins::bool z=(x==y);}
     return z
 
 def neq(any ptr x, any ptr y)
     doc "not equal"
     doc "Compares the address of two pointers."
-    {builtins:bool z=(x!=y);}
+    {builtins::bool z=(x!=y);}
     return z
 
 def neg(Number x)
@@ -74,7 +74,7 @@ def add(Number x, Number y)
     doc "add"
     doc "Adds two numbers of the same type. This is an overload for the + operator."
     if is_different(x,y)
-        compiler:skip()
+        compiler::skip()
     {type(x) z=x+y;}
     return z
 
@@ -82,7 +82,7 @@ def mul(Number x, Number y)
     doc "multiply with"
     doc "Multiplies two numbers of the same type. This is an overload for the * operator."
     if is_different(x,y)
-        compiler:skip()
+        compiler::skip()
     {type(x) z=x*y;}
     return z
 
@@ -90,7 +90,7 @@ def div(Number x, Number y)
     doc "divide by"
     doc "Divides two numbers of the same type. This is an overload for the / operator."
     if is_different(x,y)
-        compiler:skip()
+        compiler::skip()
     {type(x) zero = 0;}
     if y==zero
         doc "Safeguards against division by zero."
@@ -111,39 +111,39 @@ def lt(Number x, Number y)
     doc "less than"
     doc "Compares two numbers of the same type. This is an overload for the < operator."
     if is_different(x,y)
-        compiler:skip()
-    {builtins:bool z = x<y;}
+        compiler::skip()
+    {builtins::bool z = x<y;}
     return z
 
 def gt(Number x, Number y)
     doc "Compares two numbers of the same type. This is an overload for the > operator."
     doc "greater than"
     if is_different(x,y)
-        compiler:skip()
-    {builtins:bool z = x>y;}
+        compiler::skip()
+    {builtins::bool z = x>y;}
     return z
 
 def le(Number x, Number y)
     doc "less than or equal to"
     doc "Compares two numbers of the same type. This is an overload for the <= operator."
     if is_different(x,y)
-        compiler:skip()
-    {builtins:bool z = x<=y;}
+        compiler::skip()
+    {builtins::bool z = x<=y;}
     return z
 
 def ge(Number x, Number y)
     doc "greater than or equal to"
     doc "Compares two numbers of the same type. This is an overload for the >= operator."
     if is_different(x,y)
-        compiler:skip()
-    {builtins:bool z = x>=y;}
+        compiler::skip()
+    {builtins::bool z = x>=y;}
     return z
     
 def sub(Number x, Number y)
     doc "subtract by"
     doc "Subtracts two numbers of the same type. This is an overload for the - operator."
     if is_different(x,y) 
-        compiler:skip()
+        compiler::skip()
     if x is nat
         doc "Natural numbers are safeguarded against acquiring negative results, which would overflow."
     if x is nat and x<y

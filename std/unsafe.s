@@ -21,7 +21,7 @@ def alloc(nat bytes)
     doc "Allocates a memory of the provided size in bytes."
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
-    {builtins:compiler:ptr allocated = malloc(bytes);}
+    {builtins::compiler::ptr allocated = malloc(bytes);}
     if not exists allocated fail "allocation failed"
     return unsafe_mut allocated
 
@@ -31,11 +31,11 @@ def realloc(any ptr allocated, nat bytes)
     doc "the original one without any safety."
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
-    {if(allocated){builtins:compiler:ptr new_allocated = realloc(allocated, bytes);}}
+    {if(allocated){builtins::compiler::ptr new_allocated = realloc(allocated, bytes);}}
     {else{new_allocated=malloc(bytes);}}
     if not exists new_allocated fail "reallocation failed"
     {allocated=new_allocated;}
-    return new_allocated.compiler:unsafe_attach_type(allocated)
+    return new_allocated.compiler::unsafe_attach_type(allocated)
 
 def free(mut any ptr allocated)
     doc "free memory"
@@ -56,5 +56,5 @@ def add(any ptr allocated, nat offset)
     doc "Adds a natural number offset to a pointer."
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
-    {builtins:compiler:ptr element = allocated + offset;}
-    return element.compiler:unsafe_attach_type(allocated)
+    {builtins::compiler::ptr element = allocated + offset;}
+    return element.compiler::unsafe_attach_type(allocated)

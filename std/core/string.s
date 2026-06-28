@@ -32,7 +32,7 @@ def char_allocator = new|char_arena|char_circular|char_list
 
 def exists(cstr c)
     doc "checks whether a cstr is not zero-initialized"
-    {builtins:bool z = c!=0;}
+    {builtins::bool z = c!=0;}
     return z
 
 local def strdat(nat pos, nat length, char first)
@@ -45,7 +45,7 @@ def str(char ptr unsafe_ptr, strdat dat)
 
 def str(char ptr unsafe_ptr, nat pos, nat length)
     doc "a string residing on a buffer"
-    {if(length){builtins:compiler:ptr first_pos = unsafe_ptr+pos;builtins:char first = *first_pos;}} # properly zero-initialized otherwise
+    {if(length){builtins::compiler::ptr first_pos = unsafe_ptr+pos;builtins::char first = *first_pos;}} # properly zero-initialized otherwise
     return str(unsafe_ptr, pos, length, first)
 
 def str(char[] buf, strdat dat)
@@ -97,8 +97,8 @@ def str(cstr c)
     doc "Subsequent comparisons no longer use the underlying pointer value."
     buf = mut char[]  # mut to create, convert to const on return to prevent resizing
     {buf__unsafe_ptr = c;}
-    buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler:unsafe_attach_type(c)&&
-    {if(c){builtins:nat length = strlen(c);}} # length initializes to zero
+    buf.unsafe_ptr = unsafe_mut buf.unsafe_ptr.compiler::unsafe_attach_type(c)&&
+    {if(c){builtins::nat length = strlen(c);}} # length initializes to zero
     buf.unsafe_size = length+1  # account for null termination
     return str(buf,0 len length)
 
@@ -116,17 +116,17 @@ def char(cstr s)
     doc "treat as character"
     doc "The first character of a string is extracted,"
     doc "for example to write `c = char \"C\"`."
-    {if(s) {builtins:char c = *s;}}
+    {if(s) {builtins::char c = *s;}}
     return c
 
 def eq(char x, char y)
     doc "equals"
-    {builtins:bool z = (x==y);}
+    {builtins::bool z = (x==y);}
     return z
 
 def neq(char x, char y)
     doc "not equals"
-    {builtins:bool z = (x!=y);}
+    {builtins::bool z = (x!=y);}
     return z
 
 def copy(effect edit char_allocator CHARS, str|cstr _other)
@@ -142,7 +142,7 @@ def copy_null_terminated(effect new CHARS, str other)
     doc "This is mainly useful for supporting 'cstr unsafe_temp'."
     buf = alloc(char[], 1+len other)
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
-    {builtins:compiler:ptr endpos = buf__unsafe_ptr+other__dat__length;}
+    {builtins::compiler::ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}
     return str(buf, 0, other.dat.length, other.dat.first)
 
@@ -165,7 +165,7 @@ def unsafe_temp(str other)
     doc "*Info: This is safe to run during 'compt' in that the latter will fail gracefully.*"
     str = new().copy_null_terminated(other)
     _ret = str.unsafe_ptr+str.dat.pos
-    {builtins:cstr cstr = _ret;}
+    {builtins::cstr cstr = _ret;}
     return class(cstr, str)
 
 def unsafe_temp(cstr cstr)
@@ -188,7 +188,7 @@ def endpos(const str s)
 
 def eq(cstr x, cstr y)
     doc "equals"
-    {builtins:bool z = (x==y);}
+    {builtins::bool z = (x==y);}
     return z
 
 def eq(str x, str y)
@@ -198,7 +198,7 @@ def eq(str x, str y)
         return false
     if x.dat.first!=y.dat.first
         return false
-    {builtins:bool z = !memcmp(x__unsafe_ptr+x__dat__pos, y__unsafe_ptr+y__dat__pos, n);}
+    {builtins::bool z = !memcmp(x__unsafe_ptr+x__dat__pos, y__unsafe_ptr+y__dat__pos, n);}
     return z
 
 def eq(str x, cstr y)
@@ -228,7 +228,7 @@ def copy_null_terminated(effect edit char_arena CHARS, str|cstr _other)
     if next_pos>len CHARS.buf
         fail "string buffer out of memory"
     {memcpy(CHARS__buf__unsafe_ptr+CHARS__pos, other__unsafe_ptr+other__dat__pos, other__dat__length);}
-    {builtins:compiler:ptr endpos = CHARS__buf__unsafe_ptr+null_pos;}
+    {builtins::compiler::ptr endpos = CHARS__buf__unsafe_ptr+null_pos;}
     {*endpos=0;}
     prev_pos = CHARS.pos+0 # this is pretty important to decouple a pressumed equality in position when referencing
     CHARS.pos = next_pos
@@ -243,7 +243,7 @@ def print(effect edit console CLI, str s, cstr|blank endl)
 
 def get(str s, nat i)
     doc "a character in a string"
-    return s.unsafe_ptr.unsafe:add(s.dat.pos+i)
+    return s.unsafe_ptr.unsafe::add(s.dat.pos+i)
 
 def print(effect edit console CLI, char c, cstr|blank endl)
     doc "print a character"

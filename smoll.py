@@ -1869,30 +1869,37 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if DEBUG_TYPE in method.variations:
         if not is_lsp: print(signature_like(vars, impl))
         return vars
-    if RESOLVE_LITERAL_TYPE in method.variations and len(vars)==1 and vars[0].type.is_literal_of is not None:
-        variable = Variable(create_temp(), vars[0].type.is_literal_of, token=error_token)
-        literal_method = vars[0].type
-        if literal_method.is_literal_of==CSTR_TYPE:
-            current = literal_method.at.text
-            if is_lsp and error_token.file.is_main_file: print_lsp_literal(error_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
-            tmp: str|None = global_cstr2var.get(current, None)
-            variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE, token=error_token)
-            if tmp is None: 
-                global_cstr2var[current] = variable.name
-                global_var2cstr[variable.name] = current
-            impl.vars[variable.name] = variable
-            impl.used_globals.add(variable.name)
-            return [variable]
-        variable = Variable(create_temp(), literal_method.is_literal_of, token=error_token)
-        if is_lsp and error_token.file.is_main_file: print_lsp_literal(error_token, "**literal**\n\nnumber defined to be "+literal_method.at.text)
-        impl.vars[variable.name] = variable
-        impl.implementation.extend([
-            variable,
-            CODEWORD_EQUALS,
-            CodeWord(literal_method.at.text),
-            CODEWORD_SEMICOLON
-        ])
-        return [variable]
+    if RESOLVE_LITERAL_TYPE in method.variations:# and len(vars)==1 and vars[0].type.is_literal_of is not None:
+        new_vars = list()
+        for var in vars:
+            if not var.type.is_literal_of:
+                new_vars.append(var)
+                continue
+            variable = Variable(create_temp(), var.type.is_literal_of, token=error_token)
+            literal_method = var.type
+            if literal_method.is_literal_of==CSTR_TYPE:
+                current = literal_method.at.text
+                #if is_lsp and error_token.file.is_main_file: print_lsp_literal(error_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
+                tmp: str|None = global_cstr2var.get(current, None)
+                variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE, token=error_token)
+                if tmp is None: 
+                    global_cstr2var[current] = variable.name
+                    global_var2cstr[variable.name] = current
+                impl.vars[variable.name] = variable
+                impl.used_globals.add(variable.name)
+            else:
+                variable = Variable(create_temp(), literal_method.is_literal_of, token=error_token)
+                impl.vars[variable.name] = variable
+                impl.implementation.extend([
+                    variable,
+                    CODEWORD_EQUALS,
+                    CodeWord(literal_method.at.text),
+                    CODEWORD_SEMICOLON
+                ])
+            new_vars.append(variable)
+        if is_lsp and error_token.file.is_main_file: print_lsp_literal(error_token, "**type to value**\n\nConverts a tuple containing literal types, including the outcome of 'compt', to a local variable of type:\n```rust\n"+signature_like(new_vars, impl)+"\n```")
+            
+        return new_vars
     if SIZEOF_TYPE in method.variations:
         total_size = 0
         for var in vars:
@@ -2464,7 +2471,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         # if is_lsp and type_start.file.is_main_file: print_lsp_keyword(type_start, "denotes a data literal")
         # pos += 1
     literal_tok = type_start#get(tokens, pos)
-    if literal_tok.is_string() and peek_text(tokens, pos+1)!=":":
+    if literal_tok.is_string() and peek_text(tokens, pos+1)!="::":
         if is_lsp and literal_tok.file.is_main_file: print_lsp_string(literal_tok)
         return pos+1, create_literal_type(literal_tok, CSTR_TYPE)
     if literal_tok.is_char():
@@ -2549,7 +2556,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         return pos, synthetic_type_union
 
         #literal_tok.error("type", "a 'literal' definition can only be followed by a number or string literal, not an expession")
-    if peek_text(tokens, pos+1)!=":":
+    if peek_text(tokens, pos+1)!="::":
         if name in operators: tokens[pos].error("syntax", "the previous expression has ended")
         type: UnionType|None = file.types.get(name, None)
         if type is None: 
@@ -2597,16 +2604,16 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                     varname = name+"__"
                     vars = [r for r in impl.vars.values() if r.name.startswith(varname)]
                     if vars: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local variable with the same name exists '"+signature_like(vars, impl)+"'")
-                tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\":"+k for k in file.namespaces])
+                tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\"::"+k for k in file.namespaces])
             
             namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
-            if namespace is None: tokens[pos].error("import", "unknown namespace or type '"+name+"'", suggestions=["\""+file.path+"\":"+k for k in file.namespaces])
+            if namespace is None: tokens[pos].error("import", "unknown namespace or type '"+name+"'", suggestions=["\""+file.path+"\"::"+k for k in file.namespaces])
             assert namespace is not None
-            if peek_text(tokens, pos+3)==":":
+            if peek_text(tokens, pos+3)=="::":
                 return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)
             return pos+1, namespace
             
-            #tokens[pos].error("type", "unknown type '\""+file.path+"\":"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\":"+k for k in file.namespaces])
+            #tokens[pos].error("type", "unknown type '\""+file.path+"\"::"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\"::"+k for k in file.namespaces])
         assert type is not None
         if peek_text(tokens, pos+1)=="[":
             at_pos = get(tokens, pos+1)
@@ -2677,7 +2684,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
 
         return pos+1, type
     namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
-    if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\":"+k for k in file.namespaces])
+    if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\"::"+k for k in file.namespaces])
     assert namespace is not None
     return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)
  
@@ -4042,7 +4049,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if impl.is_parsing_a_defer: impl.invalidate_types_on_defer.extend(type.variations)
         else: impl.invalidate_types_when_called.extend(type.variations)
         return pos, []
-    # if current == "deref" or current==":":
+    # if current == "deref" or current=="::":
     #     pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
     #     pos, ret = process_deref(file, pos, ret, impl, current_token)
     #     return await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
@@ -4400,7 +4407,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                     variable = Variable(varname, rets[0].type, token=tok)
                     impl.vars[varname] = variable
                     impl.implementation.append(variable)
-                elif tok.text=="builtins" and peek_text(tokens, pos+1)==":":
+                elif tok.text=="builtins" and peek_text(tokens, pos+1)=="::":
                     pos += 2
                     pos, type = await process_type(file_cache["builtins"], tokens, pos, impl=impl)
                     if not isinstance(type, UnionType): get(tokens, pos).error("type", "only builtin types can be unpacked here but found file '"+pretty_name(type.path)+"'")
@@ -4871,7 +4878,7 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         name = prev_name
         imported.path = name
     pos += 1
-    if peek_text(tokens, pos)==":":
+    if peek_text(tokens, pos)=="::":
         if not isinstance(imported, File): get(tokens, pos).error("import", "expecting file before ':' but got type '"+name+"'")
         assert isinstance(imported, File)
         pos, imported = await process_type(imported, tokens, pos - 1) # go back and process properly
@@ -5375,7 +5382,7 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
                             if c in ")]": 
                                 bracket_depth -= 1
                                 if bracket_indent_stack: bracket_indent_stack.pop()
-                            if c in "(){}[];&|.:": break
+                            if c in "(){}[];&|.": break
                             c = line[col]
                             if c not in symbols or c in "(){}[];&|": break
                         if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
@@ -5589,7 +5596,7 @@ FOR_COUNTER_TYPE.rets.append("counter")
 # FAIL_TYPE.vars["message"] = CSTR_TYPE
 # FAIL_TYPE.args.append("message")
 
-RESOLVE_LITERAL_TYPE = ImplementedType("literal")
+RESOLVE_LITERAL_TYPE = ImplementedType("value")
 
 SAME_CONTENTS_TYPE = ImplementedType("unsafe_attach_type")
 SAME_CONTENTS_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
@@ -5666,7 +5673,7 @@ fixed_namespace.types["unsafe_attach_type"] = UnionType("unsafe_attach_type", at
 fixed_namespace.types["catch"] = UnionType("catch", at=compiler_token).append(CAUGHT_TYPE)
 fixed_namespace.types["for_counter"] = UnionType("for_counter", at=compiler_token).append(FOR_COUNTER_TYPE)
 fixed_namespace.types["size"] = UnionType("size", at=compiler_token).append(SIZEOF_TYPE)
-fixed_namespace.types["literal"] = UnionType("literal", at=compiler_token).append(RESOLVE_LITERAL_TYPE)
+fixed_namespace.types["value"] = UnionType("value", at=compiler_token).append(RESOLVE_LITERAL_TYPE)
 fixed_namespace.types["call"] = UnionType("call", at=compiler_token).append(CALL_TYPE)
 fixed_namespace.types["abstract"] = UnionType("abstract", at=compiler_token).append(ABSTRACT_TYPE)
 fixed_namespace.types["deref"] = UnionType("deref", at=compiler_token).append(DEREF_TYPE)

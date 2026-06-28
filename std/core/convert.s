@@ -23,7 +23,7 @@ def float(Number x)
         doc "May lose information because floats are not exact representation of all integers."
     if x is float
         doc "Serves as a tautology function for code that parses on multiple number types."
-    {builtins:float z=x;}
+    {builtins::float z=x;}
     return z
 
 def int(Number x)
@@ -34,7 +34,7 @@ def int(Number x)
         doc "Overflows are mapped to negative integers and are not protected against."
     if x is int
         doc "Serves as a tautology function for code that parses on multiple number types."
-    {builtins:int z=x;}
+    {builtins::int z=x;}
     return z
 
 def nat(Number x)
@@ -45,19 +45,19 @@ def nat(Number x)
         fail "cannot convert negative int to id"
     if x is float and x<float(0)
         fail "cannot convert negative float to id"
-    {builtins:nat value=x;}
+    {builtins::nat value=x;}
     return value
 
 def nat(char x)
     doc "cast to nat"
     doc "Converting a character to a natural number considers"
     doc "its bit representation interpreted as an unsigned number."
-    {builtins:nat value=x;}
+    {builtins::nat value=x;}
     return value
 
 def exists(const any ptr x)
     doc "checks that a pointer exists"
-    {builtins:bool z = x!=0;}
+    {builtins::bool z = x!=0;}
     return z
 
 def bits(nat value)
@@ -70,14 +70,14 @@ def bits(int x)
     doc "bit representation"
     doc "Retrives the bit representation of a number of shift"
     doc "arithmetics and bitwise operations."
-    {builtins:nat z=x;}
+    {builtins::nat z=x;}
     return bits z
 
 def bits(float x)
     doc "bit representation"
     doc "Retrives the bit representation of a number of shift"
     doc "arithmetics and bitwise operations."
-    {builtins:nat z=0;}
+    {builtins::nat z=0;}
     {memcpy(&z, &x, 8);}
     return bits z
 
@@ -89,37 +89,37 @@ def nat(bits x)
 def int(bits x)
     doc "cast to int"
     doc "Converts a bit representation to the corresponding integer."
-    {builtins:int z=x__value;}
+    {builtins::int z=x__value;}
     return z
 
 def float(bits x)
     doc "cast to float"
     doc "Converts a bit representation to the corresponding float number."
-    {builtins:float z=0;}
+    {builtins::float z=0;}
     {memcpy(&z, &x__value, 8);}
     return z
     
 def lshift(bits x, nat y) 
     doc "left shift"
-    {builtins:nat z = (x__value<<y);}
+    {builtins::nat z = (x__value<<y);}
     return bits z
 
 def rshift(bits x, nat y) 
     doc "right shift"
-    {builtins:nat z = (x__value>>y);}
+    {builtins::nat z = (x__value>>y);}
     return bits z
 
 def xor(bits x, bits y) 
     doc "bitwise xor"
-    {builtins:nat z = (x__value^y__value);}
+    {builtins::nat z = (x__value^y__value);}
     return bits z
 
 def band(bits x, bits y) 
     doc "bitwise and"
-    {builtins:nat z = (x__value&y__value);}
+    {builtins::nat z = (x__value&y__value);}
     return bits z
 
 def bor(bits x, bits y) 
     doc "bitwise or"
-    {builtins:nat z = (x__value|y__value);}
+    {builtins::nat z = (x__value|y__value);}
     return bits z

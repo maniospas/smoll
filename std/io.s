@@ -4,8 +4,8 @@ import "std/io/dir.s" as dir
 import "std/io/web.s" as web
 local import "std/core.s"
 
-def get(edit dir:open data, nat) 
-    return dir:entry data
+def get(edit dir::open data, nat) 
+    return dir::entry data
 
-def get(effect edit char_arena|char_circular CHARS, edit file:File|process:open f, nat)
-    return file:line|process:line(CHARS, f)
+def get(effect edit char_arena|char_circular CHARS, edit file::File|process::open f, nat)
+    return file::line|process::line(CHARS, f)

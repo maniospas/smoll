@@ -19,5 +19,5 @@ def safe_main(effect edit console CLI)
 def main()
     CLI = edit console()
     try safe_main()
-    if try error=compiler:catch()
+    if try error=compiler::catch()
         print cstr error

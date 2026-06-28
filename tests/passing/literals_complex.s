@@ -10,7 +10,7 @@ def inc(nat x, "two")
     return x+2
 
 def which(effect edit console CLI, OPTIONS option)
-    print compiler:literal option
+    print compiler::value option
 
 def main()
     CLI = edit console()

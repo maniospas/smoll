@@ -17,9 +17,9 @@
 local import "std/extern/math.h"
 
 def pi()
-    {builtins:float pi = M_PI;}
+    {builtins::float pi = M_PI;}
     return pi
 
 def e()
-    {builtins:float e = M_E;}
+    {builtins::float e = M_E;}
     return e

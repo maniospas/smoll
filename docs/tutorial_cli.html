@@ -333,11 +333,11 @@ and handled. Preface error-prone expressions with a <code>try</code> keyword. Th
 evaluates to true/false depending on whether execution was successful or an error
 occurred. Use it like below.</p>
 
-<p>At the very end of our function, the <code>debug:nocatch()</code>
+<p>At the very end of our function, the <code>debug::nocatch()</code>
 function is called to ensure that we have enclosed all potential errors in a <code>try</code>
 statement. This is recognized during compilation, with the language helping us 
 identify missed errors up to that point. In general, there are several helper functions
-under the <code>debug:</code> and <code>compiler:</code> namespaces that help us interact with the compiler
+under the <code>debug::</code> and <code>compiler::</code> namespaces that help us interact with the compiler
 for debugging and more dynamic programs.</p>
 
 <div class="codehilite">
@@ -354,7 +354,7 @@ for debugging and more dynamic programs.</p>
         <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
     <span class="k">else</span>
         <span class="nb">print</span> <span class="s2">&quot;failed to read number&quot;</span>
-    <span class="n">debug</span><span class="p">:</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
+    <span class="n">debug</span><span class="p">::</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
 </code></pre>
 </div>
 
@@ -374,7 +374,7 @@ input by substituting the <code>if</code> with a <code>while</code> loop, like b
         <span class="nb">print</span> <span class="s2">&quot;invalid format&quot;</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;its square is: &quot;</span>
     <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
-    <span class="n">debug</span><span class="p">:</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
+    <span class="n">debug</span><span class="p">::</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
 </code></pre>
 </div>
 
@@ -881,7 +881,7 @@ the above like so.</p>
 <p>Variables associated with literal types can only be assigned to literals
 of the same type and are therefore useless for runtime code, where they do
 not appear, even if they are pretty useful
-for type checks. Use the <code>compiler:literal</code> function to retrieve the actual 
+for type checks. Use the <code>compiler::value</code> function to retrieve the actual 
 value from the compiler to write polymorphic functions whose runtime data depend
 on which polymorphic function variation is used.</p>
 
@@ -893,7 +893,7 @@ same mechanism as above grants us zero-cost literal comparison.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="o">|</span><span class="s2">&quot;hi&quot;</span> <span class="n">greeting</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">greeting</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">greeting</span>
     <span class="k">if</span> <span class="n">greeting</span> <span class="ow">is</span> <span class="s2">&quot;hello&quot;</span> <span class="c1"># &#39;is&#39; starts type parsing</span>
         <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot; world&quot;</span>
     <span class="nb">print</span> <span class="s2">&quot;!&quot;</span>
@@ -959,14 +959,14 @@ you can only find them within parentheses.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="o">|</span><span class="s2">&quot;hi&quot;</span> <span class="n">greeting</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="s2">&quot;world&quot;</span> <span class="n">world</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="s2">&quot;.&quot;</span><span class="o">|</span><span class="s2">&quot;!&quot;</span> <span class="n">punctuation</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">greeting</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">greeting</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">world</span> <span class="ow">is</span> <span class="n">blank</span>
         <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot; &quot;</span>
-        <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">world</span>
+        <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">world</span>
     <span class="k">if</span> <span class="n">punctuation</span> <span class="ow">is</span> <span class="n">blank</span>
         <span class="nb">print</span> <span class="s2">&quot;&quot;</span>
     <span class="k">else</span>
-        <span class="nb">print</span> <span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">punctuation</span>
+        <span class="nb">print</span> <span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">punctuation</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1106,7 +1106,7 @@ string literal qualifier to convey intent, like below.</p>
 <p>Since we are in the subject of string manipulation, now is a good time
 to mention that we can import some more command line functionality from the
 process namespace that is part of <code>"std/io.s"</code>. That gives access
-to the ability to run system commands per <code>process:system "ls"</code> or even
+to the ability to run system commands per <code>process::system "ls"</code> or even
 read their outputs as if you would files. But the relevant part is 
 that we can retrieve the operating system name as a <code>cstr</code> value, as well
 as command line arguments passed to the running program as a <code>cstr[]</code> buffer.
@@ -1248,19 +1248,19 @@ newly read lines only at the managed buffer.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">circular</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="k">try</span> <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">:</span><span class="nb">open</span> <span class="s2">&quot;README.md&quot;</span> <span class="c1"># reminder: checks for opening success</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="k">try</span> <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">::</span><span class="nb">open</span> <span class="s2">&quot;README.md&quot;</span> <span class="c1"># reminder: checks for opening success</span>
         <span class="nb">print</span> <span class="s2">&quot;could not find file&quot;</span>
         <span class="n">fail</span> <span class="s2">&quot;could not find file&quot;</span> <span class="c1"># create an error manually to stop the program</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span>
         <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;line &quot;</span>
-        <span class="nb">print</span> <span class="n">compiler</span><span class="p">:</span><span class="n">for_counter</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="n">compiler</span><span class="p">::</span><span class="n">for_counter</span><span class="p">()</span>
         <span class="nb">print</span> <span class="n">line</span>
 </code></pre>
 </div>
 
 <p>By the way, the <code>for varname in iterable</code> in general is a means of going through
 all elements of an iterable. It desugars to a <code>while</code> loop under-the-hood,
-and also grants access to <code>compiler:for_counter()</code> variable to automatically 
+and also grants access to <code>compiler::for_counter()</code> variable to automatically 
 enumerate the iteration&#8217;s progress.</p>
 
     <script>

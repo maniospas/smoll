@@ -85,7 +85,7 @@ def main()
 ```
 
 You can also import a file as a namespace to access its
-contents with the `:` notation. This is more verbose
+contents with the `::` notation. This is more verbose
 but unambiguous, like below. You can also access child
 namespaces.
 
@@ -94,7 +94,7 @@ import "std/core.s" as core
 
 def main()
     CLI = edit console() 
-    core:print "hello world!"
+    core::print "hello world!"
 ```
 
 If you want to import something specific from a namespace, 
@@ -106,7 +106,7 @@ This is used for isolating which functionality
 is introduced in each file.
 
 ```python
-local import "std/core.s":print
+local import "std/core.s"::print
 
 def main()
     CLI = edit console() 
@@ -140,14 +140,14 @@ methods. You can always refer to functions
 within namespaces.
 
 ```python
-# an atypical import structure for demonstration
+# atypical import for core - for demonstration
 import "std/core.s" as core
 
 def main()
     CLI = edit console() 
     x1 = 1
-    x2 = x1.core:add 1
-    core:print x2.core:add 2
+    x2 = x1.core::add 1
+    core::print x2.core::add 2
 ```
 
 Avoid needless parentheses,
@@ -712,7 +712,7 @@ def main()
 Declare alternatives between types (unions) by separating them
 with `|`. Below is an example that defines a function for
 adding either a float or an integer to a float. The brackets
-are used to add some C code, inside which `builtins:float` is
+are used to add some C code, inside which `builtins::float` is
 injected by *smoλ* as the appropriate builtin type. 
 
 The exemplified functionality of adding any two numbers together
@@ -729,7 +729,7 @@ import "builtins"
 import "std/core.s":print
 
 def unsafe_add(float x, float|int y)
-    {builtins:float z=x+y;}
+    {builtins::float z=x+y;}
     return z
 
 def main()
@@ -748,7 +748,7 @@ import "std/core.s":print
 
 def Number = float|int|nat
 def unsafe_add(Number x, Number y)
-    {builtins:float z=x+y;}
+    {builtins::float z=x+y;}
     return z
 
 def main()
@@ -846,8 +846,8 @@ For example, `"two" number_name` is a valid function argument of type `"two"`.
 This is not a value and yout cannot, say, print it.
 
 But you can get back the value associated value with the type via 
-the `compiler:literal` function. 
-That is, `compiler:literal type "two"` yields the `cstr` value `"two"`.
+the `compiler::value` function. 
+That is, `compiler::value type "two"` yields the `cstr` value `"two"`.
 This way, you can extract values from the type system.
 An example that restricts how functions are called is presented next.
 
@@ -857,7 +857,7 @@ import "std/core.s"
 def inc(nat x, blank|1|2 inc)
     if inc is blank  # check if exists - see next section
         inc = type 1 # literal convertible
-    return x+compiler:literal inc
+    return x+compiler::value inc
 
 def main()
     CLI = edit console()
@@ -977,7 +977,7 @@ def main()
     print inc(2,2) # prints 4
 ```
 
-Here is a much more complicated scenario, where `compiler:skip()` 
+Here is a much more complicated scenario, where `compiler::skip()` 
 prevents certain versions of the function from being
 created (e.g. there is no `inc(float,int)`). The example also reveals 
 three type inference constructs.
@@ -998,7 +998,7 @@ def inc(Num x, Num|blank value) # equivalent: def inc(float|int|nat x, float|int
     if value is blank
         value = Num 1->type x # one with the same number format as x
     if not value is type x
-        compiler:skip() # skip invalid 'inc' definitions
+        compiler::skip() # skip invalid 'inc' definitions
     return x+value
 
 def main()
@@ -1238,7 +1238,7 @@ new value to a mutable pointer use `&&` after the value again per
 `old_ptr = new_ptr&&`. Otherwise, assignment copies a compatible
 structure's contents onto a mutable pointer's memory location.
 
-The `compiler:deref` function dereferences pointers onto local objects. 
+The `compiler::deref` function dereferences pointers onto local objects. 
 For example, `compiler.deref(ptr).field` gets a field from an object, after
 dereferencing the latter. Given all these operators
 it is now possible to explain that `buffer[pos]=value` desugars 
@@ -1271,14 +1271,14 @@ a pointer to it. Then that is moved around via its memory address.
 import "std/core.s"
 
 def inc(mut float ptr element)
-    element = 1.0+compiler:deref element
+    element = 1.0+compiler::deref element
 
 def main()
     CLI = edit console()
     element = [0.0]& # equivalent to element = [0.0][0]&& 
-    print compiler:deref element # prints 0.0
+    print compiler::deref element # prints 0.0
     inc element
-    print compiler:deref element # prints 1,0
+    print compiler::deref element # prints 1,0
 ```
 
 Creating many pointers this way is inefficient in that it produce a lot of small allocations.
@@ -1455,7 +1455,7 @@ Propagating failures is done in the spirit of writing concise but well-controlle
 **Don't care about failures. Unless you must.** That is, assume correct execution,
 as if you were scripting, and only handle failures at places where they can be handled
 safely or where they would be critical. If it is important to ensure that 
-a function does not fail up to a certain point, place the `debug:nocatch()` 
+a function does not fail up to a certain point, place the `debug::nocatch()` 
 assertion. There are various other compiler assertions too, which are covered later.
 
 ```python
@@ -1467,7 +1467,7 @@ def main()
     try x[0] = char "a" # still needs a try for buffer elements - though checks can be optimized away
     try print x[0]
     print "this must run at all costs"
-    debug:nocatch()    # error if without 'try' on all PREVIOUS calls that could fail
+    debug::nocatch()    # error if without 'try' on all PREVIOUS calls that could fail
     print x[10000]      # allowed to fail now
     print "this will never run due to out of bounds error"
 ```
@@ -1628,7 +1628,7 @@ import "std/io.s":process as process
 
 def main()
     CLI = edit console()
-    proc = mut process:read "echo \"hello world!\""
+    proc = mut process::read "echo \"hello world!\""
     del proc # runs the process's defer, which waits for completion
     print "bye!"
 ```
@@ -1636,7 +1636,7 @@ def main()
 
 ## catching errors
 
-The `compiler:catch()` function provides the means of retrieving
+The `compiler::catch()` function provides the means of retrieving
 an error code intercepted by `try` statements. This function creates
 an error itself if it *fails* to find an error. To avoid confusion, the
 compiler just mandates that you should wrap the catch function inside a `try` 
@@ -1650,7 +1650,7 @@ import "std/io.s" as io
 def main()
     CLI = edit console()
     try print 2*3-20 # nat cannot become negative
-    if try error = compiler:catch()
+    if try error = compiler::catch()
         print "cannot substract two nat numbers and obtain a negative result"
 ```
 
@@ -1673,11 +1673,11 @@ def bye_error()
 
 def main()
     CLI = edit console()
-    proc = mut process:read "echo \"hello world!\""
+    proc = mut process::read "echo \"hello world!\""
     try bye_error()
     del proc
 
-    if try error = compiler:catch()
+    if try error = compiler::catch()
         print cstr error # prints 'bye!' if no process error
         fail error       # can fail with error codes too
 ```
@@ -1733,15 +1733,15 @@ one. It is assumed that any such functions could fail when called, and their eff
 will *not* be automatically gathered. Furthermore all their arguments are immutable.
 
 The example below also uses `type inc` to retrieve the functor type
-of the function `inc`, as well as the `compiler:call` builtin function 
+of the function `inc`, as well as the `compiler::call` builtin function 
 to call a functor with given arguments. The retrieval into a factor should be unique.
 
 ```python
 import "std/core.s"
 
 def two(nat->nat c)
-    one = c.compiler:call 0
-    return c.compiler:call one
+    one = c.compiler::call 0
+    return c.compiler::call one
 
 def inc(nat x)
     return x+1
@@ -1783,10 +1783,10 @@ functors based on arguments.
 import "std/core.s"
 
 def call_one(nat->nat->nat x) 
-    return x.compiler:call 1
+    return x.compiler::call 1
 
 def add(nat x, 0|1|2 y) 
-    return x+compiler:literal y
+    return x+compiler::value y
     
 def add(nat x) 
     if x==0 return abstract type add<nat,0>
@@ -1796,7 +1796,7 @@ def add(nat x)
 def main()
     CLI = console()
     x = call_one type add<nat>
-    print x.compiler:call 5 # prints 6
+    print x.compiler::call 5 # prints 6
 ```
 
 
@@ -1804,15 +1804,15 @@ def main()
 
 *Warning: This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.*
 
-So far there was mention of `compiler:skip()`, 
-`compiler:catch()`, `compiler:literal(expression)` and `debug:nocatch()`
+So far there was mention of `compiler::skip()`, 
+`compiler::catch()`, `compiler::value(expression)` and `debug::nocatch()`
 that let code interface with the compiler to an extend.
 
 There are some more mechanisms that help inspect
 programs or grant access to internal compilation state that
 can be analyzed for debugging.
 
-Foremost of debugging tools is `debug:print(expression)`. This 
+Foremost of debugging tools is `debug::print(expression)`. This 
 runs an expression, prints its return at compile time, 
 and returns its value. It works this way so that it can 
 be effortlessly interweaved in code. Do note that you
@@ -1826,13 +1826,13 @@ def main()
     CLI = edit console()
     s1 = str "s1"
     s2 = str "s2"
-    debug:print type "--- main ---" # prints '"--- main ---"' at compile time
-    s = debug:print (s1,s2)         # prints 'const str, const str' at compile time
+    debug::print type "--- main ---" # prints '"--- main ---"' at compile time
+    s = debug::print (s1,s2)         # prints 'const str, const str' at compile time
     print s # ERROR due to undefined print, but the above still prints
 ```
 
 Finally, assert that a specific point in a function does not lie within a loop
-or condition with the `debug:branchless()` check. Or, if you have set up VSCode or 
+or condition with the `debug::branchless()` check. Or, if you have set up VSCode or 
 another means of accessing the language service,
 simply check on the satements by hovering over the `if`. This asserts that there is no 
 conditional compilation going on, with the compiler creating an error otherwis, 
@@ -1854,8 +1854,8 @@ def main()
     c = "one"
     test = (a,b,c)
     if not test is test1|test2
-        debug:branchless()
-        debug:print type "invalid data" # literal type to print the message instead of 'cstr'
+        debug::branchless()
+        debug::print type "invalid data" # literal type to print the message instead of 'cstr'
 ```
 
 ## bounded compute
@@ -1888,14 +1888,14 @@ def main()
     CLI = edit console()
     SAFETY = range of 14 # recursive depth limit in playground
     try wooo 0
-    if try error = compiler:catch()
+    if try error = compiler::catch()
         print cstr error # prints 'iteration end'
 ```
 
 A mechanism that already exists for *smoλ* programs is that the SIGINT signal,
 which is produced by the user pressing ctrl+C, requires manual handling. The
 signal handler is imported from the `"std/io.s"` module and requires a mutable 
-`console CLI` effect to listen to the console interrupt. Then, the `process:interrupt_point()`
+`console CLI` effect to listen to the console interrupt. Then, the `process::interrupt_point()`
 function creates an error if it is called after such an interrupt. For safety,
 this function asks for user input on whether the program should be terminated.
 
@@ -1906,7 +1906,7 @@ import "std/io.s"
 
 rec wooo(effect edit console CLI)
     if false return blank()
-    process:interrupt_point()
+    process::interrupt_point()
     print "wooo"
     wooo()
 
@@ -2121,7 +2121,7 @@ import "std/io.s"
 
 def main()
     CLI = edit console()
-    f = file:read "README.md"
+    f = file::read "README.md"
     mem = char[].alloc KB 4 # max 4 KB chunk size, on char[] by default
     for line in (mem, f)
         print nn "|"
@@ -2138,10 +2138,10 @@ import "std/io.s"
 
 def main()
     CLI = edit console()
-    f = file:write "tmp.txt"
+    f = file::write "tmp.txt"
     f.print "hello world"
     defer 
-        dir:remove "tmp.txt"
+        dir::remove "tmp.txt"
 ```
 
 Above was a first introduction to the `dir` namespace for directory 
@@ -2156,10 +2156,10 @@ import "std/io.s"
 
 def main()
     CLI = edit console()
-    dir = mut dir:read "."
+    dir = mut dir::read "."
     for entry in dir
         print(entry, " ")
-        if dir:is_file entry print "file"
+        if dir::is_file entry print "file"
         else print "dir"
 ```
 
@@ -2195,7 +2195,7 @@ def main()
 
 Equivalently, manually release the process to wait for its conclusion.
 As resource release code intercepts erroneous termination with `try`,
-check on this with `compiler:catch()`.  To propagate or otherwise
+check on this with `compiler::catch()`.  To propagate or otherwise
 handle the intercepted errors, use a pattern like below.
 
 ```python
@@ -2206,7 +2206,7 @@ def main()
     CLI = edit console()
     process = proc:process "ls"
     del process
-    if try error = compiler:catch()
+    if try error = compiler::catch()
         fail error # can fail on error codes too
 ```
 
@@ -2298,7 +2298,7 @@ def concat(mini:str[] buff)
 def main()
     CLI = edit console()
     buff = mini:str[].alloc 6
-    debug:print buff # print the buffer type during compilation
+    debug::print buff # print the buffer type during compilation
     buff[0] = mini:str "hi"
     buff[1] = mini:str "my"
     buff[2] = mini:str "name"
@@ -2355,7 +2355,7 @@ def safe_main()
 def main()
     CLI = edit console()
     try safe_main()
-    if try error=compiler:catch()
+    if try error=compiler::catch()
         print cstr error
 ```
 
@@ -2469,21 +2469,21 @@ def Circle(float _cx, float _cy, float _vx, float _vy, float _radius)
     return (cx,cy,vx,vy,radius)
 
 def process(mut Circle ptr _self, float dt)
-    self = compiler:deref _self
+    self = compiler::deref _self
     self.cx = self.cx + self.vx * dt
     self.cy = self.cy + self.vy * dt
     if self.cx - self.radius < 0.0
         self.cx = self.radius
-        self.vx = sci:abs self.vx
+        self.vx = sci::abs self.vx
     if self.cx + self.radius > 800.0
         self.cx = 800.0 - self.radius
-        self.vx = 0.0-(sci:abs self.vx)
+        self.vx = 0.0-(sci::abs self.vx)
     if self.cy - self.radius < 0.0
         self.cy = self.radius
-        self.vy = sci:abs self.vy
+        self.vy = sci::abs self.vy
     if self.cy + self.radius > 600.0
         self.cy = 600.0 - self.radius
-        self.vy = 0.0-(sci:abs self.vy)
+        self.vy = 0.0-(sci::abs self.vy)
     _self = self
 
 def draw(Circle self, edit graphics:Window win)
@@ -2502,7 +2502,7 @@ def main()
     N = 1000
     circles = Circle[].alloc N
     for create_circle&& in circles
-        i = float compiler:for_counter() # builtin way of enumerating
+        i = float compiler::for_counter() # builtin way of enumerating
         create_circle = Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
 
     while graphics:is_open win
@@ -2539,9 +2539,9 @@ import "std/core.s"
 import "std/io.s"
 
 def run(cstr|str command)
-    proc = mut process:open command
+    proc = mut process::open command
     del proc # force resource deallocation = end the process
-    if try error = compiler:catch()
+    if try error = compiler::catch()
         print cstr error
 
 def main()
@@ -2550,7 +2550,7 @@ def main()
     path = "./tests/passing/"
     copy "./smoll "
     copy path
-    test_dir = dir:open path
+    test_dir = dir::open path
     for entry in test_dir # do not move the position
         if not entry.ends_with ".s" continue
         command = CHARS.buf.str endpos copy_null_terminated(local CHARS, str entry)
@@ -2581,7 +2581,7 @@ def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/
 def main()
     CLI = edit console()
     CHARS = circular alloc KB 4
-    f = edit file:open web:get README
+    f = edit file::open web:get README
     size = mut 0
     for line in f
         size = size+len line

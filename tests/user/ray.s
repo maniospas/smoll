@@ -16,16 +16,16 @@ def process(mut Circle ptr _self, float dt)
     self.cy = self.cy + self.vy * dt
     if self.cx - self.radius < 0.0
         self.cx = self.radius
-        self.vx = sci:abs self.vx
+        self.vx = sci::abs self.vx
     if self.cx + self.radius > 800.0
         self.cx = 800.0 - self.radius
-        self.vx = 0.0-(sci:abs self.vx)
+        self.vx = 0.0-(sci::abs self.vx)
     if self.cy - self.radius < 0.0
         self.cy = self.radius
-        self.vy = sci:abs self.vy
+        self.vy = sci::abs self.vy
     if self.cy + self.radius > 600.0
         self.cy = 600.0 - self.radius
-        self.vy = 0.0-(sci:abs self.vy)
+        self.vy = 0.0-(sci::abs self.vy)
     _self = self
 
 def draw(Circle self, edit graphics:Window win)
@@ -44,7 +44,7 @@ def main()
     N = 1000
     circles = Circle[].alloc N
     for create_circle&& in circles
-        i = float compiler:for_counter() # builtin way of enumerating
+        i = float compiler::for_counter() # builtin way of enumerating
         create_circle = Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
 
     while graphics:is_open win

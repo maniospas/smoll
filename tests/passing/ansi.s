@@ -1,11 +1,11 @@
 import "std/core.s"
 
 def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
-    print nn compiler:literal greeting
+    print nn compiler::value greeting
     if punctuation is blank
         print ""
     else
-        print compiler:literal punctuation
+        print compiler::value punctuation
 
 def main()
     CLI = edit console()

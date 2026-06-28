@@ -15,7 +15,7 @@ def mat(effect edit new FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
     doc "matrix on a fresh buffer"
     buf = float[].alloc(rows*cols dirty)
     if clear_policy is blank
-        buf.unsafe_ptr.unsafe:zero(0, 8*len buf)
+        buf.unsafe_ptr.unsafe::zero(0, 8*len buf)
     return mat(buf.unsafe_ptr, 0, rows, cols, cols)
 
 def mat(effect edit float_allocator\new FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
@@ -25,7 +25,7 @@ def mat(effect edit float_allocator\new FLOATS, nat rows, nat cols, "dirty"|blan
     size = rows*cols
     surface = FLOATS.alloc size
     if clear_policy is blank
-        surface.buf.unsafe_ptr.unsafe:zero(8*surface.pos, 8*(surface.pos+size))
+        surface.buf.unsafe_ptr.unsafe::zero(8*surface.pos, 8*(surface.pos+size))
     return mat(FLOATS.buf.unsafe_ptr, surface.pos, rows, cols, cols)
 
 def constmat(float[] buf, nat rows)

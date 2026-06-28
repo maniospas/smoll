@@ -11,8 +11,8 @@ def hash(str k, nat size)
     return h.mod size
 
 def hash(nat k, nat size)
-    {builtins:nat c1 = 0xff51afd7ed558ccd;}
-    {builtins:nat c2 = 0xc4ceb9fe1a85ec53;}
+    {builtins::nat c1 = 0xff51afd7ed558ccd;}
+    {builtins::nat c2 = 0xc4ceb9fe1a85ec53;}
     x = mut bits k
     x = x.xor x.rshift 33
     x = bits nat(x).mul c1
@@ -56,7 +56,7 @@ def find(robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
     if is_zero k
         return 0
     if not k is type raw data[0]
-        compiler:skip()
+        compiler::skip()
     n = len data
     pos = hash(k, n)
     for i in range of n
@@ -75,7 +75,7 @@ def at(edit robinhood_entry[] data, cstr|str|nat _k)
     if is_zero k
         return 0
     if not k is type raw data[0]
-        compiler:skip()
+        compiler::skip()
     n = len data
     pos = hash(k, n)
     for i in range of n

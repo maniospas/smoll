@@ -20,7 +20,7 @@ local import "std/unsafe.s" as unsafe
 def is_dir(cstr path)
     doc "checks whether a path points to an existing directory"
     VM "[os.path.is_dir($path)]"
-    {builtins:bool exists = __smo_is_dir(path);}
+    {builtins::bool exists = __smo_is_dir(path);}
     return exists
 
 def is_dir(str|cstr path)
@@ -30,7 +30,7 @@ def is_dir(str|cstr path)
 def create_dir(cstr path)
     doc "creates a directory at a cstr path, fails if it alopeny exists or cannot be created"
     VM "[os.path.mkdir($path)]"
-    {builtins:bool result = __smo_create_dir(path);}
+    {builtins::bool result = __smo_create_dir(path);}
     if not result fail "failed to create directory"
 
 def create_dir(str path)
@@ -39,13 +39,13 @@ def create_dir(str path)
 def is_file(str|cstr _path)
     doc "checks whether a cstr path points to an existing file"
     path = cstr unsafe_temp _path
-    {builtins:bool exists = __smo_is_file(path);}
+    {builtins::bool exists = __smo_is_file(path);}
     return exists
 
 def remove(str|cstr _path)
     doc "removes a file at a cstr path, fails if it cannot be removed"
     path = cstr unsafe_temp _path
-    {builtins:bool result = __smo_remove_file(path);}
+    {builtins::bool result = __smo_remove_file(path);}
     if not result fail "failed to remove file"
 
 local def closedir(any ptr unsafe_ptr) # super unsafe to expose
@@ -55,7 +55,7 @@ local def closedir(any ptr unsafe_ptr) # super unsafe to expose
 def open(cstr path)
     doc "loads a cstr path as a openable directory"
     VM "[memory.register_foreign(os.scandir($path), 'dir '+$path)]"
-    {builtins:compiler:ptr unsafe_ptr = (char*)opendir(path);}
+    {builtins::compiler::ptr unsafe_ptr = (char*)opendir(path);}
     defer
         closedir unsafe_ptr
     if not exists unsafe_ptr fail "failed to open file"
@@ -68,10 +68,10 @@ local def raw_entry(edit open f) # this function returns a content pointer, but 
     VM "[safeguard(lambda memory=memory: memory.write_cstr(next(memory.get_foreign($f__unsafe_ptr)).name), ExpectedException('end of dir'))]"
     if not exists f.unsafe_ptr
         fail "not open dir"
-    {builtins:compiler:ptr de = (char*)readdir((DIR*)f__unsafe_ptr);}
+    {builtins::compiler::ptr de = (char*)readdir((DIR*)f__unsafe_ptr);}
     if not exists de
         fail "end of dir"
-    {builtins:cstr dirname=((struct dirent*)de)->d_name;}
+    {builtins::cstr dirname=((struct dirent*)de)->d_name;}
     return dirname
 
 def entry(edit open f)

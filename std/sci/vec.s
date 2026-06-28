@@ -16,7 +16,7 @@ def vec(effect new FLOATS, nat length, "dirty"|blank clear_policy)
     doc "Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer."
     buf = float[].alloc(length dirty)
     if clear_policy is blank
-        buf.unsafe_ptr.unsafe:zero(0, 8*length)
+        buf.unsafe_ptr.unsafe::zero(0, 8*length)
     return vec(buf.unsafe_ptr, 0, length)
 
 def vec(edit float[] buf)
@@ -38,7 +38,7 @@ def vec(effect edit float_allocator\new FLOATS, nat length, "dirty"|blank clear_
     surface = FLOATS.alloc length
     FLOATS.pos = FLOATS.pos+length
     if clear_policy is blank
-        FLOATS.buf.unsafe_ptr.unsafe:zero(8*surface.pos, 8*(surface.pos+length))
+        FLOATS.buf.unsafe_ptr.unsafe::zero(8*surface.pos, 8*(surface.pos+length))
     return vec(surface.buf.unsafe_ptr, surface.pos, length)
 
 def len(vec v)
@@ -68,7 +68,7 @@ def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
         fail "different vector sizes"
     v = edit vec(v1.length dirty)
     for value in v1
-        i = compiler:for_counter()
+        i = compiler::for_counter()
         v[i] = value+v2.at i
     return v
 
@@ -84,7 +84,7 @@ def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
         fail "different vector sizes"
     v = edit vec(v1.length dirty)
     for value in v1
-        i = compiler:for_counter()
+        i = compiler::for_counter()
         v[i] = value-v2.at i
     return v
 
@@ -93,7 +93,7 @@ def sub(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "Grabs an FLOATS for the result as an effect."
     v = edit vec v2.length
     for value in v2
-        v[compiler:for_counter()] = v1-value
+        v[compiler::for_counter()] = v1-value
     return v
 
 def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
@@ -103,7 +103,7 @@ def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
         fail "different vector sizes"
     v = edit vec(v1.length dirty)
     for value in v1
-        i = compiler:for_counter()
+        i = compiler::for_counter()
         v[i] = value*v2.at i
     return v
 
@@ -120,7 +120,7 @@ def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
         fail "different vector sizes"
     v = edit vec(v1.length dirty)
     for value in v1
-        i = compiler:for_counter()
+        i = compiler::for_counter()
         v[i] = pow(value, v2.at i)
     return v
 
@@ -129,7 +129,7 @@ def pow(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "Grabs an FLOATS for the result as an effect."
     v = edit vec(v2.length dirty)
     for value in v2
-        v[compiler:for_counter()] = pow(v1, value)
+        v[compiler::for_counter()] = pow(v1, value)
     return v
 
 def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
@@ -140,7 +140,7 @@ def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     v = edit vec(v1.length dirty)
     p1 = v1.unsafe_ptr
     for value in v1
-        i = compiler:for_counter()
+        i = compiler::for_counter()
         v[i] = value/v2.at i
     return v
 
@@ -149,7 +149,7 @@ def div(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "Grabs an FLOATS for the result as an effect."
     v = edit vec(v2.length dirty)
     for value in v2
-        v[compiler:for_counter()] = v1/value
+        v[compiler::for_counter()] = v1/value
     return v
     
 def reduce(vec v, blank|"mul"|"sub"|"rel" comparison, blank|vec v2, blank|"add"|"mul" reduction, blank|"abs"|"sqr"|"l2" transform)
@@ -164,17 +164,17 @@ def reduce(vec v, blank|"mul"|"sub"|"rel" comparison, blank|vec v2, blank|"add"|
     if reduction is "mul"
         ret = mut 1.0
     if (v2 is blank) and (not comparison is blank)
-        compiler:skip()
+        compiler::skip()
     for _value in v
         value = mut _value
         if comparison is "sub"
-            i = compiler:for_counter()
+            i = compiler::for_counter()
             value = value-v2[i]
         if comparison is "mul"
-            i = compiler:for_counter()
+            i = compiler::for_counter()
             value = value-v2[i]
         if comparison is "rel"
-            i = compiler:for_counter()
+            i = compiler::for_counter()
             value = (value-v2[i])*2.0/(abs(value)+abs(v2[i]))
         if transform is "abs"
             value = abs(value)
@@ -187,6 +187,10 @@ def reduce(vec v, blank|"mul"|"sub"|"rel" comparison, blank|vec v2, blank|"add"|
     if transform is "l2"
         ret = pow(ret, 0.5)
     return const ret
+
+def dot(vec v1, vec v2)
+    doc "dot product"
+    return reduce(v1 mul v2)
 
 def sum(vec v)
     doc "sum"
@@ -234,7 +238,7 @@ def copy(effect edit float_allocator FLOATS, vec v)
     doc "Grabs a FLOATS for the result as an effect."
     result = edit vec(v.length dirty)
     for value in v
-        result[compiler:for_counter()] = value
+        result[compiler::for_counter()] = value
     return result
 
 def arena(edit vec v)

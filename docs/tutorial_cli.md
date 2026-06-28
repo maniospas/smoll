@@ -99,11 +99,11 @@ and handled. Preface error-prone expressions with a `try` keyword. This actually
 evaluates to true/false depending on whether execution was successful or an error
 occurred. Use it like below.
 
-At the very end of our function, the `debug:nocatch()`
+At the very end of our function, the `debug::nocatch()`
 function is called to ensure that we have enclosed all potential errors in a `try`
 statement. This is recognized during compilation, with the language helping us 
 identify missed errors up to that point. In general, there are several helper functions
-under the `debug:` and `compiler:` namespaces that help us interact with the compiler
+under the `debug::` and `compiler::` namespaces that help us interact with the compiler
 for debugging and more dynamic programs.
 
 ```python
@@ -120,7 +120,7 @@ def main()
         print x*x
     else
         print "failed to read number"
-    debug:nocatch() # fails compilation if we leave unhandled errors
+    debug::nocatch() # fails compilation if we leave unhandled errors
 ```
 
 The above can also be converted into a safe loop that waits for successful user
@@ -139,7 +139,7 @@ def main()
         print "invalid format"
     print nn "its square is: "
     print x*x
-    debug:nocatch() # fails compilation if we leave unhandled errors
+    debug::nocatch() # fails compilation if we leave unhandled errors
 ```
 
 ## more on types
@@ -635,7 +635,7 @@ def main()
 Variables associated with literal types can only be assigned to literals
 of the same type and are therefore useless for runtime code, where they do
 not appear, even if they are pretty useful
-for type checks. Use the `compiler:literal` function to retrieve the actual 
+for type checks. Use the `compiler::value` function to retrieve the actual 
 value from the compiler to write polymorphic functions whose runtime data depend
 on which polymorphic function variation is used.
 
@@ -647,7 +647,7 @@ same mechanism as above grants us zero-cost literal comparison.
 import "std/core.s"
 
 def greet(effect edit console CLI, "hello"|"hi" greeting)
-    print nn compiler:literal greeting
+    print nn compiler::value greeting
     if greeting is "hello" # 'is' starts type parsing
         print nn " world"
     print "!"
@@ -712,14 +712,14 @@ you can only find them within parentheses.
 import "std/core.s"
 
 def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"world" world, blank|"."|"!" punctuation)
-    print nn compiler:literal greeting
+    print nn compiler::value greeting
     if not world is blank
         print nn " "
-        print nn compiler:literal world
+        print nn compiler::value world
     if punctuation is blank
         print ""
     else
-        print compiler:literal punctuation
+        print compiler::value punctuation
 
 def main()
     CLI = edit console()
@@ -853,7 +853,7 @@ def main()
 Since we are in the subject of string manipulation, now is a good time
 to mention that we can import some more command line functionality from the
 process namespace that is part of `"std/io.s"`. That gives access
-to the ability to run system commands per `process:system "ls"` or even
+to the ability to run system commands per `process::system "ls"` or even
 read their outputs as if you would files. But the relevant part is 
 that we can retrieve the operating system name as a `cstr` value, as well
 as command line arguments passed to the running program as a `cstr[]` buffer.
@@ -993,16 +993,16 @@ import "std/io.s"
 def main()
     CLI = edit console()
     CHARS = edit circular char[].alloc 4096
-    if not try f = file:open "README.md" # reminder: checks for opening success
+    if not try f = file::open "README.md" # reminder: checks for opening success
         print "could not find file"
         fail "could not find file" # create an error manually to stop the program
     for line in f
         print nn "line "
-        print compiler:for_counter()
+        print compiler::for_counter()
         print line
 ```
 
 By the way, the `for varname in iterable` in general is a means of going through
 all elements of an iterable. It desugars to a `while` loop under-the-hood,
-and also grants access to `compiler:for_counter()` variable to automatically 
+and also grants access to `compiler::for_counter()` variable to automatically 
 enumerate the iteration's progress.

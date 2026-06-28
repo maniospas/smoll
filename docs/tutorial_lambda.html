@@ -299,7 +299,7 @@ via the <code>class</code> notation. Retrieve results with the dot notation too.
 modifiers followed by a type and an optional (though typically present) variable 
 name. The type itself can be of the form <code>type1-&gt;type2</code> to declare a <strong>functor</strong>
 that takes as inputs arguments of <code>type1</code> and yields arguments of <code>type2</code>. Functors
-can be supplied with arguments to yield a result using the <code>compiler:call</code> builtin
+can be supplied with arguments to yield a result using the <code>compiler::call</code> builtin
 helper function. This executes the functor eagerly.
 Conversely, to create a functor from a function name, use the <code>type</code>
 keyword. Next is an example.</p>
@@ -309,7 +309,7 @@ keyword. Next is an example.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">pair</span><span class="p">(</span><span class="n">nat</span><span class="p">,</span><span class="n">nat</span><span class="p">)</span>  <span class="c1"># no function body assumes that arguments are returned</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">pair</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">addition</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">addition</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">adder</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span>
@@ -330,7 +330,7 @@ the <code>&lt;...&gt;</code> notation to enclose a valid input signature. Like b
 
 <span class="k">def</span><span class="w"> </span><span class="nf">pair</span><span class="p">(</span><span class="n">nat</span><span class="p">,</span><span class="n">nat</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">pair</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">addition</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">addition</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -355,7 +355,7 @@ zero-cost abstractions and function pointers under the hood. Below is an example
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">add1</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span> 
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
@@ -369,7 +369,7 @@ zero-cost abstractions and function pointers under the hood. Below is an example
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">successor_function</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>  <span class="c1"># filter out add functions from the standard library</span>
-    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
+    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
 </code></pre>
 </div>
 
@@ -379,16 +379,16 @@ to simplify it; those are types that correspond to specific
 literal values. Next is an example, where <code>1,2</code> at the
 place where types are expected create literal types, and the 
 vertical dash <code>|</code> shows type alternatives. The builtin
-<code>compiler:literal</code> retrieves back a value from a literal type.</p>
+<code>compiler::value</code> retrieves back a value from a literal type.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">value</span><span class="p">)</span> 
-    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">value</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span>
@@ -398,7 +398,7 @@ vertical dash <code>|</code> shows type alternatives. The builtin
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">successor_function</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>
-    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
+    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
 </code></pre>
 </div>
 
@@ -406,26 +406,26 @@ vertical dash <code>|</code> shows type alternatives. The builtin
 would complain that <code>add(nat y)</code> has mismatching return types. The
 reason is that literal types persist in the type system, even if incur
 no runtime cost. However, you can strip away the literal type information
-from functors using the <code>compiler:abstract</code> function.</p>
+from functors using the <code>compiler::abstract</code> function.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">value</span><span class="p">)</span> 
-    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">value</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">:</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span>
-    <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">2</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">:</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">2</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span>
     <span class="n">fail</span> <span class="s2">&quot;unaccepted number&quot;</span> 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">successor_function</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>
-    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
+    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
 </code></pre>
 </div>
 
@@ -440,21 +440,21 @@ types instead of functions.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">increments</span> <span class="o">=</span> <span class="mi">1</span><span class="o">|</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span><span class="mi">4</span><span class="o">|</span><span class="mi">5</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">increments</span> <span class="n">value</span><span class="p">)</span> 
-    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">value</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">increment</span> <span class="ow">is</span> <span class="n">increments</span>
-        <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">increment</span>
-            <span class="k">return</span> <span class="n">compiler</span><span class="p">:</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="n">increment</span><span class="o">&gt;</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">increment</span>
+            <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="n">increment</span><span class="o">&gt;</span>
     <span class="n">fail</span> <span class="s2">&quot;unaccepted number&quot;</span> 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">successor_function</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>
-    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
+    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
 </code></pre>
 </div>
 
@@ -473,9 +473,9 @@ or use-after-free.</p>
 upwards in the call stack. Below is an example, where <code>try</code> encloses
 potentially failing expressions. For clarity, you are not allowed to <code>try</code> 
 on an error-less expression. There are also some accompanying builtin functions 
-that provide more advanced diagnostics, like <code>compiler:catch</code> to retrieve
+that provide more advanced diagnostics, like <code>compiler::catch</code> to retrieve
 error codes and descriptions afterwards, but these are not the subject
-of this tutorial. Only note that <code>try print successor_function.compiler:call 5</code>
+of this tutorial. Only note that <code>try print successor_function.compiler::call 5</code>
 would print <em>0</em> because try forcefully tries to implement every declared function
 call, substituting failures with zero-initialized values.</p>
 
@@ -483,20 +483,20 @@ call, substituting failures with zero-initialized values.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">10</span> <span class="c1"># will return a &quot;null&quot; functor</span>
+    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">10</span> <span class="c1"># will return a &quot;null&quot; functor</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">increments</span> <span class="o">=</span> <span class="mi">1</span><span class="o">|</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span><span class="mi">4</span><span class="o">|</span><span class="mi">5</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">increments</span> <span class="n">value</span><span class="p">)</span> 
-    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">value</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">increment</span> <span class="ow">is</span> <span class="n">increments</span>
-        <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">increment</span>
-            <span class="k">return</span> <span class="n">compiler</span><span class="p">:</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="n">increment</span><span class="o">&gt;</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">increment</span>
+            <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="n">increment</span><span class="o">&gt;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">successor_function</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>
-    <span class="k">if</span> <span class="k">try</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># fail to call the &quot;null&quot; functor</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># fail to call the &quot;null&quot; functor</span>
         <span class="nb">print</span> <span class="n">ret</span>
     <span class="k">else</span>
         <span class="nb">print</span> <span class="s2">&quot;failed&quot;</span>

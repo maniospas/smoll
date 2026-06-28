@@ -13,7 +13,7 @@ def concat(mini:str[] buff)
 def main()
   CLI = edit console()
   buff = mut mini:str[].alloc 6
-  debug:print buff
+  debug::print buff
   buff[0] = mini:str "hi"
   buff[1] = mini:str "my"
   buff[2] = mini:str "name"

@@ -24,10 +24,10 @@
 local import "std/core.s"
 
 local def rotl(nat x, nat k)
-    {builtins:nat left = x << k;}
-    {builtins:nat compk = 64 - k;}
-    {builtins:nat right = x >> compk;}
-    {builtins:nat z = left | right;}
+    {builtins::nat left = x << k;}
+    {builtins::nat compk = 64 - k;}
+    {builtins::nat right = x >> compk;}
+    {builtins::nat z = left | right;}
     return z
 
 def splitmix64(mut nat x)
@@ -41,8 +41,8 @@ def splitmix64(mut nat x)
     doc "marked as a leaking resource to prevent time-based randomization (which is "
     doc "not random)."
     {x = x+0x9E3779B97F4A7C15ULL;}
-    {builtins:nat z = x;}
-    {builtins:nat rot = z >> 30;}
+    {builtins::nat z = x;}
+    {builtins::nat rot = z >> 30;}
     {z = z^rot;}
     {z = z * 0xBF58476D1CE4E5B9ULL;}
     {rot = z >> 27;}
@@ -57,9 +57,9 @@ def splitmix64()
     doc "Computes the seed of a splitmix64 sequence using the clock"
     doc "as the source of entropy."
     VM "[time.time_ns()]"
-    {builtins:compiler:ptr ts = alloca(sizeof(struct timespec));}
+    {builtins::compiler::ptr ts = alloca(sizeof(struct timespec));}
     {clock_gettime(CLOCK_REALTIME, (struct timespec*)ts);}
-    {builtins:nat seed = (unsigned long long)((struct timespec*)ts)->tv_sec * (unsigned long long)1000000000 + ((struct timespec*)ts)->tv_nsec;}
+    {builtins::nat seed = (unsigned long long)((struct timespec*)ts)->tv_sec * (unsigned long long)1000000000 + ((struct timespec*)ts)->tv_nsec;}
     return seed
 
 def Rand(nat seed)
@@ -87,16 +87,16 @@ def Rand()
 
 def next(mut Rand self)
     doc "Computes the next random number of a Rand sequence."
-    {builtins:nat result = self__s0 + self__s3;}
-    {builtins:nat t = self__s1 << 17;}
+    {builtins::nat result = self__s0 + self__s3;}
+    {builtins::nat t = self__s1 << 17;}
     {self__s2 = self__s2^self__s0;}
     {self__s3 = self__s3^self__s1;}
     {self__s1 = self__s1^self__s2;}
     {self__s0 = self__s0^self__s3;}
     {self__s2 = self__s2^t;}
     self.s3 = rotl(self.s3, 45)
-    {builtins:float denom = 0x0020000000000000ULL;}
-    {builtins:float nom = result >> 11;}
-    {builtins:float value = nom / denom;}
+    {builtins::float denom = 0x0020000000000000ULL;}
+    {builtins::float nom = result >> 11;}
+    {builtins::float value = nom / denom;}
     return value
 

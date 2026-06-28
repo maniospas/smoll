@@ -8,7 +8,7 @@ def ok(response response)
     return (response.status >= 200) and (response.status < 300)
 
 def HttpMethod("GET"|"POST" _method)
-    method = compiler:literal _method
+    method = compiler::value _method
     return class method
 
 def HttpOptions(HttpMethod method, cstr|blank body, cstr|blank content_type)
@@ -20,14 +20,14 @@ def HttpOptions(HttpMethod method, cstr|blank body, cstr|blank content_type)
 
 def request(effect edit new|char_arena|char_circular CHARS, str|cstr _url, HttpOptions opts)
     {"-lcurl"}
-    {builtins:compiler:ptr curl = curl_easy_init();}
+    {builtins::compiler::ptr curl = curl_easy_init();}
     if not exists curl fail "curl initialization failed"
     url = cstr unsafe_temp _url
     if CHARS is new
         buf = edit char[]
         pos = 0
         defer
-            if exists buf.unsafe_ptr buf.unsafe_ptr.unsafe:free()
+            if exists buf.unsafe_ptr buf.unsafe_ptr.builtins::free()
     if CHARS is char_arena
         buf = CHARS.buf
         pos = CHARS.pos
@@ -56,13 +56,13 @@ def request(effect edit new|char_arena|char_circular CHARS, str|cstr _url, HttpO
         curl_easy_setopt((CURL*)curl, CURLOPT_HTTPHEADER, __headers);
     }
     {
-        builtins:nat status = 0;
+        builtins::nat status = 0;
         if (curl_easy_perform((CURL*)curl) == CURLE_OK)
             curl_easy_getinfo((CURL*)curl, CURLINFO_RESPONSE_CODE, &status);
         curl_easy_cleanup((CURL*)curl);
         if (__headers) curl_slist_free_all(__headers);
     }
-    { builtins:bool has_read = __buf.data!=0; }
+    { builtins::bool has_read = __buf.data!=0; }
     if not has_read fail "out of memory while reading response"
     {buf__unsafe_size = __buf.size;}
     {buf__unsafe_ptr = __buf.data;}

@@ -25,4 +25,4 @@ def main()
     CLI = console()
     CHARS = edit circular char[].alloc 1024*1024
     GLOBS = globals()
-    for line in file:open "tests/test.s"
+    for line in file::open "tests/test.s"

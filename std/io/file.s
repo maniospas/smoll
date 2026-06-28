@@ -21,7 +21,7 @@ def open(str|cstr _path)
     doc "loads a path as a openable file"
     doc "The file name is not maintained and must be tracked externally, if needed."
     path = cstr unsafe_temp _path
-    {builtins:compiler:ptr unsafe_ptr = (char*)fopen(path, "r");}
+    {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "r");}
     defer
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
     if not exists unsafe_ptr fail "failed to open file"
@@ -30,7 +30,7 @@ def open(str|cstr _path)
 def write(str|cstr _path)
     path = cstr unsafe_temp _path
     doc "creates a new file at cstr path as a writable object, fails if it alopeny exists"
-    {builtins:compiler:ptr unsafe_ptr = (char*)fopen(path, "wx+");}
+    {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "wx+");}
     defer
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
     if not exists unsafe_ptr fail "failed to create file"
@@ -38,9 +38,9 @@ def write(str|cstr _path)
 
 def terminal()
     doc "opens a new system writable interactive terminal, fails if no display is available"
-    {builtins:bool has_gui = __smo_has_display();}
+    {builtins::bool has_gui = __smo_has_display();}
     if not has_gui fail "cannot open a new terminal in the current environment"
-    {builtins:compiler:ptr unsafe_ptr = __smo_open_console();}
+    {builtins::compiler::ptr unsafe_ptr = __smo_open_console();}
     defer
         {__smo_close_console((FILE*)unsafe_ptr); unsafe_ptr=0;}
     if not exists unsafe_ptr fail "failed to open new terminal"
@@ -71,9 +71,9 @@ def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     if pos is blank
         pos = mut 0
     if not exists buf.unsafe_ptr fail "not open file"
-    contents = unsafe:add(buf.unsafe_ptr, pos)
+    contents = unsafe::add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos
-    {builtins:nat bytes_open = f__unsafe_ptr?fread((char*)contents, 1, size, (FILE*)f__unsafe_ptr):0;}
+    {builtins::nat bytes_open = f__unsafe_ptr?fread((char*)contents, 1, size, (FILE*)f__unsafe_ptr):0;}
     if bytes_open==0 fail "end of file"
     prev_pos = const pos
     pos = pos+bytes_open
@@ -95,19 +95,19 @@ def line(effect edit char_arena|char_circular CHARS, edit File f)
     buf = ref CHARS.buf
     if not exists buf.unsafe_ptr
         fail "not open file"
-    contents = unsafe:add(buf.unsafe_ptr, pos)
+    contents = unsafe::add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos
-    {if(f__unsafe_ptr){builtins:compiler:ptr obtained = fgets(contents, size, (FILE*)f__unsafe_ptr);}}
+    {if(f__unsafe_ptr){builtins::compiler::ptr obtained = fgets(contents, size, (FILE*)f__unsafe_ptr);}}
     if not exists obtained
         fail "end of file"
-    {builtins:nat bytes_open = strlen(contents);}
+    {builtins::nat bytes_open = strlen(contents);}
     CHARS.pos = pos+bytes_open
     return str(buf, pos to CHARS.pos)
 
 def print(edit terminal|write f, str text)
     doc "writes a string to a write file"
     if not exists f.unsafe_ptr fail "failed to write to closed file"
-    {builtins:nat bytes_written = fwrite((char*)text__unsafe_ptr, 1, text__unsafe_size, (FILE*)f__unsafe_ptr);}
+    {builtins::nat bytes_written = fwrite((char*)text__unsafe_ptr, 1, text__unsafe_size, (FILE*)f__unsafe_ptr);}
     if bytes_written!=len text fail "failed to write to file"
 
 def print(edit terminal|write f, cstr text)

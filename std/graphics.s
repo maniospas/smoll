@@ -23,7 +23,7 @@ def Window(Size size, cstr title)
     return singleton(size, title, openy)
 
 def is_open(Window)
-    {builtins:bool ret = WindowShouldClose(); }
+    {builtins::bool ret = WindowShouldClose(); }
     return not ret
 
 def draw(edit Window window)
@@ -61,11 +61,11 @@ def exists(Texture tex)
 
 def open(cstr path)
     {
-        builtins:nat id = 0;
-        builtins:float width = 0;
-        builtins:float height = 0;
-        builtins:nat mipmaps = 0;
-        builtins:nat format = 0;
+        builtins::nat id = 0;
+        builtins::float width = 0;
+        builtins::float height = 0;
+        builtins::nat mipmaps = 0;
+        builtins::nat format = 0;
         __smolambda_ray_texture(path__contents, id, width, height, mipmaps, format);
     }
     defer
@@ -137,8 +137,8 @@ def rect_line(edit Window window, Position pos, Size size, nat thickness, Color 
 
 def circ_line(edit Window window, Position pos, nat radius, nat thickness, Color color)
     {
-        builtins:float inner = (radius > thickness) ? (float)(radius - thickness) : 0.0f;
-        builtins:float outer = (float)radius;
+        builtins::float inner = (radius > thickness) ? (float)(radius - thickness) : 0.0f;
+        builtins::float outer = (float)radius;
         DrawRing(
             (Vector2){(float)pos__x, 
             (float)pos__y}, 
@@ -153,5 +153,5 @@ def circ_line(edit Window window, Position pos, nat radius, nat thickness, Color
     return window
 
 def dt()
-    {builtins:float dt = GetFrameTime();}
+    {builtins::float dt = GetFrameTime();}
     return dt

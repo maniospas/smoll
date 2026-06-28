@@ -37,7 +37,7 @@ def unsafe_console()
     doc "This is convenient for print debugging by writing `unsafe_console().print ...`"
     doc "without needing to evoke an effect to pass the normally singleton console."
     CLI = edit console()
-    debug:unsafe_singletons()
+    debug::unsafe_singletons()
     return CLI
 
 def flush(effect edit console CLI)
@@ -87,14 +87,14 @@ def print(effect edit console CLI, bool value, cstr|blank endl)
         endl = "\n"
     {if(value){printf("%s%s", "true", endl);}else{printf("%s%s", "false", endl);}}
 
-def print(effect edit console CLI, compiler:true, cstr|blank endl)
+def print(effect edit console CLI, compiler::true, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("true%s", endl);}
     
-def print(effect edit console CLI, compiler:false, cstr|blank endl)
+def print(effect edit console CLI, compiler::false, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
@@ -103,7 +103,7 @@ def print(effect edit console CLI, compiler:false, cstr|blank endl)
 
 def supports_ansi(console CLI)
     VM "[supports_ansi()]"
-    {builtins:bool supports = __smo_ansi_supported();}
+    {builtins::bool supports = __smo_ansi_supported();}
     return supports
 
 def colors(edit console CLI)

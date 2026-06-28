@@ -64,7 +64,7 @@ Function arguments are comma-separated and have the form of some optional mutabi
 modifiers followed by a type and an optional (though typically present) variable 
 name. The type itself can be of the form `type1->type2` to declare a **functor**
 that takes as inputs arguments of `type1` and yields arguments of `type2`. Functors
-can be supplied with arguments to yield a result using the `compiler:call` builtin
+can be supplied with arguments to yield a result using the `compiler::call` builtin
 helper function. This executes the functor eagerly.
 Conversely, to create a functor from a function name, use the `type`
 keyword. Next is an example.
@@ -74,7 +74,7 @@ import "std/core.s"
 
 def pair(nat,nat)  # no function body assumes that arguments are returned
 def next(nat x, pair->nat addition)
-    return addition.compiler:call(x,1)
+    return addition.compiler::call(x,1)
 
 def adder(nat x, nat y)
     return x+y
@@ -94,7 +94,7 @@ import "std/core.s"
 
 def pair(nat,nat)
 def next(nat x, pair->nat addition)
-    return addition.compiler:call(x,1)
+    return addition.compiler::call(x,1)
 
 def main()
     CLI = edit console()
@@ -118,7 +118,7 @@ zero-cost abstractions and function pointers under the hood. Below is an example
 import "std/core.s"
 
 def next(nat->nat->nat addition_generator)
-    return addition_generator.compiler:call 1
+    return addition_generator.compiler::call 1
 
 def add1(nat x) 
     return x+1
@@ -132,7 +132,7 @@ def add(nat y)
 def main()
     CLI = edit console()
     successor_function = next type add<nat>  # filter out add functions from the standard library
-    print successor_function.compiler:call 5 # prints 6
+    print successor_function.compiler::call 5 # prints 6
 ```
 
 This code has a lot of repetition, which would only grow if
@@ -141,16 +141,16 @@ to simplify it; those are types that correspond to specific
 literal values. Next is an example, where `1,2` at the
 place where types are expected create literal types, and the 
 vertical dash `|` shows type alternatives. The builtin
-`compiler:literal` retrieves back a value from a literal type.
+`compiler::value` retrieves back a value from a literal type.
 
 ```python
 import "std/core.s"
 
 def next(nat->nat->nat addition_generator)
-    return addition_generator.compiler:call 1
+    return addition_generator.compiler::call 1
 
 def add(nat x, 1|2 value) 
-    return x+compiler:literal value
+    return x+compiler::value value
 
 def add(nat y)
     if y==1 return type add<nat,1>
@@ -160,34 +160,34 @@ def add(nat y)
 def main()
     CLI = edit console()
     successor_function = next type add<nat>
-    print successor_function.compiler:call 5 # prints 6
+    print successor_function.compiler::call 5 # prints 6
 ```
 
 The above code makes a lot of sense for us humans, but the compiler
 would complain that `add(nat y)` has mismatching return types. The
 reason is that literal types persist in the type system, even if incur
 no runtime cost. However, you can strip away the literal type information
-from functors using the `compiler:abstract` function.
+from functors using the `compiler::abstract` function.
 
 
 ```python
 import "std/core.s"
 
 def next(nat->nat->nat addition_generator)
-    return addition_generator.compiler:call 1
+    return addition_generator.compiler::call 1
 
 def add(nat x, 1|2 value) 
-    return x+compiler:literal value
+    return x+compiler::value value
 
 def add(nat y)
-    if y==1 return compiler:abstract type add<nat,1>
-    if y==2 return compiler:abstract type add<nat,2>
+    if y==1 return compiler::abstract type add<nat,1>
+    if y==2 return compiler::abstract type add<nat,2>
     fail "unaccepted number" 
 
 def main()
     CLI = edit console()
     successor_function = next type add<nat>
-    print successor_function.compiler:call 5 # prints 6
+    print successor_function.compiler::call 5 # prints 6
 ```
 
 We are starting to generalize. As a last feature,
@@ -202,21 +202,21 @@ types instead of functions.
 import "std/core.s"
 
 def next(nat->nat->nat addition_generator)
-    return addition_generator.compiler:call 1
+    return addition_generator.compiler::call 1
 
 def increments = 1|2|3|4|5
 def add(nat x, increments value) 
-    return x+compiler:literal value
+    return x+compiler::value value
 def add(nat y)
     for increment is increments
-        if y==compiler:literal increment
-            return compiler:abstract type add<nat,increment>
+        if y==compiler::value increment
+            return compiler::abstract type add<nat,increment>
     fail "unaccepted number" 
 
 def main()
     CLI = edit console()
     successor_function = next type add<nat>
-    print successor_function.compiler:call 5 # prints 6
+    print successor_function.compiler::call 5 # prints 6
 ```
 
 
@@ -235,9 +235,9 @@ One can actually test for errors in *smoλ* at any point, as they cascade
 upwards in the call stack. Below is an example, where `try` encloses
 potentially failing expressions. For clarity, you are not allowed to `try` 
 on an error-less expression. There are also some accompanying builtin functions 
-that provide more advanced diagnostics, like `compiler:catch` to retrieve
+that provide more advanced diagnostics, like `compiler::catch` to retrieve
 error codes and descriptions afterwards, but these are not the subject
-of this tutorial. Only note that `try print successor_function.compiler:call 5`
+of this tutorial. Only note that `try print successor_function.compiler::call 5`
 would print *0* because try forcefully tries to implement every declared function
 call, substituting failures with zero-initialized values.
 
@@ -245,20 +245,20 @@ call, substituting failures with zero-initialized values.
 import "std/core.s"
 
 def next(nat->nat->nat addition_generator)
-    return addition_generator.compiler:call 10 # will return a "null" functor
+    return addition_generator.compiler::call 10 # will return a "null" functor
 
 def increments = 1|2|3|4|5
 def add(nat x, increments value) 
-    return x+compiler:literal value
+    return x+compiler::value value
 def add(nat y)
     for increment is increments
-        if y==compiler:literal increment
-            return compiler:abstract type add<nat,increment>
+        if y==compiler::value increment
+            return compiler::abstract type add<nat,increment>
 
 def main()
     CLI = edit console()
     successor_function = next type add<nat>
-    if try ret = successor_function.compiler:call 5 # fail to call the "null" functor
+    if try ret = successor_function.compiler::call 5 # fail to call the "null" functor
         print ret
     else
         print "failed"

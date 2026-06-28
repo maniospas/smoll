@@ -16,7 +16,7 @@
 
 local import "std/core/builtinsext.s"
 
-def cstr(compiler:catch value)
+def cstr(compiler::catch value)
     doc "a cstr description of an error code"
     doc "Error codes should *not* be compared numerically against"
     doc "given numbers, as their numbering changes for different"
@@ -25,10 +25,10 @@ def cstr(compiler:catch value)
     doc "This comparison is also one numerical comparison, as"
     doc "care is taken for all cstr to point to the same memory"
     doc "location."
-    {builtins:cstr ret = __t_all_errcodes[value];}
+    {builtins::cstr ret = __t_all_errcodes[value];}
     return ret
 
-# def exists(compiler:catch value)
+# def exists(compiler::catch value)
 #     doc "checks that an error code is an error"
-#     {builtins:bool ret = (value!=0);}
+#     {builtins::bool ret = (value!=0);}
 #     return ret

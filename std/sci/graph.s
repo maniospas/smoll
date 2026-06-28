@@ -64,7 +64,7 @@ def filter(ppr config, matrix m, vec p0)
     empty = mut vec len p
     for alpha in config
         # this loops requires exactly one allocation
-        iter = compiler:for_counter()
+        iter = compiler::for_counter()
         prev_p = p
         p = self(m*p)*alpha
         p = self(p)+normalized_p0
@@ -85,7 +85,7 @@ def normalize(effect edit float_allocator FLOATS, edit coo _m)
     m = edit _m
     degrees = sum(m row).pow 0.5
     for entry_ptr&& in m
-        entry = compiler:deref entry_ptr
+        entry = compiler::deref entry_ptr
         denom = degrees[entry.row]*degrees[entry.col]
         entry_ptr.value = entry.value/denom
     return _m

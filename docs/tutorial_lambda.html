@@ -1,0 +1,534 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>smoλ</title>
+        <link rel="stylesheet" href="index.css"> 
+        <style>
+        body {
+            max-width:800px;
+            margin:40px auto;
+            padding:0 10px;
+            font:18px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            color:#444;
+        }
+        h1:first-child {font-size:4rem}
+        h2,
+        h3 {
+        line-height:1.2
+        }
+        h1 {margin-top:60px}
+        a {
+            color:#888;
+            text-decoration: none;
+        }
+        a:hover {
+            color:#58a6ff
+        }
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 28px;
+            z-index: 2000;
+            font-size: 0.9rem;
+            justify-content: center;
+        }
+        .topbar > a, .topbar > .dropdown > a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #444;
+        }
+        .topbar > a:hover, .topbar > .dropdown > a:hover { color: #58a6ff; }
+        .dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        .dropdown > a::after {
+            content: " ▾";
+            font-size: 0.75em;
+            opacity: 0.6;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 6px 0;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 3000;
+        }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a {
+            display: block;
+            padding: 7px 18px;
+            font-weight: 400;
+            white-space: nowrap;
+            color: #444;
+        }
+        .dropdown-menu a:hover { color: #58a6ff; background: #f5f5f5; }
+        .dropdown-menu hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 4px 0;
+        }
+        .toc {
+            position:fixed;
+            padding-top:50px;
+            left:0;
+            top:0;
+            padding-left:20px;
+            width:200px;
+            overflow-y:auto;
+            font-size:0.9rem;
+            z-index:1000;
+        }
+        .toc i {color: #888}
+        pre {
+            color: #2f2f2f;
+        }
+        @media (prefers-color-scheme: dark) {
+            a {
+                color:#aaa;
+            }
+            body {
+                color:#eeeeee;
+                background:#1f1f1f;
+            }
+            .topbar {
+                color:#eeeeee;
+                background:#1f1f1f;
+                border-bottom: 1px solid #444;
+            }
+            .topbar > a, .topbar > .dropdown > a {color:#dddddd;}
+            .toc {
+                color:#eeeeee;
+                background:#1f1f1f;
+            }
+            .dropdown-menu {
+                background: #1f1f1f;
+                border-color: #444;
+            }
+            .dropdown-menu a { color: #ddd; }
+            .dropdown-menu a:hover { background: #2f2f2f; color: #58a6ff; }
+            .dropdown-menu hr { border-color: #444; }
+        }
+        @media (max-width: 1380px) {
+            body {margin:10px;}
+            .toc {
+                background:white!important;
+                position:static;
+                width:90%;
+                margin: 0;
+                border:0;
+            }
+        }
+        .console {
+            background: #1F1F1F; color:#EEEEEE;padding:0px 10px;font-size:0.8rem;border-radius: 8px;border:1px solid #444
+        }
+        .output {
+            white-space: pre-wrap;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .notice-box {
+            border-left: 4px solid;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-style: normal;
+        }
+        .box-warning {
+            border-color: #c0392b;
+            background: #fff0f0;
+            color: #7a1a1a;
+        }
+        .box-info {
+            border-color: #388bfd;
+            background: #e6f0ff;
+            color: #0a3069;
+        }
+        .button {
+            text-decoration: none;
+            font-weight: 500;
+            padding: 1rem;
+            padding-right: 1.5rem;
+            margin-right: 0.5rem;
+            border: 1px solid #aaa;
+            border-radius: 15px;
+            width: 200px!important;
+            font-size: 1.4rem;
+        }
+        .button:hover {
+            background: #fafae3;
+        }
+        .runbutton {
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border: 1px solid #444;
+            border-radius: 5px;
+        }
+        .runbutton:hover {
+            background: #fafafa;
+            color: #58a6ff;
+        }
+        .step {border: 1px solid #444; padding-left:20px; border-radius: 15px;background: #fafafa;margin-bottom:2rem;}
+        .button {background: white;color:#58a6ff}
+        @media (prefers-color-scheme: dark) {
+            .box-warning {
+                background: #272115;
+                color: #e3b341;
+            }
+            .box-info {
+                background: #0d1f3c;
+                color: #79c0ff;
+            }
+            .step {background: #2f2f2f;border: 1px solid #444;}
+            .button {background: #fafae3;color:black}
+        }
+        </style>
+    </head>
+    <body>
+        <nav class="topbar">
+            <a href="index.html" style="position:absolute;left:20px;font-weight:500">Smoλ</a>
+            <a href="install.html" style="font-weight:500">Install</a>
+            <div class="dropdown">
+                <a href="#" style="font-weight:900">Tutorials</a>
+                <div class="dropdown-menu">
+                    <a href="tutorial_cli.html" style="font-weight:400">Command line app</a>
+                    <a href="tutorial_web.html" style="font-weight:400">Web server</a>
+                    <a href="tutorial_game.html" style="font-weight:400">Game dev</a>
+                    <a href="tutorial_data.html" style="font-weight:400">Data analysis</a>
+                    <a href="tutorial_graph.html" style="font-weight:400">Graph mining</a>
+                    <a href="tutorial_lambda.html" style="font-weight:900">Lambda calculus</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" style="font-weight:500">Documentation</a>
+                <div class="dropdown-menu">
+                    <a href="reference.html" style="font-weight:400">Learn</a>
+                    <a href="std.html" style="font-weight:400">Standard library</a>
+                </div>
+            </div>
+            <a href="playground.html" style="font-weight:500">Playground</a>
+            <a href="https://github.com/maniospas/smoll">GitHub</a>
+        </nav>
+    <h1>Lambda calculus sm<img style="width:1.5rem" src="smoll.png"></img>λ</h1>
+
+<div class="toc">
+
+<p><strong>Contents</strong><br>
+<a href="#functions">functions</a> <br>
+<a href="#functors">functors</a> <br>
+<a href="#literals">literals</a> <br>
+<a href="#error-handling">error handling</a> <br></p>
+
+</div>
+
+<h2 id="functions">functions</h2>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This tutorial assumes a certain level of programming expertise.</div>
+
+<p>Functions in <em>smoλ</em> are defined like below, where a program&#8217;s entry point is the 
+<em>main</em> function. Notice<code>CLI = edit console()</code>; the <code>edit</code> identifier tells us that 
+we will be actively modifying the console&#8217;s contents (by reading and writing to it).
+Lambda calculus focuses on immutable computations, however, and we will not spend time
+in the mutability system. The only thing to stress is that
+<code>CLI</code> is an <em>effect</em> that is automatically passed to called fuctions needing it, 
+such as <code>print</code>. There are no other complicated hidden behaviors for effects,
+and they are in CAPS by convention. 
+The <code>CLI</code> effect is also a <em>singleton</em> in that only one can be created in your program.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="c1"># our program - this is a line comment</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;hello &quot;</span> <span class="c1"># adds an empty string instead of new line at end of print </span>
+    <span class="nb">print</span> <span class="s2">&quot;world!&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">greet</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p>Omit parentheses for one function argument. You can also pipe the first
+argument into the function with the dot notation, like below. Finally, function
+returns can be tuples (enclosed in parentheses and comma-separated) 
+and are treated as structural types. You can treat a function return
+as a nominal type that can not be matched to the outputs of other functions
+via the <code>class</code> notation. Retrieve results with the dot notation too.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">employee</span><span class="p">(</span><span class="nb">str</span> <span class="n">name</span><span class="p">,</span> <span class="nb">str</span> <span class="n">surname</span><span class="p">,</span> <span class="n">nat</span> <span class="n">age</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">surname</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">is_of_age</span><span class="p">(</span><span class="n">employee</span> <span class="bp">self</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">age</span><span class="o">&gt;=</span><span class="mi">18</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">mario</span> <span class="o">=</span> <span class="n">employee</span><span class="p">(</span><span class="nb">str</span> <span class="s2">&quot;me&quot;</span><span class="p">,</span> <span class="nb">str</span> <span class="s2">&quot;mario&quot;</span><span class="p">,</span>  <span class="mi">25</span><span class="p">)</span> <span class="c1"># str converts cstr in quotations to strings</span>
+    <span class="nb">print</span> <span class="n">mario</span><span class="o">.</span><span class="n">is_of_age</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h2 id="functors">functors</h2>
+
+<p>Function arguments are comma-separated and have the form of some optional mutability
+modifiers followed by a type and an optional (though typically present) variable 
+name. The type itself can be of the form <code>type1-&gt;type2</code> to declare a <strong>functor</strong>
+that takes as inputs arguments of <code>type1</code> and yields arguments of <code>type2</code>. Functors
+can be supplied with arguments to yield a result using the <code>compiler:call</code> builtin
+helper function. This executes the functor eagerly.
+Conversely, to create a functor from a function name, use the <code>type</code>
+keyword. Next is an example.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">pair</span><span class="p">(</span><span class="n">nat</span><span class="p">,</span><span class="n">nat</span><span class="p">)</span>  <span class="c1"># no function body assumes that arguments are returned</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">pair</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">addition</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">adder</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="mf">5.</span><span class="n">next</span> <span class="nb">type</span> <span class="n">adder</span> <span class="c1"># prints 6</span>
+</code></pre>
+</div>
+
+<p>We may want to use the <code>add</code> function defined for natural numbers in the 
+standard library, but there are several overloads for various numbers and
+its <code>type</code> would not be unique. Specialize on required argument types using
+the <code>&lt;...&gt;</code> notation to enclose a valid input signature. Like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">pair</span><span class="p">(</span><span class="n">nat</span><span class="p">,</span><span class="n">nat</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">pair</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">addition</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="mf">5.</span><span class="n">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="n">nat</span><span class="o">&gt;</span> <span class="c1"># prints 6</span>
+</code></pre>
+</div>
+
+<h2 id="literals">literals</h2>
+
+<p>Functors can be more complicated, for example in the form of <code>nat-&gt;nat-&gt;nat</code>,
+which corresponds to <code>nat-&gt;(nat-&gt;nat)</code>; unless operators are arithmetic ones, 
+they are resolved left-to-right. This type suggests the ability to dynamically
+generate functions of the form <code>nat-&gt;nat</code> given an input natural number. However,
+<em>smoλ</em> does <em>not</em> allow dynamic memory management overheads. Instead, corresponding
+functions can select between functors defined at compile time.</p>
+
+<p>Such functors can still have some tracked arguments, but these need to come from
+a well-controlled selection. This lets the type system resolve everything with
+zero-cost abstractions and function pointers under the hood. Below is an example.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add1</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add2</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mi">2</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="nb">type</span> <span class="n">add1</span>
+    <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">2</span> <span class="k">return</span> <span class="nb">type</span> <span class="n">add2</span>
+    <span class="n">fail</span> <span class="s2">&quot;unaccepted number&quot;</span> <span class="c1"># interceptable runtime error</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">successor_function</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>  <span class="c1"># filter out add functions from the standard library</span>
+    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
+</code></pre>
+</div>
+
+<p>This code has a lot of repetition, which would only grow if
+we considered more cases. But we can use <em>smoλ</em> literal types
+to simplify it; those are types that correspond to specific 
+literal values. Next is an example, where <code>1,2</code> at the
+place where types are expected create literal types, and the 
+vertical dash <code>|</code> shows type alternatives. The builtin
+<code>compiler:literal</code> retrieves back a value from a literal type.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">value</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">value</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">2</span> <span class="k">return</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span> <span class="c1"># THIS CODE FAILS RIGHT NOW</span>
+    <span class="n">fail</span> <span class="s2">&quot;unaccepted number&quot;</span> 
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">successor_function</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>
+    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
+</code></pre>
+</div>
+
+<p>The above code makes a lot of sense for us humans, but the compiler
+would complain that <code>add(nat y)</code> has mismatching return types. The
+reason is that literal types persist in the type system, even if incur
+no runtime cost. However, you can strip away the literal type information
+from functors using the <code>compiler:abstract</code> function.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">value</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">value</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">:</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="mi">2</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">:</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span>
+    <span class="n">fail</span> <span class="s2">&quot;unaccepted number&quot;</span> 
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">successor_function</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>
+    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
+</code></pre>
+</div>
+
+<p>We are starting to generalize. As a last feature,
+we also use a variation of the <code>for</code> loop (which has typical syntax <code>for var in iterable</code>)
+that instead iterates across several literals or functors. 
+Let us also name a union type <code>Increments</code> of acceptable increment
+values using the <code>def name = ...</code> syntax for defining 
+types instead of functions.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">increments</span> <span class="o">=</span> <span class="mi">1</span><span class="o">|</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span><span class="mi">4</span><span class="o">|</span><span class="mi">5</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">increments</span> <span class="n">value</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">value</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">increment</span> <span class="ow">is</span> <span class="n">increments</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">increment</span>
+            <span class="k">return</span> <span class="n">compiler</span><span class="p">:</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="n">increment</span><span class="o">&gt;</span>
+    <span class="n">fail</span> <span class="s2">&quot;unaccepted number&quot;</span> 
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">successor_function</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>
+    <span class="nb">print</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
+</code></pre>
+</div>
+
+<h2 id="error-handling">error handling</h2>
+
+<p>The above code has an explicit failure mode if a value not
+in <code>increments</code> is provided. Actually, the failure mode
+is optional because unset variables (the returned value here) 
+are zero-initialized, whereas proper runtime errors are created
+for unset &#8220;null&#8221; function pointers implementing the functors.
+All functor calls can potentially fail due to non-existence.
+That said, failures are handled gracefully, without memory leaks
+or use-after-free.</p>
+
+<p>One can actually test for errors in <em>smoλ</em> at any point, as they cascade
+upwards in the call stack. Below is an example, where <code>try</code> encloses
+potentially failing expressions. For clarity, you are not allowed to <code>try</code> 
+on an error-less expression. There are also some accompanying builtin functions 
+that provide more advanced diagnostics, like <code>compiler:catch</code> to retrieve
+error codes and descriptions afterwards, but these are not the subject
+of this tutorial. Only note that <code>try print successor_function.compiler:call 5</code>
+would print <em>0</em> because try forcefully tries to implement every declared function
+call, substituting failures with zero-initialized values.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">10</span> <span class="c1"># will return a &quot;null&quot; functor</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">increments</span> <span class="o">=</span> <span class="mi">1</span><span class="o">|</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span><span class="mi">4</span><span class="o">|</span><span class="mi">5</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">increments</span> <span class="n">value</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">value</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">increment</span> <span class="ow">is</span> <span class="n">increments</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">==</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">increment</span>
+            <span class="k">return</span> <span class="n">compiler</span><span class="p">:</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="n">increment</span><span class="o">&gt;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">successor_function</span> <span class="o">=</span> <span class="nb">next</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">successor_function</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># fail to call the &quot;null&quot; functor</span>
+        <span class="nb">print</span> <span class="n">ret</span>
+    <span class="k">else</span>
+        <span class="nb">print</span> <span class="s2">&quot;failed&quot;</span>
+</code></pre>
+</div>
+
+<p>In general, consider errors to be exceptional runtime modes and only handle them
+at critical points of the business logic, for example that allow restarting
+user workflows. In the context of both lambda calculus and implementation of
+other functionality, freely create failures but treat all code as a hot path, 
+and do not worry about error escape hatches unless you have an opportunity for 
+redirecting control flow.</p>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("pre").forEach(pre => {
+            if(pre.className==="skiptry") return;
+            pre.style.position = "relative";
+            const btn = document.createElement("a");
+            btn.textContent = "▶ try it";
+            btn.className = "runbutton";
+            btn.style.cssText = "position:absolute;bottom:8px;right:8px;cursor:pointer;";
+            btn.addEventListener("click", () => {
+                const code = pre.querySelector("code")?.innerText ?? pre.innerText;
+                const encoded = btoa(unescape(encodeURIComponent(code)));
+                window.location.href = "playground.html?contents=" + encoded;
+            });
+            pre.appendChild(btn);
+        });
+    });
+    </script>
+    
+    </body>
+    </html>
+    

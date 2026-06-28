@@ -217,6 +217,7 @@
                     <a href="tutorial_game.html" style="font-weight:400">Game dev</a>
                     <a href="tutorial_data.html" style="font-weight:400">Data analysis</a>
                     <a href="tutorial_graph.html" style="font-weight:400">Graph mining</a>
+                    <a href="tutorial_lambda.html" style="font-weight:400">Lambda calculus</a>
                 </div>
             </div>
             <div class="dropdown">
@@ -623,7 +624,7 @@ modifications.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
-    <span class="n">t</span> <span class="o">=</span> <span class="n">Test</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">Test</span><span class="p">()</span>
     <span class="nb">print</span> <span class="n">t</span><span class="o">.</span><span class="n">x</span> <span class="c1"># prints 1</span>
     <span class="n">t</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="nb">print</span> <span class="n">t</span><span class="o">.</span><span class="n">x</span> <span class="c1"># prints 0</span>
@@ -2004,23 +2005,24 @@ That said, such overheads can often be ignored compare to the
 actual complexity of practical code.</p>
 
 <p>The means of creating placeholder arguments that allow for dynamically
-provided functions is by changing its type to <code>input_type-&gt;output_type</code>,
+provided functions is by changing its type to a functor, that is,
+an expression of the form <code>input_type-&gt;output_type</code>,
 as demonstrated in the example below. This lets the implementation prepare
-for functions of the required input and output characters that may be 
+for functions of the required input and output characteristics that may be 
 only encountered later. The shape of such functions will always be the required
-one. It is assumed that any such functions may fail when called, and their effects
-will <em>not</em> be automatically gathered.</p>
+one. It is assumed that any such functions could fail when called, and their effects
+will <em>not</em> be automatically gathered. Furthermore all their arguments are immutable.</p>
 
-<p>The example below also also uses <code>type inc</code> to retrieve the functor type
-of the function <code>inc</code>, as well as <code>call c</code> to convert the functor <code>c</code> to 
-a function call. The retrieval into a factor should be unique.</p>
+<p>The example below also uses <code>type inc</code> to retrieve the functor type
+of the function <code>inc</code>, as well as the <code>compiler:call</code> builtin function 
+to call a functor with given arguments. The retrieval into a factor should be unique.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">two</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">c</span><span class="p">)</span>
-    <span class="n">one</span> <span class="o">=</span> <span class="n">call</span> <span class="n">c</span> <span class="mi">0</span>
-    <span class="k">return</span> <span class="n">call</span> <span class="n">c</span> <span class="n">one</span>
+    <span class="n">one</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">c</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="n">one</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
@@ -2051,6 +2053,33 @@ a function call. The retrieval into a factor should be unique.</p>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="nb">print</span> <span class="n">two</span><span class="p">(</span><span class="nb">type</span> <span class="n">inc</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">least</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="nb">type</span> <span class="nb">min</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>A final type resolution feature is that you can specialize on
+argument types as you would by providing comma-separated arguments vias
+the <code>&lt;...&gt;</code> notation. This is demonstrated below, where different verions
+of the <code>add</code> function are retrieved in different situations to extract
+functors based on arguments.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">call_one</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">y</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">:</span><span class="n">literal</span> <span class="n">y</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span> 
+    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">0</span> <span class="k">return</span> <span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">2</span> <span class="k">return</span> <span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">call_one</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>
+    <span class="nb">print</span> <span class="n">x</span><span class="o">.</span><span class="n">compiler</span><span class="p">:</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
 </code></pre>
 </div>
 

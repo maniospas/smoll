@@ -1,18 +1,21 @@
 import "std/core.s"
-import compiler # fsat usage of: literal, call, abstract
 
-def call_one(nat->nat->nat x)
-    return x.call 1
+def next(nat->nat->nat addition_generator)
+    return addition_generator.compiler:call 3 # will return a "null" functor
 
-local def add(nat x, 0|1|2 y)
-    return x+literal y
-
-def addnat(nat x)
-    for v is 0|1|2 # type iteration!!!
-        if x==literal v
-            return abstract type add<nat,v>
+def increments = 1|2|3|4|5
+def add(nat x, increments value) 
+    return x+compiler:literal value
+def add(nat y)
+    for increment is increments
+        if y==compiler:literal increment
+            return compiler:abstract type add<nat,increment>
 
 def main()
-    CLI = console()
-    x = call_one type addnat
-    print x.call 5 # prints 6
+    CLI = edit console()
+    s = next type add<nat>
+    successor_function = s
+    if try ret = successor_function.compiler:call 5 # prints 6
+        print ret
+    else
+        print "failed"

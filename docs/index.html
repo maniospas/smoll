@@ -217,6 +217,7 @@
                     <a href="tutorial_game.html" style="font-weight:400">Game dev</a>
                     <a href="tutorial_data.html" style="font-weight:400">Data analysis</a>
                     <a href="tutorial_graph.html" style="font-weight:400">Graph mining</a>
+                    <a href="tutorial_lambda.html" style="font-weight:400">Lambda calculus</a>
                 </div>
             </div>
             <div class="dropdown">
@@ -269,7 +270,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="c1"># effects to automatically pass around (some functions grab these by name)</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">circular</span> <span class="n">alloc</span> <span class="mi">4096</span> 
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">circular</span> <span class="n">alloc</span> <span class="mi">4096</span> 
     <span class="n">f</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">file</span><span class="p">:</span><span class="nb">open</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span> <span class="c1"># parentheses optional for one argument</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span>

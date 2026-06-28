@@ -257,13 +257,14 @@ def export(path, target):
             <a href="index.html" style="position:absolute;left:20px;font-weight:{'900' if 'index' in target else '500'}">Smoλ</a>
             <a href="install.html" style="font-weight:{'900' if 'install' in target else '500'}">Install</a>
             <div class="dropdown">
-                <a href="#" style="font-weight:{'900' if any(t in target for t in ['tutorial_cli', 'tutorial_web', 'tutorial_game', 'tutorial_data', 'tutorial_graph']) else '500'}">Tutorials</a>
+                <a href="#" style="font-weight:{'900' if any(t in target for t in ['tutorial_cli', 'tutorial_web', 'tutorial_game', 'tutorial_data', 'tutorial_graph', 'tutorial_lambda']) else '500'}">Tutorials</a>
                 <div class="dropdown-menu">
                     <a href="tutorial_cli.html" style="font-weight:{'900' if 'tutorial_cli' in target else '400'}">Command line app</a>
                     <a href="tutorial_web.html" style="font-weight:{'900' if 'tutorial_web' in target else '400'}">Web server</a>
                     <a href="tutorial_game.html" style="font-weight:{'900' if 'tutorial_game' in target else '400'}">Game dev</a>
                     <a href="tutorial_data.html" style="font-weight:{'900' if 'tutorial_data' in target else '400'}">Data analysis</a>
                     <a href="tutorial_graph.html" style="font-weight:{'900' if 'tutorial_graph' in target else '400'}">Graph mining</a>
+                    <a href="tutorial_lambda.html" style="font-weight:{'900' if 'tutorial_lambda' in target else '400'}">Lambda calculus</a>
                 </div>
             </div>
             <div class="dropdown">
@@ -296,3 +297,4 @@ export("docs/tutorial_web.md", "docs/tutorial_web.html")
 export("docs/tutorial_graph.md", "docs/tutorial_graph.html")
 export("docs/tutorial_game.md", "docs/tutorial_game.html")
 export("docs/tutorial_data.md", "docs/tutorial_data.html")
+export("docs/tutorial_lambda.md", "docs/tutorial_lambda.html")

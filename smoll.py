@@ -891,16 +891,18 @@ class ImplementedType:
         local_vars: dict[str,int|float] = dict(zip(args[:input_args],values[:input_args]))
         #print(self.name, values)
         self.can_try_interpreter = False
-
         async def process_expression(impl: list[CodeSegment], pos: int, end: int):
             if pos>end: return
             if impl[pos].tostring()=="(" and pos<=end-3 and impl[pos+1].tostring()=="__smoll_func_ptr_type" and impl[pos+2].tostring()==")":
-                found_func = None
                 candidate_name = impl[pos+3].tostring()
+                functor_exists = local_vars.get(candidate_name, None)
+                found_func = None
+                if functor_exists is not None: return functor_exists
                 for candidate in self.dependent_implementations:
                     if candidate.monomorphic_name==candidate_name:
                         found_func = candidate
-                if found_func is None: self.at.error("interpreter", "failed to retrieve functor '"+candidate_name+"'")
+                if found_func is None:
+                    self.at.error("interpreter", "failed to retrieve functor '"+candidate_name+"'")
                 assert found_func
                 return memory.register_foreign(found_func, "") # no free check
             if impl[pos].tostring()=="(" and pos<end-3 and impl[pos+2].tostring()=="*" and impl[pos+3].tostring()==")":
@@ -1848,10 +1850,12 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if len(vars)==0 or vars[0].type.is_functor_of is None:
             error_token.error("type", "only a functor followed by arguments can be 'call'-ed here but got '"+signature_like(vars, impl)+"'")
         functor_var = impl.stabilize([vars[0]])[0]
-        functor_method = convert_functor_to_method_type(impl, functor_var, error_token)
+        functor_method, pending_close_bracket = convert_functor_to_method_type(impl, functor_var, error_token)
         union_type = UnionType(method.name, at=method.at)
         union_type.variations.append(functor_method)
-        return resolve_call(file, impl, union_type, vars[1:], error_token, out_format)
+        ret_all = resolve_call(file, impl, union_type, vars[1:], error_token, out_format)
+        if pending_close_bracket: impl.implementation.append(CODEWORD_RBRACKET)
+        return ret_all
     
     if ABSTRACT_TYPE in method.variations:
         if len(vars)!=1 or vars[0].type.is_functor_of is None:
@@ -2735,6 +2739,7 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
     ])
     if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: err_token.error("safety", "the matching 'try' has already handled a different failure")
     try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
+    pending_close_bracket = False
     if try_var is not None:
         impl.has_any_complaint = True
         impl.implementation.extend([
@@ -2742,12 +2747,17 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
             CODEWORD_EQUALS,
             CodeWord("2"),
             CODEWORD_SEMICOLON,
+            try_var,
+            CODEWORD_EQUALS,
+            CodeWord("__t_complain"),
+            CODEWORD_SEMICOLON,
             CODEWORD_RBRACKET,
             CodeWord("else"),
             CODEWORD_LBRACKET
         ])
         impl.spawned_error_codes.add(2)
         impl.count_handled_tries[-1] += 1
+        pending_close_bracket = True
     else:
         # non-allocation check is mandatory unfortunately
         if debug_mode:
@@ -2797,7 +2807,8 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
     if arg_code and ret_code: arg_code += ", "
     ret_type.monomorphic_name = "(("+signature_ret+" (*)("+arg_code+ret_code+"))"+functor_var.name+")"
     ret_type.functor_var_name = functor_var.name
-    return ret_type
+
+    return ret_type, pending_close_bracket
 
 def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_token: Token, skip_literals: bool=False, from_name: Optional[str]=None):
     if len(_method.variations)==0: err_token.error("type", "no variations to convert to a functor")
@@ -5059,7 +5070,9 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                 if peek_text(tokens, pos) in ["def", "repo", "import", "local"]:
                     impl.rets = [arg for arg in impl.args]
                 else:
-                    pos = await process_body(file, tokens, pos, impl)
+                    if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
+                    else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
+                    #pos = await process_body(file, tokens, pos, impl)
                     if not impl.has_returned_once: 
                         impl.returns([], start_token, True)
                     

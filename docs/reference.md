@@ -387,7 +387,7 @@ def Test()
 
 def main()
     CLI = edit console() 
-    t = Test()
+    t = edit Test()
     print t.x # prints 1
     t.x = 0
     print t.x # prints 0
@@ -1724,23 +1724,24 @@ That said, such overheads can often be ignored compare to the
 actual complexity of practical code.
 
 The means of creating placeholder arguments that allow for dynamically
-provided functions is by changing its type to `input_type->output_type`,
+provided functions is by changing its type to a functor, that is,
+an expression of the form `input_type->output_type`,
 as demonstrated in the example below. This lets the implementation prepare
-for functions of the required input and output characters that may be 
+for functions of the required input and output characteristics that may be 
 only encountered later. The shape of such functions will always be the required
-one. It is assumed that any such functions may fail when called, and their effects
-will *not* be automatically gathered.
+one. It is assumed that any such functions could fail when called, and their effects
+will *not* be automatically gathered. Furthermore all their arguments are immutable.
 
-The example below also also uses `type inc` to retrieve the functor type
-of the function `inc`, as well as `call c` to convert the functor `c` to 
-a function call. The retrieval into a factor should be unique.
+The example below also uses `type inc` to retrieve the functor type
+of the function `inc`, as well as the `compiler:call` builtin function 
+to call a functor with given arguments. The retrieval into a factor should be unique.
 
 ```python
 import "std/core.s"
 
 def two(nat->nat c)
-    one = call c 0
-    return call c one
+    one = c.compiler:call 0
+    return c.compiler:call one
 
 def inc(nat x)
     return x+1
@@ -1770,6 +1771,32 @@ def main()
     CLI = edit console()
     print two(type inc)
     print least([5,4,1,3,2], type min)
+```
+
+A final type resolution feature is that you can specialize on
+argument types as you would by providing comma-separated arguments vias
+the `<...>` notation. This is demonstrated below, where different verions
+of the `add` function are retrieved in different situations to extract
+functors based on arguments.
+
+```python
+import "std/core.s"
+
+def call_one(nat->nat->nat x) 
+    return x.compiler:call 1
+
+def add(nat x, 0|1|2 y) 
+    return x+compiler:literal y
+    
+def add(nat x) 
+    if x==0 return abstract type add<nat,0>
+    if x==1 return abstract type add<nat,1>
+    if x==2 return abstract type add<nat,2>
+
+def main()
+    CLI = console()
+    x = call_one type add<nat>
+    print x.compiler:call 5 # prints 6
 ```
 
 

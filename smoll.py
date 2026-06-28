@@ -1844,7 +1844,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token, out_format: Optional[list[Variable]]=None, _callee:Optional[ImplementedType]=None) -> list[Variable]:
     if ANY_TYPE in method.variations:
         return vars
-    if  CALL_TYPE in method.variations:
+    if CALL_TYPE in method.variations:
         if len(vars)==0 or vars[0].type.is_functor_of is None:
             error_token.error("type", "only a functor followed by arguments can be 'call'-ed here but got '"+signature_like(vars, impl)+"'")
         functor_var = impl.stabilize([vars[0]])[0]
@@ -1852,7 +1852,15 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         union_type = UnionType(method.name, at=method.at)
         union_type.variations.append(functor_method)
         return resolve_call(file, impl, union_type, vars[1:], error_token, out_format)
+    
+    if ABSTRACT_TYPE in method.variations:
+        if len(vars)!=1 or vars[0].type.is_functor_of is None:
+            error_token.error("type", "only a functor can 'abstract'-ed here but got '"+signature_like(vars, impl)+"'")
+        functor_var = impl.stabilize([vars[0]])[0]
 
+        tmp = UnionType(functor_var.type.is_functor_of.name, at=functor_var.type.is_functor_of.at)
+        tmp.variations.append(functor_var.type.is_functor_of)
+        return convert_method_to_functor(impl, tmp, error_token, skip_literals=True, from_name=functor_var.name)
 
     if DEBUG_TYPE in method.variations:
         if not is_lsp: print(signature_like(vars, impl))
@@ -2456,16 +2464,16 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         if is_lsp and literal_tok.file.is_main_file: print_lsp_string(literal_tok)
         return pos+1, create_literal_type(literal_tok, CSTR_TYPE)
     if literal_tok.is_char():
-        if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "a character")
+        if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "a character literal: "+literal_tok.text)
         return pos+1, create_literal_type(literal_tok, CHAR_TYPE)
     if literal_tok.is_uint():
-        if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "an unsigned integer")
+        if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "an unsigned integer literal: "+literal_tok.text)
         return pos+1, create_literal_type(literal_tok, UINT_TYPE)
     if literal_tok.is_int():
-        if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "an integer")
+        if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "an integer literal: "+literal_tok.text)
         return pos+1, create_literal_type(literal_tok, INT_TYPE)
     if literal_tok.is_float():
-        if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "a float value")
+        if is_lsp and literal_tok.file.is_main_file: print_lsp_literal(literal_tok, "a float literal: "+literal_tok.text)
         return pos+1, create_literal_type(literal_tok, FLOAT_TYPE)
     # if literal_tok.text=="call":
     #     if impl is None:
@@ -2548,11 +2556,11 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                     if peek_text(tokens, tokpos+2)=="=": tokens[pos].error("type", "type union is declared later per 'def "+name+"'")
                     else:
                         if pos>tokpos: 
-                            tokens[pos].error("type", "recursive usage of 'def "+name+"' before its definition; perhaps declare it as 'rec'")
+                            tokens[pos].error("type", "usage of 'def "+name+"' before its definition", suggestions=["fix compilation errors", "declare it as 'rec'"])
                         else:
-                            tokens[pos].error("type", "recursive usage of 'def "+name+"' defined later, but the present function must return non-recursively before its first recursive call")
+                            tokens[pos].error("type", "usage of 'def "+name+"' defined later, but the present function must return non-recursively before its first recursive call")
                 elif tok.text=="rec" and peek_text(tokens, tokpos+1)==name:
-                    tokens[pos].error("type", "usage of 'rec "+name+"' before its definition") 
+                    tokens[pos].error("type", "usage of 'rec "+name+"' before its definition", suggestions=["fix compilation errors", "move the definition earlier (recursive functions can call subsequent ones)"]) 
 
             if name[0] in symbols and name[0]!="&": tokens[pos].error("syntax", "previous expression ended before operator '"+name+"'")
             candidates: list[ImplementedType] = list()
@@ -2571,8 +2579,16 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                     varname = name
                     var = impl.vars.get(varname, None)
                     if var is not None:
+                        # if var.type.is_functor_of:
+                        #     tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local functor variable with the same name exists; use 'compiler:call' to call that variable as if it were a type '"+signature_like([var], impl)+"'")
                         if var.type.is_functor_of:
-                            tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local functor variable with the same name exists; use 'call' to call that variable as if it were a type '"+signature_like([var], impl)+"'")
+                            ret = UnionType(var.type.is_functor_of.name, at=var.type.is_functor_of.at)
+                            ret.variations.append(var.type.is_functor_of)
+                            return pos+1, ret
+                        if var.type.is_literal_of:
+                            ret = UnionType(var.type.name, at=var.type.at)
+                            ret.variations.append(var.type)
+                            return pos+1, ret
                         tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local variable with the same name exists '"+signature_like([var], impl)+"'")
                     varname = name+"__"
                     vars = [r for r in impl.vars.values() if r.name.startswith(varname)]
@@ -2783,7 +2799,8 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
     ret_type.functor_var_name = functor_var.name
     return ret_type
 
-def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_token: Token):
+def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_token: Token, skip_literals: bool=False, from_name: Optional[str]=None):
+    if len(_method.variations)==0: err_token.error("type", "no variations to convert to a functor")
     if len(_method.variations)!=1: err_token.error("type", "cannot convert multiple variations to a functor", suggestions=[t.signature() for t in _method.variations])
     method = _method.variations[0]
     if method.at is None: err_token.error("type", "cannot retrieve functors from functions defined by the compiler, as these require interaction with the compilation state that is unavailable at runtime", suggestions=["create a wrapper for the desired functionality"])
@@ -2811,7 +2828,7 @@ def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_tok
             if existing_pointer_type is not None and existing_pointer_type!=ANY_TYPE:
                 new_method.set_pointer_type(method.vars[arg], existing_pointer_type)
         rets = resolve_call(err_token.file, new_method, _method, [new_method.vars[arg] for arg in new_method.args], err_token, _callee=method)
-        new_method.returns(rets, err_token, False) # don't do reduendant error checks
+        new_method.returns(rets, err_token, False) # don't do redundant error checks
         new_method.implementation.extend([CODEWORD_GOTO, CodeWord("__t_return"), CODEWORD_SEMICOLON])
         new_method.needs_failure_mode = err_token
         new_method.force_not_inline = True
@@ -2819,6 +2836,7 @@ def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_tok
     input_variation = ImplementedType("", at=method.at)
     output_variation = ImplementedType("", at=method.at)
     for ret in method.args:
+        if skip_literals and method.vars[ret].type.is_literal_of: continue
         input_variation.rets.append(ret)
         input_variation.vars[ret] = method.vars[ret]
         if method.vars[ret].type==POINTER_TYPE:
@@ -2826,6 +2844,7 @@ def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_tok
             if existing_pointer_type is not None and existing_pointer_type!=ANY_TYPE:
                 input_variation.set_pointer_type(method.vars[ret], existing_pointer_type)
     for ret in method.rets:
+        if skip_literals and method.vars[ret].type.is_literal_of: continue
         output_variation.rets.append(ret)
         output_variation.vars[ret] = method.vars[ret]
         if method.vars[ret].type==POINTER_TYPE:
@@ -2846,9 +2865,27 @@ def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_tok
         CODEWORD_LPAR,
         CodeWord("__smoll_func_ptr_type"),
         CODEWORD_RPAR,
-        CodeWord(method.monomorphic_name),
+        CodeWord(from_name if from_name is not None else method.monomorphic_name),
         CODEWORD_SEMICOLON
-    ]);
+    ])
+
+    if is_lsp and err_token.file.is_main_file:
+        variation = var.type
+        at = variation.at if variation.at else err_token
+        print("---")
+        # position in processed file
+        printid("struct")
+        printid(os.path.abspath(err_token.file.path))
+        print(err_token.row)
+        print(err_token.col)
+        print(len(err_token.text)+err_token.col-err_token.col)
+        # defined at
+        printid(os.path.abspath(at.file.path))
+        print(at.row)
+        print(at.col)
+        # message (may span multiple lines))
+        printid("```rust\n"+signature_like([variation.vars[ret] for ret in variation.rets], variation)+"\n```")
+
     return [var]
 
 async def process_linear_type(file: File, tokens: list[Token], pos: int, show_lsp: bool=False, reduce_to_unique_variations: bool=True, impl: Optional[ImplementedType]=None) -> tuple[int, UnionType]:
@@ -2889,6 +2926,64 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
     if parentheses:
         if peek_text(tokens, pos)!=")": get(tokens, start_pos-1).error("type", "unclosed type definition parenthesis")
         pos += 1
+    if peek_text(tokens, pos)=="<":
+        functor_token = get(tokens, pos)
+        pos -= 2
+        pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr, effect_names = await _gather_def(file, tokens, pos, True, True, "<", ">", contained_in=impl)
+        starting_pos = pos
+        candidates: set[ImplementedType] = set()
+        for arg_types in itertools.product(*abstract_arg_types):
+            impl = ImplementedType(name, at=functor_token)
+            impl.effect_names = effect_names
+            for arg_name, arg_type, immutable, convert_to_ptr in zip(abstract_arg_names, arg_types, abstract_arg_immutability, abstract_arg_convert_to_ptr):
+                if convert_to_ptr:
+                    impl.vars[arg_name] = Variable(arg_name, POINTER_TYPE, immutable!=0, token=functor_token)
+                    impl.args.append(arg_name)
+                    impl.set_pointer_type(impl.vars[arg_name], arg_type)
+                    if immutable==1: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
+                    continue
+                elif arg_type.builtin:
+                    impl.vars[arg_name] = Variable(arg_name, arg_type, immutable!=0, token=functor_token)
+                    impl.args.append(arg_name)
+                    if arg_type==POINTER_TYPE: impl.set_pointer_type(impl.vars[arg_name], ANY_TYPE)
+                    continue
+                prefix_len = len(longest_common_prefix(arg_type.rets))
+                used_immutable = False
+                for ret in arg_type.rets:
+                    ret_name = arg_name+"__"+ret[prefix_len:]  if len(arg_type.rets)>1 else arg_name
+                    impl.vars[ret_name] = arg_type.vars[ret].renamed_copy(ret_name, functor_token)
+                    if immutable==0: impl.vars[ret_name] = impl.vars[ret_name].mutable_copy(tokens[pos-1])
+                    elif immutable==1:
+                        original_var = impl.vars[ret_name] 
+                        if (not impl.vars[ret_name].isprivate and not impl.vars[ret_name].immutable): #or not impl.vars[ret_name].type.builtin: 
+                            impl.vars[ret_name] = impl.vars[ret_name].mutable_copy(tokens[pos-1])
+                        else: 
+                            impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
+                            #if original_var.immutable!=impl.vars[ret_name].immutable:
+                            used_immutable = True
+                    elif immutable==-1: impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
+                    elif immutable==-2:
+                        impl.vars[ret_name] = impl.vars[ret_name].stable_copy()
+                    impl.refargs.append(ret_name) # start with everything as refarg and we will remove during assignment
+                    impl.args.append(ret_name)
+                    if impl.vars[ret_name].type==POINTER_TYPE:
+                        found_ptr_type = arg_type.get_pointer_type(arg_type.vars[ret])
+                        if found_ptr_type is not None and found_ptr_type!=ANY_TYPE: impl.set_pointer_type(impl.vars[ret_name], found_ptr_type)
+                        #else:
+                        #    dep = arg_type.follow_pointer_dependency(arg_type.vars[ret])
+                        #    if dep is not None: impl.set_pointer_depedency(dep.renamed_copy(arg_name+"__"+dep.name[prefix_len:]))
+                if immutable==1 and not used_immutable: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
+            for variation in type.variations:
+                if len(variation.args)!=len(impl.args): continue
+                compliant = True
+                for arg1, arg2 in zip(variation.args, impl.args):
+                    if not variation.vars[arg1].is_same(impl.vars[arg2]):
+                        compliant = False
+                        break
+                if compliant: candidates.add(variation)
+        ret = UnionType(type.name+"<...>", at=get(tokens, prev_pos))
+        ret.variations = [variation for variation in type.variations if variation in candidates]
+        type = ret
     if peek_text(tokens, pos)=="->":
         pos += 1
         functor_token = get(tokens, pos)
@@ -3170,7 +3265,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     impl.vars[is_variation_matching_var.name] = is_variation_matching_var
                     for variation in found_variations:
                         impl.implementation.extend([is_variation_matching_var, CODEWORD_EQUALS, CodeWord("1"),CODEWORD_SEMICOLON])
-                        for arg_pos, arg in enumerate(variation.args):
+                        for arg_pos, arg in enumerate(variation.rets):
                             literal_method = variation.vars[arg].type
                             if literal_method.is_literal_of is None: continue # already checked
                             if literal_method.is_literal_of==CSTR_TYPE or literal_method.is_forced_pointer_type_of:
@@ -3724,7 +3819,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         impl.VM = next_token.text
         return pos+1,[]
     if peek_text(tokens, pos)=="[":
-        if peek_text(tokens, pos)!="[": get(tokens, pos).error("syntax", "expecting '[' after 'args'")
+        #if peek_text(tokens, pos)!="[": get(tokens, pos).error("syntax", "expecting '[' after 'args'")
         variables_sets: list[list[Variable]] = list()
         pos, buffer_element = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
         variables_sets.append(buffer_element)
@@ -4155,7 +4250,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         start_call = get(tokens,pos)
         is_type_resolution = start_call.text=="type"
         if is_type_resolution:
-            if is_lsp and start_call.file.is_main_file: print_lsp_decorator(start_call, "**literal or function type**\n\nConverts a literal value into a literal type, or a function into a functor.")
+            if is_lsp and start_call.file.is_main_file: print_lsp_decorator(start_call, "**literal or function type**\n\nPerform type resolution and store the result as a first-class variable. This creates a literal type value from a literal, or a functor from a function.")
             pos, method = await process_linear_type(file, tokens, pos+1, reduce_to_unique_variations=False, show_lsp=True, impl=impl)
             if all(variation.is_literal_of is None for variation in method.variations): 
                 return pos, convert_method_to_functor(impl, method, start_call)
@@ -4429,7 +4524,6 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             continue
         if name.text=="for":
             if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**for**\n\nLoop that automatically retrieves index-indexed items. 'for var in iterator ...' is equivalent to 'index =0 while try var=iterator[index] ... index=index+1'")
-            impl.nesting.append("while")
             if_pos = pos-1
             as_pointer = False
             as_mutpointer = False
@@ -4441,7 +4535,36 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             elif peek_text(tokens, pos+1)=="&":
                 pos += 1
                 as_pointer = True
-            if peek_text(tokens, pos+1)!="in": get(tokens, pos+1).error("syntax", "'in' expected; for syntax should be 'for var in iterable'")
+            if peek_text(tokens, pos+1)=="is":
+                is_token = get(tokens, pos+1)
+                if as_pointer or as_mutpointer:
+                     get(tokens, pos+1).error("syntax", "types obtained by 'is' cannot be retrieved as pointer variables", suggestions=["use 'in' instead"])
+                pos, iterating_types = await process_linear_type(file, tokens, pos+2, show_lsp=True, reduce_to_unique_variations=False, impl=impl)
+                #previous_vars = {k: v for k, v in impl.vars.items()}
+                if not iterating_types.variations:
+                    get(tokens, pos).error("type", "no valid variation; use an explicit 'if' check for safety")
+                start_body_pos = pos
+                if varname in impl.vars: is_token.error("type", "variable already exists: "+varname)
+                for variation in iterating_types.variations:
+                    pos = start_body_pos
+                    if variation.is_literal_of is not None:
+                        var = Variable(varname, variation)
+                        impl.vars[var.name] = var
+                    else:
+                        if varname in impl.vars: del impl.vars[varname]
+                        tmp = UnionType(variation.name, at=variation.at)
+                        tmp.variations.append(variation)
+                        impl.assign(varname, convert_method_to_functor(impl, tmp, is_token), is_token)
+                    if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
+                    else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
+                    if varname in impl.rets: is_token.error("type", "cannot return a 'for' type variable, as its type may be different each time")
+                    for defer in impl.defers+impl.returned_defers:
+                        for tok in defer: 
+                            if varname==tok.tostring(): is_token.error("type", "cannot involve a 'for' type variable in a defer, as its type may be different each time")
+                impl.invalidated[varname] = name
+                continue
+            impl.nesting.append("while")
+            if peek_text(tokens, pos+1)!="in": get(tokens, pos+1).error("syntax", "'in' or 'is' expected", suggestions=["iteration syntax should be 'for var in iterable'", "type repetition syntax should be 'for var is types'"])
             in_pos = pos+1
             indexor = Variable(create_temp(), UINT_TYPE, immutable=False)
             impl.vars[indexor.name] = indexor
@@ -4779,7 +4902,7 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         file.namespaces[namespace_name] = namespace_value
     return pos, imported
 
-async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception: bool, is_local: bool):
+async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exception: bool, is_local: bool, start_symbol: str="(", end_symbol: str=")", contained_in: Optional[ImplementedType]=None):
     start_token = get(tokens, pos)
     pos += 1
     name = get(tokens, pos).text
@@ -4788,10 +4911,10 @@ async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exc
     abstract_arg_immutability: list[int] = list()
     abstract_arg_convert_to_ptr: list[bool] = list()
     pos += 1
-    if get(tokens, pos).text!="(": tokens[pos].error("syntax", "expecting opening parenthesis")
+    if get(tokens, pos).text!=start_symbol: tokens[pos].error("syntax", "expecting opening parenthesis")
     pos += 1
     effect_names: list[str] = list()
-    while peek_text(tokens, pos)!=")":
+    while peek_text(tokens, pos)!=end_symbol:
         arg_immutability = -1
         is_effect = False
         if get(tokens, pos).text=="effect":
@@ -4821,7 +4944,7 @@ async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exc
             if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "**any type**\n\nThis marks a generic type, which depends on what is passed as arguments later. HOWEVER, this function's implementation is determined now.")
             pos += 1
             arg_type = smol_namespace.types["any"]
-        else: pos, arg_type = await process_linear_type(file, tokens, pos, True)
+        else: pos, arg_type = await process_linear_type(file, tokens, pos, True, impl=contained_in)
         if peek_text(tokens, pos)=="ptr":
             if is_lsp and get(tokens,pos).file.is_main_file:
                 at = get(tokens,pos)
@@ -4843,7 +4966,7 @@ async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exc
         else: abstract_arg_convert_to_ptr.append(False)
         arg_name = peek_text(tokens, pos)
         if is_effect: effect_names.append(arg_name)
-        if arg_name==")" or arg_name==",": arg_name = "__t_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
+        if arg_name==end_symbol or arg_name==",": arg_name = "__t_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
         else: pos += 1
         arg_type_variations: list[ImplementedType] = find_unique_variations(arg_type.variations)
         abstract_arg_types.append(arg_type_variations)
@@ -4853,10 +4976,10 @@ async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exc
         abstract_arg_names.append(arg_name)
         abstract_arg_immutability.append(arg_immutability)
         next_symbol = peek_text(tokens, pos)
-        if next_symbol==")": break
+        if next_symbol==end_symbol: break
         if next_symbol!=",": tokens[pos].error("syntax", "expecting comma between arguments")
         pos += 1 # skip the comma
-    if get(tokens, pos).text!=")": tokens[pos].error("syntax", "expecting closing parenthesis")
+    if get(tokens, pos).text!=end_symbol: tokens[pos].error("syntax", "expecting closing '"+end_symbol+"'")
     pos += 1
     return pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr, effect_names
 
@@ -5422,6 +5545,9 @@ DEREF_TYPE.doc.append("Cannot do so fo `any ptr` data, as their type becomes unk
 DEREF_TYPE.vars["ptr"] = Variable("ptr", POINTER_TYPE)
 DEREF_TYPE.args.append("ptr")
 
+ABSTRACT_TYPE = ImplementedType("abstract")
+ABSTRACT_TYPE.doc.append("Abstracts a functor by removing all literal type references.")
+
 NOCATCH_TYPE = ImplementedType("nocatch")
 NOCATCH_TYPE.doc.append("verify no errors up to now")
 NOCATCH_TYPE.doc.append("Creates a compiler error if it is possible to have seen an error outside a 'try' statement that would have terminate this function before this point.")
@@ -5516,7 +5642,8 @@ ASSERT_SAME_TYPE.needs_failure_mode = compiler_token
 ASSERT_SAME_TYPE.doc.append("pointer is equal to another")
 ASSERT_SAME_TYPE.doc.append("Equivalent to assigning to the first argument the value of the second after checking that the two memories are the same.")
 ASSERT_SAME_TYPE.doc.append("This reinstates compiler awareness between two memory regions, for example that would have been lost due to types passing through opaque functors or buffer contents.")
-
+ASSERT_SAME_TYPE.doc.append("")
+ASSERT_SAME_TYPE.doc.append("This is also safe, as the error occurs after the assignment; given that deferred resource releases can only be created by this function -and not passed as arguments- we end up properly releasing everything on failure.")
 
 fixed_namespace.types["skip"] = UnionType("skip", at=compiler_token).append(FAIL_TYPE)
 fixed_namespace.types["true"] = UnionType("true", at=compiler_token).append(TRUE_TYPE)
@@ -5528,6 +5655,7 @@ fixed_namespace.types["for_counter"] = UnionType("for_counter", at=compiler_toke
 fixed_namespace.types["size"] = UnionType("size", at=compiler_token).append(SIZEOF_TYPE)
 fixed_namespace.types["literal"] = UnionType("literal", at=compiler_token).append(RESOLVE_LITERAL_TYPE)
 fixed_namespace.types["call"] = UnionType("call", at=compiler_token).append(CALL_TYPE)
+fixed_namespace.types["abstract"] = UnionType("abstract", at=compiler_token).append(ABSTRACT_TYPE)
 fixed_namespace.types["deref"] = UnionType("deref", at=compiler_token).append(DEREF_TYPE)
 fixed_namespace.types["assert_eq"] = UnionType("assert_eq", at=compiler_token).append(ASSERT_SAME_TYPE)
 

@@ -1,20 +1,18 @@
 import "std/core.s"
+import compiler # fsat usage of: literal, call, abstract
 
-def test(char_arena->str creator)
-    CHARS = edit arena char[].alloc 128
-    ret = str creator.compiler:call CHARS
-    # the next assertion is REQUIRED to inject a 
-    # runtime assertion that the compiler can reason 
-    # about (otherwise it would complain that the
-    # relationship between CHARS and ret is unknown)
-    compiler:assert_eq(ret.unsafe_ptr, CHARS.buf.unsafe_ptr)
-    return ret
+def call_one(nat->nat->nat x)
+    return x.call 1
 
-def string_creator(char_arena _CHARS)
-    CHARS = unsafe_mut _CHARS
-    strings = [copy "created"]
-    unsafe_return strings[0]
+local def add(nat x, 0|1|2 y)
+    return x+literal y
+
+def addnat(nat x)
+    for v is 0|1|2 # type iteration!!!
+        if x==literal v
+            return abstract type add<nat,v>
 
 def main()
     CLI = console()
-    print test(type string_creator)
+    x = call_one type addnat
+    print x.call 5 # prints 6

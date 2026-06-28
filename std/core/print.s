@@ -19,13 +19,15 @@ import "std/extern.s"
 
 def console()
     doc "references the system console"
-    doc "As a singleton for program safety, the console should usually be instantiated"
+    doc "As a singleton, the console should usually be instantiated"
     doc "in the `main()` function and then passed to dependent calls, for example via an"
-    doc "an effect for convenience. Standard library functions provide the CLI effect"
+    doc "an effect for convenience. Standard library print functions provide the CLI effect"
     doc "and you can propagate to this by prepending `effect edit console CLI` to function"
-    doc "arguments. This is a zero-cost abstraction in that it does not transfer any data"
-    doc "but only works alongside the safety of the compiler."
-    doc "To quickly print internals for debugging, use `unsafe_console()` instead."
+    doc "arguments."
+    doc ""
+    doc "The console is a zero-cost abstraction in that it does not transfer any data"
+    doc "but relies on singleton safety to synchronize io across threads."
+    doc "Quickly print internals for debugging without with `unsafe_console()`."
     # this trick of going through a mut, allows edit console to be an available action
     handler = mut singleton()
     return const handler 

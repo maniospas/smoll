@@ -3,7 +3,7 @@ import "std/mini.s"
 import "std/extern/raysupport.h"
 
 
-def Color(nat _r, nat _g, nat _b, nat|blank _a)
+def color(nat _r, nat _g, nat _b, nat|blank _a)
     if _a is blank
         _a = 255
     r = nat8 _r
@@ -12,22 +12,22 @@ def Color(nat _r, nat _g, nat _b, nat|blank _a)
     a = nat8 _a
     return (r,g,b,a)
 
-def Position(float x, float y)
-def Size(float width, float height)
+def position(float x, float y)
+def size(float width, float height)
 
-def Window(Size size, cstr title)
+def window(size size, cstr title)
     {"-lraylib"}
     {"-lGL"}
     {SetTraceLogLevel(LOG_WARNING); InitWindow(size__width, size__height, title); }
     openy = mut false
     return singleton(size, title, openy)
 
-def is_open(Window)
+def is_open(effect edit window WINDOW)
     {builtins::bool ret = WindowShouldClose(); }
     return not ret
 
-def draw(edit Window window)
-    if window.openy fail "alopeny drawing on window"
+def draw(effect edit window WINDOW)
+    if WINDOW.openy fail "alopeny drawing on window"
     is_drawing = true
     {BeginDrawing();}
     defer
@@ -35,11 +35,10 @@ def draw(edit Window window)
             {EndDrawing();}
     return is_drawing
 
-def clear(edit Window window, Color color)
+def clear(effect edit window WINDOW, color color)
     {ClearBackground((Color){color__r,color__g,color__b,color__a});}
-    return window
 
-def text(edit Window window, cstr txt, Position pos, float size, Color color)
+def text(effect edit window WINDOW, cstr txt, position pos, float size, color color)
     {
         DrawText(
             txt, 
@@ -49,9 +48,8 @@ def text(edit Window window, cstr txt, Position pos, float size, Color color)
             (Color){color__r, color__g, color__b, color__a}
         ); 
     }
-    return window
 
-local def TextureData(nat id, Size size, nat mipmaps, nat format)
+local def TextureData(nat id, size size, nat mipmaps, nat format)
 def Texture(TextureData _data)
     data = [_data]
     return class(data)
@@ -70,9 +68,9 @@ def open(cstr path)
     }
     defer
         {UnloadTexture((Texture2D){id, (int)width, (int)height, (int)mipmaps, (int)format});}
-    return Texture(id, Size(width, height), mipmaps, format)
+    return Texture(id, size(width, height), mipmaps, format)
 
-def draw(edit Window window, Texture _tex, Position pos, Color color)
+def draw(effect edit window WINDOW, Texture _tex, position pos, color color)
     tex = TextureData _tex.data[0]
     { 
         DrawTexture(
@@ -81,9 +79,8 @@ def draw(edit Window window, Texture _tex, Position pos, Color color)
             (Color){color__r,color__g,color__b,color__a}
         ); 
     }
-    return window
 
-def draw(edit Window window, Texture _tex, Position pos, float rotation, float scale, Color color)
+def draw(effect edit window WINDOW, Texture _tex, position pos, float rotation, float scale, color color)
     tex = TextureData _tex.data[0]
     { 
         DrawTextureEx(
@@ -94,9 +91,8 @@ def draw(edit Window window, Texture _tex, Position pos, float rotation, float s
             (Color){color__r,color__g,color__b,color__a}
         ); 
     }
-    return window
 
-def draw(edit Window window, Texture _tex, Position pos, float rotation, Size size, Color color)
+def draw(effect edit window WINDOW, Texture _tex, position pos, float rotation, size size, color color)
     tex = TextureData _tex.data[0]
     scale_x = size.width/float tex.size.width
     scale_y = size.height/float tex.size.height
@@ -109,9 +105,8 @@ def draw(edit Window window, Texture _tex, Position pos, float rotation, Size si
             (Color){color__r,color__g,color__b,color__a}
         ); 
     }
-    return window
 
-def circ(edit Window window, Position pos, float radius, Color color)
+def circ(effect edit window WINDOW, position pos, float radius, color color)
     {
         DrawCircleV(
             (Vector2){(float)pos__x, (float)pos__y}, 
@@ -119,9 +114,8 @@ def circ(edit Window window, Position pos, float radius, Color color)
             (Color){color__r,color__g,color__b,color__a}
         );
     }
-    return window
 
-def rect(edit Window window, Position pos, Size size, Color color)
+def rect(effect edit window WINDOW, position pos, size size, color color)
     {
         DrawRectangle(
             pos__x, pos__y,
@@ -129,13 +123,11 @@ def rect(edit Window window, Position pos, Size size, Color color)
             (Color){color__r,color__g,color__b,color__a}
         );
     }
-    return window
 
-def rect_line(edit Window window, Position pos, Size size, nat thickness, Color color)
+def rect_line(effect edit window WINDOW, position pos, size size, nat thickness, color color)
     {DrawRectangleLinesEx((Rectangle){(float)pos__x, (float)pos__y, (float)size__width, (float)size__height}, (int)thickness, (Color){color__r,color__g,color__b,color__a});}
-    return window
 
-def circ_line(edit Window window, Position pos, nat radius, nat thickness, Color color)
+def circ_line(effect edit window WINDOW, position pos, nat radius, nat thickness, color color)
     {
         builtins::float inner = (radius > thickness) ? (float)(radius - thickness) : 0.0f;
         builtins::float outer = (float)radius;
@@ -150,8 +142,7 @@ def circ_line(edit Window window, Position pos, nat radius, nat thickness, Color
             (Color){color__r,color__g,color__b,color__a}
         );
     }
-    return window
 
-def dt()
+def dt(effect window WINDOW)
     {builtins::float dt = GetFrameTime();}
     return dt

@@ -1,8 +1,8 @@
 import "std/core.s"
 import "std/sci.s" as sci
-import "std/graphics.s" as graphics
+import "std/graphics.s"
 
-def Circle(float _cx, float _cy, float _vx, float _vy, float _radius)
+def circle(float _cx, float _cy, float _vx, float _vy, float _radius)
     cx = mut _cx
     cy = mut _cy
     vx = mut _vx
@@ -10,7 +10,7 @@ def Circle(float _cx, float _cy, float _vx, float _vy, float _radius)
     radius = mut _radius
     return (cx,cy,vx,vy,radius)
 
-def process(mut Circle ptr _self, float dt)
+def process(mut circle ptr _self, float dt)
     self = mut compiler::deref _self # unpack
     self.cx = self.cx + self.vx * dt
     self.cy = self.cy + self.vy * dt
@@ -28,31 +28,30 @@ def process(mut Circle ptr _self, float dt)
         self.vy = 0.0-(sci::abs self.vy)
     _self = self
 
-def draw(Circle self, edit graphics::Window win)
-    white  = graphics::Color(255, 255, 255)
-    teal   = graphics::Color(0,   200, 180)
-    shadow = graphics::Color(0,   200, 180, 60)
+def draw(effect edit window WINDOW, circle self)
+    white  = color(255, 255, 255)
+    teal   = color(0,   200, 180)
+    shadow = color(0,   200, 180, 60)
     pos = (self.cx, self.cy)
-    win
-    .graphics::circ(self.cx + 4.0, self.cy + 4.0, self.radius, shadow)
-    .graphics::circ(pos, self.radius, teal)
-    .graphics::circ_line(pos, nat self.radius, 2, white)
+    circ(self.cx + 4.0, self.cy + 4.0, self.radius, shadow)
+    circ(pos, self.radius, teal)
+    circ_line(pos, nat self.radius, 2, white)
 
 def main()
-    win = edit graphics::Size(800.0, 600.0).graphics::Window "Moving Circle"
+    WINDOW = edit window(800.0, 600.0, "Moving circle")
 
     N = 1000
-    circles = edit Circle[].alloc N
+    circles = edit circle[].alloc N
     for create_circle&& in circles
         i = float compiler::for_counter() # builtin way of enumerating
-        create_circle = Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
+        create_circle = circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
 
-    while graphics::is_open win
-        dt = graphics::dt()
+    while is_open()
+        dt = dt()
         for proc_circle&& in circles # mutable pointer
             proc_circle.process dt
-        frame = graphics::draw win
-        win.graphics::clear graphics::Color(20, 20, 60)
+        frame = draw()
+        clear color(20, 20, 60)
         for draw_circle in circles
-            draw_circle.draw win
+            draw_circle.draw()
         del frame

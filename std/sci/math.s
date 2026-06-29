@@ -2,12 +2,12 @@ local import "std/extern/math.h"
 local import "std/core.s"
 
 def abs(float x)
-    VM "[-$x]"
+    VM "[abs($x)]"
     {builtins::int c = 0x7FFFFFFFFFFFFFFF;}
     return float bits(x).band(bits c)
 
 def abs(int x)
-    VM "[-$x]"
+    VM "[abs($x)]"
     mask = rshift(bits x, 63)
     return nat xor(mask, bits x+int mask)
 

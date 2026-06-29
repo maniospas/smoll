@@ -1,2 +1,2 @@
-import "std/net/fetch.s":get
-import "std/net/fetch.s":post
+import "std/net/fetch.s"::get
+import "std/net/fetch.s"::post

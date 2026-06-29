@@ -27,7 +27,7 @@ def request(effect edit new|char_arena|char_circular CHARS, str|cstr _url, HttpO
         buf = edit char[]
         pos = 0
         defer
-            if exists buf.unsafe_ptr buf.unsafe_ptr.builtins::free()
+            if exists buf.unsafe_ptr buf.unsafe_ptr.unsafe::free()
     if CHARS is char_arena
         buf = CHARS.buf
         pos = CHARS.pos

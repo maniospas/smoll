@@ -36,7 +36,6 @@ def vec(effect edit float_allocator\new FLOATS, nat length, "dirty"|blank clear_
     if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
     if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
     surface = FLOATS.alloc length
-    FLOATS.pos = FLOATS.pos+length
     if clear_policy is blank
         FLOATS.buf.unsafe_ptr.unsafe::zero(8*surface.pos, 8*(surface.pos+length))
     return vec(surface.buf.unsafe_ptr, surface.pos, length)
@@ -172,7 +171,7 @@ def reduce(vec v, blank|"mul"|"sub"|"rel" comparison, blank|vec v2, blank|"add"|
             value = value-v2[i]
         if comparison is "mul"
             i = compiler::for_counter()
-            value = value-v2[i]
+            value = value*v2[i]
         if comparison is "rel"
             i = compiler::for_counter()
             value = (value-v2[i])*2.0/(abs(value)+abs(v2[i]))

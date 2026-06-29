@@ -1789,9 +1789,9 @@ def add(nat x, 0|1|2 y)
     return x+compiler::value y
     
 def add(nat x) 
-    if x==0 return abstract type add<nat,0>
-    if x==1 return abstract type add<nat,1>
-    if x==2 return abstract type add<nat,2>
+    if x==0 return compiler::abstract type add<nat,0>
+    if x==1 return compiler::abstract type add<nat,1>
+    if x==2 return compiler::abstract type add<nat,2>
 
 def main()
     CLI = console()

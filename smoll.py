@@ -3267,8 +3267,36 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     is_with_literal = False
                     if matched:
                         for variation_ret, rets_ret in zip(variation.rets, rets):
-                            if variation.vars[variation_ret].type.is_literal_of: is_with_literal = True
-                            if variation.vars[variation_ret].type!=rets_ret.type and variation.vars[variation_ret].type.is_literal_of!=rets_ret.type:
+                            # literal_method = variation.vars[variation_ret].type
+                            # if literal_method.is_literal_of is not None and (literal_method.is_literal_of==CSTR_TYPE or literal_method.is_forced_pointer_type_of):
+                            #     current = literal_method.at.text
+                            #     tmp: str|None = global_cstr2var.get(current, None)
+                            #     ptr_type = literal_method.is_forced_pointer_type_of
+                            #     variable = Variable(tmp if tmp else create_temp(), POINTER_TYPE if ptr_type else literal_method.is_literal_of, token=op_token)
+                            #     if tmp is None: 
+                            #         global_cstr2var[current] = variable.name
+                            #         global_var2cstr[variable.name] = current
+                            #     impl.vars[variable.name] = variable
+                            #     impl.used_globals.add(variable.name)
+                            #     if ptr_type: impl.set_pointer_type(variable, ptr_type)
+                                
+                            #     variable2 = rets_ret
+                            #     if variable2.type.is_literal_of:
+                            #         current = literal_method.at.text
+                            #         tmp: str|None = global_cstr2var.get(current, None)
+                            #         ptr_type = literal_method.is_forced_pointer_type_of
+                            #         variable2 = Variable(tmp if tmp else create_temp(), POINTER_TYPE if ptr_type else literal_method.is_literal_of, token=op_token)
+                            #         if tmp is None: 
+                            #             global_cstr2var[current] = variable2.name
+                            #             global_var2cstr[variable2.name] = current
+                            #         impl.vars[variable2.name] = variable2
+                            #         impl.used_globals.add(variable2.name)
+                            #         if ptr_type: impl.set_pointer_type(variable2, ptr_type)
+                            #     if variable.name==variable2.name: 
+                            #         continue
+                            if variation.vars[variation_ret].type.is_literal_of:
+                                is_with_literal = True
+                            if (variation.vars[variation_ret].type!=rets_ret.type and variation.vars[variation_ret].type.is_literal_of!=rets_ret.type):
                                 matched = False
                                 break
                     if matched: 
@@ -3297,6 +3325,34 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                                 impl.vars[variable.name] = variable
                                 impl.used_globals.add(variable.name)
                                 if ptr_type: impl.set_pointer_type(variable, ptr_type)
+                                
+                                variable2 = rets[arg_pos]
+                                if variable2.type.is_literal_of:
+                                    current = literal_method.at.text
+                                    tmp: str|None = global_cstr2var.get(current, None)
+                                    ptr_type = literal_method.is_forced_pointer_type_of
+                                    variable2 = Variable(tmp if tmp else create_temp(), POINTER_TYPE if ptr_type else literal_method.is_literal_of, token=op_token)
+                                    if tmp is None: 
+                                        global_cstr2var[current] = variable2.name
+                                        global_var2cstr[variable2.name] = current
+                                    impl.vars[variable2.name] = variable2
+                                    impl.used_globals.add(variable2.name)
+                                    if ptr_type: impl.set_pointer_type(variable2, ptr_type)
+
+                                impl.implementation.extend([
+                                    CODEWORD_IF,
+                                    CODEWORD_LPAR,
+                                    variable,
+                                    CodeWord("!="),
+                                    variable2,#rets[arg_pos],#CodeWord(rets[arg_pos].type.at.text),
+                                    CODEWORD_RPAR,
+                                    CODEWORD_LBRACKET,
+                                    is_variation_matching_var,
+                                    CODEWORD_EQUALS,
+                                    CodeWord("0"),
+                                    CODEWORD_SEMICOLON,
+                                    CODEWORD_RBRACKET,
+                                ])
                             else:
                                 variable = Variable(create_temp(), literal_method.is_literal_of, token=op_token)
                                 impl.vars[variable.name] = variable
@@ -3306,20 +3362,20 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                                     CodeWord(literal_method.at.text),
                                     CODEWORD_SEMICOLON
                                 ])
-                            impl.implementation.extend([
-                                CODEWORD_IF,
-                                CODEWORD_LPAR,
-                                variable,
-                                CodeWord("!="),
-                                rets[arg_pos],
-                                CODEWORD_RPAR,
-                                CODEWORD_LBRACKET,
-                                is_variation_matching_var,
-                                CODEWORD_EQUALS,
-                                CodeWord("0"),
-                                CODEWORD_SEMICOLON,
-                                CODEWORD_RBRACKET,
-                            ])
+                                impl.implementation.extend([
+                                    CODEWORD_IF,
+                                    CODEWORD_LPAR,
+                                    variable,
+                                    CodeWord("!="),
+                                    CodeWord(rets[arg_pos].type.at.text),
+                                    CODEWORD_RPAR,
+                                    CODEWORD_LBRACKET,
+                                    is_variation_matching_var,
+                                    CODEWORD_EQUALS,
+                                    CodeWord("0"),
+                                    CODEWORD_SEMICOLON,
+                                    CODEWORD_RBRACKET,
+                                ])
                         impl.implementation.extend([
                             CODEWORD_IF,
                             CODEWORD_LPAR,
@@ -5616,6 +5672,7 @@ SAME_CONTENTS_TYPE_CSTR.args.extend(["to", "from"])
 SAME_CONTENTS_TYPE_CSTR.set_pointer_type(SAME_CONTENTS_TYPE_CSTR.vars["to"], CHAR_TYPE)
 SAME_CONTENTS_TYPE_CSTR.doc.append("pointer references the same type as another")
 SAME_CONTENTS_TYPE_CSTR.doc.append("Forces the first pointer to reference a buffer of characters.")
+BLANK_TYPE = ImplementedType("void")
 
 smol_namespace = File("builtins")
 builtin_token = Token("builtins", smol_namespace, 1, 1)
@@ -5628,7 +5685,7 @@ smol_namespace.types["nat8"] = UnionType("nat8", at=builtin_token).append(UINT8_
 smol_namespace.types["float"] = UnionType("float", at=builtin_token).append(FLOAT_TYPE)
 smol_namespace.types["bool"] = UnionType("bool", at=builtin_token).append(BOOL_TYPE)
 smol_namespace.types["err"] = UnionType("err", at=builtin_token).append(ImplementedType("err", "int"))
-smol_namespace.types["blank"] = UnionType("blank", at=builtin_token).append(ImplementedType("void"))
+smol_namespace.types["blank"] = UnionType("blank", at=builtin_token).append(BLANK_TYPE)
 smol_namespace.types["char"] = UnionType("char", at=builtin_token).append(CHAR_TYPE)
 smol_namespace.types["any"] = UnionType("any", at=builtin_token).append(ANY_TYPE)
 

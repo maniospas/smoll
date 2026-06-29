@@ -643,7 +643,7 @@ class ImplementedType:
 
     def set_pointer_type(self, var: Variable, type: "ImplementedType"):
         assert var.type == POINTER_TYPE
-        assert var.name not in self._pointer_type_dependencies
+        assert var.name not in self._pointer_type_dependencies or self._pointer_type_dependencies[var.name] is not None
         #assert not self.get_pointer_type(var)
         self._pointer_types[var.name] = type
 
@@ -804,6 +804,10 @@ class ImplementedType:
         return None
 
     def returns(self, value: list[Variable], error_token: "Token", is_safe: bool):
+        if value:
+            for v in value[1:]:
+                if v.type==self:
+                    error_token.error("type", "'class' or 'singleton' created by this function within its return data should be positioned at the beginning of the returned tuple")
         for v in value:
             if v._references is not None: 
                 #if not any(u.name==v._references for u in value):
@@ -2280,6 +2284,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     #         found_type = impl.get_pointer_type(rets[i+1])
     #         if found_type is None or found_type==ANY_TYPE:
     #             impl.set_pointer_type(rets[i+1], ret.type.is_buffer_of)
+
     return rets
 
 def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token, explicit: bool=True):
@@ -2378,6 +2383,31 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
             for other_var in impl.get_required_accompany(impl.vars[r.stabilized_name()]):
                 impl.add_required_accompany(var, other_var)
             impl.add_required_accompany(var, impl.vars[r.stabilized_name()])
+
+    rets = new_vars
+
+    # now there is a special quirk that if we retrieve classes we need to fill in missing pointer info
+    # because that info is simply not retrievable from the type system (which only sees abstract pointers)
+    i = 0
+    while i<len(rets):
+        ret = rets[i]
+        rt = ret.type
+        if len(rt.rets)==0 or rt.vars[rt.rets[0]].type!=rt: 
+            i += 1 
+            continue
+        if rt==POINTER_TYPE:
+            current_token.error("safety", "pointers cannot dereference to pointer structural data (mirroring that buffers cannot contain pointer structural data)", suggestions=["those can only be part of a 'class' or a 'singleton'", "it is my great shame to admit that this is not an actual error per the language specification, but the work to fix type checking if this rule is not imposed requires rewriting the compiler - maniospas"])
+        for ret_ret in rt.rets:
+            if rt.vars[ret_ret].type==POINTER_TYPE:
+                ret = rets[i]
+                pt = rt.get_pointer_type(rt.vars[ret_ret])
+                if pt not in [None, ANY_TYPE]:
+                    existing_dep = impl.get_pointer_type(ret)
+                    if existing_dep not in [None, pt]:
+                        current_token.error("type", "incompatible type '"+existing_dep.signature()+"' vs '"+pt.signature()+"'")
+                    impl.set_pointer_type(ret, pt)
+            i += 1
+
     return pos, new_vars
 
 buffer_types: dict[UnionType|ImplementedType, UnionType] = dict()
@@ -2415,6 +2445,12 @@ def create_buffer_type(name, memory_size, variation, error_token):
         if variation.vars[varg].type == POINTER_TYPE:
             actual_variation.invalidated_by = POINTER_TYPE
         i += 1
+    i = 0
+    while i<len(variation.rets):
+        varg = variation.rets[i]
+        if variation.vars[varg].type == POINTER_TYPE:
+            error_token.error("safety", "a buffer cannot contain pointer structural data", suggestions=["those can only be part of a 'class' or a 'singleton'", "it is my great shame to admit that this is not an actual error per the language specification, but the work to fix type checking if this rule is not imposed requires rewriting the compiler - maniospas"])
+        i += max(len(variation.vars[varg].type.rets), 1)
     actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=True, isprivate=False)
     actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
     actual_variation.vars["unsafe_size"] = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
@@ -5078,6 +5114,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                     impl.vars[arg_name] = Variable(arg_name, POINTER_TYPE, immutable!=0, token=start_token)
                     impl.args.append(arg_name)
                     impl.set_pointer_type(impl.vars[arg_name], arg_type)
+                    if arg_type!=ANY_TYPE and len([ret for ret in arg_type.rets if arg_type.vars[ret].type.builtin])==0: tokens[pos-1].error("safety", "cannot convert a data type with no runtime storage to a pointer")
                     if immutable==1: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
                     continue
                 elif arg_type.builtin:

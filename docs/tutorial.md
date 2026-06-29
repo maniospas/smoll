@@ -6,7 +6,7 @@ for most code written in the language. Find more things in the langauge's
 
 ### hello world!
 
-Our first program consists consists -traditionally- of printing a greeting statement.
+Our first program consists -traditionally- of printing a greeting statement.
 We use the `repo` instruction to tell the language that it should automatically download
 code under *std/* from a corresponding web URL (download code is stored in a *.cache* folder).
 Following examples will not have this command for brevity.

@@ -15,7 +15,7 @@ def sum(Point2D[] v)
 
 def Point3D(float x, float y, float z)
     plane = Point2D(x,y)
-    return (plane,class(z))
+    return class(plane,z)
 
 def main()
     CLI = edit console()

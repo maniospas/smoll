@@ -5710,6 +5710,8 @@ SAME_CONTENTS_TYPE_CSTR.set_pointer_type(SAME_CONTENTS_TYPE_CSTR.vars["to"], CHA
 SAME_CONTENTS_TYPE_CSTR.doc.append("pointer references the same type as another")
 SAME_CONTENTS_TYPE_CSTR.doc.append("Forces the first pointer to reference a buffer of characters.")
 BLANK_TYPE = ImplementedType("void")
+BLANK_TYPE.doc.append("empty tuple")
+BLANK_TYPE.doc.append("This is the type of non-existent variables, empty parantheses, and functions of no returns.")
 
 smol_namespace = File("builtins")
 builtin_token = Token("builtins", smol_namespace, 1, 1)

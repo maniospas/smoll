@@ -14,7 +14,7 @@ def sum(Point2D[] v)
 def Point3D(effect edit console CLI, float x, float y, float z)
     plane = Point2D(x,y)
     print "starting point creation"
-    return (plane,class(z))
+    return class(plane,z)
 
 def main()
     CLI = edit console()

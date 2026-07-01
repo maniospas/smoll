@@ -16,7 +16,7 @@
 # python -m smoll test.s
 #
 # Compile with:
-# nuitka --standalone --onefile --lto=yes --output-filename=smoll --python-flag=no_asserts --python-flag=no_site --python-flag=static_hashes smoll.py
+# nuitka --standalone --onefile --lto=yes --output-filename=smoll --python-flag=no_asserts --python-flag=no_site --python-flag=no_asserts --python-flag=static_hashes smoll.py
 #
 # Profile with:
 # time python  -m cProfile -s cumulative -o out.prof smoll.py docs/std.s --docs
@@ -39,7 +39,8 @@ import re
 from pathlib import Path
 from collections import deque
 from typing import Optional, Any
-#import gc
+import gc
+gc.disable()
 #gc.set_threshold(150000)
 
 RED   = "\033[31m"
@@ -316,10 +317,11 @@ class CodeWord(CodeSegment):
     def copy(self, prefix: str): return self
     
 CODEWORD_EQUALS = CodeWord("=")
+CODEWORD_COMPARISON_EQUALS = CodeWord("==")
+CODEWORD_COMPARISON_NOT_EQUALS = CodeWord("!=")
 CODEWORD_LPAR = CodeWord("(")
 CODEWORD_RPAR = CodeWord(")")
 CODEWORD_AMP = CodeWord("&")
-CODEWORD_NOT = CodeWord("!")
 CODEWORD_COMMA = CodeWord(",")
 CODEWORD_ADD = CodeWord("+")
 CODEWORD_MUL = CodeWord("*")
@@ -328,11 +330,29 @@ CODEWORD_RBRACKET = CodeWord("}")
 CODEWORD_SEMICOLON = CodeWord(";")
 CODEWORD_PRINTF = CodeWord("printf")
 CODEWORD_GOTO = CodeWord("goto")
+CODEWORD_NOT = CodeWord("!")
 CODEWORD_IF = CodeWord("if")
 CODEWORD_ELSE = CodeWord("else")
+CODEWORD_BREAK = CodeWord("break")
+CODEWORD_CONTINUE = CodeWord("continue")
+CODEWORD_WHILE = CodeWord("while")
 CODEWORD_ZERO = CodeWord("0")
+CODEWORD_ONE = CodeWord("1")
+CODEWORD_TWO= CodeWord("2")
+CODEWORD_MINUS = CodeWord("-")
 CODEWORD_TCOMPLAIN = CodeWord("__t_complain")
 CODEWORD_TERRCODE = CodeWord("__t_errcode")
+CODEWORD_TFAILURE = CodeWord("__t_failure")
+CODEWORD_TRETURN = CodeWord("__t_return")
+CODEWORD_CAST_FUNC_PTR = CodeWord("__smoll_func_ptr_type")
+code_word_cache: dict[str, CodeWord] = dict()
+
+def create_code_word_cached(text: str):
+    entry = code_word_cache.get(text, None)
+    if entry is None:
+        entry = CodeWord(text)
+        code_word_cache[text] = entry
+    return entry
 
 lsp_text_ids: dict[str, int] = dict()
 def printid(text: int|str):
@@ -1913,7 +1933,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 impl.implementation.extend([
                     variable,
                     CODEWORD_EQUALS,
-                    CodeWord(literal_method.at.text),
+                    create_code_word_cached(literal_method.at.text),
                     CODEWORD_SEMICOLON
                 ])
                 new_vars.append(variable)
@@ -1930,7 +1950,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.implementation.extend([
             var,
             CODEWORD_EQUALS,
-            CodeWord(str(total_size)),
+            create_code_word_cached(str(total_size)),
             CODEWORD_SEMICOLON
         ])
         return [var]
@@ -1983,7 +2003,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             CODEWORD_EQUALS,
             CODEWORD_LPAR,
             CODEWORD_TCOMPLAIN,
-            CodeWord("=="),
+            CODEWORD_COMPARISON_EQUALS,
             CODEWORD_ZERO,
             CODEWORD_RPAR,
             CODEWORD_SEMICOLON,
@@ -2244,7 +2264,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             ])
         impl.implementation.extend([
             CODEWORD_GOTO,
-            CodeWord("__t_failure"),
+            CODEWORD_TFAILURE,
             CODEWORD_SEMICOLON,
             CODEWORD_RBRACKET
         ])
@@ -2349,7 +2369,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     impl.implementation.extend([
         CODEWORD_IF,
         CODEWORD_LPAR,
-        CodeWord("!"),
+        CODEWORD_NOT,
         ret[0],
         CODEWORD_RPAR,
         CODEWORD_LBRACKET,
@@ -2361,7 +2381,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
         impl.implementation.extend([
             CODEWORD_TCOMPLAIN,
             CODEWORD_EQUALS,
-            CodeWord("2"),
+            CODEWORD_TWO,
             CODEWORD_SEMICOLON,
             CODEWORD_RBRACKET,
             CODEWORD_ELSE,
@@ -2385,13 +2405,13 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
         impl.implementation.extend([
             CODEWORD_TERRCODE,
             CODEWORD_EQUALS,
-            CodeWord("2"),
+            CODEWORD_TWO,
             CODEWORD_SEMICOLON
         ])
         impl.spawned_error_codes.add(2)
         impl.implementation.extend([
             CODEWORD_GOTO,
-            CodeWord("__t_failure"),
+            CODEWORD_TFAILURE,
             CODEWORD_SEMICOLON,
             CODEWORD_RBRACKET
         ])
@@ -2404,15 +2424,9 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
         if not mem_size: continue
         impl.implementation.extend(
             [CodeWord(w) for w in "memcpy (".split(" ")]
-            + [CODEWORD_AMP]
-            + [r_var]
-            + [CODEWORD_COMMA]
-            #+ [CodeWord(w) for w in "( char * )".split(" ")]
-            + [ret[0]]
-          
+            + [CODEWORD_AMP, r_var, CODEWORD_COMMA, ret[0]]
             + ([CODEWORD_ADD, CodeWord(str(progress))] if progress else [])
-            + [CODEWORD_COMMA, CodeWord(str(mem_size))]
-            + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
+            + [CODEWORD_COMMA, CodeWord(str(mem_size)), CODEWORD_RPAR, CODEWORD_SEMICOLON]
         )
         progress += mem_size
     if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
@@ -2474,7 +2488,6 @@ def find_unique_variations(variations: list[ImplementedType]):
         if not already_parsed: all_found.append(impl)
     return all_found
 
-
 def create_buffer_type(name, memory_size, variation, error_token):
     actual_variation = ImplementedType(name, at=variation.at)
     actual_variation.is_buffer_of = variation
@@ -2493,15 +2506,15 @@ def create_buffer_type(name, memory_size, variation, error_token):
             error_token.error("safety", "a buffer cannot contain pointer structural data", suggestions=["those can only be part of a 'class' or a 'singleton'", "it is my great shame to admit that this is not an actual error per the language specification, but the work to fix type checking if this rule is not imposed requires rewriting the compiler - maniospas"])
         i += max(len(variation.vars[varg].type.rets), 1)
     actual_variation.vars[type_arg] = Variable(type_arg, actual_variation, immutable=True, isprivate=False)
-    actual_variation.vars["unsafe_ptr"] = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
-    actual_variation.vars["unsafe_size"] = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
-    actual_variation.vars["unsafe_offset"] = Variable("unsafe_offset", UINT16_TYPE, immutable=False, isprivate=False)
-    actual_variation.vars["unsafe_align"] = Variable("unsafe_align", UINT16_TYPE, immutable=False, isprivate=False)
+    actual_variation.vars["unsafe_ptr"] = UNSAFE_PTR_VARIABLE
+    actual_variation.vars["unsafe_size"] = UNSAFE_SIZE_VARIABLE
+    actual_variation.vars["unsafe_offset"] = UNSAFE_OFFSET_VARIABLE
+    actual_variation.vars["unsafe_align"] = UNSAFE_ALIGN_VARIABLE
     actual_variation.set_pointer_type(actual_variation.vars["unsafe_ptr"], variation)
     actual_variation.implementation.extend([
         actual_variation.vars["unsafe_align"],
         CODEWORD_EQUALS,
-        CodeWord(memory_size),
+        create_code_word_cached(memory_size),
         CODEWORD_SEMICOLON
     ])
     actual_variation.rets.append(type_arg)
@@ -2818,7 +2831,7 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
     impl.implementation.extend([
         CODEWORD_IF,
         CODEWORD_LPAR,
-        CodeWord("!"),
+        CODEWORD_NOT,
         functor_var,
         CODEWORD_RPAR,
         CODEWORD_LBRACKET,
@@ -2831,7 +2844,7 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
         impl.implementation.extend([
             CODEWORD_TCOMPLAIN,
             CODEWORD_EQUALS,
-            CodeWord("2"),
+            CODEWORD_TWO,
             CODEWORD_SEMICOLON,
             try_var,
             CODEWORD_EQUALS,
@@ -2861,13 +2874,13 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
         impl.implementation.extend([
             CODEWORD_TERRCODE,
             CODEWORD_EQUALS,
-            CodeWord("2"),
+            CODEWORD_TWO,
             CODEWORD_SEMICOLON
         ])
         impl.spawned_error_codes.add(2)
         impl.implementation.extend([
             CODEWORD_GOTO,
-            CodeWord("__t_failure"),
+            CODEWORD_TFAILURE,
             CODEWORD_SEMICOLON,
             CODEWORD_RBRACKET
         ])
@@ -2929,7 +2942,7 @@ def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_tok
                 new_method.set_pointer_type(method.vars[arg], existing_pointer_type)
         rets = resolve_call(err_token.file, new_method, _method, [new_method.vars[arg] for arg in new_method.args], err_token, _callee=method)
         new_method.returns(rets, err_token, False) # don't do redundant error checks
-        new_method.implementation.extend([CODEWORD_GOTO, CodeWord("__t_return"), CODEWORD_SEMICOLON])
+        new_method.implementation.extend([CODEWORD_GOTO, CODEWORD_TRETURN, CODEWORD_SEMICOLON])
         new_method.needs_failure_mode = err_token
         new_method.force_not_inline = True
         method = new_method
@@ -2964,7 +2977,7 @@ def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_tok
         var,
         CODEWORD_EQUALS,
         CODEWORD_LPAR,
-        CodeWord("__smoll_func_ptr_type"),
+        CODEWORD_CAST_FUNC_PTR,
         CODEWORD_RPAR,
         CodeWord(from_name if from_name is not None else method.monomorphic_name),
         CODEWORD_SEMICOLON
@@ -3228,7 +3241,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             impl.implementation.extend([
                 CODEWORD_IF,
                 CODEWORD_LPAR,
-                CodeWord("!"),
+                CODEWORD_NOT,
                 var,
                 CODEWORD_RPAR,
                 CODEWORD_LBRACKET,
@@ -3240,7 +3253,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 impl.implementation.extend([
                     CODEWORD_TCOMPLAIN,
                     CODEWORD_EQUALS,
-                    CodeWord("2"),
+                    CODEWORD_TWO,
                     CODEWORD_SEMICOLON,
                     CODEWORD_RBRACKET,
                     CODEWORD_ELSE,
@@ -3265,13 +3278,13 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 impl.implementation.extend([
                     CODEWORD_TERRCODE,
                     CODEWORD_EQUALS,
-                    CodeWord("2"),
+                    CODEWORD_TWO,
                     CODEWORD_SEMICOLON
                 ])
                 impl.spawned_error_codes.add(2)
                 impl.implementation.extend([
                     CODEWORD_GOTO,
-                    CodeWord("__t_failure"),
+                    CODEWORD_TFAILURE,
                     CODEWORD_SEMICOLON,
                     CODEWORD_RBRACKET
                 ])
@@ -3284,10 +3297,10 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 impl.implementation.extend(
                     [CodeWord("memcpy"), CODEWORD_LPAR]
                     +[var]
-                    + ([CODEWORD_ADD, CodeWord(str(progress))] if progress else [])
+                    + ([CODEWORD_ADD, create_code_word_cached(str(progress))] if progress else [])
                     + [CODEWORD_COMMA, CODEWORD_AMP]
                     + [impl.vars[r.stabilized_name()]]
-                    + [CODEWORD_COMMA, CodeWord(str(mem_size))]
+                    + [CODEWORD_COMMA, create_code_word_cached(str(mem_size))]
                     + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
                 )
                 if impl.vars[r.stabilized_name()].type==POINTER_TYPE:
@@ -3349,7 +3362,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             impl.implementation.extend([
                 CODEWORD_IF,
                 CODEWORD_LPAR,
-                CodeWord("!"),
+                CODEWORD_NOT,
                 rets[0],
                 CODEWORD_RPAR,
                 CODEWORD_LBRACKET
@@ -3450,7 +3463,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     impl.vars[has_any_var.name] = has_any_var
                     impl.vars[is_variation_matching_var.name] = is_variation_matching_var
                     for variation in found_variations:
-                        impl.implementation.extend([is_variation_matching_var, CODEWORD_EQUALS, CodeWord("1"),CODEWORD_SEMICOLON])
+                        impl.implementation.extend([is_variation_matching_var, CODEWORD_EQUALS, CODEWORD_ONE,CODEWORD_SEMICOLON])
                         for arg_pos, arg in enumerate(variation.rets):
                             literal_method = variation.vars[arg].type
                             if literal_method.is_literal_of is None: continue # already checked
@@ -3483,7 +3496,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                                     CODEWORD_IF,
                                     CODEWORD_LPAR,
                                     variable,
-                                    CodeWord("!="),
+                                    CODEWORD_COMPARISON_NOT_EQUALS,
                                     variable2,#rets[arg_pos],#CodeWord(rets[arg_pos].type.at.text),
                                     CODEWORD_RPAR,
                                     CODEWORD_LBRACKET,
@@ -3506,7 +3519,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                                     CODEWORD_IF,
                                     CODEWORD_LPAR,
                                     variable,
-                                    CodeWord("!="),
+                                    CODEWORD_COMPARISON_NOT_EQUALS,
                                     CodeWord(rets[arg_pos].type.at.text),
                                     CODEWORD_RPAR,
                                     CODEWORD_LBRACKET,
@@ -3524,7 +3537,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                             CODEWORD_LBRACKET,
                             has_any_var,
                             CODEWORD_EQUALS,
-                            CodeWord("1"),
+                            CODEWORD_ONE,
                             CODEWORD_SEMICOLON,
                             CODEWORD_RBRACKET,
                         ])
@@ -3588,7 +3601,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     impl.implementation.extend([
                         CODEWORD_IF,
                         CODEWORD_LPAR,
-                        CodeWord("!"),
+                        CODEWORD_NOT,
                         rets[0],
                         CODEWORD_RPAR,
                         CODEWORD_LBRACKET,
@@ -3600,7 +3613,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         impl.implementation.extend([
                             CODEWORD_TCOMPLAIN,
                             CODEWORD_EQUALS,
-                            CodeWord("2"),
+                            CODEWORD_TWO,
                             CODEWORD_SEMICOLON,
                             CODEWORD_RBRACKET,
                             CODEWORD_ELSE,
@@ -3626,13 +3639,13 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         impl.implementation.extend([
                             CODEWORD_TERRCODE,
                             CODEWORD_EQUALS,
-                            CodeWord("2"),
+                            CODEWORD_TWO,
                             CODEWORD_SEMICOLON
                         ])
                         impl.spawned_error_codes.add(2)
                         impl.implementation.extend([
                             CODEWORD_GOTO,
-                            CodeWord("__t_failure"),
+                            CODEWORD_TFAILURE,
                             CODEWORD_SEMICOLON,
                             CODEWORD_RBRACKET
                         ])
@@ -3951,7 +3964,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     ret[0],
                     CODEWORD_SEMICOLON,
                     CODEWORD_GOTO,
-                    CodeWord("__t_failure"),
+                    CODEWORD_TFAILURE,
                     CODEWORD_SEMICOLON
                 ])
                 impl.needs_failure_mode = current_token
@@ -3996,7 +4009,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 CodeWord(str(err_code)),
                 CODEWORD_SEMICOLON,
                 CODEWORD_GOTO,
-                CodeWord("__t_failure"),
+                CODEWORD_TFAILURE,
                 CODEWORD_SEMICOLON
             ])
             impl.needs_failure_mode = current_token
@@ -4008,7 +4021,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         impl.implementation.extend([
             variable,
             CODEWORD_EQUALS,
-            CodeWord("1"),
+            CODEWORD_ONE,
             CODEWORD_SEMICOLON
         ])
         return await process_statement_operator(file, tokens, impl, pos+1, [variable], current_operator_priority)
@@ -4220,7 +4233,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 var,
                 CODEWORD_EQUALS,
                 var,
-                CodeWord("=="),
+                CODEWORD_COMPARISON_EQUALS,
                 CODEWORD_ZERO,
                 CODEWORD_SEMICOLON
             ])
@@ -4385,7 +4398,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             impl.implementation.extend([
                 CODEWORD_IF,
                 CODEWORD_LPAR,
-                CodeWord("!"),
+                CODEWORD_NOT,
                 var,
                 CODEWORD_RPAR,
                 CODEWORD_LBRACKET,
@@ -4397,7 +4410,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 impl.implementation.extend([
                     CODEWORD_TCOMPLAIN,
                     CODEWORD_EQUALS,
-                    CodeWord("2"),
+                    CODEWORD_TWO,
                     CODEWORD_SEMICOLON,
                     CODEWORD_RBRACKET,
                     CODEWORD_ELSE,
@@ -4422,13 +4435,13 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 impl.implementation.extend([
                     CODEWORD_TERRCODE,
                     CODEWORD_EQUALS,
-                    CodeWord("2"),
+                    CODEWORD_TWO,
                     CODEWORD_SEMICOLON
                 ])
                 impl.spawned_error_codes.add(2)
                 impl.implementation.extend([
                     CODEWORD_GOTO,
-                    CodeWord("__t_failure"),
+                    CODEWORD_TFAILURE,
                     CODEWORD_SEMICOLON,
                     CODEWORD_RBRACKET
                 ])
@@ -4678,7 +4691,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 impl.returns(ret, name, name.text=="return")
                 #if not ret: impl.implementation.extend([CodeWord("return"), CODEWORD_SEMICOLON])
                 #else: 
-                impl.implementation.extend([CODEWORD_GOTO, CodeWord("__t_return"), CODEWORD_SEMICOLON])
+                impl.implementation.extend([CODEWORD_GOTO, CODEWORD_TRETURN, CODEWORD_SEMICOLON])
                 return pos, ret
             pos, ret = await process_return(pos)
             continue
@@ -4775,7 +4788,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             if is_lsp and name.file.is_main_file:
                 if name.text=="continue": print_lsp_keyword(name, "continues immediately from the next loop iteration by skipping the rest of the current iteration")
                 else: print_lsp_keyword(name, "stops the current loop immediately")
-            impl.implementation.extend([CodeWord(name.text), CODEWORD_SEMICOLON])
+            impl.implementation.extend([CODEWORD_BREAK if name.text=="break" else CODEWORD_CONTINUE, CODEWORD_SEMICOLON])
             continue
         if name.text=="for":
             if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**for**\n\nLoop that automatically retrieves index-indexed items. 'for var in iterator ...' is equivalent to 'index =0 while try var=iterator[index] ... index=index+1'")
@@ -4832,15 +4845,15 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 indexor,
                 CODEWORD_EQUALS,
                 CODEWORD_ZERO,
-                CodeWord("-"),
-                CodeWord("1"),
+                CODEWORD_MINUS,
+                CODEWORD_ONE,
                 CODEWORD_SEMICOLON
             ])
             
             impl.implementation.extend([
-                CodeWord("while"),
+                CODEWORD_WHILE,
                 CODEWORD_LPAR,
-                CodeWord("1"),
+                CODEWORD_ONE,
                 CODEWORD_RPAR,
                 CODEWORD_LBRACKET,
             ])
@@ -4866,7 +4879,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                     var,
                     CODEWORD_EQUALS,
                     var,
-                    CodeWord("=="),
+                    CODEWORD_COMPARISON_EQUALS,
                     CODEWORD_ZERO,
                     CODEWORD_SEMICOLON
                 ])
@@ -4876,7 +4889,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 CODEWORD_EQUALS,
                 indexor,
                 CODEWORD_ADD,
-                CodeWord("1"),
+                CODEWORD_ONE,
                 CODEWORD_SEMICOLON
             ])
             pos, ret = await process_for_get(pos)
@@ -4898,11 +4911,11 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 impl.implementation.extend([
                         CODEWORD_IF, 
                         CODEWORD_LPAR,
-                        CodeWord("!"),
+                        CODEWORD_NOT,
                         ret[0],
                         CODEWORD_RPAR,
                         CODEWORD_LBRACKET,
-                        CodeWord("break"),
+                        CODEWORD_BREAK,
                         CODEWORD_SEMICOLON,
                         CODEWORD_RBRACKET,
                     ])
@@ -4924,9 +4937,9 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             impl.nesting.append("while")
             if_pos = pos-1
             impl.implementation.extend([
-                CodeWord("while"),
+                CODEWORD_WHILE,
                 CODEWORD_LPAR,
-                CodeWord("1"),
+                CODEWORD_ONE,
                 CODEWORD_RPAR,
                 CODEWORD_LBRACKET,
             ])
@@ -4951,11 +4964,11 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 impl.implementation.extend([
                     CODEWORD_IF, 
                     CODEWORD_LPAR,
-                    CodeWord("!"),
+                    CODEWORD_NOT,
                     ret[0],
                     CODEWORD_RPAR,
                     CODEWORD_LBRACKET,
-                    CodeWord("break"),
+                    CODEWORD_BREAK,
                     CODEWORD_SEMICOLON,
                     CODEWORD_RBRACKET,
                 ])
@@ -5892,16 +5905,16 @@ ASSERT_SAME_TYPE.implementation.extend([
     CODEWORD_IF,
     CODEWORD_LPAR,
     ASSERT_SAME_TYPE.vars["to"],
-    CodeWord("!="),
+    CODEWORD_COMPARISON_NOT_EQUALS,
     ASSERT_SAME_TYPE.vars["from"],
     CODEWORD_RPAR,
     CODEWORD_LBRACKET,
     CODEWORD_TERRCODE,
-    CodeWord("=="),
+    CODEWORD_COMPARISON_EQUALS,
     CodeWord("3"),
     CODEWORD_SEMICOLON,
     CODEWORD_GOTO,
-    CodeWord("__t_failure"),
+    CODEWORD_TFAILURE,
     CODEWORD_SEMICOLON,
     CODEWORD_RBRACKET,
 ])
@@ -5938,6 +5951,10 @@ debug_namespace.types["unsafe_singletons"] = UnionType("unsafe_singletons", at=c
 smol_namespace.namespaces["debug"] = debug_namespace
 
 file_cache["builtins"] = smol_namespace
+UNSAFE_PTR_VARIABLE = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
+UNSAFE_SIZE_VARIABLE = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
+UNSAFE_OFFSET_VARIABLE = Variable("unsafe_offset", UINT16_TYPE, immutable=False, isprivate=False)
+UNSAFE_ALIGN_VARIABLE = Variable("unsafe_align", UINT16_TYPE, immutable=False, isprivate=False)
 
 def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_point: str|None) -> None:
     src_path = Path(f"{output_name}.c")

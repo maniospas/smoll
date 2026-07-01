@@ -20,15 +20,12 @@ local import "std/core/allocators.s"
 local import "std/unsafe.s" as unsafe
 
 
-def char_arena()
-    return arena char[]
-def char_circular()
-    return circular char[]
-local def char_list()
-    return list char[]
-local def alloc(effect edit new CHARS, nat length)
+def arena(char::name)    return arena char[]
+def circular(char::name) return circular char[]
+def list(char::name)     return list char[]
+local def alloc(effect edit new CHARS, nat length) 
     return allocated(char[].alloc length, 0)
-def char_allocator = new|char_arena|char_circular|char_list
+def char_allocator = new|arena<char::name>|circular<char::name>|list<char::name>
 
 def exists(cstr c)
     doc "checks whether a cstr is not zero-initialized"
@@ -217,7 +214,7 @@ def neq(str|cstr x, str|cstr y)
     doc "not equals"
     return not x==y
 
-def copy_null_terminated(effect edit char_arena CHARS, str|cstr _other)
+def copy_null_terminated(effect edit arena<char::name> CHARS, str|cstr _other)
     doc "copy a string while adding null termination"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."

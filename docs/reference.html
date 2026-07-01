@@ -256,7 +256,7 @@
 <em>2.7.</em> <a href="#defer">{defer}</a><br>
 <em>2.8.</em> <a href="#catching-errors">catching errors</a><br>
 <em>2.9.</em> <a href="#allocator-effects">allocator-effects</a><br>
-<em>2.10.</em> <a href="#functors">funnctors</a><br>
+<em>2.10.</em> <a href="#functors">functors</a><br>
 <em>2.11.</em> <a href="#debugging-tools">{debugging tools}</a><br>
 <em>2.12.</em> <a href="#bounded-compute">{bounded compute}</a><br></p>
 
@@ -412,21 +412,22 @@ The default ending is otherwise <em>"\n"</em>.</p>
 <h2 id="mutability">mutability</h2>
 
 <p>Varaibles cannot normally be overwritten. For example,
-if you set <code>x=1</code>, you cannot set a new value on <code>x</code>. This
+setting <code>x=1</code> prevents overwriting <code>x</code> with another value. This
 property is called immutability.
 To allow oeverwriting, place <code>mut</code> just after the first assignment
-to indicate that the variable can be <em>mutated</em>.</p>
+to indicate that the variable is instead <em>mutasble</em>.</p>
 
 <p>You can keep overwriting mutable variables. This is much more
-intrusive than <code>edit</code>, which we have been using to edit the console.
-For example, primitive types -like numbers- cannot be edited. You can only
-set them as <code>mut</code> to overwrite them with a different value, like below.
-Even if a value is mutable, it can only be overwritten by
+intrusive than the <code>edit</code> qualifier that we have been using to edit the console.
+For example, primitive types -like numbers- cannot be edited because they have 
+no internal state. But you can
+set them as <code>mut</code> to allow replacement with a different value, like below.
+That said, even if a value is mutable, it can only be overwritten by
 others of the same type.</p>
 
 <p>In most code, variables will remain immutable. Prefer using <code>edit</code> 
 when possible, as it is the more restrictive of the two permission
-levels. You will see more on the latter <a href="#type-mutability">momentarily</a>.</p>
+levels. See more on edit permissions <a href="#type-mutability">later</a>.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -2072,9 +2073,9 @@ functors based on arguments.</p>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">y</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span> 
-    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">0</span> <span class="k">return</span> <span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span>
-    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span>
-    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">2</span> <span class="k">return</span> <span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">0</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">2</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>

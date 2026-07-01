@@ -27,7 +27,7 @@ def console()
     doc ""
     doc "The console is a zero-cost abstraction in that it does not transfer any data"
     doc "but relies on singleton safety to synchronize io across threads."
-    doc "Quickly print internals for debugging without with `unsafe_console()`."
+    doc "Quickly print internals for debugging with `unsafe_console()`."
     # this trick of going through a mut, allows edit console to be an available action
     handler = mut singleton()
     return const handler 
@@ -99,7 +99,7 @@ def print(effect edit console CLI, compiler::false, cstr|blank endl)
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
-    {printf("true%s", endl);}
+    {printf("false%s", endl);}
 
 def supports_ansi(console CLI)
     VM "[supports_ansi()]"

@@ -79,7 +79,7 @@ def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     pos = pos+bytes_open
     return str(buf, prev_pos, type "len", bytes_open)
 
-def line(effect edit char_arena|char_circular CHARS, edit File f)
+def line(effect edit arena<char::name>|circular<char::name> CHARS, edit File f)
     doc "next line"
     doc "Retrieves the next line from a file,"
     doc "and stores it on a CHARS storage effect."
@@ -88,9 +88,9 @@ def line(effect edit char_arena|char_circular CHARS, edit File f)
     doc "new line character, in case the line does not fit onto the buffer"
     doc "at once, in which case it requires multiple opens, or at the"
     doc "output stream's end."
-    if CHARS is char_arena
+    if CHARS is arena<char::name>
         pos = CHARS.pos
-    if CHARS is char_circular
+    if CHARS is circular<char::name>
         pos = 0
     buf = ref CHARS.buf
     if not exists buf.unsafe_ptr

@@ -4,7 +4,7 @@ import "std/map.s"
 def strstrmap(nat size)
     return strmap alloc(str[], size)
 
-def test(effect edit console CLI, edit char_arena buf)
+def test(effect edit console CLI, edit arena<char::name> buf)
     map = edit strmap str[].alloc 128
     map["hello"] = buf.copy str "hello world!"
     map["manio"] = buf.copy str "it's a me, manio."

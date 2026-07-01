@@ -1,6 +1,6 @@
 import "std/core.s"
 
-def test(char_arena->str creator)
+def test(arena<char::name>->str creator)
     CHARS = edit arena char[].alloc 128
     ret = str creator.compiler::call CHARS
     # the next assertion is REQUIRED to inject a 
@@ -10,7 +10,7 @@ def test(char_arena->str creator)
     compiler::assert_eq(ret.unsafe_ptr, CHARS.buf.unsafe_ptr)
     return ret
 
-def string_creator(char_arena _CHARS)
+def string_creator(arena<char::name> _CHARS)
     CHARS = unsafe_mut _CHARS
     strings = [copy "created"]
     unsafe_return strings[0]

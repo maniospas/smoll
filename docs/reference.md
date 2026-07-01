@@ -25,7 +25,7 @@ _2.6._ [{iterators}](#iterators)<br>
 _2.7._ [{defer}](#defer)<br>
 _2.8._ [catching errors](#catching-errors)<br>
 _2.9._ [allocator-effects](#allocator-effects)<br>
-_2.10._ [funnctors](#functors)<br>
+_2.10._ [functors](#functors)<br>
 _2.11._ [{debugging tools}](#debugging-tools)<br>
 _2.12._ [{bounded compute}](#bounded-compute)<br>
 
@@ -177,21 +177,22 @@ def main()
 ## mutability
 
 Varaibles cannot normally be overwritten. For example,
-if you set `x=1`, you cannot set a new value on `x`. This
+setting `x=1` prevents overwriting `x` with another value. This
 property is called immutability.
 To allow oeverwriting, place `mut` just after the first assignment
-to indicate that the variable can be *mutated*.
+to indicate that the variable is instead *mutasble*.
 
 You can keep overwriting mutable variables. This is much more
-intrusive than `edit`, which we have been using to edit the console.
-For example, primitive types -like numbers- cannot be edited. You can only
-set them as `mut` to overwrite them with a different value, like below.
-Even if a value is mutable, it can only be overwritten by
+intrusive than the `edit` qualifier that we have been using to edit the console.
+For example, primitive types -like numbers- cannot be edited because they have 
+no internal state. But you can
+set them as `mut` to allow replacement with a different value, like below.
+That said, even if a value is mutable, it can only be overwritten by
 others of the same type.
 
 In most code, variables will remain immutable. Prefer using `edit` 
 when possible, as it is the more restrictive of the two permission
-levels. You will see more on the latter [momentarily](#type-mutability).
+levels. See more on edit permissions [later](#type-mutability).
 
 ```python
 import "std/core.s"

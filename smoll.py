@@ -16,7 +16,7 @@
 # python -m smoll test.s
 #
 # Compile with:
-# nuitka --standalone --onefile --lto=yes --output-filename=smoll --python-flag=no_site --python-flag=no_asserts --python-flag=static_hashes smoll.py
+# nuitka --standalone --jobs=8 --deployment --lto=yes --output-filename=smoll --python-flag=no_site --python-flag=no_asserts --python-flag=static_hashes smoll.py
 #
 # Profile with:
 # time python  -m cProfile -s cumulative -o out.prof smoll.py docs/std.s --docs
@@ -49,7 +49,7 @@ GREEN = "\033[32m"
 YELLOW= "\033[33m"
 PURPLE= "\033[35m"
 RESET = "\033[0m"
-symbols = "=\\/+-*@<>!%&#!(){}[]:.,;|^"
+symbols = "=\\/+-*@<>!%&#!(){}[]:.,;|^~"
 END_TOKEN = "...]" # impossible for something else to be tokenized as this
 START_TOKEN = "[..." # impossible for something else to be tokenized as this
 err_code_table: dict[str,int] = dict()
@@ -149,7 +149,7 @@ class MemoryEmulator:
         self.write_int64(addr, foreign_object_id)
         return addr
 
-    def get_foreign(self, addr: int) -> int:
+    def get_foreign(self, addr: int) -> int|None:
         foreign_object_id = self.read_int64(addr)
         ret = self.foreign_objects.get(foreign_object_id)  # .get() instead of ()
         if ret is None: return None
@@ -1962,7 +1962,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                     new_var = Variable(var+ret, literal_method.vars[ret].type)
                     impl.vars[new_var.name] = new_var
                     new_vars.append(new_var)
-            else:
+            elif literal_method.is_literal_of!=BLANK_TYPE:
                 variable = Variable(create_temp(), literal_method.is_literal_of, token=error_token)
                 impl.vars[variable.name] = variable
                 impl.implementation.extend([
@@ -2667,7 +2667,9 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 lits.append(create_literal_type(Token("\""+memory.as_cstr(returned_values[i])+"\"", literal_tok.file, literal_tok.row, literal_tok.col), CSTR_TYPE).variations[0])
             i += 1
         if len(lits)==0:
-            return pos, smol_namespace.types["blank"]
+            ret = UnionType(BLANK_LITERAL.name, at=BLANK_LITERAL.at)
+            ret.variations.append(BLANK_LITERAL)
+            return pos, ret
         synthetic_type = ImplementedType(signature_like(ret, temporary_implementation), at=literal_tok)
         synthetic_type.is_literal_of = synthetic_type # self-literals mean unpacking
         for lit in lits:
@@ -2684,9 +2686,8 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
     if peek_text(tokens, pos+1)!="::" or (namespace is None and do_not_follow_namespace):
         if name in operators: tokens[pos].error("syntax", "the previous expression has ended")
         type: UnionType|None = file.types.get(name, None)
-        if type is None: 
+        if type is None:
             #raise("unknown type '"+name+"'")
-            found = False
             for tokpos, tok in enumerate(tokens):
                 if tok.text=="def" and peek_text(tokens, tokpos+1)==name:
                     if peek_text(tokens, tokpos+2)=="=": tokens[pos].error("type", "type union is declared later per 'def "+name+"'")
@@ -4373,7 +4374,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             if peek==",":
                 continue
             littype = literal_types.get("\""+peek+"\"", None)
-            if littype is None: get(tokens, prev_pos).error("syntax", "expecting comma, closing parenthesis, or keyword derived from a cstr literal type")
+            if littype is None: get(tokens, prev_pos).error("syntax", "expecting comma, closing parenthesis, or keyword derived from a cstr literal type but got: '"+peek+"'")
             if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_keyword(get(tokens, pos), "**literal type**\n\nThis is a shorthand to adding a 'type \""+peek+"\"' argument here.")
             litvar = Variable(create_temp(), littype.variations[0])
             impl.vars[litvar.name] = litvar
@@ -5832,9 +5833,12 @@ CHAR_TYPE = ImplementedType("char", "char", memory_size=1, at=builtin_token)
 CHAR_TYPE.doc.append("a character")
 CHAR_TYPE.doc.append("Represents characters in the numeric range `0 to 255`.")
 
-BLANK_TYPE = ImplementedType("void", at=builtin_token)
+BLANK_TYPE = ImplementedType("blank", at=builtin_token)
 BLANK_TYPE.doc.append("empty tuple")
 BLANK_TYPE.doc.append("This is the type of non-existent variables, empty parantheses, and functions of no returns.")
+
+BLANK_LITERAL = ImplementedType("blank literal", at=Token("blank", smol_namespace, 1, 1))
+BLANK_LITERAL.is_literal_of = BLANK_LITERAL
 
 ANY_TYPE = ImplementedType("any", at=builtin_token) #TODO: consider deliberately not having a builtin token
 ANY_TYPE.doc.append("any type")

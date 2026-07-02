@@ -16,7 +16,7 @@
 # python -m smoll test.s
 #
 # Compile with:
-# nuitka --standalone --jobs=8 --deployment --lto=yes --output-filename=smoll --python-flag=no_site --python-flag=no_asserts --python-flag=static_hashes smoll.py
+# nuitka --onefile --jobs=8 --deployment --lto=yes --output-filename=smoll --python-flag=no_site --python-flag=no_asserts --python-flag=static_hashes smoll.py
 #
 # Profile with:
 # time python  -m cProfile -s cumulative -o out.prof smoll.py docs/std.s --docs

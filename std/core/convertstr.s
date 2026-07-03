@@ -126,8 +126,9 @@ def str(effect edit char_allocator CHARS, edit console console)
     if ch.buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
     start = const ch.pos
     while true
-        {builtins::int _c = getchar();}
-        {if(_c=='\n'||_c=='\r'||_c==EOF){break;}}
+        _c = char console
+        {if(_c=='\n'){break;}}
+        {if(_c=='\r'){break;}}
         if ch.pos>=ch.buf.unsafe_size 
             if CHARS is new
                 ch.buf = ch.buf.resize ch.buf.unsafe_size*3/2

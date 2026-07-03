@@ -883,6 +883,10 @@ class ImplementedType:
         for pos, arg in enumerate(value):
             if not arg.name.startswith("__t"): self.return_names[arg.name] = pos
             if self.has_returned_once: 
+                #v1 = self.vars[self.rets[pos]]
+                # if is_safe and v1.type==POINTER_TYPE and arg.type==POINTER_TYPE:
+                #     if not self.get_assignment(v1.name, [arg.name]) and not self.get_assignment(arg.name, [v1.name]):
+                #         error_token.error("safety", "you are returning an incompatible pointer")
                 self.assign(self.rets[pos], [arg], error_token, perform_immutability_checks=False, top_entry=False) # TODO: do not use assign but a manual setting to allow overwriting (or make mutable)
             else:
                 self.rets.append(arg.name)
@@ -890,7 +894,14 @@ class ImplementedType:
         for i in range(len(self.rets)):
             for j in range(i+1,len(self.rets)):
                 if self.rets[i]==self.rets[j]: error_token.error("safety", "cannot return the same variable multiple times; conflict for '"+pretty_name(self.rets[i])+"'")
+        
+        prev_self_rets = self.rets
         if True:
+            self.rets = [v.name for v in value]
+            prev_returned_defers = {id(defer) for defer in self.returned_defers}
+            new_returned_defers = set()
+            self.defers = self.defers+self.returned_defers
+            self.returned_defers = []
             to_remove = list()
             for defer in self.defers:
                 orignal_defer = defer
@@ -908,13 +919,25 @@ class ImplementedType:
                     error_token.error("safety", "cannot have a 'defer' that mixes non-returned mutable argument and returns")
                 has_assigned = set()
                 has_not_assigned = set()
+                confirm = True
                 for pos, segment in enumerate(defer):
                     if pos<len(defer)-1 and defer[pos+1].tostring()=="=" and segment not in has_not_assigned: has_assigned.add(segment)
                     has_not_assigned.add(segment)
                     if isinstance(segment, Variable) and segment.name not in global_var2cstr and not segment.is_temp() and segment not in has_assigned and not any(segment.tostring()==v.name for v in value):
-                        if not segment in value: error_token.error("safety", "cannot return a partial 'defer'\nThis return statement does not explicitly return '"+pretty_name(segment.tostring())+"'. However, a value from that is used within a 'defer' that also contains returned values; the latter would be delegated for later calling without knowing the missing return value.", suggestions=["return '"+pretty_name(segment.tostring())+"' too, or any structure it resides in", "do not return variables within the same 'defer'"])
-                self.returned_defers.append(defer)
-                to_remove.append(orignal_defer)
+                        if not segment in value: 
+                            confirm = False
+                            error_token.error("safety", "cannot return a partial 'defer'\nThis return statement does not explicitly return '"+pretty_name(segment.tostring())+"'. However, this variable is partially or fully used within a 'defer' that also contains returned values. It is wrong for this defer to run within this function.", suggestions=["return '"+pretty_name(segment.tostring())+"' too, or any structure it resides in", "do not return variables within the same 'defer'", "use 'unsafe_return' to run the defer in question within this function"])
+                if confirm:
+                    self.returned_defers.append(defer)
+                    new_returned_defers.add(id(orignal_defer))
+                    to_remove.append(orignal_defer)
+            if self.has_returned_once and is_safe:
+                for defer in prev_returned_defers:
+                    if defer not in new_returned_defers:
+                        error_token.error("safety", "incompatible returned defers compared to previous return")
+                for defer in new_returned_defers:
+                    if defer not in prev_returned_defers:
+                        error_token.error("safety", "incompatible returned defers compared to previous return")
             for defer in to_remove: self.defers.remove(defer)
 
         if is_safe:
@@ -931,13 +954,14 @@ class ImplementedType:
                         if accompanying==v: continue
                         to_defer = self.get_assignment(accompanying.stabilized_name(), defer_var_names)
                         if to_defer is None and self.defers and not self.get_assignment(accompanying.stabilized_name(), self.args):
-                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' cannot be done, because the variable comes from '"+pretty_name(accompanying.stabilized_name())+"' for which equality-based analysis is cut short (e.g., passes through allocated memory) and therefore cannot be proven to *not* be associated with a defer not accompanying the return", reason=accompanying.token, suggestions=["use 'compiler:assert_eq' to verify memory region equality and thus properly transfer deferred values", "create a copy on new memory and return that", "return all variables with associated defers, to let those defers accompany the function's return", "return a container/buffer and position pair and reconstruct necessary pointers at the return site", "return the non-pointer section of your data and reconstruct the object at the calling site"])
+                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' cannot be done, because the variable comes from '"+pretty_name(accompanying.stabilized_name())+"' for which equality-based analysis is cut short (e.g., passes through allocated memory) and therefore cannot be proven to *not* be associated with a defer not accompanying the return", reason=accompanying.token, suggestions=["use 'compiler:assert_eq' to verify memory region equality and thus properly transfer deferred values", "create a copy on new memory and return that", "return all variables with associated defers, to let those defers accompany the function's return", "return a container/buffer and position pair and reconstruct necessary pointers at the return site", "return the non-pointer section of your data and reconstruct the object at the calling site", "return with 'unsafe_return' (you can even return a blank value)"])
                     
-                        if (to_defer and not self.get_assignment(to_defer, self.rets)):# and not any(self.get_assignment(ret, defer_var_names) for ret in self.rets):
-                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' requires to also return '"+pretty_name(accompanying.stabilized_name())+"' so that its resource release is defered further", reason=accompanying.token, raason_message="due to", suggestions=["return the accompanying variable", "return a structure containing the accompanying variable", "create a ref to the accompanying variable"])
+                        if (to_defer and not self.get_assignment(to_defer, self.rets)):# and not self.get_assignment(accompanying.stabilized_name(), self.args):# and not any(self.get_assignment(ret, defer_var_names) for ret in self.rets):
+                            error_token.error("safety", "safely "+("returning '"if ret in self.rets else "mutating or editing input '")+pretty_name(v.stabilized_name())+"' requires to also return '"+pretty_name(accompanying.stabilized_name())+"' so that its resource release is defered further", reason=accompanying.token, raason_message="due to", suggestions=["return the accompanying variable", "return a structure containing the accompanying variable", "create a ref to the accompanying variable", "return with 'unsafe_return' (you can even return a blank value)"])
                 if v.stabilized_name() in self.invalidated:
                     error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' has been invalidated", reason=self.invalidated[v.stabilized_name()], raason_message="due to")
 
+        self.rets = prev_self_rets
         self.has_returned_once = True
         if self.fast_return_exception: 
             self.force_not_inline = True
@@ -1907,7 +1931,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         for defer in callee.returned_defers: printid("```rust\n"+code_summary(defer,callee)+"```")
         singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
         if singletons: printid("\nThe following singletons are initialized:")
-        for singleton in singletons: printid("```rust\n"+singletons.signature()+"\n```")
+        for singleton in singletons: printid("```rust\n"+singleton.signature()+"\n```")
         if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*")
     return callee
 
@@ -1933,6 +1957,98 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         tmp = UnionType(functor_var.type.is_functor_of.name, at=functor_var.type.is_functor_of.at)
         tmp.variations.append(functor_var.type.is_functor_of)
         return convert_method_to_functor(impl, tmp, error_token, skip_literals=True, from_name=functor_var.name)
+    
+    if UNSAFE_DEREF_TYPE in method.variations:
+        if len(vars)!=6 or vars[1].type.is_buffer_of is None or vars[0].type!=POINTER_TYPE:
+            error_token.error("type", "only a pointer followed by a buffer type indicating the data can be unsafely deferred, but got '"+signature_like(vars, impl)+"'")
+        return process_deref(file, None, [vars[0]], impl, error_token, unsafe_pointer_type=vars[1].type.is_buffer_of)[1]
+    
+    if UNSAFE_COPY_TYPE in method.variations:
+        if len(vars)<2 or vars[0].type!=POINTER_TYPE:
+            error_token.error("type", "only a pointer followed by at least one value can be unsafely copied, but got '"+signature_like(vars, impl)+"'")
+        var = impl.stabilize([vars[0]])[0]
+        rets = vars[1:]
+        err_token = error_token
+        rets = impl.stabilize(rets)
+        ret = rets
+        if var is not None and var.isprivate: err_token.error("type", "cannot set to immutable class field: '"+pretty_name(var.name)+"'")
+        if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but found '"+signature_like(rets)+"'")
+        if var.stabilized_name() in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
+        if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&&' or 'mutget' from a buffer if you are working with std", "remove 'const' qualitifier"])
+        impl.implementation.extend([
+            CODEWORD_IF,
+            CODEWORD_LPAR,
+            CODEWORD_NOT,
+            var,
+            CODEWORD_RPAR,
+            CODEWORD_LBRACKET,
+        ])
+        if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
+        try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
+        if try_var is not None:
+            impl.has_any_complaint = True
+            impl.implementation.extend([
+                CODEWORD_TCOMPLAIN,
+                CODEWORD_EQUALS,
+                CODEWORD_TWO,
+                CODEWORD_SEMICOLON,
+                CODEWORD_RBRACKET,
+                CODEWORD_ELSE,
+                CODEWORD_LBRACKET
+            ])
+            impl.spawned_error_codes.add(2)
+            impl.count_handled_tries[-1] += 1
+        else:
+            # non-allocation check is mandatory unfortunately
+            if debug_mode:
+                text = "\\033[31mmemory error\\033[0m null pointer\\n"
+                text += "\\033[31mat\\033[0m "+err_token.file.path.replace('"','\\"')+" line "+str(err_token.row)+" column "+str(err_token.col)+"\\n"
+                impl.implementation.extend([
+                    CODEWORD_PRINTF,
+                    CODEWORD_LPAR,
+                    CodeWord('"%s"'),
+                    CODEWORD_COMMA,
+                    CodeWord('"'+text.replace('"', '\\"')+'"'),
+                    CODEWORD_RPAR,
+                    CODEWORD_SEMICOLON,
+                ])
+            impl.implementation.extend([
+                CODEWORD_TERRCODE,
+                CODEWORD_EQUALS,
+                CODEWORD_TWO,
+                CODEWORD_SEMICOLON
+            ])
+            impl.spawned_error_codes.add(2)
+            impl.implementation.extend([
+                CODEWORD_GOTO,
+                CODEWORD_TFAILURE,
+                CODEWORD_SEMICOLON,
+                CODEWORD_RBRACKET
+            ])
+            impl.needs_failure_mode = error_token
+
+        progress = 0
+        for r in ret:
+            mem_size = r.type.memory_size() if r.type.builtin else 0
+            if not mem_size: continue
+            impl.implementation.extend(
+                [CodeWord("memcpy"), CODEWORD_LPAR]
+                +[var]
+                + ([CODEWORD_ADD, create_code_word_cached(str(progress))] if progress else [])
+                + [CODEWORD_COMMA, CODEWORD_AMP]
+                + [impl.vars[r.stabilized_name()]]
+                + [CODEWORD_COMMA, create_code_word_cached(str(mem_size))]
+                + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
+            )
+            if impl.vars[r.stabilized_name()].type==POINTER_TYPE:
+                for other_var in impl.get_required_accompany(var):
+                    for source_var in impl.get_required_accompany(impl.vars[r.stabilized_name()]):
+                        impl.add_required_accompany(other_var, source_var)
+                    impl.add_required_accompany(other_var, impl.vars[r.stabilized_name()])
+                impl.add_required_accompany(var, impl.vars[r.stabilized_name()])
+            progress += mem_size
+        if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
+        return []
 
     if DEBUG_TYPE in method.variations:
         if not is_lsp: print(signature_like(vars, impl))
@@ -2276,7 +2392,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.assign(vars[0].name, [vars[1]], error_token, perform_immutability_checks=False)
 
     if callee.needs_failure_mode and not impl.is_parsing_a_try:
-        if impl.is_parsing_a_defer: error_token.error("safety", "cannot call a function with unhandled failure within 'defer'", reason=callee.at)
+        if impl.is_parsing_a_defer: error_token.error("safety", "cannot call a function with unhandled failure within 'defer'", reason=callee.at, suggestions=["usa only safe code", "add a 'try'"])
         impl.implementation.extend([
             CODEWORD_IF,
             CODEWORD_LPAR,
@@ -2357,7 +2473,19 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     for defer in callee.returned_defers:
         new_defer = list()
         for segment in defer:
-            if not isinstance(segment, Variable) or (segment.name in global_var2cstr):
+            if isinstance(segment, CallPointer):
+                if segment.callee.functor_var_name is not None:
+                    if segment.callee.functor_var_name in callee.rets:
+                        next_segment = ImplementedType("", at=error_token)
+                        for a in segment.callee.__dict__:
+                            setattr(next_segment, a, getattr(segment.callee, a))
+                        new_functor_var_name = tmp+"__"+segment.callee.functor_var_name
+                        next_segment.monomorphic_name = segment.callee.monomorphic_name.replace(")"+segment.callee.functor_var_name+")", ")"+new_functor_var_name+")")
+                        next_segment.functor_var_name = new_functor_var_name
+                        segment = CallPointer(next_segment)
+                new_defer.append(segment)
+                continue
+            if segment.name[0] in symbols or not isinstance(segment, Variable) or (segment.name in global_var2cstr):
                 new_defer.append(segment)
                 continue
             v_name = segment.tostring()
@@ -2370,6 +2498,18 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             new_v = segment.renamed_copy(secondary_tmp+"__"+v_name, error_token)
             new_defer.append(new_v)
             impl.vars[new_v.name] = new_v
+        for pos, segment in enumerate(new_defer):
+            if not isinstance(defer, Variable): continue
+            if segment.type.functor_var_name: print(segment.type.functor_var_name)
+            if segment.type.functor_var_name is None or segment.type.functor_var_name not in callee.rets: continue
+            ret_type = ImplementedType("", at=error_token)
+            for a in segment.type.__dict__:
+                setattr(ret_type, a, getattr(segment.type, a))
+            new_functor_var_name = tmp+"__"+segment.type.functor_var_name
+            ret_type.monomorphic_name = segment.type.monomorphic_name.replace(")"+segment.type.functor_var_name+")", ")"+new_functor_var_name+")")
+            ret_type.functor_var_name = new_functor_var_name
+            new_defer[pos] = Variable(segment.name, ret_type)
+
         impl.defers.append(new_defer)
 
     # at this point we have resolved everything succcessfully for normal functions
@@ -2383,7 +2523,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
 
     return rets
 
-def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token, explicit: bool=True):
+def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedType, current_token: Token, explicit: bool=True, unsafe_pointer_type:Optional[ImplementedType]=None):
     ret = impl.stabilize(ret)
     if len(ret)!=1: 
         if not explicit: return pos, ret
@@ -2392,9 +2532,12 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
         if not explicit: return pos, ret
         current_token.error("type", "can only deref a 'ptr' but got '"+signature_like(ret)+"'")
     if ret[0].stabilized_name() in impl.invalidated: current_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[ret[0].stabilized_name()])
-    pointer_type = impl.get_pointer_type(ret[0])
-    if pointer_type is None: current_token.error("type", "there is no known type attached to the pointer to deref at this point")
-    if pointer_type == ANY_TYPE: current_token.error("type", "cannot deref a pointer on 'any' data (this can be specialized)")
+    if unsafe_pointer_type is not None:
+        pointer_type = unsafe_pointer_type
+    else:
+        pointer_type = impl.get_pointer_type(ret[0])
+        if pointer_type is None: current_token.error("type", "there is no known type attached to the pointer to deref at this point")
+        if pointer_type == ANY_TYPE: current_token.error("type", "cannot deref a pointer on 'any' data (this can be specialized)")
     assert pointer_type is not None
     new_vars = list()
     prefix = create_temp()+"__"
@@ -2642,7 +2785,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         returned_values = [0 for r in ret if r.type.builtin]
         temporary_implementation.defers.clear()
         returned_error = await temporary_implementation.interpret(returned_values, memory, recursion_budget=vm_recursion_budget)
-        if returned_error!=0: literal_tok.error("interpreter", "failed because "+err_code_list[returned_error][1:-1])
+        if returned_error!=0: literal_tok.error("interpreter", "failed due to "+err_code_list[returned_error][1:-1])
         lits: list[ImplementedType] = list()
         i = 0
         for r in ret:
@@ -2657,7 +2800,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 lits.append(create_literal_type(Token(str(int(returned_values[i])), literal_tok.file, literal_tok.row, literal_tok.col), BOOL_TYPE).variations[0])
             elif r.type is POINTER_TYPE:
                 mem_size = memory.alloc_sizes.get(returned_values[i], None)
-                if returned_values[i]==0: literal_tok.error("interpreter", "failed because 'compt' evaluated to a null pointer value")
+                if returned_values[i]==0: literal_tok.error("interpreter", "failed due to 'compt' evaluated to a null pointer value")
                 if mem_size is None: literal_tok.error("interpreter", "failed because 'compt' can not capture pointers to foreign resources (like file handles)")
                 lits.append(create_literal_type(Token("\""+memory.as_rawstr(returned_values[i], mem_size)+"\"", literal_tok.file, literal_tok.row, literal_tok.col), POINTER_TYPE, allow_cache=False).variations[0])
                 raw_type = temporary_implementation.get_pointer_type(r)
@@ -3264,7 +3407,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             if var is None: err_token.error("type", "can only set a value to an existing pointer with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.stabilized_name() in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
-            if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&&' from a buffer (or mutget) if you are working with std", "remove 'const' qualitifier"])
+            if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&&' or 'mutget' from a buffer if you are working with std", "remove 'const' qualitifier"])
             pointer_type: ImplementedType|None = impl.get_pointer_type(var)
             if pointer_type is None or pointer_type==ANY_TYPE: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type")
             assert pointer_type is not None
@@ -4565,7 +4708,8 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             pos, method = await process_linear_type(file, tokens, pos, reduce_to_unique_variations=False, impl=impl)
         call_token = get(tokens, pos-1)
         if all(variation.is_literal_of is not None for variation in method.variations):
-            if len(method.variations)!=1: call_token.error("type", "cannot have multiple literal type alternatives")
+            if len(method.variations)==0: call_token.error("type", "cannot have no literal type alternatives")
+            if len(method.variations)!=1: call_token.error("type", "cannot have multiple literal type alternatives", suggestions=[variation.signature() for variation in method.variations])
             literal_method = method.variations[0]
             if is_type_resolution:
                 pos += 1
@@ -5936,6 +6080,9 @@ SAME_CONTENTS_TYPE_CSTR.doc.append("Forces the first pointer to reference a buff
 
 fixed_namespace = File("compiler")
 compiler_token = Token("compiler", fixed_namespace, 1, 1)
+UNSAFE_COPY_TYPE = ImplementedType("unsafe_copy", at=compiler_token)
+UNSAFE_DEREF_TYPE = ImplementedType("unsafe_deref", at=compiler_token)
+
 ASSERT_SAME_TYPE = ImplementedType("assert_eq", at=compiler_token)
 ASSERT_SAME_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
 ASSERT_SAME_TYPE.vars["from"] = Variable("from", POINTER_TYPE)
@@ -5980,6 +6127,8 @@ fixed_namespace.types["call"] = UnionType("call", at=compiler_token).append(CALL
 fixed_namespace.types["abstract"] = UnionType("abstract", at=compiler_token).append(ABSTRACT_TYPE)
 fixed_namespace.types["deref"] = UnionType("deref", at=compiler_token).append(DEREF_TYPE)
 fixed_namespace.types["assert_eq"] = UnionType("assert_eq", at=compiler_token).append(ASSERT_SAME_TYPE)
+fixed_namespace.types["unsafe_copy"] = UnionType("unsafe_copy", at=compiler_token).append(UNSAFE_COPY_TYPE)
+fixed_namespace.types["unsafe_deref"] = UnionType("unsafe_deref", at=compiler_token).append(UNSAFE_DEREF_TYPE)
 
 smol_namespace.namespaces["compiler"] = fixed_namespace
 

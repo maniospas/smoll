@@ -23,7 +23,6 @@ def new(cstr obj)
     copy obj
     copy ").compiler::unsafe_copy "
     copy obj
-    #unsafe_console().print str CHARS.buf
     return CHARS.buf
 
 def match(cstr obj, cstr type_name)

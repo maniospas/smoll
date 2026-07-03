@@ -61,6 +61,7 @@ err_code_table["assertion error"] = 3
 debug_mode = True
 repositories: dict[str, str] = dict()
 externals: list["File"] = list()
+MACRO_LIMIT = 20
 
 def supports_ansi() -> bool:
     if is_pyodide: return True
@@ -4431,9 +4432,13 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             tok.file = literal_tok.file
             tok.row = literal_tok.row
             tok.col = literal_tok.col
+        if len(impl.nesting)>=MACRO_LIMIT:
+            literal_tok.error("interpreter", "macros expanded more than "+str(MACRO_LIMIT)+" nesting levels deep (counting loops and conditions too), which indicates either infinite recursion that should be stopped, or metaprogramming hell the should be avoided; directly call code building")
+        impl.nesting.append("macro")
         local_pos = 0
         local_pos, ret = await process_statement(file, local_toks, local_pos, impl, current_operator_priority=0)
         local_pos, ret = await process_statement_operator(file, local_toks, impl, local_pos, ret, current_operator_priority=0)
+        impl.nesting.pop()
         return pos, ret
         
     if current=="mut":

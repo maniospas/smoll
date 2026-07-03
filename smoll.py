@@ -977,7 +977,7 @@ class ImplementedType:
         input_args = len([k for k in self.args if self.vars[k].type.builtin])
         #by_reference = [not self.vals[k].immutable for k in self.args if self.vals[k].builtin]+[True for k in self.rets if self.vals[k].builtin]
         assert isinstance(values, list)
-        if len(values)!=len(args): self.at.error("interpreter", "requesting "+str(len(args))+" inputs and outputs total, but "+str(len(values))+" were provided")
+        if len(values)!=len(args): self.at.error("interpreter", self.signature()+" needs "+str(len(args))+" inputs and outputs total, but "+str(len(values))+" were provided")
         _arg_values = values
         local_vars: dict[str,int|float] = dict(zip(args[:input_args],values[:input_args]))
         #print(self.name, values)
@@ -1689,6 +1689,11 @@ class File:
         self.is_main_file: bool = False
         self.is_extern_file: bool = False
         self.localdefs: set[UnionType|ImplementedType|File] = set() # a set of references to local types and namespaces
+        self.cached: Optional[list[str]] = None # do not normally use - onlly proper usage is for macros to tokenize
+
+    def open(self):
+        if self.cached: return self.cached
+        return open(self.path, "r")
 
 class Token:
     def __init__(self, text, file: File, row, col):
@@ -1958,6 +1963,20 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         tmp.variations.append(functor_var.type.is_functor_of)
         return convert_method_to_functor(impl, tmp, error_token, skip_literals=True, from_name=functor_var.name)
     
+    if VARNAME_TYPE in method.variations:
+        current = ""
+        for ret in vars:
+            if current: current += ","
+            current += ret.name
+        current = "("+current+")"
+        current = "\""+current+"\""
+        tmp: str|None = global_cstr2var.get(current, None)
+        variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE, token=error_token)
+        if tmp is None: 
+            global_cstr2var[current] = variable.name
+            global_var2cstr[variable.name] = current
+        return [variable]
+    
     if UNSAFE_DEREF_TYPE in method.variations:
         if len(vars)!=6 or vars[1].type.is_buffer_of is None or vars[0].type!=POINTER_TYPE:
             error_token.error("type", "only a pointer followed by a buffer type indicating the data can be unsafely deferred, but got '"+signature_like(vars, impl)+"'")
@@ -2048,7 +2067,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 impl.add_required_accompany(var, impl.vars[r.stabilized_name()])
             progress += mem_size
         if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
-        return []
+        return [var]
 
     if DEBUG_TYPE in method.variations:
         if not is_lsp: print(signature_like(vars, impl))
@@ -2769,7 +2788,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
     #     return pos, union_type
     if literal_tok.text=="compt":
         if is_lsp and literal_tok.file.is_main_file: print_lsp_keyword(literal_tok, "**compile time evaluation**\n\nEvaluates the following expression to a literal value during compilation. This requires that the VM is able to axecute all of the expression's dependent code.")
-        temporary_implementation = ImplementedType("compt", at=literal_tok)
+        temporary_implementation = ImplementedType(literal_tok.text, at=literal_tok)
         pos, ret = await process_statement(file, tokens, pos+1, temporary_implementation, current_operator_priority=0)
         pos, ret = await process_statement_operator(file, tokens, temporary_implementation, pos, ret, current_operator_priority=0)
         for i in range(len(ret)):
@@ -2786,6 +2805,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         temporary_implementation.defers.clear()
         returned_error = await temporary_implementation.interpret(returned_values, memory, recursion_budget=vm_recursion_budget)
         if returned_error!=0: literal_tok.error("interpreter", "failed due to "+err_code_list[returned_error][1:-1])
+
         lits: list[ImplementedType] = list()
         i = 0
         for r in ret:
@@ -2800,7 +2820,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 lits.append(create_literal_type(Token(str(int(returned_values[i])), literal_tok.file, literal_tok.row, literal_tok.col), BOOL_TYPE).variations[0])
             elif r.type is POINTER_TYPE:
                 mem_size = memory.alloc_sizes.get(returned_values[i], None)
-                if returned_values[i]==0: literal_tok.error("interpreter", "failed due to 'compt' evaluated to a null pointer value")
+                if returned_values[i]==0: literal_tok.error("interpreter", "failed because 'compt' evaluated to a null pointer value")
                 if mem_size is None: literal_tok.error("interpreter", "failed because 'compt' can not capture pointers to foreign resources (like file handles)")
                 lits.append(create_literal_type(Token("\""+memory.as_rawstr(returned_values[i], mem_size)+"\"", literal_tok.file, literal_tok.row, literal_tok.col), POINTER_TYPE, allow_cache=False).variations[0])
                 raw_type = temporary_implementation.get_pointer_type(r)
@@ -3268,6 +3288,12 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
                 assert lit is not None
                 for litvar in lit.variations:
                     if litvar not in variations: variations.append(litvar)
+            elif reflection_token_text=="tag":
+                lit = create_literal_type(Token("\""+variation.monomorphic_name+"\"", at.file, at.row, at.col), CSTR_TYPE)
+                if is_lsp and get(tokens,pos-2).file.is_main_file: print_lsp_literal(reflection_token, "**type "+reflection_token_text+" literal**\n\nRetrieves the type's "+reflection_token_text+" as the literal type "+lit.at.text)
+                assert lit is not None
+                for litvar in lit.variations:
+                    if litvar not in variations: variations.append(litvar)
             elif reflection_token_text=="rets":
                 if len(type.variations)!=1: reflection_token.error("type", "more than one variations for '"+type.name+"' prevent obtaining a function's returns via reflection", suggestions=[candidate.signature() for candidate in type.variations])
                 for arg in variation.args:
@@ -3296,8 +3322,15 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
                     variable_type.vars["name"] = Variable("name", lit.variations[0])
                     variable_type.vars["zero"] = Variable("zero", variation.vars[arg].type)
                     variations.append(variable_type)
+            elif reflection_token_text=="size":
+                memory_size = str(variation.memory_size())
+                lit = create_literal_type(Token(memory_size, at.file, at.row, at.col), UINT_TYPE)
+                if is_lsp and get(tokens,pos-2).file.is_main_file: print_lsp_literal(reflection_token, "**type "+reflection_token_text+" literal**\n\nRetrieves the type's "+reflection_token_text+" as the literal type "+lit.at.text)
+                assert lit is not None
+                for litvar in lit.variations:
+                    if litvar not in variations: variations.append(litvar)
             else:
-                reflection_token.error("type", "only '::name' or '::args' are allowed for reflection but got '::"+reflection_token_text+"'")
+                reflection_token.error("type", "only '::name', '::tag', '::size', '::rets', or '::args' are allowed for reflection but got '::"+reflection_token_text+"'")
             
         ret = UnionType(type.name+"::"+reflection_token_text, at=reflection_token)
         ret.variations = variations
@@ -4353,7 +4386,56 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_var(get(tokens, pos), signature_like(created_buffer, impl))
         return await process_statement_operator(file, tokens, impl, pos+1, created_buffer, current_operator_priority)
 
-
+    if current=="macro":
+        literal_tok = current_token
+        if is_lsp and literal_tok.file.is_main_file: print_lsp_keyword(literal_tok, "**macro**\n\nEvaluates a dependent user-defined function that manipulates 'cstr' literals available at compile-time with the pattern 'macro<builder>(inputs)'. That function must return 'char[]', which is then re-tokenized and parsed as code.")
+        if peek_text(tokens, pos+1)!="<":
+            get(tokens, pos+1).error("syntax", "expecting 'macro'-ed string manipulation in 'macro<...>'")
+        pos += 1
+        pos, method = await process_linear_type(file, tokens, pos+1, show_lsp=True, reduce_to_unique_variations=False, impl=impl)
+        if peek_text(tokens, pos)!=">":
+            get(tokens, pos).error("syntax", "expecting closing '>'")
+        pos += 1
+        pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
+        pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+        temporary_implementation = _select_call(file, impl, method, ret, literal_tok, out_format=None)
+        input_args = ret
+        ret = input_args+[temporary_implementation.vars[r] for r in temporary_implementation.rets]
+        memory = MemoryEmulator(1024*vm_memory_kb)
+        returned_values = [0 for r in ret if r.type.builtin]
+        for i, arg in enumerate(input_args):
+            if arg.type!=CSTR_TYPE: 
+                literal_tok.error("type", "macros can only have known cstr inputs", suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
+            if arg.name not in global_var2cstr: 
+                literal_tok.error("type", "macros can only have known cstr inputs", suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
+            returned_values[i] = memory.write_cstr(global_var2cstr[arg.name][1:-1])
+        temporary_implementation.defers.clear()
+        returned_error = await temporary_implementation.interpret(returned_values, memory, recursion_budget=vm_recursion_budget)
+        if returned_error!=0: literal_tok.error("interpreter", "failed due to "+err_code_list[returned_error][1:-1])
+        returned_values = returned_values[len(input_args):]
+        ret = ret[len(input_args):]
+        if len(ret)==5 and ret[0].type.is_buffer_of==CHAR_TYPE:
+            offset = returned_values[2]
+            mem_size = returned_values[1]
+            if returned_values[0]==0: literal_tok.error("interpreter", "failed because 'macro' evaluated to a null pointer value")
+            text = memory.as_rawstr(returned_values[0]+offset, mem_size)
+        else:
+            literal_tok.error("type", "macros can only output char[] but returned '"+signature_like(ret, temporary_implementation)+"'")
+        local_file = File("macro")
+        local_file.cached = text.split("\n")
+        local_file.types = file.types
+        local_file.namespaces = file.namespaces
+        local_file.localdefs = file.localdefs
+        local_file, local_toks = _load(local_file, False, literal_tok)
+        for tok in local_toks:
+            tok.file = literal_tok.file
+            tok.row = literal_tok.row
+            tok.col = literal_tok.col
+        local_pos = 0
+        local_pos, ret = await process_statement(file, local_toks, local_pos, impl, current_operator_priority=0)
+        local_pos, ret = await process_statement_operator(file, local_toks, impl, local_pos, ret, current_operator_priority=0)
+        return pos, ret
+        
     if current=="mut":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable, meaning that it can be overwritten with a value of the same type, and that its fields and pointer contents may be modified. This also means that variables, fields and pointer contents may modified. Creates an error if such treatment is unsafe.")
         if peek_text(tokens, pos-1) not in ["=", "return"]: current_token.error("safety", "'mut' can only follow an assignment or 'return' symbol (temporary variables retain 'edit' status)")
@@ -5720,8 +5802,8 @@ async def resolve_name(path: str, at_token: Token|None) -> str:
     else: symbol = path
     return symbol
 
-def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tuple[File, list[Token]]:
-    file = File(path)
+def _load(file: File, is_main_file: bool=False, err_token:Token|None=None) -> tuple[File, list[Token]]:
+    assert isinstance(file, File)
     file.is_main_file = is_main_file
     tokens = list()
     nesting_levels = [0]
@@ -5731,98 +5813,98 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
     bracket_depth = 0
     bracket_indent_stack = []
     try:
-        with open(path, "r") as f:
-            for line in f:
-                row += 1
-                count_spaces = len(line)
-                line = line.strip(" \t")
-                count_spaces -= len(line)
-                if not len(line) or line.startswith("//") or line.startswith("#") or line=="\n": continue
-                prev_nesting_level = nesting_levels[len(nesting_levels)-1]
-                has_space = " " in line[:(count_spaces+1)] 
-                has_tab = "\t" in line[:(count_spaces+1)]
-                if has_tab:
-                    if has_space: 
-                        Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you have mixed tabs and spaces in this line's indentation")
-                    if has_spaces: 
-                        Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you are using tabs for this line's indentation, but previous lines used spaces")
-                    has_tabs = True
-                elif has_space:
-                    if has_tabs: 
-                        Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you are using spaces for this line's indentation, but previous lines used tabs")
-                    has_spaces = True
-                if bracket_depth == 0 or (line.startswith("]") or line.startswith(")")):
-                    while count_spaces < prev_nesting_level:
-                        tokens.append(Token(END_TOKEN, file, row, prev_nesting_level+1))
-                        error_nesting_level = prev_nesting_level
-                        nesting_levels.pop() # pop from back
-                        prev_nesting_level = nesting_levels[len(nesting_levels)-1]
-                        if count_spaces > prev_nesting_level: Token(" "*count_spaces, file, row, 1).error("syntax", f"misaligned indentation - expecting this line to start {error_nesting_level} {'tab' if has_tabs else 'space'}{'s' if error_nesting_level!=1 else 0} deep but it starts at {prev_nesting_level+1}")
-                    if count_spaces > prev_nesting_level:
-                        tokens.append(Token(START_TOKEN, file, row, count_spaces+1))
-                        nesting_levels.append(count_spaces)
-                else: 
-                    required = bracket_indent_stack[-1]
-                    if count_spaces <= required:
-                        Token(" "*count_spaces, file, row, 1).error(
-                            "syntax",
-                            f"continuation line inside brackets must be indented more than the opening line "
-                            f"(expected more than {required} {'tab' if has_tabs else 'space'}{'s' if required != 1 else ''}, got {count_spaces})"
-                        )
-                col = 0
-                token_start = 0
-                while col < len(line):
-                    c = line[col] # c is a character
-                    if c in " \t\n\r":
-                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                        while True:
-                            col += 1
-                            if col==len(line): break
-                            c = line[col]
-                            if c not in " \t\n\r": break
-                        token_start = col
-                    elif c=="\"":
-                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                        token_start = col
-                        while True:
-                            col += 1
-                            if col==len(line): Token(line[token_start:col], file, row, token_start + 1 + count_spaces).error("syntax", "string never closed (strings cannot continue across multiple lines) - "+line[token_start:col])
-                            if line[col]=="\"" and (line[col-1]!="\\" or col<2 or line[col-2]=="\\"): break
+        f = file.open()
+        for line in f:
+            row += 1
+            count_spaces = len(line)
+            line = line.strip(" \t")
+            count_spaces -= len(line)
+            if not len(line) or line.startswith("//") or line.startswith("#") or line=="\n": continue
+            prev_nesting_level = nesting_levels[len(nesting_levels)-1]
+            has_space = " " in line[:(count_spaces+1)] 
+            has_tab = "\t" in line[:(count_spaces+1)]
+            if has_tab:
+                if has_space: 
+                    Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you have mixed tabs and spaces in this line's indentation")
+                if has_spaces: 
+                    Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you are using tabs for this line's indentation, but previous lines used spaces")
+                has_tabs = True
+            elif has_space:
+                if has_tabs: 
+                    Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you are using spaces for this line's indentation, but previous lines used tabs")
+                has_spaces = True
+            if bracket_depth == 0 or (line.startswith("]") or line.startswith(")")):
+                while count_spaces < prev_nesting_level:
+                    tokens.append(Token(END_TOKEN, file, row, prev_nesting_level+1))
+                    error_nesting_level = prev_nesting_level
+                    nesting_levels.pop() # pop from back
+                    prev_nesting_level = nesting_levels[len(nesting_levels)-1]
+                    if count_spaces > prev_nesting_level: Token(" "*count_spaces, file, row, 1).error("syntax", f"misaligned indentation - expecting this line to start {error_nesting_level} {'tab' if has_tabs else 'space'}{'s' if error_nesting_level!=1 else 0} deep but it starts at {prev_nesting_level+1}")
+                if count_spaces > prev_nesting_level:
+                    tokens.append(Token(START_TOKEN, file, row, count_spaces+1))
+                    nesting_levels.append(count_spaces)
+            else: 
+                required = bracket_indent_stack[-1]
+                if count_spaces <= required:
+                    Token(" "*count_spaces, file, row, 1).error(
+                        "syntax",
+                        f"continuation line inside brackets must be indented more than the opening line "
+                        f"(expected more than {required} {'tab' if has_tabs else 'space'}{'s' if required != 1 else ''}, got {count_spaces})"
+                    )
+            col = 0
+            token_start = 0
+            while col < len(line):
+                c = line[col] # c is a character
+                if c in " \t\n\r":
+                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                    while True:
                         col += 1
-                        tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                        token_start = col
-                    elif c=="'":
-                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                        token_start = col
-                        while True:
-                            col += 1
-                            if col==len(line): Token(line[token_start:col], file, row, token_start + 1 + count_spaces).error("syntax", "character never closed (strings cannot continue across multiple lines) - "+line[token_start:col])
-                            if line[col]=="'" and (line[col-1]!="\\" or col<2 or line[col-2]=="\\"): break
+                        if col==len(line): break
+                        c = line[col]
+                        if c not in " \t\n\r": break
+                    token_start = col
+                elif c=="\"":
+                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                    token_start = col
+                    while True:
                         col += 1
-                        tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                        token_start = col
-                    elif c=="#" or (c=="/" and col<len(line)-1 and line[col+1]=="/"):
-                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                        token_start = col # comment out stuff
-                        break
-                    elif c in symbols:
-                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                        token_start = col
-                        while True:
-                            col += 1
-                            if col==len(line): break
-                            if c in "([": bracket_depth += 1; bracket_indent_stack.append(count_spaces)
-                            if c in ")]": 
-                                bracket_depth -= 1
-                                if bracket_indent_stack: bracket_indent_stack.pop()
-                            if c in "(){}[];&|.": break
-                            c = line[col]
-                            if c==":" and not line[token_start:col].endswith(":"): break
-                            if c not in symbols or c in "(){}[];&|-": break
-                        if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
-                        token_start = col
-                    else: col += 1
-                if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start +1 + count_spaces))
+                        if col==len(line): Token(line[token_start:col], file, row, token_start + 1 + count_spaces).error("syntax", "string never closed (strings cannot continue across multiple lines) - "+line[token_start:col])
+                        if line[col]=="\"" and (line[col-1]!="\\" or col<2 or line[col-2]=="\\"): break
+                    col += 1
+                    tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                    token_start = col
+                elif c=="'":
+                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                    token_start = col
+                    while True:
+                        col += 1
+                        if col==len(line): Token(line[token_start:col], file, row, token_start + 1 + count_spaces).error("syntax", "character never closed (strings cannot continue across multiple lines) - "+line[token_start:col])
+                        if line[col]=="'" and (line[col-1]!="\\" or col<2 or line[col-2]=="\\"): break
+                    col += 1
+                    tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                    token_start = col
+                elif c=="#" or (c=="/" and col<len(line)-1 and line[col+1]=="/"):
+                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                    token_start = col # comment out stuff
+                    break
+                elif c in symbols:
+                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                    token_start = col
+                    while True:
+                        col += 1
+                        if col==len(line): break
+                        if c in "([": bracket_depth += 1; bracket_indent_stack.append(count_spaces)
+                        if c in ")]": 
+                            bracket_depth -= 1
+                            if bracket_indent_stack: bracket_indent_stack.pop()
+                        if c in "(){}[];&|.": break
+                        c = line[col]
+                        if c==":" and not line[token_start:col].endswith(":"): break
+                        if c not in symbols or c in "(){}[];&|-": break
+                    if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
+                    token_start = col
+                else: col += 1
+            if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start +1 + count_spaces))
     except Exception as err: 
         if is_lsp:
             if err_token: err_token.error("syntax", str(err))
@@ -5842,7 +5924,7 @@ def _load(path: str, is_main_file: bool=False, err_token:Token|None=None) -> tup
                 printid(str(err))
             raise FatalException
         print(f"[{RED}✗{RESET}] {PURPLE}file read error{RESET} {err}")
-        location = f"{path} line {row+1}"
+        location = f"{file.path} line {row+1}"
         print(f"{RED}at{RESET} {location}")
         errexit()
 
@@ -5936,7 +6018,7 @@ file_cache_complete: set[str] = set()
 async def load(path, is_main_file=False, err_token=None):
     file = file_cache.get(path, None)
     if file is None:
-        file, processed_tokens = _load(path, is_main_file, err_token)
+        file, processed_tokens = _load(File(path), is_main_file, err_token)
         file_cache[path] = file
         await process(file, processed_tokens, 0)
         file_cache_complete.add(path)
@@ -6082,6 +6164,7 @@ fixed_namespace = File("compiler")
 compiler_token = Token("compiler", fixed_namespace, 1, 1)
 UNSAFE_COPY_TYPE = ImplementedType("unsafe_copy", at=compiler_token)
 UNSAFE_DEREF_TYPE = ImplementedType("unsafe_deref", at=compiler_token)
+VARNAME_TYPE = ImplementedType("varname", at=compiler_token)
 
 ASSERT_SAME_TYPE = ImplementedType("assert_eq", at=compiler_token)
 ASSERT_SAME_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
@@ -6129,6 +6212,8 @@ fixed_namespace.types["deref"] = UnionType("deref", at=compiler_token).append(DE
 fixed_namespace.types["assert_eq"] = UnionType("assert_eq", at=compiler_token).append(ASSERT_SAME_TYPE)
 fixed_namespace.types["unsafe_copy"] = UnionType("unsafe_copy", at=compiler_token).append(UNSAFE_COPY_TYPE)
 fixed_namespace.types["unsafe_deref"] = UnionType("unsafe_deref", at=compiler_token).append(UNSAFE_DEREF_TYPE)
+fixed_namespace.types["varname"] = UnionType("varname", at=compiler_token).append(VARNAME_TYPE)
+
 
 smol_namespace.namespaces["compiler"] = fixed_namespace
 

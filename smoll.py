@@ -1691,6 +1691,7 @@ class File:
         self.is_extern_file: bool = False
         self.localdefs: set[UnionType|ImplementedType|File] = set() # a set of references to local types and namespaces
         self.cached: Optional[list[str]] = None # do not normally use - onlly proper usage is for macros to tokenize
+        self.expanded: Optional["Token"] = None
 
     def open(self):
         if self.cached: return self.cached
@@ -1755,12 +1756,12 @@ class Token:
             for suggestion in suggestions:
                 print("    -", suggestion)
         try:
-            with open(self.file.resolved_path, "r", encoding="utf-8") as f:
-                for i, line in enumerate(f, start=1):
-                    if i == self.row:
-                        source_line = line.rstrip("\n")
-                        break
-                else: source_line = ""
+            f = open(self.file.resolved_path, "r", encoding="utf-8")
+            for i, line in enumerate(f, start=1):
+                if i == self.row:
+                    source_line = line.rstrip("\n")
+                    break
+            else: source_line = ""
         except OSError as exc:
             errexit()
         token_len = max(len(self.text), 1)
@@ -1771,12 +1772,12 @@ class Token:
         if reason:
             orignal_token_len = token_len
             try:
-                with open(reason.file.resolved_path, "r", encoding="utf-8") as f:
-                    for i, line in enumerate(f, start=1):
-                        if i == reason.row:
-                            source_line = line.rstrip("\n")
-                            break
-                    else: source_line = ""
+                f = open(reason.file.resolved_path, "r", encoding="utf-8")
+                for i, line in enumerate(f, start=1):
+                    if i == reason.row:
+                        source_line = line.rstrip("\n")
+                        break
+                else: source_line = ""
             except OSError as exc:
                 errexit()
             token_len = max(len(reason.text), 1)
@@ -1965,11 +1966,16 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         return convert_method_to_functor(impl, tmp, error_token, skip_literals=True, from_name=functor_var.name)
     
     if VARNAME_TYPE in method.variations:
-        current = ""
-        for ret in vars:
-            if current: current += ","
-            current += ret.name
-        current = "("+current+")"
+        prefix_len = longest_common_prefix_len([v.name for v in vars])
+        if prefix_len: 
+            current = vars[0].name[:prefix_len]
+            if len(current)>2 and current.endswith("__"): current = current[:-2]
+        else:
+            current = ""
+            for ret in vars:
+                if current: current += ","
+                current += ret.name
+            current = "("+current+")"
         current = "\""+current+"\""
         tmp: str|None = global_cstr2var.get(current, None)
         variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE, token=error_token)
@@ -2747,10 +2753,13 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
             literal_tok.error("type", "can only use 'type' within function bodies")
         pos, values = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
         pos, values = await process_statement_operator(file, tokens, impl, pos, values, current_operator_priority=0)
-        variation = ImplementedType("", at=type_start)
-        for r in values:
-            variation.rets.append(r.name)
-            variation.vars[r.name] = r
+        if values and ((values[0].type.builtin and len(values)==1) or len(values[0].type.rets)==len(values)): 
+            variation = values[0].type
+        else:
+            variation = ImplementedType("", at=type_start)
+            for r in values:
+                variation.rets.append(r.name)
+                variation.vars[r.name] = r
         type = UnionType("", at=type_start)
         type.variations.append(variation)
         if is_lsp and type_start.file.is_main_file and show_lsp: print_lsp_keyword(type_start, signature_like(values, impl))
@@ -2890,10 +2899,16 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                             ret = UnionType(var.type.name, at=var.type.at)
                             ret.variations.append(var.type)
                             return pos+1, ret
-                        tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local variable with the same name exists '"+signature_like([var], impl)+"'")
+                        # if peek_text(tokens, pos+1)[0] in symbols:
+                        #     tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local variable with the same name exists '"+signature_like([var] if var else obj, impl)+"'", suggestions=["enclose an expression within another parenthesis pair"])
+                        tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural variable with the same name exists '"+signature_like([var] if var else obj, impl)+"'")
                     varname = name+"__"
                     vars = [r for r in impl.vars.values() if r.name.startswith(varname)]
-                    if vars: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local variable with the same name exists '"+signature_like(vars, impl)+"'")
+                    if vars and ((vars[0].type.builtin and len(obj)==1) or len(vars[0].type.rets)==len(vars)):
+                        ret = UnionType(vars[0].type.name, at=vars[0].type.at)
+                        ret.variations.append(vars[0].type)
+                        return pos+1, ret
+                    if vars: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural or nominal variable with the same name exists '"+signature_like(vars, impl)+"'")
                 tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\"::"+k for k in file.namespaces])
             
             namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
@@ -3967,7 +3982,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             reflection_token = get(tokens, pos)
             pos += 1
             reflection_token_text = reflection_token.text
-            if len(rets)!=1: 
+            if len(rets)!=1:
                 get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or variable descriptors but got: '"+signature_like(rets, impl)+"'")
             reflection_var = rets[0]
             if reflection_var.type.is_functor_of is None and reflection_var.type.is_literal_of!=ANY_TYPE:
@@ -4451,7 +4466,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         tmp = create_temp()
         impl.assign(tmp, ret, current_token)
         ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
-        if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'mut' but the current value consists only of references")
+        if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'mut'. And the current value consists only of references, so it does nothing.")
         mutated = [r.mutable_copy(tokens[prev_pos]) if r.stabilized_name()==r.name else r for r in ret]
         return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
     

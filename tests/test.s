@@ -2,7 +2,7 @@ import "std/core.s"
 import "std/tag.s"
 
 def pair(float x, float y)
-    return class ("pair", x, y)
+    return class (x, y)
 
 def recursive(cstr test)
     CHARS = edit arena char[].alloc 100

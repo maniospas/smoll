@@ -2989,6 +2989,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
 
         return pos+1, type
     namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
+    if namespace is None: namespace = smol_namespace.namespaces.get(name, None)
     if namespace is None: tokens[pos].error("import", "unknown namespace '"+name+"'", suggestions=["\""+file.path+"\"::"+k for k in file.namespaces])
     assert namespace is not None
     return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)

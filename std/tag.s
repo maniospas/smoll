@@ -17,11 +17,23 @@ def unsafe_defer_free(mut tagged ptr obj)
         unsafe::free obj
     return obj
 
-def new(cstr obj)
+def tagged_alloc(edit arena<char::name> arena, nat size) 
+    allocated = mut arena.alloc size
+    return allocated.buf[allocated.pos]&&
+
+def alloc(cstr|blank surface, cstr obj)
     if 0==len str obj fail "empty input name"
-    if obj.contains "," fail "cannot tag a structural type"
+    if obj.contains char "," fail "cannot tag a structural type"
+    if not surface is blank
+        if surface.contains char "," fail "tag surface cannot be structural type"
     CHARS = edit arena char[].alloc 1024
-    copy "unsafe_defer_free unsafe_mut unsafe::alloc(cstr::size + compiler::size "
+    if surface is blank
+        copy "unsafe_defer_free unsafe_mut unsafe::alloc"
+    else
+        copy "unsafe_mut "
+        copy surface
+        copy ".tagged_alloc"
+    copy "(cstr::size + compiler::size "
     copy obj
     copy ").compiler::unsafe_copy ("
     copy "tagged compiler::value type "

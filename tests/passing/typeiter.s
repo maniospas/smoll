@@ -1,5 +1,5 @@
 import "std/core.s"
-import compiler # fsat usage of: literal, call, abstract
+import compiler # fast usage of: literal, call, abstract
 
 def call_one(nat->nat->nat x)
     return x.call 1

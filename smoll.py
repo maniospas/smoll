@@ -5920,10 +5920,10 @@ def _load(file: File, is_main_file: bool=False, err_token:Token|None=None) -> tu
                         if c in ")]": 
                             bracket_depth -= 1
                             if bracket_indent_stack: bracket_indent_stack.pop()
-                        if c in "(){}[];&|.": break
+                        if c in "(){}[];&|.^": break
                         c = line[col]
                         if c==":" and not line[token_start:col].endswith(":"): break
-                        if c not in symbols or c in "(){}[];&|-": break
+                        if c not in symbols or c in "(){}[];&|-^": break
                     if token_start<col: tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
                     token_start = col
                 else: col += 1

@@ -399,16 +399,17 @@ def print_lsp_string(tok):
     print(tok.col)
     printid("a string literal")
 
-def print_lsp_literal(tok: "Token", name: str):
+def print_lsp_literal(tok: "Token", name: str, defined: Optional["Token"]=None):
+    if defined is None: defined = tok
     print("---")
     print("number")
     printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
     print(len(tok.text))
-    printid(os.path.abspath(tok.file.path))
-    print(tok.row)
-    print(tok.col)
+    printid(os.path.abspath(defined.file.path))
+    print(defined.row)
+    print(defined.col)
     printid(name)
 
 def print_lsp_keyword(tok: "Token", description: str):
@@ -873,13 +874,25 @@ class ImplementedType:
             for v in value[1:]:
                 if v.type==self:
                     error_token.error("type", "'class' or 'singleton' created by this function within its return data should be positioned at the beginning of the returned tuple")
-        for v in value:
+        for pos, v in enumerate(value):
             if v._references is not None: 
                 #if not any(u.name==v._references for u in value):
                 #    error_token.error("safety", "returning reference '"+pretty_name(v.name)+"' without the accompanying referenced value '"+pretty_name(v._references)+"'")
                 self.assign(v.name, [self.vars[v._references]], error_token, perform_immutability_checks=False, top_entry=False)
                 v._references = None
-
+            elif v.type==CSTR_TYPE and not self.has_returned_once:
+                # if we have multiple returns and just return globals we need to create a var to store the global
+                if v.name in global_var2cstr:
+                    var = v.renamed_copy(create_temp())
+                    self.vars[var.name] = var
+                    self.implementation.extend([
+                        var,
+                        CODEWORD_EQUALS,
+                        v,
+                        CODEWORD_SEMICOLON
+                    ])
+                    value[pos] = var
+                
         if self.has_returned_once and len(self.rets)!=len(value):
             error_token.error("type", "this value returned here is a different type than previous returns '"+signature_like([self.vars[ret] for ret in self.rets])+"' vs '"+signature_like(value)+"'")
         for pos, arg in enumerate(value):
@@ -3544,8 +3557,10 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             continue
         
         if op_name=="and":
-            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "logical 'and' between two boolean or compile-time boolean values; the right hand side evaluates only if the left is 'true'")
-            if len(rets)!=1: op_token.error("type", "the left hand side must always be true/false for 'and'")
+            and_token = get(tokens,pos)
+            if is_lsp and and_token.file.is_main_file: print_lsp_keyword(and_token, "**logical and**\n\nBehaves as expected with short-circuiting for booleans. But can also use a boolean to conditionally evaluate a value; the right hand side evaluates only if the left is 'true'. Otherwise, the result is the zero-initialized right hand side passed through an overload of the 'not' function.")
+            if len(rets)!=1: 
+                op_token.error("type", "the left hand side must always be true/false for 'and'")
             if rets[0].type==TRUE_TYPE:
                 pos, rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority) 
                 continue
@@ -3561,6 +3576,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 CODEWORD_LBRACKET
             ])
             pos, rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority)
+            if is_lsp and and_token.file.is_main_file: print_lsp_keyword(and_token, "evaluates to the same type as the right hand side: '"+signature_like(rets,impl)+"'")
+            
             pack_name = create_temp()
             impl.assign(pack_name, rets, op_token)
             rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
@@ -3579,7 +3596,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             continue
 
         if op_name=="or":
-            if is_lsp and get(tokens,pos).file.is_main_file: print_lsp_keyword(get(tokens,pos), "logical 'or' between two boolean or compile-time boolean values; the right hand side evaluates only if the left is 'false'")
+            or_token = get(tokens,pos)
+            if is_lsp and or_token.file.is_main_file: print_lsp_keyword(or_token, "**logical or**\n\nBehaves as expected with short-circuiting for booleans. But can also use a boolean to conditionally evaluate a value; the right hand side evaluates only if the left is 'false'. Otherwise, the result is the zero-initialized right hand side.")
             if len(rets)!=1: op_token.error("type", "the left hand side must always be true/false for 'or'")
             if rets[0].type==TRUE_TYPE:
                 pos = skip_statement(file, tokens, pos+1) 
@@ -3597,6 +3615,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 CODEWORD_LBRACKET
             ])
             pos, rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority) 
+            if is_lsp and or_token.file.is_main_file: print_lsp_keyword(or_token, "evaluates to the same type as the right hand side: '"+signature_like(rets,impl)+"'")
+            
             pack_name = create_temp()
             impl.assign(pack_name, rets, op_token)
             rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
@@ -4829,8 +4849,8 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     if lit_method.is_literal_of==CSTR_TYPE or (literal_method.is_literal_of and literal_method.is_forced_pointer_type_of):
                         current = lit_method.at.text
                         if is_lsp and current_token.file.is_main_file: 
-                            if lit_method.is_literal_of==CSTR_TYPE: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
-                            else: print_lsp_literal(call_token, "**literal**\n\nstatic pointer transferred via a char[] representation")
+                            if lit_method.is_literal_of==CSTR_TYPE: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text, defined=lit_method.at)
+                            else: print_lsp_literal(call_token, "**literal**\n\nstatic pointer transferred via a char[] representation", defined=lit_method.at)
                         tmp: str|None = global_cstr2var.get(current, None)
                         ptr_type = literal_method.is_forced_pointer_type_of
                         variable = Variable(tmp if tmp else create_temp(), POINTER_TYPE if ptr_type else lit_method.is_literal_of, token=current_token)
@@ -4843,7 +4863,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                         varsret.append(variable)
                     elif lit_method.is_literal_of:
                         variable = Variable(create_temp(), lit_method.is_literal_of, token=current_token)
-                        if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\nnumber defined to be "+literal_method.at.text)
+                        if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\nnumber defined to be "+literal_method.at.text, defined=lit_method.at)
                         impl.vars[variable.name] = variable
                         impl.implementation.extend([
                             variable,
@@ -4858,7 +4878,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                         varsret.append(variable)
             elif literal_method.is_literal_of==CSTR_TYPE:
                 current = literal_method.at.text
-                if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text)
+                if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text, defined=literal_method.at)
                 tmp: str|None = global_cstr2var.get(current, None)
                 variable = Variable(tmp if tmp else create_temp(), CSTR_TYPE, token=current_token)
                 if tmp is None: 
@@ -4869,7 +4889,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 varsret = [variable]
             else:
                 variable = Variable(create_temp(), literal_method.is_literal_of, token=current_token)
-                if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\nnumber defined to be "+literal_method.at.text)
+                if is_lsp and current_token.file.is_main_file: print_lsp_literal(call_token, "**literal**\n\nnumber defined to be "+literal_method.at.text, defined=literal_method.at)
                 impl.vars[variable.name] = variable
                 impl.implementation.extend([
                     variable,
@@ -6129,7 +6149,7 @@ DEREF_TYPE = ImplementedType("deref")
 DEREF_TYPE.doc.append("dereference a pointer")
 DEREF_TYPE.doc.append("Dereferences a pointer by unpacking it to local data.")
 DEREF_TYPE.doc.append("This function is automatically overloaded for all pointer types.")
-DEREF_TYPE.doc.append("Cannot do so for `any ptr` data, as their type becomes unknown in their processing context.")
+DEREF_TYPE.doc.append("Cannot dereference `any ptr` data, as their type becomes unknown in their processing context.")
 DEREF_TYPE.vars["ptr"] = Variable("ptr", POINTER_TYPE)
 DEREF_TYPE.args.append("ptr")
 

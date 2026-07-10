@@ -8,9 +8,9 @@ def tagged(cstr value)
     return class value
 
 def unsafe_match(tagged ptr obj, cstr name, any ptr type)
-    found = obj.compiler::unsafe_deref cstr[]
+    found = compiler::deref obj.value
     if found!=name fail "does not match"
-    return unsafe_mut obj.unsafe::add(cstr::size).compiler::unsafe_attach_type(type)
+    return unsafe_mut obj.unsafe::add(tagged::size).compiler::unsafe_attach_type(type)
 
 def unsafe_defer_free(mut tagged ptr obj)
     defer

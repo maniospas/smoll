@@ -655,6 +655,7 @@ class ImplementedType:
         var_stabilized_name = var.stabilized_name()
         ret = set()
         for acc in self.required_accompany.get(var_stabilized_name, []):
+            if acc not in self.vars: continue
             var = self.vars[acc]
             if var not in ret: ret.add(var)
         return list(ret)
@@ -2378,6 +2379,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             # t1 = impl.get_pointer_type(a)
             # t2 = impl.get_pointer_type(r)
             # if t1 is None or t2 is None or t1==ANY_TYPE or t2==ANY_TYPE or t1==t2 or t1 is POINTER_TYPE or t2 is POINTER_TYPE:
+            if a.name not in impl.vars: error_token.error("type", "cannot find returned variable "+pretty_name(a.name))
             #if callee.vars[ac] in callee.get_required_accompany(callee.vars[rc]):
             for accompany in impl.get_required_accompany(a):
                 impl.add_required_accompany(r, accompany)
@@ -3564,7 +3566,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
             impl.implementation.append(CODEWORD_RBRACKET)
             if "while" in impl.nesting:
-                impl.implementation.append(CODEWORD_LBRACKET)
+                impl.implementation.extend([CODEWORD_ELSE, CODEWORD_LBRACKET])
                 for ret in rets:
                     if ret.type.builtin:
                         impl.implementation.extend([
@@ -6127,7 +6129,7 @@ DEREF_TYPE = ImplementedType("deref")
 DEREF_TYPE.doc.append("dereference a pointer")
 DEREF_TYPE.doc.append("Dereferences a pointer by unpacking it to local data.")
 DEREF_TYPE.doc.append("This function is automatically overloaded for all pointer types.")
-DEREF_TYPE.doc.append("Cannot do so fo `any ptr` data, as their type becomes unknown in their processing context.")
+DEREF_TYPE.doc.append("Cannot do so for `any ptr` data, as their type becomes unknown in their processing context.")
 DEREF_TYPE.vars["ptr"] = Variable("ptr", POINTER_TYPE)
 DEREF_TYPE.args.append("ptr")
 

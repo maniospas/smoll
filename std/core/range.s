@@ -51,12 +51,13 @@ def next(edit range r)
     r.from = ret+1
     return ret
 
-def get(range r, nat pos)
-    doc "assert that a number lies in the range"
+
+
+def get(range r, nat _pos)
+    doc "assert that a number plus range start lies in the range"
     doc "The item itself is returned. This lets the range be used as an iterator"
     doc "per a pattern like `for i in range 10 ...`."
+    pos = _pos+r.from
     if pos>=r.to
         fail "iteration end"
-    if pos<r.from
-        fail "iterator range"
     return pos

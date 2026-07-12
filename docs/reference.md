@@ -1055,7 +1055,7 @@ def ones = compt vec [1.0, 1.0]
 def main()
     CLI = edit console()
     v = mut vec [5.0, 10.0]
-    allocator = arena float[].alloc 128
+    allocator = edit arena float[].alloc 128
     v = v+ones
     print v[0] # prints 6.0
     print v[1] # prints 11.0
@@ -1950,8 +1950,8 @@ def main()
 ```
 
 By the way, the `alloc` function can also be called on arenas and circular buffers,
-that can be similarly used once constructed per `mem = arena float[].alloc 3` 
-and `mem = circular float[].alloc 3`. These structures are more stable than lists
+that can be similarly used once constructed per `mem = edit arena float[].alloc 3` 
+and `mem = edit circular float[].alloc 3`. These structures are more stable than lists
 in that they do not reallocate; the arena creates an error when out of size, and
 the circular buffer is an arena that restarts once full.
 
@@ -1997,7 +1997,7 @@ import "std/core.s"
 
 def main()
     CLI = edit console()
-    buf = arena alloc KB 4 # equivalent to buf = (alloc KB 4, mut 0)
+    buf = edit arena alloc KB 4 # equivalent to buf = (alloc KB 4, mut 0)
     s = buf.copy "hello world!"
     print s
 ```
@@ -2011,7 +2011,7 @@ import "std/core.s"
 
 def main()
     CLI = edit console()
-    CHARS = arena alloc KB 4 # effect for placing string data
+    CHARS = edit arena alloc KB 4 # effect for placing string data
     s = copy "hello world!"
     print s
 ```
@@ -2045,7 +2045,7 @@ import "std/core.s"
 
 def main()
     CLI = edit console()
-    CHARS = arena char[].alloc KB 4
+    CHARS = edit arena char[].alloc KB 4
     s1 = copy "hello"
     s2 = copy "world!"
     print s1+" "+s2
@@ -2064,7 +2064,7 @@ import "std/core.s"
 
 def main()
     CLI = edit console()
-    CHARS = arena alloc KB 4
+    CHARS = edit arena alloc KB 4
     start = CHARS.pos
     copy "hello"
     copy " "
@@ -2189,7 +2189,7 @@ import "std/io.s":process as proc
 def main()
     CLI = edit console()
     process = proc:process "ls"
-    buf = arena char[].alloc KB 4 # example with growing position
+    buf = edit arena char[].alloc KB 4 # example with growing position
     for line in (buf, process)
         print line
 ```
@@ -2289,7 +2289,7 @@ import "std/core.s"
 import "std/mini.s" as mini
 
 def concat(mini:str[] buff)
-    mem = arena char[].alloc KB 4
+    mem = edit arena char[].alloc KB 4
     start = mem.pos
     for element in buff
         mem.copy mini:unpack element
@@ -2547,7 +2547,7 @@ def run(cstr|str command)
 
 def main()
     CLI = edit console()
-    CHARS = arena char[].alloc 256
+    CHARS = edit arena char[].alloc 256
     path = "./tests/passing/"
     copy "./smoll "
     copy path

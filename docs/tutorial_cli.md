@@ -419,7 +419,7 @@ corrupting previous data instead of creating new ones.
 Such data corruptions are predictable and do not introduce runtime 
 checks or invalid class relations. Still, the main argument for
 their usage is that old data stored on buffers are likely no longer useful.
-The example below runs in only 80 bytes, whereas any less size than `CHARS = arena char[].alloc 130` 
+The example below runs in only 80 bytes, whereas any less size than `CHARS = edit arena char[].alloc 130` 
 would create an error.
 
 

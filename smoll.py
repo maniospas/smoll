@@ -2180,7 +2180,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.has_caught_used_error_codes = True
         if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
-        if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if exists error=compiler:catch() print cstr error`")
+        if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if try error=compiler::catch() print cstr error`")
         else: impl.count_handled_tries[-1] += 1
         impl.implementation.extend([
             var,
@@ -4035,7 +4035,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             elif reflection_token_text=="args":
                 reflection_token.error("type", "'::args' is supported only during type resolution")
             else:
-                reflection_token.error("type", "only '::name' or '::args' are allowed for reflection but got '::"+reflection_token_text+"'")
+                reflection_token.error("type", "only '::name' is allowed for reflection on variables but got '::"+reflection_token_text+"'")
             assert lit is not None
             ret = Variable(create_temp(), lit.variations[0])
             impl.vars[ret.name] = ret
@@ -4437,6 +4437,17 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         pos += 1
         pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
         pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+        for i, arg in enumerate(ret):
+            if arg.type.is_literal_of==CSTR_TYPE:
+                current = arg.type.at.text
+                tmp: str|None = global_cstr2var.get(current, None)
+                ptr_type = arg.type.is_forced_pointer_type_of
+                variable = Variable(tmp if tmp else create_temp(), POINTER_TYPE if ptr_type else arg.type.is_literal_of, token=current_token)
+                if tmp is None: 
+                    global_cstr2var[current] = variable.name
+                    global_var2cstr[variable.name] = current
+                ret[i] = variable
+
         temporary_implementation = _select_call(file, impl, method, ret, literal_tok, out_format=None)
         input_args = ret
         ret = input_args+[temporary_implementation.vars[r] for r in temporary_implementation.rets]
@@ -4457,7 +4468,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             offset = returned_values[2]
             mem_size = returned_values[1]
             if returned_values[0]==0: literal_tok.error("interpreter", "failed because 'macro' evaluated to a null pointer value")
-            text = memory.as_rawstr(returned_values[0]+offset, mem_size)
+            text = memory.as_str(returned_values[0]+offset, mem_size)
         else:
             literal_tok.error("type", "macros can only output char[] but returned '"+signature_like(ret, temporary_implementation)+"'")
         local_file = File("macro")
@@ -4473,6 +4484,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if len(impl.nesting)>=MACRO_LIMIT:
             literal_tok.error("interpreter", "macros expanded more than "+str(MACRO_LIMIT)+" nesting levels deep (counting loops and conditions too), which indicates either infinite recursion that should be stopped, or metaprogramming hell the should be avoided; directly call code building")
         impl.nesting.append("macro")
+        
         local_pos = 0
         local_pos, ret = await process_statement(file, local_toks, local_pos, impl, current_operator_priority=0)
         local_pos, ret = await process_statement_operator(file, local_toks, impl, local_pos, ret, current_operator_priority=0)

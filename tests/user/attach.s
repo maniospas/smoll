@@ -2,7 +2,7 @@ import "std/core.s"
 import "std/sci.s"
 
 def transform(matrix m, vec x, float offset)
-    FLOATS = arena float[].alloc 2*len x
+    FLOATS = edit arena float[].alloc 2*len x
     p0 = copy x
     p = self(m*x)+offset
     p = self(p)+p0

@@ -2,7 +2,6 @@ import "std/core.s"
 import "std/mini.s"
 import "std/extern/raysupport.h"
 
-
 def color(nat _r, nat _g, nat _b, nat|blank _a)
     if _a is blank
         _a = 255
@@ -15,11 +14,20 @@ def color(nat _r, nat _g, nat _b, nat|blank _a)
 def position(float x, float y)
 def size(float width, float height)
 
-def window(size size, cstr title)
+def window(size size, cstr title, cstr font_path)
     {"-lraylib"}
     {"-lGL"}
     {SetTraceLogLevel(LOG_WARNING); InitWindow(size__width, size__height, title); }
     openy = mut false
+    if exists font_path
+        {
+            builtins::int __smolambda_n = 0;
+            for (builtins::int c = 32; c <= 126; c++)   __smolambda_codepoints[__smolambda_n++] = c;
+            __smolambda_codepoints[__smolambda_n++] = 0x2018;
+            __smolambda_codepoints[__smolambda_n++] = 0x2019;
+            for (int c = 0x2500; c <= 0x257F; c++) __smolambda_codepoints[__smolambda_n++] = c;
+            __smolambda_font = LoadFontEx(font_path, 32, __smolambda_codepoints, __smolambda_n);
+        }
     return singleton(size, title, openy)
 
 def is_open(effect edit window WINDOW)
@@ -40,11 +48,24 @@ def clear(effect edit window WINDOW, color color)
 
 def text(effect edit window WINDOW, cstr txt, position pos, float size, color color)
     {
-        DrawText(
+        DrawTextEx(
+            __smolambda_font,
             txt, 
-            pos__x, 
-            pos__y, 
+            (Vector2){pos__x,pos__y}, 
             size, 
+            1.0f,
+            (Color){color__r, color__g, color__b, color__a}
+        ); 
+    }
+
+def text(effect edit window WINDOW, str txt, position pos, float size, color color)
+    {
+        DrawTextEx(
+            __smolambda_font,
+            TextSubtext(txt__unsafe_ptr, txt__dat__pos, txt__dat__length), 
+            (Vector2){pos__x,pos__y}, 
+            size, 
+            1.0f,
             (Color){color__r, color__g, color__b, color__a}
         ); 
     }
@@ -146,3 +167,42 @@ def circ_line(effect edit window WINDOW, position pos, nat radius, nat thickness
 def dt(effect window WINDOW)
     {builtins::float dt = GetFrameTime();}
     return dt
+
+def key_down(effect window WINDOW, nat key)
+    {builtins::bool ret = IsKeyDown(key);}
+    return ret
+
+def key_pressed(effect edit window WINDOW, nat key)
+    {builtins::bool ret = IsKeyPressed(key);}
+    return ret
+
+def key_released(effect edit window WINDOW, nat key)
+    {builtins::bool ret = IsKeyReleased(key);}
+    return ret
+
+def mouse_pos(effect window WINDOW)
+    {
+        builtins::float x = GetMouseX();
+        builtins::float y = GetMouseY();
+    }
+    return position(x, y)
+
+def mouse_down(effect window WINDOW, nat button)
+    {builtins::bool ret = IsMouseButtonDown(button);}
+    return ret
+
+def mouse_pressed(effect edit window WINDOW, nat button)
+    {builtins::bool ret = IsMouseButtonPressed(button);}
+    return ret
+
+def mouse_wheel(effect window WINDOW)
+    {builtins::float ret = GetMouseWheelMove();}
+    return ret
+
+def KEY_SPACE  = 32
+def KEY_X  = 88
+def KEY_ENTER  = 257
+def KEY_RIGHT  = 262
+def KEY_LEFT   = 263
+def KEY_DOWN   = 264
+def KEY_UP     = 265

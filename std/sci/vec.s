@@ -2,6 +2,7 @@ local import "std/core.s"
 local import "std/sci/math.s"
 local import "std/sci/unsafe.s"
 local import "std/unsafe.s" as unsafe
+local import "std/unsafe.s"::add
 
 def arena(float::name)    return arena float[]
 def circular(float::name) return circular float[]

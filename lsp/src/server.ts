@@ -1,11 +1,11 @@
 import { createConnection, TextDocuments, ProposedFeatures, InitializeParams, TextDocumentSyncKind, Diagnostic, DiagnosticSeverity, Hover, Location, Position, Range, TextDocumentPositionParams, DefinitionParams, SemanticTokensBuilder, CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { execFile } from 'child_process';
 import { pathToFileURL, fileURLToPath } from 'url';
 import { writeFile, unlink } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { platform } from 'os';
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 
 const LOGGING = false;
 function log(msg: string) { if (LOGGING) connection.console.log(`[smoll] ${msg}`); }
@@ -79,10 +79,13 @@ function remapTokenPaths(tokens: CompilerToken[], tmpPath: string, realPath: str
   }));
 }
 
+// def: entries persist across the whole compiler process lifetime, so this dictionary
+// lives at module scope instead of being recreated per parse call.
+const defDictionary = new Map<number, string>();
+
 function parseCompilerOutput(stdout: string): CompilerToken[] {
   const tokens: CompilerToken[] = [];
   const seenErrorPos = new Set<string>();
-  const defDictionary = new Map<number, string>();
   const chunks = stdout.split(/^---\r?\n/m).filter(c => c.trim() !== '');
   log(`parser: got ${chunks.length} chunks from ${stdout.length} bytes of output`);
   for(const chunk of chunks) {
@@ -111,35 +114,71 @@ function parseCompilerOutput(stdout: string): CompilerToken[] {
       if (seenErrorPos.has(pos)) continue;
       else seenErrorPos.add(pos);
     }
-    //log(`parser: [${tokenType}] ${file}:${line}:${col} len=${length} | def=${defFile}:${defLine}:${defCol} | msg="${message}"`);
     tokens.push({ tokenType, file, line, col, length, message, kind, definition: { file: defFile, line: defLine, col: defCol } });
   }
-  //log(`parser: done — ${tokens.length} tokens total`);
   return tokens;
 }
 
+let compilerProc: ChildProcessWithoutNullStreams | null = null;
+let pendingResolve: ((stdout: string) => void) | null = null;
+let outputBuffer = '';
+const requestQueue: { tmpPath: string; isFirst: boolean; resolve: (s: string) => void }[] = [];
+let busy = false;
+
+const END_MARKER = '===END===';
+
+function ensureCompilerRunning(firstTmpPath: string) {
+  if (compilerProc) return;
+  const BINARY = platform() === 'win32' ? 'smoll.exe' : './smoll';
+  compilerProc = spawn(BINARY, [firstTmpPath, '--lsp'], {});
+  compilerProc.stdout.setEncoding('utf8');
+  compilerProc.stdout.on('data', (chunk: string) => {
+    outputBuffer += chunk;
+    const idx = outputBuffer.indexOf(END_MARKER);
+    if (idx !== -1 && pendingResolve) {
+      const result = outputBuffer.slice(0, idx);
+      outputBuffer = outputBuffer.slice(idx + END_MARKER.length);
+      const resolve = pendingResolve;
+      pendingResolve = null;
+      resolve(result);
+      dequeueNext();
+    }
+  });
+  compilerProc.on('exit', () => {
+    compilerProc = null;
+    outputBuffer = '';
+    busy = false;
+    const stalled = pendingResolve;
+    pendingResolve = null;
+    if (stalled) stalled('');
+    dequeueNext();
+  });
+}
+
+function dequeueNext() {
+  if (busy || requestQueue.length === 0) return;
+  const next = requestQueue.shift()!;
+  busy = true;
+  pendingResolve = (stdout: string) => {
+    busy = false;
+    next.resolve(stdout);
+  };
+  if (!next.isFirst) compilerProc!.stdin.write(next.tmpPath + '\n');
+}
+
 function runCompiler(tmpPath: string): Promise<CompilerToken[]> {
+  const isFirst = !compilerProc;
+  ensureCompilerRunning(tmpPath);
   return new Promise((resolve) => {
-    const BINARY = platform() === 'win32' ? 'smoll.exe' : './smoll';
-    log(`compiler: spawning ${BINARY} ${tmpPath} --lsp`);
-    log(`─────────────────────────────────────────`);
-    execFile(BINARY, [tmpPath, '--lsp'], { timeout: 10_000 }, (err, stdout, stderr) => {
-      log(`compiler: exited | stdout=${stdout.length}b stderr=${stderr.length}b`);
-      if (stderr.length > 0) log(`compiler: stderr → ${stderr.slice(0, 200)}`);
-      if (stdout.length === 0) {
-        log(`compiler: WARNING stdout is empty — no tokens will be produced`);
-        log(`─────────────────────────────────────────`);
-        resolve([]);
-        return;
-      }
-      log(`compiler: full stdout ↓\n${stdout}`);
-      log(`─────────────────────────────────────────`);
-      try { resolve(parseCompilerOutput(stdout)); } 
-      catch(e) {
-        log(`compiler: parse threw → ${String(e)}`);
-        resolve([]);
-      }
+    requestQueue.push({
+      tmpPath,
+      isFirst,
+      resolve: (stdout: string) => {
+        try { resolve(parseCompilerOutput(stdout)); }
+        catch { resolve([]); }
+      },
     });
+    dequeueNext();
   });
 }
 
@@ -223,7 +262,7 @@ connection.onHover((params: TextDocumentPositionParams): Hover | null => {
 
   if (hits.length === 0) return null;
 
-  const sections = [...new Set(hits.map(hit => hit.message))];
+  const sections = Array.from(new Set(hits.map(hit => hit.message)));
 
   return {
     contents: {

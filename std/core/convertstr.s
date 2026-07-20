@@ -19,6 +19,7 @@ local import "std/core/convert.s"
 local import "std/core/range.s"
 local import "std/core/string.s"
 local import "std/core/array.s"
+local import "std/unsafe.s" as unsafe
 
 def char(console)
     {builtins::int _c=getchar();}
@@ -134,7 +135,7 @@ def str(effect edit char_allocator CHARS, edit console console)
                 ch.buf = ch.buf.resize ch.buf.unsafe_size*3/2
             else
                 fail "read string does not fit on buffer"
-        ptr_pos = ch.buf.unsafe_ptr+ch.pos
+        ptr_pos = ch.buf.unsafe_ptr.unsafe::add ch.pos
         {*ptr_pos=_c;}
         ch.pos = ch.pos+1
     if CHARS is arena<char::name>

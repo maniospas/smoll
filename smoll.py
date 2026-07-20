@@ -3461,7 +3461,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             op_token.error("safety", "there is no clear priority order between multiple equalities and inequalities; be explicit with parentheses")
         peek_next = peek_text(tokens, pos+1)
         if op_name=="=": #op_name==">>" or op_name=="<<" or 
-            if op_name=="=" and peek_text(tokens, pos-1)!="]" and (len(rets)!=1 or rets[0].type!=POINTER_TYPE): tokens[pos].error("safety", "unexpected '=' in the middle of expression", suggestions=["use 'buffer[item] = value' when supported by 'mutget' (for buffers, this is equivalent to buffer[item]&&<<value)"])
+            if op_name=="=" and peek_text(tokens, pos-1)!="]" and (len(rets)!=1 or rets[0].type!=POINTER_TYPE): tokens[pos].error("safety", "unexpected '=' in the middle of expression", suggestions=["use 'buffer[item]&&.field = value' when supported by 'mutget', which retrieves a mutable pointer to an item, and then gets the field sub-pointer", "in the most general case, use 'buffer[item] = value' when supported by 'mutget' (for buffers, this is equivalent to buffer[item]&&=value)", "in the most general case, use 'p=value' where 'p' is a mutable pointer"])
             err_token = op_token
             pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0) # don't touch rets
             pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
@@ -5466,14 +5466,25 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         pos += 1
     if isinstance(imported, UnionType):
         if not as_mode: name = imported.name
-        if name in file.types: name_token.error("import", "cannot overwrite type '"+name+"'")
+        #if name in file.types: name_token.error("import", "cannot combine imported type '"+name+"'")
+        existing = file.types.get(name, None)
+        if existing is not None:
+            new_type = UnionType(name, at=name_token)
+            new_type.variations.extend(existing.variations)
+            new_type.variations.extend(imported.variations)
+            new_type.variations = list(dict.fromkeys(new_type.variations))#list(set(new_type.variations))
+            imported = new_type
+        else: # we NEED to decouple between files
+            new_type = UnionType(name, at=name_token)
+            new_type.variations.extend(imported.variations)
+            imported = new_type
         file.types[name] = imported
         if is_local: 
             for variation in imported.variations: file.localdefs.add(variation)
         return pos, imported
     assert isinstance(imported, File)
     if as_mode:
-        if name in file.namespaces: name_token.error("import", "cannot overwrite existing namespace '"+name+"'")
+        if name in file.namespaces: name_token.error("import", "cannot combine namespaces for shared name '"+name+"'")
         file.namespaces[name] = imported
         if is_local: file.localdefs.add(imported)
         return pos, imported
@@ -5484,6 +5495,10 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
             new_type.variations.extend(existing.variations)
             new_type.variations.extend(type_value.variations)
             new_type.variations = list(dict.fromkeys(new_type.variations))#list(set(new_type.variations))
+            type_value = new_type
+        else: # we NEED to decouple between files
+            new_type = UnionType(type_name, at=name_token)
+            new_type.variations.extend(type_value.variations)
             type_value = new_type
         if is_local:
             for variation in type_value.variations: file.localdefs.add(variation)
@@ -5701,7 +5716,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
             else: found_type.variations.append(impl)
             greatest_pos = pos
         except CompfailException: pass
-    if name not in file.types or greatest_pos is None: start_token.error("safety", "no valid variations of '"+name+"'"+(" given the same name and arguments" if candidates else ""), suggestions=[candidate.signature()+(" defined in "+candidate.at.file.path if candidate.at else " from compiler definitions") for candidate in candidates])
+    if name not in file.types or greatest_pos is None: start_token.error("safety", "no valid variations of '"+name+"'"+(" given that alternatives bearing the same name and arguments already exist " if candidates else ""), suggestions=[candidate.signature()+(" defined in "+candidate.at.file.path if candidate.at else " from compiler definitions") for candidate in candidates])
     if greatest_pos is not None:
         pos = greatest_pos
     return pos  # all parsing should end at the same position
@@ -6075,13 +6090,22 @@ async def download_with_progress(url: str, filepath: str, message: str):
 
 file_cache: dict[str, File] = dict()
 file_cache_complete: set[str] = set()
+dependents: dict[str, set[str]] = {}
+load_mtimes: dict[str, float] = {}
 
 async def load(path, is_main_file=False, err_token=None):
+    relative_path = path
+    #path = os.path.abspath(path) if path!="builtins" else path
+    if err_token is not None and err_token.file is not None:
+        dependents.setdefault(path, set()).add(err_token.file.path)
     file = file_cache.get(path, None)
     if file is None:
         start_time = time.time() if is_time else None
-        file, processed_tokens = _load(File(path), is_main_file, err_token)
+        file, processed_tokens = _load(File(relative_path), is_main_file, err_token)
         file_cache[path] = file
+        if path != "builtins":
+            try: load_mtimes[path] = os.path.getmtime(path)
+            except OSError: pass
         await process(file, processed_tokens, 0)
         file_cache_complete.add(path)
         if is_time: print("    "+path.ljust(30)+f" {(time.time()-start_time)*1000:.0f} ms".rjust(10))
@@ -6090,6 +6114,26 @@ async def load(path, is_main_file=False, err_token=None):
         if err_token: err_token.error("import", "circular import detected for '"+path+"'")
         else: print("circular import detected for '"+path+"'")
     return file
+
+def unload(path: str):
+    del load_mtimes[path]
+    if path in dependents:
+        for dependent in list(dependents[path]):
+            unload(dependent)
+        del dependents[path]
+    file_cache.pop(path, None)
+    file_cache_complete.discard(path)
+    for dep_set in dependents.values():
+        dep_set.discard(path)
+
+def check_unloads():
+    for path in list(load_mtimes.keys()):
+        try: current_mtime = os.path.getmtime(path)
+        except OSError:
+            unload(path)
+            continue
+        if current_mtime != load_mtimes[path]:
+            unload(path)
 
 POINTER_TYPE = ImplementedType("ptr", "char*", memory_size=8)
 POINTER_TYPE.vars[POINTER_TYPE.rets[0]].immutable = False
@@ -6477,6 +6521,17 @@ async def main():
                         os.remove(str(exe_path))
                     os._exit(1)
             os._exit(0) # not in lsp or pyodide case, as it inteferes with the stdout pipe
+    else:
+        while True:
+            print("===END===")
+            try: line = input()
+            except EOFError: break
+            line = line.strip()
+            if not line: continue
+            check_unloads()
+            try: file = await load(await resolve_name(line, None), is_main_file=True)
+            except Exception as e: print(f"error: {e}")
+            sys.stdout.flush()
 
 if is_pyodide: main()
 else: asyncio.run(main())

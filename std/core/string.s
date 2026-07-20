@@ -161,7 +161,7 @@ def unsafe_temp(str other)
     doc ""
     doc "*Info: This is safe to run during 'compt' in that the latter will fail gracefully.*"
     str = new().copy_null_terminated(other)
-    _ret = str.unsafe_ptr+str.dat.pos
+    _ret = str.unsafe_ptr.unsafe::add str.dat.pos
     {builtins::cstr cstr = _ret;}
     return class(cstr, str)
 

@@ -90,7 +90,7 @@ def line(effect edit arena<char::name>|circular<char::name> CHARS, open f)
     if CHARS is circular<char::name>
         pos = 0
     buf = ref CHARS.buf
-    unsafe_ptr = buf.unsafe_ptr+pos
+    unsafe_ptr = buf.unsafe_ptr.unsafe::add pos
     size = buf.unsafe_size-pos
     {if(f__unsafe_ptr){builtins::compiler::ptr obtained = fgets(unsafe_ptr, size, (FILE*)f__unsafe_ptr);}}
     if not exists obtained

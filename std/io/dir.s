@@ -45,8 +45,9 @@ def is_file(str|cstr _path)
 def remove(str|cstr _path)
     doc "removes a file at a cstr path, fails if it cannot be removed"
     path = cstr unsafe_temp _path
-    {builtins::bool result = __smo_remove_file(path);}
-    if not result fail "failed to remove file"
+    if is_file path
+        {builtins::bool result = __smo_remove_file(path);}
+        if not result fail "failed to remove file"
 
 local def closedir(any ptr unsafe_ptr) # super unsafe to expose
     VM "memory.get_foreign($unsafe_ptr).close() or memory.close_foreign($unsafe_ptr)"

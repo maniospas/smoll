@@ -17,7 +17,7 @@ def size(float width, float height)
 def window(size size, cstr title, cstr font_path)
     {"-lraylib"}
     {"-lGL"}
-    {SetTraceLogLevel(LOG_WARNING); InitWindow(size__width, size__height, title); }
+    {SetTraceLogLevel(LOG_NONE); InitWindow(size__width, size__height, title); }
     openy = mut false
     if exists font_path
         {
@@ -26,7 +26,7 @@ def window(size size, cstr title, cstr font_path)
             __smolambda_codepoints[__smolambda_n++] = 0x2018;
             __smolambda_codepoints[__smolambda_n++] = 0x2019;
             for (int c = 0x2500; c <= 0x257F; c++) __smolambda_codepoints[__smolambda_n++] = c;
-            __smolambda_font = LoadFontEx(font_path, 32, __smolambda_codepoints, __smolambda_n);
+            __smolambda_font = LoadFontEx(font_path, 128, __smolambda_codepoints, __smolambda_n);
         }
     return singleton(size, title, openy)
 
@@ -199,10 +199,113 @@ def mouse_wheel(effect window WINDOW)
     {builtins::float ret = GetMouseWheelMove();}
     return ret
 
-def KEY_SPACE  = 32
-def KEY_X  = 88
-def KEY_ENTER  = 257
-def KEY_RIGHT  = 262
-def KEY_LEFT   = 263
-def KEY_DOWN   = 264
-def KEY_UP     = 265
+def KEY_NULL            = 0
+def KEY_APOSTROPHE      = 39
+def KEY_COMMA           = 44
+def KEY_MINUS           = 45
+def KEY_PERIOD          = 46
+def KEY_SLASH           = 47
+def KEY_ZERO            = 48
+def KEY_ONE             = 49
+def KEY_TWO             = 50
+def KEY_THREE           = 51
+def KEY_FOUR            = 52
+def KEY_FIVE            = 53
+def KEY_SIX             = 54
+def KEY_SEVEN           = 55
+def KEY_EIGHT           = 56
+def KEY_NINE            = 57
+def KEY_SEMICOLON       = 59
+def KEY_EQUAL           = 61
+def KEY_A               = 65
+def KEY_B               = 66
+def KEY_C               = 67
+def KEY_D               = 68
+def KEY_E               = 69
+def KEY_F               = 70
+def KEY_G               = 71
+def KEY_H               = 72
+def KEY_I               = 73
+def KEY_J               = 74
+def KEY_K               = 75
+def KEY_L               = 76
+def KEY_M               = 77
+def KEY_N               = 78
+def KEY_O               = 79
+def KEY_P               = 80
+def KEY_Q               = 81
+def KEY_R               = 82
+def KEY_S               = 83
+def KEY_T               = 84
+def KEY_U               = 85
+def KEY_V               = 86
+def KEY_W               = 87
+def KEY_X               = 88
+def KEY_Y               = 89
+def KEY_Z               = 90
+def KEY_LEFT_BRACKET    = 91
+def KEY_BACKSLASH       = 92
+def KEY_RIGHT_BRACKET   = 93
+def KEY_GRAVE           = 96
+def KEY_SPACE           = 32
+def KEY_ESCAPE          = 256
+def KEY_ENTER           = 257
+def KEY_TAB             = 258
+def KEY_BACKSPACE       = 259
+def KEY_INSERT          = 260
+def KEY_DELETE          = 261
+def KEY_RIGHT           = 262
+def KEY_LEFT            = 263
+def KEY_DOWN            = 264
+def KEY_UP              = 265
+def KEY_PAGE_UP         = 266
+def KEY_PAGE_DOWN       = 267
+def KEY_HOME            = 268
+def KEY_END             = 269
+def KEY_CAPS_LOCK       = 280
+def KEY_SCROLL_LOCK     = 281
+def KEY_NUM_LOCK        = 282
+def KEY_PRINT_SCREEN    = 283
+def KEY_PAUSE           = 284
+def KEY_F1              = 290
+def KEY_F2              = 291
+def KEY_F3              = 292
+def KEY_F4              = 293
+def KEY_F5              = 294
+def KEY_F6              = 295
+def KEY_F7              = 296
+def KEY_F8              = 297
+def KEY_F9              = 298
+def KEY_F10             = 299
+def KEY_F11             = 300
+def KEY_F12             = 301
+def KEY_LEFT_SHIFT      = 340
+def KEY_LEFT_CONTROL    = 341
+def KEY_LEFT_ALT        = 342
+def KEY_LEFT_SUPER      = 343
+def KEY_RIGHT_SHIFT     = 344
+def KEY_RIGHT_CONTROL   = 345
+def KEY_RIGHT_ALT       = 346
+def KEY_RIGHT_SUPER     = 347
+def KEY_KB_MENU         = 348
+def KEY_KP_0            = 320
+def KEY_KP_1            = 321
+def KEY_KP_2            = 322
+def KEY_KP_3            = 323
+def KEY_KP_4            = 324
+def KEY_KP_5            = 325
+def KEY_KP_6            = 326
+def KEY_KP_7            = 327
+def KEY_KP_8            = 328
+def KEY_KP_9            = 329
+def KEY_KP_DECIMAL      = 330
+def KEY_KP_DIVIDE       = 331
+def KEY_KP_MULTIPLY     = 332
+def KEY_KP_SUBTRACT     = 333
+def KEY_KP_ADD          = 334
+def KEY_KP_ENTER        = 335
+def KEY_KP_EQUAL        = 336
+def KEY_BACK            = 4
+def KEY_MENU            = 5
+def KEY_VOLUME_UP       = 24
+def KEY_VOLUME_DOWN     = 25

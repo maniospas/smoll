@@ -49,7 +49,7 @@ GREEN = "\033[32m"
 YELLOW= "\033[33m"
 PURPLE= "\033[35m"
 RESET = "\033[0m"
-symbols = "=\\/+-*@<>!%&#!(){}[]:.,;|^~"
+symbols = "=\\/+-*@<>!%&#!(){}[]:.,;|^~$@"
 END_TOKEN = "...]" # impossible for something else to be tokenized as this
 START_TOKEN = "[..." # impossible for something else to be tokenized as this
 err_code_table: dict[str,int] = dict()
@@ -265,6 +265,7 @@ class MemoryEmulator:
 
 
 def pretty_name(name: str):
+    #return name.replace("__", ".")
     parts = name.split("__") # re.split(r'__(?!t)', name)
     last_good_part = 0
     while last_good_part<len(parts):
@@ -4140,6 +4141,9 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 elif peek_text(tokens, pos)=="=":
                     get_func_name = "mutget"
                     deref = False
+                elif peek_text(tokens, pos)=="." and any(not r.immutable for r in rets):
+                    get_func_name = "mutget"
+                    deref = True
                 type = file.types.get(get_func_name, None)
                 if type is None: err_token.error("type", "missing implementation for '"+get_func_name+"'")
                 assert type is not None
@@ -5064,8 +5068,10 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 for defer in impl.defers:
                     if not any(v in defer for v in invalidated): continue
                     for v in defer:
-                        if isinstance(v, Variable) and any(impl.get_assignment(arg, [v]) or impl.get_required_accompany(impl.vars[arg]) for arg in impl.args): 
-                            name.error("safety", "this 'del' would evoke a defer that would invalidate an argument '"+pretty_name(v.name)+"'")
+                        if isinstance(v, Variable):
+                            for arg in impl.args:
+                                if (not impl.vars[arg].immutable) and (impl.get_assignment(arg, [v]) or impl.get_required_accompany(impl.vars[arg])): 
+                                    name.error("safety", "this 'del' would evoke a defer that would invalidate the mutable argument '"+pretty_name(arg)+"'")
                     impl.implementation.extend(defer)
                     to_remove.append(defer)
                 if not to_remove:
@@ -5952,7 +5958,7 @@ def _load(file: File, is_main_file: bool=False, err_token:Token|None=None) -> tu
                         if c in ")]": 
                             bracket_depth -= 1
                             if bracket_indent_stack: bracket_indent_stack.pop()
-                        if c in "(){}[];&|.^": break
+                        if c in "(){}[];&|.^$@": break
                         c = line[col]
                         if c==":" and not line[token_start:col].endswith(":"): break
                         if c not in symbols or c in "(){}[];&|-^": break
@@ -6073,10 +6079,12 @@ file_cache_complete: set[str] = set()
 async def load(path, is_main_file=False, err_token=None):
     file = file_cache.get(path, None)
     if file is None:
+        start_time = time.time() if is_time else None
         file, processed_tokens = _load(File(path), is_main_file, err_token)
         file_cache[path] = file
         await process(file, processed_tokens, 0)
         file_cache_complete.add(path)
+        if is_time: print("    "+path.ljust(30)+f" {(time.time()-start_time)*1000:.0f} ms".rjust(10))
     elif path=="builtins": pass
     elif path not in file_cache_complete:
         if err_token: err_token.error("import", "circular import detected for '"+path+"'")
@@ -6364,6 +6372,7 @@ parser = argparse.ArgumentParser(description="Compile a .s file and optionally r
 parser.add_argument("source", metavar="SOURCE", help="Path to the .s source file to compile.",)
 parser.add_argument("--lsp", action="store_true", help="No compilation, and output is meant for the lsp to read.",)
 parser.add_argument("--build", action="store_true", help="Build without running.",)
+parser.add_argument("--time", action="store_true", help="Report the time of ending file parses.",)
 parser.add_argument("--docs", action="store_true", help="Export to a markdown file.",)
 parser.add_argument("--cleanup", action="store_true", help="Clean up generated .C files and executables.",)
 parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
@@ -6375,6 +6384,7 @@ debug_mode = args.debug
 cleanup_mode = args.cleanup
 docs_mode = args.docs
 chosen_compiler = args.back or "auto"
+is_time = args.time
 is_lsp = args.lsp
 is_pyodide = sys.platform == "emscripten"
 vm_memory_kb = args.vmkb

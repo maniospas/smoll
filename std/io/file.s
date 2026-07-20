@@ -104,13 +104,17 @@ def line(effect edit arena<char::name>|circular<char::name> CHARS, edit File f)
     CHARS.pos = pos+bytes_open
     return str(buf, pos to CHARS.pos)
 
-def print(edit terminal|write f, str text)
+local def _print(edit terminal|write f, str text)
     doc "writes a string to a write file"
     if not exists f.unsafe_ptr fail "failed to write to closed file"
-    {builtins::nat bytes_written = fwrite((char*)text__unsafe_ptr, 1, text__unsafe_size, (FILE*)f__unsafe_ptr);}
-    if bytes_written!=len text fail "failed to write to file"
+    if 0!=text.dat.length
+        {builtins::compiler::ptr first_pos = text__unsafe_ptr+text__dat__pos;}
+        {builtins::nat bytes_written = fwrite(first_pos, 1, text__dat__length, (FILE*)f__unsafe_ptr);}
+        if bytes_written!=len text fail "failed to write to file"
 
-def print(edit terminal|write f, cstr text)
-    doc "writes a cstr to a write file"
-    if not exists f.unsafe_ptr fail "failed to write to closed file"
-    {fwrite(text, 1, strlen(text), (FILE*)f__unsafe_ptr);}
+def print(edit terminal|write f, str|cstr text, cstr|blank endl)
+    if endl is blank
+        endl = "\n"
+    f._print str text
+    if endl!=""
+        f._print str endl

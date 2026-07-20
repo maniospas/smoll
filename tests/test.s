@@ -1,19 +1,24 @@
 import "std/core.s"
-import "std/tag.s"
-import compiler::varname as vrn
+import "std/pipe.s"
+def @ = compiler::varname
+def ^ = compiler::deref
 
-def test1(nat x, nat y)
-    return x+y+1
-def test2(nat x, nat y)
-    return x+y+2
+def dat()
+    data = edit str[].alloc 4
+    value = mut 0
+    return class(data, value)
 
-def to_functor(cstr functor_name)
-    CHARS = edit arena char[].alloc 1024
-    copy "type "
-    copy functor_name
-    return CHARS.buf
+def listofdat()
+    data = edit dat[].alloc 4
+    return class(data)
+
+def accessible(effect edit console CLI, listofdat obj)
+    print obj.data[0].data[0]
 
 def main()
     CLI = edit console()
-    for x is "test1"|"test2"
-        print compiler::call(macro<to_functor> x, 1,1)
+    obj = mut listofdat()
+    obj.data[0] = dat()
+    obj.data[0]&&.value = 0
+    obj.data[0].data[0] = str "test"
+    accessible obj

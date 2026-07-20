@@ -111,10 +111,10 @@ function parseCompilerOutput(stdout: string): CompilerToken[] {
       if (seenErrorPos.has(pos)) continue;
       else seenErrorPos.add(pos);
     }
-    log(`parser: [${tokenType}] ${file}:${line}:${col} len=${length} | def=${defFile}:${defLine}:${defCol} | msg="${message}"`);
+    //log(`parser: [${tokenType}] ${file}:${line}:${col} len=${length} | def=${defFile}:${defLine}:${defCol} | msg="${message}"`);
     tokens.push({ tokenType, file, line, col, length, message, kind, definition: { file: defFile, line: defLine, col: defCol } });
   }
-  log(`parser: done — ${tokens.length} tokens total`);
+  //log(`parser: done — ${tokens.length} tokens total`);
   return tokens;
 }
 

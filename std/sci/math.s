@@ -12,46 +12,57 @@ def abs(int x)
     return nat xor(mask, bits x+int mask)
 
 def sqrt(float x)
+    {"-lm"}
     {builtins::float z = sqrt(x);}
     return z
 
 def sin(float x)
+    {"-lm"}
     {builtins::float z = sin(x);}
     return z
 
 def cos(float x)
+    {"-lm"}
     {builtins::float z = cos(x);}
     return z
 
 def log(float x)
+    {"-lm"}
     {builtins::float z = log(x);}
     return z
 
 def tan(float x)
+    {"-lm"}
     {builtins::float z = tan(x);}
     return z
 
 def floor(float x)
+    {"-lm"}
     {builtins::int z = floor(x);}
     return z
 
 def asin(float x)
+    {"-lm"}
     {builtins::float z = asin(x);}
     return z
 
 def acos(float x)
+    {"-lm"}
     {builtins::float z = acos(x);}
     return z
 
 def atan(float x)
+    {"-lm"}
     {builtins::float z = atan(x);}
     return z
 
 def atan(float x, float y)
+    {"-lm"}
     {builtins::float z = atan2(x, y);}
     return z
 
 def exp(float x)
+    {"-lm"}
     {builtins::float z = exp(x);}
     return z
 
@@ -62,10 +73,12 @@ def pow(float x, float y)
 
 def isnan(float x)
     VM "[math.isnan(x)]"
+    {"-lm"}
     {builtins::bool z = (fpclassify(x)==FP_NAN);}
     return z
 
 def isinf(float x)
     VM "[math.isinf(x)]"
+    {"-lm"}
     {builtins::bool z = (fpclassify(x)==FP_INFINITE);}
     return z

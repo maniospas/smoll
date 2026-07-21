@@ -97,3 +97,14 @@ def alloc(edit list allocator, nat|blank length)
 def at(edit allocated surface)
     doc "get a mutable pointer to the last buffer element"
     return surface.buf[surface.pos]&&
+
+local def nat16(nat x) # declare here to not import from anywhere
+    {builtins::nat16 value = x;}
+    return value
+
+def slice(edit arena surface, nat length)
+    allocated = mut surface.alloc(length)
+    buf = mut allocated.buf
+    buf.unsafe_size = length
+    buf.unsafe_offset = nat16 buf.unsafe_offset.nat()+buf.unsafe_align.nat()*allocated.pos
+    return buf

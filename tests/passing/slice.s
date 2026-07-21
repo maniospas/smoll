@@ -1,6 +1,5 @@
 import "std/core.s"
 
-
 def main()
     CLI = edit console()
     xall = edit arena nat[].alloc 10

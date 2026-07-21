@@ -330,6 +330,7 @@ class CodeWord(CodeSegment):
 CODEWORD_EQUALS = CodeWord("=")
 CODEWORD_COMPARISON_EQUALS = CodeWord("==")
 CODEWORD_COMPARISON_NOT_EQUALS = CodeWord("!=")
+CODEWORD_MEMCPY = CodeWord("memcpy")
 CODEWORD_LPAR = CodeWord("(")
 CODEWORD_RPAR = CodeWord(")")
 CODEWORD_AMP = CodeWord("&")
@@ -357,6 +358,169 @@ CODEWORD_TFAILURE = CodeWord("__t_failure")
 CODEWORD_TRETURN = CodeWord("__t_return")
 CODEWORD_CAST_FUNC_PTR = CodeWord("__smoll_func_ptr_type")
 code_word_cache: dict[str, CodeWord] = dict()
+
+
+PREALLOCATED_MEMCPY_OFFSET_PATTERN = [
+    CODEWORD_MEMCPY, 
+    CODEWORD_LPAR, 
+    None,
+    CODEWORD_ADD, 
+    None,
+    CODEWORD_COMMA, 
+    CODEWORD_AMP,
+    None,
+    CODEWORD_COMMA, 
+    None,
+    CODEWORD_RPAR, 
+    CODEWORD_SEMICOLON
+]
+
+PREALLOCATED_MEMCPY_NOOFFSET_PATTERN = [
+    CODEWORD_MEMCPY, 
+    CODEWORD_LPAR, 
+    None,
+    CODEWORD_COMMA, 
+    CODEWORD_AMP,
+    None,
+    CODEWORD_COMMA, 
+    None,
+    CODEWORD_RPAR, 
+    CODEWORD_SEMICOLON
+]
+
+PREALLOCATED_ASSIGN_PATTERN = [None, CODEWORD_EQUALS, None, CODEWORD_SEMICOLON]
+
+
+PREALLOCATED_CHECKERRTWO_PATTERN = [
+    CODEWORD_TCOMPLAIN,
+    CODEWORD_EQUALS,
+    CODEWORD_TWO,
+    CODEWORD_SEMICOLON,
+    CODEWORD_RBRACKET,
+    CODEWORD_ELSE,
+    CODEWORD_LBRACKET
+]
+
+PREALLOCATED_CHECKGOTO_FAILURE_PATTERN = [
+    CODEWORD_IF,
+    CODEWORD_LPAR,
+    CODEWORD_TERRCODE,
+    CODEWORD_RPAR,
+    CODEWORD_LBRACKET,
+    CODEWORD_GOTO,
+    CODEWORD_TFAILURE,
+    CODEWORD_SEMICOLON,
+    CODEWORD_RBRACKET
+]
+
+
+PREALLOCATED_ERRTWOEND_PATTERN = [
+    CODEWORD_TERRCODE,
+    CODEWORD_EQUALS,
+    CODEWORD_TWO,
+    CODEWORD_SEMICOLON,
+    CODEWORD_GOTO,
+    CODEWORD_TFAILURE,
+    CODEWORD_SEMICOLON,
+    CODEWORD_RBRACKET
+]
+
+FUNCTOR_VAR_CHECK_PATTERN = [
+    CODEWORD_IF,
+    CODEWORD_LPAR,
+    CODEWORD_NOT,
+    None,
+    CODEWORD_RPAR,
+    CODEWORD_LBRACKET,
+]
+
+FUNCTOR_TRYVAR_CHECK_PATTERN = [
+    CODEWORD_TCOMPLAIN,
+    CODEWORD_EQUALS,
+    CODEWORD_TWO,
+    CODEWORD_SEMICOLON,
+    None,
+    CODEWORD_EQUALS,
+    CODEWORD_TCOMPLAIN,
+    CODEWORD_SEMICOLON,
+    CODEWORD_RBRACKET,
+    CODEWORD_ELSE,
+    CODEWORD_LBRACKET
+]
+
+CAST_FUNC_PTR_PATTERN = [
+    None,
+    CODEWORD_EQUALS,
+    CODEWORD_LPAR,
+    CODEWORD_CAST_FUNC_PTR,
+    CODEWORD_RPAR,
+    None,
+    CODEWORD_SEMICOLON
+]
+
+IFNOT_CHECK_PATTERN = [
+    CODEWORD_IF,
+    CODEWORD_LPAR,
+    CODEWORD_NOT,
+    None,
+    CODEWORD_RPAR,
+    CODEWORD_LBRACKET,
+]
+
+IFYES_CHECK_PATTERN = [
+    CODEWORD_IF,
+    CODEWORD_LPAR,
+    None,
+    CODEWORD_RPAR,
+    CODEWORD_LBRACKET
+]
+
+WHILE_FOREVER_PATTERN = [
+    CODEWORD_WHILE,
+    CODEWORD_LPAR,
+    CODEWORD_ONE,
+    CODEWORD_RPAR,
+    CODEWORD_LBRACKET,
+]
+
+INDEXOR_CHECK_PATTERN = [
+    None,
+    CODEWORD_EQUALS,
+    CODEWORD_ZERO,
+    CODEWORD_MINUS,
+    CODEWORD_ONE,
+    CODEWORD_SEMICOLON
+]
+
+INDEXOR_INCREMENT_PATTERN = [
+    None,
+    CODEWORD_EQUALS,
+    None,
+    CODEWORD_ADD,
+    CODEWORD_ONE,
+    CODEWORD_SEMICOLON
+]
+
+NEGATEBOOL_PATTERN = [
+    None,
+    CODEWORD_EQUALS,
+    None,
+    CODEWORD_COMPARISON_EQUALS,
+    CODEWORD_ZERO,
+    CODEWORD_SEMICOLON
+]
+
+ENDLOOP_PATTERN = [
+    CODEWORD_IF, 
+    CODEWORD_LPAR,
+    CODEWORD_NOT,
+    None,
+    CODEWORD_RPAR,
+    CODEWORD_LBRACKET,
+    CODEWORD_BREAK,
+    CODEWORD_SEMICOLON,
+    CODEWORD_RBRACKET,
+]
 
 def create_code_word_cached(text: str):
     entry = code_word_cache.get(text, None)
@@ -818,7 +982,10 @@ class ImplementedType:
         self.dependent_assignments[existing.name] = value[0].stabilized_name()
         if not already_assigned and existing.type.builtin and (existing._references is None or not perform_immutability_checks): 
             if existing.name in self.refargs: self.refargs.remove(existing.name)
-            self.implementation.extend([existing, CODEWORD_EQUALS, value[0], CODEWORD_SEMICOLON])
+            #self.implementation.extend([existing, CODEWORD_EQUALS, value[0], CODEWORD_SEMICOLON])
+            PREALLOCATED_ASSIGN_PATTERN[0] = existing
+            PREALLOCATED_ASSIGN_PATTERN[2] = value[0]
+            self.implementation.extend(PREALLOCATED_ASSIGN_PATTERN)
 
 
     # def get_assignment(self, from_name: str, _to_name: list[str]):
@@ -886,12 +1053,15 @@ class ImplementedType:
                 if v.name in global_var2cstr:
                     var = v.renamed_copy(create_temp())
                     self.vars[var.name] = var
-                    self.implementation.extend([
-                        var,
-                        CODEWORD_EQUALS,
-                        v,
-                        CODEWORD_SEMICOLON
-                    ])
+                    # self.implementation.extend([
+                    #     var,
+                    #     CODEWORD_EQUALS,
+                    #     v,
+                    #     CODEWORD_SEMICOLON
+                    # ])
+                    PREALLOCATED_ASSIGN_PATTERN[0] = var
+                    PREALLOCATED_ASSIGN_PATTERN[2] = v
+                    self.implementation.extend(PREALLOCATED_ASSIGN_PATTERN)
                     value[pos] = var
                 
         if self.has_returned_once and len(self.rets)!=len(value):
@@ -1579,9 +1749,81 @@ class ImplementedType:
             for defer in reversed(self.defers): await process_block(defer, 0, len(defer)-1)
         self.can_try_interpreter = True
         return local_vars.get("__t_errcode", 0)
+
+    def simplify(self) -> bool:
+        var_uses: dict[str, int] = dict()
+        for arg in self.args: var_uses[arg] = 2
+        for ret in self.rets: var_uses[ret] = 2
+        def is_assignment_target(seq, i):
+            return i + 1 < len(seq) and seq[i + 1].tostring() == "="
+        def is_memcpy_dest(seq, i):
+            return (
+                i >= 3
+                and i + 1 < len(seq)
+                and seq[i - 1].tostring() == "&"
+                and seq[i - 2].tostring() == "("
+                and seq[i - 3].tostring() == "memcpy"
+                and seq[i + 1].tostring() == ","
+            )
+        def count(seq):
+            for i, tok in enumerate(seq):
+                if not isinstance(tok, Variable):
+                    continue
+                if is_assignment_target(seq, i) or is_memcpy_dest(seq, i):
+                    continue
+                var_uses[tok.name] = var_uses.get(tok.name, 0) + 1
+        count(self.implementation)
+        for defer in self.defers:
+            count(defer)
+        for defer in self.returned_defers:
+            count(defer)
+        unused = {name for name, var in self.vars.items() if var_uses.get(name, 0) == 0 and var.type.is_functor_of is None}
+        def strip(seq):
+            result = []
+            i = 0
+            n = len(seq)
+            while i < n:
+                tok = seq[i]
+                if (
+                    isinstance(tok, Variable)
+                    and tok.name in unused
+                    and i + 1 < n
+                    and seq[i + 1].tostring() == "="
+                ):
+                    j = i
+                    while j < n and seq[j] is not CODEWORD_SEMICOLON:
+                        j += 1
+                    i = j + 1
+                    continue
+                if (
+                    tok.tostring() == "memcpy"
+                    and i + 4 < n
+                    and seq[i + 1].tostring() == "("
+                    and seq[i + 2].tostring() == "&"
+                    and isinstance(seq[i + 3], Variable)
+                    and seq[i + 3].name in unused
+                    and seq[i + 4].tostring() == ","
+                ):
+                    j = i
+                    while j < n and seq[j] is not CODEWORD_SEMICOLON:
+                        j += 1
+                    i = j + 1
+                    continue
+                result.append(tok)
+                i += 1
+            return result
+
+        self.implementation = strip(self.implementation)
+        self.defers = [strip(defer) for defer in self.defers]
+        self.returned_defers = [strip(defer) for defer in self.returned_defers]
+        self.var_uses = var_uses
+        for name in unused:
+            del self.vars[name]
+        return bool(unused)
             
     def transpile(self, for_inlining=False) -> str:
         if self.never_implement: return ""
+        while self.simplify(): pass
         if not self.needs_failure_mode and self.force_not_inline: self.needs_failure_mode = self.at
         ret_body_start = ""
         ret_body_end = ""
@@ -2016,27 +2258,30 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but found '"+signature_like(rets)+"'")
         if var.stabilized_name() in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
         if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&&' or 'mutget' from a buffer if you are working with std", "remove 'const' qualitifier"])
-        impl.implementation.extend([
-            CODEWORD_IF,
-            CODEWORD_LPAR,
-            CODEWORD_NOT,
-            var,
-            CODEWORD_RPAR,
-            CODEWORD_LBRACKET,
-        ])
+        IFNOT_CHECK_PATTERN[3] = var
+        impl.implementation.extend(IFNOT_CHECK_PATTERN)
+        # impl.implementation.extend([
+        #     CODEWORD_IF,
+        #     CODEWORD_LPAR,
+        #     CODEWORD_NOT,
+        #     var,
+        #     CODEWORD_RPAR,
+        #     CODEWORD_LBRACKET,
+        # ])
         if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is not None:
             impl.has_any_complaint = True
-            impl.implementation.extend([
-                CODEWORD_TCOMPLAIN,
-                CODEWORD_EQUALS,
-                CODEWORD_TWO,
-                CODEWORD_SEMICOLON,
-                CODEWORD_RBRACKET,
-                CODEWORD_ELSE,
-                CODEWORD_LBRACKET
-            ])
+            # impl.implementation.extend([
+            #     CODEWORD_TCOMPLAIN,
+            #     CODEWORD_EQUALS,
+            #     CODEWORD_TWO,
+            #     CODEWORD_SEMICOLON,
+            #     CODEWORD_RBRACKET,
+            #     CODEWORD_ELSE,
+            #     CODEWORD_LBRACKET
+            # ])
+            impl.implementation.extend(PREALLOCATED_CHECKERRTWO_PATTERN)
             impl.spawned_error_codes.add(2)
             impl.count_handled_tries[-1] += 1
         else:
@@ -2053,34 +2298,40 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                     CODEWORD_RPAR,
                     CODEWORD_SEMICOLON,
                 ])
-            impl.implementation.extend([
-                CODEWORD_TERRCODE,
-                CODEWORD_EQUALS,
-                CODEWORD_TWO,
-                CODEWORD_SEMICOLON
-            ])
+            impl.implementation.extend(PREALLOCATED_ERRTWOEND_PATTERN)
             impl.spawned_error_codes.add(2)
-            impl.implementation.extend([
-                CODEWORD_GOTO,
-                CODEWORD_TFAILURE,
-                CODEWORD_SEMICOLON,
-                CODEWORD_RBRACKET
-            ])
             impl.needs_failure_mode = error_token
 
         progress = 0
         for r in ret:
             mem_size = r.type.memory_size() if r.type.builtin else 0
             if not mem_size: continue
-            impl.implementation.extend(
-                [CodeWord("memcpy"), CODEWORD_LPAR]
-                +[var]
-                + ([CODEWORD_ADD, create_code_word_cached(str(progress))] if progress else [])
-                + [CODEWORD_COMMA, CODEWORD_AMP]
-                + [impl.vars[r.stabilized_name()]]
-                + [CODEWORD_COMMA, create_code_word_cached(str(mem_size))]
-                + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
-            )
+            if progress:
+                # impl.implementation.extend([
+                #     CODEWORD_MEMCPY, CODEWORD_LPAR, var,
+                #     CODEWORD_ADD, create_code_word_cached(str(progress)),
+                #     CODEWORD_COMMA, CODEWORD_AMP,
+                #     impl.vars[r.stabilized_name()],
+                #     CODEWORD_COMMA, create_code_word_cached(str(mem_size)),
+                #     CODEWORD_RPAR, CODEWORD_SEMICOLON
+                # ])
+                PREALLOCATED_MEMCPY_OFFSET_PATTERN[2] = var
+                PREALLOCATED_MEMCPY_OFFSET_PATTERN[4] = create_code_word_cached(str(progress))
+                PREALLOCATED_MEMCPY_OFFSET_PATTERN[7] = impl.vars[r.stabilized_name()]
+                PREALLOCATED_MEMCPY_OFFSET_PATTERN[9] = create_code_word_cached(str(mem_size))
+                impl.implementation.extend(PREALLOCATED_MEMCPY_OFFSET_PATTERN)
+            else:
+                # impl.implementation.extend([
+                #     CODEWORD_MEMCPY, CODEWORD_LPAR, var,
+                #     CODEWORD_COMMA, CODEWORD_AMP,
+                #     impl.vars[r.stabilized_name()],
+                #     CODEWORD_COMMA, create_code_word_cached(str(mem_size)),
+                #     CODEWORD_RPAR, CODEWORD_SEMICOLON
+                # ])
+                PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[2] = var
+                PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[5] = impl.vars[r.stabilized_name()]
+                PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[7] = create_code_word_cached(str(mem_size))
+                impl.implementation.extend(PREALLOCATED_MEMCPY_NOOFFSET_PATTERN)
             if impl.vars[r.stabilized_name()].type==POINTER_TYPE:
                 for other_var in impl.get_required_accompany(var):
                     for source_var in impl.get_required_accompany(impl.vars[r.stabilized_name()]):
@@ -2183,14 +2434,12 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if try error=compiler::catch() print cstr error`")
         else: impl.count_handled_tries[-1] += 1
+        impl.has_any_complaint = True
         impl.implementation.extend([
             var,
             CODEWORD_EQUALS,
             CODEWORD_TCOMPLAIN,
             CODEWORD_SEMICOLON,
-        ])
-        impl.has_any_complaint = True
-        impl.implementation.extend([
             try_var,
             CODEWORD_EQUALS,
             CODEWORD_LPAR,
@@ -2199,8 +2448,6 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             CODEWORD_ZERO,
             CODEWORD_RPAR,
             CODEWORD_SEMICOLON,
-        ])
-        impl.implementation.extend([
             CODEWORD_TCOMPLAIN,
             CODEWORD_EQUALS,
             CODEWORD_ZERO,
@@ -2412,12 +2659,15 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is not None:
-            impl.implementation.extend([
-                try_var,
-                CODEWORD_EQUALS,
-                CODEWORD_TCOMPLAIN,
-                CODEWORD_SEMICOLON,
-            ])
+            PREALLOCATED_ASSIGN_PATTERN[0] = try_var
+            PREALLOCATED_ASSIGN_PATTERN[2] = CODEWORD_TCOMPLAIN
+            impl.implementation.extend(PREALLOCATED_ASSIGN_PATTERN)
+            # impl.implementation.extend([
+            #     try_var,
+            #     CODEWORD_EQUALS,
+            #     CODEWORD_TCOMPLAIN,
+            #     CODEWORD_SEMICOLON,
+            # ])
 
     if callee.needs_failure_mode and impl.is_parsing_a_try:
         if impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the 'try' mechanism has already matched one function call")
@@ -2435,14 +2685,15 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
 
     if callee.needs_failure_mode and not impl.is_parsing_a_try:
         if impl.is_parsing_a_defer: error_token.error("safety", "cannot call a function with unhandled failure within 'defer'", reason=callee.at, suggestions=["usa only safe code", "add a 'try'"])
-        impl.implementation.extend([
-            CODEWORD_IF,
-            CODEWORD_LPAR,
-            CODEWORD_TERRCODE,
-            CODEWORD_RPAR,
-            CODEWORD_LBRACKET,
-        ])
+        
         if debug_mode:
+            impl.implementation.extend([
+                CODEWORD_IF,
+                CODEWORD_LPAR,
+                CODEWORD_TERRCODE,
+                CODEWORD_RPAR,
+                CODEWORD_LBRACKET,
+            ])
             text = "\\033[31mat\\033[0m "+error_token.file.path.replace('"','\\"')+" line "+str(error_token.row)+" column "+str(error_token.col)+"\\n"
             text +="   unhandled error from "+callee.signature()+"\\n"
             impl.implementation.extend([
@@ -2454,12 +2705,25 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
-        impl.implementation.extend([
-            CODEWORD_GOTO,
-            CODEWORD_TFAILURE,
-            CODEWORD_SEMICOLON,
-            CODEWORD_RBRACKET
-        ])
+            impl.implementation.extend([
+                CODEWORD_GOTO,
+                CODEWORD_TFAILURE,
+                CODEWORD_SEMICOLON,
+                CODEWORD_RBRACKET
+            ])
+        else:
+            # impl.implementation.extend([
+            #     CODEWORD_IF,
+            #     CODEWORD_LPAR,
+            #     CODEWORD_TERRCODE,
+            #     CODEWORD_RPAR,
+            #     CODEWORD_LBRACKET,
+            #     CODEWORD_GOTO,
+            #     CODEWORD_TFAILURE,
+            #     CODEWORD_SEMICOLON,
+            #     CODEWORD_RBRACKET
+            # ])
+            impl.implementation.extend(PREALLOCATED_CHECKGOTO_FAILURE_PATTERN)
         impl.needs_failure_mode = error_token
 
     # transfer dependent assignments from inputs to outputs on callee
@@ -2586,27 +2850,30 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     progress = 0
     skip = 0
     # non-allocation check is mandatory unfortunately
-    impl.implementation.extend([
-        CODEWORD_IF,
-        CODEWORD_LPAR,
-        CODEWORD_NOT,
-        ret[0],
-        CODEWORD_RPAR,
-        CODEWORD_LBRACKET,
-    ])
+    IFNOT_CHECK_PATTERN[3] = ret[0]
+    impl.implementation.extend(IFNOT_CHECK_PATTERN)
+    # impl.implementation.extend([
+    #     CODEWORD_IF,
+    #     CODEWORD_LPAR,
+    #     CODEWORD_NOT,
+    #     ret[0],
+    #     CODEWORD_RPAR,
+    #     CODEWORD_LBRACKET,
+    # ])
     if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: current_token.error("safety", "the matching 'try' has already handled a different failure")
     try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
     if try_var is not None:
         impl.has_any_complaint = True
-        impl.implementation.extend([
-            CODEWORD_TCOMPLAIN,
-            CODEWORD_EQUALS,
-            CODEWORD_TWO,
-            CODEWORD_SEMICOLON,
-            CODEWORD_RBRACKET,
-            CODEWORD_ELSE,
-            CODEWORD_LBRACKET
-        ])
+        # impl.implementation.extend([
+        #     CODEWORD_TCOMPLAIN,
+        #     CODEWORD_EQUALS,
+        #     CODEWORD_TWO,
+        #     CODEWORD_SEMICOLON,
+        #     CODEWORD_RBRACKET,
+        #     CODEWORD_ELSE,
+        #     CODEWORD_LBRACKET
+        # ])
+        impl.implementation.extend(PREALLOCATED_CHECKERRTWO_PATTERN)
         impl.spawned_error_codes.add(2)
         impl.count_handled_tries[-1] += 1
     else:
@@ -2622,19 +2889,8 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
-        impl.implementation.extend([
-            CODEWORD_TERRCODE,
-            CODEWORD_EQUALS,
-            CODEWORD_TWO,
-            CODEWORD_SEMICOLON
-        ])
+        impl.implementation.extend(PREALLOCATED_ERRTWOEND_PATTERN)
         impl.spawned_error_codes.add(2)
-        impl.implementation.extend([
-            CODEWORD_GOTO,
-            CODEWORD_TFAILURE,
-            CODEWORD_SEMICOLON,
-            CODEWORD_RBRACKET
-        ])
         impl.needs_failure_mode = current_token
     for ret_name in pointer_type.rets:
         r_var = pointer_type.vars[ret_name].renamed_copy(prefix+ret_name, current_token)
@@ -2642,12 +2898,40 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
         mem_size = r_var.type.memory_size() if r_var.type.builtin else 0
         impl.vars[r_var.name] = r_var
         if not mem_size: continue
-        impl.implementation.extend(
-            [CodeWord(w) for w in "memcpy (".split(" ")]
-            + [CODEWORD_AMP, r_var, CODEWORD_COMMA, ret[0]]
-            + ([CODEWORD_ADD, CodeWord(str(progress))] if progress else [])
-            + [CODEWORD_COMMA, CodeWord(str(mem_size)), CODEWORD_RPAR, CODEWORD_SEMICOLON]
-        )
+        if progress:
+            impl.implementation.extend([
+                CODEWORD_MEMCPY,
+                CODEWORD_LPAR,
+                CODEWORD_AMP,
+                r_var,
+                CODEWORD_COMMA,
+                ret[0],
+                CODEWORD_ADD,
+                create_code_word_cached(str(progress)),
+                CODEWORD_COMMA,
+                create_code_word_cached(str(mem_size)),
+                CODEWORD_RPAR,
+                CODEWORD_SEMICOLON
+            ])
+        else:
+            impl.implementation.extend([
+                CODEWORD_MEMCPY,
+                CODEWORD_LPAR,
+                CODEWORD_AMP,
+                r_var,
+                CODEWORD_COMMA,
+                ret[0],
+                CODEWORD_COMMA,
+                create_code_word_cached(str(mem_size)),
+                CODEWORD_RPAR,
+                CODEWORD_SEMICOLON
+            ])
+        # impl.implementation.extend(
+        #     [CodeWord(w) for w in "memcpy (".split(" ")]
+        #     + [CODEWORD_AMP, r_var, CODEWORD_COMMA, ret[0]]
+        #     + ([CODEWORD_ADD, CodeWord(str(progress))] if progress else [])
+        #     + [CODEWORD_COMMA, CodeWord(str(mem_size)), CODEWORD_RPAR, CODEWORD_SEMICOLON]
+        # )
         progress += mem_size
     if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
     if is_lsp and current_token.file.is_main_file: print_lsp_var(current_token, signature_like(new_vars, impl))
@@ -3058,32 +3342,36 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
     for a in functor_var.type.is_functor_of.__dict__:
         setattr(ret_type, a, getattr(functor_var.type.is_functor_of, a))
 
-    impl.implementation.extend([
-        CODEWORD_IF,
-        CODEWORD_LPAR,
-        CODEWORD_NOT,
-        functor_var,
-        CODEWORD_RPAR,
-        CODEWORD_LBRACKET,
-    ])
+    FUNCTOR_VAR_CHECK_PATTERN[3] = functor_var
+    impl.implementation.extend(FUNCTOR_VAR_CHECK_PATTERN)
+    # impl.implementation.extend([
+    #     CODEWORD_IF,
+    #     CODEWORD_LPAR,
+    #     CODEWORD_NOT,
+    #     functor_var,
+    #     CODEWORD_RPAR,
+    #     CODEWORD_LBRACKET,
+    # ])
     if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: err_token.error("safety", "the matching 'try' has already handled a different failure")
     try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
     pending_close_bracket = False
     if try_var is not None:
         impl.has_any_complaint = True
-        impl.implementation.extend([
-            CODEWORD_TCOMPLAIN,
-            CODEWORD_EQUALS,
-            CODEWORD_TWO,
-            CODEWORD_SEMICOLON,
-            try_var,
-            CODEWORD_EQUALS,
-            CODEWORD_TCOMPLAIN,
-            CODEWORD_SEMICOLON,
-            CODEWORD_RBRACKET,
-            CODEWORD_ELSE,
-            CODEWORD_LBRACKET
-        ])
+        FUNCTOR_TRYVAR_CHECK_PATTERN[4] = try_var
+        impl.implementation.extend(FUNCTOR_TRYVAR_CHECK_PATTERN)
+        # impl.implementation.extend([
+        #     CODEWORD_TCOMPLAIN,
+        #     CODEWORD_EQUALS,
+        #     CODEWORD_TWO,
+        #     CODEWORD_SEMICOLON,
+        #     try_var,
+        #     CODEWORD_EQUALS,
+        #     CODEWORD_TCOMPLAIN,
+        #     CODEWORD_SEMICOLON,
+        #     CODEWORD_RBRACKET,
+        #     CODEWORD_ELSE,
+        #     CODEWORD_LBRACKET
+        # ])
         impl.spawned_error_codes.add(2)
         impl.count_handled_tries[-1] += 1
         pending_close_bracket = True
@@ -3101,19 +3389,18 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
-        impl.implementation.extend([
-            CODEWORD_TERRCODE,
-            CODEWORD_EQUALS,
-            CODEWORD_TWO,
-            CODEWORD_SEMICOLON
-        ])
+        # impl.implementation.extend([
+        #     CODEWORD_TERRCODE,
+        #     CODEWORD_EQUALS,
+        #     CODEWORD_TWO,
+        #     CODEWORD_SEMICOLON,
+        #     CODEWORD_GOTO,
+        #     CODEWORD_TFAILURE,
+        #     CODEWORD_SEMICOLON,
+        #     CODEWORD_RBRACKET
+        # ])
+        impl.implementation.extend(PREALLOCATED_ERRTWOEND_PATTERN)
         impl.spawned_error_codes.add(2)
-        impl.implementation.extend([
-            CODEWORD_GOTO,
-            CODEWORD_TFAILURE,
-            CODEWORD_SEMICOLON,
-            CODEWORD_RBRACKET
-        ])
         impl.needs_failure_mode = err_token
 
     # only change the name in the ret_type
@@ -3203,15 +3490,18 @@ def convert_method_to_functor(impl: ImplementedType, _method: UnionType, err_tok
     impl.vars[var.name] = var
     if method not in impl.dependent_implementations:
         impl.dependent_implementations.append(method)
-    impl.implementation.extend([
-        var,
-        CODEWORD_EQUALS,
-        CODEWORD_LPAR,
-        CODEWORD_CAST_FUNC_PTR,
-        CODEWORD_RPAR,
-        CodeWord(from_name if from_name is not None else method.monomorphic_name),
-        CODEWORD_SEMICOLON
-    ])
+    CAST_FUNC_PTR_PATTERN[0] = var
+    CAST_FUNC_PTR_PATTERN[5] = create_code_word_cached(from_name if from_name is not None else method.monomorphic_name)
+    impl.implementation.extend(CAST_FUNC_PTR_PATTERN)
+    # impl.implementation.extend([
+    #     var,
+    #     CODEWORD_EQUALS,
+    #     CODEWORD_LPAR,
+    #     CODEWORD_CAST_FUNC_PTR,
+    #     CODEWORD_RPAR,
+    #     create_code_word_cached(from_name if from_name is not None else method.monomorphic_name),
+    #     CODEWORD_SEMICOLON
+    # ])
     if is_lsp and err_token.file.is_main_file:
         variation = var.type
         at = variation.at if variation.at else err_token
@@ -3481,27 +3771,30 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             for pr, r in zip(pointer_type.rets, ret):
                 if pointer_type.vars[pr].type != r.type: err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'")
             # we now have a contract that we can place our data on the pointer
-            impl.implementation.extend([
-                CODEWORD_IF,
-                CODEWORD_LPAR,
-                CODEWORD_NOT,
-                var,
-                CODEWORD_RPAR,
-                CODEWORD_LBRACKET,
-            ])
+            IFNOT_CHECK_PATTERN[3] = var
+            impl.implementation.extend(IFNOT_CHECK_PATTERN)
+            # impl.implementation.extend([
+            #     CODEWORD_IF,
+            #     CODEWORD_LPAR,
+            #     CODEWORD_NOT,
+            #     var,
+            #     CODEWORD_RPAR,
+            #     CODEWORD_LBRACKET,
+            # ])
             if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: op_token.error("safety", "the matching 'try' has already handled a different failure")
             try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
             if try_var is not None:
                 impl.has_any_complaint = True
-                impl.implementation.extend([
-                    CODEWORD_TCOMPLAIN,
-                    CODEWORD_EQUALS,
-                    CODEWORD_TWO,
-                    CODEWORD_SEMICOLON,
-                    CODEWORD_RBRACKET,
-                    CODEWORD_ELSE,
-                    CODEWORD_LBRACKET
-                ])
+                # impl.implementation.extend([
+                #     CODEWORD_TCOMPLAIN,
+                #     CODEWORD_EQUALS,
+                #     CODEWORD_TWO,
+                #     CODEWORD_SEMICOLON,
+                #     CODEWORD_RBRACKET,
+                #     CODEWORD_ELSE,
+                #     CODEWORD_LBRACKET
+                # ])
+                impl.implementation.extend(PREALLOCATED_CHECKERRTWO_PATTERN)
                 impl.spawned_error_codes.add(2)
                 impl.count_handled_tries[-1] += 1
             else:
@@ -3518,34 +3811,38 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         CODEWORD_RPAR,
                         CODEWORD_SEMICOLON,
                     ])
-                impl.implementation.extend([
-                    CODEWORD_TERRCODE,
-                    CODEWORD_EQUALS,
-                    CODEWORD_TWO,
-                    CODEWORD_SEMICOLON
-                ])
+                impl.implementation.extend(PREALLOCATED_ERRTWOEND_PATTERN)
                 impl.spawned_error_codes.add(2)
-                impl.implementation.extend([
-                    CODEWORD_GOTO,
-                    CODEWORD_TFAILURE,
-                    CODEWORD_SEMICOLON,
-                    CODEWORD_RBRACKET
-                ])
                 impl.needs_failure_mode = op_token
 
             progress = 0
             for r in ret:
                 mem_size = r.type.memory_size() if r.type.builtin else 0
                 if not mem_size: continue
-                impl.implementation.extend(
-                    [CodeWord("memcpy"), CODEWORD_LPAR]
-                    +[var]
-                    + ([CODEWORD_ADD, create_code_word_cached(str(progress))] if progress else [])
-                    + [CODEWORD_COMMA, CODEWORD_AMP]
-                    + [impl.vars[r.stabilized_name()]]
-                    + [CODEWORD_COMMA, create_code_word_cached(str(mem_size))]
-                    + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
-                )
+                if progress:
+                    # impl.implementation.extend([
+                    #     CODEWORD_MEMCPY, CODEWORD_LPAR, var,
+                    #     CODEWORD_ADD, create_code_word_cached(str(progress)),
+                    #     CODEWORD_COMMA, CODEWORD_AMP, impl.vars[r.stabilized_name()],
+                    #     CODEWORD_COMMA, create_code_word_cached(str(mem_size)),
+                    #     CODEWORD_RPAR, CODEWORD_SEMICOLON
+                    # ])
+                    PREALLOCATED_MEMCPY_OFFSET_PATTERN[2] = var
+                    PREALLOCATED_MEMCPY_OFFSET_PATTERN[4] = create_code_word_cached(str(progress))
+                    PREALLOCATED_MEMCPY_OFFSET_PATTERN[7] = impl.vars[r.stabilized_name()]
+                    PREALLOCATED_MEMCPY_OFFSET_PATTERN[9] = create_code_word_cached(str(mem_size))
+                    impl.implementation.extend(PREALLOCATED_MEMCPY_OFFSET_PATTERN)
+                else:
+                    # impl.implementation.extend([
+                    #     CODEWORD_MEMCPY, CODEWORD_LPAR, var,
+                    #     CODEWORD_COMMA, CODEWORD_AMP, impl.vars[r.stabilized_name()],
+                    #     CODEWORD_COMMA, create_code_word_cached(str(mem_size)),
+                    #     CODEWORD_RPAR, CODEWORD_SEMICOLON
+                    # ])
+                    PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[2] = var
+                    PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[5] = impl.vars[r.stabilized_name()]
+                    PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[7] = create_code_word_cached(str(mem_size))
+                    impl.implementation.extend(PREALLOCATED_MEMCPY_NOOFFSET_PATTERN)
                 if impl.vars[r.stabilized_name()].type==POINTER_TYPE:
                     for other_var in impl.get_required_accompany(var):
                         for source_var in impl.get_required_accompany(impl.vars[r.stabilized_name()]):
@@ -3569,13 +3866,15 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 pos = skip_statement(file, tokens, pos+1) 
                 continue
             if rets[0].type!=BOOL_TYPE: op_token.error("type", "the left hand side must always be true/false for 'and'")
-            impl.implementation.extend([
-                CODEWORD_IF,
-                CODEWORD_LPAR,
-                rets[0],
-                CODEWORD_RPAR,
-                CODEWORD_LBRACKET
-            ])
+            IFYES_CHECK_PATTERN[2] = rets[0]
+            impl.implementation.extend(IFYES_CHECK_PATTERN)
+            # impl.implementation.extend([
+            #     CODEWORD_IF,
+            #     CODEWORD_LPAR,
+            #     rets[0],
+            #     CODEWORD_RPAR,
+            #     CODEWORD_LBRACKET
+            # ])
             pos, rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority)
             if is_lsp and and_token.file.is_main_file: print_lsp_keyword(and_token, "evaluates to the same type as the right hand side: '"+signature_like(rets,impl)+"'")
             
@@ -3607,14 +3906,16 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 pos, rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority) 
                 continue
             if rets[0].type!=BOOL_TYPE: op_token.error("type", "the left hand side must always be true/false for 'or'")
-            impl.implementation.extend([
-                CODEWORD_IF,
-                CODEWORD_LPAR,
-                CODEWORD_NOT,
-                rets[0],
-                CODEWORD_RPAR,
-                CODEWORD_LBRACKET
-            ])
+            IFNOT_CHECK_PATTERN[3] = rets[0]
+            impl.implementation.extend(IFNOT_CHECK_PATTERN)
+            # impl.implementation.extend([
+            #     CODEWORD_IF,
+            #     CODEWORD_LPAR,
+            #     CODEWORD_NOT,
+            #     rets[0],
+            #     CODEWORD_RPAR,
+            #     CODEWORD_LBRACKET
+            # ])
             pos, rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=op_priority) 
             if is_lsp and or_token.file.is_main_file: print_lsp_keyword(or_token, "evaluates to the same type as the right hand side: '"+signature_like(rets,impl)+"'")
             
@@ -3848,27 +4149,30 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     impl.set_pointer_type(new_var, temp_type)
                     if is_lsp and field_token.file.is_main_file: print_lsp_var(field_token, signature_like([new_var], impl))
 
-                    impl.implementation.extend([
-                        CODEWORD_IF,
-                        CODEWORD_LPAR,
-                        CODEWORD_NOT,
-                        rets[0],
-                        CODEWORD_RPAR,
-                        CODEWORD_LBRACKET,
-                    ])
+                    IFNOT_CHECK_PATTERN[3] = rets[0]
+                    impl.implementation.extend(IFNOT_CHECK_PATTERN)
+                    # impl.implementation.extend([
+                    #     CODEWORD_IF,
+                    #     CODEWORD_LPAR,
+                    #     CODEWORD_NOT,
+                    #     rets[0],
+                    #     CODEWORD_RPAR,
+                    #     CODEWORD_LBRACKET,
+                    # ])
                     if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: op_token.error("safety", "the matching 'try' has already handled a different failure")
                     try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
                     if try_var is not None:
                         impl.has_any_complaint = True
-                        impl.implementation.extend([
-                            CODEWORD_TCOMPLAIN,
-                            CODEWORD_EQUALS,
-                            CODEWORD_TWO,
-                            CODEWORD_SEMICOLON,
-                            CODEWORD_RBRACKET,
-                            CODEWORD_ELSE,
-                            CODEWORD_LBRACKET
-                        ])
+                        # impl.implementation.extend([
+                        #     CODEWORD_TCOMPLAIN,
+                        #     CODEWORD_EQUALS,
+                        #     CODEWORD_TWO,
+                        #     CODEWORD_SEMICOLON,
+                        #     CODEWORD_RBRACKET,
+                        #     CODEWORD_ELSE,
+                        #     CODEWORD_LBRACKET
+                        # ])
+                        impl.implementation.extend(PREALLOCATED_CHECKERRTWO_PATTERN)
                         impl.spawned_error_codes.add(2)
                         impl.count_handled_tries[-1] += 1
                     else:
@@ -3886,19 +4190,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                                 CODEWORD_RPAR,
                                 CODEWORD_SEMICOLON,
                             ])
-                        impl.implementation.extend([
-                            CODEWORD_TERRCODE,
-                            CODEWORD_EQUALS,
-                            CODEWORD_TWO,
-                            CODEWORD_SEMICOLON
-                        ])
+                        impl.implementation.extend(PREALLOCATED_ERRTWOEND_PATTERN)
                         impl.spawned_error_codes.add(2)
-                        impl.implementation.extend([
-                            CODEWORD_GOTO,
-                            CODEWORD_TFAILURE,
-                            CODEWORD_SEMICOLON,
-                            CODEWORD_RBRACKET
-                        ])
                         impl.needs_failure_mode = op_token
                     impl.implementation.extend([
                         new_var,
@@ -4716,27 +5009,30 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             for pr, r in zip(pointer_type.rets, ret):
                 if pointer_type.vars[pr].type != r.type: err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'"+(". Perhaps you meant to add && after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
             # we now have a contract that we can place our data on the pointer
-            impl.implementation.extend([
-                CODEWORD_IF,
-                CODEWORD_LPAR,
-                CODEWORD_NOT,
-                var,
-                CODEWORD_RPAR,
-                CODEWORD_LBRACKET,
-            ])
+            IFNOT_CHECK_PATTERN[3] = var
+            impl.implementation.extend(IFNOT_CHECK_PATTERN)
+            # impl.implementation.extend([
+            #     CODEWORD_IF,
+            #     CODEWORD_LPAR,
+            #     CODEWORD_NOT,
+            #     var,
+            #     CODEWORD_RPAR,
+            #     CODEWORD_LBRACKET,
+            # ])
             if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: op_token.error("safety", "the matching 'try' has already handled a different failure")
             try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
             if try_var is not None:
                 impl.has_any_complaint = True
-                impl.implementation.extend([
-                    CODEWORD_TCOMPLAIN,
-                    CODEWORD_EQUALS,
-                    CODEWORD_TWO,
-                    CODEWORD_SEMICOLON,
-                    CODEWORD_RBRACKET,
-                    CODEWORD_ELSE,
-                    CODEWORD_LBRACKET
-                ])
+                # impl.implementation.extend([
+                #     CODEWORD_TCOMPLAIN,
+                #     CODEWORD_EQUALS,
+                #     CODEWORD_TWO,
+                #     CODEWORD_SEMICOLON,
+                #     CODEWORD_RBRACKET,
+                #     CODEWORD_ELSE,
+                #     CODEWORD_LBRACKET
+                # ])
+                impl.implementation.extend(PREALLOCATED_CHECKERRTWO_PATTERN)
                 impl.spawned_error_codes.add(2)
                 impl.count_handled_tries[-1] += 1
             else:
@@ -4753,34 +5049,38 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                         CODEWORD_RPAR,
                         CODEWORD_SEMICOLON,
                     ])
-                impl.implementation.extend([
-                    CODEWORD_TERRCODE,
-                    CODEWORD_EQUALS,
-                    CODEWORD_TWO,
-                    CODEWORD_SEMICOLON
-                ])
+                impl.implementation.extend(PREALLOCATED_ERRTWOEND_PATTERN)
                 impl.spawned_error_codes.add(2)
-                impl.implementation.extend([
-                    CODEWORD_GOTO,
-                    CODEWORD_TFAILURE,
-                    CODEWORD_SEMICOLON,
-                    CODEWORD_RBRACKET
-                ])
                 impl.needs_failure_mode = op_token
 
             progress = 0
             for r in ret:
                 mem_size = r.type.memory_size() if r.type.builtin else 0
                 if not mem_size: continue
-                impl.implementation.extend(
-                    [CodeWord("memcpy"), CODEWORD_LPAR]
-                    +[var]
-                    + ([CODEWORD_ADD, CodeWord(str(progress))] if progress else [])
-                    + [CODEWORD_COMMA, CODEWORD_AMP]
-                    + [impl.vars[r.stabilized_name()]]
-                    + [CODEWORD_COMMA, CodeWord(str(mem_size))]
-                    + [CODEWORD_RPAR, CODEWORD_SEMICOLON]
-                )
+                if progress:
+                    # impl.implementation.extend([
+                    #     CODEWORD_MEMCPY, CODEWORD_LPAR, var,
+                    #     CODEWORD_ADD, CodeWord(str(progress)),
+                    #     CODEWORD_COMMA, CODEWORD_AMP, impl.vars[r.stabilized_name()],
+                    #     CODEWORD_COMMA, CodeWord(str(mem_size)),
+                    #     CODEWORD_RPAR, CODEWORD_SEMICOLON
+                    # ])
+                    PREALLOCATED_MEMCPY_OFFSET_PATTERN[2] = var
+                    PREALLOCATED_MEMCPY_OFFSET_PATTERN[4] = create_code_word_cached(str(progress))
+                    PREALLOCATED_MEMCPY_OFFSET_PATTERN[7] = impl.vars[r.stabilized_name()]
+                    PREALLOCATED_MEMCPY_OFFSET_PATTERN[9] = create_code_word_cached(str(mem_size))
+                    impl.implementation.extend(PREALLOCATED_MEMCPY_OFFSET_PATTERN)
+                else:
+                    # impl.implementation.extend([
+                    #     CODEWORD_MEMCPY, CODEWORD_LPAR, var,
+                    #     CODEWORD_COMMA, CODEWORD_AMP, impl.vars[r.stabilized_name()],
+                    #     CODEWORD_COMMA, CodeWord(str(mem_size)),
+                    #     CODEWORD_RPAR, CODEWORD_SEMICOLON
+                    # ])
+                    PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[2] = var
+                    PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[5] = impl.vars[r.stabilized_name()]
+                    PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[7] = create_code_word_cached(str(mem_size))
+                    impl.implementation.extend(PREALLOCATED_MEMCPY_NOOFFSET_PATTERN)
                 if impl.vars[r.stabilized_name()].type==POINTER_TYPE:
                     for other_var in impl.get_required_accompany(var):
                         impl.add_required_accompany(other_var, impl.vars[r.stabilized_name()])
@@ -5165,22 +5465,18 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             pos, iterator_object = await process_statement(file, tokens, pos+2, impl, current_operator_priority=0)
             impl.accumulating_defers.append(dict())
 
-            impl.implementation.extend([
-                indexor,
-                CODEWORD_EQUALS,
-                CODEWORD_ZERO,
-                CODEWORD_MINUS,
-                CODEWORD_ONE,
-                CODEWORD_SEMICOLON
-            ])
+            INDEXOR_CHECK_PATTERN[0] = indexor
+            impl.implementation.extend(INDEXOR_CHECK_PATTERN)
+            # impl.implementation.extend([
+            #     indexor,
+            #     CODEWORD_EQUALS,
+            #     CODEWORD_ZERO,
+            #     CODEWORD_MINUS,
+            #     CODEWORD_ONE,
+            #     CODEWORD_SEMICOLON
+            # ])
             
-            impl.implementation.extend([
-                CODEWORD_WHILE,
-                CODEWORD_LPAR,
-                CODEWORD_ONE,
-                CODEWORD_RPAR,
-                CODEWORD_LBRACKET,
-            ])
+            impl.implementation.extend(WHILE_FOREVER_PATTERN)
             current_token = name
             async def process_for_get(pos: int):
                 tmp = create_temp()
@@ -5199,23 +5495,29 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 if impl.count_handled_tries[-1]==0: current_token.error("safety", "this 'try' statement does not guard against anything")
                 impl.count_handled_tries.pop()
                 impl.is_parsing_a_try.pop()
-                impl.implementation.extend([
-                    var,
-                    CODEWORD_EQUALS,
-                    var,
-                    CODEWORD_COMPARISON_EQUALS,
-                    CODEWORD_ZERO,
-                    CODEWORD_SEMICOLON
-                ])
+                NEGATEBOOL_PATTERN[0] = var
+                NEGATEBOOL_PATTERN[2] = var
+                impl.implementation.extend(NEGATEBOOL_PATTERN)
+                # impl.implementation.extend([
+                #     var,
+                #     CODEWORD_EQUALS,
+                #     var,
+                #     CODEWORD_COMPARISON_EQUALS,
+                #     CODEWORD_ZERO,
+                #     CODEWORD_SEMICOLON
+                # ])
                 return pos, [var]
-            impl.implementation.extend([
-                indexor,
-                CODEWORD_EQUALS,
-                indexor,
-                CODEWORD_ADD,
-                CODEWORD_ONE,
-                CODEWORD_SEMICOLON
-            ])
+            INDEXOR_INCREMENT_PATTERN[0] = indexor
+            INDEXOR_INCREMENT_PATTERN[2] = indexor
+            impl.implementation.extend(INDEXOR_INCREMENT_PATTERN)
+            # impl.implementation.extend([
+            #     indexor,
+            #     CODEWORD_EQUALS,
+            #     indexor,
+            #     CODEWORD_ADD,
+            #     CODEWORD_ONE,
+            #     CODEWORD_SEMICOLON
+            # ])
             pos, ret = await process_for_get(pos)
             if ret[0].type!=BOOL_TYPE: get(tokens, in_pos).error("type", "internal error - conditions can only evaluate to 'bool' or be constantly true/false")
             if ret[0].type==TRUE_TYPE:
@@ -5232,17 +5534,19 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                         elif next_token==END_TOKEN: depth -= 1
                         pos += 1
             else:
-                impl.implementation.extend([
-                        CODEWORD_IF, 
-                        CODEWORD_LPAR,
-                        CODEWORD_NOT,
-                        ret[0],
-                        CODEWORD_RPAR,
-                        CODEWORD_LBRACKET,
-                        CODEWORD_BREAK,
-                        CODEWORD_SEMICOLON,
-                        CODEWORD_RBRACKET,
-                    ])
+                ENDLOOP_PATTERN[3] = ret[0] 
+                impl.implementation.extend(ENDLOOP_PATTERN)
+                # impl.implementation.extend([
+                #         CODEWORD_IF, 
+                #         CODEWORD_LPAR,
+                #         CODEWORD_NOT,
+                #         ret[0],
+                #         CODEWORD_RPAR,
+                #         CODEWORD_LBRACKET,
+                #         CODEWORD_BREAK,
+                #         CODEWORD_SEMICOLON,
+                #         CODEWORD_RBRACKET,
+                #     ])
                 if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
                 else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
 
@@ -5260,13 +5564,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**while**\n\nLoop that runs while the condition is true.")
             impl.nesting.append("while")
             if_pos = pos-1
-            impl.implementation.extend([
-                CODEWORD_WHILE,
-                CODEWORD_LPAR,
-                CODEWORD_ONE,
-                CODEWORD_RPAR,
-                CODEWORD_LBRACKET,
-            ])
+            impl.implementation.extend(WHILE_FOREVER_PATTERN)
             impl.accumulating_defers.append(dict())
             pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
             if len(ret)!=1: name.error("type", "conditions can only evaluate to 'bool' but found '"+signature_like(ret)+"'")
@@ -5285,17 +5583,19 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                         pos += 1
             else:
                 if ret[0].type!=BOOL_TYPE: name.error("type", "conditions can only evaluate to 'bool' or be constantly true/false")
-                impl.implementation.extend([
-                    CODEWORD_IF, 
-                    CODEWORD_LPAR,
-                    CODEWORD_NOT,
-                    ret[0],
-                    CODEWORD_RPAR,
-                    CODEWORD_LBRACKET,
-                    CODEWORD_BREAK,
-                    CODEWORD_SEMICOLON,
-                    CODEWORD_RBRACKET,
-                ])
+                ENDLOOP_PATTERN[3] = ret[0] 
+                impl.implementation.extend(ENDLOOP_PATTERN)
+                # impl.implementation.extend([
+                #     CODEWORD_IF, 
+                #     CODEWORD_LPAR,
+                #     CODEWORD_NOT,
+                #     ret[0],
+                #     CODEWORD_RPAR,
+                #     CODEWORD_LBRACKET,
+                #     CODEWORD_BREAK,
+                #     CODEWORD_SEMICOLON,
+                #     CODEWORD_RBRACKET,
+                # ])
                 if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
                 else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
             
@@ -5349,13 +5649,15 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 continue
             if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**if**\n\nStart a conditional statement and run a code block if it is true.")
             if ret[0].type!=BOOL_TYPE: name.error("type", "conditions can only evaluate to 'true', 'false', or 'bool' (the first two refer to compile-time known literals)")
-            impl.implementation.extend([
-                CODEWORD_IF, 
-                CODEWORD_LPAR,
-                ret[0],
-                CODEWORD_RPAR,
-                CODEWORD_LBRACKET
-            ])
+            IFYES_CHECK_PATTERN[2] = ret[0]
+            impl.implementation.extend(IFYES_CHECK_PATTERN)
+            # impl.implementation.extend([
+            #     CODEWORD_IF, 
+            #     CODEWORD_LPAR,
+            #     ret[0],
+            #     CODEWORD_RPAR,
+            #     CODEWORD_LBRACKET
+            # ])
             previous_vars = {k: v for k, v in impl.vars.items()}
             impl.nesting.append("if")
             if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
@@ -5474,10 +5776,10 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
             new_type.variations.extend(imported.variations)
             new_type.variations = list(dict.fromkeys(new_type.variations))#list(set(new_type.variations))
             imported = new_type
-        else: # we NEED to decouple between files
-            new_type = UnionType(name, at=name_token)
-            new_type.variations.extend(imported.variations)
-            imported = new_type
+        # else: # we NEED to decouple between files, however this is moved to the DDDDDD marker
+        #     new_type = UnionType(name, at=name_token)
+        #     new_type.variations.extend(imported.variations)
+        #     imported = new_type
         file.types[name] = imported
         if is_local: 
             for variation in imported.variations: file.localdefs.add(variation)
@@ -5496,10 +5798,10 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
             new_type.variations.extend(type_value.variations)
             new_type.variations = list(dict.fromkeys(new_type.variations))#list(set(new_type.variations))
             type_value = new_type
-        else: # we NEED to decouple between files
-            new_type = UnionType(type_name, at=name_token)
-            new_type.variations.extend(type_value.variations)
-            type_value = new_type
+        # else: # we NEED to decouple between files, however this is moved to the DDDDDD marker
+        #     new_type = UnionType(type_name, at=name_token)
+        #     new_type.variations.extend(type_value.variations)
+        #     type_value = new_type
         if is_local:
             for variation in type_value.variations: file.localdefs.add(variation)
         file.types[type_name] = type_value
@@ -5709,6 +6011,13 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
             if found_type is None:
                 found_type = UnionType(impl.name, at=start_token)
                 file.types[impl.name] = found_type
+            elif not already_parsed: # DDDDDD marker
+                found_type_tmp = UnionType(found_type.name, at=found_type.at)
+                found_type_tmp.variations.extend(found_type.variations)
+                found_type = found_type_tmp
+                file.types[impl.name] = found_type
+
+
             if already_parsed is not None:
                 for a in impl.__dict__:
                     if a not in ["monomorphic_name", "force_not_inline"]:

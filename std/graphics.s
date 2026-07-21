@@ -69,6 +69,20 @@ def text(effect edit window WINDOW, str txt, position pos, float size, color col
             (Color){color__r, color__g, color__b, color__a}
         ); 
     }
+    
+def text_rotated(effect edit window WINDOW, str txt, position pos, position origin, float rotation, float size, color color)
+    {
+        DrawTextPro(
+            __smolambda_font,
+            TextSubtext(txt__unsafe_ptr, txt__dat__pos, txt__dat__length), 
+            (Vector2){pos__x,pos__y}, 
+            (Vector2){origin__x,origin__y},
+            rotation,
+            size, 
+            1.0f,
+            (Color){color__r, color__g, color__b, color__a}
+        ); 
+    }
 
 local def TextureData(nat id, size size, nat mipmaps, nat format)
 def Texture(TextureData _data)

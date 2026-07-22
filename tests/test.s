@@ -1,5 +1,7 @@
 import "std/core.s"
 
+def pair(nat x, nat y) return compiler::args()
+
 
 def main()
     CLI = edit console()

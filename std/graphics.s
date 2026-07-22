@@ -12,7 +12,10 @@ def color(nat _r, nat _g, nat _b, nat|blank _a)
     return (r,g,b,a)
 
 def position(float x, float y)
+    return compiler::args()
+
 def size(float width, float height)
+    return compiler::args()
 
 def window(size size, cstr title, cstr font_path)
     {"-lraylib"}
@@ -85,6 +88,8 @@ def text_rotated(effect edit window WINDOW, str txt, position pos, position orig
     }
 
 local def TextureData(nat id, size size, nat mipmaps, nat format)
+    return compiler::args()
+    
 def Texture(TextureData _data)
     data = [_data]
     return class(data)

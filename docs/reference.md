@@ -8,7 +8,7 @@ _1.4._ [types](#types) <br>
 _1.5._ [type mutability](#type-mutability) <br>
 _1.6._ [conditions](#conditions)<br>
 _1.7._ [recursion](#recursion) <br>
-_1.8._ [effects](#recursion) <br>
+_1.8._ [effects](#effects) <br>
 _1.9._ [unions](#unions) <br>
 _1.10._ [literal types](#literal-types) <br>
 _1.11._ [conditional compilation and default arguments](#conditional-compilation-and-default-arguments)<br>
@@ -50,14 +50,16 @@ _3.11._ [process and web](#process-and-web)<br>
 
 ## import
 
-Here is how to import the entire contents of another source code
-file. The `print` and `console` functions are imported from the core. 
+Here is how to directly import and reuse another source code
+file: the `print` and `console` functions are imported from the core. 
 Assigning to the CLI variable tells the program to print to the
-command line interface, that is, the currently open terminal. 
-The `edit` before the console call tells the program that we intent
-to modify console contents, and not merely perform some diagnostic
-action. This is an [effect](#effects), though before learning about
+host terminal. This is an [effect](#effects), though before learning about
 those just treat it as boilerplate for simple programs.
+
+The `edit` after the assignment symbol (and before the console call) 
+tells the program that we intend to modify console contents, 
+and not merely perform some diagnostic action. For example, we would not
+be able to print without it.
 
 ```python
 import "std/core.s"
@@ -68,12 +70,14 @@ def main()
     print "hello world!"
 ```
 
-You need only the executable (and a local C compiler) to start working. Once
-you download the language's executable, you can reference local or **online** directories 
-in your code. Online dependencies are automatically downloaded. Below is an example,
-where the theoretical *std/* location is grabbed from the development repository. 
-For safety, repositories in other than the main file only make suggestions, 
-and fail to compile if they are not permitted in the main file too.
+You need only *smoλ*'s executable (and a local C compiler) to start working. Once
+you download said executable, you can reference local or **online** directories 
+in your code. Online dependencies are automatically downloaded and placed in a cache
+directory. Below is an example,
+where the theoretical *std/* location is grabbed from the language's
+development repository. For safety, repository declarations in files other than the main 
+file can only make suggestions, and fail to compile if they are not permitted in the main
+file too. This way, you can only explicitly declare third-party code sources.
 
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
@@ -84,10 +88,9 @@ def main()
     print "hello world!"
 ```
 
-You can also import a file as a namespace to access its
-contents with the `::` notation. This is more verbose
-but unambiguous, like below. You can also access child
-namespaces.
+You can also import a file as a namespace and hereby access its
+contents only via the namespace name followed by the `::` notation. This is shown
+below and is more verbose, bue helps avoid confusion of where function come from.
 
 ```python
 import "std/core.s" as core
@@ -98,12 +101,14 @@ def main()
 ```
 
 If you want to import something specific from a namespace, 
-use `:` within the import statement. Using the path instead of the
-namespace name is also allowed.
-Finally, have imports -or function definitions- be preceded by `local` to avoid 
-exposing definition to files up the import chain. 
+use `::` within the import statement, as shown below. 
+Using the path instead of the namespace name is also allowed, 
+and you can also access child namespaces.
+Finally, have imports -or function definitions- be preceded 
+by `local` to avoid exposing definitions to files up the import chain. 
 This is used for isolating which functionality
-is introduced in each file.
+is introduced in each file, as opposed to files that aggregate
+available programming interfaces in one place.
 
 ```python
 local import "std/core.s"::print
@@ -117,10 +122,11 @@ def main()
 ## calling notation
 
 Functions are followed by their arguments in parentheses,
-although you can also omit the latter if they would end 
-at the end of the line. Arguments are comma-separated,
-like below. In general, commas within parentheses designate
-tuples.
+although you can also omit those parentheses if there is only
+one argumet, for example obtained by calling another function 
+or stoed in a local variable. Arguments are comma-separated,
+like below. Actually, commas within parentheses designate
+tuples and all functions just accept one tuple as argument.
 
 
 ```python
@@ -133,7 +139,7 @@ def main()
     print add(1,2)
 ```
 
-The `.` operator can also pipe some data
+The `.` operator pipes data
 into the beginning of a function like below. This
 works as a notation for calling functions like class 
 methods. You can always refer to functions
@@ -151,9 +157,10 @@ def main()
 ```
 
 Avoid needless parentheses,
-as the snippet below does; `f1 f2 ... args` is a chain of 
-function calls, read left to right. Always read function calls 
-from left to right, considering all the subsequent contents
+as the snippet below does; `f1 f2 f3 args` is a chain of 
+function calls, read left to right; easier to chain than
+`f1(f2(f3(args)))`. Always read function calls 
+from left to right, and consider all the subsequent contents
 to be part of the call. 
 
 One particularly useful function
@@ -176,11 +183,11 @@ def main()
 
 ## mutability
 
-Varaibles cannot normally be overwritten. For example,
+Variables cannot normally be overwritten. For example,
 setting `x=1` prevents overwriting `x` with another value. This
 property is called immutability.
-To allow oeverwriting, place `mut` just after the first assignment
-to indicate that the variable is instead *mutasble*.
+To allow overwriting, place `mut` just after the first assignment
+to indicate that the variable is instead *mutable*.
 
 You can keep overwriting mutable variables. This is much more
 intrusive than the `edit` qualifier that we have been using to edit the console.
@@ -191,8 +198,9 @@ That said, even if a value is mutable, it can only be overwritten by
 others of the same type.
 
 In most code, variables will remain immutable. Prefer using `edit` 
-when possible, as it is the more restrictive of the two permission
-levels. See more on edit permissions [later](#type-mutability).
+for data structures whose contents are edited, 
+as it is the more restricted -and hence less destructive- 
+of the two permission levels. See more on edit permissions [later](#type-mutability).
 
 ```python
 import "std/core.s"
@@ -241,16 +249,14 @@ The example above uses the `.` notation to obtain
 a value packed in a type by name. This name is determined
 by the returned value's name.
 
-Types like the above are structurally matched, as we did
-when applying `add` to the range construct. This structural
-typing is rich but can be kind of unsafe if you do not keep
-track of your data shapes in that you may accidentally allow
-applying the same functions to unforeseen data structures. This
-weakness is also its stronges theoretical benefit, though; it
-becomes a determine only for structures that also require some
-relational invariant between values.
+Types like the above are structurally matched. This structural
+typing is rich in allowing unforeseen uses, but you may accidentally 
+allow passing the data to unforeseen new functions. This is fine
+when bundling values, such as a pair of floats, but not when certain 
+invariants are assumed to be preserved, such as the pair of numbers 
+summing to 1.0.
 
-To prevent implicit structural matches, 
+In cases where implicit structural matches should be prevented, 
 use the following `class` notation to wrap the returned value.
 You will mainly want to do so when the relations between class
 field values (e.g., a character buffer and its used size) is
@@ -260,7 +266,7 @@ important to safeguard.
 ```python
 import "std/core.s"
 
-def Point(float x, float y)
+def point(float x, float y)
     return class(x,y)
 
 def sum(Point p)
@@ -268,7 +274,7 @@ def sum(Point p)
 
 def main()
     CLI = edit console() 
-    p = Point(1.0, 2.0)
+    p = point(1.0, 2.0)
     print sum p 
 ```
 
@@ -314,14 +320,19 @@ def main()
 
 Use `singleton` instead of `class` to further
 ensure that the function runs at most once in your program.
-On the other hand, a shorthand for defining a structural type that would
-immediately return all its fields is to omit its body, like next.
+By the way, sometimes we want to declare types via functions
+that just return their arguments. To avoid code repetition, use
+the `compiler::args()` function to return a tuple of all arguments.
+This is exemplified below.
 
 ```python
 import "std/core.s"
 
-def Point(float x, float y) # structural definition needs no body
-def Field(Point a, Point b)
+def Point(float x, float y) 
+    return compiler::args()
+
+def Field(Point a, Point b) 
+    return compiler::args()
 
 def main()
     CLI = edit console() 
@@ -346,7 +357,6 @@ def main()
     print nn "Its square is: "
     print x*x
 ```
-
 
 ## type mutability
 
@@ -441,6 +451,11 @@ def main()
 You can have one-liners for conditions and loops,
 like in the following version. These one-liners parse
 exactly one statement (one expression, or one condition, etc).
+In the examples, notice that sometimes immutable variables like
+`sgn` are allowed to assume different values, depending on the
+code branch being executed; the compiler allows this as there
+will be only one value set to those variables. If no value is
+set, the variable is zero-initialized.
 
 ```python
 import "std/core.s"
@@ -459,7 +474,8 @@ import "std/core.s"
 def main()
     CLI = edit console()
     x = 1.0-2.0
-    if x<0.0 sgn = "-" else sgn = "+"
+    if x<0.0 sgn = "-" 
+    else sgn = "+"
     print nn "sign is: "
     print sgn
 ```
@@ -467,7 +483,8 @@ def main()
 Loops are similar to conditions, but execute multiple
 times until they check to false. You can use `continue` 
 to skip the rest of the current loop and `break` to halt it. 
-Here is a simple example. Please do not write code like this.
+Here is a simple example. 
+**Please do not write code like this demonstration.**
 
 ```python
 import "std/core.s"
@@ -485,14 +502,15 @@ def main()
         i = i+1
 ```
 
-A more efficient way to write loops, is with the `for variable in iterator`
-pattern, which uses iterators that have the means to
-obtain the next element. The `range` iterator, for example, 
+A more efficient way to write loops, is with the pattern
+`for variable in iterator`, which uses iterators that have the means to
+obtain their next elements until failure. The `range` iterator, for example, 
 takes a pair of start and non-inclusive end numbers and allows
-calling `next` to retrieve the next value until the end
+retrieval of the next value until the end of the range
 is reached (non-inclusively). Use the `of` function to support
-various means of expressing such value pairs. Here are some examples, 
-which se [literals](#literal-types) for explicitness:
+various means of constructing value pairs representing a range. 
+Here are some examples, which make use of [literal keywords](#literal-types)
+*to, upto, len* for explicitness:
 
 -  `range of 10` becomes `range(0,10)` 
 -  `range of (1 to 10)` becomes `range(1,10)` 
@@ -500,9 +518,9 @@ which se [literals](#literal-types) for explicitness:
 -  `range of (2 len 10)` becomes `range(2,12)`
 
 Iterators safely try to keep producting new elements until they
-fail to do so (any kind of failure stops them).
+fail to do so; any kind of failure stops them.
 Underneath, they desugar to [error code semantics](#try-and-fail).
-More on iterators later.
+More on iterators later but here is how they look like.
 
 ```python
 import "std/core.s"
@@ -525,6 +543,7 @@ Below is an example that highlights the short-circuiting properties of logical o
 import "std/core.s"
 
 def point(float x, float y)
+    return compiler::args()
 def add(point p1, point p2)
     return point(p1.x+p2.x, p1.y+p2.y)
 def all_positives(point p)
@@ -653,7 +672,7 @@ def main()
 
 ## effects
 
-No, don't run!
+No, don't run away!
 
 *Smoλ* deliberately avoids a complicated effect system; it just presents the ability to pass
 some arguments implicitly from the calling scope. In the standard library later, this mechanism
@@ -760,11 +779,12 @@ def main()
 
 *Warning: You can skip the more complicated aspects of the type system in the rest of this subsection. Unlike `|`, they are only rarely needed, especially in well-structured code that defines types incrementally.*
 
-In truth, *smoλ* implements a linear type system, but this
-was hidden till this point because people tend to shy away
-from reading technical terms. Practically, it means
+*Smoλ* also implements a linear type system, but this
+was hidden till this point because it is not fundamental to understanding the
+language. Practically, linear typing means
 that -in addition to type unions- you can also get the intersection
-of type unions with the `&` symbol. Use parantheses like normal.
+of type unions with the `&` symbol and some form of type negation. 
+Use parantheses within type definitions to be explicit on how operation work.
 
 Next is an example where, say, we define a `float` function that returns
 something other than a builtin float number. We can get the intersection
@@ -877,8 +897,12 @@ to several runtime checks.
 import "std/core.s"
 
 def ENUM = "A"|"B"|"C"
+
 def answer_schemas(ENUM first, ENUM second, nat minutes_to_answer)
+    return compiler::args()
+
 def answers(cstr first, cstr second, nat minutes_to_answer)
+    return compiler::args()
 
 def main()
     CLI = edit console()
@@ -1123,7 +1147,7 @@ in bytes and, importantly, if there are dependent buffers from which
 the type is inferred. 
 
 In this setting, it is not allowed to wrongfully promote the buffer *buf* to
-being mutable; elevating buffer or -more generally- pointer pemissions
+being mutable; elevating buffer or -more generally- pointer permissions
 from constant to mutable is not allowed for safety.
 
 ```python
@@ -1186,7 +1210,7 @@ type like below.
 import "std/core.s"
 
 def named_buffer(str name, edit any[] buf)
-    return class(name, buf)
+    return class compiler::args()
 
 def named_strbuffer()
     return named_buffer(str "", str[])
@@ -1550,7 +1574,7 @@ def main()
         print i   # prints 0,1,2...,9
 ```
 
-If the outcome of the `get` is a pointer, it automatically
+If the outcome of the `get` is a pointer, it is automatically
 dereferenced so that you can readily iterate across buffers,
 like below.
 
@@ -1573,6 +1597,8 @@ the data.
 import "std/core.s"
 
 def solution(mut nat x, mut nat y)
+    return compiler::args()
+    
 def get(edit solution s, nat) # skip the iteration index argument
     s.x = (s.x+1)/2
     s.y = (s.y+1)/2
@@ -1758,6 +1784,8 @@ Here is a different example.
 import "std/core.s"
 
 def pair(nat, nat)
+    return compiler::args()
+
 def least(nat[] numbers, pair->bool order)
     ret = mut numbers[0]
     for number in numbers
@@ -1805,19 +1833,21 @@ def main()
 
 *Warning: This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.*
 
-So far there was mention of `compiler::skip()`, 
+So far we encountered `compiler::args()`, `compiler::skip()`, 
 `compiler::catch()`, `compiler::value(expression)` and `debug::nocatch()`
 that let code interface with the compiler to an extend.
 
 There are some more mechanisms that help inspect
 programs or grant access to internal compilation state that
-can be analyzed for debugging.
+can be analyzed for debugging. Some are presented here,
+though view the standard library's documentation for an
+extensive list.
 
 Foremost of debugging tools is `debug::print(expression)`. This 
 runs an expression, prints its return at compile time, 
 and returns its value. It works this way so that it can 
-be effortlessly interweaved in code. Do note that you
-can use it with literal types to print messages too.
+be effortlessly interweaved in code and removed afterwards. 
+Do note that youcan use it with literal types to print messages too.
 For example, one pattern usable for debuggining is the following.
 
 ```python
@@ -1846,7 +1876,10 @@ suffices to make a judgement, even if enums usually require runtime checking.
 import "std/core.s"
 
 def test1(nat a, nat b, "one"|"two")
+    return compiler::args()
+    
 def test2(float a, float b, "one"|"two")
+    return compiler::args()
 
 def main()
     CLI = edit console()
@@ -1955,6 +1988,26 @@ and `mem = edit circular float[].alloc 3`. These structures are more stable than
 in that they do not reallocate; the arena creates an error when out of size, and
 the circular buffer is an arena that restarts once full.
 
+Specifically for arenas, it is possible to obtain a sub-buffer view of a slice, like
+below.
+
+```python
+import "std/core.s"
+
+def main()
+    CLI = edit console()
+    xall = edit arena nat[].alloc 8
+    x1 = mut xall.slice 3
+    x2 = mut xall.slice 3
+    x1[0] = 0
+    x1[1] = 1
+    x1[2] = 2
+    x2[0] = 3
+    x2[1] = 4
+    x2[2] = 5
+    print x1[2]
+    print x2[2]
+```
 
 ## strings
 
@@ -2236,7 +2289,7 @@ def main()
 
 *Xoshiro256plus* is meant to compute random numbers in the range [0,1] and is recommended
 for long-running programs. Use this unless you know what you are doing, or need cryptographically
-secure random numbers (these are NOT sscure). Initialize it per `Rand()` and call `next` to
+secure random numbers (these are NOT secure). Initialize it per `Rand()` and call `next` to
 retrieve next random values.
 
 ```python

@@ -30,6 +30,7 @@ def with(pipe ptr obj)
     return class(obj)
 
 local def pipe_ptr(pipe ptr value)
+    return compiler::args()
 
 local def unsafe_join(mut any ptr handle)
     {thread_join(handle);}

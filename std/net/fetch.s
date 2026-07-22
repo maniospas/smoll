@@ -3,6 +3,7 @@ import "std/unsafe.s" as unsafe
 import "std/extern/curl.h"
 
 local def response(nat status, str body)
+    return compiler::args()
 
 def ok(response response)
     return (response.status >= 200) and (response.status < 300)

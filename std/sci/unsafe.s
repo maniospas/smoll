@@ -10,7 +10,8 @@ def mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride)
     doc "Warning: directly calling this constructor without safety checks is unsafe."
     return mut class(unsafe_mut unsafe_ptr, pos, rows, cols, stride)
 
-def sparse_element(nat row, nat col, float value)
+def sparse_element(nat row, nat col, float value) 
+    return compiler::args()
 def coo(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz)
     doc "coo sparse matrix type declaration"
     doc "Warning: directly calling this constructor without safety checks is unsafe."

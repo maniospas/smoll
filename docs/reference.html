@@ -240,7 +240,7 @@
 <em>1.5.</em> <a href="#type-mutability">type mutability</a> <br>
 <em>1.6.</em> <a href="#conditions">conditions</a><br>
 <em>1.7.</em> <a href="#recursion">recursion</a> <br>
-<em>1.8.</em> <a href="#recursion">effects</a> <br>
+<em>1.8.</em> <a href="#effects">effects</a> <br>
 <em>1.9.</em> <a href="#unions">unions</a> <br>
 <em>1.10.</em> <a href="#literal-types">literal types</a> <br>
 <em>1.11.</em> <a href="#conditional-compilation-and-default-arguments">conditional compilation and default arguments</a><br>
@@ -281,14 +281,16 @@
 
 <h2 id="import">import</h2>
 
-<p>Here is how to import the entire contents of another source code
-file. The <code>print</code> and <code>console</code> functions are imported from the core. 
+<p>Here is how to directly import and reuse another source code
+file: the <code>print</code> and <code>console</code> functions are imported from the core. 
 Assigning to the CLI variable tells the program to print to the
-command line interface, that is, the currently open terminal. 
-The <code>edit</code> before the console call tells the program that we intent
-to modify console contents, and not merely perform some diagnostic
-action. This is an <a href="#effects">effect</a>, though before learning about
+host terminal. This is an <a href="#effects">effect</a>, though before learning about
 those just treat it as boilerplate for simple programs.</p>
+
+<p>The <code>edit</code> after the assignment symbol (and before the console call) 
+tells the program that we intend to modify console contents, 
+and not merely perform some diagnostic action. For example, we would not
+be able to print without it.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -300,12 +302,14 @@ those just treat it as boilerplate for simple programs.</p>
 </code></pre>
 </div>
 
-<p>You need only the executable (and a local C compiler) to start working. Once
-you download the language&#8217;s executable, you can reference local or <strong>online</strong> directories 
-in your code. Online dependencies are automatically downloaded. Below is an example,
-where the theoretical <em>std/</em> location is grabbed from the development repository. 
-For safety, repositories in other than the main file only make suggestions, 
-and fail to compile if they are not permitted in the main file too.</p>
+<p>You need only <em>smoλ</em>&#8217;s executable (and a local C compiler) to start working. Once
+you download said executable, you can reference local or <strong>online</strong> directories 
+in your code. Online dependencies are automatically downloaded and placed in a cache
+directory. Below is an example,
+where the theoretical <em>std/</em> location is grabbed from the language&#8217;s
+development repository. For safety, repository declarations in files other than the main 
+file can only make suggestions, and fail to compile if they are not permitted in the main
+file too. This way, you can only explicitly declare third-party code sources.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">repo</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/&quot;</span> <span class="k">as</span> <span class="s2">&quot;std/&quot;</span>
@@ -317,10 +321,9 @@ and fail to compile if they are not permitted in the main file too.</p>
 </code></pre>
 </div>
 
-<p>You can also import a file as a namespace to access its
-contents with the <code>::</code> notation. This is more verbose
-but unambiguous, like below. You can also access child
-namespaces.</p>
+<p>You can also import a file as a namespace and hereby access its
+contents only via the namespace name followed by the <code>::</code> notation. This is shown
+below and is more verbose, bue helps avoid confusion of where function come from.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
@@ -332,12 +335,14 @@ namespaces.</p>
 </div>
 
 <p>If you want to import something specific from a namespace, 
-use <code>:</code> within the import statement. Using the path instead of the
-namespace name is also allowed.
-Finally, have imports -or function definitions- be preceded by <code>local</code> to avoid 
-exposing definition to files up the import chain. 
+use <code>::</code> within the import statement, as shown below. 
+Using the path instead of the namespace name is also allowed, 
+and you can also access child namespaces.
+Finally, have imports -or function definitions- be preceded 
+by <code>local</code> to avoid exposing definitions to files up the import chain. 
 This is used for isolating which functionality
-is introduced in each file.</p>
+is introduced in each file, as opposed to files that aggregate
+available programming interfaces in one place.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">local</span> <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">::</span><span class="nb">print</span>
@@ -351,10 +356,11 @@ is introduced in each file.</p>
 <h2 id="calling-notation">calling notation</h2>
 
 <p>Functions are followed by their arguments in parentheses,
-although you can also omit the latter if they would end 
-at the end of the line. Arguments are comma-separated,
-like below. In general, commas within parentheses designate
-tuples.</p>
+although you can also omit those parentheses if there is only
+one argumet, for example obtained by calling another function 
+or stoed in a local variable. Arguments are comma-separated,
+like below. Actually, commas within parentheses designate
+tuples and all functions just accept one tuple as argument.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -367,7 +373,7 @@ tuples.</p>
 </code></pre>
 </div>
 
-<p>The <code>.</code> operator can also pipe some data
+<p>The <code>.</code> operator pipes data
 into the beginning of a function like below. This
 works as a notation for calling functions like class 
 methods. You can always refer to functions
@@ -386,9 +392,10 @@ within namespaces.</p>
 </div>
 
 <p>Avoid needless parentheses,
-as the snippet below does; <code>f1 f2 ... args</code> is a chain of 
-function calls, read left to right. Always read function calls 
-from left to right, considering all the subsequent contents
+as the snippet below does; <code>f1 f2 f3 args</code> is a chain of 
+function calls, read left to right; easier to chain than
+<code>f1(f2(f3(args)))</code>. Always read function calls 
+from left to right, and consider all the subsequent contents
 to be part of the call. </p>
 
 <p>One particularly useful function
@@ -411,11 +418,11 @@ The default ending is otherwise <em>"\n"</em>.</p>
 
 <h2 id="mutability">mutability</h2>
 
-<p>Varaibles cannot normally be overwritten. For example,
+<p>Variables cannot normally be overwritten. For example,
 setting <code>x=1</code> prevents overwriting <code>x</code> with another value. This
 property is called immutability.
-To allow oeverwriting, place <code>mut</code> just after the first assignment
-to indicate that the variable is instead <em>mutasble</em>.</p>
+To allow overwriting, place <code>mut</code> just after the first assignment
+to indicate that the variable is instead <em>mutable</em>.</p>
 
 <p>You can keep overwriting mutable variables. This is much more
 intrusive than the <code>edit</code> qualifier that we have been using to edit the console.
@@ -426,8 +433,9 @@ That said, even if a value is mutable, it can only be overwritten by
 others of the same type.</p>
 
 <p>In most code, variables will remain immutable. Prefer using <code>edit</code> 
-when possible, as it is the more restrictive of the two permission
-levels. See more on edit permissions <a href="#type-mutability">later</a>.</p>
+for data structures whose contents are edited, 
+as it is the more restricted -and hence less destructive- 
+of the two permission levels. See more on edit permissions <a href="#type-mutability">later</a>.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -477,16 +485,14 @@ a deliberate choise to enforce memory safety later.</p>
 a value packed in a type by name. This name is determined
 by the returned value&#8217;s name.</p>
 
-<p>Types like the above are structurally matched, as we did
-when applying <code>add</code> to the range construct. This structural
-typing is rich but can be kind of unsafe if you do not keep
-track of your data shapes in that you may accidentally allow
-applying the same functions to unforeseen data structures. This
-weakness is also its stronges theoretical benefit, though; it
-becomes a determine only for structures that also require some
-relational invariant between values.</p>
+<p>Types like the above are structurally matched. This structural
+typing is rich in allowing unforeseen uses, but you may accidentally 
+allow passing the data to unforeseen new functions. This is fine
+when bundling values, such as a pair of floats, but not when certain 
+invariants are assumed to be preserved, such as the pair of numbers 
+summing to 1.0.</p>
 
-<p>To prevent implicit structural matches, 
+<p>In cases where implicit structural matches should be prevented, 
 use the following <code>class</code> notation to wrap the returned value.
 You will mainly want to do so when the relations between class
 field values (e.g., a character buffer and its used size) is
@@ -495,7 +501,7 @@ important to safeguard.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">Point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="n">Point</span> <span class="n">p</span><span class="p">)</span>
@@ -503,7 +509,7 @@ important to safeguard.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
-    <span class="n">p</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">point</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
     <span class="nb">print</span> <span class="nb">sum</span> <span class="n">p</span> 
 </code></pre>
 </div>
@@ -549,14 +555,19 @@ triple should be allowed.</p>
 
 <p>Use <code>singleton</code> instead of <code>class</code> to further
 ensure that the function runs at most once in your program.
-On the other hand, a shorthand for defining a structural type that would
-immediately return all its fields is to omit its body, like next.</p>
+By the way, sometimes we want to declare types via functions
+that just return their arguments. To avoid code repetition, use
+the <code>compiler::args()</code> function to return a tuple of all arguments.
+This is exemplified below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">Point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span> <span class="c1"># structural definition needs no body</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">Field</span><span class="p">(</span><span class="n">Point</span> <span class="n">a</span><span class="p">,</span> <span class="n">Point</span> <span class="n">b</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Field</span><span class="p">(</span><span class="n">Point</span> <span class="n">a</span><span class="p">,</span> <span class="n">Point</span> <span class="n">b</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -679,7 +690,12 @@ be prematurely terminated with <code>break</code>, or skipped with
 
 <p>You can have one-liners for conditions and loops,
 like in the following version. These one-liners parse
-exactly one statement (one expression, or one condition, etc).</p>
+exactly one statement (one expression, or one condition, etc).
+In the examples, notice that sometimes immutable variables like
+<code>sgn</code> are allowed to assume different values, depending on the
+code branch being executed; the compiler allows this as there
+will be only one value set to those variables. If no value is
+set, the variable is zero-initialized.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -699,7 +715,8 @@ exactly one statement (one expression, or one condition, etc).</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
-    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mf">0.0</span> <span class="n">sgn</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span> <span class="k">else</span> <span class="n">sgn</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mf">0.0</span> <span class="n">sgn</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span> 
+    <span class="k">else</span> <span class="n">sgn</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;sign is: &quot;</span>
     <span class="nb">print</span> <span class="n">sgn</span>
 </code></pre>
@@ -708,7 +725,8 @@ exactly one statement (one expression, or one condition, etc).</p>
 <p>Loops are similar to conditions, but execute multiple
 times until they check to false. You can use <code>continue</code> 
 to skip the rest of the current loop and <code>break</code> to halt it. 
-Here is a simple example. Please do not write code like this.</p>
+Here is a simple example. 
+<strong>Please do not write code like this demonstration.</strong></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -727,14 +745,15 @@ Here is a simple example. Please do not write code like this.</p>
 </code></pre>
 </div>
 
-<p>A more efficient way to write loops, is with the <code>for variable in iterator</code>
-pattern, which uses iterators that have the means to
-obtain the next element. The <code>range</code> iterator, for example, 
+<p>A more efficient way to write loops, is with the pattern
+<code>for variable in iterator</code>, which uses iterators that have the means to
+obtain their next elements until failure. The <code>range</code> iterator, for example, 
 takes a pair of start and non-inclusive end numbers and allows
-calling <code>next</code> to retrieve the next value until the end
+retrieval of the next value until the end of the range
 is reached (non-inclusively). Use the <code>of</code> function to support
-various means of expressing such value pairs. Here are some examples, 
-which se <a href="#literal-types">literals</a> for explicitness:</p>
+various means of constructing value pairs representing a range. 
+Here are some examples, which make use of <a href="#literal-types">literal keywords</a>
+<em>to, upto, len</em> for explicitness:</p>
 
 <ul>
 <li><code>range of 10</code> becomes <code>range(0,10)</code> </li>
@@ -744,9 +763,9 @@ which se <a href="#literal-types">literals</a> for explicitness:</p>
 </ul>
 
 <p>Iterators safely try to keep producting new elements until they
-fail to do so (any kind of failure stops them).
+fail to do so; any kind of failure stops them.
 Underneath, they desugar to <a href="#try-and-fail">error code semantics</a>.
-More on iterators later.</p>
+More on iterators later but here is how they look like.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -772,6 +791,7 @@ like normal, but have two more properties:</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">point</span> <span class="n">p1</span><span class="p">,</span> <span class="n">point</span> <span class="n">p2</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">point</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">p2</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">p1</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="n">p2</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">all_positives</span><span class="p">(</span><span class="n">point</span> <span class="n">p</span><span class="p">)</span>
@@ -901,7 +921,7 @@ mean never.</p>
 
 <h2 id="effects">effects</h2>
 
-<p>No, don&#8217;t run!</p>
+<p>No, don&#8217;t run away!</p>
 
 <p><em>Smoλ</em> deliberately avoids a complicated effect system; it just presents the ability to pass
 some arguments implicitly from the calling scope. In the standard library later, this mechanism
@@ -1009,11 +1029,12 @@ An example follows.</p>
 
 <div class="notice-box box-warning"><strong>Warning:</strong> You can skip the more complicated aspects of the type system in the rest of this subsection. Unlike <code>|</code>, they are only rarely needed, especially in well-structured code that defines types incrementally.</div>
 
-<p>In truth, <em>smoλ</em> implements a linear type system, but this
-was hidden till this point because people tend to shy away
-from reading technical terms. Practically, it means
+<p><em>Smoλ</em> also implements a linear type system, but this
+was hidden till this point because it is not fundamental to understanding the
+language. Practically, linear typing means
 that -in addition to type unions- you can also get the intersection
-of type unions with the <code>&amp;</code> symbol. Use parantheses like normal.</p>
+of type unions with the <code>&amp;</code> symbol and some form of type negation. 
+Use parantheses within type definitions to be explicit on how operation work.</p>
 
 <p>Next is an example where, say, we define a <code>float</code> function that returns
 something other than a builtin float number. We can get the intersection
@@ -1130,8 +1151,12 @@ to several runtime checks.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">ENUM</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">|</span><span class="s2">&quot;B&quot;</span><span class="o">|</span><span class="s2">&quot;C&quot;</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">answer_schemas</span><span class="p">(</span><span class="n">ENUM</span> <span class="n">first</span><span class="p">,</span> <span class="n">ENUM</span> <span class="n">second</span><span class="p">,</span> <span class="n">nat</span> <span class="n">minutes_to_answer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">answers</span><span class="p">(</span><span class="n">cstr</span> <span class="n">first</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">second</span><span class="p">,</span> <span class="n">nat</span> <span class="n">minutes_to_answer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1317,7 +1342,7 @@ runtime.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">vec</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]</span>
-    <span class="n">allocator</span> <span class="o">=</span> <span class="n">arena</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="n">allocator</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">+</span><span class="n">ones</span>
     <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># prints 6.0</span>
     <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># prints 11.0</span>
@@ -1387,7 +1412,7 @@ in bytes and, importantly, if there are dependent buffers from which
 the type is inferred. </p>
 
 <p>In this setting, it is not allowed to wrongfully promote the buffer <em>buf</em> to
-being mutable; elevating buffer or -more generally- pointer pemissions
+being mutable; elevating buffer or -more generally- pointer permissions
 from constant to mutable is not allowed for safety.</p>
 
 <div class="codehilite">
@@ -1452,7 +1477,7 @@ type like below.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">named_buffer</span><span class="p">(</span><span class="nb">str</span> <span class="n">name</span><span class="p">,</span> <span class="n">edit</span> <span class="nb">any</span><span class="p">[]</span> <span class="n">buf</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">buf</span><span class="p">)</span>
+    <span class="k">return</span> <span class="k">class</span><span class="w"> </span><span class="nc">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">named_strbuffer</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">named_buffer</span><span class="p">(</span><span class="nb">str</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">[])</span>
@@ -1827,7 +1852,7 @@ examples is equivalent to the next one.</p>
 </code></pre>
 </div>
 
-<p>If the outcome of the <code>get</code> is a pointer, it automatically
+<p>If the outcome of the <code>get</code> is a pointer, it is automatically
 dereferenced so that you can readily iterate across buffers,
 like below.</p>
 
@@ -1851,6 +1876,8 @@ the data.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">solution</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">mut</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">edit</span> <span class="n">solution</span> <span class="n">s</span><span class="p">,</span> <span class="n">nat</span><span class="p">)</span> <span class="c1"># skip the iteration index argument</span>
     <span class="n">s</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
     <span class="n">s</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
@@ -2040,6 +2067,8 @@ to call a functor with given arguments. The retrieval into a factor should be un
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">pair</span><span class="p">(</span><span class="n">nat</span><span class="p">,</span> <span class="n">nat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">least</span><span class="p">(</span><span class="n">nat</span><span class="p">[]</span> <span class="n">numbers</span><span class="p">,</span> <span class="n">pair</span><span class="o">-&gt;</span><span class="nb">bool</span> <span class="n">order</span><span class="p">)</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">numbers</span>
@@ -2088,19 +2117,21 @@ functors based on arguments.</p>
 
 <div class="notice-box box-warning"><strong>Warning:</strong> This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.</div>
 
-<p>So far there was mention of <code>compiler::skip()</code>, 
+<p>So far we encountered <code>compiler::args()</code>, <code>compiler::skip()</code>, 
 <code>compiler::catch()</code>, <code>compiler::value(expression)</code> and <code>debug::nocatch()</code>
 that let code interface with the compiler to an extend.</p>
 
 <p>There are some more mechanisms that help inspect
 programs or grant access to internal compilation state that
-can be analyzed for debugging.</p>
+can be analyzed for debugging. Some are presented here,
+though view the standard library&#8217;s documentation for an
+extensive list.</p>
 
 <p>Foremost of debugging tools is <code>debug::print(expression)</code>. This 
 runs an expression, prints its return at compile time, 
 and returns its value. It works this way so that it can 
-be effortlessly interweaved in code. Do note that you
-can use it with literal types to print messages too.
+be effortlessly interweaved in code and removed afterwards. 
+Do note that youcan use it with literal types to print messages too.
 For example, one pattern usable for debuggining is the following.</p>
 
 <div class="codehilite">
@@ -2130,7 +2161,10 @@ suffices to make a judgement, even if enums usually require runtime checking.</p
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test1</span><span class="p">(</span><span class="n">nat</span> <span class="n">a</span><span class="p">,</span> <span class="n">nat</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="o">|</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">test2</span><span class="p">(</span><span class="nb">float</span> <span class="n">a</span><span class="p">,</span> <span class="nb">float</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="o">|</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2235,10 +2269,32 @@ growing lists.</p>
 </div>
 
 <p>By the way, the <code>alloc</code> function can also be called on arenas and circular buffers,
-that can be similarly used once constructed per <code>mem = arena float[].alloc 3</code> 
-and <code>mem = circular float[].alloc 3</code>. These structures are more stable than lists
+that can be similarly used once constructed per <code>mem = edit arena float[].alloc 3</code> 
+and <code>mem = edit circular float[].alloc 3</code>. These structures are more stable than lists
 in that they do not reallocate; the arena creates an error when out of size, and
 the circular buffer is an arena that restarts once full.</p>
+
+<p>Specifically for arenas, it is possible to obtain a sub-buffer view of a slice, like
+below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">xall</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">nat</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">8</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">xall</span><span class="o">.</span><span class="n">slice</span> <span class="mi">3</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">xall</span><span class="o">.</span><span class="n">slice</span> <span class="mi">3</span>
+    <span class="n">x1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">x1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">x1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">x2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">x2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">x2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="nb">print</span> <span class="n">x1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="n">x2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</code></pre>
+</div>
 
 <h2 id="strings">strings</h2>
 
@@ -2284,7 +2340,7 @@ will also use them to store <code>float</code> vector contents.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># equivalent to buf = (alloc KB 4, mut 0)</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># equivalent to buf = (alloc KB 4, mut 0)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">print</span> <span class="n">s</span>
 </code></pre>
@@ -2299,7 +2355,7 @@ location based on their name.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># effect for placing string data</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># effect for placing string data</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">print</span> <span class="n">s</span>
 </code></pre>
@@ -2335,7 +2391,7 @@ as a <code>+</code> operation like below.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
     <span class="n">s1</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;hello&quot;</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="n">copy</span> <span class="s2">&quot;world!&quot;</span>
     <span class="nb">print</span> <span class="n">s1</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="n">s2</span>
@@ -2355,7 +2411,7 @@ There also exists the variation <code>str(char[] buffer, nat start, "to", nat le
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">CHARS</span><span class="o">.</span><span class="n">pos</span>
     <span class="n">copy</span> <span class="s2">&quot;hello&quot;</span>
     <span class="n">copy</span> <span class="s2">&quot; &quot;</span>
@@ -2484,7 +2540,7 @@ similarly to files.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">:</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># example with growing position</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span> <span class="c1"># example with growing position</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">process</span><span class="p">)</span>
         <span class="nb">print</span> <span class="n">line</span>
 </code></pre>
@@ -2534,7 +2590,7 @@ system clock as a source of entropy. Here is an example.</p>
 
 <p><em>Xoshiro256plus</em> is meant to compute random numbers in the range [0,1] and is recommended
 for long-running programs. Use this unless you know what you are doing, or need cryptographically
-secure random numbers (these are NOT sscure). Initialize it per <code>Rand()</code> and call <code>next</code> to
+secure random numbers (these are NOT secure). Initialize it per <code>Rand()</code> and call <code>next</code> to
 retrieve next random values.</p>
 
 <div class="codehilite">
@@ -2589,7 +2645,7 @@ when organized in a string buffer.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/mini.s&quot;</span> <span class="k">as</span> <span class="n">mini</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[]</span> <span class="n">buff</span><span class="p">)</span>
-    <span class="n">mem</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">pos</span>
     <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">buff</span>
         <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="n">mini</span><span class="p">:</span><span class="n">unpack</span> <span class="n">element</span>
@@ -2852,7 +2908,7 @@ which can be caught afterwards to check for successful termination.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">256</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">256</span>
     <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;./tests/passing/&quot;</span>
     <span class="n">copy</span> <span class="s2">&quot;./smoll &quot;</span>
     <span class="n">copy</span> <span class="n">path</span>

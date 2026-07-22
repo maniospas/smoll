@@ -2221,6 +2221,11 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         tmp = UnionType(functor_var.type.is_functor_of.name, at=functor_var.type.is_functor_of.at)
         tmp.variations.append(functor_var.type.is_functor_of)
         return convert_method_to_functor(impl, tmp, error_token, skip_literals=True, from_name=functor_var.name)
+
+    if ARGUMENTS_TYPE in method.variations:
+        if len(vars)!=0:
+            error_token.error("type", "the function's argument tuple retrieval cannot but have any arguments but got '"+signature_like(vars, impl)+"'")
+        return [impl.vars[arg] for arg in impl.args]
     
     if VARNAME_TYPE in method.variations:
         prefix_len = longest_common_prefix_len([v.name for v in vars])
@@ -5968,6 +5973,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         continue
             try:
                 if peek_text(tokens, pos) in ["def", "repo", "import", "local"]:
+                    start_token.error("safety", "function definitions cannot be missing their implementation; consider returning 'return compiler::args()'")
                     impl.rets = [arg for arg in impl.args]
                 else:
                     if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
@@ -6088,7 +6094,7 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
                                 depth -= 1
                                 if depth==0: break
                             pos_end += 1
-                    i = await process_def(file, tokens, i, fast_return_exception=tok.text=="rec", is_local=is_local)
+                    i = await process_def(file, tokens, i, fast_return_exception=tok.text=="rec", is_local=is_local)                 
                     if followed_by_body: i = pos_end+1
             elif tok.text=="import": 
                 if has_made_def: tok.error("safety", "can only import before the file's first definition", reason=first_def_tok, raason_message="first definition at")
@@ -6581,6 +6587,12 @@ compiler_token = Token("compiler", fixed_namespace, 1, 1)
 UNSAFE_COPY_TYPE = ImplementedType("unsafe_copy", at=compiler_token)
 UNSAFE_DEREF_TYPE = ImplementedType("unsafe_deref", at=compiler_token)
 VARNAME_TYPE = ImplementedType("varname", at=compiler_token)
+VARNAME_TYPE.doc.append("tuple to cstr literal")
+VARNAME_TYPE.doc.append("Converts a tuple to a cstr literal capturing the name of local variables,")
+VARNAME_TYPE.doc.append("for example so that macros can consume the result.")
+
+ARGUMENTS_TYPE = ImplementedType("args", at=compiler_token)
+ARGUMENTS_TYPE.doc.append("the function's argument tuple")
 
 ASSERT_SAME_TYPE = ImplementedType("assert_eq", at=compiler_token)
 ASSERT_SAME_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
@@ -6628,6 +6640,7 @@ fixed_namespace.types["deref"] = UnionType("deref", at=compiler_token).append(DE
 fixed_namespace.types["assert_eq"] = UnionType("assert_eq", at=compiler_token).append(ASSERT_SAME_TYPE)
 fixed_namespace.types["unsafe_copy"] = UnionType("unsafe_copy", at=compiler_token).append(UNSAFE_COPY_TYPE)
 fixed_namespace.types["unsafe_deref"] = UnionType("unsafe_deref", at=compiler_token).append(UNSAFE_DEREF_TYPE)
+fixed_namespace.types["args"] = UnionType("args", at=compiler_token).append(ARGUMENTS_TYPE)
 fixed_namespace.types["varname"] = UnionType("varname", at=compiler_token).append(VARNAME_TYPE)
 
 

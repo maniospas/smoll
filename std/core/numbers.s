@@ -94,7 +94,7 @@ def div(Number x, Number y)
     {type(x) zero = 0;}
     if y==zero
         doc "Safeguards against division by zero."
-        fail "division by zero "
+        fail "division by zero"
     {type(x) z=x/y;}
     return z
 
@@ -103,7 +103,7 @@ def mod(nat x, nat y)
     doc "Computes the modulo between two natural numbers. This is an overload for the % operator."
     {type(x) zero = 0;}
     if y==zero
-        fail "modulo by zero "
+        fail "modulo by zero"
     {type(x) z=x%y;}
     return z
 

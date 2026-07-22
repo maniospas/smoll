@@ -42,9 +42,9 @@ def nat(Number x)
     doc "Converting to natural numbers loses information."
     doc" Failed on negative input because it typically indicates a later error in buffer indexing."
     if x is int and x<int(0)
-        fail "cannot convert negative int to id"
+        fail "cannot convert negative int to nat"
     if x is float and x<float(0)
-        fail "cannot convert negative float to id"
+        fail "cannot convert negative float to nat"
     {builtins::nat value=x;}
     return value
 

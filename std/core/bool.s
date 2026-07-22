@@ -35,32 +35,32 @@ def not(bool value)
 
 def eq(compiler::true, compiler::true) 
     doc "equals"
-    doc "This is a compile-time operations that does not evoke any runtime booleans."
+    doc "This is a compile-time operation that does not evoke any runtime booleans."
     return compiler::true()
 
 def eq(compiler::false, compiler::false) 
     doc "equals"
-    doc "This is a compile-time operations that does not evoke any runtime booleans."
+    doc "This is a compile-time operation that does not evoke any runtime booleans."
     return compiler::true()
 
 def eq(compiler::true, compiler::false) 
     doc "equals"
-    doc "This is a compile-time operations that does not evoke any runtime booleans."
+    doc "This is a compile-time operation that does not evoke any runtime booleans."
     return compiler::false()
 
 def eq(compiler::false, compiler::true) 
     doc "equals"
-    doc "This is a compile-time operations that does not evoke any runtime booleans."
+    doc "This is a compile-time operation that does not evoke any runtime booleans."
     return compiler::false()
 
 def not(compiler::true)
     doc "logical inverse"
-    doc "This is a compile-time operations on the compiler::true type rather than a runtime boolean."
+    doc "This is a compile-time operation on the compiler::true type rather than a runtime boolean."
     return compiler::false()
 
 def not(compiler::false)
     doc "logical inverse"
-    doc "This is a compile-time operations on the compiler::false type rather than a runtime boolean."
+    doc "This is a compile-time operation on the compiler::false type rather than a runtime boolean."
     return compiler::true()
 
 def neq(compiler::true|compiler::false x, compiler::true|compiler::false y)

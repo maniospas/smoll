@@ -815,6 +815,8 @@ class ImplementedType:
         # this is used to throw a FastReturnException the first time the function returns
         self.fast_return_exception = False
         self.has_been_completed = False
+        self.min_abstraction_level = 0
+        self.max_abstraction_level = 0
 
     def get_required_accompany(self, var: Variable):
         assert isinstance(var, Variable)
@@ -2187,6 +2189,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         if len(callee.doc)>1: print("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:]))
         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
         spawned_error_codes = callee.gather_spawned_error_codes(set())
+        printid("Levels of abstraction: "+str(callee.min_abstraction_level)+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
         if len(spawned_error_codes): 
             if callee.needs_failure_mode: printid("Potential errors:\n")
             else: printid("No failing errors, but can catch these intercepted ones:\n")
@@ -2404,6 +2407,9 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         return [var]
     if _callee is not None: callee = _callee
     else: callee = _select_call(file, impl, method, vars, error_token, out_format)
+    if impl.min_abstraction_level==0: impl.min_abstraction_level = callee.min_abstraction_level+1
+    else: impl.min_abstraction_level = min(impl.min_abstraction_level, callee.min_abstraction_level+1)
+    impl.max_abstraction_level = max(impl.max_abstraction_level, callee.max_abstraction_level+1) 
     for link in callee.linker:
         if link not in impl.linker: impl.linker.append(link)
     if len(vars)<len(callee.args):
@@ -5253,12 +5259,14 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
         pos += 1
         if name.text==END_TOKEN and not one_line: return pos
         if name.text=="{" and get_skip(tokens,pos).is_string():
+            impl.min_abstraction_level = 0
             impl.linker.append(get_skip(tokens,pos).text[1:-1])
             pos += 1
             if peek_text(tokens,pos)!="}": name.error("syntax", "linker instruction should be a string within branckets")
             pos += 1
             continue
         if name.text=="{":
+            impl.min_abstraction_level = 0
             depth = 1
             while pos<len(tokens):
                 tok = tokens[pos]
@@ -6000,6 +6008,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         if len(callee.doc)>1: printid("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:]))
                         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
                         spawned_error_codes = callee.gather_spawned_error_codes(set())
+                        printid("Levels of abstraction: "+str(callee.min_abstraction_level)+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
                         if len(spawned_error_codes):
                             if callee.needs_failure_mode: printid("Potential errors:\n")
                             else: printid("No failing errors, but can catch these intercepted ones:\n")
@@ -6491,6 +6500,7 @@ BLANK_LITERAL.is_literal_of = BLANK_LITERAL
 ANY_TYPE = ImplementedType("any", at=builtin_token) #TODO: consider deliberately not having a builtin token
 ANY_TYPE.doc.append("any type")
 ANY_TYPE.doc.append("Represents a generic for buffers and pointers for type-independent code that can be matched to a concrete type later.")
+ANY_TYPE.doc.append("This type ordains special treatment by the compiler.")
 NONE_OR_ANY = [None, ANY_TYPE]
 
 smol_namespace.types["cstr"] = UnionType("cstr", at=builtin_token).append(CSTR_TYPE)
@@ -6796,6 +6806,7 @@ async def main():
                     if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                     docs_file.write("\n```rust\n"+callee.signature()+"\n```\n")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
                     spawned_error_codes = callee.gather_spawned_error_codes(set())
+                    docs_file.write("Levels of abstraction: "+str(callee.min_abstraction_level)+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n\n")
                     if len(spawned_error_codes): 
                         if callee.needs_failure_mode: docs_file.write("Potential errors:\n\n")
                         else: docs_file.write("No failing errors, but can catch these intercepted ones:\n\n")

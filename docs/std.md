@@ -273,26 +273,8 @@
 ```rust
 cstr() -> (cstr)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 174*
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-```rust
-cstr(cstr cstr, str) -> (cstr)
-```
-
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 174*
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-```rust
-cstr(unsafe_temp) -> (cstr)
-```
 
 ### cstr - a cstr description of an error code
 *Defined in: std/core/error.s line 19*
@@ -308,6 +290,32 @@ location.
 ```rust
 cstr(catch) -> (cstr)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 174*
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+```rust
+cstr(cstr cstr, str) -> (cstr)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 174*
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+```rust
+cstr(unsafe_temp) -> (cstr)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # int
 ### int - a signed integer value
@@ -318,6 +326,8 @@ Represents values in the range `2^-63 to 2^63-1`.
 ```rust
 int() -> (int)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### int - cast to int
 *Defined in: std/core/convert.s line 29*
@@ -327,6 +337,8 @@ Serves as a tautology function for code that parses on multiple number types.
 ```rust
 int(int) -> (int)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### int - cast to int
 *Defined in: std/core/convert.s line 29*
@@ -336,6 +348,8 @@ May lose information due to truncating.
 ```rust
 int(float) -> (int)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### int - cast to int
 *Defined in: std/core/convert.s line 89*
@@ -345,6 +359,8 @@ Converts a bit representation to the corresponding integer.
 ```rust
 int(bits) -> (int)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### int - cast to int
 *Defined in: std/core/convert.s line 29*
@@ -354,6 +370,8 @@ Overflows are mapped to negative integers and are not protected against.
 ```rust
 int(nat) -> (int)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### int - converts a string to an integer
 *Defined in: std/core/convertstr.s line 149*
@@ -361,6 +379,8 @@ int(nat) -> (int)
 ```rust
 int(str) -> (int)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 27. invalid int conversion from string with only a sign
@@ -374,6 +394,8 @@ Potential errors:
 ```rust
 int(cstr) -> (int)
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -390,6 +412,8 @@ Potential errors:
 ```rust
 int(console) -> (int)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -409,6 +433,8 @@ Represents values in the range `0 to 2^64-1`.
 ```rust
 nat() -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat
 *Defined in: std/core/array.s line 24*
@@ -416,6 +442,8 @@ nat() -> (nat)
 ```rust
 nat(nat16) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 84*
@@ -425,6 +453,8 @@ Converts a bit representation to the corresponding natural number.
 ```rust
 nat(bits) -> (nat)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 51*
@@ -435,6 +465,8 @@ its bit representation interpreted as an unsigned number.
 ```rust
 nat(char) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 40*
@@ -445,6 +477,8 @@ Converting to natural numbers loses information.
 ```rust
 nat(nat) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 40*
@@ -455,9 +489,11 @@ Converting to natural numbers loses information.
 ```rust
 nat(int) -> (nat)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
-8. cannot convert negative int to id
+8. cannot convert negative int to nat
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 40*
@@ -468,9 +504,11 @@ Converting to natural numbers loses information.
 ```rust
 nat(float) -> (nat)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
-7. cannot convert negative float to id
+7. cannot convert negative float to nat
 
 ### nat - converts a string to an unsigned integer
 *Defined in: std/core/convertstr.s line 172*
@@ -478,6 +516,8 @@ Potential errors:
 ```rust
 nat(str) -> (nat)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 9. iteration end
@@ -491,6 +531,8 @@ Potential errors:
 ```rust
 nat(cstr) -> (nat)
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -507,6 +549,8 @@ Potential errors:
 ```rust
 nat(console) -> (nat)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -523,6 +567,8 @@ Potential errors:
 ```rust
 nat(nat32) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # nat32
 ### nat32 - a 32-bit unsigned integer value
@@ -533,6 +579,8 @@ Represents values in the range `0 to 2^32-1`.
 ```rust
 nat32() -> (nat32)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat32 - convert unsigned number to 32 bits
 *Defined in: std/mini.s line 22*
@@ -543,6 +591,8 @@ If it does not, this operation can fail.
 ```rust
 nat32(nat) -> (nat32)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 58. nat value too large to pack in nat32
@@ -556,6 +606,8 @@ Represents values in the range `0 to 2^16-1`.
 ```rust
 nat16() -> (nat16)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat16
 *Defined in: std/core/allocators.s line 101*
@@ -563,6 +615,8 @@ nat16() -> (nat16)
 ```rust
 nat16(nat) -> (nat16)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat16 - convert unsigned number to 16 bits
 *Defined in: std/mini.s line 14*
@@ -573,6 +627,8 @@ If it does not, this operation can fail.
 ```rust
 nat16(nat) -> (nat16)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 57. nat value too large to pack in nat16
@@ -586,6 +642,8 @@ Represents values in the range `0 to 255`.
 ```rust
 nat8() -> (nat8)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat8 - convert unsigned number to 8 bits
 *Defined in: std/mini.s line 6*
@@ -596,6 +654,8 @@ If it does not, this operation can fail.
 ```rust
 nat8(nat) -> (nat8)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 56. nat value too large to pack in nat8
@@ -607,6 +667,8 @@ Potential errors:
 ```rust
 float() -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 20*
@@ -616,6 +678,8 @@ May lose information because floats are not exact representation of all integers
 ```rust
 float(nat) -> (float)
 ```
+Levels of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 20*
@@ -625,6 +689,8 @@ May lose information because floats are not exact representation of all integers
 ```rust
 float(int) -> (float)
 ```
+Levels of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 20*
@@ -634,6 +700,8 @@ Serves as a tautology function for code that parses on multiple number types.
 ```rust
 float(float) -> (float)
 ```
+Levels of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 95*
@@ -643,6 +711,8 @@ Converts a bit representation to the corresponding float number.
 ```rust
 float(bits) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float - converts a string to a float
 *Defined in: std/core/convertstr.s line 184*
@@ -650,6 +720,8 @@ float(bits) -> (float)
 ```rust
 float(str) -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 32. invalid float conversion from string with only a sign
@@ -664,6 +736,8 @@ Potential errors:
 ```rust
 float(cstr) -> (float)
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 32. invalid float conversion from string with only a sign
@@ -681,6 +755,8 @@ Potential errors:
 ```rust
 float(console) -> (float)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -700,6 +776,8 @@ Can only be `true` or `false`.
 ```rust
 bool() -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # err
 ### err
@@ -708,6 +786,8 @@ bool() -> (bool)
 ```rust
 err() -> (err)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # blank
 ### blank - empty tuple
@@ -718,6 +798,8 @@ This is the type of non-existent variables, empty parantheses, and functions of 
 ```rust
 blank() -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # char
 ### char - a character
@@ -728,6 +810,20 @@ Represents characters in the numeric range `0 to 255`.
 ```rust
 char() -> (char)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### char
+*Defined in: std/core/convertstr.s line 24*
+
+```rust
+char(console) -> (char)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+23. unexpected end of console read
 
 ### char - treat as character
 *Defined in: std/core/string.s line 112*
@@ -738,6 +834,8 @@ for example to write `c = char \"C\"`.
 ```rust
 char(cstr) -> (char)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### char - treat as character
 *Defined in: std/core/string.s line 106*
@@ -748,26 +846,21 @@ for example to write `c = char str \"C\"`.
 ```rust
 char(str) -> (char)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
-### char
-*Defined in: std/core/convertstr.s line 24*
-
-```rust
-char(console) -> (char)
-```
-Potential errors:
-
-23. unexpected end of console read
 
 # any
 ### any - any type
 *Defined in: builtins line 1*
 
 Represents a generic for buffers and pointers for type-independent code that can be matched to a concrete type later.
+This type ordains special treatment by the compiler.
 
 ```rust
 any() -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # eq
 ### eq - equals
@@ -776,6 +869,8 @@ any() -> ()
 ```rust
 eq(int x, int y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/numbers.s line 26*
@@ -783,6 +878,8 @@ eq(int x, int y) -> (bool)
 ```rust
 eq(float x, float y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 82*
@@ -790,6 +887,8 @@ eq(float x, float y) -> (bool)
 ```rust
 eq(bool value, false) -> (bool)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 78*
@@ -797,6 +896,8 @@ eq(bool value, false) -> (bool)
 ```rust
 eq(false, bool value) -> (bool)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 74*
@@ -804,6 +905,8 @@ eq(false, bool value) -> (bool)
 ```rust
 eq(bool value, true) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 70*
@@ -811,42 +914,52 @@ eq(bool value, true) -> (bool)
 ```rust
 eq(true, bool value) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 51*
 
-This is a compile-time operations that does not evoke any runtime booleans.
+This is a compile-time operation that does not evoke any runtime booleans.
 
 ```rust
 eq(false, true) -> (false)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 46*
 
-This is a compile-time operations that does not evoke any runtime booleans.
+This is a compile-time operation that does not evoke any runtime booleans.
 
 ```rust
 eq(true, false) -> (false)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 41*
 
-This is a compile-time operations that does not evoke any runtime booleans.
+This is a compile-time operation that does not evoke any runtime booleans.
 
 ```rust
 eq(false, false) -> (true)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 36*
 
-This is a compile-time operations that does not evoke any runtime booleans.
+This is a compile-time operation that does not evoke any runtime booleans.
 
 ```rust
 eq(true, true) -> (true)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 20*
@@ -854,6 +967,8 @@ eq(true, true) -> (true)
 ```rust
 eq(bool x, bool y) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/numbers.s line 56*
@@ -863,6 +978,8 @@ Compares the address of two pointers.
 ```rust
 eq(any ptr x, any ptr y) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - eqqual to
 *Defined in: std/core/numbers.s line 40*
@@ -874,6 +991,8 @@ by the same running program.
 ```rust
 eq(catch x, catch y) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/numbers.s line 26*
@@ -881,6 +1000,8 @@ eq(catch x, catch y) -> (bool)
 ```rust
 eq(nat x, nat y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/string.s line 207*
@@ -888,6 +1009,8 @@ eq(nat x, nat y) -> (bool)
 ```rust
 eq(cstr x, str) -> (bool)
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -901,6 +1024,8 @@ Potential errors:
 ```rust
 eq(str, cstr y) -> (bool)
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -914,6 +1039,8 @@ Potential errors:
 ```rust
 eq(str, str) -> (bool)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/string.s line 186*
@@ -921,6 +1048,8 @@ eq(str, str) -> (bool)
 ```rust
 eq(cstr x, cstr y) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### eq - equals
 *Defined in: std/core/string.s line 119*
@@ -928,6 +1057,8 @@ eq(cstr x, cstr y) -> (bool)
 ```rust
 eq(char x, char y) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # neq
 ### neq - not equal
@@ -936,6 +1067,8 @@ eq(char x, char y) -> (bool)
 ```rust
 neq(bool x, false y) -> (bool)
 ```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/bool.s line 90*
@@ -943,6 +1076,8 @@ neq(bool x, false y) -> (bool)
 ```rust
 neq(bool x, true y) -> (bool)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/bool.s line 86*
@@ -950,6 +1085,8 @@ neq(bool x, true y) -> (bool)
 ```rust
 neq(false x, bool y) -> (bool)
 ```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/bool.s line 86*
@@ -957,6 +1094,8 @@ neq(false x, bool y) -> (bool)
 ```rust
 neq(true x, bool y) -> (bool)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/bool.s line 66*
@@ -964,6 +1103,8 @@ neq(true x, bool y) -> (bool)
 ```rust
 neq(false x, false y) -> (false)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/bool.s line 66*
@@ -971,6 +1112,8 @@ neq(false x, false y) -> (false)
 ```rust
 neq(false x, true y) -> (true)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/bool.s line 66*
@@ -978,6 +1121,8 @@ neq(false x, true y) -> (true)
 ```rust
 neq(true x, false y) -> (true)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/bool.s line 66*
@@ -985,6 +1130,8 @@ neq(true x, false y) -> (true)
 ```rust
 neq(true x, true y) -> (false)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/bool.s line 25*
@@ -992,6 +1139,8 @@ neq(true x, true y) -> (false)
 ```rust
 neq(bool x, bool y) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/numbers.s line 62*
@@ -1001,6 +1150,8 @@ Compares the address of two pointers.
 ```rust
 neq(any ptr x, any ptr y) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/numbers.s line 48*
@@ -1012,6 +1163,8 @@ by the same running program.
 ```rust
 neq(catch x, catch y) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/numbers.s line 33*
@@ -1019,6 +1172,8 @@ neq(catch x, catch y) -> (bool)
 ```rust
 neq(nat x, nat y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/numbers.s line 33*
@@ -1026,6 +1181,8 @@ neq(nat x, nat y) -> (bool)
 ```rust
 neq(int x, int y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equal
 *Defined in: std/core/numbers.s line 33*
@@ -1033,6 +1190,8 @@ neq(int x, int y) -> (bool)
 ```rust
 neq(float x, float y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equals
 *Defined in: std/core/string.s line 213*
@@ -1040,6 +1199,8 @@ neq(float x, float y) -> (bool)
 ```rust
 neq(cstr x, cstr y) -> (bool)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equals
 *Defined in: std/core/string.s line 213*
@@ -1047,6 +1208,8 @@ neq(cstr x, cstr y) -> (bool)
 ```rust
 neq(cstr x, str) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -1060,6 +1223,8 @@ Potential errors:
 ```rust
 neq(str, cstr y) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -1073,6 +1238,8 @@ Potential errors:
 ```rust
 neq(str, str) -> (bool)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neq - not equals
 *Defined in: std/core/string.s line 124*
@@ -1080,25 +1247,31 @@ neq(str, str) -> (bool)
 ```rust
 neq(char x, char y) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # not
 ### not - logical inverse
 *Defined in: std/core/bool.s line 61*
 
-This is a compile-time operations on the compiler::false type rather than a runtime boolean.
+This is a compile-time operation on the compiler::false type rather than a runtime boolean.
 
 ```rust
 not(false) -> (true)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### not - logical inverse
 *Defined in: std/core/bool.s line 56*
 
-This is a compile-time operations on the compiler::true type rather than a runtime boolean.
+This is a compile-time operation on the compiler::true type rather than a runtime boolean.
 
 ```rust
 not(true) -> (false)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### not - logical inverse
 *Defined in: std/core/bool.s line 30*
@@ -1108,6 +1281,8 @@ This operates on boolean values at runtime.
 ```rust
 not(bool) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # Number
 ### nat - an unsigned integer value
@@ -1118,6 +1293,8 @@ Represents values in the range `0 to 2^64-1`.
 ```rust
 nat() -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float
 *Defined in: builtins line 1*
@@ -1125,6 +1302,8 @@ nat() -> (nat)
 ```rust
 float() -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### int - a signed integer value
 *Defined in: builtins line 1*
@@ -1134,6 +1313,8 @@ Represents values in the range `2^-63 to 2^63-1`.
 ```rust
 int() -> (int)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # is\_different
 ### is\_different
@@ -1142,6 +1323,8 @@ int() -> (int)
 ```rust
 is_different(nat x, nat y) -> (false)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### is\_different
 *Defined in: std/core/numbers.s line 23*
@@ -1149,6 +1332,8 @@ is_different(nat x, nat y) -> (false)
 ```rust
 is_different(nat x, int y) -> (true)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### is\_different
 *Defined in: std/core/numbers.s line 23*
@@ -1156,6 +1341,8 @@ is_different(nat x, int y) -> (true)
 ```rust
 is_different(nat x, float y) -> (true)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### is\_different
 *Defined in: std/core/numbers.s line 23*
@@ -1163,6 +1350,8 @@ is_different(nat x, float y) -> (true)
 ```rust
 is_different(int x, nat y) -> (true)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### is\_different
 *Defined in: std/core/numbers.s line 23*
@@ -1170,6 +1359,8 @@ is_different(int x, nat y) -> (true)
 ```rust
 is_different(int x, int y) -> (false)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### is\_different
 *Defined in: std/core/numbers.s line 23*
@@ -1177,6 +1368,8 @@ is_different(int x, int y) -> (false)
 ```rust
 is_different(int x, float y) -> (true)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### is\_different
 *Defined in: std/core/numbers.s line 23*
@@ -1184,6 +1377,8 @@ is_different(int x, float y) -> (true)
 ```rust
 is_different(float x, nat y) -> (true)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### is\_different
 *Defined in: std/core/numbers.s line 23*
@@ -1191,6 +1386,8 @@ is_different(float x, nat y) -> (true)
 ```rust
 is_different(float x, int y) -> (true)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### is\_different
 *Defined in: std/core/numbers.s line 23*
@@ -1198,6 +1395,8 @@ is_different(float x, int y) -> (true)
 ```rust
 is_different(float x, float y) -> (false)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # neg
 ### neg - negative of a number
@@ -1206,6 +1405,8 @@ is_different(float x, float y) -> (false)
 ```rust
 neg(nat) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neg - negative of a number
 *Defined in: std/core/numbers.s line 68*
@@ -1213,6 +1414,8 @@ neg(nat) -> (nat)
 ```rust
 neg(int) -> (int)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### neg - negative of a number
 *Defined in: std/core/numbers.s line 68*
@@ -1220,6 +1423,8 @@ neg(int) -> (int)
 ```rust
 neg(float) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # add
 ### add - add
@@ -1230,6 +1435,8 @@ Adds two numbers of the same type. This is an overload for the + operator.
 ```rust
 add(nat x, nat y) -> (nat)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### add - add
 *Defined in: std/core/numbers.s line 73*
@@ -1239,6 +1446,8 @@ Adds two numbers of the same type. This is an overload for the + operator.
 ```rust
 add(int x, int y) -> (int)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### add - add
 *Defined in: std/core/numbers.s line 73*
@@ -1248,6 +1457,8 @@ Adds two numbers of the same type. This is an overload for the + operator.
 ```rust
 add(float x, float y) -> (float)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### add - pointer addition
 *Defined in: std/unsafe.s line 54*
@@ -1259,6 +1470,8 @@ Adds a natural number offset to a pointer.
 ```rust
 add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### add
 *Defined in: std/core/string.s line 302*
@@ -1266,10 +1479,12 @@ add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
 ```rust
 add(edit list, cstr _s1, cstr _s2) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 6. nat subtraction would yield a negative
 11. reallocation failed
 14. cannot resize an unallocated or freed buffer
@@ -1284,10 +1499,12 @@ Potential errors:
 ```rust
 add(edit list, cstr _s1, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 6. nat subtraction would yield a negative
 11. reallocation failed
 14. cannot resize an unallocated or freed buffer
@@ -1302,10 +1519,12 @@ Potential errors:
 ```rust
 add(edit list, str, cstr _s2) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 6. nat subtraction would yield a negative
 11. reallocation failed
 14. cannot resize an unallocated or freed buffer
@@ -1320,10 +1539,12 @@ Potential errors:
 ```rust
 add(edit list, str, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 6. nat subtraction would yield a negative
 11. reallocation failed
 14. cannot resize an unallocated or freed buffer
@@ -1338,6 +1559,8 @@ Potential errors:
 ```rust
 add(edit circular, cstr _s1, cstr _s2) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1354,6 +1577,8 @@ Potential errors:
 ```rust
 add(edit circular, cstr _s1, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1370,6 +1595,8 @@ Potential errors:
 ```rust
 add(edit circular, str, cstr _s2) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1386,6 +1613,8 @@ Potential errors:
 ```rust
 add(edit circular, str, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1402,6 +1631,8 @@ Potential errors:
 ```rust
 add(edit arena, cstr _s1, cstr _s2) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1417,6 +1648,8 @@ Potential errors:
 ```rust
 add(edit arena, cstr _s1, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1432,6 +1665,8 @@ Potential errors:
 ```rust
 add(edit arena, str, cstr _s2) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1447,6 +1682,8 @@ Potential errors:
 ```rust
 add(edit arena, str, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1462,6 +1699,8 @@ Potential errors:
 ```rust
 add(new CHARS, cstr _s1, cstr _s2) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -1486,6 +1725,8 @@ free(mut any ptr) -> ()
 ```rust
 add(new CHARS, cstr _s1, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -1510,6 +1751,8 @@ free(mut any ptr) -> ()
 ```rust
 add(new CHARS, str, cstr _s2) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -1534,6 +1777,8 @@ free(mut any ptr) -> ()
 ```rust
 add(new CHARS, str, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -1555,11 +1800,13 @@ free(mut any ptr) -> ()
 ### add - vector addition
 *Defined in: std/sci/vec.s line 72*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 add(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -1571,11 +1818,13 @@ Potential errors:
 ### add - vector addition
 *Defined in: std/sci/vec.s line 72*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 add(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1587,11 +1836,13 @@ Potential errors:
 ### add - vector addition
 *Defined in: std/sci/vec.s line 72*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 add(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -1609,11 +1860,13 @@ free(mut any ptr) -> ()
 ### add - vector addition
 *Defined in: std/sci/vec.s line 61*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 add(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -1625,11 +1878,13 @@ Potential errors:
 ### add - vector addition
 *Defined in: std/sci/vec.s line 61*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 add(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -1642,11 +1897,13 @@ Potential errors:
 ### add - vector addition
 *Defined in: std/sci/vec.s line 61*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 add(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1658,11 +1915,13 @@ Potential errors:
 ### add - vector addition
 *Defined in: std/sci/vec.s line 61*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 add(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1675,11 +1934,13 @@ Potential errors:
 ### add - vector addition
 *Defined in: std/sci/vec.s line 61*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 add(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -1697,11 +1958,13 @@ free(mut any ptr) -> ()
 ### add - vector addition
 *Defined in: std/sci/vec.s line 61*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 add(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -1726,6 +1989,8 @@ Multiplies two numbers of the same type. This is an overload for the * operator.
 ```rust
 mul(nat x, nat y) -> (nat)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### mul - multiply with
 *Defined in: std/core/numbers.s line 81*
@@ -1735,6 +2000,8 @@ Multiplies two numbers of the same type. This is an overload for the * operator.
 ```rust
 mul(int x, int y) -> (int)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### mul - multiply with
 *Defined in: std/core/numbers.s line 81*
@@ -1744,15 +2011,19 @@ Multiplies two numbers of the same type. This is an overload for the * operator.
 ```rust
 mul(float x, float y) -> (float)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s line 107*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 mul(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -1764,11 +2035,13 @@ Potential errors:
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s line 107*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 mul(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1780,11 +2053,13 @@ Potential errors:
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s line 107*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 mul(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -1802,11 +2077,13 @@ free(mut any ptr) -> ()
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s line 96*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 mul(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -1818,11 +2095,13 @@ Potential errors:
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s line 96*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 mul(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -1835,11 +2114,13 @@ Potential errors:
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s line 96*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 mul(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1851,11 +2132,13 @@ Potential errors:
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s line 96*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 mul(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -1868,11 +2151,13 @@ Potential errors:
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s line 96*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 mul(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -1890,11 +2175,13 @@ free(mut any ptr) -> ()
 ### mul - vector multiplication
 *Defined in: std/sci/vec.s line 96*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 mul(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -1918,6 +2205,8 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit circular, mat, mat) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -1937,6 +2226,8 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit arena, mat, mat) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -1956,6 +2247,8 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(new FLOATS, mat, mat) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -1981,6 +2274,8 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit circular, vec, mat) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -2001,6 +2296,8 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit arena, vec, mat) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -2021,6 +2318,8 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(new FLOATS, vec, mat) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -2047,6 +2346,8 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit circular, mat, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -2067,6 +2368,8 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit arena, mat, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -2087,6 +2390,8 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(new FLOATS, mat, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -2111,6 +2416,8 @@ free(mut any ptr) -> ()
 ```rust
 mul(edit circular, coo, mat) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -2129,6 +2436,8 @@ Potential errors:
 ```rust
 mul(edit arena, coo, mat) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -2147,6 +2456,8 @@ Potential errors:
 ```rust
 mul(new FLOATS, coo, mat) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -2173,6 +2484,8 @@ free(mut any ptr) -> ()
 ```rust
 mul(edit circular, vec, coo) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -2190,6 +2503,8 @@ Potential errors:
 ```rust
 mul(edit arena, vec, coo) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -2207,6 +2522,8 @@ Potential errors:
 ```rust
 mul(new FLOATS, vec, coo) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -2228,6 +2545,8 @@ free(mut any ptr) -> ()
 ```rust
 mul(edit circular, coo, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -2243,6 +2562,8 @@ Potential errors:
 ```rust
 mul(edit arena, coo, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -2258,6 +2579,8 @@ Potential errors:
 ```rust
 mul(new FLOATS, coo, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -2283,9 +2606,11 @@ Safeguards against division by zero.
 ```rust
 div(nat x, nat y) -> (nat)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
-4. division by zero 
+4. division by zero
 
 ### div - divide by
 *Defined in: std/core/numbers.s line 89*
@@ -2296,9 +2621,11 @@ Safeguards against division by zero.
 ```rust
 div(int x, int y) -> (int)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
-4. division by zero 
+4. division by zero
 
 ### div - divide by
 *Defined in: std/core/numbers.s line 89*
@@ -2309,23 +2636,27 @@ Safeguards against division by zero.
 ```rust
 div(float x, float y) -> (float)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
-4. division by zero 
+4. division by zero
 
 ### div - vector division
 *Defined in: std/sci/vec.s line 144*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 div(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
 2. null pointer
-4. division by zero 
+4. division by zero
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 15. out of bounds
@@ -2333,16 +2664,18 @@ Potential errors:
 ### div - vector division
 *Defined in: std/sci/vec.s line 144*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 div(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
 2. null pointer
-4. division by zero 
+4. division by zero
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 15. out of bounds
@@ -2350,15 +2683,17 @@ Potential errors:
 ### div - vector division
 *Defined in: std/sci/vec.s line 144*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 div(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
@@ -2373,16 +2708,18 @@ free(mut any ptr) -> ()
 ### div - vector division
 *Defined in: std/sci/vec.s line 132*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 div(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
 2. null pointer
-4. division by zero 
+4. division by zero
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 15. out of bounds
@@ -2390,16 +2727,18 @@ Potential errors:
 ### div - vector division
 *Defined in: std/sci/vec.s line 132*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 div(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
 2. null pointer
-4. division by zero 
+4. division by zero
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 61. different vector sizes
@@ -2408,16 +2747,18 @@ Potential errors:
 ### div - vector division
 *Defined in: std/sci/vec.s line 132*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 div(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
 2. null pointer
-4. division by zero 
+4. division by zero
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 15. out of bounds
@@ -2425,16 +2766,18 @@ Potential errors:
 ### div - vector division
 *Defined in: std/sci/vec.s line 132*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 div(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
 2. null pointer
-4. division by zero 
+4. division by zero
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 61. different vector sizes
@@ -2443,15 +2786,17 @@ Potential errors:
 ### div - vector division
 *Defined in: std/sci/vec.s line 132*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 div(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
@@ -2466,16 +2811,18 @@ free(mut any ptr) -> ()
 ### div - vector division
 *Defined in: std/sci/vec.s line 132*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 div(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
 13. cannot allocate a buffer of unsized type
-4. division by zero 
+4. division by zero
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
 61. different vector sizes
@@ -2496,9 +2843,11 @@ Computes the modulo between two natural numbers. This is an overload for the % o
 ```rust
 mod(nat x, nat y) -> (nat)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
-5. modulo by zero 
+5. modulo by zero
 
 # lt
 ### lt - less than
@@ -2509,6 +2858,8 @@ Compares two numbers of the same type. This is an overload for the < operator.
 ```rust
 lt(nat x, nat y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### lt - less than
 *Defined in: std/core/numbers.s line 110*
@@ -2518,6 +2869,8 @@ Compares two numbers of the same type. This is an overload for the < operator.
 ```rust
 lt(int x, int y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### lt - less than
 *Defined in: std/core/numbers.s line 110*
@@ -2527,6 +2880,8 @@ Compares two numbers of the same type. This is an overload for the < operator.
 ```rust
 lt(float x, float y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # gt
 ### gt - Compares two numbers of the same type. This is an overload for the > operator.
@@ -2537,6 +2892,8 @@ greater than
 ```rust
 gt(nat x, nat y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### gt - Compares two numbers of the same type. This is an overload for the > operator.
 *Defined in: std/core/numbers.s line 118*
@@ -2546,6 +2903,8 @@ greater than
 ```rust
 gt(int x, int y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### gt - Compares two numbers of the same type. This is an overload for the > operator.
 *Defined in: std/core/numbers.s line 118*
@@ -2555,6 +2914,8 @@ greater than
 ```rust
 gt(float x, float y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # le
 ### le - less than or equal to
@@ -2565,6 +2926,8 @@ Compares two numbers of the same type. This is an overload for the <= operator.
 ```rust
 le(nat x, nat y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### le - less than or equal to
 *Defined in: std/core/numbers.s line 126*
@@ -2574,6 +2937,8 @@ Compares two numbers of the same type. This is an overload for the <= operator.
 ```rust
 le(int x, int y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### le - less than or equal to
 *Defined in: std/core/numbers.s line 126*
@@ -2583,6 +2948,8 @@ Compares two numbers of the same type. This is an overload for the <= operator.
 ```rust
 le(float x, float y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # ge
 ### ge - greater than or equal to
@@ -2593,6 +2960,8 @@ Compares two numbers of the same type. This is an overload for the >= operator.
 ```rust
 ge(nat x, nat y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### ge - greater than or equal to
 *Defined in: std/core/numbers.s line 134*
@@ -2602,6 +2971,8 @@ Compares two numbers of the same type. This is an overload for the >= operator.
 ```rust
 ge(int x, int y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### ge - greater than or equal to
 *Defined in: std/core/numbers.s line 134*
@@ -2611,6 +2982,8 @@ Compares two numbers of the same type. This is an overload for the >= operator.
 ```rust
 ge(float x, float y) -> (bool)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # sub
 ### sub - subtract by
@@ -2622,6 +2995,8 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 ```rust
 sub(nat x, nat y) -> (nat)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 6. nat subtraction would yield a negative
@@ -2634,6 +3009,8 @@ Subtracts two numbers of the same type. This is an overload for the - operator.
 ```rust
 sub(int x, int y) -> (int)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### sub - subtract by
 *Defined in: std/core/numbers.s line 142*
@@ -2643,15 +3020,19 @@ Subtracts two numbers of the same type. This is an overload for the - operator.
 ```rust
 sub(float x, float y) -> (float)
 ```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 88*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 sub(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -2663,11 +3044,13 @@ Potential errors:
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 88*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 sub(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -2679,11 +3062,13 @@ Potential errors:
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 88*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 sub(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -2701,11 +3086,13 @@ free(mut any ptr) -> ()
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 77*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 sub(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -2717,11 +3104,13 @@ Potential errors:
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 77*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 sub(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -2734,11 +3123,13 @@ Potential errors:
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 77*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 sub(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -2750,11 +3141,13 @@ Potential errors:
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 77*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 sub(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -2767,11 +3160,13 @@ Potential errors:
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 77*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 sub(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -2789,11 +3184,13 @@ free(mut any ptr) -> ()
 ### sub - vector subtraction
 *Defined in: std/sci/vec.s line 77*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 sub(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -2818,15 +3215,19 @@ Exponentiates a natural number by another.
 ```rust
 pow(nat x, nat y) -> (mut nat)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 124*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 pow(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -2838,11 +3239,13 @@ Potential errors:
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 124*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 pow(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -2854,11 +3257,13 @@ Potential errors:
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 124*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 pow(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -2876,11 +3281,13 @@ free(mut any ptr) -> ()
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 113*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 pow(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -2892,11 +3299,13 @@ Potential errors:
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 113*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 pow(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -2909,11 +3318,13 @@ Potential errors:
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 113*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 pow(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -2925,11 +3336,13 @@ Potential errors:
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 113*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 pow(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -2942,11 +3355,13 @@ Potential errors:
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 113*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 pow(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -2964,11 +3379,13 @@ free(mut any ptr) -> ()
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 113*
 
-Grabs an FLOATS for the result as an effect.
+Grabs a FLOATS allocator effect to store the result.
 
 ```rust
 pow(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -2990,6 +3407,8 @@ free(mut any ptr) -> ()
 ```rust
 pow(float x, float y) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # console
 ### console - references the system console
@@ -3008,6 +3427,8 @@ Quickly print internals for debugging with `unsafe_console()`.
 ```rust
 console() -> (console)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # unsafe\_console
 ### unsafe\_console - references the system console unsafely
@@ -3019,6 +3440,8 @@ without needing to evoke an effect to pass the normally singleton console.
 ```rust
 unsafe_console() -> (console)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # flush
 ### flush - flushes the print buffer on the console
@@ -3027,6 +3450,8 @@ unsafe_console() -> (console)
 ```rust
 flush(console) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # nn
 ### nn - no new line
@@ -3039,6 +3464,8 @@ to print without automatically adding a new line.
 ```rust
 nn(nat) -> (nat value, cstr)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nn - no new line
 *Defined in: std/core/print.s line 47*
@@ -3050,6 +3477,8 @@ to print without automatically adding a new line.
 ```rust
 nn(int) -> (int value, cstr)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nn - no new line
 *Defined in: std/core/print.s line 47*
@@ -3061,6 +3490,8 @@ to print without automatically adding a new line.
 ```rust
 nn(float) -> (float value, cstr)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nn - no new line
 *Defined in: std/core/print.s line 47*
@@ -3072,6 +3503,8 @@ to print without automatically adding a new line.
 ```rust
 nn(cstr) -> (cstr value, cstr)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nn - no new line
 *Defined in: std/core/string.s line 295*
@@ -3083,6 +3516,8 @@ to print without a new line.
 ```rust
 nn(str) -> (str, cstr)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nn - no new line
 *Defined in: std/sci/vec.s line 215*
@@ -3094,6 +3529,8 @@ to print without a new line.
 ```rust
 nn(vec) -> (vec, cstr)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # print
 ### print - prints a boolean
@@ -3104,6 +3541,8 @@ Automatically ends the line too.
 ```rust
 print(console CLI, false) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints a boolean
 *Defined in: std/core/print.s line 97*
@@ -3111,6 +3550,8 @@ print(console CLI, false) -> () with effects CLI
 ```rust
 print(console CLI, false, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints a boolean
 *Defined in: std/core/print.s line 90*
@@ -3120,6 +3561,8 @@ Automatically ends the line too.
 ```rust
 print(console CLI, true) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints a boolean
 *Defined in: std/core/print.s line 90*
@@ -3127,6 +3570,8 @@ print(console CLI, true) -> () with effects CLI
 ```rust
 print(console CLI, true, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints a boolean
 *Defined in: std/core/print.s line 83*
@@ -3136,6 +3581,8 @@ Automatically ends the line too.
 ```rust
 print(console CLI, bool value) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints a boolean
 *Defined in: std/core/print.s line 83*
@@ -3143,6 +3590,8 @@ print(console CLI, bool value) -> () with effects CLI
 ```rust
 print(console CLI, bool value, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints an unsigned integer
 *Defined in: std/core/print.s line 76*
@@ -3152,6 +3601,8 @@ Automatically ends the line too.
 ```rust
 print(console CLI, nat value) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints an unsigned integer
 *Defined in: std/core/print.s line 76*
@@ -3159,6 +3610,8 @@ print(console CLI, nat value) -> () with effects CLI
 ```rust
 print(console CLI, nat value, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints an integer
 *Defined in: std/core/print.s line 69*
@@ -3168,6 +3621,8 @@ Automatically ends the line too.
 ```rust
 print(console CLI, int value) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints an integer
 *Defined in: std/core/print.s line 69*
@@ -3175,6 +3630,8 @@ print(console CLI, int value) -> () with effects CLI
 ```rust
 print(console CLI, int value, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints a float
 *Defined in: std/core/print.s line 61*
@@ -3185,6 +3642,8 @@ Automatically ends the line too.
 ```rust
 print(console CLI, float value) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints a float
 *Defined in: std/core/print.s line 61*
@@ -3194,6 +3653,8 @@ To pre-specified 6 decimal digits.
 ```rust
 print(console CLI, float value, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints a cstr
 *Defined in: std/core/print.s line 54*
@@ -3203,6 +3664,8 @@ Automatically ends the line too.
 ```rust
 print(console CLI, cstr value) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - prints a cstr
 *Defined in: std/core/print.s line 54*
@@ -3210,6 +3673,8 @@ print(console CLI, cstr value) -> () with effects CLI
 ```rust
 print(console CLI, cstr value, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - print a character
 *Defined in: std/core/string.s line 245*
@@ -3219,6 +3684,8 @@ Ends the line too.
 ```rust
 print(console CLI, char c) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - print a character
 *Defined in: std/core/string.s line 245*
@@ -3226,6 +3693,8 @@ print(console CLI, char c) -> () with effects CLI
 ```rust
 print(console CLI, char c, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - print a string
 *Defined in: std/core/string.s line 234*
@@ -3235,6 +3704,8 @@ Ends the line too.
 ```rust
 print(console CLI, str) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - print a string
 *Defined in: std/core/string.s line 234*
@@ -3242,6 +3713,8 @@ print(console CLI, str) -> () with effects CLI
 ```rust
 print(console CLI, str, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### print - print a matrix with aligned brackets
 *Defined in: std/sci/mat.s line 116*
@@ -3251,6 +3724,8 @@ single-row matrices stay on one line; taller ones get top/mid/bottom brackets
 ```rust
 print(console CLI, mat) -> () with effects CLI
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -3267,6 +3742,8 @@ single-row matrices stay on one line; taller ones get top/mid/bottom brackets
 ```rust
 print(console CLI, mat, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -3283,6 +3760,8 @@ Prints as a row, such as [ 1.0  2.0  3.0 ]
 ```rust
 print(console CLI, vec) -> () with effects CLI
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 9. iteration end
@@ -3298,6 +3777,8 @@ Prints as a row, such as [ 1.0  2.0  3.0 ]
 ```rust
 print(console CLI, vec, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 9. iteration end
@@ -3313,6 +3794,8 @@ Prints it as coordinate as list: (i, j): v
 ```rust
 print(console CLI, coo) -> () with effects CLI
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -3325,6 +3808,8 @@ Prints it as coordinate as list: (i, j): v
 ```rust
 print(console CLI, coo, cstr endl) -> () with effects CLI
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -3336,6 +3821,8 @@ No failing errors, but can catch these intercepted ones:
 ```rust
 supports_ansi(console) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[supports_ansi()]`*
 # colors
@@ -3345,6 +3832,8 @@ supports_ansi(console) -> (bool)
 ```rust
 colors(console) -> (colors)
 ```
+Levels of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 
 Returned values defer use of the following functions:
@@ -3357,6 +3846,8 @@ Returned values defer use of the following functions:
 ```rust
 set(colors, "reset_underline") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 180*
@@ -3364,6 +3855,8 @@ set(colors, "reset_underline") -> ()
 ```rust
 set(colors, "reset_bold") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 178*
@@ -3371,6 +3864,8 @@ set(colors, "reset_bold") -> ()
 ```rust
 set(colors, "reset_bg") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 176*
@@ -3378,6 +3873,8 @@ set(colors, "reset_bg") -> ()
 ```rust
 set(colors, "reset_color") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 174*
@@ -3385,6 +3882,8 @@ set(colors, "reset_color") -> ()
 ```rust
 set(colors, "reset") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 172*
@@ -3392,6 +3891,8 @@ set(colors, "reset") -> ()
 ```rust
 set(colors, "strikethrough") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 170*
@@ -3399,6 +3900,8 @@ set(colors, "strikethrough") -> ()
 ```rust
 set(colors, "reverse") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 168*
@@ -3406,6 +3909,8 @@ set(colors, "reverse") -> ()
 ```rust
 set(colors, "blink") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 166*
@@ -3413,6 +3918,8 @@ set(colors, "blink") -> ()
 ```rust
 set(colors, "underline") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 164*
@@ -3420,6 +3927,8 @@ set(colors, "underline") -> ()
 ```rust
 set(colors, "italic") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 162*
@@ -3427,6 +3936,8 @@ set(colors, "italic") -> ()
 ```rust
 set(colors, "dim") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 160*
@@ -3434,6 +3945,8 @@ set(colors, "dim") -> ()
 ```rust
 set(colors, "bold") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 158*
@@ -3441,6 +3954,8 @@ set(colors, "bold") -> ()
 ```rust
 set(colors, "bg_black") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 156*
@@ -3448,6 +3963,8 @@ set(colors, "bg_black") -> ()
 ```rust
 set(colors, "bg_white") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 154*
@@ -3455,6 +3972,8 @@ set(colors, "bg_white") -> ()
 ```rust
 set(colors, "bg_cyan") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 152*
@@ -3462,6 +3981,8 @@ set(colors, "bg_cyan") -> ()
 ```rust
 set(colors, "bg_magenta") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 150*
@@ -3469,6 +3990,8 @@ set(colors, "bg_magenta") -> ()
 ```rust
 set(colors, "bg_blue") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 148*
@@ -3476,6 +3999,8 @@ set(colors, "bg_blue") -> ()
 ```rust
 set(colors, "bg_yellow") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 146*
@@ -3483,6 +4008,8 @@ set(colors, "bg_yellow") -> ()
 ```rust
 set(colors, "bg_green") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 144*
@@ -3490,6 +4017,8 @@ set(colors, "bg_green") -> ()
 ```rust
 set(colors, "bg_red") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 142*
@@ -3497,6 +4026,8 @@ set(colors, "bg_red") -> ()
 ```rust
 set(colors, "bright_white") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 140*
@@ -3504,6 +4035,8 @@ set(colors, "bright_white") -> ()
 ```rust
 set(colors, "bright_cyan") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 138*
@@ -3511,6 +4044,8 @@ set(colors, "bright_cyan") -> ()
 ```rust
 set(colors, "bright_magenta") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 136*
@@ -3518,6 +4053,8 @@ set(colors, "bright_magenta") -> ()
 ```rust
 set(colors, "bright_blue") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 134*
@@ -3525,6 +4062,8 @@ set(colors, "bright_blue") -> ()
 ```rust
 set(colors, "bright_yellow") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 132*
@@ -3532,6 +4071,8 @@ set(colors, "bright_yellow") -> ()
 ```rust
 set(colors, "bright_green") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 130*
@@ -3539,6 +4080,8 @@ set(colors, "bright_green") -> ()
 ```rust
 set(colors, "bright_red") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 128*
@@ -3546,6 +4089,8 @@ set(colors, "bright_red") -> ()
 ```rust
 set(colors, "black") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 126*
@@ -3553,6 +4098,8 @@ set(colors, "black") -> ()
 ```rust
 set(colors, "white") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 124*
@@ -3560,6 +4107,8 @@ set(colors, "white") -> ()
 ```rust
 set(colors, "cyan") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 122*
@@ -3567,6 +4116,8 @@ set(colors, "cyan") -> ()
 ```rust
 set(colors, "magenta") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 120*
@@ -3574,6 +4125,8 @@ set(colors, "magenta") -> ()
 ```rust
 set(colors, "blue") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 118*
@@ -3581,6 +4134,8 @@ set(colors, "blue") -> ()
 ```rust
 set(colors, "yellow") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 116*
@@ -3588,6 +4143,8 @@ set(colors, "yellow") -> ()
 ```rust
 set(colors, "green") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### set
 *Defined in: std/core/print.s line 114*
@@ -3595,6 +4152,8 @@ set(colors, "green") -> ()
 ```rust
 set(colors, "red") -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # exists
 ### exists - checks whether a cstr is not zero-initialized
@@ -3603,6 +4162,8 @@ set(colors, "red") -> ()
 ```rust
 exists(cstr) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### exists - checks that a pointer exists
 *Defined in: std/core/convert.s line 58*
@@ -3610,6 +4171,8 @@ exists(cstr) -> (bool)
 ```rust
 exists(any ptr) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### exists
 *Defined in: std/graphics.s line 97*
@@ -3617,6 +4180,8 @@ exists(any ptr) -> (bool)
 ```rust
 exists(Texture) -> (bool)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # bits
 ### bits - bit representation
@@ -3628,6 +4193,8 @@ arithmetics and bitwise operations.
 ```rust
 bits(float) -> (bits)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### bits - bit representation
 *Defined in: std/core/convert.s line 69*
@@ -3638,6 +4205,8 @@ arithmetics and bitwise operations.
 ```rust
 bits(int) -> (bits)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### bits - bit representation
 *Defined in: std/core/convert.s line 63*
@@ -3648,6 +4217,8 @@ arithmetics and bitwise operations.
 ```rust
 bits(nat) -> (bits)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # lshift
 ### lshift - left shift
@@ -3656,6 +4227,8 @@ bits(nat) -> (bits)
 ```rust
 lshift(bits, nat y) -> (bits)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # rshift
 ### rshift - right shift
@@ -3664,6 +4237,8 @@ lshift(bits, nat y) -> (bits)
 ```rust
 rshift(bits, nat y) -> (bits)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # xor
 ### xor - bitwise xor
@@ -3672,6 +4247,8 @@ rshift(bits, nat y) -> (bits)
 ```rust
 xor(bits, bits) -> (bits)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # band
 ### band - bitwise and
@@ -3680,6 +4257,8 @@ xor(bits, bits) -> (bits)
 ```rust
 band(bits, bits) -> (bits)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # bor
 ### bor - bitwise or
@@ -3688,6 +4267,8 @@ band(bits, bits) -> (bits)
 ```rust
 bor(bits, bits) -> (bits)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # of
 ### of - yields a pair of nats
@@ -3698,6 +4279,8 @@ Represents the range [from, from+length] where 'from' and 'length' are the argum
 ```rust
 of(nat from, "len", nat length) -> (nat from, nat)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### of - yields a pair of nats
 *Defined in: std/core/range.s line 29*
@@ -3707,6 +4290,8 @@ Represents the range [from, to] where 'from' and 'to' are the arguments.
 ```rust
 of(nat from, "upto", nat to) -> (nat from, nat)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### of - yields a pair of nats
 *Defined in: std/core/range.s line 24*
@@ -3716,6 +4301,8 @@ Represents the range [from, to) where 'from' and 'to' are the arguments.
 ```rust
 of(nat from, "to", nat to) -> (nat from, nat to)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### of - yields a pair of nats
 *Defined in: std/core/range.s line 19*
@@ -3725,6 +4312,8 @@ Represents the range [0, to) where 'to' its  its arguments.
 ```rust
 of(nat) -> (nat, nat to)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # range
 ### range - constructs a range
@@ -3735,6 +4324,8 @@ Endpoints are natural numbers (unsigned integers). This is handy for several kin
 ```rust
 range(nat _from, nat to) -> (edit range)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # next
 ### next - next range number
@@ -3745,6 +4336,8 @@ This increments the r.from position and returns the previous one.
 ```rust
 next(edit range) -> (nat)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 9. iteration end
@@ -3755,6 +4348,8 @@ Potential errors:
 ```rust
 next(robinhood_nat_entry[], mut nat pos) -> (mut nat)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -3766,6 +4361,8 @@ Potential errors:
 ```rust
 next(robinhood_str_entry[], mut nat pos) -> (mut str)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -3777,21 +4374,18 @@ Potential errors:
 ```rust
 next(mut Rand) -> (float)
 ```
+Levels of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # get
-### get - a character in a string
-*Defined in: std/core/string.s line 241*
-
-```rust
-get(str, nat i) -> (char ptr)
-```
-
 ### get - get a list element pointer
 *Defined in: std/core/allocators.s line 52*
 
 ```rust
 get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -3802,6 +4396,8 @@ Potential errors:
 ```rust
 get(circular, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -3812,6 +4408,8 @@ Potential errors:
 ```rust
 get(any[], nat i) -> (any ptr {follows any ptr buffer.unsafe_ptr})
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -3825,9 +4423,20 @@ per a pattern like `for i in range 10 ...`.
 ```rust
 get(range, nat _pos) -> (nat)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 9. iteration end
+
+### get - a character in a string
+*Defined in: std/core/string.s line 241*
+
+```rust
+get(str, nat i) -> (char ptr)
+```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### get - get a hash map entry
 *Defined in: std/map.s line 28*
@@ -3837,10 +4446,12 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 get(robinhood_nat_entry[], any[], nat key) -> (any ptr {follows any ptr values.unsafe_ptr})
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 54. index not found
 6. nat subtraction would yield a negative
 9. iteration end
@@ -3854,10 +4465,12 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 get(robinhood_str_entry[], any[], str) -> (any ptr {follows any ptr values.unsafe_ptr})
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 54. index not found
 6. nat subtraction would yield a negative
 9. iteration end
@@ -3871,10 +4484,12 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 get(robinhood_str_entry[], any[], cstr key) -> (any ptr {follows any ptr values.unsafe_ptr})
 ```
+Levels of abstraction: 2 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 6. nat subtraction would yield a negative
 9. iteration end
 15. out of bounds
@@ -3888,6 +4503,8 @@ Potential errors:
 ```rust
 get(edit circular, edit open, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -3903,6 +4520,8 @@ Potential errors:
 ```rust
 get(edit circular, edit terminal, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -3919,6 +4538,8 @@ Potential errors:
 ```rust
 get(edit circular, edit write, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -3935,6 +4556,8 @@ Potential errors:
 ```rust
 get(edit circular, edit write, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -3951,6 +4574,8 @@ Potential errors:
 ```rust
 get(edit circular, edit open, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -3967,6 +4592,8 @@ Potential errors:
 ```rust
 get(edit circular, edit open, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -3983,6 +4610,8 @@ Potential errors:
 ```rust
 get(edit arena, edit open, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -3998,6 +4627,8 @@ Potential errors:
 ```rust
 get(edit arena, edit terminal, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4014,6 +4645,8 @@ Potential errors:
 ```rust
 get(edit arena, edit write, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4030,6 +4663,8 @@ Potential errors:
 ```rust
 get(edit arena, edit write, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4046,6 +4681,8 @@ Potential errors:
 ```rust
 get(edit arena, edit open, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4062,6 +4699,8 @@ Potential errors:
 ```rust
 get(edit arena, edit open, nat) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4078,6 +4717,8 @@ Potential errors:
 ```rust
 get(edit open, nat) -> (str)
 ```
+Levels of abstraction: 2 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4093,6 +4734,8 @@ Potential errors:
 ```rust
 get(vec, nat i) -> (float ptr)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -4103,6 +4746,8 @@ Potential errors:
 ```rust
 get(coo, nat k) -> (sparse_element ptr)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -4113,6 +4758,8 @@ Potential errors:
 ```rust
 get(mat, nat i, nat j) -> (float ptr)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -4125,6 +4772,8 @@ Potential errors:
 ```rust
 KB(nat) -> (nat)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # MB
 ### MB - megabytes to bytes
@@ -4133,6 +4782,8 @@ KB(nat) -> (nat)
 ```rust
 MB(nat) -> (nat)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # GB
 ### GB - gigabytes to bytes
@@ -4141,6 +4792,8 @@ MB(nat) -> (nat)
 ```rust
 GB(nat) -> (nat)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # alloc
 ### alloc
@@ -4149,6 +4802,8 @@ GB(nat) -> (nat)
 ```rust
 alloc(new CHARS, nat length) -> (edit allocated) with effects CHARS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4169,10 +4824,12 @@ Creates room for one element.
 ```rust
 alloc(edit list) -> (edit allocated)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 11. reallocation failed
-4. division by zero 
+4. division by zero
 14. cannot resize an unallocated or freed buffer
 
 ### alloc - list allocation
@@ -4181,10 +4838,12 @@ Potential errors:
 ```rust
 alloc(edit list, nat length) -> (edit allocated)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 11. reallocation failed
-4. division by zero 
+4. division by zero
 14. cannot resize an unallocated or freed buffer
 
 ### alloc - circular arena allocation
@@ -4195,6 +4854,8 @@ Creates room for one element.
 ```rust
 alloc(edit circular) -> (edit allocated)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -4205,6 +4866,8 @@ Potential errors:
 ```rust
 alloc(edit circular, nat length) -> (edit allocated)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -4217,6 +4880,8 @@ Creates room for one element.
 ```rust
 alloc(edit arena) -> (edit allocated)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -4227,6 +4892,8 @@ Potential errors:
 ```rust
 alloc(edit arena, nat length) -> (edit allocated)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -4237,6 +4904,8 @@ Potential errors:
 ```rust
 alloc(nat) -> (edit char[])
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4262,6 +4931,8 @@ This version allocates a buffer of ONE element, which can be used for stable ind
 ```rust
 alloc(edit any[]) -> (edit any[])
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4287,6 +4958,8 @@ This version allocates a buffer of ONE element, which can be used for stable ind
 ```rust
 alloc(edit any[], "dirty") -> (edit any[])
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4311,6 +4984,8 @@ allocate again, or use 'buffer.resize new_size' once a first non-zero allocation
 ```rust
 alloc(edit any[], nat size) -> (edit any[])
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4335,6 +5010,8 @@ allocate again, or use 'buffer.resize new_size' once a first non-zero allocation
 ```rust
 alloc(edit any[], nat size, "dirty") -> (edit any[])
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4357,6 +5034,8 @@ Allocates a memory of the provided size in bytes.
 ```rust
 alloc(nat) -> (mut any ptr)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4367,6 +5046,8 @@ Potential errors:
 ```rust
 alloc(cstr) -> (mut char[])
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4393,6 +5074,8 @@ free(mut any ptr) -> ()
 ```rust
 alloc(cstr surface, cstr obj) -> (mut char[])
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4425,6 +5108,8 @@ resources.
 ```rust
 resize(edit any[], nat size) -> (edit any[])
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 11. reallocation failed
@@ -4440,6 +5125,8 @@ resources.
 ```rust
 resize(edit any[], nat size, "unsafe") -> (edit any[])
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 11. reallocation failed
@@ -4451,6 +5138,8 @@ Potential errors:
 ```rust
 last(any[]) -> (any ptr {follows any ptr buffer.unsafe_ptr})
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 6. nat subtraction would yield a negative
@@ -4463,6 +5152,8 @@ Potential errors:
 ```rust
 mutlast(edit any[]) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 6. nat subtraction would yield a negative
@@ -4475,6 +5166,8 @@ Potential errors:
 ```rust
 mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -4485,6 +5178,8 @@ Potential errors:
 ```rust
 mutget(edit circular, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -4495,6 +5190,8 @@ Potential errors:
 ```rust
 mutget(edit any[], nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -4507,10 +5204,12 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 mutget(edit robinhood_nat_entry[], edit any[], nat key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 6. nat subtraction would yield a negative
 55. string buffer is full
 9. iteration end
@@ -4524,10 +5223,12 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 mutget(edit robinhood_str_entry[], edit any[], str) -> (mut any ptr {follows any ptr values.unsafe_ptr})
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 6. nat subtraction would yield a negative
 55. string buffer is full
 9. iteration end
@@ -4541,10 +5242,12 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 mutget(edit robinhood_str_entry[], edit any[], cstr key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 6. nat subtraction would yield a negative
 9. iteration end
 15. out of bounds
@@ -4558,6 +5261,8 @@ Potential errors:
 ```rust
 mutget(edit vec, nat i) -> (mut float ptr)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -4568,6 +5273,8 @@ Potential errors:
 ```rust
 mutget(edit coo, nat k) -> (mut sparse_element ptr)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -4578,6 +5285,8 @@ Potential errors:
 ```rust
 mutget(edit mat, nat i, nat j) -> (mut float ptr)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -4590,6 +5299,8 @@ Potential errors:
 ```rust
 len(str) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### len - the number of buffer elements
 *Defined in: std/core/array.s line 94*
@@ -4597,6 +5308,8 @@ len(str) -> (nat)
 ```rust
 len(any[]) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### len - vectot length
 *Defined in: std/sci/vec.s line 41*
@@ -4604,6 +5317,8 @@ len(any[]) -> (nat)
 ```rust
 len(vec) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # new
 ### new - allocations on new bufs
@@ -4612,6 +5327,8 @@ len(vec) -> (nat)
 ```rust
 new() -> (new)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # arena
 ### arena
@@ -4620,6 +5337,8 @@ new() -> (new)
 ```rust
 arena("char") -> (edit arena)
 ```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### arena - a buffer and mutable position pair
 *Defined in: std/core/allocators.s line 16*
@@ -4630,6 +5349,8 @@ to track the size of allocated data within the buffer.
 ```rust
 arena(edit any[]) -> (edit arena)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### arena - a buffer and mutable position pair
 *Defined in: std/core/allocators.s line 9*
@@ -4640,6 +5361,8 @@ to track the size of allocated data within the buffer.
 ```rust
 arena(edit any[], nat _pos) -> (edit arena)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### arena
 *Defined in: std/sci/vec.s line 7*
@@ -4647,6 +5370,8 @@ arena(edit any[], nat _pos) -> (edit arena)
 ```rust
 arena("float") -> (edit arena)
 ```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### arena
 *Defined in: std/sci/vec.s line 241*
@@ -4654,6 +5379,8 @@ arena("float") -> (edit arena)
 ```rust
 arena(edit vec) -> (edit arena)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # allocated
 ### allocated
@@ -4662,6 +5389,8 @@ arena(edit vec) -> (edit arena)
 ```rust
 allocated(edit any[], nat pos) -> (edit allocated)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # status
 ### status - convert to a nameless buffer and position pair
@@ -4673,6 +5402,8 @@ memory data as part of structural input.
 ```rust
 status(allocated) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### status - convert to a nameless buffer and position pair
 *Defined in: std/core/allocators.s line 25*
@@ -4683,6 +5414,8 @@ memory data as part of structural input.
 ```rust
 status(arena) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # circular
 ### circular
@@ -4691,6 +5424,8 @@ status(arena) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat)
 ```rust
 circular("char") -> (edit circular)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### circular - circular buf
 *Defined in: std/core/allocators.s line 39*
@@ -4698,6 +5433,8 @@ circular("char") -> (edit circular)
 ```rust
 circular(edit any[]) -> (edit circular)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### circular
 *Defined in: std/sci/vec.s line 8*
@@ -4705,6 +5442,8 @@ circular(edit any[]) -> (edit circular)
 ```rust
 circular("float") -> (edit circular)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # list
 ### list
@@ -4713,6 +5452,8 @@ circular("float") -> (edit circular)
 ```rust
 list("char") -> (edit list)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4734,6 +5475,8 @@ A capacity is maintained so that resizes are not performed too frequently.
 ```rust
 list(edit any[]) -> (edit list)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4752,6 +5495,8 @@ free(mut any ptr) -> ()
 ```rust
 list("float") -> (edit list)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4771,6 +5516,8 @@ free(mut any ptr) -> ()
 ```rust
 at(edit allocated) -> (mut any ptr {follows any ptr surface.buf.unsafe_ptr})
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 15. out of bounds
@@ -4781,10 +5528,12 @@ Potential errors:
 ```rust
 at(edit robinhood_nat_entry[], nat _k) -> (mut nat)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 6. nat subtraction would yield a negative
 55. string buffer is full
 9. iteration end
@@ -4796,10 +5545,12 @@ Potential errors:
 ```rust
 at(edit robinhood_str_entry[], str) -> (mut nat)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 6. nat subtraction would yield a negative
 55. string buffer is full
 9. iteration end
@@ -4811,10 +5562,12 @@ Potential errors:
 ```rust
 at(edit robinhood_str_entry[], cstr _k) -> (mut nat)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 6. nat subtraction would yield a negative
 9. iteration end
 15. out of bounds
@@ -4828,6 +5581,8 @@ Potential errors:
 ```rust
 at(vec, nat i) -> (float)
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4839,14 +5594,30 @@ Potential errors:
 ```rust
 at(float number, nat i) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # slice
+### slice
+*Defined in: std/core/allocators.s line 105*
+
+```rust
+slice(edit arena, nat length) -> (mut any[] {follows any ptr surface.buf.unsafe_ptr})
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+16. arena is out of space
+
 ### slice
 *Defined in: std/core/string.s line 252*
 
 ```rust
 slice(str, nat from, nat to) -> (str)
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4862,6 +5633,8 @@ Potential errors:
 ```rust
 slice(cstr _s, nat from, nat to) -> (str)
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4871,16 +5644,6 @@ Potential errors:
 6. nat subtraction would yield a negative
 15. out of bounds
 
-### slice
-*Defined in: std/core/allocators.s line 105*
-
-```rust
-slice(edit arena, nat length) -> (mut any[] {follows any ptr surface.buf.unsafe_ptr})
-```
-Potential errors:
-
-16. arena is out of space
-
 # char\_allocator
 ### list
 *Defined in: std/core/string.s line 25*
@@ -4888,6 +5651,8 @@ Potential errors:
 ```rust
 list("char") -> (edit list)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -4906,6 +5671,8 @@ free(mut any ptr) -> ()
 ```rust
 circular("char") -> (edit circular)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### arena
 *Defined in: std/core/string.s line 23*
@@ -4913,6 +5680,8 @@ circular("char") -> (edit circular)
 ```rust
 arena("char") -> (edit arena)
 ```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### new - allocations on new bufs
 *Defined in: std/core/allocators.s line 5*
@@ -4920,6 +5689,8 @@ arena("char") -> (edit arena)
 ```rust
 new() -> (new)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # strdat
 ### strdat - string data without the buffer storage
@@ -4928,6 +5699,8 @@ new() -> (new)
 ```rust
 strdat(nat pos, nat length, char first) -> (nat pos, nat length, char first)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### strdat
 *Defined in: std/mini.s line 41*
@@ -4935,6 +5708,8 @@ strdat(nat pos, nat length, char first) -> (nat pos, nat length, char first)
 ```rust
 strdat(nat _pos, nat _length) -> (nat16 pos, nat16 length)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 57. nat value too large to pack in nat16
@@ -4949,6 +5724,8 @@ Subsequent comparisons no longer use the underlying pointer value.
 ```rust
 str(cstr) -> (str)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -4966,6 +5743,8 @@ on negative comparisons.
 ```rust
 str(char[], nat endpos, "from", nat pos) -> (str)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -4984,6 +5763,8 @@ on negative comparisons.
 ```rust
 str(char[], nat pos, "to", nat endpos) -> (str)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5002,6 +5783,8 @@ on negative comparisons.
 ```rust
 str(char[], nat pos, "len", nat length) -> (str)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -5015,6 +5798,8 @@ Potential errors:
 ```rust
 str(str) -> (str)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### str - a string residing on the full breadth of a buffer
 *Defined in: std/core/string.s line 55*
@@ -5022,6 +5807,8 @@ str(str) -> (str)
 ```rust
 str(char[]) -> (str)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5036,6 +5823,8 @@ Potential errors:
 ```rust
 str(char[], nat length) -> (str)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5050,6 +5839,8 @@ Potential errors:
 ```rust
 str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 18. can only define strings on contiguous buffers
@@ -5061,6 +5852,8 @@ Potential errors:
 ```rust
 str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### str - a string residing on a buffer
 *Defined in: std/core/string.s line 39*
@@ -5068,6 +5861,8 @@ str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```rust
 str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### str - reads a string from the console
 *Defined in: std/core/convertstr.s line 114*
@@ -5077,6 +5872,8 @@ The read string is placed on an arena while consuming only the necessarily minim
 ```rust
 str(edit arena, console console) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5096,10 +5893,12 @@ The resulting memory will consume exactly the required size in bytes.
 ```rust
 str(new CHARS, console console) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 6. nat subtraction would yield a negative
 10. allocation failed
 11. reallocation failed
@@ -5126,6 +5925,8 @@ retrieving data with 'unpack' for memory efficiency.
 ```rust
 str(cstr) -> (str)
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5143,6 +5944,8 @@ retrieving data with 'unpack' for memory efficiency.
 ```rust
 str(str) -> (str)
 ```
+Levels of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 57. nat value too large to pack in nat16
@@ -5154,12 +5957,14 @@ Potential errors:
 ```rust
 copy(edit list, cstr _other) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-4. division by zero 
 2. null pointer
+19. can only define strings on non-offset buffers
+4. division by zero
+18. can only define strings on contiguous buffers
 11. reallocation failed
 14. cannot resize an unallocated or freed buffer
 15. out of bounds
@@ -5170,11 +5975,13 @@ Potential errors:
 ```rust
 copy(edit list, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
-4. division by zero 
+4. division by zero
 11. reallocation failed
 14. cannot resize an unallocated or freed buffer
 
@@ -5184,6 +5991,8 @@ Potential errors:
 ```rust
 copy(edit circular, cstr _other) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -5198,6 +6007,8 @@ Potential errors:
 ```rust
 copy(edit circular, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -5210,6 +6021,8 @@ Potential errors:
 ```rust
 copy(edit arena, cstr _other) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -5224,6 +6037,8 @@ Potential errors:
 ```rust
 copy(edit arena, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -5236,6 +6051,8 @@ Potential errors:
 ```rust
 copy(new CHARS, cstr _other) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5258,6 +6075,8 @@ free(mut any ptr) -> ()
 ```rust
 copy(new CHARS, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 18. can only define strings on contiguous buffers
@@ -5280,6 +6099,8 @@ Grabs a FLOATS for the result as an effect.
 ```rust
 copy(edit circular, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -5296,6 +6117,8 @@ Grabs a FLOATS for the result as an effect.
 ```rust
 copy(edit arena, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -5312,6 +6135,8 @@ Grabs a FLOATS for the result as an effect.
 ```rust
 copy(new FLOATS, vec) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5337,6 +6162,8 @@ This operation may fail if the string does not fit the current allocation - pref
 ```rust
 copy_null_terminated(edit arena, cstr _other) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 18. can only define strings on contiguous buffers
@@ -5355,6 +6182,8 @@ This operation may fail if the string does not fit the current allocation - pref
 ```rust
 copy_null_terminated(edit arena, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 18. can only define strings on contiguous buffers
@@ -5370,6 +6199,8 @@ This is mainly useful for supporting 'cstr unsafe_temp'.
 ```rust
 copy_null_terminated(new CHARS, str) -> (str) with effects CHARS
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 18. can only define strings on contiguous buffers
@@ -5393,6 +6224,8 @@ This is mainly used as a stt-input counterpart for converting str|cstr to cstr.
 ```rust
 unsafe_temp(cstr) -> (cstr cstr, str)
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -5422,6 +6255,8 @@ passing data to 'system' or 'compt'.*
 ```rust
 unsafe_temp(str) -> (unsafe_temp)
 ```
+Levels of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 18. can only define strings on contiguous buffers
@@ -5446,6 +6281,8 @@ enclosing buffer.
 ```rust
 endpos(str) -> (nat)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # starts\_with
 ### starts\_with
@@ -5454,6 +6291,8 @@ endpos(str) -> (nat)
 ```rust
 starts_with(str, str) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5469,6 +6308,8 @@ Potential errors:
 ```rust
 starts_with(str, cstr _needle) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5484,6 +6325,8 @@ Potential errors:
 ```rust
 starts_with(cstr _stack, str) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5499,6 +6342,8 @@ Potential errors:
 ```rust
 starts_with(cstr _stack, cstr _needle) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5515,6 +6360,8 @@ Potential errors:
 ```rust
 ends_with(str, str) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5530,6 +6377,8 @@ Potential errors:
 ```rust
 ends_with(str, cstr _needle) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5545,6 +6394,8 @@ Potential errors:
 ```rust
 ends_with(cstr _stack, str) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5560,6 +6411,8 @@ Potential errors:
 ```rust
 ends_with(cstr _stack, cstr _needle) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5574,49 +6427,10 @@ Potential errors:
 *Defined in: std/core/string.s line 284*
 
 ```rust
-contains(cstr _stack, cstr _needle) -> (bool)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. slice out of string bounds
-9. iteration end
-15. out of bounds
-
-### contains
-*Defined in: std/core/string.s line 277*
-
-```rust
-contains(str, char needle) -> (bool)
-```
-Potential errors:
-
-9. iteration end
-2. null pointer
-
-### contains
-*Defined in: std/core/string.s line 277*
-
-```rust
-contains(cstr _stack, char needle) -> (bool)
-```
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-9. iteration end
-15. out of bounds
-
-### contains
-*Defined in: std/core/string.s line 284*
-
-```rust
 contains(str, str) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5633,6 +6447,8 @@ Potential errors:
 ```rust
 contains(str, cstr _needle) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5649,6 +6465,8 @@ Potential errors:
 ```rust
 contains(cstr _stack, str) -> (bool)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5659,6 +6477,53 @@ Potential errors:
 9. iteration end
 15. out of bounds
 
+### contains
+*Defined in: std/core/string.s line 284*
+
+```rust
+contains(cstr _stack, cstr _needle) -> (bool)
+```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+6. nat subtraction would yield a negative
+22. slice out of string bounds
+9. iteration end
+15. out of bounds
+
+### contains
+*Defined in: std/core/string.s line 277*
+
+```rust
+contains(str, char needle) -> (bool)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+9. iteration end
+2. null pointer
+
+### contains
+*Defined in: std/core/string.s line 277*
+
+```rust
+contains(cstr _stack, char needle) -> (bool)
+```
+Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+9. iteration end
+15. out of bounds
+
 # is\_number
 ### is\_number
 *Defined in: std/core/convertstr.s line 31*
@@ -5666,6 +6531,8 @@ Potential errors:
 ```rust
 is_number(char) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # rotl
 ### rotl
@@ -5674,6 +6541,8 @@ is_number(char) -> (bool)
 ```rust
 rotl(nat x, nat k) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # splitmix64
 ### splitmix64 - time seed
@@ -5685,6 +6554,8 @@ as the source of entropy.
 ```rust
 splitmix64() -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[time.time_ns()]`*
 ### splitmix64 - next random number
@@ -5702,6 +6573,8 @@ not random).
 ```rust
 splitmix64(mut nat) -> (mut nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # Rand
 ### Rand - random number generator
@@ -5715,6 +6588,8 @@ on four u64 state fields. This version defaults to a time-based seed. Its period
 ```rust
 Rand() -> (edit Rand)
 ```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### Rand - random number generator
 *Defined in: std/rand.s line 65*
@@ -5727,6 +6602,8 @@ on four u64 state fields. The version is seed-initalized. Its period is 2^256-1.
 ```rust
 Rand(nat) -> (edit Rand)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # Hashable
 ### nat - an unsigned integer value
@@ -5737,6 +6614,8 @@ Represents values in the range `0 to 2^64-1`.
 ```rust
 nat() -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float
 *Defined in: builtins line 1*
@@ -5744,6 +6623,8 @@ nat() -> (nat)
 ```rust
 float() -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### cstr - constant string
 *Defined in: builtins line 1*
@@ -5751,6 +6632,8 @@ float() -> (float)
 ```rust
 cstr() -> (cstr)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 20*
@@ -5760,6 +6643,8 @@ May lose information because floats are not exact representation of all integers
 ```rust
 float(nat) -> (float)
 ```
+Levels of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 20*
@@ -5769,6 +6654,8 @@ May lose information because floats are not exact representation of all integers
 ```rust
 float(int) -> (float)
 ```
+Levels of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 20*
@@ -5778,26 +6665,8 @@ Serves as a tautology function for code that parses on multiple number types.
 ```rust
 float(float) -> (float)
 ```
+Levels of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
 
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 174*
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-```rust
-cstr(cstr cstr, str) -> (cstr)
-```
-
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 174*
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-```rust
-cstr(unsafe_temp) -> (cstr)
-```
 
 ### str - convert to string
 *Defined in: std/core/string.s line 91*
@@ -5808,6 +6677,8 @@ Subsequent comparisons no longer use the underlying pointer value.
 ```rust
 str(cstr) -> (str)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -5825,6 +6696,8 @@ on negative comparisons.
 ```rust
 str(char[], nat endpos, "from", nat pos) -> (str)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5843,6 +6716,8 @@ on negative comparisons.
 ```rust
 str(char[], nat pos, "to", nat endpos) -> (str)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5861,6 +6736,8 @@ on negative comparisons.
 ```rust
 str(char[], nat pos, "len", nat length) -> (str)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -5874,6 +6751,8 @@ Potential errors:
 ```rust
 str(str) -> (str)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### str - a string residing on the full breadth of a buffer
 *Defined in: std/core/string.s line 55*
@@ -5881,6 +6760,8 @@ str(str) -> (str)
 ```rust
 str(char[]) -> (str)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5895,6 +6776,8 @@ Potential errors:
 ```rust
 str(char[], nat length) -> (str)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -5909,6 +6792,8 @@ Potential errors:
 ```rust
 str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 18. can only define strings on contiguous buffers
@@ -5920,6 +6805,8 @@ Potential errors:
 ```rust
 str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### str - a string residing on a buffer
 *Defined in: std/core/string.s line 39*
@@ -5927,6 +6814,8 @@ str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```rust
 str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat
 *Defined in: std/core/array.s line 24*
@@ -5934,6 +6823,8 @@ str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```rust
 nat(nat16) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 95*
@@ -5943,6 +6834,8 @@ Converts a bit representation to the corresponding float number.
 ```rust
 float(bits) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 84*
@@ -5952,6 +6845,8 @@ Converts a bit representation to the corresponding natural number.
 ```rust
 nat(bits) -> (nat)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 51*
@@ -5962,6 +6857,8 @@ its bit representation interpreted as an unsigned number.
 ```rust
 nat(char) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 40*
@@ -5972,6 +6869,8 @@ Converting to natural numbers loses information.
 ```rust
 nat(nat) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 40*
@@ -5982,9 +6881,11 @@ Converting to natural numbers loses information.
 ```rust
 nat(int) -> (nat)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
-8. cannot convert negative int to id
+8. cannot convert negative int to nat
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 40*
@@ -5995,9 +6896,35 @@ Converting to natural numbers loses information.
 ```rust
 nat(float) -> (nat)
 ```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
-7. cannot convert negative float to id
+7. cannot convert negative float to nat
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 174*
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+```rust
+cstr(cstr cstr, str) -> (cstr)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 174*
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+```rust
+cstr(unsafe_temp) -> (cstr)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # hash
 ### hash
@@ -6006,9 +6933,11 @@ Potential errors:
 ```rust
 hash(nat k, nat size) -> (nat)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
-5. modulo by zero 
+5. modulo by zero
 
 ### hash
 *Defined in: std/hash.s line 7*
@@ -6016,11 +6945,13 @@ Potential errors:
 ```rust
 hash(str, nat size) -> (nat)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 9. iteration end
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 
 # to\_hash\_base
 ### to\_hash\_base
@@ -6029,6 +6960,8 @@ Potential errors:
 ```rust
 to_hash_base(nat) -> (bits)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### to\_hash\_base
 *Defined in: std/hash.s line 27*
@@ -6036,6 +6969,8 @@ to_hash_base(nat) -> (bits)
 ```rust
 to_hash_base(int) -> (bits)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### to\_hash\_base
 *Defined in: std/hash.s line 27*
@@ -6043,6 +6978,8 @@ to_hash_base(int) -> (bits)
 ```rust
 to_hash_base(float) -> (bits)
 ```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### to\_hash\_base
 *Defined in: std/hash.s line 24*
@@ -6050,6 +6987,8 @@ to_hash_base(float) -> (bits)
 ```rust
 to_hash_base(cstr) -> (str)
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -6063,6 +7002,8 @@ Potential errors:
 ```rust
 to_hash_base(str) -> (str)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # robinhood\_str\_entry
 ### robinhood\_str\_entry
@@ -6071,6 +7012,8 @@ to_hash_base(str) -> (str)
 ```rust
 robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # robinhood\_nat\_entry
 ### robinhood\_nat\_entry
@@ -6079,6 +7022,8 @@ robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```rust
 robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # robinhood\_entry
 ### robinhood\_nat\_entry
@@ -6087,6 +7032,8 @@ robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```rust
 robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### robinhood\_str\_entry
 *Defined in: std/hash.s line 30*
@@ -6094,6 +7041,8 @@ robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```rust
 robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # raw
 ### raw
@@ -6102,6 +7051,8 @@ robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```rust
 raw(cstr) -> (str)
 ```
+Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 19. can only define strings on non-offset buffers
@@ -6115,6 +7066,8 @@ Potential errors:
 ```rust
 raw(nat) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### raw
 *Defined in: std/hash.s line 41*
@@ -6122,6 +7075,8 @@ raw(nat) -> (nat)
 ```rust
 raw(str) -> (str)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### raw
 *Defined in: std/hash.s line 38*
@@ -6129,6 +7084,8 @@ raw(str) -> (str)
 ```rust
 raw(nat s, nat cost) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### raw
 *Defined in: std/hash.s line 38*
@@ -6136,6 +7093,8 @@ raw(nat s, nat cost) -> (nat)
 ```rust
 raw(str, nat cost) -> (str)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # is\_zero
 ### is\_zero
@@ -6144,6 +7103,8 @@ raw(str, nat cost) -> (str)
 ```rust
 is_zero(nat) -> (bool)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### is\_zero
 *Defined in: std/hash.s line 47*
@@ -6151,6 +7112,8 @@ is_zero(nat) -> (bool)
 ```rust
 is_zero(str) -> (bool)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # find
 ### find - find an item in a robinhood_entry list
@@ -6159,10 +7122,12 @@ is_zero(str) -> (bool)
 ```rust
 find(nat[], nat _k) -> (mut nat)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 54. index not found
 6. nat subtraction would yield a negative
 9. iteration end
@@ -6174,10 +7139,12 @@ Potential errors:
 ```rust
 find(str[], str) -> (mut nat)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 54. index not found
 6. nat subtraction would yield a negative
 9. iteration end
@@ -6189,10 +7156,12 @@ Potential errors:
 ```rust
 find(str[], cstr _k) -> (mut nat)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 6. nat subtraction would yield a negative
 9. iteration end
 15. out of bounds
@@ -6206,10 +7175,12 @@ Potential errors:
 ```rust
 find(robinhood_nat_entry[], nat _k) -> (mut nat)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 54. index not found
 6. nat subtraction would yield a negative
 9. iteration end
@@ -6221,10 +7192,12 @@ Potential errors:
 ```rust
 find(robinhood_str_entry[], str) -> (mut nat)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 54. index not found
 6. nat subtraction would yield a negative
 9. iteration end
@@ -6236,10 +7209,12 @@ Potential errors:
 ```rust
 find(robinhood_str_entry[], cstr _k) -> (mut nat)
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-5. modulo by zero 
+5. modulo by zero
 6. nat subtraction would yield a negative
 9. iteration end
 15. out of bounds
@@ -6257,6 +7232,8 @@ Map size is static and cannot be adjusted after initialization.
 ```rust
 strmap(edit any[]) -> (mut robinhood_str_entry[], edit any[])
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -6279,6 +7256,8 @@ Map size is static and cannot be adjusted after initialization.
 ```rust
 natmap(edit any[]) -> (mut robinhood_nat_entry[], edit any[])
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -6298,6 +7277,8 @@ free(mut any ptr) -> ()
 ```rust
 unpack(char[], nat16 dat.pos, nat16 dat.length) -> (str)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 20. string does not fit on buffer
@@ -6311,6 +7292,8 @@ that is more efficient for computations in 64-bit architectures.
 ```rust
 unpack(str) -> (str)
 ```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # abs
 ### abs
@@ -6319,6 +7302,8 @@ unpack(str) -> (str)
 ```rust
 abs(int) -> (nat)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[abs($x)]`*
 ### abs
@@ -6327,6 +7312,8 @@ abs(int) -> (nat)
 ```rust
 abs(float) -> (float)
 ```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[abs($x)]`*
 # sqrt
@@ -6336,6 +7323,8 @@ abs(float) -> (float)
 ```rust
 sqrt(float) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # sin
 ### sin
@@ -6344,6 +7333,8 @@ sqrt(float) -> (float)
 ```rust
 sin(float) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # cos
 ### cos
@@ -6352,6 +7343,8 @@ sin(float) -> (float)
 ```rust
 cos(float) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # log
 ### log
@@ -6360,6 +7353,8 @@ cos(float) -> (float)
 ```rust
 log(float) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # tan
 ### tan
@@ -6368,6 +7363,8 @@ log(float) -> (float)
 ```rust
 tan(float) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # floor
 ### floor
@@ -6376,6 +7373,8 @@ tan(float) -> (float)
 ```rust
 floor(float) -> (int)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # asin
 ### asin
@@ -6384,6 +7383,8 @@ floor(float) -> (int)
 ```rust
 asin(float) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # acos
 ### acos
@@ -6392,6 +7393,8 @@ asin(float) -> (float)
 ```rust
 acos(float) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # atan
 ### atan
@@ -6400,6 +7403,8 @@ acos(float) -> (float)
 ```rust
 atan(float x, float y) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### atan
 *Defined in: std/sci/math.s line 54*
@@ -6407,6 +7412,8 @@ atan(float x, float y) -> (float)
 ```rust
 atan(float) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # exp
 ### exp
@@ -6415,6 +7422,8 @@ atan(float) -> (float)
 ```rust
 exp(float) -> (float)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # isnan
 ### isnan
@@ -6423,6 +7432,8 @@ exp(float) -> (float)
 ```rust
 isnan(float) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[math.isnan(x)]`*
 # isinf
@@ -6432,6 +7443,8 @@ isnan(float) -> (bool)
 ```rust
 isinf(float) -> (bool)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[math.isinf(x)]`*
 # vec
@@ -6441,6 +7454,8 @@ isinf(float) -> (bool)
 ```rust
 vec(edit circular, nat length) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -6453,6 +7468,8 @@ Potential errors:
 ```rust
 vec(edit circular, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -6465,6 +7482,8 @@ Potential errors:
 ```rust
 vec(edit arena, nat length) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -6477,6 +7496,8 @@ Potential errors:
 ```rust
 vec(edit arena, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -6489,6 +7510,8 @@ Potential errors:
 ```rust
 vec(edit float[]) -> (mut vec)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 59. can only place vectors on contiguous buffers
@@ -6502,6 +7525,8 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 ```rust
 vec(new FLOATS, nat length) -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -6522,6 +7547,8 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 ```rust
 vec(new FLOATS, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -6542,6 +7569,8 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 vec(float ptr unsafe_ptr, nat pos, nat length) -> (mut vec)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### vec - view a matrix as a vector
 *Defined in: std/sci/mat.s line 65*
@@ -6549,6 +7578,8 @@ vec(float ptr unsafe_ptr, nat pos, nat length) -> (mut vec)
 ```rust
 vec(mat) -> (mut vec)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # mat
 ### mat - matrix type declaration
@@ -6559,6 +7590,8 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride) -> (mut mat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### mat - view a vector as a matrix on the same memory
 *Defined in: std/sci/mat.s line 55*
@@ -6569,6 +7602,8 @@ to indicate the new matrix's orientation.
 ```rust
 mat(vec, "col") -> (mut mat)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### mat - view a vector as a matrix on the same memory
 *Defined in: std/sci/mat.s line 55*
@@ -6579,6 +7614,8 @@ to indicate the new matrix's orientation.
 ```rust
 mat(vec, "row") -> (mut mat)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### mat - matrix on an existing float[] buffer
 *Defined in: std/sci/mat.s line 37*
@@ -6586,11 +7623,13 @@ mat(vec, "row") -> (mut mat)
 ```rust
 mat(edit float[], nat rows) -> (mut mat)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 64. buffer size not divisible by vector rows
 16. arena is out of space
-4. division by zero 
+4. division by zero
 62. can only place matrices on contiguous buffers
 63. cannot place matrices on buffer offsets
 
@@ -6600,6 +7639,8 @@ Potential errors:
 ```rust
 mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -6612,6 +7653,8 @@ Potential errors:
 ```rust
 mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -6624,6 +7667,8 @@ Potential errors:
 ```rust
 mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -6636,6 +7681,8 @@ Potential errors:
 ```rust
 mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -6648,6 +7695,8 @@ Potential errors:
 ```rust
 mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -6666,6 +7715,8 @@ free(mut any ptr) -> ()
 ```rust
 mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -6685,6 +7736,8 @@ free(mut any ptr) -> ()
 ```rust
 sparse_element(nat row, nat col, float value) -> (nat row, nat col, float value)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # coo
 ### coo - coo sparse matrix type declaration
@@ -6695,6 +7748,8 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 coo(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz) -> (mut coo)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### coo
 *Defined in: std/sci/coo.s line 40*
@@ -6702,6 +7757,8 @@ coo(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz) -> (mut coo)
 ```rust
 coo(sparse_element[], nat rows, nat cols) -> (mut coo)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### coo - allocate a sparse matrix
 *Defined in: std/sci/coo.s line 34*
@@ -6711,6 +7768,8 @@ This creates a new buffer of sparse elements for convenience.
 ```rust
 coo(nat rows, nat cols, nat nnz) -> (mut coo)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -6730,6 +7789,8 @@ free(mut any ptr) -> ()
 ```rust
 new() -> (new)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### circular
 *Defined in: std/sci/vec.s line 8*
@@ -6737,6 +7798,8 @@ new() -> (new)
 ```rust
 circular("float") -> (edit circular)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### arena
 *Defined in: std/sci/vec.s line 7*
@@ -6744,6 +7807,8 @@ circular("float") -> (edit circular)
 ```rust
 arena("float") -> (edit arena)
 ```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # constvec
 ### constvec - treat an immutable float buffer as an immutable vector
@@ -6752,6 +7817,8 @@ arena("float") -> (edit arena)
 ```rust
 constvec(float[]) -> (vec)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 59. can only place vectors on contiguous buffers
@@ -6770,6 +7837,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "l2") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -6786,6 +7855,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "sqr") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -6802,6 +7873,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "abs") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -6818,6 +7891,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec) -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -6832,428 +7907,10 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
 
 ```rust
-reduce(vec, "rel", vec, "mul", "l2") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "mul", "sqr") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "mul", "abs") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "mul") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "add", "l2") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "add", "sqr") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "add", "abs") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "add") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "l2") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "sqr") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "abs") -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec) -> (float)
-```
-Potential errors:
-
-2. null pointer
-4. division by zero 
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul", "l2") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul", "sqr") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul", "abs") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add", "l2") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add", "sqr") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add", "abs") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "l2") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "sqr") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "abs") -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec) -> (float)
-```
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
 reduce(vec, "mul", vec, "mul", "l2") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7271,6 +7928,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec, "mul", "sqr") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7288,6 +7947,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec, "mul", "abs") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7305,6 +7966,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec, "mul") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7322,6 +7985,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec, "add", "l2") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7339,6 +8004,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec, "add", "sqr") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7356,6 +8023,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec, "add", "abs") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7373,6 +8042,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec, "add") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7390,6 +8061,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec, "l2") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7407,6 +8080,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec, "sqr") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7424,6 +8099,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec, "abs") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7441,6 +8118,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", vec) -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7458,6 +8137,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "mul", "l2") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7474,6 +8155,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "mul", "sqr") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7490,6 +8173,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "mul", "abs") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7506,6 +8191,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "mul") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7522,6 +8209,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "add", "l2") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7538,6 +8227,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "add", "sqr") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7554,6 +8245,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "add", "abs") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7570,6 +8263,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "add") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7586,6 +8281,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "l2") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7602,6 +8299,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "sqr") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7618,6 +8317,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "abs") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7634,6 +8335,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec) -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7650,6 +8353,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", "l2") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7666,6 +8371,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", "sqr") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7682,6 +8389,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", "abs") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7698,6 +8407,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7714,6 +8425,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "add", "l2") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7730,6 +8443,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "add", "sqr") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7746,6 +8461,8 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "add", "abs") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
@@ -7762,9 +8479,479 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "add") -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 No failing errors, but can catch these intercepted ones:
 
 2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "mul", "l2") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "mul", "sqr") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "mul", "abs") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "mul") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "add", "l2") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "add", "sqr") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "add", "abs") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "add") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "l2") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "sqr") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "abs") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec) -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul", "l2") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul", "sqr") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul", "abs") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add", "l2") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add", "sqr") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add", "abs") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "l2") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "sqr") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "abs") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec) -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
 
 # dot
 ### dot - dot product
@@ -7773,6 +8960,8 @@ No failing errors, but can catch these intercepted ones:
 ```rust
 dot(vec, vec) -> (float)
 ```
+Levels of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7785,6 +8974,8 @@ Potential errors:
 ```rust
 sum(vec) -> (float)
 ```
+Levels of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### sum - sum of each column
 *Defined in: std/sci/coo.s line 109*
@@ -7794,6 +8985,8 @@ result[j] = sum of all stored values in column j
 ```rust
 sum(edit circular, coo, "col") -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -7810,6 +9003,8 @@ result[j] = sum of all stored values in column j
 ```rust
 sum(edit arena, coo, "col") -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -7826,6 +9021,8 @@ result[j] = sum of all stored values in column j
 ```rust
 sum(new FLOATS, coo, "col") -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7848,6 +9045,8 @@ result[i] = sum of all stored values in row i
 ```rust
 sum(edit circular, coo, "row") -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -7864,6 +9063,8 @@ result[i] = sum of all stored values in row i
 ```rust
 sum(edit arena, coo, "row") -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -7880,6 +9081,8 @@ result[i] = sum of all stored values in row i
 ```rust
 sum(new FLOATS, coo, "row") -> (mut vec) with effects FLOATS
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -7901,10 +9104,12 @@ free(mut any ptr) -> ()
 ```rust
 mean(vec) -> (float)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 
 # var
 ### var - variance
@@ -7913,10 +9118,12 @@ Potential errors:
 ```rust
 var(vec) -> (float)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 15. out of bounds
 
 # std
@@ -7926,10 +9133,12 @@ Potential errors:
 ```rust
 std(vec) -> (float)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 15. out of bounds
 
 # self
@@ -7939,6 +9148,8 @@ Potential errors:
 ```rust
 self(edit vec) -> (edit arena, edit vec)
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # rows
 ### rows - number of rows
@@ -7947,6 +9158,8 @@ self(edit vec) -> (edit arena, edit vec)
 ```rust
 rows(coo) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### rows - number of rows
 *Defined in: std/sci/mat.s line 6*
@@ -7954,6 +9167,8 @@ rows(coo) -> (nat)
 ```rust
 rows(mat) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # cols
 ### cols - number of columns
@@ -7962,6 +9177,8 @@ rows(mat) -> (nat)
 ```rust
 cols(coo) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### cols - number of columns
 *Defined in: std/sci/mat.s line 10*
@@ -7969,6 +9186,8 @@ cols(coo) -> (nat)
 ```rust
 cols(mat) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # constmat
 ### constmat - immutable matrix on an immutable float[] buffer
@@ -7977,11 +9196,13 @@ cols(mat) -> (nat)
 ```rust
 constmat(float[], nat rows) -> (mat)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 64. buffer size not divisible by vector rows
 16. arena is out of space
-4. division by zero 
+4. division by zero
 62. can only place matrices on contiguous buffers
 63. cannot place matrices on buffer offsets
 
@@ -7992,6 +9213,8 @@ Potential errors:
 ```rust
 mutvec(mat) -> (mut vec)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # row
 ### row - view matrix row as a vector
@@ -8000,6 +9223,8 @@ mutvec(mat) -> (mut vec)
 ```rust
 row(mat, nat i) -> (mut vec)
 ```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -8011,6 +9236,8 @@ Potential errors:
 ```rust
 nnz(coo) -> (nat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # todense
 ### todense - convert to dense mat
@@ -8019,6 +9246,8 @@ nnz(coo) -> (nat)
 ```rust
 todense(edit circular, coo) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -8035,6 +9264,8 @@ Potential errors:
 ```rust
 todense(edit arena, coo) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -8051,6 +9282,8 @@ Potential errors:
 ```rust
 todense(new FLOATS, coo) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 65. row out of bounds
@@ -8076,6 +9309,8 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 coo(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz) -> (mut coo)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### mat - matrix type declaration
 *Defined in: std/sci/unsafe.s line 8*
@@ -8085,6 +9320,8 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride) -> (mut mat)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### coo
 *Defined in: std/sci/coo.s line 40*
@@ -8092,6 +9329,8 @@ mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride) -> (mut mat)
 ```rust
 coo(sparse_element[], nat rows, nat cols) -> (mut coo)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### coo - allocate a sparse matrix
 *Defined in: std/sci/coo.s line 34*
@@ -8101,6 +9340,8 @@ This creates a new buffer of sparse elements for convenience.
 ```rust
 coo(nat rows, nat cols, nat nnz) -> (mut coo)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -8122,6 +9363,8 @@ to indicate the new matrix's orientation.
 ```rust
 mat(vec, "col") -> (mut mat)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### mat - view a vector as a matrix on the same memory
 *Defined in: std/sci/mat.s line 55*
@@ -8132,6 +9375,8 @@ to indicate the new matrix's orientation.
 ```rust
 mat(vec, "row") -> (mut mat)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### mat - matrix on an existing float[] buffer
 *Defined in: std/sci/mat.s line 37*
@@ -8139,11 +9384,13 @@ mat(vec, "row") -> (mut mat)
 ```rust
 mat(edit float[], nat rows) -> (mut mat)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 64. buffer size not divisible by vector rows
 16. arena is out of space
-4. division by zero 
+4. division by zero
 62. can only place matrices on contiguous buffers
 63. cannot place matrices on buffer offsets
 
@@ -8153,6 +9400,8 @@ Potential errors:
 ```rust
 mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -8165,6 +9414,8 @@ Potential errors:
 ```rust
 mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 17. does not fit in circular arena
@@ -8177,6 +9428,8 @@ Potential errors:
 ```rust
 mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -8189,6 +9442,8 @@ Potential errors:
 ```rust
 mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -8201,6 +9456,8 @@ Potential errors:
 ```rust
 mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -8219,6 +9476,8 @@ free(mut any ptr) -> ()
 ```rust
 mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -8241,6 +9500,8 @@ Ensures that 'tag ptr' has a unique type and allocates at least a cstr's
 ```rust
 tagged(cstr) -> (tagged)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # unsafe\_match
 ### unsafe\_match
@@ -8249,6 +9510,8 @@ tagged(cstr) -> (tagged)
 ```rust
 unsafe_match(tagged ptr obj, cstr name, any ptr type) -> (mut any ptr {follows any ptr type})
 ```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -8261,6 +9524,8 @@ Potential errors:
 ```rust
 unsafe_defer_free(mut tagged ptr) -> (mut tagged ptr)
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 
 Returned values defer use of the following functions:
@@ -8274,6 +9539,8 @@ free(mut any ptr) -> ()
 ```rust
 tagged_alloc(edit arena, nat size) -> (mut char ptr)
 ```
+Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 16. arena is out of space
@@ -8286,6 +9553,8 @@ Potential errors:
 ```rust
 match(cstr obj, cstr type_name) -> (mut char[])
 ```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -8315,6 +9584,8 @@ the original one without any safety.
 ```rust
 realloc(any ptr allocated, nat bytes) -> (any ptr {follows any ptr allocated})
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 11. reallocation failed
@@ -8330,6 +9601,8 @@ Frees allocated memory.
 ```rust
 free(mut any ptr) -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # zero
 ### zero - set memory to zero
@@ -8342,6 +9615,8 @@ Memsets a memory region to zero.
 ```rust
 zero(any ptr allocated, nat from, nat to) -> ()
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # color
 ### color
@@ -8350,6 +9625,8 @@ zero(any ptr allocated, nat from, nat to) -> ()
 ```rust
 color(nat _r, nat _g, nat _b, nat _a) -> (nat8 r, nat8 g, nat8 b, nat8 a)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 56. nat value too large to pack in nat8
@@ -8360,6 +9637,8 @@ Potential errors:
 ```rust
 color(nat _r, nat _g, nat _b) -> (nat8 r, nat8 g, nat8 b, nat8 a)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 56. nat value too large to pack in nat8
@@ -8371,6 +9650,8 @@ Potential errors:
 ```rust
 position(float x, float y) -> (float x, float y)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # size
 ### size
@@ -8379,6 +9660,8 @@ position(float x, float y) -> (float x, float y)
 ```rust
 size(float width, float height) -> (float width, float height)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # window
 ### window
@@ -8387,6 +9670,8 @@ size(float width, float height) -> (float width, float height)
 ```rust
 window(float size.width, float size.height, cstr title, cstr font_path) -> (edit window)
 ```
+Levels of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # is\_open
 ### is\_open
@@ -8395,6 +9680,8 @@ window(float size.width, float size.height, cstr title, cstr font_path) -> (edit
 ```rust
 is_open(edit window) -> (bool) with effects WINDOW
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # draw
 ### draw
@@ -8403,10 +9690,12 @@ is_open(edit window) -> (bool) with effects WINDOW
 ```rust
 draw(edit window, Texture, float pos.x, float pos.y, float rotation, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
-4. division by zero 
+4. division by zero
 15. out of bounds
 
 ### draw
@@ -8415,6 +9704,8 @@ Potential errors:
 ```rust
 draw(edit window, Texture, float pos.x, float pos.y, float rotation, float scale, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -8426,6 +9717,8 @@ Potential errors:
 ```rust
 draw(edit window, Texture, float pos.x, float pos.y, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 2. null pointer
@@ -8437,6 +9730,8 @@ Potential errors:
 ```rust
 draw(edit window) -> (bool) with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 74. alopeny drawing on window
@@ -8452,6 +9747,8 @@ Returned values defer use of the following functions:
 ```rust
 clear(edit window, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # text
 ### text
@@ -8460,6 +9757,8 @@ clear(edit window, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> ()
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### text
 *Defined in: std/graphics.s line 64*
@@ -8467,6 +9766,8 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### text
 *Defined in: std/graphics.s line 52*
@@ -8474,6 +9775,8 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 ```rust
 text(edit window, cstr txt, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # text\_rotated
 ### text\_rotated
@@ -8482,6 +9785,8 @@ text(edit window, cstr txt, float pos.x, float pos.y, float size, nat8 color.r, 
 ```rust
 text_rotated(edit window, str, float pos.x, float pos.y, float origin.x, float origin.y, float rotation, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 ### text\_rotated
 *Defined in: std/graphics.s line 76*
@@ -8489,6 +9794,8 @@ text_rotated(edit window, str, float pos.x, float pos.y, float origin.x, float o
 ```rust
 text_rotated(edit window, str, float pos.x, float pos.y, float origin.x, float origin.y, float rotation, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # TextureData
 ### TextureData
@@ -8497,6 +9804,8 @@ text_rotated(edit window, str, float pos.x, float pos.y, float origin.x, float o
 ```rust
 TextureData(nat id, float size.width, float size.height, nat mipmaps, nat format) -> (nat id, float size.width, float size.height, nat mipmaps, nat format)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # Texture
 ### Texture
@@ -8505,6 +9814,8 @@ TextureData(nat id, float size.width, float size.height, nat mipmaps, nat format
 ```rust
 Texture(nat id, float size.width, float size.height, nat mipmaps, nat format) -> (Texture)
 ```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -8524,6 +9835,8 @@ free(mut any ptr) -> ()
 ```rust
 open(cstr) -> (Texture)
 ```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
 Potential errors:
 
 10. allocation failed
@@ -8543,6 +9856,8 @@ free(mut any ptr) -> ()
 ```rust
 circ(edit window, float pos.x, float pos.y, float radius, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # rect
 ### rect
@@ -8551,6 +9866,8 @@ circ(edit window, float pos.x, float pos.y, float radius, nat8 color.r, nat8 col
 ```rust
 rect(edit window, float pos.x, float pos.y, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # rect\_line
 ### rect\_line
@@ -8559,6 +9876,8 @@ rect(edit window, float pos.x, float pos.y, float size.width, float size.height,
 ```rust
 rect_line(edit window, float pos.x, float pos.y, float size.width, float size.height, nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # circ\_line
 ### circ\_line
@@ -8567,6 +9886,8 @@ rect_line(edit window, float pos.x, float pos.y, float size.width, float size.he
 ```rust
 circ_line(edit window, float pos.x, float pos.y, nat radius, nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # dt
 ### dt
@@ -8575,6 +9896,8 @@ circ_line(edit window, float pos.x, float pos.y, nat radius, nat thickness, nat8
 ```rust
 dt(window) -> (float) with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # key\_down
 ### key\_down
@@ -8583,6 +9906,8 @@ dt(window) -> (float) with effects WINDOW
 ```rust
 key_down(window, nat key) -> (bool) with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # key\_pressed
 ### key\_pressed
@@ -8591,6 +9916,8 @@ key_down(window, nat key) -> (bool) with effects WINDOW
 ```rust
 key_pressed(edit window, nat key) -> (bool) with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # key\_released
 ### key\_released
@@ -8599,6 +9926,8 @@ key_pressed(edit window, nat key) -> (bool) with effects WINDOW
 ```rust
 key_released(edit window, nat key) -> (bool) with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # mouse\_pos
 ### mouse\_pos
@@ -8607,6 +9936,8 @@ key_released(edit window, nat key) -> (bool) with effects WINDOW
 ```rust
 mouse_pos(window) -> (float x, float y) with effects WINDOW
 ```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # mouse\_down
 ### mouse\_down
@@ -8615,6 +9946,8 @@ mouse_pos(window) -> (float x, float y) with effects WINDOW
 ```rust
 mouse_down(window, nat button) -> (bool) with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # mouse\_pressed
 ### mouse\_pressed
@@ -8623,6 +9956,8 @@ mouse_down(window, nat button) -> (bool) with effects WINDOW
 ```rust
 mouse_pressed(edit window, nat button) -> (bool) with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # mouse\_wheel
 ### mouse\_wheel
@@ -8631,6 +9966,8 @@ mouse_pressed(edit window, nat button) -> (bool) with effects WINDOW
 ```rust
 mouse_wheel(window) -> (float) with effects WINDOW
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_NULL
 ### \_\_t7663t
@@ -8639,6 +9976,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (0)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_APOSTROPHE
 ### \_\_t7666t
@@ -8647,6 +9986,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (39)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_COMMA
 ### \_\_t7669t
@@ -8655,6 +9996,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (44)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_MINUS
 ### \_\_t7672t
@@ -8663,6 +10006,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (45)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_PERIOD
 ### \_\_t7675t
@@ -8671,6 +10016,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (46)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_SLASH
 ### \_\_t7678t
@@ -8679,6 +10026,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (47)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_ZERO
 ### \_\_t7681t
@@ -8687,6 +10036,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (48)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_ONE
 ### \_\_t7684t
@@ -8695,6 +10046,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (49)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_TWO
 ### \_\_t7687t
@@ -8703,6 +10056,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (50)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_THREE
 ### \_\_t7690t
@@ -8711,6 +10066,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (51)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_FOUR
 ### \_\_t7693t
@@ -8719,6 +10076,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (52)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_FIVE
 ### \_\_t7696t
@@ -8727,6 +10086,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (53)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_SIX
 ### \_\_t7699t
@@ -8735,6 +10096,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (54)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_SEVEN
 ### \_\_t7702t
@@ -8743,6 +10106,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (55)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_EIGHT
 ### \_\_t7705t
@@ -8751,6 +10116,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (56)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_NINE
 ### \_\_t7708t
@@ -8759,6 +10126,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (57)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_SEMICOLON
 ### \_\_t7711t
@@ -8767,6 +10136,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (59)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_EQUAL
 ### \_\_t7714t
@@ -8775,6 +10146,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (61)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_A
 ### \_\_t7717t
@@ -8783,6 +10156,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (65)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_B
 ### \_\_t7720t
@@ -8791,6 +10166,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (66)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_C
 ### \_\_t7723t
@@ -8799,6 +10176,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (67)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_D
 ### \_\_t7726t
@@ -8807,6 +10186,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (68)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_E
 ### \_\_t7729t
@@ -8815,6 +10196,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (69)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F
 ### \_\_t7732t
@@ -8823,6 +10206,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (70)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_G
 ### \_\_t7735t
@@ -8831,6 +10216,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (71)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_H
 ### \_\_t7738t
@@ -8839,6 +10226,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (72)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_I
 ### \_\_t7741t
@@ -8847,6 +10236,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (73)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_J
 ### \_\_t7744t
@@ -8855,6 +10246,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (74)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_K
 ### \_\_t7747t
@@ -8863,6 +10256,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (75)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_L
 ### \_\_t7750t
@@ -8871,6 +10266,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (76)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_M
 ### \_\_t7753t
@@ -8879,6 +10276,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (77)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_N
 ### \_\_t7756t
@@ -8887,6 +10286,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (78)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_O
 ### \_\_t7759t
@@ -8895,6 +10296,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (79)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_P
 ### \_\_t7762t
@@ -8903,6 +10306,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (80)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_Q
 ### \_\_t7765t
@@ -8911,6 +10316,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (81)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_R
 ### \_\_t7768t
@@ -8919,6 +10326,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (82)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_S
 ### \_\_t7771t
@@ -8927,6 +10336,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (83)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_T
 ### \_\_t7774t
@@ -8935,6 +10346,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (84)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_U
 ### \_\_t7777t
@@ -8943,6 +10356,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (85)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_V
 ### \_\_t7780t
@@ -8951,6 +10366,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (86)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_W
 ### \_\_t7783t
@@ -8959,6 +10376,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (87)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_X
 ### \_\_t7786t
@@ -8967,6 +10386,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (88)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_Y
 ### \_\_t7789t
@@ -8975,6 +10396,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (89)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_Z
 ### \_\_t7792t
@@ -8983,6 +10406,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (90)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_LEFT\_BRACKET
 ### \_\_t7795t
@@ -8991,6 +10416,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (91)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_BACKSLASH
 ### \_\_t7798t
@@ -8999,6 +10426,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (92)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_RIGHT\_BRACKET
 ### \_\_t7801t
@@ -9007,6 +10436,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (93)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_GRAVE
 ### \_\_t7804t
@@ -9015,6 +10446,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (96)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_SPACE
 ### \_\_t7807t
@@ -9023,6 +10456,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (32)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_ESCAPE
 ### \_\_t7810t
@@ -9031,6 +10466,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (256)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_ENTER
 ### \_\_t7813t
@@ -9039,6 +10476,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (257)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_TAB
 ### \_\_t7816t
@@ -9047,6 +10486,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (258)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_BACKSPACE
 ### \_\_t7819t
@@ -9055,6 +10496,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (259)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_INSERT
 ### \_\_t7822t
@@ -9063,6 +10506,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (260)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_DELETE
 ### \_\_t7825t
@@ -9071,6 +10516,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (261)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_RIGHT
 ### \_\_t7828t
@@ -9079,6 +10526,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (262)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_LEFT
 ### \_\_t7831t
@@ -9087,6 +10536,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (263)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_DOWN
 ### \_\_t7834t
@@ -9095,6 +10546,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (264)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_UP
 ### \_\_t7837t
@@ -9103,6 +10556,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (265)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_PAGE\_UP
 ### \_\_t7840t
@@ -9111,6 +10566,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (266)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_PAGE\_DOWN
 ### \_\_t7843t
@@ -9119,6 +10576,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (267)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_HOME
 ### \_\_t7846t
@@ -9127,6 +10586,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (268)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_END
 ### \_\_t7849t
@@ -9135,6 +10596,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (269)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_CAPS\_LOCK
 ### \_\_t7852t
@@ -9143,6 +10606,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (280)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_SCROLL\_LOCK
 ### \_\_t7855t
@@ -9151,6 +10616,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (281)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_NUM\_LOCK
 ### \_\_t7858t
@@ -9159,6 +10626,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (282)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_PRINT\_SCREEN
 ### \_\_t7861t
@@ -9167,6 +10636,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (283)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_PAUSE
 ### \_\_t7864t
@@ -9175,6 +10646,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (284)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F1
 ### \_\_t7867t
@@ -9183,6 +10656,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (290)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F2
 ### \_\_t7870t
@@ -9191,6 +10666,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (291)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F3
 ### \_\_t7873t
@@ -9199,6 +10676,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (292)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F4
 ### \_\_t7876t
@@ -9207,6 +10686,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (293)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F5
 ### \_\_t7879t
@@ -9215,6 +10696,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (294)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F6
 ### \_\_t7882t
@@ -9223,6 +10706,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (295)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F7
 ### \_\_t7885t
@@ -9231,6 +10716,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (296)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F8
 ### \_\_t7888t
@@ -9239,6 +10726,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (297)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F9
 ### \_\_t7891t
@@ -9247,6 +10736,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (298)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F10
 ### \_\_t7894t
@@ -9255,6 +10746,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (299)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F11
 ### \_\_t7897t
@@ -9263,6 +10756,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (300)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_F12
 ### \_\_t7900t
@@ -9271,6 +10766,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (301)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_LEFT\_SHIFT
 ### \_\_t7903t
@@ -9279,6 +10776,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (340)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_LEFT\_CONTROL
 ### \_\_t7906t
@@ -9287,6 +10786,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (341)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_LEFT\_ALT
 ### \_\_t7909t
@@ -9295,6 +10796,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (342)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_LEFT\_SUPER
 ### \_\_t7912t
@@ -9303,6 +10806,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (343)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_RIGHT\_SHIFT
 ### \_\_t7915t
@@ -9311,6 +10816,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (344)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_RIGHT\_CONTROL
 ### \_\_t7918t
@@ -9319,6 +10826,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (345)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_RIGHT\_ALT
 ### \_\_t7921t
@@ -9327,6 +10836,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (346)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_RIGHT\_SUPER
 ### \_\_t7924t
@@ -9335,6 +10846,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (347)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KB\_MENU
 ### \_\_t7927t
@@ -9343,6 +10856,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (348)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_0
 ### \_\_t7930t
@@ -9351,6 +10866,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (320)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_1
 ### \_\_t7933t
@@ -9359,6 +10876,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (321)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_2
 ### \_\_t7936t
@@ -9367,6 +10886,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (322)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_3
 ### \_\_t7939t
@@ -9375,6 +10896,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (323)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_4
 ### \_\_t7942t
@@ -9383,6 +10906,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (324)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_5
 ### \_\_t7945t
@@ -9391,6 +10916,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (325)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_6
 ### \_\_t7948t
@@ -9399,6 +10926,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (326)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_7
 ### \_\_t7951t
@@ -9407,6 +10936,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (327)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_8
 ### \_\_t7954t
@@ -9415,6 +10946,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (328)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_9
 ### \_\_t7957t
@@ -9423,6 +10956,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (329)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_DECIMAL
 ### \_\_t7960t
@@ -9431,6 +10966,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (330)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_DIVIDE
 ### \_\_t7963t
@@ -9439,6 +10976,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (331)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_MULTIPLY
 ### \_\_t7966t
@@ -9447,6 +10986,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (332)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_SUBTRACT
 ### \_\_t7969t
@@ -9455,6 +10996,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (333)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_ADD
 ### \_\_t7972t
@@ -9463,6 +11006,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (334)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_ENTER
 ### \_\_t7975t
@@ -9471,6 +11016,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (335)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_KP\_EQUAL
 ### \_\_t7978t
@@ -9479,6 +11026,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (336)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_BACK
 ### \_\_t7981t
@@ -9487,6 +11036,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (4)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_MENU
 ### \_\_t7984t
@@ -9495,6 +11046,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (5)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_VOLUME\_UP
 ### \_\_t7987t
@@ -9503,6 +11056,8 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (24)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # KEY\_VOLUME\_DOWN
 ### \_\_t7990t
@@ -9511,4 +11066,6 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (25)
 ```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 

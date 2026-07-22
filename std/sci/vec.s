@@ -60,7 +60,7 @@ local def at(vec v, nat i)
 
 def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector addition"
-    doc "Grabs an FLOATS for the result as an effect."
+    doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length
         fail "different vector sizes"
     v = edit vec(v1.length dirty)
@@ -71,12 +71,12 @@ def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 
 def add(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector addition"
-    doc "Grabs an FLOATS for the result as an effect."
+    doc "Grabs a FLOATS allocator effect to store the result."
     return v2+v1
 
 def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector subtraction"
-    doc "Grabs an FLOATS for the result as an effect."
+    doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
     v = edit vec(v1.length dirty)
@@ -87,7 +87,7 @@ def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 
 def sub(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector subtraction"
-    doc "Grabs an FLOATS for the result as an effect."
+    doc "Grabs a FLOATS allocator effect to store the result."
     v = edit vec v2.length
     for value in v2
         v[compiler::for_counter()] = v1-value
@@ -95,7 +95,7 @@ def sub(effect edit float_allocator FLOATS, float v1, vec v2)
 
 def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector multiplication"
-    doc "Grabs an FLOATS for the result as an effect."
+    doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
     v = edit vec(v1.length dirty)
@@ -106,13 +106,13 @@ def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 
 def mul(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector multiplication"
-    doc "Grabs an FLOATS for the result as an effect."
+    doc "Grabs a FLOATS allocator effect to store the result."
     return v2*v1
 
 
 def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector exponentiation"
-    doc "Grabs an FLOATS for the result as an effect."
+    doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
     v = edit vec(v1.length dirty)
@@ -123,7 +123,7 @@ def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 
 def pow(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector exponentiation"
-    doc "Grabs an FLOATS for the result as an effect."
+    doc "Grabs a FLOATS allocator effect to store the result."
     v = edit vec(v2.length dirty)
     for value in v2
         v[compiler::for_counter()] = pow(v1, value)
@@ -131,7 +131,7 @@ def pow(effect edit float_allocator FLOATS, float v1, vec v2)
 
 def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector division"
-    doc "Grabs an FLOATS for the result as an effect."
+    doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
     v = edit vec(v1.length dirty)
@@ -143,7 +143,7 @@ def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 
 def div(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector division"
-    doc "Grabs an FLOATS for the result as an effect."
+    doc "Grabs a FLOATS allocator effect to store the result."
     v = edit vec(v2.length dirty)
     for value in v2
         v[compiler::for_counter()] = v1/value

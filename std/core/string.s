@@ -254,7 +254,7 @@ def slice(cstr|str _s, nat from, nat to)
     if from==to return str ""
     if from>to or to>s.dat.length fail "slice out of string bounds"
     new_length = to-from
-    if from!=0 new_first = s[from]
+    if from!=0 new_first = const s[from]
     else new_first = const s.dat.first
     return str(s.unsafe_ptr, s.dat.pos+from, new_length, new_first)
 

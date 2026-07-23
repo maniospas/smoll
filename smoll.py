@@ -43,8 +43,15 @@ from itertools import count
 import gc
 import re
 try:
+    prev_stdout = sys.stdout
+    prev_stderr = sys.stderr
+    sys.stdout = None
+    sys.stderr = None
     import pyray
 except: pass
+finally: 
+    sys.stdout = prev_stdout
+    sys.stderr = prev_stderr
 gc.disable()
 #gc.set_threshold(150000)
 
@@ -659,18 +666,18 @@ class Variable(CodeSegment):
     def copy(self, prefix: str): return Variable(prefix+"__"+self.name, self.type, self.immutable, self.isprivate, self._references)
     def renamed_copy(self, new_name: str, token: Optional["Token"]=None): return Variable(new_name, self.type, self.immutable, self.isprivate, self._references, token if token else self.token)
     def mutable_copy(self, error_token): 
-        if error_token and self.type is POINTER_TYPE and self.immutable: 
-            error_token.error("safety", "cannot make mutable an immutable pointer '"+pretty_name(self.name)+"'", suggestions=["set the pointer or its data structure locally as a 'ref'; this fixes references to the original while mutating the rest", "if you know what you are doing, use 'unsafe_mut' instead to overwrite safety"])
+        if error_token and self.type is POINTER_TYPE and self.immutable and not self.isprivate:
+            error_token.error("safety", "cannot make mutable an immutable pointer '"+pretty_name(self.name)+"'", suggestions=["if the pointer resides on a buffer element, get a mutable pointer to that element per 'value = buf[index]&&' given that buf[index] is syntax sugar for derefencing 'get' and not 'mutget'", "if you want to decouple from buffer element do value = compiler::deref buf[index]&&' given that buf[index] is syntax sugar for derefencing 'get' and not 'mutget'", "set the pointer or its data structure locally as a 'ref'; this fixes references to the original while mutating the rest", "if you know what you are doing, use 'unsafe_mut' instead to overwrite safety"])
         if error_token and self._references: # this should not appear when 'mut' is used for both mutation and safe mutation
             error_token.error("safety", "cannot make a reference mutable '"+pretty_name(self.name), suggestions=["use 'safe_mut' instead", "use 'ref mut' instead of 'mut ref'"])
-        return Variable(self.name, self.type, False, self.isprivate, self._references, error_token if error_token else self.token)
+        return Variable(self.name, self.type, False, self.isprivate if error_token else False, self._references, error_token if error_token else self.token)
     def editable_copy(self):
         if self.type is POINTER_TYPE and self.immutable: 
             return self
         if self._references:
             return self
         return Variable(self.name, self.type, self.immutable and not self.isprivate, self.isprivate, self._references, self.token)
-    def immutable_copy(self): return Variable(self.name, self.type, True, False, self._references, self.token)
+    def immutable_copy(self): return Variable(self.name, self.type, True, self.isprivate, self._references, self.token)
     def private_copy(self): return Variable(self.name, self.type, self.immutable, True, self._references, self.token)
     def is_same(self, other: "Variable"):
         if self.type!=other.type: return False
@@ -4209,11 +4216,16 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     len_common_prefix = 0
                     temp_type = ImplementedType(associated_type.name+"."+field_name)
                     associated_len_common_prefix = longest_common_prefix_len([var for var in associated_type.rets[min_pos:max_pos_plus_one]])
+                    isprivate = False
+                    new_var_name = None
                     for j in range(min_pos, max_pos_plus_one):
-                        new_name = associated_type.rets[j][associated_len_common_prefix:]
+                        new_name = associated_type.rets[j]
+                        if len(new_name)>associated_len_common_prefix: new_name = new_name[associated_len_common_prefix:]
+                        else: new_var_name = new_name
                         temp_type.rets.append(new_name)
                         temp_type.vars[new_name] = associated_type.vars[associated_type.rets[j]].renamed_copy(new_name)
-                    new_var = Variable(create_temp(), POINTER_TYPE, immutable=rets[0].immutable, isprivate=rets[0].isprivate, token=op_token)
+                        if temp_type.vars[new_name].isprivate: isprivate = True
+                    new_var = Variable(new_var_name if new_var_name else create_temp(), POINTER_TYPE, immutable=rets[0].immutable, isprivate=rets[0].isprivate or isprivate, token=op_token)
                     impl.vars[new_var.name] = new_var
                     impl.set_pointer_type(new_var, temp_type)
                     if is_lsp and field_token.file.is_main_file: print_lsp_var(field_token, signature_like([new_var], impl))
@@ -4859,7 +4871,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         
     if current=="mut":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**mutable**\n\nDeclares that the following value will be treated as mutable, meaning that it can be overwritten with a value of the same type, and that its fields and pointer contents may be modified. This also means that variables, fields and pointer contents may modified. Creates an error if such treatment is unsafe.")
-        if peek_text(tokens, pos-1) not in ["=", "return"]: current_token.error("safety", "'mut' can only follow an assignment or 'return' symbol (temporary variables retain 'edit' status)")
+        if peek_text(tokens, pos-1) not in ["=", "local", "return"]: current_token.error("safety", "'mut' can only follow an assignment, 'local', or 'return' symbol (temporary variables retain 'mut' status)")
         prev_pos = pos
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         if len(ret)==0:
@@ -4873,7 +4885,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
     
     if current=="edit":
         if is_lsp and current_token.file.is_main_file: print_lsp_decorator(current_token, "**editable**\n\nDeclares that the following value cannot be overwritten, but its fields and pointer contents may be modified. Creates an error if such treatment is unsafe.")
-        if peek_text(tokens, pos-1) not in ["=", "return"]: current_token.error("safety", "'edit' can only follow an assignment or 'return' symbol (temporary variables retain 'edit' status)")
+        if peek_text(tokens, pos-1) not in ["=", "local", "return"]: current_token.error("safety", "'edit' can only follow an assignment, 'local', or 'return' symbol (temporary variables retain 'edit' status)")
         prev_pos = pos
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         if len(ret)==0:
@@ -5752,10 +5764,10 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                     if var is None: continue
                     if var.type!=v.type:
                         tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable with different types '"+k+"'")
-                    if var.isprivate!=v.isprivate:
+                    if (var.isprivate or var.immutable)!=(v.isprivate or v.immutable):
                         tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable but assume differently whether it is packed in a class '"+k+"' - perhaps try to 'const' it first")
-                    if var.immutable!=v.immutable:
-                        tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable but assume differently whether it is immutable '"+k+"'") 
+                    # if var.immutable!=v.immutable:
+                    #     tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable but assume differently whether it is immutable '"+k+"'") 
                 for k, v in diff_vars_if.items():
                     var = impl.vars.get(k, None)
                     if var is None:
@@ -5763,10 +5775,10 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                         continue
                     if var.type!=v.type:
                         tokens[if_pos].error("safety", "the conditional blocks starting here have a variable with different types '"+k+"'")
-                    if var.isprivate!=v.isprivate:
+                    if (var.isprivate or var.immutable)!=(v.isprivate or v.immutable):
                         tokens[if_pos].error("safety", "the conditional blocks starting here have a variable but assume differently whether it is packed in a class '"+k+"' - perhaps try to 'const' it first")
-                    if var.immutable!=v.immutable:
-                        tokens[if_pos].error("safety", "the conditional blocks starting here have a variable but assume differently whether it is immutable '"+k+"'") 
+                    # if var.immutable!=v.immutable:
+                    #     tokens[if_pos].error("safety", "the conditional blocks starting here have a variable but assume differently whether it is immutable '"+k+"'") 
             continue
         pos, _ = await process_statement(file, tokens, pos-1, impl, 0)
     return pos
@@ -5998,7 +6010,8 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                 for ret in arg_type.rets:
                     ret_name = arg_name+"__"+ret[prefix_len:]  if len(arg_type.rets)>1 else arg_name
                     impl.vars[ret_name] = arg_type.vars[ret].renamed_copy(ret_name, start_token)
-                    if immutable==0: impl.vars[ret_name] = impl.vars[ret_name].mutable_copy(tokens[pos-1])
+                    if immutable==0: 
+                        impl.vars[ret_name] = impl.vars[ret_name].mutable_copy(tokens[pos-1])
                     elif immutable==1:
                         original_var = impl.vars[ret_name] 
                         if (not impl.vars[ret_name].isprivate and not impl.vars[ret_name].immutable): #or not impl.vars[ret_name].type.builtin: 
@@ -6007,7 +6020,8 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                             impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
                             #if original_var.immutable!=impl.vars[ret_name].immutable:
                             used_immutable = True
-                    elif immutable==-1: impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
+                    elif immutable==-1: 
+                        impl.vars[ret_name] = impl.vars[ret_name].immutable_copy()
                     elif immutable==-2:
                         impl.vars[ret_name] = impl.vars[ret_name].stable_copy()
                     impl.refargs.append(ret_name) # start with everything as refarg and we will remove during assignment

@@ -384,7 +384,7 @@ within namespaces.</p>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">core</span><span class="p">::</span><span class="n">console</span><span class="p">()</span> 
     <span class="n">x1</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">x2</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">core</span><span class="p">::</span><span class="n">add</span> <span class="mi">1</span>
     <span class="n">core</span><span class="p">::</span><span class="nb">print</span> <span class="n">x2</span><span class="o">.</span><span class="n">core</span><span class="p">::</span><span class="n">add</span> <span class="mi">2</span>
@@ -474,7 +474,7 @@ a deliberate choise to enforce memory safety later.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
-    <span class="n">r</span> <span class="o">=</span> <span class="n">toinfinity</span> <span class="mi">0</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">toinfinity</span> <span class="mi">0</span>
     <span class="nb">next</span> <span class="n">r</span> <span class="c1"># proper loops later</span>
     <span class="nb">print</span> <span class="n">r</span><span class="o">.</span><span class="n">pos</span>
     <span class="nb">print</span> <span class="n">add</span> <span class="n">r</span>
@@ -504,7 +504,7 @@ important to safeguard.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="n">Point</span> <span class="n">p</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="n">point</span> <span class="n">p</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">p</span><span class="o">.</span><span class="n">y</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -545,7 +545,7 @@ triple should be allowed.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
-    <span class="n">data</span> <span class="o">=</span> <span class="n">std_data</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">std_data</span><span class="p">()</span>
     <span class="n">data</span><span class="o">.</span><span class="n">register</span> <span class="mf">1.0</span>
     <span class="n">data</span><span class="o">.</span><span class="n">register</span> <span class="mf">1.0</span>
     <span class="n">data</span><span class="o">.</span><span class="n">register</span> <span class="mf">2.3</span>
@@ -563,15 +563,15 @@ This is exemplified below.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">Point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span> 
+<span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span> 
     <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">Field</span><span class="p">(</span><span class="n">Point</span> <span class="n">a</span><span class="p">,</span> <span class="n">Point</span> <span class="n">b</span><span class="p">)</span> 
+<span class="k">def</span><span class="w"> </span><span class="nf">field</span><span class="p">(</span><span class="n">point</span> <span class="n">a</span><span class="p">,</span> <span class="n">point</span> <span class="n">b</span><span class="p">)</span> 
     <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
-    <span class="n">f</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">f</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">f</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="c1"># prints 5.0</span>
 </code></pre>
 </div>
@@ -608,16 +608,16 @@ permissions.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">Test</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">1</span>
     <span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
-    <span class="n">t</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">Test</span><span class="p">()</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">Test</span><span class="p">()</span> <span class="c1"># overwrite &#39;t&#39; completely - remains mutable</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> 
+    <span class="n">t</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">test</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">test</span><span class="p">()</span> <span class="c1"># overwrite &#39;t&#39; completely - remains mutable</span>
+    <span class="nb">print</span> <span class="n">t</span><span class="o">.</span><span class="n">x</span> 
 </code></pre>
 </div>
 
@@ -644,26 +644,26 @@ modifications.</p>
 </code></pre>
 </div>
 
-<p>It has been already mentioned, but is worth repeating: to preserve mutation for
+<p>It has been already mentioned, but worth repeating: to preserve mutation for
 mutable fields without allowing a full variable rewrite use <code>edit</code>.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">Test</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">1</span>
     <span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">(</span><span class="n">edit</span> <span class="n">Test</span> <span class="n">t</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">edit</span> <span class="n">test</span> <span class="n">t</span><span class="p">)</span>
     <span class="n">t</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1"># allowed only thanks to &#39;edit&#39;</span>
     <span class="nb">print</span> <span class="n">t</span><span class="o">.</span><span class="n">x</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
-    <span class="n">t</span> <span class="o">=</span> <span class="n">Test</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">test</span><span class="p">()</span>
     <span class="n">t</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">5</span>
-    <span class="n">test</span> <span class="n">t</span>
+    <span class="n">run</span> <span class="n">t</span>
 </code></pre>
 </div>
 
@@ -995,7 +995,8 @@ will be added in the future.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">:</span><span class="nb">print</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">::</span><span class="nb">print</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">::</span><span class="n">console</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span> <span class="n">y</span><span class="p">)</span>
     <span class="p">{</span><span class="n">builtins</span><span class="p">::</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
@@ -1014,7 +1015,8 @@ An example follows.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">:</span><span class="nb">print</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">::</span><span class="nb">print</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">::</span><span class="n">console</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Number</span> <span class="o">=</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="n">Number</span> <span class="n">x</span><span class="p">,</span> <span class="n">Number</span> <span class="n">y</span><span class="p">)</span>
@@ -1046,6 +1048,8 @@ symbol for set differces.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="c1"># defines Number like above</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">natpair</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="p">;:</span><span class="n">args</span><span class="p">()</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">float</span><span class="p">(</span><span class="n">natpair</span> <span class="n">a</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span>
     <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span>
@@ -1084,6 +1088,7 @@ literal types (so capitals indicate either effects or literals).</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">INCREMENT</span> <span class="o">=</span> <span class="mi">1</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">INCREMENT</span>
 
@@ -1102,8 +1107,10 @@ can be a string or number literal.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">VERSION</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">)</span> <span class="c1"># just a literal type</span>
     <span class="nb">print</span> <span class="s2">&quot;version one&quot;</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;version two&quot;</span>
 
@@ -1180,22 +1187,25 @@ the same-named type literal. Below is an example.</p>
 <p>Do remember that this syntax replaces the comma separator. So it occurs after an expression 
 ends. Therefore, to convert two literals
 back-to-back, you need use a placeholder with no outputs as an argument, 
-like <code>blank()</code>. But you can still have a literal at the end of an expression.</p>
+like the <code>()</code> expression. But you can still have a literal at the end of an expression.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;sub&quot;</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">-</span><span class="n">y</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">5</span>
     <span class="n">modify</span><span class="p">(</span><span class="n">x</span> <span class="n">add</span> <span class="mi">3</span><span class="p">)</span>
-    <span class="n">modify</span><span class="p">(</span><span class="n">x</span> <span class="n">add</span> <span class="n">blank</span><span class="p">()</span> <span class="n">one</span><span class="p">)</span>
+    <span class="n">modify</span><span class="p">(</span><span class="n">x</span> <span class="n">add</span> <span class="p">()</span> <span class="n">one</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">x</span> <span class="c1"># prints 9</span>
 </code></pre>
 </div>
@@ -1342,7 +1352,7 @@ runtime.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">vec</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]</span>
-    <span class="n">allocator</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
+    <span class="n">FLOATS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">128</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">+</span><span class="n">ones</span>
     <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># prints 6.0</span>
     <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># prints 11.0</span>
@@ -1870,7 +1880,10 @@ like below.</p>
 of the iteration state, even when the iterator itself
 is constant. But you can always skip it. For example,
 next is a program that keeps the iteration state inside
-the data.</p>
+the data. Do note usage of <code>local</code> to create a temporary
+mutable variable that remains anonymous; for logical safety,
+permissions can only after this qualifier, equality, and 
+returns.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1878,7 +1891,7 @@ the data.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">solution</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">mut</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">edit</span> <span class="n">solution</span> <span class="n">s</span><span class="p">,</span> <span class="n">nat</span><span class="p">)</span> <span class="c1"># skip the iteration index argument</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">mut</span> <span class="n">solution</span> <span class="n">s</span><span class="p">,</span> <span class="n">nat</span><span class="p">)</span> <span class="c1"># skip the iteration index argument</span>
     <span class="n">s</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
     <span class="n">s</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
     <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="n">s</span><span class="o">.</span><span class="n">y</span> <span class="n">fail</span> <span class="s2">&quot;converged&quot;</span>
@@ -1887,7 +1900,7 @@ the data.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">sol</span> <span class="o">=</span> <span class="n">solution</span><span class="p">(</span><span class="n">mut</span> <span class="mi">32</span><span class="p">,</span> <span class="n">mut</span> <span class="mi">19</span><span class="p">)</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">solution</span><span class="p">(</span><span class="n">local</span> <span class="n">mut</span> <span class="mi">32</span><span class="p">,</span> <span class="n">local</span> <span class="n">mut</span> <span class="mi">19</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">diff</span> <span class="ow">in</span> <span class="n">sol</span> 
         <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;difference &quot;</span>
         <span class="nb">print</span> <span class="n">diff</span>
@@ -2072,7 +2085,7 @@ to call a functor with given arguments. The retrieval into a factor should be un
 <span class="k">def</span><span class="w"> </span><span class="nf">least</span><span class="p">(</span><span class="n">nat</span><span class="p">[]</span> <span class="n">numbers</span><span class="p">,</span> <span class="n">pair</span><span class="o">-&gt;</span><span class="nb">bool</span> <span class="n">order</span><span class="p">)</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">numbers</span>
-        <span class="k">if</span> <span class="n">call</span> <span class="n">order</span><span class="p">(</span><span class="n">number</span><span class="p">,</span><span class="n">ret</span><span class="p">)</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">number</span>
+        <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span><span class="p">(</span><span class="n">number</span><span class="p">,</span><span class="n">ret</span><span class="p">)</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">number</span>
     <span class="k">return</span> <span class="n">ret</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">min</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
@@ -2081,7 +2094,6 @@ to call a functor with given arguments. The retrieval into a factor should be un
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="nb">print</span> <span class="n">two</span><span class="p">(</span><span class="nb">type</span> <span class="n">inc</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">least</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="nb">type</span> <span class="nb">min</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -2142,7 +2154,7 @@ For example, one pattern usable for debuggining is the following.</p>
     <span class="n">s1</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s1&quot;</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s2&quot;</span>
     <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;--- main ---&quot;</span> <span class="c1"># prints &#39;&quot;--- main ---&quot;&#39; at compile time</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>         <span class="c1"># prints &#39;const str, const str&#39; at compile time</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>         <span class="c1"># prints &#39;str, str&#39; at compile time</span>
     <span class="nb">print</span> <span class="n">s</span> <span class="c1"># ERROR due to undefined print, but the above still prints</span>
 </code></pre>
 </div>

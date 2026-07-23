@@ -150,7 +150,7 @@ within namespaces.
 import "std/core.s" as core
 
 def main()
-    CLI = edit console() 
+    CLI = edit core::console() 
     x1 = 1
     x2 = x1.core::add 1
     core::print x2.core::add 2
@@ -239,7 +239,7 @@ def next(edit toinfinity r) # allow modification of mut fields only
 
 def main()
     CLI = edit console() 
-    r = toinfinity 0
+    r = edit toinfinity 0
     next r # proper loops later
     print r.pos
     print add r
@@ -269,7 +269,7 @@ import "std/core.s"
 def point(float x, float y)
     return class(x,y)
 
-def sum(Point p)
+def sum(point p)
     return p.x+p.y
 
 def main()
@@ -311,7 +311,7 @@ def std(std_data data)
 
 def main()
     CLI = edit console() 
-    data = std_data()
+    data = edit std_data()
     data.register 1.0
     data.register 1.0
     data.register 2.3
@@ -328,15 +328,15 @@ This is exemplified below.
 ```python
 import "std/core.s"
 
-def Point(float x, float y) 
+def point(float x, float y) 
     return compiler::args()
 
-def Field(Point a, Point b) 
+def field(point a, point b) 
     return compiler::args()
 
 def main()
     CLI = edit console() 
-    f = Field(1.0, 2.0, 3.0, 4.0)
+    f = field(1.0, 2.0, 3.0, 4.0)
     print f.a.x+f.b.y # prints 5.0
 ```
 
@@ -371,16 +371,16 @@ permissions.
 ```python
 import "std/core.s"
 
-def Test()
+def test()
     x = mut 1
     y = 2
     return class(x, y)
 
 def main()
     CLI = edit console() 
-    t = mut Test()
-    t = Test() # overwrite 't' completely - remains mutable
-    print(t.x) 
+    t = mut test()
+    t = test() # overwrite 't' completely - remains mutable
+    print t.x 
 ```
 
 If you do not use a mutation identifier like `mut` or `edit`,
@@ -405,26 +405,26 @@ def main()
     print t.y # prints 2
 ```
 
-It has been already mentioned, but is worth repeating: to preserve mutation for
+It has been already mentioned, but worth repeating: to preserve mutation for
 mutable fields without allowing a full variable rewrite use `edit`.
 
 ```python
 import "std/core.s"
 
-def Test()
+def test()
     x = mut 1
     y = 2
     return class(x, y)
 
-def test(edit Test t)
+def run(effect edit console CLI, edit test t)
     t.x = 10 # allowed only thanks to 'edit'
     print t.x
 
 def main()
     CLI = edit console() 
-    t = Test()
+    t = edit test()
     t.x = 5
-    test t
+    run t
 ```
 
 
@@ -746,7 +746,8 @@ will be added in the future.
 
 ```python
 import "builtins"
-import "std/core.s":print
+import "std/core.s"::print
+import "std/core.s"::console
 
 def unsafe_add(float x, float|int y)
     {builtins::float z=x+y;}
@@ -764,7 +765,8 @@ An example follows.
 
 ```python
 import "builtins"
-import "std/core.s":print
+import "std/core.s"::print
+import "std/core.s"::console
 
 def Number = float|int|nat
 def unsafe_add(Number x, Number y)
@@ -796,6 +798,8 @@ symbol for set differces.
 import "std/core.s" # defines Number like above
 
 def natpair(nat x, nat y)
+    return compiler;:args()
+
 def float(natpair a)
     x = float a.x
     y = float a.y
@@ -833,6 +837,7 @@ literal types (so capitals indicate either effects or literals).
 import "std/core.s"
 
 def INCREMENT = 1
+
 def inc(nat x)
     return x+INCREMENT
 
@@ -850,8 +855,10 @@ can be a string or number literal.
 import "std/core.s"
 
 def VERSION = "two"
+
 def version(effect edit console CLI, "one") # just a literal type
     print "version one"
+
 def version(effect edit console CLI, "two")
     print "version two"
 
@@ -925,22 +932,25 @@ the same-named type literal. Below is an example.
 Do remember that this syntax replaces the comma separator. So it occurs after an expression 
 ends. Therefore, to convert two literals
 back-to-back, you need use a placeholder with no outputs as an argument, 
-like `blank()`. But you can still have a literal at the end of an expression.
+like the `()` expression. But you can still have a literal at the end of an expression.
 
 ```python
 import "std/core.s"
 
 def modify(mut nat x, "add", "one")
     x = x+1
+
 def modify(mut nat x, "add", nat y)
     x = x+y
+
 def modify(mut nat x, "sub", nat y)
     x = x-y
+
 def main()
     CLI = edit console()
     x = mut 5
     modify(x add 3)
-    modify(x add blank() one)
+    modify(x add () one)
     print x # prints 9
 ```
 
@@ -1079,7 +1089,7 @@ def ones = compt vec [1.0, 1.0]
 def main()
     CLI = edit console()
     v = mut vec [5.0, 10.0]
-    allocator = edit arena float[].alloc 128
+    FLOATS = edit arena float[].alloc 128
     v = v+ones
     print v[0] # prints 6.0
     print v[1] # prints 11.0
@@ -1591,7 +1601,10 @@ The hidden index can be mutated and used to keep track
 of the iteration state, even when the iterator itself
 is constant. But you can always skip it. For example,
 next is a program that keeps the iteration state inside
-the data.
+the data. Do note usage of `local` to create a temporary
+mutable variable that remains anonymous; for logical safety,
+permissions can only after this qualifier, equality, and 
+returns.
 
 ```python
 import "std/core.s"
@@ -1599,7 +1612,7 @@ import "std/core.s"
 def solution(mut nat x, mut nat y)
     return compiler::args()
     
-def get(edit solution s, nat) # skip the iteration index argument
+def get(mut solution s, nat) # skip the iteration index argument
     s.x = (s.x+1)/2
     s.y = (s.y+1)/2
     if s.x==s.y fail "converged"
@@ -1608,7 +1621,7 @@ def get(edit solution s, nat) # skip the iteration index argument
 
 def main()
     CLI = edit console()
-    sol = solution(mut 32, mut 19)
+    sol = solution(local mut 32, local mut 19)
     for diff in sol 
         print nn "difference "
         print diff
@@ -1789,7 +1802,7 @@ def pair(nat, nat)
 def least(nat[] numbers, pair->bool order)
     ret = mut numbers[0]
     for number in numbers
-        if call order(number,ret) ret = number
+        if order.compiler::call(number,ret) ret = number
     return ret
 
 def min(nat x, nat y)
@@ -1798,7 +1811,6 @@ def min(nat x, nat y)
 
 def main()
     CLI = edit console()
-    print two(type inc)
     print least([5,4,1,3,2], type min)
 ```
 
@@ -1858,7 +1870,7 @@ def main()
     s1 = str "s1"
     s2 = str "s2"
     debug::print type "--- main ---" # prints '"--- main ---"' at compile time
-    s = debug::print (s1,s2)         # prints 'const str, const str' at compile time
+    s = debug::print (s1,s2)         # prints 'str, str' at compile time
     print s # ERROR due to undefined print, but the above still prints
 ```
 

@@ -133,8 +133,11 @@
 [color](#color) 
 [position](#position) 
 [size](#size) 
+[unsafe\_open\_window](#unsafe\_open\_window) 
 [window](#window) 
 [is\_open](#is\_open) 
+[unsafe\_begin\_drawing](#unsafe\_begin\_drawing) 
+[unsafe\_end\_drawing](#unsafe\_end\_drawing) 
 [draw](#draw) 
 [clear](#clear) 
 [text](#text) 
@@ -276,23 +279,6 @@ cstr() -> (cstr)
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### cstr - a cstr description of an error code
-*Defined in: std/core/error.s line 19*
-
-Error codes should *not* be compared numerically against
-given numbers, as their numbering changes for different
-programs. Instead, they should be converted to a cstr
-string with this function, which can then be compared.
-This comparison is also one numerical comparison, as
-care is taken for all cstr to point to the same memory
-location.
-
-```rust
-cstr(catch) -> (cstr)
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s line 174*
 
@@ -317,6 +303,23 @@ cstr(unsafe_temp) -> (cstr)
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+### cstr - a cstr description of an error code
+*Defined in: std/core/error.s line 19*
+
+Error codes should *not* be compared numerically against
+given numbers, as their numbering changes for different
+programs. Instead, they should be converted to a cstr
+string with this function, which can then be compared.
+This comparison is also one numerical comparison, as
+care is taken for all cstr to point to the same memory
+location.
+
+```rust
+cstr(catch) -> (cstr)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 # int
 ### int - a signed integer value
 *Defined in: builtins line 1*
@@ -325,6 +328,28 @@ Represents values in the range `2^-63 to 2^63-1`.
 
 ```rust
 int() -> (int)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### int - cast to int
+*Defined in: std/core/convert.s line 89*
+
+Converts a bit representation to the corresponding integer.
+
+```rust
+int(bits) -> (int)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### int - cast to int
+*Defined in: std/core/convert.s line 29*
+
+Overflows are mapped to negative integers and are not protected against.
+
+```rust
+int(nat) -> (int)
 ```
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
@@ -351,27 +376,23 @@ int(float) -> (int)
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### int - cast to int
-*Defined in: std/core/convert.s line 89*
-
-Converts a bit representation to the corresponding integer.
+### int - reads an integer from the console
+*Defined in: std/core/convertstr.s line 36*
 
 ```rust
-int(bits) -> (int)
+int(console) -> (int)
 ```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
 
+Potential errors:
 
-### int - cast to int
-*Defined in: std/core/convert.s line 29*
-
-Overflows are mapped to negative integers and are not protected against.
-
-```rust
-int(nat) -> (int)
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+23. unexpected end of console read
+24. user input was not a float
+9. iteration end
+15. out of bounds
 
 ### int - converts a string to an integer
 *Defined in: std/core/convertstr.s line 149*
@@ -404,24 +425,6 @@ Potential errors:
 26. invalid int conversion from empty string
 27. invalid int conversion from string with only a sign
 28. invalid integer int from non-number string
-15. out of bounds
-
-### int - reads an integer from the console
-*Defined in: std/core/convertstr.s line 36*
-
-```rust
-int(console) -> (int)
-```
-Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-23. unexpected end of console read
-24. user input was not a float
-9. iteration end
 15. out of bounds
 
 # nat
@@ -510,6 +513,24 @@ Potential errors:
 
 7. cannot convert negative float to nat
 
+### nat - reads an unsigned integer from the console
+*Defined in: std/core/convertstr.s line 60*
+
+```rust
+nat(console) -> (nat)
+```
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+23. unexpected end of console read
+24. user input was not a float
+9. iteration end
+15. out of bounds
+
 ### nat - converts a string to an unsigned integer
 *Defined in: std/core/convertstr.s line 172*
 
@@ -541,24 +562,6 @@ Potential errors:
 9. iteration end
 29. invalid nat conversion from empty string
 30. invalid nat conversion from non-number string
-15. out of bounds
-
-### nat - reads an unsigned integer from the console
-*Defined in: std/core/convertstr.s line 60*
-
-```rust
-nat(console) -> (nat)
-```
-Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-23. unexpected end of console read
-24. user input was not a float
-9. iteration end
 15. out of bounds
 
 ### nat - retrieved unsigned number from 32 bits
@@ -671,6 +674,17 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 ### float - cast to float
+*Defined in: std/core/convert.s line 95*
+
+Converts a bit representation to the corresponding float number.
+
+```rust
+float(bits) -> (float)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### float - cast to float
 *Defined in: std/core/convert.s line 20*
 
 May lose information because floats are not exact representation of all integers.
@@ -703,16 +717,23 @@ float(float) -> (float)
 Levels of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### float - cast to float
-*Defined in: std/core/convert.s line 95*
-
-Converts a bit representation to the corresponding float number.
+### float - reads a float from the console
+*Defined in: std/core/convertstr.s line 80*
 
 ```rust
-float(bits) -> (float)
+float(console) -> (float)
 ```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
 
+Potential errors:
+
+2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
+23. unexpected end of console read
+24. user input was not a float
+9. iteration end
+15. out of bounds
 
 ### float - converts a string to a float
 *Defined in: std/core/convertstr.s line 184*
@@ -748,24 +769,6 @@ Potential errors:
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
 31. invalid float conversion from empty string
-
-### float - reads a float from the console
-*Defined in: std/core/convertstr.s line 80*
-
-```rust
-float(console) -> (float)
-```
-Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-23. unexpected end of console read
-24. user input was not a float
-9. iteration end
-15. out of bounds
 
 # bool
 ### bool - boolean value
@@ -863,24 +866,6 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # eq
-### eq - equals
-*Defined in: std/core/numbers.s line 26*
-
-```rust
-eq(int x, int y) -> (bool)
-```
-Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### eq - equals
-*Defined in: std/core/numbers.s line 26*
-
-```rust
-eq(float x, float y) -> (bool)
-```
-Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 ### eq - equals
 *Defined in: std/core/bool.s line 82*
 
@@ -999,6 +984,24 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 ```rust
 eq(nat x, nat y) -> (bool)
+```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### eq - equals
+*Defined in: std/core/numbers.s line 26*
+
+```rust
+eq(int x, int y) -> (bool)
+```
+Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### eq - equals
+*Defined in: std/core/numbers.s line 26*
+
+```rust
+eq(float x, float y) -> (bool)
 ```
 Levels of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
 
@@ -1321,6 +1324,24 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 *Defined in: std/core/numbers.s line 23*
 
 ```rust
+is_different(float x, int y) -> (true)
+```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### is\_different
+*Defined in: std/core/numbers.s line 23*
+
+```rust
+is_different(float x, float y) -> (false)
+```
+Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### is\_different
+*Defined in: std/core/numbers.s line 23*
+
+```rust
 is_different(nat x, nat y) -> (false)
 ```
 Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1376,24 +1397,6 @@ Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.
 
 ```rust
 is_different(float x, nat y) -> (true)
-```
-Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### is\_different
-*Defined in: std/core/numbers.s line 23*
-
-```rust
-is_different(float x, int y) -> (true)
-```
-Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### is\_different
-*Defined in: std/core/numbers.s line 23*
-
-```rust
-is_different(float x, float y) -> (false)
 ```
 Levels of abstraction: 2 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
 
@@ -1565,9 +1568,9 @@ Potential errors:
 
 16. arena is out of space
 17. does not fit in circular arena
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
 
@@ -1583,9 +1586,9 @@ Potential errors:
 
 16. arena is out of space
 17. does not fit in circular arena
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
 
@@ -1601,9 +1604,9 @@ Potential errors:
 
 16. arena is out of space
 17. does not fit in circular arena
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
 
@@ -1619,9 +1622,9 @@ Potential errors:
 
 16. arena is out of space
 17. does not fit in circular arena
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
 
@@ -1636,9 +1639,9 @@ Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.
 Potential errors:
 
 16. arena is out of space
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
 
@@ -1653,9 +1656,9 @@ Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.
 Potential errors:
 
 16. arena is out of space
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
 
@@ -1670,9 +1673,9 @@ Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.
 Potential errors:
 
 16. arena is out of space
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
 
@@ -1687,9 +1690,9 @@ Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.
 Potential errors:
 
 16. arena is out of space
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 2. null pointer
+19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
 
@@ -2203,48 +2206,6 @@ free(mut any ptr) -> ()
 Grabs an allocator for the result as an effect.
 
 ```rust
-mul(edit circular, mat, mat) -> (mut mat) with effects FLOATS
-```
-Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-65. row out of bounds
-2. null pointer
-66. column out of bounds
-69. inner dimensions must agree
-9. iteration end
-17. does not fit in circular arena
-62. can only place matrices on contiguous buffers
-63. cannot place matrices on buffer offsets
-
-### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 102*
-
-Grabs an allocator for the result as an effect.
-
-```rust
-mul(edit arena, mat, mat) -> (mut mat) with effects FLOATS
-```
-Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-65. row out of bounds
-2. null pointer
-66. column out of bounds
-69. inner dimensions must agree
-9. iteration end
-16. arena is out of space
-62. can only place matrices on contiguous buffers
-63. cannot place matrices on buffer offsets
-
-### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 102*
-
-Grabs an allocator for the result as an effect.
-
-```rust
 mul(new FLOATS, mat, mat) -> (mut mat) with effects FLOATS
 ```
 Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2596,6 +2557,48 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
+### mul - matrix-matrix multiplication
+*Defined in: std/sci/mat.s line 102*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(edit circular, mat, mat) -> (mut mat) with effects FLOATS
+```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+65. row out of bounds
+2. null pointer
+66. column out of bounds
+69. inner dimensions must agree
+9. iteration end
+17. does not fit in circular arena
+62. can only place matrices on contiguous buffers
+63. cannot place matrices on buffer offsets
+
+### mul - matrix-matrix multiplication
+*Defined in: std/sci/mat.s line 102*
+
+Grabs an allocator for the result as an effect.
+
+```rust
+mul(edit arena, mat, mat) -> (mut mat) with effects FLOATS
+```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+65. row out of bounds
+2. null pointer
+66. column out of bounds
+69. inner dimensions must agree
+9. iteration end
+16. arena is out of space
+62. can only place matrices on contiguous buffers
+63. cannot place matrices on buffer offsets
+
 # div
 ### div - divide by
 *Defined in: std/core/numbers.s line 89*
@@ -2641,25 +2644,6 @@ Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.
 Potential errors:
 
 4. division by zero
-
-### div - vector division
-*Defined in: std/sci/vec.s line 144*
-
-Grabs a FLOATS allocator effect to store the result.
-
-```rust
-div(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
-```
-Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-17. does not fit in circular arena
-2. null pointer
-4. division by zero
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-15. out of bounds
 
 ### div - vector division
 *Defined in: std/sci/vec.s line 144*
@@ -2834,6 +2818,25 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
+### div - vector division
+*Defined in: std/sci/vec.s line 144*
+
+Grabs a FLOATS allocator effect to store the result.
+
+```rust
+div(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
+```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+17. does not fit in circular arena
+2. null pointer
+4. division by zero
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+15. out of bounds
+
 # mod
 ### mod - modulo by
 *Defined in: std/core/numbers.s line 101*
@@ -3402,7 +3405,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### pow
-*Defined in: std/sci/math.s line 69*
+*Defined in: std/sci/math.s line 73*
 
 ```rust
 pow(float x, float y) -> (float)
@@ -3716,42 +3719,6 @@ print(console CLI, str, cstr endl) -> () with effects CLI
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### print - print a matrix with aligned brackets
-*Defined in: std/sci/mat.s line 116*
-
-single-row matrices stay on one line; taller ones get top/mid/bottom brackets
-
-```rust
-print(console CLI, mat) -> () with effects CLI
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-65. row out of bounds
-2. null pointer
-66. column out of bounds
-6. nat subtraction would yield a negative
-9. iteration end
-
-### print - print a matrix with aligned brackets
-*Defined in: std/sci/mat.s line 116*
-
-single-row matrices stay on one line; taller ones get top/mid/bottom brackets
-
-```rust
-print(console CLI, mat, cstr endl) -> () with effects CLI
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-65. row out of bounds
-2. null pointer
-66. column out of bounds
-6. nat subtraction would yield a negative
-9. iteration end
-
 ### print - print a vector
 *Defined in: std/sci/vec.s line 222*
 
@@ -3814,6 +3781,42 @@ No failing errors, but can catch these intercepted ones:
 
 2. null pointer
 
+### print - print a matrix with aligned brackets
+*Defined in: std/sci/mat.s line 116*
+
+single-row matrices stay on one line; taller ones get top/mid/bottom brackets
+
+```rust
+print(console CLI, mat) -> () with effects CLI
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+65. row out of bounds
+2. null pointer
+66. column out of bounds
+6. nat subtraction would yield a negative
+9. iteration end
+
+### print - print a matrix with aligned brackets
+*Defined in: std/sci/mat.s line 116*
+
+single-row matrices stay on one line; taller ones get top/mid/bottom brackets
+
+```rust
+print(console CLI, mat, cstr endl) -> () with effects CLI
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+65. row out of bounds
+2. null pointer
+66. column out of bounds
+6. nat subtraction would yield a negative
+9. iteration end
+
 # supports\_ansi
 ### supports\_ansi
 *Defined in: std/core/print.s line 104*
@@ -3840,42 +3843,6 @@ Returned values defer use of the following functions:
 ```rust
 ```
 # set
-### set
-*Defined in: std/core/print.s line 182*
-
-```rust
-set(colors, "reset_underline") -> ()
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### set
-*Defined in: std/core/print.s line 180*
-
-```rust
-set(colors, "reset_bold") -> ()
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### set
-*Defined in: std/core/print.s line 178*
-
-```rust
-set(colors, "reset_bg") -> ()
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### set
-*Defined in: std/core/print.s line 176*
-
-```rust
-set(colors, "reset_color") -> ()
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 ### set
 *Defined in: std/core/print.s line 174*
 
@@ -4155,6 +4122,42 @@ set(colors, "red") -> ()
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+### set
+*Defined in: std/core/print.s line 182*
+
+```rust
+set(colors, "reset_underline") -> ()
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### set
+*Defined in: std/core/print.s line 180*
+
+```rust
+set(colors, "reset_bold") -> ()
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### set
+*Defined in: std/core/print.s line 178*
+
+```rust
+set(colors, "reset_bg") -> ()
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### set
+*Defined in: std/core/print.s line 176*
+
+```rust
+set(colors, "reset_color") -> ()
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 # exists
 ### exists - checks whether a cstr is not zero-initialized
 *Defined in: std/core/string.s line 30*
@@ -4175,7 +4178,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 ### exists
-*Defined in: std/graphics.s line 97*
+*Defined in: std/graphics.s line 114*
 
 ```rust
 exists(Texture) -> (bool)
@@ -4342,6 +4345,15 @@ Potential errors:
 
 9. iteration end
 
+### next - Computes the next random number of a Rand sequence.
+*Defined in: std/rand.s line 88*
+
+```rust
+next(mut Rand) -> (float)
+```
+Levels of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 ### next
 *Defined in: std/map.s line 38*
 
@@ -4367,15 +4379,6 @@ Potential errors:
 
 2. null pointer
 15. out of bounds
-
-### next - Computes the next random number of a Rand sequence.
-*Defined in: std/rand.s line 88*
-
-```rust
-next(mut Rand) -> (float)
-```
-Levels of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-
 
 # get
 ### get - get a list element pointer
@@ -4723,9 +4726,9 @@ Potential errors:
 
 2. null pointer
 19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 52. not open dir
 53. end of dir
-18. can only define strings on contiguous buffers
 15. out of bounds
 
 ### get - get a vector element at given position
@@ -4733,18 +4736,6 @@ Potential errors:
 
 ```rust
 get(vec, nat i) -> (float ptr)
-```
-Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-15. out of bounds
-
-### get - get a sparse element
-*Defined in: std/sci/coo.s line 43*
-
-```rust
-get(coo, nat k) -> (sparse_element ptr)
 ```
 Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 
@@ -4764,6 +4755,18 @@ Potential errors:
 
 65. row out of bounds
 66. column out of bounds
+
+### get - get a sparse element
+*Defined in: std/sci/coo.s line 43*
+
+```rust
+get(coo, nat k) -> (sparse_element ptr)
+```
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+15. out of bounds
 
 # KB
 ### KB - kilobytes to bytes
@@ -5082,8 +5085,8 @@ Potential errors:
 71. empty input name
 72. cannot tag a structural type
 73. tag surface cannot be structural type
-10. allocation failed
 9. iteration end
+10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 15. out of bounds
@@ -5267,18 +5270,6 @@ Potential errors:
 
 15. out of bounds
 
-### mutget - mutable reference to a sparse element
-*Defined in: std/sci/coo.s line 48*
-
-```rust
-mutget(edit coo, nat k) -> (mut sparse_element ptr)
-```
-Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-15. out of bounds
-
 ### mutget - mutable reference to matrix element (i,j)
 *Defined in: std/sci/mat.s line 43*
 
@@ -5292,21 +5283,33 @@ Potential errors:
 65. row out of bounds
 66. column out of bounds
 
-# len
-### len - string length
-*Defined in: std/core/string.s line 102*
+### mutget - mutable reference to a sparse element
+*Defined in: std/sci/coo.s line 48*
 
 ```rust
-len(str) -> (nat)
+mutget(edit coo, nat k) -> (mut sparse_element ptr)
 ```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 
+Potential errors:
 
+15. out of bounds
+
+# len
 ### len - the number of buffer elements
 *Defined in: std/core/array.s line 94*
 
 ```rust
 len(any[]) -> (nat)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### len - string length
+*Defined in: std/core/string.s line 102*
+
+```rust
+len(str) -> (nat)
 ```
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
@@ -5715,6 +5718,58 @@ Potential errors:
 57. nat value too large to pack in nat16
 
 # str
+### str - reads a string from the console
+*Defined in: std/core/convertstr.s line 114*
+
+The read string is placed on an arena while consuming only the necessarily minimum size.
+
+```rust
+str(edit arena, console console) -> (str) with effects CHARS
+```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+23. unexpected end of console read
+25. read string does not fit on buffer
+15. out of bounds
+
+### str - reads a string from the console
+*Defined in: std/core/convertstr.s line 114*
+
+The read string is placed onto memory that keeps being reallocated to accommodate its size.
+The resulting memory will consume exactly the required size in bytes.
+
+```rust
+str(new CHARS, console console) -> (str) with effects CHARS
+```
+Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+6. nat subtraction would yield a negative
+10. allocation failed
+11. reallocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+14. cannot resize an unallocated or freed buffer
+15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+23. unexpected end of console read
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
 ### str - convert to string
 *Defined in: std/core/string.s line 91*
 
@@ -5864,58 +5919,6 @@ str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### str - reads a string from the console
-*Defined in: std/core/convertstr.s line 114*
-
-The read string is placed on an arena while consuming only the necessarily minimum size.
-
-```rust
-str(edit arena, console console) -> (str) with effects CHARS
-```
-Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-23. unexpected end of console read
-25. read string does not fit on buffer
-15. out of bounds
-
-### str - reads a string from the console
-*Defined in: std/core/convertstr.s line 114*
-
-The read string is placed onto memory that keeps being reallocated to accommodate its size.
-The resulting memory will consume exactly the required size in bytes.
-
-```rust
-str(new CHARS, console console) -> (str) with effects CHARS
-```
-Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-6. nat subtraction would yield a negative
-10. allocation failed
-11. reallocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-14. cannot resize an unallocated or freed buffer
-15. out of bounds
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-23. unexpected end of console read
-
-
-Returned values defer use of the following functions:
-```rust
-exists(any ptr) -> (bool)
-free(mut any ptr) -> ()
-```
 ### str - create a compact str
 *Defined in: std/mini.s line 54*
 
@@ -5961,10 +5964,10 @@ Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.
 
 Potential errors:
 
-2. null pointer
+18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
 4. division by zero
-18. can only define strings on contiguous buffers
+2. null pointer
 11. reallocation failed
 14. cannot resize an unallocated or freed buffer
 15. out of bounds
@@ -5996,9 +5999,9 @@ Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.
 Potential errors:
 
 17. does not fit in circular arena
-2. null pointer
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
+2. null pointer
 15. out of bounds
 
 ### copy - copy a string to a new buffer
@@ -6026,9 +6029,9 @@ Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.
 Potential errors:
 
 16. arena is out of space
-2. null pointer
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
+2. null pointer
 15. out of bounds
 
 ### copy - copy a string to a new buffer
@@ -6055,9 +6058,9 @@ Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.
 
 Potential errors:
 
-2. null pointer
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
+2. null pointer
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
@@ -6367,8 +6370,8 @@ Potential errors:
 2. null pointer
 19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
 22. slice out of string bounds
+6. nat subtraction would yield a negative
 15. out of bounds
 
 ### ends\_with
@@ -6384,8 +6387,8 @@ Potential errors:
 2. null pointer
 19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
 22. slice out of string bounds
+6. nat subtraction would yield a negative
 15. out of bounds
 
 ### ends\_with
@@ -6401,8 +6404,8 @@ Potential errors:
 2. null pointer
 19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
 22. slice out of string bounds
+6. nat subtraction would yield a negative
 15. out of bounds
 
 ### ends\_with
@@ -6418,8 +6421,8 @@ Potential errors:
 2. null pointer
 19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
 22. slice out of string bounds
+6. nat subtraction would yield a negative
 15. out of bounds
 
 # contains
@@ -6436,8 +6439,8 @@ Potential errors:
 2. null pointer
 19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
 22. slice out of string bounds
+6. nat subtraction would yield a negative
 9. iteration end
 15. out of bounds
 
@@ -6454,8 +6457,8 @@ Potential errors:
 2. null pointer
 19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
 22. slice out of string bounds
+6. nat subtraction would yield a negative
 9. iteration end
 15. out of bounds
 
@@ -6472,8 +6475,8 @@ Potential errors:
 2. null pointer
 19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
 22. slice out of string bounds
+6. nat subtraction would yield a negative
 9. iteration end
 15. out of bounds
 
@@ -6490,8 +6493,8 @@ Potential errors:
 2. null pointer
 19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
 22. slice out of string bounds
+6. nat subtraction would yield a negative
 9. iteration end
 15. out of bounds
 
@@ -6635,6 +6638,91 @@ cstr() -> (cstr)
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+### nat
+*Defined in: std/core/array.s line 24*
+
+```rust
+nat(nat16) -> (nat)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### float - cast to float
+*Defined in: std/core/convert.s line 95*
+
+Converts a bit representation to the corresponding float number.
+
+```rust
+float(bits) -> (float)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 84*
+
+Converts a bit representation to the corresponding natural number.
+
+```rust
+nat(bits) -> (nat)
+```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 51*
+
+Converting a character to a natural number considers
+its bit representation interpreted as an unsigned number.
+
+```rust
+nat(char) -> (nat)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 40*
+
+Converting to natural numbers loses information.
+ Failed on negative input because it typically indicates a later error in buffer indexing.
+
+```rust
+nat(nat) -> (nat)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 40*
+
+Converting to natural numbers loses information.
+ Failed on negative input because it typically indicates a later error in buffer indexing.
+
+```rust
+nat(int) -> (nat)
+```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+8. cannot convert negative int to nat
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 40*
+
+Converting to natural numbers loses information.
+ Failed on negative input because it typically indicates a later error in buffer indexing.
+
+```rust
+nat(float) -> (nat)
+```
+Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+7. cannot convert negative float to nat
+
 ### float - cast to float
 *Defined in: std/core/convert.s line 20*
 
@@ -6666,6 +6754,30 @@ Serves as a tautology function for code that parses on multiple number types.
 float(float) -> (float)
 ```
 Levels of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 174*
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+```rust
+cstr(cstr cstr, str) -> (cstr)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 174*
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+```rust
+cstr(unsafe_temp) -> (cstr)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
 ### str - convert to string
@@ -6813,115 +6925,6 @@ Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.
 
 ```rust
 str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### nat
-*Defined in: std/core/array.s line 24*
-
-```rust
-nat(nat16) -> (nat)
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### float - cast to float
-*Defined in: std/core/convert.s line 95*
-
-Converts a bit representation to the corresponding float number.
-
-```rust
-float(bits) -> (float)
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 84*
-
-Converts a bit representation to the corresponding natural number.
-
-```rust
-nat(bits) -> (nat)
-```
-Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 51*
-
-Converting a character to a natural number considers
-its bit representation interpreted as an unsigned number.
-
-```rust
-nat(char) -> (nat)
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
-
-Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
-
-```rust
-nat(nat) -> (nat)
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
-
-Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
-
-```rust
-nat(int) -> (nat)
-```
-Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-8. cannot convert negative int to nat
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
-
-Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
-
-```rust
-nat(float) -> (nat)
-```
-Levels of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-7. cannot convert negative float to nat
-
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 174*
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-```rust
-cstr(cstr cstr, str) -> (cstr)
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 174*
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-```rust
-cstr(unsafe_temp) -> (cstr)
 ```
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
@@ -7297,28 +7300,26 @@ Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.
 
 # abs
 ### abs
-*Defined in: std/sci/math.s line 9*
+*Defined in: std/sci/math.s line 11*
 
 ```rust
-abs(int) -> (nat)
+abs(int) -> (int)
 ```
 Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[abs($x)]`*
 ### abs
 *Defined in: std/sci/math.s line 4*
 
 ```rust
 abs(float) -> (float)
 ```
-Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+Levels of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[abs($x)]`*
 # sqrt
 ### sqrt
-*Defined in: std/sci/math.s line 14*
+*Defined in: std/sci/math.s line 18*
 
 ```rust
 sqrt(float) -> (float)
@@ -7328,7 +7329,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # sin
 ### sin
-*Defined in: std/sci/math.s line 19*
+*Defined in: std/sci/math.s line 23*
 
 ```rust
 sin(float) -> (float)
@@ -7338,7 +7339,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # cos
 ### cos
-*Defined in: std/sci/math.s line 24*
+*Defined in: std/sci/math.s line 28*
 
 ```rust
 cos(float) -> (float)
@@ -7348,7 +7349,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # log
 ### log
-*Defined in: std/sci/math.s line 29*
+*Defined in: std/sci/math.s line 33*
 
 ```rust
 log(float) -> (float)
@@ -7358,7 +7359,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # tan
 ### tan
-*Defined in: std/sci/math.s line 34*
+*Defined in: std/sci/math.s line 38*
 
 ```rust
 tan(float) -> (float)
@@ -7368,7 +7369,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # floor
 ### floor
-*Defined in: std/sci/math.s line 39*
+*Defined in: std/sci/math.s line 43*
 
 ```rust
 floor(float) -> (int)
@@ -7378,7 +7379,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # asin
 ### asin
-*Defined in: std/sci/math.s line 44*
+*Defined in: std/sci/math.s line 48*
 
 ```rust
 asin(float) -> (float)
@@ -7388,7 +7389,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # acos
 ### acos
-*Defined in: std/sci/math.s line 49*
+*Defined in: std/sci/math.s line 53*
 
 ```rust
 acos(float) -> (float)
@@ -7398,7 +7399,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # atan
 ### atan
-*Defined in: std/sci/math.s line 59*
+*Defined in: std/sci/math.s line 63*
 
 ```rust
 atan(float x, float y) -> (float)
@@ -7407,7 +7408,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 ### atan
-*Defined in: std/sci/math.s line 54*
+*Defined in: std/sci/math.s line 58*
 
 ```rust
 atan(float) -> (float)
@@ -7417,7 +7418,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # exp
 ### exp
-*Defined in: std/sci/math.s line 64*
+*Defined in: std/sci/math.s line 68*
 
 ```rust
 exp(float) -> (float)
@@ -7427,7 +7428,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # isnan
 ### isnan
-*Defined in: std/sci/math.s line 74*
+*Defined in: std/sci/math.s line 78*
 
 ```rust
 isnan(float) -> (bool)
@@ -7438,7 +7439,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[math.isnan(x)]`*
 # isinf
 ### isinf
-*Defined in: std/sci/math.s line 80*
+*Defined in: std/sci/math.s line 84*
 
 ```rust
 isinf(float) -> (bool)
@@ -7825,230 +7826,6 @@ Potential errors:
 60. cannot place vectors on buffer offsets
 
 # reduce
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "l2") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sqr") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "abs") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec) -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "l2") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "sqr") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "abs") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "l2") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "sqr") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "abs") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add") -> (float)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
 ### reduce - reduce a vector to one value
 *Defined in: std/sci/vec.s line 152*
 
@@ -8478,6 +8255,78 @@ All computations are branchless, as literals are optimized away during compilati
 
 ```rust
 reduce(vec, "add") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "l2") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sqr") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "abs") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec) -> (float)
 ```
 Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
 
@@ -8953,6 +8802,158 @@ Potential errors:
 2. null pointer
 15. out of bounds
 
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "l2") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "sqr") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "abs") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "l2") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "sqr") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "abs") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 152*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add") -> (float)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
 # dot
 ### dot - dot product
 *Defined in: std/sci/vec.s line 188*
@@ -9153,15 +9154,6 @@ Levels of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.
 
 # rows
 ### rows - number of rows
-*Defined in: std/sci/coo.s line 22*
-
-```rust
-rows(coo) -> (nat)
-```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### rows - number of rows
 *Defined in: std/sci/mat.s line 6*
 
 ```rust
@@ -9170,21 +9162,30 @@ rows(mat) -> (nat)
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-# cols
-### cols - number of columns
-*Defined in: std/sci/coo.s line 26*
+### rows - number of rows
+*Defined in: std/sci/coo.s line 22*
 
 ```rust
-cols(coo) -> (nat)
+rows(coo) -> (nat)
 ```
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+# cols
 ### cols - number of columns
 *Defined in: std/sci/mat.s line 10*
 
 ```rust
 cols(mat) -> (nat)
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### cols - number of columns
+*Defined in: std/sci/coo.s line 26*
+
+```rust
+cols(coo) -> (nat)
 ```
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
@@ -9323,37 +9324,6 @@ mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride) -> (mut mat)
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### coo
-*Defined in: std/sci/coo.s line 40*
-
-```rust
-coo(sparse_element[], nat rows, nat cols) -> (mut coo)
-```
-Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### coo - allocate a sparse matrix
-*Defined in: std/sci/coo.s line 34*
-
-This creates a new buffer of sparse elements for convenience.
-
-```rust
-coo(nat rows, nat cols, nat nnz) -> (mut coo)
-```
-Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-
-
-Returned values defer use of the following functions:
-```rust
-exists(any ptr) -> (bool)
-free(mut any ptr) -> ()
-```
 ### mat - view a vector as a matrix on the same memory
 *Defined in: std/sci/mat.s line 55*
 
@@ -9490,6 +9460,37 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
+### coo
+*Defined in: std/sci/coo.s line 40*
+
+```rust
+coo(sparse_element[], nat rows, nat cols) -> (mut coo)
+```
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### coo - allocate a sparse matrix
+*Defined in: std/sci/coo.s line 34*
+
+This creates a new buffer of sparse elements for convenience.
+
+```rust
+coo(nat rows, nat cols, nat nnz) -> (mut coo)
+```
+Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+12. cannot resize buffers with alloc; it promises no data reallocation
+13. cannot allocate a buffer of unsized type
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
 # tagged
 ### tagged - blank tag structure
 *Defined in: std/tag.s line 4*
@@ -9557,14 +9558,14 @@ Levels of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.
 
 Potential errors:
 
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 2. null pointer
 10. allocation failed
 12. cannot resize buffers with alloc; it promises no data reallocation
 13. cannot allocate a buffer of unsized type
 15. out of bounds
-16. arena is out of space
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 
 
 Returned values defer use of the following functions:
@@ -9623,7 +9624,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 *Defined in: std/graphics.s line 5*
 
 ```rust
-color(nat _r, nat _g, nat _b, nat _a) -> (nat8 r, nat8 g, nat8 b, nat8 a)
+color(nat _r, nat _g, nat _b) -> (nat8 r, nat8 g, nat8 b, nat8 a)
 ```
 Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
 
@@ -9635,7 +9636,7 @@ Potential errors:
 *Defined in: std/graphics.s line 5*
 
 ```rust
-color(nat _r, nat _g, nat _b) -> (nat8 r, nat8 g, nat8 b, nat8 a)
+color(nat _r, nat _g, nat _b, nat _a) -> (nat8 r, nat8 g, nat8 b, nat8 a)
 ```
 Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
 
@@ -9663,19 +9664,30 @@ size(float width, float height) -> (float width, float height)
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-# window
-### window
+# unsafe\_open\_window
+### unsafe\_open\_window
 *Defined in: std/graphics.s line 20*
 
 ```rust
-window(float size.width, float size.height, cstr title, cstr font_path) -> (edit window)
+unsafe_open_window(float size.width, float size.height, cstr title, cstr font_path) -> ()
 ```
 Levels of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `(pyray.set_trace_log_level(pyray.LOG_NONE), pyray.init_window(int($size__width),int($size__height),$title),pyray.set_target_fps(60),memory.set_global('font', pyray.load_font_ex($font_path,128,None,0) if $font_path else pyray.get_font_default()))`*
+# window
+### window
+*Defined in: std/graphics.s line 33*
+
+```rust
+window(float size.width, float size.height, cstr title, cstr font_path) -> (edit window)
+```
+Levels of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 # is\_open
 ### is\_open
-*Defined in: std/graphics.s line 36*
+*Defined in: std/graphics.s line 40*
 
 ```rust
 is_open(edit window) -> (bool) with effects WINDOW
@@ -9683,9 +9695,32 @@ is_open(edit window) -> (bool) with effects WINDOW
 Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[not pyray.window_should_close()]`*
+# unsafe\_begin\_drawing
+### unsafe\_begin\_drawing
+*Defined in: std/graphics.s line 45*
+
+```rust
+unsafe_begin_drawing() -> ()
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.begin_drawing()`*
+# unsafe\_end\_drawing
+### unsafe\_end\_drawing
+*Defined in: std/graphics.s line 49*
+
+```rust
+unsafe_end_drawing() -> ()
+```
+Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.end_drawing()`*
 # draw
 ### draw
-*Defined in: std/graphics.s line 135*
+*Defined in: std/graphics.s line 152*
 
 ```rust
 draw(edit window, Texture, float pos.x, float pos.y, float rotation, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9699,7 +9734,7 @@ Potential errors:
 15. out of bounds
 
 ### draw
-*Defined in: std/graphics.s line 123*
+*Defined in: std/graphics.s line 140*
 
 ```rust
 draw(edit window, Texture, float pos.x, float pos.y, float rotation, float scale, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9712,7 +9747,7 @@ Potential errors:
 15. out of bounds
 
 ### draw
-*Defined in: std/graphics.s line 113*
+*Defined in: std/graphics.s line 130*
 
 ```rust
 draw(edit window, Texture, float pos.x, float pos.y, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9725,12 +9760,12 @@ Potential errors:
 15. out of bounds
 
 ### draw
-*Defined in: std/graphics.s line 40*
+*Defined in: std/graphics.s line 53*
 
 ```rust
 draw(edit window) -> (bool) with effects WINDOW
 ```
-Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
 
 Potential errors:
 
@@ -9739,10 +9774,11 @@ Potential errors:
 
 Returned values defer use of the following functions:
 ```rust
+unsafe_end_drawing() -> ()
 ```
 # clear
 ### clear
-*Defined in: std/graphics.s line 49*
+*Defined in: std/graphics.s line 62*
 
 ```rust
 clear(edit window, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9750,9 +9786,10 @@ clear(edit window, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> ()
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.clear_background(pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # text
 ### text
-*Defined in: std/graphics.s line 64*
+*Defined in: std/graphics.s line 79*
 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9760,8 +9797,9 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_ex(memory.globals['font'],str($txt),pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### text
-*Defined in: std/graphics.s line 64*
+*Defined in: std/graphics.s line 79*
 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9769,8 +9807,9 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_ex(memory.globals['font'],str($txt),pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### text
-*Defined in: std/graphics.s line 52*
+*Defined in: std/graphics.s line 66*
 
 ```rust
 text(edit window, cstr txt, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9778,9 +9817,10 @@ text(edit window, cstr txt, float pos.x, float pos.y, float size, nat8 color.r, 
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_ex(memory.globals['font'],$txt,pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # text\_rotated
 ### text\_rotated
-*Defined in: std/graphics.s line 76*
+*Defined in: std/graphics.s line 92*
 
 ```rust
 text_rotated(edit window, str, float pos.x, float pos.y, float origin.x, float origin.y, float rotation, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9788,8 +9828,9 @@ text_rotated(edit window, str, float pos.x, float pos.y, float origin.x, float o
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### text\_rotated
-*Defined in: std/graphics.s line 76*
+*Defined in: std/graphics.s line 92*
 
 ```rust
 text_rotated(edit window, str, float pos.x, float pos.y, float origin.x, float origin.y, float rotation, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9797,9 +9838,10 @@ text_rotated(edit window, str, float pos.x, float pos.y, float origin.x, float o
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # TextureData
 ### TextureData
-*Defined in: std/graphics.s line 90*
+*Defined in: std/graphics.s line 107*
 
 ```rust
 TextureData(nat id, float size.width, float size.height, nat mipmaps, nat format) -> (nat id, float size.width, float size.height, nat mipmaps, nat format)
@@ -9809,7 +9851,7 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 # Texture
 ### Texture
-*Defined in: std/graphics.s line 93*
+*Defined in: std/graphics.s line 110*
 
 ```rust
 Texture(nat id, float size.width, float size.height, nat mipmaps, nat format) -> (Texture)
@@ -9830,7 +9872,7 @@ free(mut any ptr) -> ()
 ```
 # open
 ### open
-*Defined in: std/graphics.s line 100*
+*Defined in: std/graphics.s line 117*
 
 ```rust
 open(cstr) -> (Texture)
@@ -9851,7 +9893,7 @@ free(mut any ptr) -> ()
 ```
 # circ
 ### circ
-*Defined in: std/graphics.s line 149*
+*Defined in: std/graphics.s line 166*
 
 ```rust
 circ(edit window, float pos.x, float pos.y, float radius, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9859,9 +9901,10 @@ circ(edit window, float pos.x, float pos.y, float radius, nat8 color.r, nat8 col
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_circle_v(pyray.Vector2($pos__x,$pos__y),$radius,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # rect
 ### rect
-*Defined in: std/graphics.s line 158*
+*Defined in: std/graphics.s line 176*
 
 ```rust
 rect(edit window, float pos.x, float pos.y, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9869,9 +9912,10 @@ rect(edit window, float pos.x, float pos.y, float size.width, float size.height,
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # rect\_line
 ### rect\_line
-*Defined in: std/graphics.s line 167*
+*Defined in: std/graphics.s line 186*
 
 ```rust
 rect_line(edit window, float pos.x, float pos.y, float size.width, float size.height, nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9879,9 +9923,10 @@ rect_line(edit window, float pos.x, float pos.y, float size.width, float size.he
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_rectangle_lines_ex(pyray.Rectangle($pos__x,$pos__y,$size__width,$size__height),$thickness,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # circ\_line
 ### circ\_line
-*Defined in: std/graphics.s line 170*
+*Defined in: std/graphics.s line 190*
 
 ```rust
 circ_line(edit window, float pos.x, float pos.y, nat radius, nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -9889,9 +9934,10 @@ circ_line(edit window, float pos.x, float pos.y, nat radius, nat thickness, nat8
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # dt
 ### dt
-*Defined in: std/graphics.s line 186*
+*Defined in: std/graphics.s line 207*
 
 ```rust
 dt(window) -> (float) with effects WINDOW
@@ -9899,9 +9945,10 @@ dt(window) -> (float) with effects WINDOW
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.get_frame_time()]`*
 # key\_down
 ### key\_down
-*Defined in: std/graphics.s line 190*
+*Defined in: std/graphics.s line 212*
 
 ```rust
 key_down(window, nat key) -> (bool) with effects WINDOW
@@ -9909,9 +9956,10 @@ key_down(window, nat key) -> (bool) with effects WINDOW
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_key_down($key)]`*
 # key\_pressed
 ### key\_pressed
-*Defined in: std/graphics.s line 194*
+*Defined in: std/graphics.s line 217*
 
 ```rust
 key_pressed(edit window, nat key) -> (bool) with effects WINDOW
@@ -9919,9 +9967,10 @@ key_pressed(edit window, nat key) -> (bool) with effects WINDOW
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_key_pressed($key)]`*
 # key\_released
 ### key\_released
-*Defined in: std/graphics.s line 198*
+*Defined in: std/graphics.s line 222*
 
 ```rust
 key_released(edit window, nat key) -> (bool) with effects WINDOW
@@ -9929,9 +9978,10 @@ key_released(edit window, nat key) -> (bool) with effects WINDOW
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_key_released($key)]`*
 # mouse\_pos
 ### mouse\_pos
-*Defined in: std/graphics.s line 202*
+*Defined in: std/graphics.s line 227*
 
 ```rust
 mouse_pos(window) -> (float x, float y) with effects WINDOW
@@ -9939,9 +9989,10 @@ mouse_pos(window) -> (float x, float y) with effects WINDOW
 Levels of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[(lambda p=pyray.get_mouse_position():(p.x,p.y))()]`*
 # mouse\_down
 ### mouse\_down
-*Defined in: std/graphics.s line 209*
+*Defined in: std/graphics.s line 235*
 
 ```rust
 mouse_down(window, nat button) -> (bool) with effects WINDOW
@@ -9949,9 +10000,10 @@ mouse_down(window, nat button) -> (bool) with effects WINDOW
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_mouse_button_down($button)]`*
 # mouse\_pressed
 ### mouse\_pressed
-*Defined in: std/graphics.s line 213*
+*Defined in: std/graphics.s line 240*
 
 ```rust
 mouse_pressed(edit window, nat button) -> (bool) with effects WINDOW
@@ -9959,9 +10011,10 @@ mouse_pressed(edit window, nat button) -> (bool) with effects WINDOW
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_mouse_button_pressed($button)]`*
 # mouse\_wheel
 ### mouse\_wheel
-*Defined in: std/graphics.s line 217*
+*Defined in: std/graphics.s line 245*
 
 ```rust
 mouse_wheel(window) -> (float) with effects WINDOW
@@ -9969,9 +10022,10 @@ mouse_wheel(window) -> (float) with effects WINDOW
 Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.get_mouse_wheel_move()]`*
 # KEY\_NULL
-### \_\_t7663t
-*Defined in: std/graphics.s line 221*
+### \_\_t7660t
+*Defined in: std/graphics.s line 250*
 
 ```rust
 () -> (0)
@@ -9980,8 +10034,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_APOSTROPHE
-### \_\_t7666t
-*Defined in: std/graphics.s line 222*
+### \_\_t7663t
+*Defined in: std/graphics.s line 251*
 
 ```rust
 () -> (39)
@@ -9990,8 +10044,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_COMMA
-### \_\_t7669t
-*Defined in: std/graphics.s line 223*
+### \_\_t7666t
+*Defined in: std/graphics.s line 252*
 
 ```rust
 () -> (44)
@@ -10000,8 +10054,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_MINUS
-### \_\_t7672t
-*Defined in: std/graphics.s line 224*
+### \_\_t7669t
+*Defined in: std/graphics.s line 253*
 
 ```rust
 () -> (45)
@@ -10010,8 +10064,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_PERIOD
-### \_\_t7675t
-*Defined in: std/graphics.s line 225*
+### \_\_t7672t
+*Defined in: std/graphics.s line 254*
 
 ```rust
 () -> (46)
@@ -10020,8 +10074,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_SLASH
-### \_\_t7678t
-*Defined in: std/graphics.s line 226*
+### \_\_t7675t
+*Defined in: std/graphics.s line 255*
 
 ```rust
 () -> (47)
@@ -10030,8 +10084,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_ZERO
-### \_\_t7681t
-*Defined in: std/graphics.s line 227*
+### \_\_t7678t
+*Defined in: std/graphics.s line 256*
 
 ```rust
 () -> (48)
@@ -10040,8 +10094,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_ONE
-### \_\_t7684t
-*Defined in: std/graphics.s line 228*
+### \_\_t7681t
+*Defined in: std/graphics.s line 257*
 
 ```rust
 () -> (49)
@@ -10050,8 +10104,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_TWO
-### \_\_t7687t
-*Defined in: std/graphics.s line 229*
+### \_\_t7684t
+*Defined in: std/graphics.s line 258*
 
 ```rust
 () -> (50)
@@ -10060,8 +10114,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_THREE
-### \_\_t7690t
-*Defined in: std/graphics.s line 230*
+### \_\_t7687t
+*Defined in: std/graphics.s line 259*
 
 ```rust
 () -> (51)
@@ -10070,8 +10124,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_FOUR
-### \_\_t7693t
-*Defined in: std/graphics.s line 231*
+### \_\_t7690t
+*Defined in: std/graphics.s line 260*
 
 ```rust
 () -> (52)
@@ -10080,8 +10134,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_FIVE
-### \_\_t7696t
-*Defined in: std/graphics.s line 232*
+### \_\_t7693t
+*Defined in: std/graphics.s line 261*
 
 ```rust
 () -> (53)
@@ -10090,8 +10144,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_SIX
-### \_\_t7699t
-*Defined in: std/graphics.s line 233*
+### \_\_t7696t
+*Defined in: std/graphics.s line 262*
 
 ```rust
 () -> (54)
@@ -10100,8 +10154,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_SEVEN
-### \_\_t7702t
-*Defined in: std/graphics.s line 234*
+### \_\_t7699t
+*Defined in: std/graphics.s line 263*
 
 ```rust
 () -> (55)
@@ -10110,8 +10164,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_EIGHT
-### \_\_t7705t
-*Defined in: std/graphics.s line 235*
+### \_\_t7702t
+*Defined in: std/graphics.s line 264*
 
 ```rust
 () -> (56)
@@ -10120,8 +10174,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_NINE
-### \_\_t7708t
-*Defined in: std/graphics.s line 236*
+### \_\_t7705t
+*Defined in: std/graphics.s line 265*
 
 ```rust
 () -> (57)
@@ -10130,8 +10184,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_SEMICOLON
-### \_\_t7711t
-*Defined in: std/graphics.s line 237*
+### \_\_t7708t
+*Defined in: std/graphics.s line 266*
 
 ```rust
 () -> (59)
@@ -10140,8 +10194,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_EQUAL
-### \_\_t7714t
-*Defined in: std/graphics.s line 238*
+### \_\_t7711t
+*Defined in: std/graphics.s line 267*
 
 ```rust
 () -> (61)
@@ -10150,8 +10204,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_A
-### \_\_t7717t
-*Defined in: std/graphics.s line 239*
+### \_\_t7714t
+*Defined in: std/graphics.s line 268*
 
 ```rust
 () -> (65)
@@ -10160,8 +10214,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_B
-### \_\_t7720t
-*Defined in: std/graphics.s line 240*
+### \_\_t7717t
+*Defined in: std/graphics.s line 269*
 
 ```rust
 () -> (66)
@@ -10170,8 +10224,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_C
-### \_\_t7723t
-*Defined in: std/graphics.s line 241*
+### \_\_t7720t
+*Defined in: std/graphics.s line 270*
 
 ```rust
 () -> (67)
@@ -10180,8 +10234,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_D
-### \_\_t7726t
-*Defined in: std/graphics.s line 242*
+### \_\_t7723t
+*Defined in: std/graphics.s line 271*
 
 ```rust
 () -> (68)
@@ -10190,8 +10244,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_E
-### \_\_t7729t
-*Defined in: std/graphics.s line 243*
+### \_\_t7726t
+*Defined in: std/graphics.s line 272*
 
 ```rust
 () -> (69)
@@ -10200,8 +10254,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F
-### \_\_t7732t
-*Defined in: std/graphics.s line 244*
+### \_\_t7729t
+*Defined in: std/graphics.s line 273*
 
 ```rust
 () -> (70)
@@ -10210,8 +10264,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_G
-### \_\_t7735t
-*Defined in: std/graphics.s line 245*
+### \_\_t7732t
+*Defined in: std/graphics.s line 274*
 
 ```rust
 () -> (71)
@@ -10220,8 +10274,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_H
-### \_\_t7738t
-*Defined in: std/graphics.s line 246*
+### \_\_t7735t
+*Defined in: std/graphics.s line 275*
 
 ```rust
 () -> (72)
@@ -10230,8 +10284,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_I
-### \_\_t7741t
-*Defined in: std/graphics.s line 247*
+### \_\_t7738t
+*Defined in: std/graphics.s line 276*
 
 ```rust
 () -> (73)
@@ -10240,8 +10294,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_J
-### \_\_t7744t
-*Defined in: std/graphics.s line 248*
+### \_\_t7741t
+*Defined in: std/graphics.s line 277*
 
 ```rust
 () -> (74)
@@ -10250,8 +10304,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_K
-### \_\_t7747t
-*Defined in: std/graphics.s line 249*
+### \_\_t7744t
+*Defined in: std/graphics.s line 278*
 
 ```rust
 () -> (75)
@@ -10260,8 +10314,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_L
-### \_\_t7750t
-*Defined in: std/graphics.s line 250*
+### \_\_t7747t
+*Defined in: std/graphics.s line 279*
 
 ```rust
 () -> (76)
@@ -10270,8 +10324,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_M
-### \_\_t7753t
-*Defined in: std/graphics.s line 251*
+### \_\_t7750t
+*Defined in: std/graphics.s line 280*
 
 ```rust
 () -> (77)
@@ -10280,8 +10334,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_N
-### \_\_t7756t
-*Defined in: std/graphics.s line 252*
+### \_\_t7753t
+*Defined in: std/graphics.s line 281*
 
 ```rust
 () -> (78)
@@ -10290,8 +10344,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_O
-### \_\_t7759t
-*Defined in: std/graphics.s line 253*
+### \_\_t7756t
+*Defined in: std/graphics.s line 282*
 
 ```rust
 () -> (79)
@@ -10300,8 +10354,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_P
-### \_\_t7762t
-*Defined in: std/graphics.s line 254*
+### \_\_t7759t
+*Defined in: std/graphics.s line 283*
 
 ```rust
 () -> (80)
@@ -10310,8 +10364,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_Q
-### \_\_t7765t
-*Defined in: std/graphics.s line 255*
+### \_\_t7762t
+*Defined in: std/graphics.s line 284*
 
 ```rust
 () -> (81)
@@ -10320,8 +10374,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_R
-### \_\_t7768t
-*Defined in: std/graphics.s line 256*
+### \_\_t7765t
+*Defined in: std/graphics.s line 285*
 
 ```rust
 () -> (82)
@@ -10330,8 +10384,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_S
-### \_\_t7771t
-*Defined in: std/graphics.s line 257*
+### \_\_t7768t
+*Defined in: std/graphics.s line 286*
 
 ```rust
 () -> (83)
@@ -10340,8 +10394,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_T
-### \_\_t7774t
-*Defined in: std/graphics.s line 258*
+### \_\_t7771t
+*Defined in: std/graphics.s line 287*
 
 ```rust
 () -> (84)
@@ -10350,8 +10404,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_U
-### \_\_t7777t
-*Defined in: std/graphics.s line 259*
+### \_\_t7774t
+*Defined in: std/graphics.s line 288*
 
 ```rust
 () -> (85)
@@ -10360,8 +10414,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_V
-### \_\_t7780t
-*Defined in: std/graphics.s line 260*
+### \_\_t7777t
+*Defined in: std/graphics.s line 289*
 
 ```rust
 () -> (86)
@@ -10370,8 +10424,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_W
-### \_\_t7783t
-*Defined in: std/graphics.s line 261*
+### \_\_t7780t
+*Defined in: std/graphics.s line 290*
 
 ```rust
 () -> (87)
@@ -10380,8 +10434,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_X
-### \_\_t7786t
-*Defined in: std/graphics.s line 262*
+### \_\_t7783t
+*Defined in: std/graphics.s line 291*
 
 ```rust
 () -> (88)
@@ -10390,8 +10444,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_Y
-### \_\_t7789t
-*Defined in: std/graphics.s line 263*
+### \_\_t7786t
+*Defined in: std/graphics.s line 292*
 
 ```rust
 () -> (89)
@@ -10400,8 +10454,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_Z
-### \_\_t7792t
-*Defined in: std/graphics.s line 264*
+### \_\_t7789t
+*Defined in: std/graphics.s line 293*
 
 ```rust
 () -> (90)
@@ -10410,8 +10464,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_LEFT\_BRACKET
-### \_\_t7795t
-*Defined in: std/graphics.s line 265*
+### \_\_t7792t
+*Defined in: std/graphics.s line 294*
 
 ```rust
 () -> (91)
@@ -10420,8 +10474,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_BACKSLASH
-### \_\_t7798t
-*Defined in: std/graphics.s line 266*
+### \_\_t7795t
+*Defined in: std/graphics.s line 295*
 
 ```rust
 () -> (92)
@@ -10430,8 +10484,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_RIGHT\_BRACKET
-### \_\_t7801t
-*Defined in: std/graphics.s line 267*
+### \_\_t7798t
+*Defined in: std/graphics.s line 296*
 
 ```rust
 () -> (93)
@@ -10440,8 +10494,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_GRAVE
-### \_\_t7804t
-*Defined in: std/graphics.s line 268*
+### \_\_t7801t
+*Defined in: std/graphics.s line 297*
 
 ```rust
 () -> (96)
@@ -10450,8 +10504,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_SPACE
-### \_\_t7807t
-*Defined in: std/graphics.s line 269*
+### \_\_t7804t
+*Defined in: std/graphics.s line 298*
 
 ```rust
 () -> (32)
@@ -10460,8 +10514,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_ESCAPE
-### \_\_t7810t
-*Defined in: std/graphics.s line 270*
+### \_\_t7807t
+*Defined in: std/graphics.s line 299*
 
 ```rust
 () -> (256)
@@ -10470,8 +10524,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_ENTER
-### \_\_t7813t
-*Defined in: std/graphics.s line 271*
+### \_\_t7810t
+*Defined in: std/graphics.s line 300*
 
 ```rust
 () -> (257)
@@ -10480,8 +10534,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_TAB
-### \_\_t7816t
-*Defined in: std/graphics.s line 272*
+### \_\_t7813t
+*Defined in: std/graphics.s line 301*
 
 ```rust
 () -> (258)
@@ -10490,8 +10544,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_BACKSPACE
-### \_\_t7819t
-*Defined in: std/graphics.s line 273*
+### \_\_t7816t
+*Defined in: std/graphics.s line 302*
 
 ```rust
 () -> (259)
@@ -10500,8 +10554,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_INSERT
-### \_\_t7822t
-*Defined in: std/graphics.s line 274*
+### \_\_t7819t
+*Defined in: std/graphics.s line 303*
 
 ```rust
 () -> (260)
@@ -10510,8 +10564,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_DELETE
-### \_\_t7825t
-*Defined in: std/graphics.s line 275*
+### \_\_t7822t
+*Defined in: std/graphics.s line 304*
 
 ```rust
 () -> (261)
@@ -10520,8 +10574,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_RIGHT
-### \_\_t7828t
-*Defined in: std/graphics.s line 276*
+### \_\_t7825t
+*Defined in: std/graphics.s line 305*
 
 ```rust
 () -> (262)
@@ -10530,8 +10584,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_LEFT
-### \_\_t7831t
-*Defined in: std/graphics.s line 277*
+### \_\_t7828t
+*Defined in: std/graphics.s line 306*
 
 ```rust
 () -> (263)
@@ -10540,8 +10594,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_DOWN
-### \_\_t7834t
-*Defined in: std/graphics.s line 278*
+### \_\_t7831t
+*Defined in: std/graphics.s line 307*
 
 ```rust
 () -> (264)
@@ -10550,8 +10604,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_UP
-### \_\_t7837t
-*Defined in: std/graphics.s line 279*
+### \_\_t7834t
+*Defined in: std/graphics.s line 308*
 
 ```rust
 () -> (265)
@@ -10560,8 +10614,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_PAGE\_UP
-### \_\_t7840t
-*Defined in: std/graphics.s line 280*
+### \_\_t7837t
+*Defined in: std/graphics.s line 309*
 
 ```rust
 () -> (266)
@@ -10570,8 +10624,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_PAGE\_DOWN
-### \_\_t7843t
-*Defined in: std/graphics.s line 281*
+### \_\_t7840t
+*Defined in: std/graphics.s line 310*
 
 ```rust
 () -> (267)
@@ -10580,8 +10634,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_HOME
-### \_\_t7846t
-*Defined in: std/graphics.s line 282*
+### \_\_t7843t
+*Defined in: std/graphics.s line 311*
 
 ```rust
 () -> (268)
@@ -10590,8 +10644,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_END
-### \_\_t7849t
-*Defined in: std/graphics.s line 283*
+### \_\_t7846t
+*Defined in: std/graphics.s line 312*
 
 ```rust
 () -> (269)
@@ -10600,8 +10654,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_CAPS\_LOCK
-### \_\_t7852t
-*Defined in: std/graphics.s line 284*
+### \_\_t7849t
+*Defined in: std/graphics.s line 313*
 
 ```rust
 () -> (280)
@@ -10610,8 +10664,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_SCROLL\_LOCK
-### \_\_t7855t
-*Defined in: std/graphics.s line 285*
+### \_\_t7852t
+*Defined in: std/graphics.s line 314*
 
 ```rust
 () -> (281)
@@ -10620,8 +10674,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_NUM\_LOCK
-### \_\_t7858t
-*Defined in: std/graphics.s line 286*
+### \_\_t7855t
+*Defined in: std/graphics.s line 315*
 
 ```rust
 () -> (282)
@@ -10630,8 +10684,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_PRINT\_SCREEN
-### \_\_t7861t
-*Defined in: std/graphics.s line 287*
+### \_\_t7858t
+*Defined in: std/graphics.s line 316*
 
 ```rust
 () -> (283)
@@ -10640,8 +10694,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_PAUSE
-### \_\_t7864t
-*Defined in: std/graphics.s line 288*
+### \_\_t7861t
+*Defined in: std/graphics.s line 317*
 
 ```rust
 () -> (284)
@@ -10650,8 +10704,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F1
-### \_\_t7867t
-*Defined in: std/graphics.s line 289*
+### \_\_t7864t
+*Defined in: std/graphics.s line 318*
 
 ```rust
 () -> (290)
@@ -10660,8 +10714,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F2
-### \_\_t7870t
-*Defined in: std/graphics.s line 290*
+### \_\_t7867t
+*Defined in: std/graphics.s line 319*
 
 ```rust
 () -> (291)
@@ -10670,8 +10724,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F3
-### \_\_t7873t
-*Defined in: std/graphics.s line 291*
+### \_\_t7870t
+*Defined in: std/graphics.s line 320*
 
 ```rust
 () -> (292)
@@ -10680,8 +10734,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F4
-### \_\_t7876t
-*Defined in: std/graphics.s line 292*
+### \_\_t7873t
+*Defined in: std/graphics.s line 321*
 
 ```rust
 () -> (293)
@@ -10690,8 +10744,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F5
-### \_\_t7879t
-*Defined in: std/graphics.s line 293*
+### \_\_t7876t
+*Defined in: std/graphics.s line 322*
 
 ```rust
 () -> (294)
@@ -10700,8 +10754,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F6
-### \_\_t7882t
-*Defined in: std/graphics.s line 294*
+### \_\_t7879t
+*Defined in: std/graphics.s line 323*
 
 ```rust
 () -> (295)
@@ -10710,8 +10764,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F7
-### \_\_t7885t
-*Defined in: std/graphics.s line 295*
+### \_\_t7882t
+*Defined in: std/graphics.s line 324*
 
 ```rust
 () -> (296)
@@ -10720,8 +10774,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F8
-### \_\_t7888t
-*Defined in: std/graphics.s line 296*
+### \_\_t7885t
+*Defined in: std/graphics.s line 325*
 
 ```rust
 () -> (297)
@@ -10730,8 +10784,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F9
-### \_\_t7891t
-*Defined in: std/graphics.s line 297*
+### \_\_t7888t
+*Defined in: std/graphics.s line 326*
 
 ```rust
 () -> (298)
@@ -10740,8 +10794,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F10
-### \_\_t7894t
-*Defined in: std/graphics.s line 298*
+### \_\_t7891t
+*Defined in: std/graphics.s line 327*
 
 ```rust
 () -> (299)
@@ -10750,8 +10804,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F11
-### \_\_t7897t
-*Defined in: std/graphics.s line 299*
+### \_\_t7894t
+*Defined in: std/graphics.s line 328*
 
 ```rust
 () -> (300)
@@ -10760,8 +10814,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_F12
-### \_\_t7900t
-*Defined in: std/graphics.s line 300*
+### \_\_t7897t
+*Defined in: std/graphics.s line 329*
 
 ```rust
 () -> (301)
@@ -10770,8 +10824,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_LEFT\_SHIFT
-### \_\_t7903t
-*Defined in: std/graphics.s line 301*
+### \_\_t7900t
+*Defined in: std/graphics.s line 330*
 
 ```rust
 () -> (340)
@@ -10780,8 +10834,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_LEFT\_CONTROL
-### \_\_t7906t
-*Defined in: std/graphics.s line 302*
+### \_\_t7903t
+*Defined in: std/graphics.s line 331*
 
 ```rust
 () -> (341)
@@ -10790,8 +10844,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_LEFT\_ALT
-### \_\_t7909t
-*Defined in: std/graphics.s line 303*
+### \_\_t7906t
+*Defined in: std/graphics.s line 332*
 
 ```rust
 () -> (342)
@@ -10800,8 +10854,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_LEFT\_SUPER
-### \_\_t7912t
-*Defined in: std/graphics.s line 304*
+### \_\_t7909t
+*Defined in: std/graphics.s line 333*
 
 ```rust
 () -> (343)
@@ -10810,8 +10864,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_RIGHT\_SHIFT
-### \_\_t7915t
-*Defined in: std/graphics.s line 305*
+### \_\_t7912t
+*Defined in: std/graphics.s line 334*
 
 ```rust
 () -> (344)
@@ -10820,8 +10874,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_RIGHT\_CONTROL
-### \_\_t7918t
-*Defined in: std/graphics.s line 306*
+### \_\_t7915t
+*Defined in: std/graphics.s line 335*
 
 ```rust
 () -> (345)
@@ -10830,8 +10884,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_RIGHT\_ALT
-### \_\_t7921t
-*Defined in: std/graphics.s line 307*
+### \_\_t7918t
+*Defined in: std/graphics.s line 336*
 
 ```rust
 () -> (346)
@@ -10840,8 +10894,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_RIGHT\_SUPER
-### \_\_t7924t
-*Defined in: std/graphics.s line 308*
+### \_\_t7921t
+*Defined in: std/graphics.s line 337*
 
 ```rust
 () -> (347)
@@ -10850,8 +10904,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KB\_MENU
-### \_\_t7927t
-*Defined in: std/graphics.s line 309*
+### \_\_t7924t
+*Defined in: std/graphics.s line 338*
 
 ```rust
 () -> (348)
@@ -10860,8 +10914,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_0
-### \_\_t7930t
-*Defined in: std/graphics.s line 310*
+### \_\_t7927t
+*Defined in: std/graphics.s line 339*
 
 ```rust
 () -> (320)
@@ -10870,8 +10924,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_1
-### \_\_t7933t
-*Defined in: std/graphics.s line 311*
+### \_\_t7930t
+*Defined in: std/graphics.s line 340*
 
 ```rust
 () -> (321)
@@ -10880,8 +10934,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_2
-### \_\_t7936t
-*Defined in: std/graphics.s line 312*
+### \_\_t7933t
+*Defined in: std/graphics.s line 341*
 
 ```rust
 () -> (322)
@@ -10890,8 +10944,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_3
-### \_\_t7939t
-*Defined in: std/graphics.s line 313*
+### \_\_t7936t
+*Defined in: std/graphics.s line 342*
 
 ```rust
 () -> (323)
@@ -10900,8 +10954,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_4
-### \_\_t7942t
-*Defined in: std/graphics.s line 314*
+### \_\_t7939t
+*Defined in: std/graphics.s line 343*
 
 ```rust
 () -> (324)
@@ -10910,8 +10964,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_5
-### \_\_t7945t
-*Defined in: std/graphics.s line 315*
+### \_\_t7942t
+*Defined in: std/graphics.s line 344*
 
 ```rust
 () -> (325)
@@ -10920,8 +10974,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_6
-### \_\_t7948t
-*Defined in: std/graphics.s line 316*
+### \_\_t7945t
+*Defined in: std/graphics.s line 345*
 
 ```rust
 () -> (326)
@@ -10930,8 +10984,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_7
-### \_\_t7951t
-*Defined in: std/graphics.s line 317*
+### \_\_t7948t
+*Defined in: std/graphics.s line 346*
 
 ```rust
 () -> (327)
@@ -10940,8 +10994,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_8
-### \_\_t7954t
-*Defined in: std/graphics.s line 318*
+### \_\_t7951t
+*Defined in: std/graphics.s line 347*
 
 ```rust
 () -> (328)
@@ -10950,8 +11004,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_9
-### \_\_t7957t
-*Defined in: std/graphics.s line 319*
+### \_\_t7954t
+*Defined in: std/graphics.s line 348*
 
 ```rust
 () -> (329)
@@ -10960,8 +11014,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_DECIMAL
-### \_\_t7960t
-*Defined in: std/graphics.s line 320*
+### \_\_t7957t
+*Defined in: std/graphics.s line 349*
 
 ```rust
 () -> (330)
@@ -10970,8 +11024,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_DIVIDE
-### \_\_t7963t
-*Defined in: std/graphics.s line 321*
+### \_\_t7960t
+*Defined in: std/graphics.s line 350*
 
 ```rust
 () -> (331)
@@ -10980,8 +11034,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_MULTIPLY
-### \_\_t7966t
-*Defined in: std/graphics.s line 322*
+### \_\_t7963t
+*Defined in: std/graphics.s line 351*
 
 ```rust
 () -> (332)
@@ -10990,8 +11044,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_SUBTRACT
-### \_\_t7969t
-*Defined in: std/graphics.s line 323*
+### \_\_t7966t
+*Defined in: std/graphics.s line 352*
 
 ```rust
 () -> (333)
@@ -11000,8 +11054,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_ADD
-### \_\_t7972t
-*Defined in: std/graphics.s line 324*
+### \_\_t7969t
+*Defined in: std/graphics.s line 353*
 
 ```rust
 () -> (334)
@@ -11010,8 +11064,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_ENTER
-### \_\_t7975t
-*Defined in: std/graphics.s line 325*
+### \_\_t7972t
+*Defined in: std/graphics.s line 354*
 
 ```rust
 () -> (335)
@@ -11020,8 +11074,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_KP\_EQUAL
-### \_\_t7978t
-*Defined in: std/graphics.s line 326*
+### \_\_t7975t
+*Defined in: std/graphics.s line 355*
 
 ```rust
 () -> (336)
@@ -11030,8 +11084,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_BACK
-### \_\_t7981t
-*Defined in: std/graphics.s line 327*
+### \_\_t7978t
+*Defined in: std/graphics.s line 356*
 
 ```rust
 () -> (4)
@@ -11040,8 +11094,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_MENU
-### \_\_t7984t
-*Defined in: std/graphics.s line 328*
+### \_\_t7981t
+*Defined in: std/graphics.s line 357*
 
 ```rust
 () -> (5)
@@ -11050,8 +11104,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_VOLUME\_UP
-### \_\_t7987t
-*Defined in: std/graphics.s line 329*
+### \_\_t7984t
+*Defined in: std/graphics.s line 358*
 
 ```rust
 () -> (24)
@@ -11060,8 +11114,8 @@ Levels of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.
 
 
 # KEY\_VOLUME\_DOWN
-### \_\_t7990t
-*Defined in: std/graphics.s line 330*
+### \_\_t7987t
+*Defined in: std/graphics.s line 359*
 
 ```rust
 () -> (25)

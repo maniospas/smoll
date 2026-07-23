@@ -38,20 +38,21 @@ def draw(effect edit window WINDOW, circle self)
     circ_line(pos, nat self.radius, 2, white)
 
 def main()
-    WINDOW = edit window(800.0, 600.0, "Moving circle")
+    WINDOW = edit window(800.0, 600.0, "Moving circle", "std/ArianaVioleta-dz2K.ttf")
 
-    N = 1000
+    N = 10
     circles = edit circle[].alloc N
     for create_circle&& in circles
         i = float compiler::for_counter() # builtin way of enumerating
         create_circle = circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
 
     while is_open()
-        dt = dt()
+        dt = dt()*3.0
         for proc_circle&& in circles # mutable pointer
             proc_circle.process dt
         frame = draw()
         clear color(20, 20, 60)
         for draw_circle in circles
             draw_circle.draw()
+        text("demo", 10.0, 10.0, 64.0, color(255,255,255))
         del frame

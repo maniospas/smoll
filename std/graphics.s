@@ -17,11 +17,9 @@ def position(float x, float y)
 def size(float width, float height)
     return compiler::args()
 
-def window(size size, cstr title, cstr font_path)
-    {"-lraylib"}
-    {"-lGL"}
+local def unsafe_open_window(size size, cstr title, cstr font_path)
+    VM "(pyray.set_trace_log_level(pyray.LOG_NONE), pyray.init_window(int($size__width),int($size__height),$title),pyray.set_target_fps(60),memory.set_global('font', pyray.load_font_ex($font_path,128,None,0) if $font_path else pyray.get_font_default()))"
     {SetTraceLogLevel(LOG_NONE); InitWindow(size__width, size__height, title); }
-    openy = mut false
     if exists font_path
         {
             builtins::int __smolambda_n = 0;
@@ -31,25 +29,42 @@ def window(size size, cstr title, cstr font_path)
             for (int c = 0x2500; c <= 0x257F; c++) __smolambda_codepoints[__smolambda_n++] = c;
             __smolambda_font = LoadFontEx(font_path, 128, __smolambda_codepoints, __smolambda_n);
         }
+
+def window(size size, cstr title, cstr font_path)
+    {"-lraylib"}
+    {"-lGL"}
+    openy = mut false
+    unsafe_open_window(size, title, font_path)
     return singleton(size, title, openy)
 
 def is_open(effect edit window WINDOW)
+    VM "[not pyray.window_should_close()]"
     {builtins::bool ret = WindowShouldClose(); }
     return not ret
 
+local def unsafe_begin_drawing()
+    VM "pyray.begin_drawing()"
+    {BeginDrawing();}
+
+local def unsafe_end_drawing()
+    VM "pyray.end_drawing()"
+    {EndDrawing();}
+    
 def draw(effect edit window WINDOW)
     if WINDOW.openy fail "alopeny drawing on window"
     is_drawing = true
-    {BeginDrawing();}
+    unsafe_begin_drawing()
     defer
         if is_drawing
-            {EndDrawing();}
+            unsafe_end_drawing()
     return is_drawing
 
 def clear(effect edit window WINDOW, color color)
+    VM "pyray.clear_background(pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {ClearBackground((Color){color__r,color__g,color__b,color__a});}
 
 def text(effect edit window WINDOW, cstr txt, position pos, float size, color color)
+    VM "pyray.draw_text_ex(memory.globals['font'],$txt,pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTextEx(
             __smolambda_font,
@@ -62,6 +77,7 @@ def text(effect edit window WINDOW, cstr txt, position pos, float size, color co
     }
 
 def text(effect edit window WINDOW, str txt, position pos, float size, color color)
+    VM "pyray.draw_text_ex(memory.globals['font'],str($txt),pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTextEx(
             __smolambda_font,
@@ -74,6 +90,7 @@ def text(effect edit window WINDOW, str txt, position pos, float size, color col
     }
     
 def text_rotated(effect edit window WINDOW, str txt, position pos, position origin, float rotation, float size, color color)
+    VM "pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTextPro(
             __smolambda_font,
@@ -147,6 +164,7 @@ def draw(effect edit window WINDOW, Texture _tex, position pos, float rotation, 
     }
 
 def circ(effect edit window WINDOW, position pos, float radius, color color)
+    VM "pyray.draw_circle_v(pyray.Vector2($pos__x,$pos__y),$radius,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawCircleV(
             (Vector2){(float)pos__x, (float)pos__y}, 
@@ -156,6 +174,7 @@ def circ(effect edit window WINDOW, position pos, float radius, color color)
     }
 
 def rect(effect edit window WINDOW, position pos, size size, color color)
+    VM "pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawRectangle(
             pos__x, pos__y,
@@ -165,9 +184,11 @@ def rect(effect edit window WINDOW, position pos, size size, color color)
     }
 
 def rect_line(effect edit window WINDOW, position pos, size size, nat thickness, color color)
+    VM "pyray.draw_rectangle_lines_ex(pyray.Rectangle($pos__x,$pos__y,$size__width,$size__height),$thickness,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {DrawRectangleLinesEx((Rectangle){(float)pos__x, (float)pos__y, (float)size__width, (float)size__height}, (int)thickness, (Color){color__r,color__g,color__b,color__a});}
 
 def circ_line(effect edit window WINDOW, position pos, nat radius, nat thickness, color color)
+    VM "pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         builtins::float inner = (radius > thickness) ? (float)(radius - thickness) : 0.0f;
         builtins::float outer = (float)radius;
@@ -184,22 +205,27 @@ def circ_line(effect edit window WINDOW, position pos, nat radius, nat thickness
     }
 
 def dt(effect window WINDOW)
+    VM "[pyray.get_frame_time()]"
     {builtins::float dt = GetFrameTime();}
     return dt
 
 def key_down(effect window WINDOW, nat key)
+    VM "[pyray.is_key_down($key)]"
     {builtins::bool ret = IsKeyDown(key);}
     return ret
 
 def key_pressed(effect edit window WINDOW, nat key)
+    VM "[pyray.is_key_pressed($key)]"
     {builtins::bool ret = IsKeyPressed(key);}
     return ret
 
 def key_released(effect edit window WINDOW, nat key)
+    VM "[pyray.is_key_released($key)]"
     {builtins::bool ret = IsKeyReleased(key);}
     return ret
 
 def mouse_pos(effect window WINDOW)
+    VM "[(lambda p=pyray.get_mouse_position():(p.x,p.y))()]"
     {
         builtins::float x = GetMouseX();
         builtins::float y = GetMouseY();
@@ -207,14 +233,17 @@ def mouse_pos(effect window WINDOW)
     return position(x, y)
 
 def mouse_down(effect window WINDOW, nat button)
+    VM "[pyray.is_mouse_button_down($button)]"
     {builtins::bool ret = IsMouseButtonDown(button);}
     return ret
 
 def mouse_pressed(effect edit window WINDOW, nat button)
+    VM "[pyray.is_mouse_button_pressed($button)]"
     {builtins::bool ret = IsMouseButtonPressed(button);}
     return ret
 
 def mouse_wheel(effect window WINDOW)
+    VM "[pyray.get_mouse_wheel_move()]"
     {builtins::float ret = GetMouseWheelMove();}
     return ret
 

@@ -41,6 +41,10 @@ from collections import deque
 from typing import Optional, Any
 from itertools import count
 import gc
+import re
+try:
+    import pyray
+except: pass
 gc.disable()
 #gc.set_threshold(150000)
 
@@ -62,6 +66,20 @@ debug_mode = True
 repositories: dict[str, str] = dict()
 externals: list["File"] = list()
 MACRO_LIMIT = 20
+
+# vm_pipes: dict[str,list[str]] = dict()
+# def push_pipe(name: str, data: str):
+#     pipe = vm_pipes.get(name, None)
+#     if pipe is None: vm_pipes[name] = [data]
+#     else: pipe.append(data)
+
+# def pop_pipe(name: str):
+#     pipe = vm_pipes.get(name, None)
+#     if not pipe: return
+#     data = '\n'.join(pipe)
+#     pipe.clear()
+#     exec(data, globals())
+
 
 def supports_ansi() -> bool:
     if is_pyodide: return True
@@ -119,6 +137,10 @@ class MemoryEmulator:
         self.foreign_objects: dict[int, tuple[Any, str]] = dict() # foreign_id->(obj,description)
         self.must_free: list[int] = list()
         self.temporary_space = self.alloc(256)
+        self.globals: dict[str, Any] = dict()
+
+    def set_global(self, name: str, value):
+        self.globals[name] = value
 
     def unsafe_cstr(self, text: str) -> int:
         encoded = text.encode('utf-8')
@@ -762,6 +784,7 @@ class ImplementedType:
         self.doc: list[str] = list()
         self.required_accompany: dict[str,list[str]] = dict()
         self.VM: str|None = None # an equivalent python implementation for the VM
+        self.VM_cache = None
         self.effect_names: list[str] = list()
         self.args: list[str] = list()
         self.rets: list[str] = list()
@@ -1704,6 +1727,41 @@ class ImplementedType:
                 pos += 1
 
         if self.VM is not None: 
+            # if not self.VM_cache:
+            #     expr = self.VM[1:-1]
+            #     expr = re.sub(r"\$(\w+)", r"\1", expr)
+            #     self.VM_cache = compile(expr, "<vm>", "eval")
+            # locals_dict = {}
+            # for pos, arg in enumerate(args[:input_args]):
+            #     if self.vars[arg].type == CSTR_TYPE: locals_dict[arg] = memory.as_cstr(int(values[pos]))
+            #     elif self.vars[arg].type == FLOAT_TYPE: locals_dict[arg] = float(values[pos])
+            #     else: locals_dict[arg] = int(values[pos])
+            # locals_dict["memory"] = memory
+            # try:
+            #     evaluated = eval(self.VM_cache, globals(), locals_dict)
+            #     if inspect.isawaitable(evaluated):
+            #         evaluated = await evaluated
+            # except ExpectedException as e:
+            #     err_code = err_code_table.get("\"" + str(e) + "\"", 1)
+            #     return err_code
+            # except Exception as e:
+            #     self.at.error(
+            #         "interpreter",
+            #         f"the VM failed with error {e} for command: {self.VM}"
+            #     )
+
+            # if not isinstance(evaluated, list):
+            #     evaluated = []
+
+            # if len(evaluated) != len(args) - input_args:
+            #     self.at.error(
+            #         "interpreter",
+            #         f"the VM command returned {len(evaluated)} values instead of {len(args)-input_args}"
+            #     )
+
+            # values[input_args:] = evaluated
+            # ret = None
+
             call_text = self.VM[1:-1]
             for pos, arg in enumerate(args[:input_args]):
                 if arg in call_text:
@@ -1722,7 +1780,7 @@ class ImplementedType:
                 self.at.error("interpreter", "the VM failed with error "+str(e)+" for command: "+call_text)
             if not isinstance(evaluated, list): evaluated = []
             if len(evaluated)!=len(args)-input_args:
-                self.at.error("interpreter", "the VM command returned a different number of values than the original")
+                self.at.error("interpreter", "the VM command returned a different number of values "+str(len(evaluated))+" than the original")
             values[input_args:] = evaluated
             ret = None
         else: 

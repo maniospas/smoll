@@ -71,23 +71,18 @@ def resize(edit any[] buffer, nat size, "unsafe"|blank prunning)
         buffer.unsafe_ptr.unsafe::zero(prev_bytes, bytes)
     return buffer
 
-def last(any[] buffer)
-    doc "get a pointer to the last buffer element"
-    if 0==buffer.unsafe_size fail "out of bounds"
-    return buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1+buffer.unsafe_offset.nat())*buffer.unsafe_align.nat())
-
-def mutlast(edit any[] buffer)
-    doc "get a mutable pointer to the last buffer element"
+def last(edit any[] buffer)
+    doc "mutable pointer to the last buffer element"
     if 0==buffer.unsafe_size fail "out of bounds"
     return unsafe_mut buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1+buffer.unsafe_offset.nat())*buffer.unsafe_align.nat())
     
 def mutget(edit any[] buffer, nat i)
-    doc "get a mutable pointer to a buffer element"
+    doc "mutable pointer to buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
     return unsafe_mut buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
     
 def get(any[] buffer, nat i)
-    doc "get a pointer to a buffer element"
+    doc "immutable pointer to buffer element"
     if i>=buffer.unsafe_size fail "out of bounds"
     return buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
 

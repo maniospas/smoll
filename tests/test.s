@@ -1,17 +1,11 @@
 import "std/core.s"
-def ^ = compiler::deref
 
-def user(str name, nat _x, nat y)
-    values = mut nat[]
-    x = mut _x
-    return class(name,x,y,values)
-
-def parse(edit user[] users)
-    user = mut users[0]&
-    user.x = 1
+def inc(mut float ptr element)
+    element = 1.0+compiler::deref element
 
 def main()
     CLI = edit console()
-    users = edit user[].alloc 4
-    parse users
-    print users[0].x
+    element = mut last [0.0] # equivalent to element = [0.0][0]& 
+    print compiler::deref element # prints 0.0
+    inc element
+    print compiler::deref element # prints 1,0

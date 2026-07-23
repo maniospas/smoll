@@ -1309,7 +1309,7 @@ def inc(mut float ptr element)
 
 def main()
     CLI = edit console()
-    element = [0.0]& # equivalent to element = [0.0][0]& 
+    element = mut [0.0]& # equivalent to element = [0.0][0]& 
     print compiler::deref element # prints 0.0
     inc element
     print compiler::deref element # prints 1,0

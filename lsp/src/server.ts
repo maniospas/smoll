@@ -7,7 +7,7 @@ import { join } from 'path';
 import { platform } from 'os';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 
-const LOGGING = false;
+const LOGGING = true;
 function log(msg: string) { if (LOGGING) connection.console.log(`[smoll] ${msg}`); }
 
 const TOKEN_TYPES = [ 'namespace', 'type', 'class', 'enum', 'interface', 'struct', 'typeParameter', 'parameter', 'variable', 'property', 'enumMember', 'event', 'function', 'method', 'macro', 'keyword', 'modifier', 'comment', 'string', 'number', 'regexp', 'operator', 'decorator'];
@@ -82,38 +82,55 @@ function remapTokenPaths(tokens: CompilerToken[], tmpPath: string, realPath: str
 // def: entries persist across the whole compiler process lifetime, so this dictionary
 // lives at module scope instead of being recreated per parse call.
 const defDictionary = new Map<number, string>();
+function resolveMessage(message: string): string {
+  return message
+    .split('\n')
+    .map(line => {
+      if(line.charCodeAt(0) !== 58) return line;
+      return defDictionary.get(parseInt(line.slice(1), 10))
+    })
+    .join('\t')
+    .split('\t') // merge with incoming tabs
+    .join('\n');
+}
 
 function parseCompilerOutput(stdout: string): CompilerToken[] {
   const tokens: CompilerToken[] = [];
-  const seenErrorPos = new Set<string>();
-  const chunks = stdout.split(/^---\r?\n/m).filter(c => c.trim() !== '');
-  log(`parser: got ${chunks.length} chunks from ${stdout.length} bytes of output`);
-  for(const chunk of chunks) {
-    const rawLines = chunk.split(/\r?\n/);
-    const lines: string[] = [];
-    for (let rawLine of rawLines) {
-      const defMatch = rawLine.match(/^def:\s*(\d+),\s*(.*)$/);
-      if (defMatch) { defDictionary.set(parseInt(defMatch[1], 10), defMatch[2]); continue; }
-      const refMatch = rawLine.match(/^:(\d+)\s*$/);
-      if (refMatch) { rawLine = defDictionary.get(parseInt(refMatch[1], 10)) ?? rawLine; }
-      lines.push(...rawLine.split('\t'));
+  const rawLines = stdout.split(/\r?\n/);
+  const lines: string[] = []; // gathered lines
+  let i = 0;
+  while(i<rawLines.length) {
+    lines.length = 0;
+    while(true) {
+      const rawLine = rawLines[i];
+      i = i+1;
+      if(rawLine === undefined) break;
+      if(rawLine.length===0) {}
+      else if(rawLine.charCodeAt(0) === 58) {
+        const newLine = lines.length<8?defDictionary.get(parseInt(rawLine.slice(1), 10))??rawLine:rawLine;
+        lines.push(newLine)
+      }
+      else if(rawLine.startsWith("def:")) {
+        const defPos = rawLine.indexOf(",");
+        if (defPos!==-1) {
+          defDictionary.set(parseInt(rawLine.slice(4,defPos), 10), rawLine.slice(defPos+1));
+        }
+      }
+      else if(rawLine==="---") break;
+      else lines.push(rawLine);
     }
     if(lines.length<8) continue;
-    const tokenType = lines[0].trim() as TokenType;
+    let tokenTypeName = lines[0].trim();
     const file      = lines[1].trim();
-    const line      = parseInt(lines[2].trim(), 10);
-    const col       = parseInt(lines[3].trim(), 10);
-    const length    = parseInt(lines[4].trim(), 10);
-    const defFile   = lines[5].trim();
-    const defLine   = parseInt(lines[6].trim(), 10);
-    const defCol    = parseInt(lines[7].trim(), 10);
-    const message   = lines.slice(8).join('\n').trim();
-    const kind: 'error' | 'annotation' = message.includes('error:') ? 'error' : 'annotation';
-    if (kind === 'error') {
-      const pos = `${file}:${line}:${col}`;
-      if (seenErrorPos.has(pos)) continue;
-      else seenErrorPos.add(pos);
-    }
+    const line      = parseInt(lines[2], 10);
+    const col       = parseInt(lines[3], 10);
+    const length    = parseInt(lines[4], 10);
+    const defFile   = lines[5];
+    const defLine   = parseInt(lines[6], 10);
+    const defCol    = parseInt(lines[7], 10);
+    const message   = lines.slice(8).join('\n');
+    let kind: 'error'|'annotation' = tokenTypeName.endsWith('error')?'error':'annotation';
+    let tokenType = tokenTypeName as TokenType;
     tokens.push({ tokenType, file, line, col, length, message, kind, definition: { file: defFile, line: defLine, col: defCol } });
   }
   return tokens;
@@ -159,10 +176,7 @@ function dequeueNext() {
   if (busy || requestQueue.length === 0) return;
   const next = requestQueue.shift()!;
   busy = true;
-  pendingResolve = (stdout: string) => {
-    busy = false;
-    next.resolve(stdout);
-  };
+  pendingResolve = (stdout: string) => { busy = false; next.resolve(stdout); };
   if (!next.isFirst) compilerProc!.stdin.write(next.tmpPath + '\n');
 }
 
@@ -223,24 +237,14 @@ function publishDiagnostics(uri: string, filePath: string, tokens: CompilerToken
   log(`diagnostics: ${mine.length} for this file (${errors.length} errors, ${annotations.length} annotations)`);
   const seen = new Map<string, Set<string>>();
   const diagnostics: Diagnostic[] = errors
-    .filter(t => {
-      const firstLine = t.message.split(':')[0];
-      const pos = `${t.line}:${t.col}`;
-      if (!seen.has(pos)) seen.set(pos, new Set());
-      const posSet = seen.get(pos)!;
-      if (posSet.has(firstLine)) return false;
-      posSet.add(firstLine);
-      return true;
-    })
     .map(t => {
-      const firstLine = t.message.split(':')[0];
       return {
-        severity: t.kind === 'error' ? DiagnosticSeverity.Error : DiagnosticSeverity.Hint,
+        severity: t.kind==='error'?DiagnosticSeverity.Error:DiagnosticSeverity.Hint,
         range: Range.create(
           Position.create(t.line - 1, t.col - 1),
           Position.create(t.line - 1, t.col - 1 + t.length)
         ),
-        message: firstLine,
+        message: t.kind,
         source: 'smoll',
       };
     });
@@ -262,7 +266,7 @@ connection.onHover((params: TextDocumentPositionParams): Hover | null => {
 
   if (hits.length === 0) return null;
 
-  const sections = Array.from(new Set(hits.map(hit => hit.message)));
+  const sections = Array.from(new Set(hits.map(hit => resolveMessage(hit.message))));
 
   return {
     contents: {

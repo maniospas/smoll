@@ -7,7 +7,7 @@ def test1()
     return x
 
 def test2(mut float[] x)
-    x.resize(2).mutlast() = 2.0
+    x.resize(2).last() = 2.0
 
 def main()
     CLI = edit console()

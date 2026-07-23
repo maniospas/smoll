@@ -19,6 +19,6 @@ def main()
     CLI = edit console()
     obj = mut listofdat()
     obj.data[0] = dat()
-    obj.data[0]&&.value = 0
+    obj.data[0]&.value = 0
     obj.data[0].data[0] = str "test"
     accessible obj

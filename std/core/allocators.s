@@ -55,7 +55,7 @@ def get(circular|list self, nat pos)
 
 def mutget(edit circular|list self, nat pos)
     doc "get a list element pointer"
-    return self.buf[pos]&&
+    return self.buf[pos]&
 
 def alloc(edit arena allocator, nat|blank length)
     doc "arena allocation"
@@ -96,7 +96,7 @@ def alloc(edit list allocator, nat|blank length)
 
 def at(edit allocated surface)
     doc "get a mutable pointer to the last buffer element"
-    return surface.buf[surface.pos]&&
+    return surface.buf[surface.pos]&
 
 local def nat16(nat x) # declare here to not import from anywhere
     {builtins::nat16 value = x;}

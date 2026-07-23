@@ -240,7 +240,7 @@ def copy(effect edit float_allocator FLOATS, vec v)
 
 def arena(edit vec v)
     buf = edit float[]
-    buf.unsafe_ptr = v.unsafe_ptr&&
+    buf.unsafe_ptr = v.unsafe_ptr&
     buf.unsafe_size = v.pos+len v
     pos = mut v.pos
     return arena(buf, pos)

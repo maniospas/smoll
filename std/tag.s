@@ -19,7 +19,7 @@ def unsafe_defer_free(mut tagged ptr obj)
 
 def tagged_alloc(edit arena<char::name> arena, nat size) 
     allocated = mut arena.alloc size
-    return allocated.buf[allocated.pos]&&
+    return allocated.buf[allocated.pos]&
 
 def alloc(cstr|blank surface, cstr obj)
     if 0==len str obj fail "empty input name"

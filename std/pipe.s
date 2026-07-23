@@ -62,7 +62,7 @@ def unsafe_pipe_mutax_init(mut pipe ptr obj)
 
 def pipe_alloc(edit arena<char::name> arena, nat size) 
     allocated = mut arena.alloc size
-    return allocated.buf[allocated.pos]&&
+    return allocated.buf[allocated.pos]&
 
 def shared(cstr|blank surface, cstr obj)
     if 0==len str obj fail "empty input name"

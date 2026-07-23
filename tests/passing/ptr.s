@@ -17,7 +17,7 @@ def main()
     f = ref float[].alloc 1  # preffer alloc than resizing empty buffers (no pointer invalidation)
     f[0] = 1.0 # move data to pointer
     print f[0]
-    f0 = f[0]&&
+    f0 = f[0]&
     (mutlast f.resize 2) = compiler::deref f0
 
 

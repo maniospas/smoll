@@ -11,5 +11,5 @@ def main()
     CLI = edit console()
     pairs = edit pp[].alloc 2
     pairs[0] = pp(pair("1","1"), pair("2","2"))
-    print ^pairs[0]&&.a.x
+    print ^pairs[0]&.a.x
     print pairs.a.x[0]

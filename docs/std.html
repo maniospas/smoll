@@ -2920,129 +2920,6 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="mul-matrix-matrix-multiplication">mul - matrix-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s line 102</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="65">
-<li>row out of bounds</li>
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>inner dimensions must agree</li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-</ol>
-
-<p>Returned values defer use of the following functions:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="mul-vector-matrix-multiplication">mul - vector-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s line 90</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="65">
-<li>row out of bounds</li>
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>vector length must match matrix rows</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-<li>does not fit in circular arena</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-</ol>
-
-<h3 id="mul-vector-matrix-multiplication-2">mul - vector-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s line 90</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="65">
-<li>row out of bounds</li>
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>vector length must match matrix rows</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-<li>arena is out of space</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-</ol>
-
-<h3 id="mul-vector-matrix-multiplication-3">mul - vector-matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/mat.s line 90</em></p>
-
-<p>Grabs an allocator for the result as an effect.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="65">
-<li>row out of bounds</li>
-<li>null pointer</li>
-<li>column out of bounds</li>
-<li>vector length must match matrix rows</li>
-<li>iteration end</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>out of bounds</li>
-</ol>
-
-<p>Returned values defer use of the following functions:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
 <h3 id="mul-matrix-vector-multiplication">mul - matrix-vector multiplication</h3>
 
 <p><em>Defined in: std/sci/mat.s line 78</em></p>
@@ -3369,7 +3246,7 @@ by the same running program.</p>
 </code></pre>
 </div>
 
-<h3 id="mul-matrix-matrix-multiplication-2">mul - matrix-matrix multiplication</h3>
+<h3 id="mul-matrix-matrix-multiplication">mul - matrix-matrix multiplication</h3>
 
 <p><em>Defined in: std/sci/mat.s line 102</em></p>
 
@@ -3395,7 +3272,7 @@ by the same running program.</p>
 <li>cannot place matrices on buffer offsets</li>
 </ol>
 
-<h3 id="mul-matrix-matrix-multiplication-3">mul - matrix-matrix multiplication</h3>
+<h3 id="mul-matrix-matrix-multiplication-2">mul - matrix-matrix multiplication</h3>
 
 <p><em>Defined in: std/sci/mat.s line 102</em></p>
 
@@ -3420,6 +3297,129 @@ by the same running program.</p>
 <li>can only place matrices on contiguous buffers</li>
 <li>cannot place matrices on buffer offsets</li>
 </ol>
+
+<h3 id="mul-matrix-matrix-multiplication-3">mul - matrix-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s line 102</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>Potential errors:</p>
+
+<ol start="65">
+<li>row out of bounds</li>
+<li>null pointer</li>
+<li>column out of bounds</li>
+<li>inner dimensions must agree</li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+</ol>
+
+<p>Returned values defer use of the following functions:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="mul-vector-matrix-multiplication">mul - vector-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s line 90</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>Potential errors:</p>
+
+<ol start="65">
+<li>row out of bounds</li>
+<li>null pointer</li>
+<li>column out of bounds</li>
+<li>vector length must match matrix rows</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+<li>does not fit in circular arena</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+</ol>
+
+<h3 id="mul-vector-matrix-multiplication-2">mul - vector-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s line 90</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>Potential errors:</p>
+
+<ol start="65">
+<li>row out of bounds</li>
+<li>null pointer</li>
+<li>column out of bounds</li>
+<li>vector length must match matrix rows</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+<li>arena is out of space</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+</ol>
+
+<h3 id="mul-vector-matrix-multiplication-3">mul - vector-matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/mat.s line 90</em></p>
+
+<p>Grabs an allocator for the result as an effect.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>Potential errors:</p>
+
+<ol start="65">
+<li>row out of bounds</li>
+<li>null pointer</li>
+<li>column out of bounds</li>
+<li>vector length must match matrix rows</li>
+<li>iteration end</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>out of bounds</li>
+</ol>
+
+<p>Returned values defer use of the following functions:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
 
 <h1 id="div">div</h1>
 
@@ -3485,86 +3485,6 @@ Safeguards against division by zero.</p>
 
 <h3 id="div-vector-division">div - vector division</h3>
 
-<p><em>Defined in: std/sci/vec.s line 144</em></p>
-
-<p>Grabs a FLOATS allocator effect to store the result.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="16">
-<li>arena is out of space</li>
-<li>null pointer</li>
-<li>division by zero</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="div-vector-division-2">div - vector division</h3>
-
-<p><em>Defined in: std/sci/vec.s line 144</em></p>
-
-<p>Grabs a FLOATS allocator effect to store the result.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>division by zero</li>
-<li>allocation failed</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>out of bounds</li>
-</ol>
-
-<p>Returned values defer use of the following functions:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<h3 id="div-vector-division-3">div - vector division</h3>
-
-<p><em>Defined in: std/sci/vec.s line 132</em></p>
-
-<p>Grabs a FLOATS allocator effect to store the result.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="17">
-<li>does not fit in circular arena</li>
-<li>null pointer</li>
-<li>division by zero</li>
-<li>can only place vectors on contiguous buffers</li>
-<li>cannot place vectors on buffer offsets</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="div-vector-division-4">div - vector division</h3>
-
 <p><em>Defined in: std/sci/vec.s line 132</em></p>
 
 <p>Grabs a FLOATS allocator effect to store the result.</p>
@@ -3588,7 +3508,7 @@ Safeguards against division by zero.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="div-vector-division-5">div - vector division</h3>
+<h3 id="div-vector-division-2">div - vector division</h3>
 
 <p><em>Defined in: std/sci/vec.s line 132</em></p>
 
@@ -3612,7 +3532,7 @@ Safeguards against division by zero.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="div-vector-division-6">div - vector division</h3>
+<h3 id="div-vector-division-3">div - vector division</h3>
 
 <p><em>Defined in: std/sci/vec.s line 132</em></p>
 
@@ -3637,7 +3557,7 @@ Safeguards against division by zero.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="div-vector-division-7">div - vector division</h3>
+<h3 id="div-vector-division-4">div - vector division</h3>
 
 <p><em>Defined in: std/sci/vec.s line 132</em></p>
 
@@ -3669,7 +3589,7 @@ Safeguards against division by zero.</p>
 </code></pre>
 </div>
 
-<h3 id="div-vector-division-8">div - vector division</h3>
+<h3 id="div-vector-division-5">div - vector division</h3>
 
 <p><em>Defined in: std/sci/vec.s line 132</em></p>
 
@@ -3702,7 +3622,7 @@ Safeguards against division by zero.</p>
 </code></pre>
 </div>
 
-<h3 id="div-vector-division-9">div - vector division</h3>
+<h3 id="div-vector-division-6">div - vector division</h3>
 
 <p><em>Defined in: std/sci/vec.s line 144</em></p>
 
@@ -3710,6 +3630,86 @@ Safeguards against division by zero.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>Potential errors:</p>
+
+<ol start="17">
+<li>does not fit in circular arena</li>
+<li>null pointer</li>
+<li>division by zero</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="div-vector-division-7">div - vector division</h3>
+
+<p><em>Defined in: std/sci/vec.s line 144</em></p>
+
+<p>Grabs a FLOATS allocator effect to store the result.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>Potential errors:</p>
+
+<ol start="16">
+<li>arena is out of space</li>
+<li>null pointer</li>
+<li>division by zero</li>
+<li>can only place vectors on contiguous buffers</li>
+<li>cannot place vectors on buffer offsets</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="div-vector-division-8">div - vector division</h3>
+
+<p><em>Defined in: std/sci/vec.s line 144</em></p>
+
+<p>Grabs a FLOATS allocator effect to store the result.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>division by zero</li>
+<li>allocation failed</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>out of bounds</li>
+</ol>
+
+<p>Returned values defer use of the following functions:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">exists</span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="div-vector-division-9">div - vector division</h3>
+
+<p><em>Defined in: std/sci/vec.s line 132</em></p>
+
+<p>Grabs a FLOATS allocator effect to store the result.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">div</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
 </code></pre>
 </div>
 
@@ -5735,30 +5735,6 @@ per a pattern like <code>for i in range 10 ...</code>.</p>
 
 <h3 id="get-get-a-hash-map-entry">get - get a hash map entry</h3>
 
-<p><em>Defined in: std/map.s line 28</em></p>
-
-<p>Implemented for string or cstr keys but buffer of any values.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">robinhood_nat_entry</span><span class="p">[],</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>modulo by zero</li>
-<li>index not found</li>
-<li>nat subtraction would yield a negative</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="get-get-a-hash-map-entry-2">get - get a hash map entry</h3>
-
 <p><em>Defined in: std/map.s line 18</em></p>
 
 <p>Implemented for string or cstr keys but buffer of any values.</p>
@@ -5781,7 +5757,7 @@ per a pattern like <code>for i in range 10 ...</code>.</p>
 <li>out of bounds</li>
 </ol>
 
-<h3 id="get-get-a-hash-map-entry-3">get - get a hash map entry</h3>
+<h3 id="get-get-a-hash-map-entry-2">get - get a hash map entry</h3>
 
 <p><em>Defined in: std/map.s line 18</em></p>
 
@@ -6097,9 +6073,9 @@ per a pattern like <code>for i in range 10 ...</code>.</p>
 <ol start="2">
 <li>null pointer</li>
 <li>can only define strings on non-offset buffers</li>
-<li>can only define strings on contiguous buffers</li>
 <li>not open dir</li>
 <li>end of dir</li>
+<li>can only define strings on contiguous buffers</li>
 <li>out of bounds</li>
 </ol>
 
@@ -6117,6 +6093,30 @@ per a pattern like <code>for i in range 10 ...</code>.</p>
 <p>Potential errors:</p>
 
 <ol start="15">
+<li>out of bounds</li>
+</ol>
+
+<h3 id="get-get-a-hash-map-entry-3">get - get a hash map entry</h3>
+
+<p><em>Defined in: std/map.s line 28</em></p>
+
+<p>Implemented for string or cstr keys but buffer of any values.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">robinhood_nat_entry</span><span class="p">[],</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>modulo by zero</li>
+<li>index not found</li>
+<li>nat subtraction would yield a negative</li>
+<li>iteration end</li>
 <li>out of bounds</li>
 </ol>
 
@@ -6728,54 +6728,6 @@ resources.</p>
 
 <h3 id="mutget-get-a-mutable-hash-map-entry">mutget - get a mutable hash map entry</h3>
 
-<p><em>Defined in: std/map.s line 33</em></p>
-
-<p>Implemented for string or cstr keys but buffer of any values.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_nat_entry</span><span class="p">[],</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>modulo by zero</li>
-<li>nat subtraction would yield a negative</li>
-<li>string buffer is full</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="mutget-get-a-mutable-hash-map-entry-2">mutget - get a mutable hash map entry</h3>
-
-<p><em>Defined in: std/map.s line 23</em></p>
-
-<p>Implemented for string or cstr keys but buffer of any values.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[],</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>modulo by zero</li>
-<li>nat subtraction would yield a negative</li>
-<li>string buffer is full</li>
-<li>iteration end</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="mutget-get-a-mutable-hash-map-entry-3">mutget - get a mutable hash map entry</h3>
-
 <p><em>Defined in: std/map.s line 23</em></p>
 
 <p>Implemented for string or cstr keys but buffer of any values.</p>
@@ -6814,6 +6766,54 @@ resources.</p>
 <p>Potential errors:</p>
 
 <ol start="15">
+<li>out of bounds</li>
+</ol>
+
+<h3 id="mutget-get-a-mutable-hash-map-entry-2">mutget - get a mutable hash map entry</h3>
+
+<p><em>Defined in: std/map.s line 33</em></p>
+
+<p>Implemented for string or cstr keys but buffer of any values.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_nat_entry</span><span class="p">[],</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 2 to 7 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>modulo by zero</li>
+<li>nat subtraction would yield a negative</li>
+<li>string buffer is full</li>
+<li>iteration end</li>
+<li>out of bounds</li>
+</ol>
+
+<h3 id="mutget-get-a-mutable-hash-map-entry-3">mutget - get a mutable hash map entry</h3>
+
+<p><em>Defined in: std/map.s line 23</em></p>
+
+<p>Implemented for string or cstr keys but buffer of any values.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">robinhood_str_entry</span><span class="p">[],</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>Potential errors:</p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>modulo by zero</li>
+<li>nat subtraction would yield a negative</li>
+<li>string buffer is full</li>
+<li>iteration end</li>
 <li>out of bounds</li>
 </ol>
 
@@ -10120,7 +10120,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;rel&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -10130,6 +10130,7 @@ All computations are branchless, as literals are optimized away during compilati
 
 <ol start="2">
 <li>null pointer</li>
+<li>division by zero</li>
 <li>out of bounds</li>
 </ol>
 
@@ -10144,7 +10145,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -10168,7 +10169,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -10192,7 +10193,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -10216,16 +10217,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-6">reduce - reduce a vector to one value</h3>
@@ -10239,16 +10241,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-7">reduce - reduce a vector to one value</h3>
@@ -10262,16 +10265,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-8">reduce - reduce a vector to one value</h3>
@@ -10285,16 +10289,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-9">reduce - reduce a vector to one value</h3>
@@ -10308,16 +10313,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-10">reduce - reduce a vector to one value</h3>
@@ -10331,16 +10337,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-11">reduce - reduce a vector to one value</h3>
@@ -10354,16 +10361,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-12">reduce - reduce a vector to one value</h3>
@@ -10377,16 +10385,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-13">reduce - reduce a vector to one value</h3>
@@ -10400,16 +10409,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-14">reduce - reduce a vector to one value</h3>
@@ -10423,16 +10433,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-15">reduce - reduce a vector to one value</h3>
@@ -10446,16 +10457,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-16">reduce - reduce a vector to one value</h3>
@@ -10469,16 +10481,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-17">reduce - reduce a vector to one value</h3>
@@ -10492,16 +10505,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-18">reduce - reduce a vector to one value</h3>
@@ -10515,16 +10529,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-19">reduce - reduce a vector to one value</h3>
@@ -10538,16 +10553,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-20">reduce - reduce a vector to one value</h3>
@@ -10561,16 +10577,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-21">reduce - reduce a vector to one value</h3>
@@ -10584,16 +10601,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-22">reduce - reduce a vector to one value</h3>
@@ -10607,16 +10625,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-23">reduce - reduce a vector to one value</h3>
@@ -10630,16 +10649,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-24">reduce - reduce a vector to one value</h3>
@@ -10653,16 +10673,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-25">reduce - reduce a vector to one value</h3>
@@ -10676,16 +10697,17 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
 
-<p>No failing errors, but can catch these intercepted ones:</p>
+<p>Potential errors:</p>
 
 <ol start="2">
 <li>null pointer</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-26">reduce - reduce a vector to one value</h3>
@@ -10699,7 +10721,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -10722,7 +10744,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -10745,7 +10767,7 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -10758,6 +10780,489 @@ All computations are branchless, as literals are optimized away during compilati
 </ol>
 
 <h3 id="reduce-reduce-a-vector-to-one-value-29">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-30">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-31">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-32">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-33">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-34">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-35">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-36">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-37">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-38">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-39">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-40">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-41">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-42">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-43">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-44">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-45">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-46">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-47">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-48">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-49">reduce - reduce a vector to one value</h3>
+
+<p><em>Defined in: std/sci/vec.s line 152</em></p>
+
+<p>You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
+
+<p>No failing errors, but can catch these intercepted ones:</p>
+
+<ol start="2">
+<li>null pointer</li>
+</ol>
+
+<h3 id="reduce-reduce-a-vector-to-one-value-50">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -10782,7 +11287,7 @@ All computations are branchless, as literals are optimized away during compilati
 <li>out of bounds</li>
 </ol>
 
-<h3 id="reduce-reduce-a-vector-to-one-value-30">reduce - reduce a vector to one value</h3>
+<h3 id="reduce-reduce-a-vector-to-one-value-51">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -10807,7 +11312,7 @@ All computations are branchless, as literals are optimized away during compilati
 <li>out of bounds</li>
 </ol>
 
-<h3 id="reduce-reduce-a-vector-to-one-value-31">reduce - reduce a vector to one value</h3>
+<h3 id="reduce-reduce-a-vector-to-one-value-52">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -10832,7 +11337,7 @@ All computations are branchless, as literals are optimized away during compilati
 <li>out of bounds</li>
 </ol>
 
-<h3 id="reduce-reduce-a-vector-to-one-value-32">reduce - reduce a vector to one value</h3>
+<h3 id="reduce-reduce-a-vector-to-one-value-53">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -10857,7 +11362,7 @@ All computations are branchless, as literals are optimized away during compilati
 <li>out of bounds</li>
 </ol>
 
-<h3 id="reduce-reduce-a-vector-to-one-value-33">reduce - reduce a vector to one value</h3>
+<h3 id="reduce-reduce-a-vector-to-one-value-54">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -10882,7 +11387,7 @@ All computations are branchless, as literals are optimized away during compilati
 <li>out of bounds</li>
 </ol>
 
-<h3 id="reduce-reduce-a-vector-to-one-value-34">reduce - reduce a vector to one value</h3>
+<h3 id="reduce-reduce-a-vector-to-one-value-55">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -10907,7 +11412,7 @@ All computations are branchless, as literals are optimized away during compilati
 <li>out of bounds</li>
 </ol>
 
-<h3 id="reduce-reduce-a-vector-to-one-value-35">reduce - reduce a vector to one value</h3>
+<h3 id="reduce-reduce-a-vector-to-one-value-56">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -10932,7 +11437,7 @@ All computations are branchless, as literals are optimized away during compilati
 <li>out of bounds</li>
 </ol>
 
-<h3 id="reduce-reduce-a-vector-to-one-value-36">reduce - reduce a vector to one value</h3>
+<h3 id="reduce-reduce-a-vector-to-one-value-57">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -10957,7 +11462,7 @@ All computations are branchless, as literals are optimized away during compilati
 <li>out of bounds</li>
 </ol>
 
-<h3 id="reduce-reduce-a-vector-to-one-value-37">reduce - reduce a vector to one value</h3>
+<h3 id="reduce-reduce-a-vector-to-one-value-58">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -10982,7 +11487,7 @@ All computations are branchless, as literals are optimized away during compilati
 <li>out of bounds</li>
 </ol>
 
-<h3 id="reduce-reduce-a-vector-to-one-value-38">reduce - reduce a vector to one value</h3>
+<h3 id="reduce-reduce-a-vector-to-one-value-59">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -11007,7 +11512,7 @@ All computations are branchless, as literals are optimized away during compilati
 <li>out of bounds</li>
 </ol>
 
-<h3 id="reduce-reduce-a-vector-to-one-value-39">reduce - reduce a vector to one value</h3>
+<h3 id="reduce-reduce-a-vector-to-one-value-60">reduce - reduce a vector to one value</h3>
 
 <p><em>Defined in: std/sci/vec.s line 152</em></p>
 
@@ -11029,511 +11534,6 @@ All computations are branchless, as literals are optimized away during compilati
 <ol start="2">
 <li>null pointer</li>
 <li>division by zero</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-40">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;rel&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>division by zero</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-41">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-42">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-43">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-44">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-45">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-46">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-47">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-48">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-49">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-50">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-51">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-52">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sub&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-53">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-54">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-55">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-56">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-57">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l2&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-58">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sqr&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-59">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>out of bounds</li>
-</ol>
-
-<h3 id="reduce-reduce-a-vector-to-one-value-60">reduce - reduce a vector to one value</h3>
-
-<p><em>Defined in: std/sci/vec.s line 152</em></p>
-
-<p>You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">reduce</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;add&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Levels of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</p>
-
-<p>Potential errors:</p>
-
-<ol start="2">
-<li>null pointer</li>
 <li>out of bounds</li>
 </ol>
 
@@ -11930,14 +11930,14 @@ All computations are branchless, as literals are optimized away during compilati
 
 <p>Potential errors:</p>
 
-<ol start="65">
-<li>row out of bounds</li>
-<li>null pointer</li>
-<li>column out of bounds</li>
+<ol start="17">
 <li>does not fit in circular arena</li>
-<li>out of bounds</li>
-<li>can only place matrices on contiguous buffers</li>
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
 <li>cannot place matrices on buffer offsets</li>
+<li>can only place matrices on contiguous buffers</li>
+<li>out of bounds</li>
 </ol>
 
 <h3 id="todense-convert-to-dense-mat-2">todense - convert to dense mat</h3>
@@ -12332,15 +12332,15 @@ to indicate the new matrix&#8217;s orientation.</p>
 
 <p>Potential errors:</p>
 
-<ol start="16">
-<li>arena is out of space</li>
-<li>can only define strings on contiguous buffers</li>
-<li>can only define strings on non-offset buffers</li>
+<ol start="2">
 <li>null pointer</li>
 <li>allocation failed</li>
 <li>cannot resize buffers with alloc; it promises no data reallocation</li>
 <li>cannot allocate a buffer of unsized type</li>
 <li>out of bounds</li>
+<li>arena is out of space</li>
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers</li>
 </ol>
 
 <p>Returned values defer use of the following functions:</p>
@@ -12962,7 +12962,7 @@ the original one without any safety.</p>
 
 <h1 id="key_null">KEY_NULL</h1>
 
-<h3 id="__t7660t">__t7660t</h3>
+<h3 id="__t7664t">__t7664t</h3>
 
 <p><em>Defined in: std/graphics.s line 250</em></p>
 
@@ -12975,7 +12975,7 @@ the original one without any safety.</p>
 
 <h1 id="key_apostrophe">KEY_APOSTROPHE</h1>
 
-<h3 id="__t7663t">__t7663t</h3>
+<h3 id="__t7667t">__t7667t</h3>
 
 <p><em>Defined in: std/graphics.s line 251</em></p>
 
@@ -12988,7 +12988,7 @@ the original one without any safety.</p>
 
 <h1 id="key_comma">KEY_COMMA</h1>
 
-<h3 id="__t7666t">__t7666t</h3>
+<h3 id="__t7670t">__t7670t</h3>
 
 <p><em>Defined in: std/graphics.s line 252</em></p>
 
@@ -13001,7 +13001,7 @@ the original one without any safety.</p>
 
 <h1 id="key_minus">KEY_MINUS</h1>
 
-<h3 id="__t7669t">__t7669t</h3>
+<h3 id="__t7673t">__t7673t</h3>
 
 <p><em>Defined in: std/graphics.s line 253</em></p>
 
@@ -13014,7 +13014,7 @@ the original one without any safety.</p>
 
 <h1 id="key_period">KEY_PERIOD</h1>
 
-<h3 id="__t7672t">__t7672t</h3>
+<h3 id="__t7676t">__t7676t</h3>
 
 <p><em>Defined in: std/graphics.s line 254</em></p>
 
@@ -13027,7 +13027,7 @@ the original one without any safety.</p>
 
 <h1 id="key_slash">KEY_SLASH</h1>
 
-<h3 id="__t7675t">__t7675t</h3>
+<h3 id="__t7679t">__t7679t</h3>
 
 <p><em>Defined in: std/graphics.s line 255</em></p>
 
@@ -13040,7 +13040,7 @@ the original one without any safety.</p>
 
 <h1 id="key_zero">KEY_ZERO</h1>
 
-<h3 id="__t7678t">__t7678t</h3>
+<h3 id="__t7682t">__t7682t</h3>
 
 <p><em>Defined in: std/graphics.s line 256</em></p>
 
@@ -13053,7 +13053,7 @@ the original one without any safety.</p>
 
 <h1 id="key_one">KEY_ONE</h1>
 
-<h3 id="__t7681t">__t7681t</h3>
+<h3 id="__t7685t">__t7685t</h3>
 
 <p><em>Defined in: std/graphics.s line 257</em></p>
 
@@ -13066,7 +13066,7 @@ the original one without any safety.</p>
 
 <h1 id="key_two">KEY_TWO</h1>
 
-<h3 id="__t7684t">__t7684t</h3>
+<h3 id="__t7688t">__t7688t</h3>
 
 <p><em>Defined in: std/graphics.s line 258</em></p>
 
@@ -13079,7 +13079,7 @@ the original one without any safety.</p>
 
 <h1 id="key_three">KEY_THREE</h1>
 
-<h3 id="__t7687t">__t7687t</h3>
+<h3 id="__t7691t">__t7691t</h3>
 
 <p><em>Defined in: std/graphics.s line 259</em></p>
 
@@ -13092,7 +13092,7 @@ the original one without any safety.</p>
 
 <h1 id="key_four">KEY_FOUR</h1>
 
-<h3 id="__t7690t">__t7690t</h3>
+<h3 id="__t7694t">__t7694t</h3>
 
 <p><em>Defined in: std/graphics.s line 260</em></p>
 
@@ -13105,7 +13105,7 @@ the original one without any safety.</p>
 
 <h1 id="key_five">KEY_FIVE</h1>
 
-<h3 id="__t7693t">__t7693t</h3>
+<h3 id="__t7697t">__t7697t</h3>
 
 <p><em>Defined in: std/graphics.s line 261</em></p>
 
@@ -13118,7 +13118,7 @@ the original one without any safety.</p>
 
 <h1 id="key_six">KEY_SIX</h1>
 
-<h3 id="__t7696t">__t7696t</h3>
+<h3 id="__t7700t">__t7700t</h3>
 
 <p><em>Defined in: std/graphics.s line 262</em></p>
 
@@ -13131,7 +13131,7 @@ the original one without any safety.</p>
 
 <h1 id="key_seven">KEY_SEVEN</h1>
 
-<h3 id="__t7699t">__t7699t</h3>
+<h3 id="__t7703t">__t7703t</h3>
 
 <p><em>Defined in: std/graphics.s line 263</em></p>
 
@@ -13144,7 +13144,7 @@ the original one without any safety.</p>
 
 <h1 id="key_eight">KEY_EIGHT</h1>
 
-<h3 id="__t7702t">__t7702t</h3>
+<h3 id="__t7706t">__t7706t</h3>
 
 <p><em>Defined in: std/graphics.s line 264</em></p>
 
@@ -13157,7 +13157,7 @@ the original one without any safety.</p>
 
 <h1 id="key_nine">KEY_NINE</h1>
 
-<h3 id="__t7705t">__t7705t</h3>
+<h3 id="__t7709t">__t7709t</h3>
 
 <p><em>Defined in: std/graphics.s line 265</em></p>
 
@@ -13170,7 +13170,7 @@ the original one without any safety.</p>
 
 <h1 id="key_semicolon">KEY_SEMICOLON</h1>
 
-<h3 id="__t7708t">__t7708t</h3>
+<h3 id="__t7712t">__t7712t</h3>
 
 <p><em>Defined in: std/graphics.s line 266</em></p>
 
@@ -13183,7 +13183,7 @@ the original one without any safety.</p>
 
 <h1 id="key_equal">KEY_EQUAL</h1>
 
-<h3 id="__t7711t">__t7711t</h3>
+<h3 id="__t7715t">__t7715t</h3>
 
 <p><em>Defined in: std/graphics.s line 267</em></p>
 
@@ -13196,7 +13196,7 @@ the original one without any safety.</p>
 
 <h1 id="key_a">KEY_A</h1>
 
-<h3 id="__t7714t">__t7714t</h3>
+<h3 id="__t7718t">__t7718t</h3>
 
 <p><em>Defined in: std/graphics.s line 268</em></p>
 
@@ -13209,7 +13209,7 @@ the original one without any safety.</p>
 
 <h1 id="key_b">KEY_B</h1>
 
-<h3 id="__t7717t">__t7717t</h3>
+<h3 id="__t7721t">__t7721t</h3>
 
 <p><em>Defined in: std/graphics.s line 269</em></p>
 
@@ -13222,7 +13222,7 @@ the original one without any safety.</p>
 
 <h1 id="key_c">KEY_C</h1>
 
-<h3 id="__t7720t">__t7720t</h3>
+<h3 id="__t7724t">__t7724t</h3>
 
 <p><em>Defined in: std/graphics.s line 270</em></p>
 
@@ -13235,7 +13235,7 @@ the original one without any safety.</p>
 
 <h1 id="key_d">KEY_D</h1>
 
-<h3 id="__t7723t">__t7723t</h3>
+<h3 id="__t7727t">__t7727t</h3>
 
 <p><em>Defined in: std/graphics.s line 271</em></p>
 
@@ -13248,7 +13248,7 @@ the original one without any safety.</p>
 
 <h1 id="key_e">KEY_E</h1>
 
-<h3 id="__t7726t">__t7726t</h3>
+<h3 id="__t7730t">__t7730t</h3>
 
 <p><em>Defined in: std/graphics.s line 272</em></p>
 
@@ -13261,7 +13261,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f">KEY_F</h1>
 
-<h3 id="__t7729t">__t7729t</h3>
+<h3 id="__t7733t">__t7733t</h3>
 
 <p><em>Defined in: std/graphics.s line 273</em></p>
 
@@ -13274,7 +13274,7 @@ the original one without any safety.</p>
 
 <h1 id="key_g">KEY_G</h1>
 
-<h3 id="__t7732t">__t7732t</h3>
+<h3 id="__t7736t">__t7736t</h3>
 
 <p><em>Defined in: std/graphics.s line 274</em></p>
 
@@ -13287,7 +13287,7 @@ the original one without any safety.</p>
 
 <h1 id="key_h">KEY_H</h1>
 
-<h3 id="__t7735t">__t7735t</h3>
+<h3 id="__t7739t">__t7739t</h3>
 
 <p><em>Defined in: std/graphics.s line 275</em></p>
 
@@ -13300,7 +13300,7 @@ the original one without any safety.</p>
 
 <h1 id="key_i">KEY_I</h1>
 
-<h3 id="__t7738t">__t7738t</h3>
+<h3 id="__t7742t">__t7742t</h3>
 
 <p><em>Defined in: std/graphics.s line 276</em></p>
 
@@ -13313,7 +13313,7 @@ the original one without any safety.</p>
 
 <h1 id="key_j">KEY_J</h1>
 
-<h3 id="__t7741t">__t7741t</h3>
+<h3 id="__t7745t">__t7745t</h3>
 
 <p><em>Defined in: std/graphics.s line 277</em></p>
 
@@ -13326,7 +13326,7 @@ the original one without any safety.</p>
 
 <h1 id="key_k">KEY_K</h1>
 
-<h3 id="__t7744t">__t7744t</h3>
+<h3 id="__t7748t">__t7748t</h3>
 
 <p><em>Defined in: std/graphics.s line 278</em></p>
 
@@ -13339,7 +13339,7 @@ the original one without any safety.</p>
 
 <h1 id="key_l">KEY_L</h1>
 
-<h3 id="__t7747t">__t7747t</h3>
+<h3 id="__t7751t">__t7751t</h3>
 
 <p><em>Defined in: std/graphics.s line 279</em></p>
 
@@ -13352,7 +13352,7 @@ the original one without any safety.</p>
 
 <h1 id="key_m">KEY_M</h1>
 
-<h3 id="__t7750t">__t7750t</h3>
+<h3 id="__t7754t">__t7754t</h3>
 
 <p><em>Defined in: std/graphics.s line 280</em></p>
 
@@ -13365,7 +13365,7 @@ the original one without any safety.</p>
 
 <h1 id="key_n">KEY_N</h1>
 
-<h3 id="__t7753t">__t7753t</h3>
+<h3 id="__t7757t">__t7757t</h3>
 
 <p><em>Defined in: std/graphics.s line 281</em></p>
 
@@ -13378,7 +13378,7 @@ the original one without any safety.</p>
 
 <h1 id="key_o">KEY_O</h1>
 
-<h3 id="__t7756t">__t7756t</h3>
+<h3 id="__t7760t">__t7760t</h3>
 
 <p><em>Defined in: std/graphics.s line 282</em></p>
 
@@ -13391,7 +13391,7 @@ the original one without any safety.</p>
 
 <h1 id="key_p">KEY_P</h1>
 
-<h3 id="__t7759t">__t7759t</h3>
+<h3 id="__t7763t">__t7763t</h3>
 
 <p><em>Defined in: std/graphics.s line 283</em></p>
 
@@ -13404,7 +13404,7 @@ the original one without any safety.</p>
 
 <h1 id="key_q">KEY_Q</h1>
 
-<h3 id="__t7762t">__t7762t</h3>
+<h3 id="__t7766t">__t7766t</h3>
 
 <p><em>Defined in: std/graphics.s line 284</em></p>
 
@@ -13417,7 +13417,7 @@ the original one without any safety.</p>
 
 <h1 id="key_r">KEY_R</h1>
 
-<h3 id="__t7765t">__t7765t</h3>
+<h3 id="__t7769t">__t7769t</h3>
 
 <p><em>Defined in: std/graphics.s line 285</em></p>
 
@@ -13430,7 +13430,7 @@ the original one without any safety.</p>
 
 <h1 id="key_s">KEY_S</h1>
 
-<h3 id="__t7768t">__t7768t</h3>
+<h3 id="__t7772t">__t7772t</h3>
 
 <p><em>Defined in: std/graphics.s line 286</em></p>
 
@@ -13443,7 +13443,7 @@ the original one without any safety.</p>
 
 <h1 id="key_t">KEY_T</h1>
 
-<h3 id="__t7771t">__t7771t</h3>
+<h3 id="__t7775t">__t7775t</h3>
 
 <p><em>Defined in: std/graphics.s line 287</em></p>
 
@@ -13456,7 +13456,7 @@ the original one without any safety.</p>
 
 <h1 id="key_u">KEY_U</h1>
 
-<h3 id="__t7774t">__t7774t</h3>
+<h3 id="__t7778t">__t7778t</h3>
 
 <p><em>Defined in: std/graphics.s line 288</em></p>
 
@@ -13469,7 +13469,7 @@ the original one without any safety.</p>
 
 <h1 id="key_v">KEY_V</h1>
 
-<h3 id="__t7777t">__t7777t</h3>
+<h3 id="__t7781t">__t7781t</h3>
 
 <p><em>Defined in: std/graphics.s line 289</em></p>
 
@@ -13482,7 +13482,7 @@ the original one without any safety.</p>
 
 <h1 id="key_w">KEY_W</h1>
 
-<h3 id="__t7780t">__t7780t</h3>
+<h3 id="__t7784t">__t7784t</h3>
 
 <p><em>Defined in: std/graphics.s line 290</em></p>
 
@@ -13495,7 +13495,7 @@ the original one without any safety.</p>
 
 <h1 id="key_x">KEY_X</h1>
 
-<h3 id="__t7783t">__t7783t</h3>
+<h3 id="__t7787t">__t7787t</h3>
 
 <p><em>Defined in: std/graphics.s line 291</em></p>
 
@@ -13508,7 +13508,7 @@ the original one without any safety.</p>
 
 <h1 id="key_y">KEY_Y</h1>
 
-<h3 id="__t7786t">__t7786t</h3>
+<h3 id="__t7790t">__t7790t</h3>
 
 <p><em>Defined in: std/graphics.s line 292</em></p>
 
@@ -13521,7 +13521,7 @@ the original one without any safety.</p>
 
 <h1 id="key_z">KEY_Z</h1>
 
-<h3 id="__t7789t">__t7789t</h3>
+<h3 id="__t7793t">__t7793t</h3>
 
 <p><em>Defined in: std/graphics.s line 293</em></p>
 
@@ -13534,7 +13534,7 @@ the original one without any safety.</p>
 
 <h1 id="key_left_bracket">KEY_LEFT_BRACKET</h1>
 
-<h3 id="__t7792t">__t7792t</h3>
+<h3 id="__t7796t">__t7796t</h3>
 
 <p><em>Defined in: std/graphics.s line 294</em></p>
 
@@ -13547,7 +13547,7 @@ the original one without any safety.</p>
 
 <h1 id="key_backslash">KEY_BACKSLASH</h1>
 
-<h3 id="__t7795t">__t7795t</h3>
+<h3 id="__t7799t">__t7799t</h3>
 
 <p><em>Defined in: std/graphics.s line 295</em></p>
 
@@ -13560,7 +13560,7 @@ the original one without any safety.</p>
 
 <h1 id="key_right_bracket">KEY_RIGHT_BRACKET</h1>
 
-<h3 id="__t7798t">__t7798t</h3>
+<h3 id="__t7802t">__t7802t</h3>
 
 <p><em>Defined in: std/graphics.s line 296</em></p>
 
@@ -13573,7 +13573,7 @@ the original one without any safety.</p>
 
 <h1 id="key_grave">KEY_GRAVE</h1>
 
-<h3 id="__t7801t">__t7801t</h3>
+<h3 id="__t7805t">__t7805t</h3>
 
 <p><em>Defined in: std/graphics.s line 297</em></p>
 
@@ -13586,7 +13586,7 @@ the original one without any safety.</p>
 
 <h1 id="key_space">KEY_SPACE</h1>
 
-<h3 id="__t7804t">__t7804t</h3>
+<h3 id="__t7808t">__t7808t</h3>
 
 <p><em>Defined in: std/graphics.s line 298</em></p>
 
@@ -13599,7 +13599,7 @@ the original one without any safety.</p>
 
 <h1 id="key_escape">KEY_ESCAPE</h1>
 
-<h3 id="__t7807t">__t7807t</h3>
+<h3 id="__t7811t">__t7811t</h3>
 
 <p><em>Defined in: std/graphics.s line 299</em></p>
 
@@ -13612,7 +13612,7 @@ the original one without any safety.</p>
 
 <h1 id="key_enter">KEY_ENTER</h1>
 
-<h3 id="__t7810t">__t7810t</h3>
+<h3 id="__t7814t">__t7814t</h3>
 
 <p><em>Defined in: std/graphics.s line 300</em></p>
 
@@ -13625,7 +13625,7 @@ the original one without any safety.</p>
 
 <h1 id="key_tab">KEY_TAB</h1>
 
-<h3 id="__t7813t">__t7813t</h3>
+<h3 id="__t7817t">__t7817t</h3>
 
 <p><em>Defined in: std/graphics.s line 301</em></p>
 
@@ -13638,7 +13638,7 @@ the original one without any safety.</p>
 
 <h1 id="key_backspace">KEY_BACKSPACE</h1>
 
-<h3 id="__t7816t">__t7816t</h3>
+<h3 id="__t7820t">__t7820t</h3>
 
 <p><em>Defined in: std/graphics.s line 302</em></p>
 
@@ -13651,7 +13651,7 @@ the original one without any safety.</p>
 
 <h1 id="key_insert">KEY_INSERT</h1>
 
-<h3 id="__t7819t">__t7819t</h3>
+<h3 id="__t7823t">__t7823t</h3>
 
 <p><em>Defined in: std/graphics.s line 303</em></p>
 
@@ -13664,7 +13664,7 @@ the original one without any safety.</p>
 
 <h1 id="key_delete">KEY_DELETE</h1>
 
-<h3 id="__t7822t">__t7822t</h3>
+<h3 id="__t7826t">__t7826t</h3>
 
 <p><em>Defined in: std/graphics.s line 304</em></p>
 
@@ -13677,7 +13677,7 @@ the original one without any safety.</p>
 
 <h1 id="key_right">KEY_RIGHT</h1>
 
-<h3 id="__t7825t">__t7825t</h3>
+<h3 id="__t7829t">__t7829t</h3>
 
 <p><em>Defined in: std/graphics.s line 305</em></p>
 
@@ -13690,7 +13690,7 @@ the original one without any safety.</p>
 
 <h1 id="key_left">KEY_LEFT</h1>
 
-<h3 id="__t7828t">__t7828t</h3>
+<h3 id="__t7832t">__t7832t</h3>
 
 <p><em>Defined in: std/graphics.s line 306</em></p>
 
@@ -13703,7 +13703,7 @@ the original one without any safety.</p>
 
 <h1 id="key_down-3">KEY_DOWN</h1>
 
-<h3 id="__t7831t">__t7831t</h3>
+<h3 id="__t7835t">__t7835t</h3>
 
 <p><em>Defined in: std/graphics.s line 307</em></p>
 
@@ -13716,7 +13716,7 @@ the original one without any safety.</p>
 
 <h1 id="key_up">KEY_UP</h1>
 
-<h3 id="__t7834t">__t7834t</h3>
+<h3 id="__t7838t">__t7838t</h3>
 
 <p><em>Defined in: std/graphics.s line 308</em></p>
 
@@ -13729,7 +13729,7 @@ the original one without any safety.</p>
 
 <h1 id="key_page_up">KEY_PAGE_UP</h1>
 
-<h3 id="__t7837t">__t7837t</h3>
+<h3 id="__t7841t">__t7841t</h3>
 
 <p><em>Defined in: std/graphics.s line 309</em></p>
 
@@ -13742,7 +13742,7 @@ the original one without any safety.</p>
 
 <h1 id="key_page_down">KEY_PAGE_DOWN</h1>
 
-<h3 id="__t7840t">__t7840t</h3>
+<h3 id="__t7844t">__t7844t</h3>
 
 <p><em>Defined in: std/graphics.s line 310</em></p>
 
@@ -13755,7 +13755,7 @@ the original one without any safety.</p>
 
 <h1 id="key_home">KEY_HOME</h1>
 
-<h3 id="__t7843t">__t7843t</h3>
+<h3 id="__t7847t">__t7847t</h3>
 
 <p><em>Defined in: std/graphics.s line 311</em></p>
 
@@ -13768,7 +13768,7 @@ the original one without any safety.</p>
 
 <h1 id="key_end">KEY_END</h1>
 
-<h3 id="__t7846t">__t7846t</h3>
+<h3 id="__t7850t">__t7850t</h3>
 
 <p><em>Defined in: std/graphics.s line 312</em></p>
 
@@ -13781,7 +13781,7 @@ the original one without any safety.</p>
 
 <h1 id="key_caps_lock">KEY_CAPS_LOCK</h1>
 
-<h3 id="__t7849t">__t7849t</h3>
+<h3 id="__t7853t">__t7853t</h3>
 
 <p><em>Defined in: std/graphics.s line 313</em></p>
 
@@ -13794,7 +13794,7 @@ the original one without any safety.</p>
 
 <h1 id="key_scroll_lock">KEY_SCROLL_LOCK</h1>
 
-<h3 id="__t7852t">__t7852t</h3>
+<h3 id="__t7856t">__t7856t</h3>
 
 <p><em>Defined in: std/graphics.s line 314</em></p>
 
@@ -13807,7 +13807,7 @@ the original one without any safety.</p>
 
 <h1 id="key_num_lock">KEY_NUM_LOCK</h1>
 
-<h3 id="__t7855t">__t7855t</h3>
+<h3 id="__t7859t">__t7859t</h3>
 
 <p><em>Defined in: std/graphics.s line 315</em></p>
 
@@ -13820,7 +13820,7 @@ the original one without any safety.</p>
 
 <h1 id="key_print_screen">KEY_PRINT_SCREEN</h1>
 
-<h3 id="__t7858t">__t7858t</h3>
+<h3 id="__t7862t">__t7862t</h3>
 
 <p><em>Defined in: std/graphics.s line 316</em></p>
 
@@ -13833,7 +13833,7 @@ the original one without any safety.</p>
 
 <h1 id="key_pause">KEY_PAUSE</h1>
 
-<h3 id="__t7861t">__t7861t</h3>
+<h3 id="__t7865t">__t7865t</h3>
 
 <p><em>Defined in: std/graphics.s line 317</em></p>
 
@@ -13846,7 +13846,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f1">KEY_F1</h1>
 
-<h3 id="__t7864t">__t7864t</h3>
+<h3 id="__t7868t">__t7868t</h3>
 
 <p><em>Defined in: std/graphics.s line 318</em></p>
 
@@ -13859,7 +13859,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f2">KEY_F2</h1>
 
-<h3 id="__t7867t">__t7867t</h3>
+<h3 id="__t7871t">__t7871t</h3>
 
 <p><em>Defined in: std/graphics.s line 319</em></p>
 
@@ -13872,7 +13872,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f3">KEY_F3</h1>
 
-<h3 id="__t7870t">__t7870t</h3>
+<h3 id="__t7874t">__t7874t</h3>
 
 <p><em>Defined in: std/graphics.s line 320</em></p>
 
@@ -13885,7 +13885,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f4">KEY_F4</h1>
 
-<h3 id="__t7873t">__t7873t</h3>
+<h3 id="__t7877t">__t7877t</h3>
 
 <p><em>Defined in: std/graphics.s line 321</em></p>
 
@@ -13898,7 +13898,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f5">KEY_F5</h1>
 
-<h3 id="__t7876t">__t7876t</h3>
+<h3 id="__t7880t">__t7880t</h3>
 
 <p><em>Defined in: std/graphics.s line 322</em></p>
 
@@ -13911,7 +13911,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f6">KEY_F6</h1>
 
-<h3 id="__t7879t">__t7879t</h3>
+<h3 id="__t7883t">__t7883t</h3>
 
 <p><em>Defined in: std/graphics.s line 323</em></p>
 
@@ -13924,7 +13924,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f7">KEY_F7</h1>
 
-<h3 id="__t7882t">__t7882t</h3>
+<h3 id="__t7886t">__t7886t</h3>
 
 <p><em>Defined in: std/graphics.s line 324</em></p>
 
@@ -13937,7 +13937,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f8">KEY_F8</h1>
 
-<h3 id="__t7885t">__t7885t</h3>
+<h3 id="__t7889t">__t7889t</h3>
 
 <p><em>Defined in: std/graphics.s line 325</em></p>
 
@@ -13950,7 +13950,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f9">KEY_F9</h1>
 
-<h3 id="__t7888t">__t7888t</h3>
+<h3 id="__t7892t">__t7892t</h3>
 
 <p><em>Defined in: std/graphics.s line 326</em></p>
 
@@ -13963,7 +13963,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f10">KEY_F10</h1>
 
-<h3 id="__t7891t">__t7891t</h3>
+<h3 id="__t7895t">__t7895t</h3>
 
 <p><em>Defined in: std/graphics.s line 327</em></p>
 
@@ -13976,7 +13976,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f11">KEY_F11</h1>
 
-<h3 id="__t7894t">__t7894t</h3>
+<h3 id="__t7898t">__t7898t</h3>
 
 <p><em>Defined in: std/graphics.s line 328</em></p>
 
@@ -13989,7 +13989,7 @@ the original one without any safety.</p>
 
 <h1 id="key_f12">KEY_F12</h1>
 
-<h3 id="__t7897t">__t7897t</h3>
+<h3 id="__t7901t">__t7901t</h3>
 
 <p><em>Defined in: std/graphics.s line 329</em></p>
 
@@ -14002,7 +14002,7 @@ the original one without any safety.</p>
 
 <h1 id="key_left_shift">KEY_LEFT_SHIFT</h1>
 
-<h3 id="__t7900t">__t7900t</h3>
+<h3 id="__t7904t">__t7904t</h3>
 
 <p><em>Defined in: std/graphics.s line 330</em></p>
 
@@ -14015,7 +14015,7 @@ the original one without any safety.</p>
 
 <h1 id="key_left_control">KEY_LEFT_CONTROL</h1>
 
-<h3 id="__t7903t">__t7903t</h3>
+<h3 id="__t7907t">__t7907t</h3>
 
 <p><em>Defined in: std/graphics.s line 331</em></p>
 
@@ -14028,7 +14028,7 @@ the original one without any safety.</p>
 
 <h1 id="key_left_alt">KEY_LEFT_ALT</h1>
 
-<h3 id="__t7906t">__t7906t</h3>
+<h3 id="__t7910t">__t7910t</h3>
 
 <p><em>Defined in: std/graphics.s line 332</em></p>
 
@@ -14041,7 +14041,7 @@ the original one without any safety.</p>
 
 <h1 id="key_left_super">KEY_LEFT_SUPER</h1>
 
-<h3 id="__t7909t">__t7909t</h3>
+<h3 id="__t7913t">__t7913t</h3>
 
 <p><em>Defined in: std/graphics.s line 333</em></p>
 
@@ -14054,7 +14054,7 @@ the original one without any safety.</p>
 
 <h1 id="key_right_shift">KEY_RIGHT_SHIFT</h1>
 
-<h3 id="__t7912t">__t7912t</h3>
+<h3 id="__t7916t">__t7916t</h3>
 
 <p><em>Defined in: std/graphics.s line 334</em></p>
 
@@ -14067,7 +14067,7 @@ the original one without any safety.</p>
 
 <h1 id="key_right_control">KEY_RIGHT_CONTROL</h1>
 
-<h3 id="__t7915t">__t7915t</h3>
+<h3 id="__t7919t">__t7919t</h3>
 
 <p><em>Defined in: std/graphics.s line 335</em></p>
 
@@ -14080,7 +14080,7 @@ the original one without any safety.</p>
 
 <h1 id="key_right_alt">KEY_RIGHT_ALT</h1>
 
-<h3 id="__t7918t">__t7918t</h3>
+<h3 id="__t7922t">__t7922t</h3>
 
 <p><em>Defined in: std/graphics.s line 336</em></p>
 
@@ -14093,7 +14093,7 @@ the original one without any safety.</p>
 
 <h1 id="key_right_super">KEY_RIGHT_SUPER</h1>
 
-<h3 id="__t7921t">__t7921t</h3>
+<h3 id="__t7925t">__t7925t</h3>
 
 <p><em>Defined in: std/graphics.s line 337</em></p>
 
@@ -14106,7 +14106,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kb_menu">KEY_KB_MENU</h1>
 
-<h3 id="__t7924t">__t7924t</h3>
+<h3 id="__t7928t">__t7928t</h3>
 
 <p><em>Defined in: std/graphics.s line 338</em></p>
 
@@ -14119,7 +14119,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_0">KEY_KP_0</h1>
 
-<h3 id="__t7927t">__t7927t</h3>
+<h3 id="__t7931t">__t7931t</h3>
 
 <p><em>Defined in: std/graphics.s line 339</em></p>
 
@@ -14132,7 +14132,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_1">KEY_KP_1</h1>
 
-<h3 id="__t7930t">__t7930t</h3>
+<h3 id="__t7934t">__t7934t</h3>
 
 <p><em>Defined in: std/graphics.s line 340</em></p>
 
@@ -14145,7 +14145,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_2">KEY_KP_2</h1>
 
-<h3 id="__t7933t">__t7933t</h3>
+<h3 id="__t7937t">__t7937t</h3>
 
 <p><em>Defined in: std/graphics.s line 341</em></p>
 
@@ -14158,7 +14158,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_3">KEY_KP_3</h1>
 
-<h3 id="__t7936t">__t7936t</h3>
+<h3 id="__t7940t">__t7940t</h3>
 
 <p><em>Defined in: std/graphics.s line 342</em></p>
 
@@ -14171,7 +14171,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_4">KEY_KP_4</h1>
 
-<h3 id="__t7939t">__t7939t</h3>
+<h3 id="__t7943t">__t7943t</h3>
 
 <p><em>Defined in: std/graphics.s line 343</em></p>
 
@@ -14184,7 +14184,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_5">KEY_KP_5</h1>
 
-<h3 id="__t7942t">__t7942t</h3>
+<h3 id="__t7946t">__t7946t</h3>
 
 <p><em>Defined in: std/graphics.s line 344</em></p>
 
@@ -14197,7 +14197,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_6">KEY_KP_6</h1>
 
-<h3 id="__t7945t">__t7945t</h3>
+<h3 id="__t7949t">__t7949t</h3>
 
 <p><em>Defined in: std/graphics.s line 345</em></p>
 
@@ -14210,7 +14210,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_7">KEY_KP_7</h1>
 
-<h3 id="__t7948t">__t7948t</h3>
+<h3 id="__t7952t">__t7952t</h3>
 
 <p><em>Defined in: std/graphics.s line 346</em></p>
 
@@ -14223,7 +14223,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_8">KEY_KP_8</h1>
 
-<h3 id="__t7951t">__t7951t</h3>
+<h3 id="__t7955t">__t7955t</h3>
 
 <p><em>Defined in: std/graphics.s line 347</em></p>
 
@@ -14236,7 +14236,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_9">KEY_KP_9</h1>
 
-<h3 id="__t7954t">__t7954t</h3>
+<h3 id="__t7958t">__t7958t</h3>
 
 <p><em>Defined in: std/graphics.s line 348</em></p>
 
@@ -14249,7 +14249,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_decimal">KEY_KP_DECIMAL</h1>
 
-<h3 id="__t7957t">__t7957t</h3>
+<h3 id="__t7961t">__t7961t</h3>
 
 <p><em>Defined in: std/graphics.s line 349</em></p>
 
@@ -14262,7 +14262,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_divide">KEY_KP_DIVIDE</h1>
 
-<h3 id="__t7960t">__t7960t</h3>
+<h3 id="__t7964t">__t7964t</h3>
 
 <p><em>Defined in: std/graphics.s line 350</em></p>
 
@@ -14275,7 +14275,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_multiply">KEY_KP_MULTIPLY</h1>
 
-<h3 id="__t7963t">__t7963t</h3>
+<h3 id="__t7967t">__t7967t</h3>
 
 <p><em>Defined in: std/graphics.s line 351</em></p>
 
@@ -14288,7 +14288,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_subtract">KEY_KP_SUBTRACT</h1>
 
-<h3 id="__t7966t">__t7966t</h3>
+<h3 id="__t7970t">__t7970t</h3>
 
 <p><em>Defined in: std/graphics.s line 352</em></p>
 
@@ -14301,7 +14301,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_add">KEY_KP_ADD</h1>
 
-<h3 id="__t7969t">__t7969t</h3>
+<h3 id="__t7973t">__t7973t</h3>
 
 <p><em>Defined in: std/graphics.s line 353</em></p>
 
@@ -14314,7 +14314,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_enter">KEY_KP_ENTER</h1>
 
-<h3 id="__t7972t">__t7972t</h3>
+<h3 id="__t7976t">__t7976t</h3>
 
 <p><em>Defined in: std/graphics.s line 354</em></p>
 
@@ -14327,7 +14327,7 @@ the original one without any safety.</p>
 
 <h1 id="key_kp_equal">KEY_KP_EQUAL</h1>
 
-<h3 id="__t7975t">__t7975t</h3>
+<h3 id="__t7979t">__t7979t</h3>
 
 <p><em>Defined in: std/graphics.s line 355</em></p>
 
@@ -14340,7 +14340,7 @@ the original one without any safety.</p>
 
 <h1 id="key_back">KEY_BACK</h1>
 
-<h3 id="__t7978t">__t7978t</h3>
+<h3 id="__t7982t">__t7982t</h3>
 
 <p><em>Defined in: std/graphics.s line 356</em></p>
 
@@ -14353,7 +14353,7 @@ the original one without any safety.</p>
 
 <h1 id="key_menu">KEY_MENU</h1>
 
-<h3 id="__t7981t">__t7981t</h3>
+<h3 id="__t7985t">__t7985t</h3>
 
 <p><em>Defined in: std/graphics.s line 357</em></p>
 
@@ -14366,7 +14366,7 @@ the original one without any safety.</p>
 
 <h1 id="key_volume_up">KEY_VOLUME_UP</h1>
 
-<h3 id="__t7984t">__t7984t</h3>
+<h3 id="__t7988t">__t7988t</h3>
 
 <p><em>Defined in: std/graphics.s line 358</em></p>
 
@@ -14379,7 +14379,7 @@ the original one without any safety.</p>
 
 <h1 id="key_volume_down">KEY_VOLUME_DOWN</h1>
 
-<h3 id="__t7987t">__t7987t</h3>
+<h3 id="__t7991t">__t7991t</h3>
 
 <p><em>Defined in: std/graphics.s line 359</em></p>
 

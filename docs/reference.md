@@ -1265,19 +1265,18 @@ to quickly move data around while sharing only one memory address.
 This abstraction remains safe as long as you do not deliberately
 inject unsafe C code.
 
-Obtain a `const` pointer from a buffer, including a buffer whose
-pointed memory location cannot be modified, per `ptr = buf[element]&`,
-and a `mut` pointer -if permissions allow it- per `ptr = buf[element]&&`. 
-Constness means that pointer contents cannot be overwritten. To set a 
-new value to a mutable pointer use `&&` after the value again per 
-`old_ptr = new_ptr&&`. Otherwise, assignment copies a compatible
+Obtain a pointer from a buffer, including a buffer whose
+pointed memory location cannot be modified, per `ptr = buf[element]&`.
+The pointer will be mutable if and only if `buf` has mutation or edit 
+permissions. Overwrite pointer locations with the pattern
+`old_ptr = new_ptr&`. Otherwise, assignment copies a compatible
 structure's contents onto a mutable pointer's memory location.
 
 The `compiler::deref` function dereferences pointers onto local objects. 
 For example, `compiler.deref(ptr).field` gets a field from an object, after
 dereferencing the latter. Given all these operators
 it is now possible to explain that `buffer[pos]=value` desugars 
-to the pointer notation `buffer[pos]&& = value` that first
+to the pointer notation `buffer[pos]& = value` that first
 retrieves a mutable pointer and then assigns to it.
 
 *Smoλ*'s compiler checks on pointer safety and creates errors if
@@ -1310,7 +1309,7 @@ def inc(mut float ptr element)
 
 def main()
     CLI = edit console()
-    element = [0.0]& # equivalent to element = [0.0][0]&& 
+    element = [0.0]& # equivalent to element = [0.0][0]& 
     print compiler::deref element # prints 0.0
     inc element
     print compiler::deref element # prints 1,0
@@ -2566,14 +2565,14 @@ def main()
     win = graphics:Size(800.0, 600.0).graphics:Window "Circles"
 
     N = 1000
-    circles = Circle[].alloc N
-    for create_circle&& in circles
+    circles = edit Circle[].alloc N
+    for create_circle& in circles
         i = float compiler::for_counter() # builtin way of enumerating
         create_circle = Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
 
     while graphics:is_open win
         dt = graphics:dt()
-        for proc_circle&& in circles # mutable pointer
+        for proc_circle& in circles # mutable pointer
             proc_circle.process dt
         frame = graphics:draw win
         win.graphics:clear graphics:Color(20, 20, 60)

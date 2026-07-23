@@ -59,3 +59,4 @@ def get(range r, nat _pos)
     if pos>=r.to
         fail "iteration end"
     return pos
+    

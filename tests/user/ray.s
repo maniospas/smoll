@@ -42,13 +42,13 @@ def main()
 
     N = 10
     circles = edit circle[].alloc N
-    for create_circle&& in circles
+    for create_circle& in circles
         i = float compiler::for_counter() # builtin way of enumerating
         create_circle = circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
 
     while is_open()
         dt = dt()*3.0
-        for proc_circle&& in circles # mutable pointer
+        for proc_circle& in circles # mutable pointer
             proc_circle.process dt
         frame = draw()
         clear color(20, 20, 60)

@@ -84,7 +84,7 @@ def normalize(effect edit float_allocator FLOATS, edit coo _m)
     doc "mean of its degrees."
     m = edit _m
     degrees = sum(m row).pow 0.5
-    for entry_ptr&& in m
+    for entry_ptr& in m
         entry = compiler::deref entry_ptr
         denom = degrees[entry.row]*degrees[entry.col]
         entry_ptr.value = entry.value/denom

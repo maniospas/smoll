@@ -21,6 +21,7 @@
 # Profile with:
 # time python  -m cProfile -s cumulative -o out.prof smoll.py docs/std.s --docs
 # flameprof out.prof > flame.svg
+# snakeviz out.prof
 
 import time
 import inspect
@@ -667,7 +668,7 @@ class Variable(CodeSegment):
     def renamed_copy(self, new_name: str, token: Optional["Token"]=None): return Variable(new_name, self.type, self.immutable, self.isprivate, self._references, token if token else self.token)
     def mutable_copy(self, error_token): 
         if error_token and self.type is POINTER_TYPE and self.immutable and not self.isprivate:
-            error_token.error("safety", "cannot make mutable an immutable pointer '"+pretty_name(self.name)+"'", suggestions=["if the pointer resides on a buffer element, get a mutable pointer to that element per 'value = buf[index]&&' given that buf[index] is syntax sugar for derefencing 'get' and not 'mutget'", "if you want to decouple from buffer element do value = compiler::deref buf[index]&&' given that buf[index] is syntax sugar for derefencing 'get' and not 'mutget'", "set the pointer or its data structure locally as a 'ref'; this fixes references to the original while mutating the rest", "if you know what you are doing, use 'unsafe_mut' instead to overwrite safety"])
+            error_token.error("safety", "cannot make mutable an immutable pointer '"+pretty_name(self.name)+"'", suggestions=["if the pointer resides on a buffer element, get a mutable pointer to that element per 'value = buf[index]&' given that buf[index] is syntax sugar for derefencing 'get' and not 'mutget'", "if you want to decouple from buffer element do value = compiler::deref buf[index]&' given that buf[index] is syntax sugar for derefencing 'get' and not 'mutget'", "set the pointer or its data structure locally as a 'ref'; this fixes references to the original while mutating the rest", "if you know what you are doing, use 'unsafe_mut' instead to overwrite safety"])
         if error_token and self._references: # this should not appear when 'mut' is used for both mutation and safe mutation
             error_token.error("safety", "cannot make a reference mutable '"+pretty_name(self.name), suggestions=["use 'safe_mut' instead", "use 'ref mut' instead of 'mut ref'"])
         return Variable(self.name, self.type, False, self.isprivate if error_token else False, self._references, error_token if error_token else self.token)
@@ -2330,7 +2331,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if var is not None and var.isprivate: err_token.error("type", "cannot set to immutable class field: '"+pretty_name(var.name)+"'")
         if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but found '"+signature_like(rets)+"'")
         if var.stabilized_name() in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
-        if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&&' or 'mutget' from a buffer if you are working with std", "remove 'const' qualitifier"])
+        if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&' or 'mutget' from an 'edit' or 'mut' buffer if you are working with std", "remove 'const' qualitifier"])
         IFNOT_CHECK_PATTERN[3] = var
         impl.implementation.extend(IFNOT_CHECK_PATTERN)
         # impl.implementation.extend([
@@ -3827,7 +3828,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             op_token.error("safety", "there is no clear priority order between multiple equalities and inequalities; be explicit with parentheses")
         peek_next = peek_text(tokens, pos+1)
         if op_name=="=": #op_name==">>" or op_name=="<<" or 
-            if op_name=="=" and peek_text(tokens, pos-1)!="]" and (len(rets)!=1 or rets[0].type!=POINTER_TYPE): tokens[pos].error("safety", "unexpected '=' in the middle of expression", suggestions=["use 'buffer[item]&&.field = value' when supported by 'mutget', which retrieves a mutable pointer to an item, and then gets the field sub-pointer", "in the most general case, use 'buffer[item] = value' when supported by 'mutget' (for buffers, this is equivalent to buffer[item]&&=value)", "in the most general case, use 'p=value' where 'p' is a mutable pointer"])
+            if op_name=="=" and peek_text(tokens, pos-1)!="]" and (len(rets)!=1 or rets[0].type!=POINTER_TYPE): tokens[pos].error("safety", "unexpected '=' in the middle of expression", suggestions=["use 'buffer[item]&.field = value' when supported by 'mutget', which retrieves a mutable pointer to an item, and then gets the field sub-pointer", "in the most general case, use 'buffer[item] = value' when supported by 'mutget' (for buffers, this is equivalent to buffer[item]&=value)", "in the most general case, use 'p=value' where 'p' is a mutable pointer"])
             err_token = op_token
             pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0) # don't touch rets
             pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
@@ -3839,7 +3840,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             if var is None: err_token.error("type", "can only set a value to an existing pointer with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.stabilized_name() in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
-            if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&&' or 'mutget' from a buffer if you are working with std", "remove 'const' qualitifier"])
+            if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&' or 'mutget' from an 'edit' or 'mut' buffer if you are working with std", "remove 'const' qualitifier"])
             pointer_type: ImplementedType|None = impl.get_pointer_type(var)
             if pointer_type is None or pointer_type==ANY_TYPE: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type")
             assert pointer_type is not None
@@ -4225,7 +4226,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                         temp_type.rets.append(new_name)
                         temp_type.vars[new_name] = associated_type.vars[associated_type.rets[j]].renamed_copy(new_name)
                         if temp_type.vars[new_name].isprivate: isprivate = True
-                    new_var = Variable(new_var_name if new_var_name else create_temp(), POINTER_TYPE, immutable=rets[0].immutable, isprivate=rets[0].isprivate or isprivate, token=op_token)
+                    new_var = Variable(create_temp()+"__"+new_var_name if new_var_name else create_temp(), POINTER_TYPE, immutable=rets[0].immutable, isprivate=isprivate, token=op_token)
                     impl.vars[new_var.name] = new_var
                     impl.set_pointer_type(new_var, temp_type)
                     if is_lsp and field_token.file.is_main_file: print_lsp_var(field_token, signature_like([new_var], impl))
@@ -4503,11 +4504,16 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 get_func_name = "get"
                 deref = True
                 also_assign = False
-                if peek_text(tokens, pos)=="&" and peek_text(tokens, pos+1)=="&":
-                    #if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_var(get(tokens, pos), "mut ptr {"+signature_like(rets+additional_rets, impl)+"}")
+                # if peek_text(tokens, pos)=="&" and peek_text(tokens, pos+1)=="&":
+                #     #if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_var(get(tokens, pos), "mut ptr {"+signature_like(rets+additional_rets, impl)+"}")
+                #     get_func_name = "mutget"
+                #     deref = False
+                #     pos += 2
+                if peek_text(tokens, pos)=="&" and any(not r.immutable and not r.isprivate for r in rets):
+                    #if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_var(get(tokens, pos), "ptr {"+signature_like(rets+additional_rets, impl)+"}")
                     get_func_name = "mutget"
                     deref = False
-                    pos += 2
+                    pos += 1
                 elif peek_text(tokens, pos)=="&":
                     #if is_lsp and get(tokens, pos).file.is_main_file: print_lsp_var(get(tokens, pos), "ptr {"+signature_like(rets+additional_rets, impl)+"}")
                     deref = False
@@ -4515,7 +4521,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 elif peek_text(tokens, pos)=="=":
                     get_func_name = "mutget"
                     deref = False
-                elif peek_text(tokens, pos)=="." and any(not r.immutable for r in rets):
+                elif peek_text(tokens, pos)=="." and any(not r.immutable and not r.isprivate for r in rets):
                     get_func_name = "mutget"
                     deref = True
                 type = file.types.get(get_func_name, None)
@@ -4758,8 +4764,9 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         should_mut_ref = False
         if should_ref:
             pos += 1
-            should_mut_ref = peek_text(tokens, pos+1)=="&"
-            if should_mut_ref: pos += 1
+            should_mut_ref = True
+            # should_mut_ref = peek_text(tokens, pos+1)=="&"
+            # if should_mut_ref: pos += 1
         created_buffer = resolve_call(file, impl, buffer_type_method, [], current_token)
         #total_size = temp_type.memory_size()*len(variables_sets)
         alloc_type = file.types.get("alloc", None)
@@ -5065,10 +5072,10 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
 
         skip_next_pointer_interior_assignment = False
         if len(ret)==1 and ret[0].type==POINTER_TYPE:
-            if peek_text(tokens, pos)=="&" and peek_text(tokens, pos+1)=="&":
-                pos += 2
+            if peek_text(tokens, pos)=="&":# and peek_text(tokens, pos+1)=="&":
+                pos += 1
                 skip_next_pointer_interior_assignment = True
-            elif peek_text(tokens, pos-1)=="&" and peek_text(tokens, pos-2)=="&":
+            elif peek_text(tokens, pos-1)=="&":# and peek_text(tokens, pos-2)=="&":
                 skip_next_pointer_interior_assignment = True
         if var and var.type==POINTER_TYPE and not skip_next_pointer_interior_assignment:
             rets = [var]
@@ -5082,13 +5089,13 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             if var is None: err_token.error("type", "can only set a value to an existing pointer with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but found '"+signature_like(rets)+"'")
             if var.stabilized_name() in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
-            if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&&' from a buffer (or mutget) if you are working with std", "remove 'const' qualitifier"])
+            if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&' from an 'edit' or 'mut' buffer when supported by 'mutget' if you are working with std", "remove 'const' qualitifier"])
             pointer_type: ImplementedType|None = impl.get_pointer_type(var)
-            if pointer_type is None or pointer_type==ANY_TYPE: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type."+(" Perhaps you meant to add && after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
+            if pointer_type is None or pointer_type==ANY_TYPE: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type."+(" Perhaps you meant to add '&' after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
             assert pointer_type is not None
-            if len(pointer_type.rets)!=len(ret): err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'"+(". Perhaps you meant to add && after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
+            if len(pointer_type.rets)!=len(ret): err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'"+(". Perhaps you meant to add '&' after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
             for pr, r in zip(pointer_type.rets, ret):
-                if pointer_type.vars[pr].type != r.type: err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'"+(". Perhaps you meant to add && after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
+                if pointer_type.vars[pr].type != r.type: err_token.error("type", "this is a pointer to data of different type: '"+signature_like(ret)+"' vs '"+pointer_type.signature()+"'"+(". Perhaps you meant to add '&' after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
             # we now have a contract that we can place our data on the pointer
             IFNOT_CHECK_PATTERN[3] = var
             impl.implementation.extend(IFNOT_CHECK_PATTERN)
@@ -5501,18 +5508,18 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             if is_lsp and name.file.is_main_file: print_lsp_keyword(name, "**for**\n\nLoop that automatically retrieves index-indexed items. 'for var in iterator ...' is equivalent to 'index =0 while try var=iterator[index] ... index=index+1'")
             if_pos = pos-1
             as_pointer = False
-            as_mutpointer = False
+            #as_mutpointer = False
             varname = peek_text(tokens,pos)
             vartok = get(tokens,pos)
-            if peek_text(tokens, pos+1)=="&" and peek_text(tokens, pos+2)=="&":
-                pos += 2
-                as_mutpointer = True
-            elif peek_text(tokens, pos+1)=="&":
+            # if peek_text(tokens, pos+1)=="&" and peek_text(tokens, pos+2)=="&":
+            #     pos += 2
+            #     as_mutpointer = True
+            if peek_text(tokens, pos+1)=="&":
                 pos += 1
                 as_pointer = True
             if peek_text(tokens, pos+1)=="is":
                 is_token = get(tokens, pos+1)
-                if as_pointer or as_mutpointer:
+                if as_pointer:# or as_mutpointer:
                      get(tokens, pos+1).error("syntax", "types obtained by 'is' cannot be retrieved as pointer variables", suggestions=["use 'in' instead"])
                 pos, iterating_types = await process_linear_type(file, tokens, pos+2, show_lsp=True, reduce_to_unique_variations=False, impl=impl)
                 #previous_vars = {k: v for k, v in impl.vars.items()}
@@ -5568,10 +5575,10 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 impl.is_parsing_a_try.append(var)
                 impl.count_handled_tries.append(0)
                 
-                type = file.types.get("mutget" if as_mutpointer else "get", None)
+                type = file.types.get("mutget" if as_pointer and any(not v.immutable and not v.isprivate for v in iterator_object) else "get", None)
                 if type is None: err_token.error("type", "missing implementation for 'get'")
                 ret = resolve_call(file, impl, type, iterator_object+[indexor], get(tokens, in_pos)) 
-                if not as_pointer and not as_mutpointer:
+                if not as_pointer:# and not as_mutpointer:
                     _, ret = process_deref(file, pos, ret, impl, get(tokens, in_pos), explicit=False)
                 if is_lsp and vartok.file.is_main_file: print_lsp_var(vartok, signature_like(ret, impl))
                 impl.assign(varname, ret, current_token)
@@ -5824,8 +5831,8 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         name = name[1:len(name)-1]
         prev_name = name
         name = await resolve_name(name, name_token)
-        if not os.path.exists(name) and name not in file_cache: name_token.error("import", "non-existent file '"+name+"'")
-        if os.path.isdir(name) and name not in file_cache: name_token.error("import", "expecting file but got directory '"+name+"'")
+        if name not in file_cache and not os.path.exists(name): name_token.error("import", "non-existent file '"+name+"'")
+        if name not in file_cache and os.path.isdir(name): name_token.error("import", "expecting file but got directory '"+name+"'")
         if name.endswith(".h") or name.endswith(".c"):
             for f in externals:
                 if f.path==name: return pos+1, f

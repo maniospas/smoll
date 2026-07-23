@@ -23,7 +23,7 @@ def get(hash::robinhood_str_entry[] keys, any[] values, cstr|str key)
 def mutget(edit hash::robinhood_str_entry[] keys, edit any[] values, cstr|str key)
     doc "get a mutable hash map entry"
     doc "Implemented for string or cstr keys but buffer of any values."
-    return values[keys.hash::at str key]&&
+    return values[keys.hash::at str key]&
 
 def get(hash::robinhood_nat_entry[] keys, any[] values, nat key)
     doc "get a hash map entry"
@@ -33,7 +33,7 @@ def get(hash::robinhood_nat_entry[] keys, any[] values, nat key)
 def mutget(edit hash::robinhood_nat_entry[] keys, edit any[] values, nat key)
     doc "get a mutable hash map entry"
     doc "Implemented for string or cstr keys but buffer of any values."
-    return values[keys.hash::at key]&&
+    return values[keys.hash::at key]&
 
 def next(hash::robinhood_entry[] keys, mut nat pos)
     if pos==0

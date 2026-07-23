@@ -1534,19 +1534,18 @@ to quickly move data around while sharing only one memory address.
 This abstraction remains safe as long as you do not deliberately
 inject unsafe C code.</p>
 
-<p>Obtain a <code>const</code> pointer from a buffer, including a buffer whose
-pointed memory location cannot be modified, per <code>ptr = buf[element]&amp;</code>,
-and a <code>mut</code> pointer -if permissions allow it- per <code>ptr = buf[element]&amp;&amp;</code>. 
-Constness means that pointer contents cannot be overwritten. To set a 
-new value to a mutable pointer use <code>&amp;&amp;</code> after the value again per 
-<code>old_ptr = new_ptr&amp;&amp;</code>. Otherwise, assignment copies a compatible
+<p>Obtain a pointer from a buffer, including a buffer whose
+pointed memory location cannot be modified, per <code>ptr = buf[element]&amp;</code>.
+The pointer will be mutable if and only if <code>buf</code> has mutation or edit 
+permissions. Overwrite pointer locations with the pattern
+<code>old_ptr = new_ptr&amp;</code>. Otherwise, assignment copies a compatible
 structure&#8217;s contents onto a mutable pointer&#8217;s memory location.</p>
 
 <p>The <code>compiler::deref</code> function dereferences pointers onto local objects. 
 For example, <code>compiler.deref(ptr).field</code> gets a field from an object, after
 dereferencing the latter. Given all these operators
 it is now possible to explain that <code>buffer[pos]=value</code> desugars 
-to the pointer notation <code>buffer[pos]&amp;&amp; = value</code> that first
+to the pointer notation <code>buffer[pos]&amp; = value</code> that first
 retrieves a mutable pointer and then assigns to it.</p>
 
 <p><em>Smoλ</em>&#8217;s compiler checks on pointer safety and creates errors if
@@ -1579,7 +1578,7 @@ a pointer to it. Then that is moved around via its memory address. </p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">element</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">&amp;</span> <span class="c1"># equivalent to element = [0.0][0]&amp;&amp; </span>
+    <span class="n">element</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">&amp;</span> <span class="c1"># equivalent to element = [0.0][0]&amp; </span>
     <span class="nb">print</span> <span class="n">compiler</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span> <span class="c1"># prints 0.0</span>
     <span class="n">inc</span> <span class="n">element</span>
     <span class="nb">print</span> <span class="n">compiler</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span> <span class="c1"># prints 1,0</span>
@@ -2873,14 +2872,14 @@ around in a window.</p>
     <span class="n">win</span> <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Size</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">)</span><span class="o">.</span><span class="n">graphics</span><span class="p">:</span><span class="n">Window</span> <span class="s2">&quot;Circles&quot;</span>
 
     <span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
-    <span class="n">circles</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">N</span>
-    <span class="k">for</span> <span class="n">create_circle</span><span class="o">&amp;&amp;</span> <span class="ow">in</span> <span class="n">circles</span>
+    <span class="n">circles</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">Circle</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">N</span>
+    <span class="k">for</span> <span class="n">create_circle</span><span class="o">&amp;</span> <span class="ow">in</span> <span class="n">circles</span>
         <span class="n">i</span> <span class="o">=</span> <span class="nb">float</span> <span class="n">compiler</span><span class="p">::</span><span class="n">for_counter</span><span class="p">()</span> <span class="c1"># builtin way of enumerating</span>
         <span class="n">create_circle</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">(</span><span class="mf">400.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="o">-</span><span class="n">i</span><span class="p">,</span> <span class="mf">160.0</span><span class="o">+</span><span class="n">i</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
 
     <span class="k">while</span> <span class="n">graphics</span><span class="p">:</span><span class="n">is_open</span> <span class="n">win</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">dt</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">proc_circle</span><span class="o">&amp;&amp;</span> <span class="ow">in</span> <span class="n">circles</span> <span class="c1"># mutable pointer</span>
+        <span class="k">for</span> <span class="n">proc_circle</span><span class="o">&amp;</span> <span class="ow">in</span> <span class="n">circles</span> <span class="c1"># mutable pointer</span>
             <span class="n">proc_circle</span><span class="o">.</span><span class="n">process</span> <span class="n">dt</span>
         <span class="n">frame</span> <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">draw</span> <span class="n">win</span>
         <span class="n">win</span><span class="o">.</span><span class="n">graphics</span><span class="p">:</span><span class="n">clear</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>

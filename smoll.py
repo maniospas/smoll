@@ -426,6 +426,9 @@ PREALLOCATED_CHECKERRTWO_PATTERN = [
     CODEWORD_EQUALS,
     CODEWORD_TWO,
     CODEWORD_SEMICOLON,
+    CODEWORD_GOTO,
+    None,
+    CODEWORD_SEMICOLON,
     CODEWORD_RBRACKET,
     CODEWORD_ELSE,
     CODEWORD_LBRACKET
@@ -472,6 +475,9 @@ FUNCTOR_TRYVAR_CHECK_PATTERN = [
     None,
     CODEWORD_EQUALS,
     CODEWORD_TCOMPLAIN,
+    CODEWORD_SEMICOLON,
+    CODEWORD_GOTO,
+    None,
     CODEWORD_SEMICOLON,
     CODEWORD_RBRACKET,
     CODEWORD_ELSE,
@@ -831,7 +837,7 @@ class ImplementedType:
         self.invalidate_types_on_defer: list[ImplementedType] = list() # add to invalidate_types_when_called only if there if we keep at least one defer locally
         self.accumulating_defers: list[dict[str, Token]] = [dict()] # for the top level we defer at the end of code block, but track loop defers here
         self.is_parsing_a_defer = False
-        self.is_parsing_a_try: list[Variable|None] = list() # list of variables that hold try results
+        self.is_parsing_a_try: list[Variable] = list() # list of variables that hold try results
         self.count_handled_tries: list[int] = list() # equivalent list that hold whether the try blocks where handled
         self.can_try_interpreter: bool = True
         if self.builtin is not None:
@@ -1202,6 +1208,8 @@ class ImplementedType:
         #print(self.name, values)
         self.can_try_interpreter = False
         async def process_expression(impl: list[CodeSegment], pos: int, end: int):
+            if pos>end: return
+            if pos+1<=end and impl[pos+1].tostring()==":": pos+=2
             if pos>end: return
             if impl[pos].tostring()=="(" and pos<=end-3 and impl[pos+1].tostring()=="__smoll_func_ptr_type" and impl[pos+2].tostring()==")":
                 candidate_name = impl[pos+3].tostring()
@@ -1680,6 +1688,15 @@ class ImplementedType:
                         ret = await process_block(impl, pos+1, endpos-1)
                         if ret=="break": break
                         if ret=="return" or ret=="failure": return ret
+                        if ret is not None:
+                            found = False
+                            while pos<=npos:
+                                if impl[pos].tostring()==":" and impl[pos-1].tostring()==ret:
+                                    found = True
+                                    break
+                                pos = pos+1
+                            if not found: return ret
+
                     pos = endpos+1
                     prev_pos = pos
                     continue
@@ -1727,9 +1744,18 @@ class ImplementedType:
                     continue
                 if impl[pos].tostring()==";":
                     if pos==prev_pos+2 and impl[prev_pos].tostring()=="goto":
-                        if impl[pos-1].tostring() in "__t_return": return "return"
-                        if impl[pos-1].tostring() == "__t_failure":  return "failure"
-                        self.at.error("interpreter", "cannot goto arbitrary C position 'goto "+impl[pos-1].tostring()+"'")
+                        target_label = impl[pos-1].tostring()
+                        if target_label == "__t_return": return "return"
+                        if target_label == "__t_failure":  return "failure"
+                        pos += 2
+                        found = False
+                        while pos<=npos:
+                            if impl[pos].tostring()==":" and impl[pos-1].tostring()==target_label:
+                                found = True
+                                break
+                            pos = pos+1
+                        if not found: return target_label
+                        #self.at.error("interpreter", "cannot goto arbitrary C position 'goto "+impl[pos-1].tostring()+"'")
                     await process_expression(impl, prev_pos, pos-1)
                     prev_pos = pos+1
                 pos += 1
@@ -2334,27 +2360,10 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&' or 'mutget' from an 'edit' or 'mut' buffer if you are working with std", "remove 'const' qualitifier"])
         IFNOT_CHECK_PATTERN[3] = var
         impl.implementation.extend(IFNOT_CHECK_PATTERN)
-        # impl.implementation.extend([
-        #     CODEWORD_IF,
-        #     CODEWORD_LPAR,
-        #     CODEWORD_NOT,
-        #     var,
-        #     CODEWORD_RPAR,
-        #     CODEWORD_LBRACKET,
-        # ])
-        if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is not None:
             impl.has_any_complaint = True
-            # impl.implementation.extend([
-            #     CODEWORD_TCOMPLAIN,
-            #     CODEWORD_EQUALS,
-            #     CODEWORD_TWO,
-            #     CODEWORD_SEMICOLON,
-            #     CODEWORD_RBRACKET,
-            #     CODEWORD_ELSE,
-            #     CODEWORD_LBRACKET
-            # ])
+            PREALLOCATED_CHECKERRTWO_PATTERN[5] = CodeWord(try_var.name+"__label")
             impl.implementation.extend(PREALLOCATED_CHECKERRTWO_PATTERN)
             impl.spawned_error_codes.add(2)
             impl.count_handled_tries[-1] += 1
@@ -2507,7 +2516,6 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         impl.vars[tmp] = var
         if not impl.used_error_codes: error_token.error("safety", "there is nothing to catch up to here")
         impl.has_caught_used_error_codes = True
-        if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if try error=compiler::catch() print cstr error`")
         else: impl.count_handled_tries[-1] += 1
@@ -2596,7 +2604,6 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     tmp = create_temp()
     rets = list()
     if callee.needs_failure_mode:
-        if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is not None:
             impl.has_any_complaint = True
@@ -2733,18 +2740,22 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             ])
 
     if callee.needs_failure_mode:
-        if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is not None:
             PREALLOCATED_ASSIGN_PATTERN[0] = try_var
             PREALLOCATED_ASSIGN_PATTERN[2] = CODEWORD_TCOMPLAIN
             impl.implementation.extend(PREALLOCATED_ASSIGN_PATTERN)
-            # impl.implementation.extend([
-            #     try_var,
-            #     CODEWORD_EQUALS,
-            #     CODEWORD_TCOMPLAIN,
-            #     CODEWORD_SEMICOLON,
-            # ])
+            impl.implementation.extend([
+                CODEWORD_IF, 
+                CODEWORD_LPAR,
+                CODEWORD_TCOMPLAIN,
+                CODEWORD_RPAR, 
+                CODEWORD_LBRACKET,
+                CODEWORD_GOTO, 
+                CodeWord(try_var.name+"__label"), 
+                CODEWORD_SEMICOLON,
+                CODEWORD_RBRACKET
+            ])
 
     if callee.needs_failure_mode and impl.is_parsing_a_try:
         if impl.is_parsing_a_try[-1] is None: error_token.error("safety", "the 'try' mechanism has already matched one function call")
@@ -2929,27 +2940,10 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     # non-allocation check is mandatory unfortunately
     IFNOT_CHECK_PATTERN[3] = ret[0]
     impl.implementation.extend(IFNOT_CHECK_PATTERN)
-    # impl.implementation.extend([
-    #     CODEWORD_IF,
-    #     CODEWORD_LPAR,
-    #     CODEWORD_NOT,
-    #     ret[0],
-    #     CODEWORD_RPAR,
-    #     CODEWORD_LBRACKET,
-    # ])
-    if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: current_token.error("safety", "the matching 'try' has already handled a different failure")
     try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
     if try_var is not None:
         impl.has_any_complaint = True
-        # impl.implementation.extend([
-        #     CODEWORD_TCOMPLAIN,
-        #     CODEWORD_EQUALS,
-        #     CODEWORD_TWO,
-        #     CODEWORD_SEMICOLON,
-        #     CODEWORD_RBRACKET,
-        #     CODEWORD_ELSE,
-        #     CODEWORD_LBRACKET
-        # ])
+        PREALLOCATED_CHECKERRTWO_PATTERN[5] = CodeWord(try_var.name+"__label")
         impl.implementation.extend(PREALLOCATED_CHECKERRTWO_PATTERN)
         impl.spawned_error_codes.add(2)
         impl.count_handled_tries[-1] += 1
@@ -3408,34 +3402,13 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
 
     FUNCTOR_VAR_CHECK_PATTERN[3] = functor_var
     impl.implementation.extend(FUNCTOR_VAR_CHECK_PATTERN)
-    # impl.implementation.extend([
-    #     CODEWORD_IF,
-    #     CODEWORD_LPAR,
-    #     CODEWORD_NOT,
-    #     functor_var,
-    #     CODEWORD_RPAR,
-    #     CODEWORD_LBRACKET,
-    # ])
-    if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: err_token.error("safety", "the matching 'try' has already handled a different failure")
     try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
     pending_close_bracket = False
     if try_var is not None:
         impl.has_any_complaint = True
         FUNCTOR_TRYVAR_CHECK_PATTERN[4] = try_var
+        FUNCTOR_TRYVAR_CHECK_PATTERN[9] = CodeWord(try_var.name+"__label")
         impl.implementation.extend(FUNCTOR_TRYVAR_CHECK_PATTERN)
-        # impl.implementation.extend([
-        #     CODEWORD_TCOMPLAIN,
-        #     CODEWORD_EQUALS,
-        #     CODEWORD_TWO,
-        #     CODEWORD_SEMICOLON,
-        #     try_var,
-        #     CODEWORD_EQUALS,
-        #     CODEWORD_TCOMPLAIN,
-        #     CODEWORD_SEMICOLON,
-        #     CODEWORD_RBRACKET,
-        #     CODEWORD_ELSE,
-        #     CODEWORD_LBRACKET
-        # ])
         impl.spawned_error_codes.add(2)
         impl.count_handled_tries[-1] += 1
         pending_close_bracket = True
@@ -3453,16 +3426,6 @@ def convert_functor_to_method_type(impl: ImplementedType, functor_var: Variable,
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
-        # impl.implementation.extend([
-        #     CODEWORD_TERRCODE,
-        #     CODEWORD_EQUALS,
-        #     CODEWORD_TWO,
-        #     CODEWORD_SEMICOLON,
-        #     CODEWORD_GOTO,
-        #     CODEWORD_TFAILURE,
-        #     CODEWORD_SEMICOLON,
-        #     CODEWORD_RBRACKET
-        # ])
         impl.implementation.extend(PREALLOCATED_ERRTWOEND_PATTERN)
         impl.spawned_error_codes.add(2)
         impl.needs_failure_mode = err_token
@@ -3837,27 +3800,10 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             # we now have a contract that we can place our data on the pointer
             IFNOT_CHECK_PATTERN[3] = var
             impl.implementation.extend(IFNOT_CHECK_PATTERN)
-            # impl.implementation.extend([
-            #     CODEWORD_IF,
-            #     CODEWORD_LPAR,
-            #     CODEWORD_NOT,
-            #     var,
-            #     CODEWORD_RPAR,
-            #     CODEWORD_LBRACKET,
-            # ])
-            if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: op_token.error("safety", "the matching 'try' has already handled a different failure")
             try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
             if try_var is not None:
                 impl.has_any_complaint = True
-                # impl.implementation.extend([
-                #     CODEWORD_TCOMPLAIN,
-                #     CODEWORD_EQUALS,
-                #     CODEWORD_TWO,
-                #     CODEWORD_SEMICOLON,
-                #     CODEWORD_RBRACKET,
-                #     CODEWORD_ELSE,
-                #     CODEWORD_LBRACKET
-                # ])
+                PREALLOCATED_CHECKERRTWO_PATTERN[5] = CodeWord(try_var.name+"__label")
                 impl.implementation.extend(PREALLOCATED_CHECKERRTWO_PATTERN)
                 impl.spawned_error_codes.add(2)
                 impl.count_handled_tries[-1] += 1
@@ -4220,27 +4166,10 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
 
                     IFNOT_CHECK_PATTERN[3] = rets[0]
                     impl.implementation.extend(IFNOT_CHECK_PATTERN)
-                    # impl.implementation.extend([
-                    #     CODEWORD_IF,
-                    #     CODEWORD_LPAR,
-                    #     CODEWORD_NOT,
-                    #     rets[0],
-                    #     CODEWORD_RPAR,
-                    #     CODEWORD_LBRACKET,
-                    # ])
-                    if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: op_token.error("safety", "the matching 'try' has already handled a different failure")
                     try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
                     if try_var is not None:
                         impl.has_any_complaint = True
-                        # impl.implementation.extend([
-                        #     CODEWORD_TCOMPLAIN,
-                        #     CODEWORD_EQUALS,
-                        #     CODEWORD_TWO,
-                        #     CODEWORD_SEMICOLON,
-                        #     CODEWORD_RBRACKET,
-                        #     CODEWORD_ELSE,
-                        #     CODEWORD_LBRACKET
-                        # ])
+                        PREALLOCATED_CHECKERRTWO_PATTERN[5] = CodeWord(try_var.name+"__label")
                         impl.implementation.extend(PREALLOCATED_CHECKERRTWO_PATTERN)
                         impl.spawned_error_codes.add(2)
                         impl.count_handled_tries[-1] += 1
@@ -4553,7 +4482,6 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     CODEWORD_RPAR,
                     CODEWORD_SEMICOLON,
                 ])
-            if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: current_token.error("safety", "the matching 'try' has already handled a different failure")
             try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
             if try_var is not None:
                 impl.has_any_complaint = True
@@ -4561,6 +4489,9 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     CODEWORD_TCOMPLAIN,
                     CODEWORD_EQUALS,
                     ret[0],
+                    CODEWORD_SEMICOLON,
+                    CODEWORD_GOTO,
+                    CodeWord(try_var.name+"__label"),
                     CODEWORD_SEMICOLON
                 ])
                 impl.count_handled_tries[-1] += 1
@@ -4598,7 +4529,6 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 CODEWORD_RPAR,
                 CODEWORD_SEMICOLON,
             ])
-        if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: current_token.error("safety", "the matching 'try' has already handled a different failure")
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         if try_var is not None:
             impl.has_any_complaint = True
@@ -4606,6 +4536,9 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 CODEWORD_TCOMPLAIN,
                 CODEWORD_EQUALS,
                 CodeWord(str(err_code)),
+                CODEWORD_SEMICOLON,
+                CODEWORD_GOTO,
+                CodeWord(try_var.name+"__label"),
                 CODEWORD_SEMICOLON
             ])
             impl.count_handled_tries[-1] += 1
@@ -4729,7 +4662,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             variables_sets.append(buffer_element)
             if len(temp_type.rets)!=len(buffer_element): get(tokens, pos).error("type", "mismatching buffer contents")
             for rx,ry in zip(buffer_element, temp_type.rets):
-                if rx.type!=temp_type.vars[ry].tyse: get(tokens, pos).error("type", "mismatching buffer contents")
+                if rx.type!=temp_type.vars[ry].type: get(tokens, pos).error("type", "mismatching buffer contents")
                 if rx.immutable and not temp_type.vars[ry].immutable: get(tokens, pos).error("type", "mismatching buffer contents")
         if peek_text(tokens, pos)!="]": get(tokens, pos).error("syntax", "expecting closing ']' for 'args' here")
         #should_ref = peek_text(tokens, pos+1)=="&"
@@ -4915,6 +4848,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
             pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
             if impl.count_handled_tries[-1]==0: current_token.error("safety", "this 'try' statement does not guard against anything")
+            impl.implementation.extend([CodeWord(impl.is_parsing_a_try[-1].name+"__label"), CodeWord(":")])
             impl.count_handled_tries.pop()
             impl.is_parsing_a_try.pop()
             impl.implementation.extend([
@@ -5074,27 +5008,10 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             # we now have a contract that we can place our data on the pointer
             IFNOT_CHECK_PATTERN[3] = var
             impl.implementation.extend(IFNOT_CHECK_PATTERN)
-            # impl.implementation.extend([
-            #     CODEWORD_IF,
-            #     CODEWORD_LPAR,
-            #     CODEWORD_NOT,
-            #     var,
-            #     CODEWORD_RPAR,
-            #     CODEWORD_LBRACKET,
-            # ])
-            if impl.is_parsing_a_try and impl.is_parsing_a_try[-1] is None: op_token.error("safety", "the matching 'try' has already handled a different failure")
             try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
             if try_var is not None:
                 impl.has_any_complaint = True
-                # impl.implementation.extend([
-                #     CODEWORD_TCOMPLAIN,
-                #     CODEWORD_EQUALS,
-                #     CODEWORD_TWO,
-                #     CODEWORD_SEMICOLON,
-                #     CODEWORD_RBRACKET,
-                #     CODEWORD_ELSE,
-                #     CODEWORD_LBRACKET
-                # ])
+                PREALLOCATED_CHECKERRTWO_PATTERN[5] = CodeWord(try_var.name+"__label")
                 impl.implementation.extend(PREALLOCATED_CHECKERRTWO_PATTERN)
                 impl.spawned_error_codes.add(2)
                 impl.count_handled_tries[-1] += 1
@@ -5121,25 +5038,12 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 mem_size = r.type.memory_size() if r.type.builtin else 0
                 if not mem_size: continue
                 if progress:
-                    # impl.implementation.extend([
-                    #     CODEWORD_MEMCPY, CODEWORD_LPAR, var,
-                    #     CODEWORD_ADD, CodeWord(str(progress)),
-                    #     CODEWORD_COMMA, CODEWORD_AMP, impl.vars[r.stabilized_name()],
-                    #     CODEWORD_COMMA, CodeWord(str(mem_size)),
-                    #     CODEWORD_RPAR, CODEWORD_SEMICOLON
-                    # ])
                     PREALLOCATED_MEMCPY_OFFSET_PATTERN[2] = var
                     PREALLOCATED_MEMCPY_OFFSET_PATTERN[4] = create_code_word_cached(str(progress))
                     PREALLOCATED_MEMCPY_OFFSET_PATTERN[7] = impl.vars[r.stabilized_name()]
                     PREALLOCATED_MEMCPY_OFFSET_PATTERN[9] = create_code_word_cached(str(mem_size))
                     impl.implementation.extend(PREALLOCATED_MEMCPY_OFFSET_PATTERN)
                 else:
-                    # impl.implementation.extend([
-                    #     CODEWORD_MEMCPY, CODEWORD_LPAR, var,
-                    #     CODEWORD_COMMA, CODEWORD_AMP, impl.vars[r.stabilized_name()],
-                    #     CODEWORD_COMMA, CodeWord(str(mem_size)),
-                    #     CODEWORD_RPAR, CODEWORD_SEMICOLON
-                    # ])
                     PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[2] = var
                     PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[5] = impl.vars[r.stabilized_name()]
                     PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[7] = create_code_word_cached(str(mem_size))
@@ -5469,18 +5373,14 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             if is_lsp and file.is_main_file: print_lsp_keyword(name, "**for**\n\nLoop that automatically retrieves index-indexed items. 'for var in iterator ...' is equivalent to 'index =0 while try var=iterator[index] ... index=index+1'")
             if_pos = pos-1
             as_pointer = False
-            #as_mutpointer = False
             varname = peek_text(tokens,pos)
             vartok = get(tokens,pos)
-            # if peek_text(tokens, pos+1)=="&" and peek_text(tokens, pos+2)=="&":
-            #     pos += 2
-            #     as_mutpointer = True
             if peek_text(tokens, pos+1)=="&":
                 pos += 1
                 as_pointer = True
             if peek_text(tokens, pos+1)=="is":
                 is_token = get(tokens, pos+1)
-                if as_pointer:# or as_mutpointer:
+                if as_pointer:
                      get(tokens, pos+1).error("syntax", "types obtained by 'is' cannot be retrieved as pointer variables", suggestions=["use 'in' instead"])
                 pos, iterating_types = await process_linear_type(file, tokens, pos+2, show_lsp=True, reduce_to_unique_variations=False, impl=impl)
                 #previous_vars = {k: v for k, v in impl.vars.items()}
@@ -5518,15 +5418,6 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
 
             INDEXOR_CHECK_PATTERN[0] = indexor
             impl.implementation.extend(INDEXOR_CHECK_PATTERN)
-            # impl.implementation.extend([
-            #     indexor,
-            #     CODEWORD_EQUALS,
-            #     CODEWORD_ZERO,
-            #     CODEWORD_MINUS,
-            #     CODEWORD_ONE,
-            #     CODEWORD_SEMICOLON
-            # ])
-            
             impl.implementation.extend(WHILE_FOREVER_PATTERN)
             current_token = name
             async def process_for_get(pos: int):
@@ -5544,6 +5435,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 if is_lsp and file.is_main_file: print_lsp_var(vartok, signature_like(ret, impl))
                 impl.assign(varname, ret, current_token)
                 if impl.count_handled_tries[-1]==0: current_token.error("safety", "this 'try' statement does not guard against anything")
+                impl.implementation.extend([CodeWord(impl.is_parsing_a_try[-1].name+"__label"), CodeWord(":")]) 
                 impl.count_handled_tries.pop()
                 impl.is_parsing_a_try.pop()
                 NEGATEBOOL_PATTERN[0] = var

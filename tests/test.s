@@ -5,7 +5,7 @@ def inc(mut float ptr element)
 
 def main()
     CLI = edit console()
-    element = mut last [0.0] # equivalent to element = [0.0][0]& 
-    print compiler::deref element # prints 0.0
-    inc element
-    print compiler::deref element # prints 1,0
+    xs = mut [1,2,3]
+    if try x = mut xs[5]&
+        print compiler::deref x
+    

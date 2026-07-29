@@ -1917,7 +1917,7 @@ class ImplementedType:
             
     def transpile(self, for_inlining=False) -> str:
         if self.never_implement: return ""
-        while self.simplify(): pass
+        #while self.simplify(): pass
         if not self.needs_failure_mode and self.force_not_inline: self.needs_failure_mode = self.at
         ret_body_start = ""
         ret_body_end = ""

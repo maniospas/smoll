@@ -28,13 +28,15 @@ def status(arena|allocated self)
     doc "memory data as part of structural input."
     return (local self.buf, local self.pos)
 
-# def get(arena l, nat pos)
-#     doc "get a list element pointer"
-#     return get(l.buf,pos)
+def get(arena l, nat pos)
+    doc "get a list element pointer"
+    if pos>=l.pos fail "out of bounds"
+    return l.buf[pos]&
 
-# def mutget(edit arena l, nat pos)
-#     doc "get a list element pointer"
-#     return mutget(l.buf,pos)
+def mutget(edit arena l, nat pos)
+    doc "get a list element pointer"
+    if pos>=l.pos fail "out of bounds"
+    return l.buf[pos]&
 
 def circular(edit any[] buf)
     doc "circular buf"

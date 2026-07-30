@@ -173,6 +173,16 @@ def circ(effect edit window WINDOW, position pos, float radius, color color)
         );
     }
 
+def ellipse(effect edit window WINDOW, position pos, position radius, color color)
+    {
+        DrawEllipseV(
+            (Vector2){(float)pos__x, (float)pos__y}, 
+            (float)radius__x,
+            (float)radius__y,
+            (Color){color__r,color__g,color__b,color__a}
+        );
+    }
+
 def rect(effect edit window WINDOW, position pos, size size, color color)
     VM "pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {

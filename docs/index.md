@@ -27,6 +27,8 @@
   <a href="reference.html" class="button">📚 Learn</a>
 </div>
 
+<img src="smol.png", style="width:50%"></img>
+
 <p class="smoll-section-label">Quickstart</p>
 
 ```python

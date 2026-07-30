@@ -1,4 +1,4 @@
-# Copyright 2025-2026 maniospas
+# Copyright 2025-2026 Emmanouil Krasanakis (maniospas)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

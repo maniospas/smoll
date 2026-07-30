@@ -1578,7 +1578,7 @@ a pointer to it. Then that is moved around via its memory address. </p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">element</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">&amp;</span> <span class="c1"># equivalent to element = [0.0][0]&amp; </span>
+    <span class="n">element</span> <span class="o">=</span> <span class="n">mut</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">&amp;</span> <span class="c1"># equivalent to element = [0.0][0]&amp; </span>
     <span class="nb">print</span> <span class="n">compiler</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span> <span class="c1"># prints 0.0</span>
     <span class="n">inc</span> <span class="n">element</span>
     <span class="nb">print</span> <span class="n">compiler</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span> <span class="c1"># prints 1,0</span>

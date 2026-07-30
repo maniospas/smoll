@@ -209,6 +209,11 @@ def dt(effect window WINDOW)
     {builtins::float dt = GetFrameTime();}
     return dt
 
+def uptime(effect window WINDOW)
+    VM "[pyray.get_time()]"
+    {builtins::float t = GetTime();}
+    return t
+
 def key_down(effect window WINDOW, nat key)
     VM "[pyray.is_key_down($key)]"
     {builtins::bool ret = IsKeyDown(key);}

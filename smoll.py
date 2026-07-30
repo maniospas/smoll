@@ -6107,11 +6107,6 @@ async def resolve_name(path: str, at_token: Token|None) -> str:
             path = url+path[len(repo):]
             symbol = path # TODO: decide between this and the commented implementation (this one is a tad slower but more flexible)
             break
-    # if not os.path.exists(path) and not path.startswith("https://") and not path.startswith("http://"):
-    #     for repo, url in repositories.items():
-    #         if path.startswith(repo):
-    #             path = url+path[len(repo):]
-    #             break
     if path.startswith("https://") or path.startswith("http://"):
         if symbol==path: 
             symbol = "./.cache"+urllib.parse.urlsplit(path).path
@@ -6294,7 +6289,7 @@ async def download(url: str, filepath: str):
 async def download_with_progress(url: str, filepath: str, message: str):
     if is_pyodide:
         from pyodide.http import pyfetch
-        import base64, os
+        import base64
         cached = _js_cache_get(url)
         if cached is not None:
             print(f"[{YELLOW}={RESET}] {message} (cached)")

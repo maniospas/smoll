@@ -20,12 +20,12 @@ local import "std/core/allocators.s"
 local import "std/unsafe.s" as unsafe
 
 
-def arena(char::name)    return arena char[]
-def circular(char::name) return circular char[]
-def list(char::name)     return list char[]
+def arena(char::tag)    return arena char[]
+def circular(char::tag) return circular char[]
+def list(char::tag)     return list char[]
 local def alloc(effect edit new CHARS, nat length) 
     return allocated(char[].alloc length, 0)
-def char_allocator = new|arena<char::name>|circular<char::name>|list<char::name>
+def char_allocator = new|arena<char::tag>|circular<char::tag>|list<char::tag>
 
 def exists(cstr c)
     doc "checks whether a cstr is not zero-initialized"
@@ -131,6 +131,7 @@ def copy(effect edit char_allocator CHARS, str|cstr _other)
     other = str _other
     surface = alloc(CHARS, len other)
     {memcpy(surface__buf__unsafe_ptr+surface__pos+surface__buf__unsafe_offset, other__unsafe_ptr+other__dat__pos, other__dat__length);}
+    compiler::unsafe_declare_deep_copy_only()
     return str(surface.buf, surface.pos, other.dat.length, other.dat.first)
 
 def copy_null_terminated(effect new CHARS, str other)
@@ -141,6 +142,7 @@ def copy_null_terminated(effect new CHARS, str other)
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     {builtins::compiler::ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}
+    compiler::unsafe_declare_deep_copy_only()
     return str(buf, 0, other.dat.length, other.dat.first)
 
 def unsafe_temp(str other)
@@ -214,7 +216,7 @@ def neq(str|cstr x, str|cstr y)
     doc "not equals"
     return not x==y
 
-def copy_null_terminated(effect edit arena<char::name> CHARS, str|cstr _other)
+def copy_null_terminated(effect edit arena<char::tag> CHARS, str|cstr _other)
     doc "copy a string while adding null termination"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -250,6 +252,11 @@ def print(effect edit console CLI, char c, cstr|blank endl)
     {printf("%c%s", c, endl);}
 
 def slice(cstr|str _s, nat from, nat to)
+    doc "get a substring view into a string"
+    doc "This operation does not perform any additional allocations"
+    doc "or memory moves and is thus convenient for parsing code."
+    doc "Explicitly copy the result to move it away from volatile"
+    doc "memory, such as circular buffers."
     s = str _s
     if from==to return str ""
     if from>to or to>s.dat.length fail "slice out of string bounds"
@@ -259,6 +266,7 @@ def slice(cstr|str _s, nat from, nat to)
     return str(s.unsafe_ptr, s.dat.pos+from, new_length, new_first)
 
 def starts_with(cstr|str _stack, cstr|str _needle)
+    doc "check whether a string startswith a particular substring sequence"
     stack = str _stack
     needle = str _needle
     if stack.dat.first!=needle.dat.first return false
@@ -266,6 +274,7 @@ def starts_with(cstr|str _stack, cstr|str _needle)
     return stack.slice(0,len needle)==needle
 
 def ends_with(cstr|str _stack, cstr|str _needle)
+    doc "check whether a string ends with a particular substring sequence"
     stack = str _stack
     needle = str _needle
     if stack.dat.length<needle.dat.length
@@ -275,6 +284,7 @@ def ends_with(cstr|str _stack, cstr|str _needle)
     return ret==needle
 
 def contains(cstr|str _stack, char needle)
+    doc "check whether a string contains a needle character"
     stack = str _stack
     if stack.dat.first==needle return true
     for i in range of len stack
@@ -282,6 +292,7 @@ def contains(cstr|str _stack, char needle)
     return false
 
 def contains(cstr|str _stack, cstr|str _needle)
+    doc "check whether a string contains a needle substring"
     stack = str _stack
     needle = str _needle
     if stack.dat.length<needle.dat.length return false
@@ -300,6 +311,8 @@ def nn(str value)
     return (value, "")
 
 def add(effect edit char_allocator CHARS, str|cstr _s1, str|cstr _s2)
+    doc "concatenate two strings"
+    doc "The result is placed on a memory surface handled CHARS allocator effect."
     s1 = str _s1
     s2 = str _s2
     surface = mut arena unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed

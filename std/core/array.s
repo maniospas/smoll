@@ -28,9 +28,7 @@ def nat(nat16 x)
 def alloc(edit any[] buffer, nat|blank size, "dirty"|blank clear_policy)
     doc "allocates a buffer"
     doc "Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,"
-    doc "as it never reallocates an allocation. For convenience for usage within loops, allocation"
-    doc "of the same size only zero-initializes the buffer. If a different size is given, and the"
-    doc "buffer is non-empty, this fails. Consider freeing the buffer first with `del buffer` to"
+    doc "as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to"
     doc "allocate again, or use 'buffer.resize new_size' once a first non-zero allocation has been made."
     if size is blank
         doc "This version allocates a buffer of ONE element, which can be used for stable indirection."
@@ -47,6 +45,7 @@ def alloc(edit any[] buffer, nat|blank size, "dirty"|blank clear_policy)
     buffer.unsafe_ptr = ref unsafe::alloc(bytes)&
     if clear_policy is blank
         buffer.unsafe_ptr.unsafe::zero(0, bytes)
+    compiler::unsafe_declare_deep_copy_only()
     unsafe_return buffer
 
 def alloc(nat size)

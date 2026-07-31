@@ -61,6 +61,7 @@ def mat(vec v, "row"|"col" orientation)
     if orientation is "col"
         # stride=1: consecutive elements of the column are adjacent
         return mat(v.unsafe_ptr, v.pos, v.length, 1, 1)
+    
 
 def vec(mat m)
     doc "view a matrix as a vector"

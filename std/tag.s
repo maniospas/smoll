@@ -17,7 +17,7 @@ def unsafe_defer_free(mut tagged ptr obj)
         unsafe::free obj
     return obj
 
-def tagged_alloc(edit arena<char::name> arena, nat size) 
+def tagged_alloc(edit arena<char::tag> arena, nat size) 
     allocated = mut arena.alloc size
     return allocated.buf[allocated.pos]&
 

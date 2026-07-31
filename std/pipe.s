@@ -60,7 +60,7 @@ def unsafe_pipe_mutax_init(mut pipe ptr obj)
         {mutex_destroy((mutex_t*)mutex_ptr);}
     return obj
 
-def pipe_alloc(edit arena<char::name> arena, nat size) 
+def pipe_alloc(edit arena<char::tag> arena, nat size) 
     allocated = mut arena.alloc size
     return allocated.buf[allocated.pos]&
 

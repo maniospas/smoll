@@ -788,6 +788,7 @@ def rename(seq: list, substitute: dict[str, Variable], others: dict[str, CodeWor
 class ImplementedType:
     def __init__(self, name: str, builtin:str|None=None, at:Optional["Token"]=None, memory_size=0):
         self.name = name
+        self.count_checkable_copies: int = 0
         self.invalidated_by = self # which type's invalidation cause invalidation of this - right now helps invalidate pointer buffers
         self.is_literal_of: Optional["ImplementedType"] = None
         self.monomorphic_name = name.replace(",","__").replace(" ","_").replace(".","_").replace("[","_").replace("]","_").replace("{","_").replace("}","_").replace("(","_").replace(")","_").replace("->","__")+create_temp()
@@ -851,8 +852,8 @@ class ImplementedType:
         self.force_not_inline = False 
         # this is used to throw a FastReturnException the first time the function returns
         self.fast_return_exception = False
-        self.has_been_completed = False
-        self.min_abstraction_level = 0
+        self.has_been_completed: Optional["Token"] = None
+        self.min_abstraction_level = -1
         self.max_abstraction_level = 0
 
     def get_required_accompany(self, var: Variable):
@@ -871,6 +872,7 @@ class ImplementedType:
         var_stabilized_name = var.stabilized_name()
         if var_stabilized_name not in self.required_accompany: self.required_accompany[var.stabilized_name()] = list()
         self.required_accompany[var_stabilized_name].append(requirement.stabilized_name())
+        self.count_checkable_copies += 1
 
     def gather_spawned_error_codes(self, discovered: set["ImplementedType"]):
         ret = set()
@@ -1077,6 +1079,10 @@ class ImplementedType:
         return None
 
     def returns(self, value: list[Variable], error_token: "Token", is_safe: bool):
+        if self.has_been_completed is not None:
+            error_token.error("safety", "have already returned", reason=self.has_been_completed)
+        if "if" not in self.nesting and "while" not in self.nesting:
+            self.has_been_completed = error_token
         if value:
             for v in value[1:]:
                 if v.type==self:
@@ -1165,8 +1171,12 @@ class ImplementedType:
                         error_token.error("safety", "incompatible returned defers compared to previous return")
             for defer in to_remove: self.defers.remove(defer)
 
+
         if is_safe:
-            defer_vars = {var for defer in self.defers+self.returned_defers for var in defer if isinstance(var, Variable)}
+            if self.has_been_completed is None:
+                defer_vars = {var for defer in self.defers+self.returned_defers for var in defer if isinstance(var, Variable)}
+            else:
+                defer_vars = {var for defer in self.returned_defers for var in defer if isinstance(var, Variable)}
             defer_var_names = [r.name for r in defer_vars]
             defer_var_names = list(set(defer_var_names))
             for ret in self.rets+[arg for arg in self.args if not self.vars[arg].immutable]: 
@@ -2090,13 +2100,13 @@ class Token:
                 # message (may span multiple lines))
                 printid("**"+errtype+" error**\n\n"+message+" "+(raason_message+" "+(reason.file.resolved_path+" " if reason.file!=self.file else "")+"line "+str(reason.row)  if reason else ""))
                 if suggestions:
-                    printid("    with alternatives:")
+                    printid("\n**alternatives**\n")
                     for suggestion in suggestions:
                         if "(" in suggestion and "'" not in suggestion and "`" not in suggestion: 
                             suggestion_splits = suggestion.split("defined in")
                             printid("```rust\n"+suggestion_splits[0]+"\n```")
                             #if len(suggestion_splits)>1: print("defined in "+suggestion_splits[1])
-                        else: printid("\n    - "+suggestion)
+                        else: printid("\n- "+suggestion)
             if is_lsp and self.file.is_main_file and errtype=="safety": return
             raise FatalException
 
@@ -2281,7 +2291,12 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
         spawned_error_codes = callee.gather_spawned_error_codes(set())
-        printid("Level of abstraction:\n\n"+str(callee.min_abstraction_level)+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
+        printid("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
+        # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):
+        #     #printid("When this function is called, it does not create a memory dependecy.\n")
+        #     pass
+        # else:
+        #     printid("When this function is called, it creates at least one memory dependecy.\n")
         if len(spawned_error_codes): 
             if callee.needs_failure_mode: printid("Potential errors:\n")
             else: printid("No failing errors, but can catch these unhandled ones within the function:\n")
@@ -2482,7 +2497,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         return [var]
     if _callee is not None: callee = _callee
     else: callee = _select_call(file, impl, method, vars, error_token, out_format)
-    if impl.min_abstraction_level==0: impl.min_abstraction_level = callee.min_abstraction_level+1
+    if impl.min_abstraction_level==-1: impl.min_abstraction_level = callee.min_abstraction_level+1
     else: impl.min_abstraction_level = min(impl.min_abstraction_level, callee.min_abstraction_level+1)
     impl.max_abstraction_level = max(impl.max_abstraction_level, callee.max_abstraction_level+1) 
     for link in callee.linker:
@@ -2498,19 +2513,17 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             if len(vars)+len(gathered_vars)>=len(callee.args): break
         gathered_vars.extend(vars)
         vars = gathered_vars
-    if callee==DEREF_TYPE:
+    if callee is DEREF_TYPE:
         if len(vars)==1 and vars[0].type is POINTER_TYPE:
             return process_deref(file, None, vars, impl, error_token)[1]
         error_token.error("syntax", "can dereference only a pointer but got '"+signature_like(vars, impl)+"'")
-    if callee==NOCATCH_TYPE:
+    if callee is NOCATCH_TYPE:
         if impl.needs_failure_mode: error_token.error("safety", "there are potential errors that can occur up to here that have not been intercepted with `try`", reason=impl.needs_failure_mode, raason_message="due to")
         #return [TRUE_TYPE if impl.needs_failure_mode else FALSE_TYPE]
-    if callee==FOR_COUNTER_TYPE:
+    if callee is FOR_COUNTER_TYPE:
         if not impl.for_counter: error_token.error("type", "you are not within a 'for' loop and so this cannot be called")
         return [impl.vars[impl.for_counter[-1]]]
-        
-
-    if callee==CAUGHT_TYPE:
+    if callee is CAUGHT_TYPE:
         tmp = create_temp()
         var = Variable(tmp, CAUGHT_TYPE, token=error_token)
         impl.vars[tmp] = var
@@ -2540,6 +2553,16 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         ])
         return [var]
 
+    if callee is NODEPENDENCY_TYPE:
+        impl.min_abstraction_level = 0
+        impl.count_checkable_copies = 0
+        return []
+
+    if callee is VERIFY_NODEPENDENCY_TYPE:
+        if impl.count_checkable_copies:
+            error_token.error("safety", "there are coupled dependencies")
+        return []
+
     unstable_vars = vars
     vars = impl.stabilize(vars)
                
@@ -2552,7 +2575,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             impl._pointer_types[var.name] = other_pointer_type
 
         # invalidate everything assigned to the same mutable pointer if the function actually requires it as mutable and the function
-        # creates invalidations
+        # creates invalidationsimpl
         if (not callee.vars[callee.args[varpos]].immutable) and POINTER_TYPE in callee.invalidate_types_when_called:
             for val in impl.vars.values():
                 v = val.stabilized_name()
@@ -2711,24 +2734,28 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     impl.implementation.append(CODEWORD_SEMICOLON)
 
     # we are now coming to the point where we bundle variables together
-    # so that we are forced to be returned together
-    all_rets = [impl.vars[tmp+"__"+ret[prefix_length:]] for ret in callee.rets]
-    all_args = vars+all_rets
-    callee_all_args = callee.args+callee.rets
-    for a, ac in zip(all_args, callee_all_args):
-        if a.type!=POINTER_TYPE: continue
-        if callee.vars[ac].immutable and ac in callee.args and ac not in callee.rets: continue
-        for r, rc in zip(all_args, callee_all_args):
-            if r.type!=POINTER_TYPE: continue
-            if callee.vars[rc].immutable and rc in callee.args and rc not in callee.rets: continue
-            # t1 = impl.get_pointer_type(a)
-            # t2 = impl.get_pointer_type(r)
-            # if t1 is None or t2 is None or t1==ANY_TYPE or t2==ANY_TYPE or t1==t2 or t1 is POINTER_TYPE or t2 is POINTER_TYPE:
-            if a.name not in impl.vars: error_token.error("type", "cannot find returned variable "+pretty_name(a.name))
-            #if callee.vars[ac] in callee.get_required_accompany(callee.vars[rc]):
-            for accompany in impl.get_required_accompany(a):
-                impl.add_required_accompany(r, accompany)
-            impl.add_required_accompany(r, a)
+    # so that they are forced to be returned together
+    if callee.count_checkable_copies:
+        all_rets = [impl.vars[tmp+"__"+ret[prefix_length:]] for ret in callee.rets]
+        all_args = vars+all_rets
+        callee_all_args = callee.args+callee.rets
+        for a, ac in zip(all_args, callee_all_args):
+            if a.type!=POINTER_TYPE: continue
+            if callee.vars[ac].immutable and ac in callee.args and ac not in callee.rets: continue
+            for r, rc in zip(all_args, callee_all_args):
+                if r.type!=POINTER_TYPE: continue
+                if callee.vars[rc].immutable and rc in callee.args and rc not in callee.rets: continue
+                #if callee.vars[rc].immutable and callee.vars[ac].immutable: continue # don't tangle two immutables
+                # t1 = impl.get_pointer_type(a)
+                # t2 = impl.get_pointer_type(r)
+                # if t1 is None or t2 is None or t1==ANY_TYPE or t2==ANY_TYPE or t1==t2 or t1 is POINTER_TYPE or t2 is POINTER_TYPE:
+                if a.name not in impl.vars: error_token.error("type", "cannot find returned variable "+pretty_name(a.name))
+                #if callee.vars[ac] in callee.get_required_accompany(callee.vars[rc]):
+                for accompany in impl.get_required_accompany(a):
+                    impl.add_required_accompany(r, accompany)
+                impl.add_required_accompany(r, a)
+
+                #print(impl.signature(), callee.signature())
 
     for var in add_to_invalidators:
         if not val.immutable:
@@ -3218,7 +3245,6 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         if name in operators: tokens[pos].error("syntax", "the previous expression has ended")
         type: UnionType|None = file.types.get(name, None)
         if type is None:
-            #raise("unknown type '"+name+"'")
             for tokpos, tok in enumerate(tokens):
                 if tok.text=="def" and peek_text(tokens, tokpos+1)==name:
                     if peek_text(tokens, tokpos+2)=="=": tokens[pos].error("type", "type union is declared later per 'def "+name+"'")
@@ -3247,8 +3273,6 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                     varname = name
                     var = impl.vars.get(varname, None)
                     if var is not None:
-                        # if var.type.is_functor_of:
-                        #     tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local functor variable with the same name exists; use 'compiler:call' to call that variable as if it were a type '"+signature_like([var], impl)+"'")
                         if var.type.is_functor_of:
                             ret = UnionType(var.type.is_functor_of.name, at=var.type.is_functor_of.at)
                             ret.variations.append(var.type.is_functor_of)
@@ -3257,8 +3281,6 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                             ret = UnionType(var.type.name, at=var.type.at)
                             ret.variations.append(var.type)
                             return pos+1, ret
-                        # if peek_text(tokens, pos+1)[0] in symbols:
-                        #     tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local variable with the same name exists '"+signature_like([var] if var else obj, impl)+"'", suggestions=["enclose an expression within another parenthesis pair"])
                         tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural variable with the same name exists '"+signature_like([var] if var else obj, impl)+"'")
                     varname = name+"__"
                     vars = [r for r in impl.vars.values() if r.name.startswith(varname)]
@@ -3267,16 +3289,21 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                         ret.variations.append(vars[0].type)
                         return pos+1, ret
                     if vars: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural or nominal variable with the same name exists '"+signature_like(vars, impl)+"'")
-                tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\"::"+k for k in file.namespaces])
+                suggestions = [candidate.signature() for candidate in candidates]+[("\""+file.path+"\"::" if not file.is_main_file else "")+k+" (namespace)" for k in file.namespaces]
+                if impl is not None:
+                    varsuggestions = {name+var[len(name):].split("__")[0]+" (variable)" for var in impl.vars if var.startswith(name)}
+                    if name in varsuggestions:
+                        tokens[pos].error("type", "cannot use variable as type: '"+pretty_name(name)+"'")
+                    suggestions = list(varsuggestions)+suggestions
+                tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=suggestions)
             
             namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
-            if namespace is None: tokens[pos].error("import", "unknown namespace or type '"+name+"'", suggestions=["\""+file.path+"\"::"+k for k in file.namespaces])
+            if namespace is None: tokens[pos].error("import", "unknown namespace or type '"+name+"'", suggestions=[("\""+file.path+"\"::" if not file.is_main_file else "") +k+" (namespace)" for k in file.namespaces])
             assert namespace is not None
             if peek_text(tokens, pos+3)=="::":
                 return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)
             return pos+1, namespace
             
-            #tokens[pos].error("type", "unknown type '\""+file.path+"\"::"+pretty_name(name)+"'", suggestions=[candidate.signature() for candidate in candidates]+["\""+file.path+"\"::"+k for k in file.namespaces])
         assert type is not None
         if peek_text(tokens, pos+1)=="[":
             at_pos = get(tokens, pos+1)
@@ -5100,9 +5127,10 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     field_candidates = list()
                     max_candidate_common_length = common_length
                 if common_length==max_candidate_common_length: 
+                    varname = current+varname[len(current):].split("__")[0]
                     varname = pretty_name(varname)
-                    field_candidates.append(varname)
-            current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=[candidate for candidate in field_candidates]) 
+                    field_candidates.append(varname+" (field)")
+            current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=field_candidates) 
         start_call = get(tokens,pos)
         is_type_resolution = start_call.text=="type"
         if is_type_resolution:
@@ -5223,6 +5251,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             continue
         if name.text=="{":
             impl.min_abstraction_level = 0
+            impl.count_checkable_copies = 1
             depth = 1
             while pos<len(tokens):
                 tok = tokens[pos]
@@ -5840,6 +5869,9 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
     start_token = get(tokens, pos)
     name_token = get(tokens, pos+1)
     pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr, effect_names = await _gather_def(file, tokens, pos, fast_return_exception, is_local)
+    for abstract_arg_name, abstract_arg_type in zip(abstract_arg_names, abstract_arg_types):
+        if not abstract_arg_type:
+            start_token.error("type", "argument '"+pretty_name(abstract_arg_name)+"' could not be resolved to a type")
     starting_pos = pos
     greatest_pos = None
     candidates: list[ImplementedType] = list()
@@ -5940,7 +5972,12 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
                         spawned_error_codes = callee.gather_spawned_error_codes(set())
-                        printid("Level of abstraction:\n\n"+str(callee.min_abstraction_level)+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
+                        printid("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
+                        # if(not impl.count_checkable_copies) and any(impl.vars[v].type==POINTER_TYPE for v in impl.rets+impl.args):
+                        #     pass
+                        #     #printid("When this function is called, it does not create a memory dependecy.\n")
+                        # else:
+                        #     printid("When this function is called, it creates at least one memory dependecy.\n")
                         if len(spawned_error_codes):
                             if callee.needs_failure_mode: printid("Potential errors:\n")
                             else: printid("No failing errors, but can catch these intercepted ones:\n")
@@ -5951,8 +5988,13 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         if singletons: printid("\nThe following singletons are initialized:")
                         for singleton in singletons: printid("```rust\n"+singleton.signature()+"\n```")
                         if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*")
+                #if impl.has_returned_once and impl.has_been_completed is None:
+                if impl.has_been_completed is None:
+                    impl.nesting.clear()
+                    impl.returns([impl.vars[var] for var in impl.rets], start_token, is_safe=True)
             except FastReturnException: 
                 assert fast_return_exception
+                #start_token.error("safety", "missing uncoditional return")
             #if not impl.force_not_inline and fast_return_exception: continue # register only forcefully RECURSIVE variations
             #make a union type to store the implementation if one does not already exist
             if found_type is None:
@@ -5972,7 +6014,8 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
             else: found_type.variations.append(impl)
             greatest_pos = pos
         except CompfailException: pass
-    if name not in file.types or greatest_pos is None: start_token.error("safety", "no valid variations of '"+name+"'"+(" given that alternatives bearing the same name and arguments already exist " if candidates else ""), suggestions=[candidate.signature()+(" defined in "+candidate.at.file.path if candidate.at else " from compiler definitions") for candidate in candidates])
+    if name not in file.types or greatest_pos is None:
+        start_token.error("safety", "no valid variations of '"+name+"'"+(" given that alternatives bearing the same name and arguments already exist " if candidates else ""), suggestions=[candidate.signature()+(" defined in "+candidate.at.file.path if candidate.at else " from compiler definitions") for candidate in candidates])
     if greatest_pos is not None:
         pos = greatest_pos
     return pos  # all parsing should end at the same position
@@ -6521,6 +6564,19 @@ VARNAME_TYPE.doc.append("tuple to cstr literal")
 VARNAME_TYPE.doc.append("Converts a tuple to a cstr literal capturing the name of local variables,")
 VARNAME_TYPE.doc.append("for example so that macros can consume the result.")
 
+
+NODEPENDENCY_TYPE = ImplementedType("unsafe_declare_deep_copy_only", at=compiler_token)
+NODEPENDENCY_TYPE.doc.append("declare that this function has no memory dependencies")
+NODEPENDENCY_TYPE.doc.append("This can be placed anywhere within a function to state")
+NODEPENDENCY_TYPE.doc.append("that it does not couple memory but only copies or ignores")
+NODEPENDENCY_TYPE.doc.append("memory regions. This allows the compiler to not create")
+NODEPENDENCY_TYPE.doc.append("return errors about needing the simultaneous returned of")
+NODEPENDENCY_TYPE.doc.append("coupled memory regions. Note that this completely invalidates")
+NODEPENDENCY_TYPE.doc.append("any notion of memory safety on the called function and it is")
+NODEPENDENCY_TYPE.doc.append("wrong, for example, to create copy-ers of")
+NODEPENDENCY_TYPE.doc.append("arbitrary buffers with pointer contents and expect them")
+NODEPENDENCY_TYPE.doc.append("to properly transfer defers. This MUST refer to deep copies only.")
+
 ARGUMENTS_TYPE = ImplementedType("args", at=compiler_token)
 ARGUMENTS_TYPE.doc.append("the function's argument tuple")
 
@@ -6555,6 +6611,9 @@ ASSERT_SAME_TYPE.doc.append("This reinstates compiler awareness between two memo
 ASSERT_SAME_TYPE.doc.append("")
 ASSERT_SAME_TYPE.doc.append("This is also safe, as the error occurs after the assignment; given that deferred resource releases can only be created by this function -and not passed as arguments- we end up properly releasing everything on failure.")
 
+VERIFY_NODEPENDENCY_TYPE = ImplementedType("verify_no_attachment", at=compiler_token)
+VERIFY_NODEPENDENCY_TYPE.doc.append("check that no memory is attached to another memory up to this call in this function")
+
 fixed_namespace.types["skip"] = UnionType("skip", at=compiler_token).append(FAIL_TYPE)
 fixed_namespace.types["true"] = UnionType("true", at=compiler_token).append(TRUE_TYPE)
 fixed_namespace.types["false"] = UnionType("false", at=compiler_token).append(FALSE_TYPE)
@@ -6572,6 +6631,7 @@ fixed_namespace.types["unsafe_copy"] = UnionType("unsafe_copy", at=compiler_toke
 fixed_namespace.types["unsafe_deref"] = UnionType("unsafe_deref", at=compiler_token).append(UNSAFE_DEREF_TYPE)
 fixed_namespace.types["args"] = UnionType("args", at=compiler_token).append(ARGUMENTS_TYPE)
 fixed_namespace.types["varname"] = UnionType("varname", at=compiler_token).append(VARNAME_TYPE)
+fixed_namespace.types["unsafe_declare_deep_copy_only"] = UnionType("unsafe_declare_deep_copy_only", at=compiler_token).append(NODEPENDENCY_TYPE)
 
 
 smol_namespace.namespaces["compiler"] = fixed_namespace
@@ -6582,6 +6642,7 @@ debug_namespace.types["nocatch"] = UnionType("nocatch", at=compiler_token).appen
 debug_namespace.types["print"] = UnionType("print", at=compiler_token).append(DEBUG_TYPE)
 debug_namespace.types["branchless"] = UnionType("branchless", at=compiler_token).append(SUCCESS_TYPE)
 debug_namespace.types["unsafe_singletons"] = UnionType("unsafe_singletons", at=compiler_token).append(UNSAFE_EFFECTS_TYPE)
+debug_namespace.types["verify_no_attachment"] = UnionType("verify_no_attachment", at=compiler_token).append(VERIFY_NODEPENDENCY_TYPE)
 smol_namespace.namespaces["debug"] = debug_namespace
 
 file_cache["builtins"] = smol_namespace
@@ -6726,7 +6787,12 @@ async def main():
                     if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                     docs_file.write("\n```rust\n"+callee.signature()+"\n```\n")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
                     spawned_error_codes = callee.gather_spawned_error_codes(set())
-                    docs_file.write("Level of abstraction:\n\n"+str(callee.min_abstraction_level)+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n\n")
+                    docs_file.write("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n\n")
+                    # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):                   
+                    #     pass
+                    #     #docs_file.write("When this function is called, it does not create a memory dependecy.\n\n")
+                    # else:
+                    #     docs_file.write("When this function is called, it creates at least one memory dependecy.\n\n")
                     if len(spawned_error_codes): 
                         if callee.needs_failure_mode: docs_file.write("Potential errors:\n\n")
                         else: docs_file.write("No failing errors, but can catch these intercepted ones:\n\n")

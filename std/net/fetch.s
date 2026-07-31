@@ -19,7 +19,7 @@ def HttpOptions(HttpMethod method, cstr|blank body, cstr|blank content_type)
         content_type = cstr()
     return class(method, body, content_type)
 
-def request(effect edit new|arena<char::name>|circular<char::name> CHARS, str|cstr _url, HttpOptions opts)
+def request(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr _url, HttpOptions opts)
     {"-lcurl"}
     {builtins::compiler::ptr curl = curl_easy_init();}
     if not exists curl fail "curl initialization failed"
@@ -29,13 +29,13 @@ def request(effect edit new|arena<char::name>|circular<char::name> CHARS, str|cs
         pos = 0
         defer
             if exists buf.unsafe_ptr buf.unsafe_ptr.unsafe::free()
-    if CHARS is arena<char::name>
+    if CHARS is arena<char::tag>
         buf = CHARS.buf
         pos = CHARS.pos
-    if CHARS is circular<char::name>
+    if CHARS is circular<char::tag>
         buf = CHARS.buf
         pos = 0
-    if CHARS is arena<char::name>|circular<char::name>
+    if CHARS is arena<char::tag>|circular<char::tag>
         if buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
         if buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
     {
@@ -69,11 +69,11 @@ def request(effect edit new|arena<char::name>|circular<char::name> CHARS, str|cs
     {buf__unsafe_ptr = __buf.data;}
     return response(status, str(buf, pos to buf.unsafe_size))
 
-def get(effect edit new|arena<char::name>|circular<char::name> CHARS, str|cstr url)
+def get(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr url)
     doc "a get request"
     return url.request HttpOptions HttpMethod type "GET"
 
-def post(effect edit new|arena<char::name>|circular<char::name> CHARS, str|cstr url, str|cstr _body, cstr|blank content_type)
+def post(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr url, str|cstr _body, cstr|blank content_type)
     doc "a post request"
     if content_type is blank
         doc "The default application/json content type is used."

@@ -7,5 +7,5 @@ local import "std/core.s"
 def get(edit dir::open data, nat) 
     return dir::entry data
 
-def get(effect edit arena<char::name>|circular<char::name> CHARS, edit file::File|process::open f, nat)
+def get(effect edit arena<char::tag>|circular<char::tag> CHARS, edit file::File|process::open f, nat)
     return file::line|process::line(CHARS, f)

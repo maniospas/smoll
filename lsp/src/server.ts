@@ -6,6 +6,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { platform } from 'os';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
+import { randomBytes } from 'crypto';
 
 const LOGGING = true;
 function log(msg: string) { if (LOGGING) connection.console.log(`[smoll] ${msg}`); }
@@ -61,7 +62,8 @@ function notifyCacheReady(filePath: string) {
 
 async function writeTempFile(content: string, realPath: string): Promise<string> {
   const ext = realPath.slice(realPath.lastIndexOf('.'));
-  const tmp = join(tmpdir(), `smoll-lsp-${process.pid}-${Date.now()}${ext}`);
+  const unique = `${Date.now()}-${randomBytes(4).toString('hex')}`;
+  const tmp = join(tmpdir(), `smoll-lsp-${process.pid}-${unique}${ext}`);
   await writeFile(tmp, content, 'utf8');
   return tmp;
 }
@@ -139,8 +141,6 @@ function parseCompilerOutput(stdout: string): CompilerToken[] {
 let compilerProc: ChildProcessWithoutNullStreams | null = null;
 let pendingResolve: ((stdout: string) => void) | null = null;
 let outputBuffer = '';
-const requestQueue: { tmpPath: string; isFirst: boolean; resolve: (s: string) => void }[] = [];
-let busy = false;
 
 const END_MARKER = '===END===';
 
@@ -171,23 +171,32 @@ function ensureCompilerRunning(firstTmpPath: string) {
     dequeueNext();
   });
 }
+const requestQueue: { tmpPath: string; uri: string; resolve: (s: string | null) => void }[] = [];
+let busy = false;
 
 function dequeueNext() {
   if (busy || requestQueue.length === 0) return;
   const next = requestQueue.shift()!;
+  if (focusedUri !== null && next.uri !== focusedUri) {
+    log(`queue: skipping ${next.tmpPath} at dispatch, ${next.uri} not focused`);
+    next.resolve(null);
+    dequeueNext();
+    return;
+  }
   busy = true;
   pendingResolve = (stdout: string) => { busy = false; next.resolve(stdout); };
-  if (!next.isFirst) compilerProc!.stdin.write(next.tmpPath + '\n');
+  const isFirst = !compilerProc;
+  ensureCompilerRunning(next.tmpPath);
+  if (!isFirst) compilerProc!.stdin.write(next.tmpPath + '\n');
 }
 
-function runCompiler(tmpPath: string): Promise<CompilerToken[]> {
-  const isFirst = !compilerProc;
-  ensureCompilerRunning(tmpPath);
+function runCompiler(tmpPath: string, uri: string): Promise<CompilerToken[] | null> {
   return new Promise((resolve) => {
     requestQueue.push({
       tmpPath,
-      isFirst,
-      resolve: (stdout: string) => {
+      uri,
+      resolve: (stdout: string | null) => {
+        if (stdout === null) { resolve(null); return; }
         try { resolve(parseCompilerOutput(stdout)); }
         catch { resolve([]); }
       },
@@ -212,7 +221,11 @@ function scheduleAnalysis(uri: string, filePath: string) {
     log(`debounce: fired for ${filePath} (gen ${gen})`);
     const tmpPath = await writeTempFile(content, filePath);
     try {
-      const raw    = await runCompiler(tmpPath);
+      const raw = await runCompiler(tmpPath, uri);
+      if (!raw) {
+        log(`debounce: skipped, ${filePath} not focused at dispatch`);
+        return;
+      }
       const tokens = remapTokenPaths(raw, tmpPath, filePath);
       if (generations.get(filePath) !== gen) {
         log(`debounce: stale result discarded (gen ${gen} vs ${generations.get(filePath)})`);
@@ -335,6 +348,11 @@ connection.onDefinition((params: DefinitionParams): Location[] => {
   return unique;
 });
 
+const KEYWORDS = [
+  'if', 'while', 'for', 'in', 'is', 'def', 'include', 'local', 'edit',
+  'mut', 'unsafe_mut', 'class', 'singleton', 'const', 'return', 'unsafe_return'
+];
+
 connection.onCompletion(async (params): Promise<CompletionItem[]> => {
   const uri      = params.textDocument.uri;
   const filePath = fileURLToPath(uri);
@@ -348,9 +366,26 @@ connection.onCompletion(async (params): Promise<CompletionItem[]> => {
     cursor.character <=  t.col + t.length
   );
   const items: CompletionItem[] = [];
-  for (const t of hits) items.push(...extractCodeBlockLineStarts(t.message));
+  for (const t of hits) items.push(...extractCodeBlockLineStarts(resolveMessage(t.message)));
   const seen = new Set<string>();
-  return items.filter(i => seen.has(i.label) ? false : (seen.add(i.label), true));
+  const deduped = items.filter(i => seen.has(i.label) ? false : (seen.add(i.label), true));
+
+  const doc = documents.get(uri);
+  const lineText = doc?.getText().split(/\r?\n/)[cursor.line] ?? '';
+  const prefix = lineText.slice(0, cursor.character).match(/[A-Za-z_][A-Za-z0-9_]*$/)?.[0] ?? '';
+
+  const keywordItems: CompletionItem[] = KEYWORDS
+    .filter(k => k.startsWith(prefix))
+    .map(k => ({ label: k, kind: CompletionItemKind.Keyword }));
+
+  const kindOrder: Partial<Record<CompletionItemKind, number>> = {
+    [CompletionItemKind.Variable]: 0,
+    [CompletionItemKind.Function]: 1,
+    [CompletionItemKind.Module]: 2,
+  };
+  deduped.sort((a, b) => (kindOrder[a.kind!] ?? 99) - (kindOrder[b.kind!] ?? 99));
+
+  return [...keywordItems, ...deduped];
 });
 
 function extractCodeBlockLineStarts(message: string): CompletionItem[] {
@@ -363,9 +398,15 @@ function extractCodeBlockLineStarts(message: string): CompletionItem[] {
       continue;
     }
     if (inCodeBlock && line.trim().length > 0) {
+      const trimmed = line.trim();
+      let kind: CompletionItemKind = CompletionItemKind.Function;
+      if (trimmed.endsWith('(variable)')) 
+        kind = CompletionItemKind.Variable;
+      else if (trimmed.endsWith('(namespace)')) 
+        kind = CompletionItemKind.Module;
       items.push({
-        label: line.trim().split('(')[0].trim(),
-        kind: CompletionItemKind.Function,
+        label: trimmed.split('(')[0].trim(),
+        kind,
       });
     }
   }
@@ -391,6 +432,20 @@ documents.onDidClose(event => {
   cache.delete(filePath);
   generations.delete(filePath);
   connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
+});
+
+let focusedUri: string | null = null;
+connection.onNotification('smoll/focusChanged', (params: { uri: string | null }) => {
+  if (params.uri && !params.uri.startsWith('file://')) {
+    log(`event: focus gained on non-file uri, ignoring — ${params.uri}`);
+    return;
+  }
+  focusedUri = params.uri;
+  if (focusedUri) {
+    const filePath = fileURLToPath(focusedUri);
+    log(`event: focus gained — ${filePath}`);
+    scheduleAnalysis(focusedUri, filePath);
+  }
 });
 
 // ── Init ──────────────────────────────────────

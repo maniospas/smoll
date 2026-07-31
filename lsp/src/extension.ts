@@ -18,6 +18,17 @@ export function activate(context: ExtensionContext) {
     statusBar.tooltip = 'smoll language server is running';
     statusBar.show();
     context.subscriptions.push(statusBar);
+    window.onDidChangeActiveTextEditor(editor => {
+      if (editor?.document.languageId === 'smoll') {
+        client.sendNotification('smoll/focusChanged', { uri: editor.document.uri.toString() });
+      }
+    });
+
+    window.onDidChangeWindowState(state => {
+      if (state.focused && window.activeTextEditor?.document.languageId === 'smoll') {
+        client.sendNotification('smoll/focusChanged', { uri: window.activeTextEditor.document.uri.toString() });
+      }
+    });
   }).catch((err) => {
     window.showErrorMessage(`smoll language server failed to start: ${err}`);
   });

@@ -1,4 +1,6 @@
-<h1 class="smoll-name">sm<img src="docs/smoll.png" style="width:1.5rem"></img><span>λ</span></h1>
+<h1 class="smoll-name">smo<span>λ</span></h1>
+
+<img src="docs/smol.png", style="width:50%"></img>
 
 This is a small compiled language that you can pick up in
 an afternoon to make fast programs that are safe to run.

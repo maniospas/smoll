@@ -1,4 +1,4 @@
-<h1>Install sm<img style="width:1.5rem" src="smoll.png"></img>λ</h1>
+<h1>Install smoλ</h1>
 
 The recommended way to use *smoλ* is through vscode, a popular and rather lightweight code editor.
 But the steps below apply to any setup:
@@ -101,6 +101,7 @@ repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as
 import "std/core.s"
 
 def main()
+    CLI = edit console() # console effects
     print "hello world!"
 ```
 

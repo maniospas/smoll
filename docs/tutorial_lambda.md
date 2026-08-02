@@ -1,4 +1,4 @@
-<h1>Lambda calculus sm<img style="width:1.5rem" src="smoll.png"></img>λ</h1>
+<h1>Lambda calculus smoλ</h1>
 
 <div class="toc" markdown="1">
 

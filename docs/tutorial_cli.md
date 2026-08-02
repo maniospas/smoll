@@ -1,5 +1,5 @@
 
-<h1>Command line apps with sm<img style="width:1.5rem" src="smoll.png"></img>λ</h1>
+<h1>Command line apps with smoλ</h1>
 
 <div class="toc" markdown="1">
 

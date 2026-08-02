@@ -1,6 +1,6 @@
 <h1 class="smoll-name">smo<span>λ</span></h1>
 
-<img src="docs/smol.png", style="width:50%"></img>
+![logo](docs/smol.png)
 
 This is a small compiled language that you can pick up in
 an afternoon to make fast programs that are safe to run.

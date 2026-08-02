@@ -1,8 +1,6 @@
 <h1 class="smoll-name">smo<span>λ</span></h1>
 
-![logo](docs/smol.png)
-
-This is a small compiled language that you can pick up in
+A small compiled language that you can pick up in
 an afternoon to make fast programs that are safe to run.
 Once in a while, some of its deeper features come in handy for fast yet safe code.
 
@@ -14,6 +12,9 @@ about how a program is lowered to source code, how types
 are resolved, and so on. In short: reading a program *sequentially*
 explains the program. Conversely, everything is safe until
 the compiler stops you from doing unsafe stuff.
+
+
+![logo](docs/smol.png)
 
 ## 🚀 Features
 

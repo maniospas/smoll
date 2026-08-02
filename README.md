@@ -14,8 +14,6 @@ explains the program. Conversely, everything is safe until
 the compiler stops you from doing unsafe stuff.
 
 
-![logo](docs/smol.png)
-
 ## 🚀 Features
 
 - Function returns as type declarations
@@ -25,6 +23,8 @@ the compiler stops you from doing unsafe stuff.
 - Immutability by default (can still easily define mutables)
 - Can opt in to constness for memory contents
 - C integration
+
+![logo](docs/smol.png)
 
 ## 🔗 Material
 

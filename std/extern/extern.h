@@ -17,7 +17,12 @@ int __smo_ansi_supported() {
     mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     return SetConsoleMode(hOut, mode) != 0;
 #else
-    if (!isatty(STDOUT_FILENO)) return 0;
+#ifdef __EMSCRIPTEN__
+    return 0;
+#else
+    if (!isatty(STDOUT_FILENO))
+        return 0;
+#endif
     const char *term = getenv("TERM");
     if (!term || strcmp(term, "dumb") == 0) return 0;
     return 1;
@@ -31,9 +36,18 @@ static void __t_handle_sigint(int sig) {
     (void)sig;
     __t_interrupted = 1;
 }
+
+#ifdef __EMSCRIPTEN__
+#define DECLARE_HANDLERS struct sigaction __t_sa = { .sa_handler = __t_handle_sigint };\
+    sigemptyset(&__t_sa.sa_mask);\
+    __t_sa.sa_flags = 0;\
+    sigaction(SIGINT, &__t_sa, NULL);\
+    __smo_fs_initialize((int *)&__smo_fs_ready);\
+    while (!__smo_fs_initialized()) emscripten_sleep(0);
+
+#else
 #define DECLARE_HANDLERS struct sigaction __t_sa = { .sa_handler = __t_handle_sigint };\
     sigemptyset(&__t_sa.sa_mask);\
     __t_sa.sa_flags = 0;\
     sigaction(SIGINT, &__t_sa, NULL);
-
-    
+#endif

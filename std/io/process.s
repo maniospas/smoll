@@ -19,6 +19,8 @@ def args()
 def breakpoint(effect edit console CLI)
     VM "[False]" # not implemented interrupts yet for the VM
     doc "checks for SIGINT"
+    if compiler::back type "emcc"
+        { emscripten_sleep(0); }
     {builtins::bool has_failed = __t_interrupted;}
     if not has_failed return ()
     color = colors CLI

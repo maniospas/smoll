@@ -33,14 +33,14 @@ def draw(effect edit window WINDOW, circle self)
     teal   = color(0,   200, 180)
     shadow = color(0,   200, 180, 60)
     pos = (self.cx, self.cy)
-    circ(self.cx + 4.0, self.cy + 4.0, self.radius, shadow)
-    circ(pos, self.radius, teal)
-    circ_line(pos, nat self.radius, 2, white)
+    rect(self.cx + 4.0, self.cy + 4.0, self.radius, self.radius solid shadow)
+    rect(pos, self.radius, self.radius solid teal)
+    rect(pos, self.radius, self.radius line 2, white)
 
 def main()
-    WINDOW = edit window(800.0, 600.0, "Moving circle", "std/ArianaVioleta-dz2K.ttf")
+    WINDOW = edit window(800.0, 600.0, "Moving rects", "std/ArianaVioleta-dz2K.ttf")
 
-    N = 10
+    N = 1000
     circles = edit circle[].alloc N
     for create_circle& in circles
         i = float compiler::for_counter() # builtin way of enumerating

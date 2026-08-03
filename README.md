@@ -33,7 +33,7 @@ the compiler stops you from doing unsafe stuff.
 [Learn](https://maniospas.github.io/smoll/reference.html)<br>
 [Playground](https://maniospas.github.io/smoll/playground.html)
 
-*Use the smoll lsp, or Python keyword and comment highlighting works pretty well.*
+*Recommended to use vscode with the smoll extension found in the installation guide. Otherwise, Python keyword highlighting works pretty well.*
 
 ## ⚡ Quickstart
 

@@ -2356,6 +2356,21 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             global_var2cstr[variable.name] = current
         return [variable]
     
+    if BACKEND_TYPE in method.variations:
+        if len(vars)!=1 or vars[0].type.is_literal_of is None:
+            error_token.error("type", "only a literal type can be obtained here but got '"+signature_like(vars, impl)+"'")
+        variable = Variable(create_temp(), TRUE_TYPE if vars[0].type.at.text=="\""+chosen_compiler+"\"" else FALSE_TYPE)
+        impl.vars[variable.name] = variable
+        return [variable]
+
+
+    if OS_TYPE in method.variations:
+        if len(vars)!=1 or vars[0].type.is_literal_of is None:
+            error_token.error("type", "only a literal type can be obtained here but got '"+signature_like(vars, impl)+"'")
+        variable = Variable(create_temp(), TRUE_TYPE if vars[0].type.at.text=="\""+os.name+"\"" else FALSE_TYPE)
+        impl.vars[variable.name] = variable
+        return [variable]
+    
     if UNSAFE_DEREF_TYPE in method.variations:
         if len(vars)!=6 or vars[1].type.is_buffer_of is None or vars[0].type!=POINTER_TYPE:
             error_token.error("type", "only a pointer followed by a buffer type indicating the data can be unsafely deferred, but got '"+signature_like(vars, impl)+"'")
@@ -3412,7 +3427,7 @@ def create_functor(input_type: UnionType, output_type: UnionType, token: Token):
             canonical_signature = variation.signature()
             functor_variation = cached_factors_for_comparison.get(canonical_signature)
             if functor_variation is None:
-                functor_variation = ImplementedType(variation.signature(), "__smoll_func_ptr_type", memory_size=8, at=token)
+                functor_variation = ImplementedType(variation.signature(), "__smoll_func_ptr_type", memory_size=4 if ADDRESS_SCHEMA_32BIT else 8, at=token)
                 functor_variation.is_functor_of = variation
                 cached_factors_for_comparison[canonical_signature] = functor_variation
             type.variations.append(functor_variation)
@@ -6422,13 +6437,45 @@ def check_unloads():
         if current_mtime != load_mtimes[path]:
             unload(path)
 
-POINTER_TYPE = ImplementedType("ptr", "char*", memory_size=8)
+
+
+# ---- MAIN
+parser = argparse.ArgumentParser(description="Compile a .s file and optionally run the result.")
+parser.add_argument("source", metavar="SOURCE", help="Path to the .s source file to compile.",)
+parser.add_argument("--lsp", action="store_true", help="No compilation, and output is meant for the lsp to read.",)
+parser.add_argument("--build", action="store_true", help="Build without running.",)
+parser.add_argument("--time", action="store_true", help="Report the time of ending file parses.",)
+parser.add_argument("--docs", action="store_true", help="Export to a markdown file.",)
+parser.add_argument("--cleanup", action="store_true", help="Clean up generated .C files and executables.",)
+parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
+parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang, none (the last option only creates a C file).",)
+parser.add_argument("--vmkb", action="store", type=int, default=256, help="VM memory in kilobytes.",)
+parser.add_argument("--vmrec", action="store", type=int, default=16, help="VM recursion budget.",)
+args, extra_args = parser.parse_known_args()
+debug_mode = args.debug
+cleanup_mode = args.cleanup
+docs_mode = args.docs
+chosen_compiler = args.back or "auto"
+is_time = args.time
+is_lsp = args.lsp
+is_pyodide = sys.platform == "emscripten"
+vm_memory_kb = args.vmkb
+vm_recursion_budget = args.vmrec
+if chosen_compiler == "auto":
+    if is_pyodide: chosen_compiler = "vm"
+    else: chosen_compiler = "gcc"
+
+ADDRESS_SCHEMA_32BIT = chosen_compiler=="emcc"
+
+
+
+POINTER_TYPE = ImplementedType("ptr", "char*", memory_size=4 if ADDRESS_SCHEMA_32BIT else 8)
 POINTER_TYPE.vars[POINTER_TYPE.rets[0]].immutable = False
 
 smol_namespace = File("builtins")
 builtin_token = Token("builtins", smol_namespace, 1, 1)
 #UNKNOWN_SOURCE_VARIABLE = Variable("const __t_source_unknown", POINTER_TYPE)
-CSTR_TYPE = ImplementedType("cstr", "const char*", memory_size=8, at=builtin_token)
+CSTR_TYPE = ImplementedType("cstr", "const char*", memory_size=4 if ADDRESS_SCHEMA_32BIT else 8, at=builtin_token)
 CSTR_TYPE.doc.append("constant string")
 BOOL_TYPE = ImplementedType("bool", "char", memory_size=1, at=builtin_token)
 BOOL_TYPE.doc.append("boolean value")
@@ -6580,6 +6627,16 @@ NODEPENDENCY_TYPE.doc.append("to properly transfer defers. This MUST refer to de
 ARGUMENTS_TYPE = ImplementedType("args", at=compiler_token)
 ARGUMENTS_TYPE.doc.append("the function's argument tuple")
 
+BACKEND_TYPE = ImplementedType("back", at=compiler_token)
+BACKEND_TYPE.doc.append("checks the target backend")
+BACKEND_TYPE.doc.append("Returns a compile-time boolean 'compiler::true' or 'compiler::false' indicating")
+BACKEND_TYPE.doc.append("a backend match given a string literal type.")
+
+OS_TYPE = ImplementedType("os", at=compiler_token)
+OS_TYPE.doc.append("checks the target operatin gsystem")
+OS_TYPE.doc.append("Returns a compile-time boolean 'compiler::true' or 'compiler::false' indicating")
+OS_TYPE.doc.append("an operating system match given a string literal type.")
+
 ASSERT_SAME_TYPE = ImplementedType("assert_eq", at=compiler_token)
 ASSERT_SAME_TYPE.vars["to"] = Variable("to", POINTER_TYPE)
 ASSERT_SAME_TYPE.vars["from"] = Variable("from", POINTER_TYPE)
@@ -6632,7 +6689,8 @@ fixed_namespace.types["unsafe_deref"] = UnionType("unsafe_deref", at=compiler_to
 fixed_namespace.types["args"] = UnionType("args", at=compiler_token).append(ARGUMENTS_TYPE)
 fixed_namespace.types["varname"] = UnionType("varname", at=compiler_token).append(VARNAME_TYPE)
 fixed_namespace.types["unsafe_declare_deep_copy_only"] = UnionType("unsafe_declare_deep_copy_only", at=compiler_token).append(NODEPENDENCY_TYPE)
-
+fixed_namespace.types["os"] = UnionType("os", at=compiler_token).append(OS_TYPE)
+fixed_namespace.types["back"] = UnionType("back", at=compiler_token).append(BACKEND_TYPE)
 
 smol_namespace.namespaces["compiler"] = fixed_namespace
 
@@ -6712,7 +6770,8 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     if chosen_compiler=="none": return
     gcc_cmd = {
         "gcc": [ "gcc", "-O3", str(src_path), "-o", str(exe_path), "-I."]+linker,
-        "antcc": [ "./antcc", "-O2", str(src_path), "-o", str(exe_path), "-I."]+linker
+        "antcc": [ "./antcc", "-O2", str(src_path), "-o", str(exe_path), "-I."]+linker,
+        "emcc": [ "emcc", "-O3", str(src_path), "-o", str(exe_path)+".js", "-I."]+linker
     }.get(chosen_compiler, None)
     if gcc_cmd is None:
         print("[✗] "+chosen_compiler+" not found")
@@ -6723,32 +6782,38 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         print("[✗] "+chosen_compiler+" failed:")
         print(result.stderr)
         errexit()
+    if chosen_compiler=="emcc":
+        generated_html = """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>raylib</title>
+    <style>
+        body {
+            margin: 0;
+            background: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas { border: 1px solid #555;}
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        var Module = { canvas: document.getElementById("canvas") };
+    </script>
+""" + f"""
+    <script src="{str(exe_path.name)+'.js'}"></script>
+</body>
+</html>
+"""
+        with open(str(exe_path)+".html", "w") as f:
+            f.write(generated_html)
 
-# ---- MAIN
-parser = argparse.ArgumentParser(description="Compile a .s file and optionally run the result.")
-parser.add_argument("source", metavar="SOURCE", help="Path to the .s source file to compile.",)
-parser.add_argument("--lsp", action="store_true", help="No compilation, and output is meant for the lsp to read.",)
-parser.add_argument("--build", action="store_true", help="Build without running.",)
-parser.add_argument("--time", action="store_true", help="Report the time of ending file parses.",)
-parser.add_argument("--docs", action="store_true", help="Export to a markdown file.",)
-parser.add_argument("--cleanup", action="store_true", help="Clean up generated .C files and executables.",)
-parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
-parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang, none (the last option only creates a C file).",)
-parser.add_argument("--vmkb", action="store", type=int, default=256, help="VM memory in kilobytes.",)
-parser.add_argument("--vmrec", action="store", type=int, default=16, help="VM recursion budget.",)
-args, extra_args = parser.parse_known_args()
-debug_mode = args.debug
-cleanup_mode = args.cleanup
-docs_mode = args.docs
-chosen_compiler = args.back or "auto"
-is_time = args.time
-is_lsp = args.lsp
-is_pyodide = sys.platform == "emscripten"
-vm_memory_kb = args.vmkb
-vm_recursion_budget = args.vmrec
-if chosen_compiler == "auto":
-    if is_pyodide: chosen_compiler = "vm"
-    else: chosen_compiler = "gcc"
 
 def errexit():
     if is_pyodide: raise SystemExit(1)
@@ -6824,21 +6889,29 @@ async def main():
         else:
             write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0].monomorphic_name)
             if not args.build and chosen_compiler!="none":
-                extra_args_str = " ".join(extra_args)
-                if extra_args_str: extra_args_str = " "+extra_args_str
-                if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); errexit()
-                print(f"[{YELLOW}+{RESET}] run          ./{exe_path}{extra_args_str}")
-                try: 
-                    result = subprocess.run("./"+str(exe_path)+extra_args_str, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
-                    if cleanup_mode: 
-                        os.remove(str(exe_path)+".c")
-                        os.remove(str(exe_path))
-                    if result.returncode != 0: os._exit(result.returncode)
-                except KeyboardInterrupt: 
-                    if cleanup_mode: 
-                        os.remove(str(exe_path)+".c")
-                        os.remove(str(exe_path))
-                    os._exit(1)
+                if chosen_compiler=="emcc":
+                    from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+                    dirname = os.path.dirname(str(exe_path))
+                    if dirname: os.chdir(dirname)
+                    server = ThreadingHTTPServer(("localhost", 8000), SimpleHTTPRequestHandler)
+                    print(f"[{YELLOW}+{RESET}] serving at http://localhost:8000/{exe_path.name}.html (ctrl+C to stop the server)")
+                    server.serve_forever()
+                else:
+                    extra_args_str = " ".join(extra_args)
+                    if extra_args_str: extra_args_str = " "+extra_args_str
+                    if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); errexit()
+                    print(f"[{YELLOW}+{RESET}] run          ./{exe_path}{extra_args_str}")
+                    try: 
+                        result = subprocess.run("./"+str(exe_path)+extra_args_str, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+                        if cleanup_mode: 
+                            os.remove(str(exe_path)+".c")
+                            os.remove(str(exe_path))
+                        if result.returncode != 0: os._exit(result.returncode)
+                    except KeyboardInterrupt: 
+                        if cleanup_mode: 
+                            os.remove(str(exe_path)+".c")
+                            os.remove(str(exe_path))
+                        os._exit(1)
             os._exit(0) # not in lsp or pyodide case, as it inteferes with the stdout pipe
     else:
         while True:

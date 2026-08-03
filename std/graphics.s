@@ -27,12 +27,28 @@ local def unsafe_open_window(size size, cstr title, cstr font_path)
             __smolambda_codepoints[__smolambda_n++] = 0x2018;
             __smolambda_codepoints[__smolambda_n++] = 0x2019;
             for (int c = 0x2500; c <= 0x257F; c++) __smolambda_codepoints[__smolambda_n++] = c;
-            __smolambda_font = LoadFontEx(font_path, 128, __smolambda_codepoints, __smolambda_n);
+            __smolambda_font = __smo_load_font(font_path, 128, __smolambda_codepoints, __smolambda_n);
         }
 
 def window(size size, cstr title, cstr font_path)
-    {"-lraylib"}
-    {"-lGL"}
+    # HOW TO INSTALL RAYLIB FOR UBUNTU
+    # sudo apt install libraylib-dev
+    # HOW TO INSTALL RAYLIB FOR EMSCRIPTEN (--back emcc)
+    # sudo apt install emscripten
+    # git clone https://github.com/raysan5/raylib.git
+    # cd raylib
+    # emcmake cmake -S . -B build -DPLATFORM=Web -DBUILD_EXAMPLES=OFF 
+    # cmake --build build -j$(nproc)
+    if compiler::back type "emcc"
+        {"-I./raylib/src"}
+        {"-L./raylib/build/raylib"}
+        {"-lraylib"}
+        {"-sUSE_GLFW=3"}
+        {"-sASYNCIFY"}
+        {"-flto"}
+    else
+        {"-lraylib"}
+        {"-lGL"}
     openy = mut false
     unsafe_open_window(size, title, font_path)
     return singleton(size, title, openy)
@@ -49,6 +65,8 @@ local def unsafe_begin_drawing()
 local def unsafe_end_drawing()
     VM "pyray.end_drawing()"
     {EndDrawing();}
+    if compiler::back type "emcc"
+        { emscripten_sleep(0); }
     
 def draw(effect edit window WINDOW)
     if WINDOW.openy fail "alopeny drawing on window"
@@ -89,7 +107,7 @@ def text(effect edit window WINDOW, str txt, position pos, float size, color col
         ); 
     }
     
-def text_rotated(effect edit window WINDOW, str txt, position pos, position origin, float rotation, float size, color color)
+def text(effect edit window WINDOW, str txt, position pos, float size, color color, "rotate", position origin, float rotation)
     VM "pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTextPro(
@@ -103,6 +121,10 @@ def text_rotated(effect edit window WINDOW, str txt, position pos, position orig
             (Color){color__r, color__g, color__b, color__a}
         ); 
     }
+
+def sleep(nat milliseconds)
+    VM "time.sleep($seconds*0.001)"
+    { WaitTime((double)milliseconds/(double)1000.0); }
 
 local def TextureData(nat id, size size, nat mipmaps, nat format)
     return compiler::args()
@@ -127,7 +149,7 @@ def open(cstr path)
         {UnloadTexture((Texture2D){id, (int)width, (int)height, (int)mipmaps, (int)format});}
     return Texture(id, size(width, height), mipmaps, format)
 
-def draw(effect edit window WINDOW, Texture _tex, position pos, color color)
+def texture(effect edit window WINDOW, Texture _tex, position pos, color color)
     tex = TextureData _tex.data[0]
     { 
         DrawTexture(
@@ -137,7 +159,7 @@ def draw(effect edit window WINDOW, Texture _tex, position pos, color color)
         ); 
     }
 
-def draw(effect edit window WINDOW, Texture _tex, position pos, float rotation, float scale, color color)
+def texture(effect edit window WINDOW, Texture _tex, position pos, float scale, color color, "rotate", float rotation)
     tex = TextureData _tex.data[0]
     { 
         DrawTextureEx(
@@ -149,7 +171,7 @@ def draw(effect edit window WINDOW, Texture _tex, position pos, float rotation, 
         ); 
     }
 
-def draw(effect edit window WINDOW, Texture _tex, position pos, float rotation, size size, color color)
+def texture(effect edit window WINDOW, Texture _tex, position pos, size size, color color, "rotate", float rotation)
     tex = TextureData _tex.data[0]
     scale_x = size.width/float tex.size.width
     scale_y = size.height/float tex.size.height
@@ -163,7 +185,33 @@ def draw(effect edit window WINDOW, Texture _tex, position pos, float rotation, 
         ); 
     }
 
-def circ(effect edit window WINDOW, position pos, float radius, color color)
+def texture(effect edit window WINDOW, Texture _tex, position pos, float scale, color color, "rotate", position origin, float rotation)
+    tex = TextureData _tex.data[0]
+    {
+        DrawTexturePro(
+            (Texture2D){tex__id, (int)tex__size__width, (int)tex__size__height, (int)tex__mipmaps, (int)tex__format},
+            (Rectangle){0, 0, (float)tex__size__width, (float)tex__size__height},
+            (Rectangle){(float)pos__x, (float)pos__y, (float)tex__size__width*scale, (float)tex__size__height*scale},
+            (Vector2){(float)origin__x, (float)origin__y},
+            (float)rotation,
+            (Color){color__r,color__g,color__b,color__a}
+        );
+    }
+
+def texture(effect edit window WINDOW, Texture _tex, position pos, size size, color color, "rotate", position origin, float rotation)
+    tex = TextureData _tex.data[0]
+    {
+        DrawTexturePro(
+            (Texture2D){tex__id, (int)tex__size__width, (int)tex__size__height, (int)tex__mipmaps, (int)tex__format},
+            (Rectangle){0, 0, (float)tex__size__width, (float)tex__size__height},
+            (Rectangle){(float)pos__x, (float)pos__y, (float)size__width, (float)size__height},
+            (Vector2){(float)origin__x, (float)origin__y},
+            (float)rotation,
+            (Color){color__r,color__g,color__b,color__a}
+        );
+    }
+
+def circ(effect edit window WINDOW, position pos, float radius, "solid", color color)
     VM "pyray.draw_circle_v(pyray.Vector2($pos__x,$pos__y),$radius,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawCircleV(
@@ -173,7 +221,7 @@ def circ(effect edit window WINDOW, position pos, float radius, color color)
         );
     }
 
-def ellipse(effect edit window WINDOW, position pos, position radius, color color)
+def ellipse(effect edit window WINDOW, position pos, position radius, "solid", color color)
     {
         DrawEllipseV(
             (Vector2){(float)pos__x, (float)pos__y}, 
@@ -183,7 +231,17 @@ def ellipse(effect edit window WINDOW, position pos, position radius, color colo
         );
     }
 
-def rect(effect edit window WINDOW, position pos, size size, color color)
+def ellipse(effect edit window WINDOW, position pos, position radius, "line", nat thickness, color color)
+    {
+        DrawEllipseLines(
+            (int)pos__x, (int)pos__y,
+            (float)radius__x,
+            (float)radius__y,
+            (Color){color__r,color__g,color__b,color__a}
+        );
+    }
+
+def rect(effect edit window WINDOW, position pos, size size, "solid", color color)
     VM "pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawRectangle(
@@ -193,11 +251,21 @@ def rect(effect edit window WINDOW, position pos, size size, color color)
         );
     }
 
-def rect_line(effect edit window WINDOW, position pos, size size, nat thickness, color color)
+def rect(effect edit window WINDOW, position pos, size size, "line", nat thickness, color color)
     VM "pyray.draw_rectangle_lines_ex(pyray.Rectangle($pos__x,$pos__y,$size__width,$size__height),$thickness,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {DrawRectangleLinesEx((Rectangle){(float)pos__x, (float)pos__y, (float)size__width, (float)size__height}, (int)thickness, (Color){color__r,color__g,color__b,color__a});}
 
-def circ_line(effect edit window WINDOW, position pos, nat radius, nat thickness, color color)
+def rect(effect edit window WINDOW, position pos, size size, "solid", color color, "rotate", position origin, float rotation)
+    {
+        DrawRectanglePro(
+            (Rectangle){(float)pos__x, (float)pos__y, (float)size__width, (float)size__height},
+            (Vector2){(float)origin__x, (float)origin__y},
+            rotation,
+            (Color){color__r,color__g,color__b,color__a}
+        );
+    }
+
+def circ(effect edit window WINDOW, position pos, float radius, "line", nat thickness, color color)
     VM "pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         builtins::float inner = (radius > thickness) ? (float)(radius - thickness) : 0.0f;

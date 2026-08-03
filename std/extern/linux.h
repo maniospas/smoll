@@ -200,7 +200,11 @@ static inline int __smo_has_display(void) {
         fclose(wsl);
     }
     if (getenv("MSYSTEM") || getenv("CYGWIN")) has = 0;
-    if (!has && isatty(STDIN_FILENO))          has = 0;
+#ifdef __EMSCRIPTEN__
+    has = 0;
+#else
+    if (!has && isatty(STDIN_FILENO)) has = 0;
+#endif
     return has;
 }
 

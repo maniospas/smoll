@@ -20,30 +20,42 @@ local import "std/unsafe.s" as unsafe
 def is_dir(cstr path)
     doc "checks whether a path points to an existing directory"
     VM "[os.path.is_dir($path)]"
+    if compiler::back type "emcc"
+        {"-sFORCE_FILESYSTEM=1"}
+        {"-lidbfs.js"}
     {builtins::bool exists = __smo_is_dir(path);}
     return exists
 
-def is_dir(str|cstr path)
+def is_dir(str path)
     doc "checks whether a path points to an existing directory"
+    if compiler::back type "emcc"
+        {"-sFORCE_FILESYSTEM=1"}
+        {"-lidbfs.js"}
     return is_dir cstr unsafe_temp path
 
 def create_dir(cstr path)
-    doc "creates a directory at a cstr path, fails if it alopeny exists or cannot be created"
+    doc "creates a directory at a cstr path, fails if it already exists or cannot be created"
     VM "[os.path.mkdir($path)]"
+    if compiler::back type "emcc"
+        {"-sFORCE_FILESYSTEM=1"}
+        {"-lidbfs.js"}
     {builtins::bool result = __smo_create_dir(path);}
     if not result fail "failed to create directory"
 
 def create_dir(str path)
     create_dir cstr unsafe_temp path
 
-def is_file(str|cstr _path)
-    doc "checks whether a cstr path points to an existing file"
-    path = cstr unsafe_temp _path
+local def _is_file(cstr path)
+    VM "[os.path.exists($path)]"
     {builtins::bool exists = __smo_is_file(path);}
     return exists
 
+def is_file(str|cstr _path)
+    doc "checks whether a path points to an existing file"
+    return _is_file cstr unsafe_temp _path
+
 def remove(str|cstr _path)
-    doc "removes a file at a cstr path, fails if it cannot be removed"
+    doc "removes a file at a path, fails if it cannot be removed"
     path = cstr unsafe_temp _path
     if is_file path
         {builtins::bool result = __smo_remove_file(path);}
@@ -51,11 +63,17 @@ def remove(str|cstr _path)
 
 local def closedir(any ptr unsafe_ptr) # super unsafe to expose
     VM "memory.get_foreign($unsafe_ptr).close() or memory.close_foreign($unsafe_ptr)"
+    if compiler::back type "emcc"
+        {"-sFORCE_FILESYSTEM=1"}
+        {"-lidbfs.js"}
     {if(unsafe_ptr) {closedir((DIR*)unsafe_ptr); unsafe_ptr=0;}}
 
 def open(cstr path)
     doc "loads a cstr path as a openable directory"
     VM "[memory.register_foreign(os.scandir($path), 'dir '+$path)]"
+    if compiler::back type "emcc"
+        {"-sFORCE_FILESYSTEM=1"}
+        {"-lidbfs.js"}
     {builtins::compiler::ptr unsafe_ptr = (char*)opendir(path);}
     defer
         closedir unsafe_ptr

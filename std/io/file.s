@@ -20,11 +20,15 @@ local import "std/unsafe.s" as unsafe
 def open(str|cstr _path)
     doc "loads a path as a openable file"
     doc "The file name is not maintained and must be tracked externally, if needed."
+    if compiler::back type "emcc"
+        {"-sFETCH"}
+        {"-sASYNCIFY"}
     path = cstr unsafe_temp _path
     {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "r");}
     defer
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
-    if not exists unsafe_ptr fail "failed to open file"
+    if not exists unsafe_ptr
+        fail "failed to open file"
     return class(unsafe_mut unsafe_ptr)
 
 def write(str|cstr _path)
@@ -33,6 +37,8 @@ def write(str|cstr _path)
     {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "wx+");}
     defer
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
+        if compiler::back type "emcc"
+            {__smo_flush_fs();}
     if not exists unsafe_ptr fail "failed to create file"
     return class(unsafe_mut unsafe_ptr)
 

@@ -35,8 +35,10 @@ static inline double __smo_time_eta(void) {
 static volatile int __smo_fs_ready = 0;
 
 EM_JS(void, __smo_fs_initialize, (int *ready_ptr), {
-    FS.mkdir("smol");
-    FS.mount(IDBFS, {}, "smol");
+    try { 
+        FS.mkdir("/smol"); 
+        FS.mount(IDBFS, {}, "/smol");
+    } catch (e) {}
 
     var synced = false;
 
@@ -73,7 +75,7 @@ static inline uint64_t __smo_file_size(FILE *fp) {
    since that's the only mounted/persisted directory. this builds that
    full path from a caller-supplied relative path. */
 static inline int __smo_full_path(char *out, size_t outsz, const char *path) {
-    int n = snprintf(out, outsz, "smol/%s", path);
+    int n = snprintf(out, outsz, "/smol/%s", path);
     return n > 0 && (size_t)n < outsz;
 }
 
@@ -105,7 +107,7 @@ enum {
 };
 
 struct __smo_pending_fetch {
-    char path[512];
+    char path[1024];
     volatile int state;
     volatile int in_use;
     uint64_t request_id;
@@ -215,12 +217,19 @@ static void __smo_fetch_onerror(emscripten_fetch_t *fetch) {
     emscripten_fetch_close(fetch);
 }
 
-static inline int __smo_is_file(const char *path) {
+static inline int __smo_is_file(const char* path) {
+    char full[1024];
+    if (!__smo_full_path(full, sizeof(full), path)) return 0;
+    struct stat st;
+    if (stat(full, &st) != 0) return 0;
+    return S_ISREG(st.st_mode);
+}
+
+static inline int __smo_await_file(const char *path) {
     char full[1024];
     if (!__smo_full_path(full, sizeof(full), path)) return 0;
 
     struct stat st;
-
     if (stat(full, &st) == 0 && S_ISREG(st.st_mode))
         return 1;
 

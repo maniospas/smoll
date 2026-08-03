@@ -230,7 +230,164 @@
             <a href="playground.html" style="font-weight:500">Playground</a>
             <a href="https://github.com/maniospas/smoll">GitHub</a>
         </nav>
-    <p></p>
+    <h1>making simple games with smoλ</h1>
+
+<div class="toc">
+
+<p><strong>Contents</strong><br>
+<a href="#window">window</a> <br>
+<a href="#shapes">shapes</a> <br>
+<a href="#textures">textures</a> <br>
+<a href="#webapp">webapp</a></p>
+
+</div>
+
+<h2 id="window">window</h2>
+
+<p>Smoλ wraps the interface of the <a href="https://www.raylib.com/">raylib</a> library
+under the <code>std/graphics.s</code> part of the standard library. The wrapper
+remains safe for use in your code, and adds some more safety checks.
+To begin with, a singleton window can be constructed based on desired dimensions, 
+window name, and default font. It must be declared as at least editable and a <code>WINDOW</code>
+variable name lets it be passsed automatically to all functions.</p>
+
+<p>There may be linking errors if raylib is not installed in your system;
+<em>smoλ</em> and gcc need to access its include and linking directories. For example,
+you may install raylib via the next command or an equivalent. At the
+end of this tutorial, we will talk about compiling with the emscripten
+backend to create a <em>webgl</em> application running in the browser.</p>
+
+<pre><code>sudo apt install libraylib-dev
+</code></pre>
+
+<p>Check for window closing events with <code>is_open</code>, or loop forever. Then, in each loop,
+create a drawable frame with the <code>frame = draw()</code> function. The frame is drawn when released,
+which occurs either automatically if the draw function call is made within a function,
+or manually with <code>del frame</code> if the drawing happens directly inside the loop.<br />
+The type system will help prevent bugs by complaining of leaking resources if you declare
+but not release a frame within a loop. In general, positions and sizes
+are float numbers. See below for colors.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/graphics.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">WINDOW</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">window</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="s2">&quot;example&quot;</span><span class="p">,</span> <span class="s2">&quot;std/ArianaVioleta-dz2K.ttf&quot;</span><span class="p">)</span>
+    <span class="n">font_size</span> <span class="o">=</span> <span class="mf">64.0</span>
+    <span class="k">while</span> <span class="n">is_open</span><span class="p">()</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">draw</span><span class="p">()</span>
+        <span class="n">clear</span> <span class="n">color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span>
+        <span class="n">text</span><span class="p">(</span><span class="s2">&quot;smoll + raylib&quot;</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="n">font_size</span><span class="p">,</span> <span class="n">color</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">del</span> <span class="n">frame</span>
+</code></pre>
+</div>
+
+<h2 id="shapes">shapes</h2>
+
+<p>Use the functions <code>rect</code>, <code>circ</code>, <code>ellipse</code> to draw corresponding shapes, as demonstrated
+below. Switch between <code>solid color</code> and <code>line thickness, color</code> to fill the contents vs create an outline. Those
+keywords are automatically created language shorthands for <code>,type "solid",</code> and <code>,type "line",</code>
+that would help select between the drawing mode via a string type.
+Finally, <code>color</code> is used to cast color values from natural number tuples to <code>nat8</code> tuples
+with either transparency or not.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/graphics.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">WINDOW</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">window</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="s2">&quot;overlap&quot;</span><span class="p">,</span> <span class="s2">&quot;std/ArianaVioleta-dz2K.ttf&quot;</span><span class="p">)</span>
+    <span class="n">circ_state</span> <span class="o">=</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">)</span> <span class="c1"># tuples are automatically unpacked when used later</span>
+    <span class="n">rect_state</span> <span class="o">=</span> <span class="p">(</span><span class="mf">120.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">)</span>
+    <span class="n">thickness</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">while</span> <span class="n">is_open</span><span class="p">()</span>
+        <span class="nb">breakpoint</span><span class="p">()</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">draw</span><span class="p">()</span>
+        <span class="n">clear</span> <span class="n">color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span>
+        <span class="c1"># outlined circ</span>
+        <span class="n">circ</span><span class="p">(</span><span class="n">circ_state</span> <span class="n">solid</span> <span class="n">color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">128</span><span class="p">))</span>
+        <span class="n">circ</span><span class="p">(</span><span class="n">circ_state</span> <span class="n">line</span> <span class="n">thickness</span><span class="p">,</span> <span class="n">color</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+        <span class="c1"># outlined rect</span>
+        <span class="n">rect</span><span class="p">(</span><span class="n">rect_state</span> <span class="n">solid</span> <span class="n">color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">128</span><span class="p">))</span>
+        <span class="n">rect</span><span class="p">(</span><span class="n">rect_state</span> <span class="n">line</span> <span class="n">thickness</span><span class="p">,</span> <span class="n">color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">128</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">del</span> <span class="n">frame</span>
+</code></pre>
+</div>
+
+<h2 id="textures">textures</h2>
+
+<p>To be completed.</p>
+
+<h2 id="webapp">webapp</h2>
+
+<p><em>Smoλ</em> offers the option to switch to different compilation beckends, or even
+run code via its own virtual machine! Do this by running programs like below:</p>
+
+<pre><code>./smol main.s --back vm
+</code></pre>
+
+<p>By default, <em>gcc</em> is the backend of choice, <em>vm</em> is a slow-ish virtual machine that
+is nonetheless used for resolution of compile-time instructions and macros, <em>antcc</em>
+is an alternate compiler, and <em>emcc</em> is emscripten for export into web applications.
+Here we focus on the last option, which lets us export graphics application to the
+browser.</p>
+
+<p>To begin with, the <code>emcc</code> compiler needs to be present in the current system.
+For, example, install it with the following command or an equivalent.</p>
+
+<pre><code>sudo apt install emscripten
+</code></pre>
+
+<p>However, you also need to compile depdendencies for the web too. You can do
+this for <em>raylib</em> by running the following cheat sheet in the workling directory
+of the <em>smoll</em> executable without affecting the system-wide installation:</p>
+
+<pre><code>git clone https://github.com/raysan5/raylib.git
+cd raylib
+emcmake cmake -S . -B build -DPLATFORM=Web -DBUILD_EXAMPLES=OFF 
+cmake --build build -j$(nproc)
+</code></pre>
+
+<p>That is, a common project can look like this:</p>
+
+<pre><code>workdir
+|- smoll
+|- main.s
+|- std/
+|  |- ...
+|- raylib/
+|  |- build/
+|  |  |- ...
+|  |- ...
+</code></pre>
+
+<p>This project can thus be compiled with both of the following
+commands, for an executable and web application.</p>
+
+<pre><code>./smoll main.s
+./smoll main.s --back emcc
+</code></pre>
+
+<p>The web application creates <em>main.js</em>, <em>main.wasm</em>, and <em>main.html</em> files.
+These need to be hosted by an http server, where <em>smoλ</em>
+automatically serves them in the localhost for demonstration.
+You can freely edit the html file, too, as the important part is to just 
+embed the javascript script into the page to properly run the wesm executable.</p>
+
+<p>Web applications work on a persistent file system compartmenized by the
+browser. Populate this file system with files obtained via a get request
+from your own server via the following pattern. This is curated so that
+you can wait on multiple files at once, and they will be retrieved asynchronously.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="nb">dir</span><span class="p">::</span><span class="n">wait_file</span> <span class="s2">&quot;myfile.txt&quot;</span> <span class="n">blank</span><span class="p">()</span> <span class="c1"># wait until this file becomes available</span>
+</code></pre>
+</div>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {

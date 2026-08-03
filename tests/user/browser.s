@@ -6,8 +6,7 @@ def main()
     WINDOW = edit window(800.0, 600.0, "test", "std/ArianaVioleta-dz2K.ttf")
     CHARS = edit arena alloc 1024
     CLI = edit console()
-    i = mut 0
-    while not dir::is_file "./README.md" blank()
+    while not dir::wait_file "./README.md" blank()
     f = edit file::open "./README.md"
     line = file::line f
     print line

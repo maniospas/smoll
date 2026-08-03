@@ -6,16 +6,28 @@
 [window](#window) <br>
 [shapes](#shapes) <br>
 [textures](#textures) <br>
+[webapp](#webapp)
 </div>
 
 ## window
 
 Smoλ wraps the interface of the [raylib](https://www.raylib.com/) library
-under the `std/graphics.s` part of the standard library. The wrap
+under the `std/graphics.s` part of the standard library. The wrapper
 remains safe for use in your code, and adds some more safety checks.
 To begin with, a singleton window can be constructed based on desired dimensions, 
 window name, and default font. It must be declared as at least editable and a `WINDOW`
-variable name lets it be passsed automatically to all functions. 
+variable name lets it be passsed automatically to all functions.
+
+There may be linking errors if raylib is not installed in your system;
+*smoλ* and gcc need to access its include and linking directories. For example,
+you may install raylib via the next command or an equivalent. At the
+end of this tutorial, we will talk about compiling with the emscripten
+backend to create a *webgl* application running in the browser.
+
+```cmd
+sudo apt install libraylib-dev
+```
+
 
 Check for window closing events with `is_open`, or loop forever. Then, in each loop,
 create a drawable frame with the `frame = draw()` function. The frame is drawn when released,
@@ -74,3 +86,78 @@ def main()
 ## textures
 
 To be completed.
+
+
+## webapp
+
+*Smoλ* offers the option to switch to different compilation beckends, or even
+run code via its own virtual machine! Do this by running programs like below:
+
+```cmd
+./smol main.s --back vm
+```
+
+By default, *gcc* is the backend of choice, *vm* is a slow-ish virtual machine that
+is nonetheless used for resolution of compile-time instructions and macros, *antcc*
+is an alternate compiler, and *emcc* is emscripten for export into web applications.
+Here we focus on the last option, which lets us export graphics application to the
+browser.
+
+To begin with, the `emcc` compiler needs to be present in the current system.
+For, example, install it with the following command or an equivalent.
+
+```cmd
+sudo apt install emscripten
+```
+
+However, you also need to compile depdendencies for the web too. You can do
+this for *raylib* by running the following cheat sheet in the workling directory
+of the *smoll* executable without affecting the system-wide installation:
+
+```cmd
+git clone https://github.com/raysan5/raylib.git
+cd raylib
+emcmake cmake -S . -B build -DPLATFORM=Web -DBUILD_EXAMPLES=OFF 
+cmake --build build -j$(nproc)
+```
+
+That is, a common project can look like this:
+
+```cmd
+workdir
+|- smoll
+|- main.s
+|- std/
+|  |- ...
+|- raylib/
+|  |- build/
+|  |  |- ...
+|  |- ...
+```
+
+This project can thus be compiled with both of the following
+commands, for an executable and web application.
+
+```cmd
+./smoll main.s
+./smoll main.s --back emcc
+```
+
+The web application creates *main.js*, *main.wasm*, and *main.html* files.
+These need to be hosted by an http server, where *smoλ*
+automatically serves them in the localhost for demonstration.
+You can freely edit the html file, too, as the important part is to just 
+embed the javascript script into the page to properly run the wesm executable.
+
+Web applications work on a persistent file system compartmenized by the
+browser. Populate this file system with files obtained via a get request
+from your own server via the following pattern. This is curated so that
+you can wait on multiple files at once, and they will be retrieved asynchronously.
+
+```python
+import "std/core.s"
+import "std/io.s"
+
+def main()
+    while not dir::wait_file "myfile.txt" blank() # wait until this file becomes available
+```

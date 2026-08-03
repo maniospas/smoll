@@ -45,14 +45,30 @@ def create_dir(cstr path)
 def create_dir(str path)
     create_dir cstr unsafe_temp path
 
-local def _is_file(cstr path)
+def is_file(cstr path)
+    doc "checks whether a path points to an existing file"
     VM "[os.path.exists($path)]"
     {builtins::bool exists = __smo_is_file(path);}
     return exists
 
-def is_file(str|cstr _path)
+def is_file(str _path)
     doc "checks whether a path points to an existing file"
-    return _is_file cstr unsafe_temp _path
+    return is_file cstr unsafe_temp _path
+
+def wait_file(cstr path)
+    doc "checks whether a path points to an existing file"
+    VM "[os.path.exists($path)]"
+    if compiler::back type "emcc"
+        {"-sFORCE_FILESYSTEM=1"}
+        {"-lidbfs.js"}
+        {builtins::bool exists = __smo_await_file(path);}
+    else
+        exists = is_file path
+    return exists
+
+def wait_file(str _path)
+    doc "checks whether a path points to an existing file"
+    return is_file cstr unsafe_temp _path
 
 def remove(str|cstr _path)
     doc "removes a file at a path, fails if it cannot be removed"

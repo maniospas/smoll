@@ -21,7 +21,7 @@ local import "std/unsafe.s" as unsafe
 # is that we GUARANTEE that non-zero pointers to a memory region contain
 # at least one element of the attached type (automatically inferred for any)
 
-def nat(nat16 x)
+def nat(nat16|nat32 x)
     {builtins::nat value = x;}
     return value
 

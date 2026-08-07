@@ -6706,8 +6706,8 @@ smol_namespace.namespaces["debug"] = debug_namespace
 file_cache["builtins"] = smol_namespace
 UNSAFE_PTR_VARIABLE = Variable("unsafe_ptr", POINTER_TYPE, immutable=False, isprivate=False)
 UNSAFE_SIZE_VARIABLE = Variable("unsafe_size", UINT_TYPE, immutable=False, isprivate=False)
-UNSAFE_OFFSET_VARIABLE = Variable("unsafe_offset", UINT16_TYPE, immutable=False, isprivate=False)
-UNSAFE_ALIGN_VARIABLE = Variable("unsafe_align", UINT16_TYPE, immutable=False, isprivate=False)
+UNSAFE_OFFSET_VARIABLE = Variable("unsafe_offset", UINT32_TYPE, immutable=False, isprivate=False)
+UNSAFE_ALIGN_VARIABLE = Variable("unsafe_align", UINT32_TYPE, immutable=False, isprivate=False)
 
 def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_point: str|None) -> None:
     src_path = Path(f"{output_name}.c")

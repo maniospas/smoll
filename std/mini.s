@@ -27,10 +27,10 @@ def nat32(nat x)
     {builtins::nat32 value = x;}
     return value
     
-def nat(nat32 x)
-    doc "retrieved unsigned number from 32 bits"
-    {builtins::nat value = x;}
-    return value
+# def nat(nat32 x)
+#     doc "retrieved unsigned number from 32 bits"
+#     {builtins::nat value = x;}
+#     return value
 
 # imported from array
 # def nat(nat16 x)

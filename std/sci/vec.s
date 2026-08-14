@@ -4,10 +4,10 @@ local import "std/sci/unsafe.s"
 local import "std/unsafe.s" as unsafe
 local import "std/unsafe.s"::add
 
-def arena(float::name)    return arena float[]
-def circular(float::name) return circular float[]
-def list(float::name)     return list float[]
-local def float_allocator = new|arena<float::name>|circular<float::name>
+def arena(float::tag)    return arena float[]
+def circular(float::tag) return circular float[]
+def list(float::tag)     return list float[]
+local def float_allocator = new|arena<float::tag>|circular<float::tag>
 
 def vec(effect new FLOATS, nat length, "dirty"|blank clear_policy)
     doc "vector on a new buffer"

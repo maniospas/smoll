@@ -173,7 +173,7 @@ def set(edit colors colors, "strikethrough")
     if colors.initialized {printf("\033[9m");}
 def set(edit colors colors, "reset")          
     if colors.initialized {printf("\033[0m");}
-def set(edit colors colors, "reset_color")    
+def set(edit colors colors, "reset_color") 
     if colors.initialized {printf("\033[39m");}
 def set(edit colors colors, "reset_bg")       
     if colors.initialized {printf("\033[49m");}

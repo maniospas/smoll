@@ -320,3 +320,10 @@ def add(effect edit char_allocator CHARS, str|cstr _s1, str|cstr _s2)
     copy(surface, s1)
     copy(surface, s2)
     return str(status surface from start)
+
+def empty(cstr c)
+    doc "checks whether a cstr is not zero-initialized"
+    return c=="" or not exists c
+
+def empty(str c)
+    return 0==len c

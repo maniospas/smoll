@@ -31,7 +31,7 @@ def int(Number x)
     if x is float
         doc "May lose information due to truncating."
     if x is nat
-        doc "Overflows are mapped to negative integers and are not protected against."
+        doc "Overflows are mapped to negative integers without any numerical safeguards."
     if x is int
         doc "Serves as a tautology function for code that parses on multiple number types."
     {builtins::int z=x;}

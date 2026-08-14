@@ -265,6 +265,28 @@ def rect(effect edit window WINDOW, position pos, size size, "solid", color colo
         );
     }
 
+def tri(effect edit window WINDOW, position p1, position p2, position p3, "solid", color color)
+    VM "pyray.draw_triangle(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),pyray.Vector2($p3__x,$p3__y),pyray.Color($color__r,$color__g,$color__b,$color__a))"
+    {
+        DrawTriangle(
+            (Vector2){(float)p1__x, (float)p1__y},
+            (Vector2){(float)p2__x, (float)p2__y},
+            (Vector2){(float)p3__x, (float)p3__y},
+            (Color){color__r,color__g,color__b,color__a}
+        );
+    }
+
+def tri(effect edit window WINDOW, position p1, position p2, position p3, "line", color color)
+    VM "pyray.draw_triangle_lines(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),pyray.Vector2($p3__x,$p3__y),pyray.Color($color__r,$color__g,$color__b,$color__a))"
+    {
+        DrawTriangleLines(
+            (Vector2){(float)p1__x, (float)p1__y},
+            (Vector2){(float)p2__x, (float)p2__y},
+            (Vector2){(float)p3__x, (float)p3__y},
+            (Color){color__r,color__g,color__b,color__a}
+        );
+    }
+
 def circ(effect edit window WINDOW, position pos, float radius, "line", nat thickness, color color)
     VM "pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {

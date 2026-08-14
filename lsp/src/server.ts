@@ -68,15 +68,22 @@ async function writeTempFile(content: string, realPath: string): Promise<string>
   return tmp;
 }
 async function deleteTempFile(tmp: string) {try { await unlink(tmp); } catch {}}
-
-function remapTokenPaths(tokens: CompilerToken[], tmpPath: string, realPath: string): CompilerToken[] {
+function remapPathsInText(text: string): string {
+  for (const [tmpPath, realPath] of tempPathMap) {
+    if (text.includes(tmpPath)) {
+      text = text.split(tmpPath).join(realPath);
+    }
+  }
+  return text;
+}
+function remapTokenPaths(tokens: CompilerToken[]): CompilerToken[] {
   return tokens.map(t => ({
     ...t,
-    file: t.file === tmpPath ? realPath : t.file,
-    message: t.message.replace(tmpPath, realPath),
+    file: tempPathMap.get(t.file) ?? t.file,
+    message: remapPathsInText(t.message),
     definition: t.definition ? {
       ...t.definition,
-      file: t.definition.file === tmpPath ? realPath : t.definition.file,
+      file: tempPathMap.get(t.definition.file) ?? t.definition.file,
     } : undefined,
   }));
 }
@@ -171,8 +178,25 @@ function ensureCompilerRunning(firstTmpPath: string) {
     dequeueNext();
   });
 }
+
+
+const MAX_TEMP_PATHS = 10_000;
+const tempPathMap = new Map<string, string>();
 const requestQueue: { tmpPath: string; uri: string; resolve: (s: string | null) => void }[] = [];
 let busy = false;
+
+
+function rememberTempPath(tmpPath: string, realPath: string) {
+  // Refresh insertion order if this temp path is reused.
+  tempPathMap.delete(tmpPath);
+  tempPathMap.set(tmpPath, realPath);
+
+  while (tempPathMap.size > MAX_TEMP_PATHS) {
+    const oldest = tempPathMap.keys().next().value;
+    if (oldest === undefined) break;
+    tempPathMap.delete(oldest);
+  }
+}
 
 function dequeueNext() {
   if (busy || requestQueue.length === 0) return;
@@ -220,13 +244,14 @@ function scheduleAnalysis(uri: string, filePath: string) {
     generations.set(filePath, gen);
     log(`debounce: fired for ${filePath} (gen ${gen})`);
     const tmpPath = await writeTempFile(content, filePath);
+    rememberTempPath(tmpPath, filePath);
     try {
       const raw = await runCompiler(tmpPath, uri);
       if (!raw) {
         log(`debounce: skipped, ${filePath} not focused at dispatch`);
         return;
       }
-      const tokens = remapTokenPaths(raw, tmpPath, filePath);
+      const tokens = remapTokenPaths(raw);
       if (generations.get(filePath) !== gen) {
         log(`debounce: stale result discarded (gen ${gen} vs ${generations.get(filePath)})`);
         return;

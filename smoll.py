@@ -586,7 +586,30 @@ def print_lsp_var(tok, signature:str):
     printid(os.path.abspath(tok.file.path))
     print(tok.row)
     print(tok.col)
-    printid("**computed value**\n\nHas the following type:\n```rust\n"+signature+"\n```")
+    printid("**computed value**\n\nHas the following type:\n```rust")
+    printid(signature+"\n```")
+
+def print_lsp_field(tok, rets, impl):
+    if not len(rets): return print_lsp_var(tok, signature_like(rets, impl))
+    defined_at = rets[0].token
+    for r in rets:
+        if r.token!=defined_at:
+            defined_at = None
+            break
+    if defined_at is None: return print_lsp_var(tok, signature_like(rets, impl))
+    signature = signature_like(rets, impl)
+    print("---")
+    printid("variable")
+    printid(os.path.abspath(tok.file.path))
+    print(tok.row)
+    print(tok.col)
+    print(len(tok.text))
+    if defined_at is None: defined_at = tok
+    printid(os.path.abspath(defined_at.file.path))
+    print(defined_at.row)
+    print(defined_at.col)
+    printid("**variable**\n\nHas the following type:\n```rust")
+    printid(signature+"\n```")
 
 def print_lsp_string(tok):
     print("---")
@@ -879,7 +902,7 @@ class ImplementedType:
         if self in discovered: return ret
         discovered.add(self)
         ret = ret.union(self.spawned_error_codes)
-        # if we have no errors (have tried with everything) but have not caught anything (to print it) then don't add propagating errors
+        # if we have no errors (have tried with everything) but have not caught anything (to print it) then don't propagate errors
         if not self.has_caught_used_error_codes and not self.needs_failure_mode: return ret 
         for other in self.used_error_codes: ret = ret.union(other.gather_spawned_error_codes(discovered))
         return ret
@@ -2154,7 +2177,7 @@ class Token:
         errexit()
 
 def get(tokens: list[Token], pos: int) -> Token:
-    if pos>=len(tokens): tokens[len(tokens)-1].error("syntax", "unexpected end of file")
+    if pos>=len(tokens): raise Exception("eof")#tokens[len(tokens)-1].error("syntax", "unexpected end of file")
     if tokens[pos].starts(): tokens[pos].error("syntax", "unexpected indentation - this line starts deeper than the previous one but this can only be done to mark new code blocks within 'def', 'if', 'else', 'while', or 'defer'")
     return tokens[pos]
 
@@ -2290,7 +2313,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
         if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
-        spawned_error_codes = callee.gather_spawned_error_codes(set())
+        spawned_error_codes = callee.spawned_error_codes
         printid("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
         # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):
         #     #printid("When this function is called, it does not create a memory dependecy.\n")
@@ -2659,6 +2682,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 CODEWORD_LPAR,
             ])
             impl.needs_failure_mode = error_token
+            impl.spawned_error_codes = impl.spawned_error_codes.union(callee.spawned_error_codes)
     else:
         impl.implementation.extend([
             CallPointer(callee),#CodeWord(callee.monomorphic_name),
@@ -3047,7 +3071,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
         # )
         progress += mem_size
     if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
-    if is_lsp and file.is_main_file: print_lsp_var(current_token, signature_like(new_vars, impl))
+    if is_lsp and file.is_main_file: print_lsp_field(current_token, new_vars, impl)
     if ret[0].immutable: new_vars = [r.immutable_copy() for r in new_vars]
     r = ret[0]
     for var in new_vars:
@@ -4204,7 +4228,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     new_var = Variable(create_temp()+"__"+new_var_name if new_var_name else create_temp(), POINTER_TYPE, immutable=rets[0].immutable, isprivate=isprivate, token=op_token)
                     impl.vars[new_var.name] = new_var
                     impl.set_pointer_type(new_var, temp_type)
-                    if is_lsp and file.is_main_file: print_lsp_var(field_token, signature_like([new_var], impl))
+                    if is_lsp and file.is_main_file: print_lsp_field(field_token, [new_var], impl)
 
                     IFNOT_CHECK_PATTERN[3] = rets[0]
                     impl.implementation.extend(IFNOT_CHECK_PATTERN)
@@ -4406,7 +4430,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 if var is None:
                     current_prefix = current+"__"
                     rets = [r for r in rets if r.name.startswith(current_prefix)]
-                    if rets and is_lsp and file.is_main_file: print_lsp_var(get(tokens, pos-1), signature_like(rets,impl))
+                    if rets and is_lsp and file.is_main_file: print_lsp_field(get(tokens, pos-1), rets, impl)
                     if rets and call_continuation:
                         start_call = get(tokens,pos+1)
                         pos, type = await process_type(file, tokens, pos+1, impl=impl)
@@ -4434,7 +4458,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     current_token.error("type", "not found field '"+pretty_name(current)+"'") 
                 assert var is not None
                 rets = [var]
-                if is_lsp and file.is_main_file: print_lsp_var(get(tokens, pos-1), signature_like(rets,impl))
+                if is_lsp and file.is_main_file: print_lsp_field(get(tokens, pos-1), rets, impl)
                 if call_continuation:
                     start_call = get(tokens,pos+1)
                     pos, type = await process_type(file, tokens, pos+1, impl=impl)
@@ -4458,10 +4482,12 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     pos, comma_rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
                     additional_rets += comma_rets
                 if peek_text(tokens, pos)!="]": err_token.error("syntax", "missing closing ']'")
+                lsp_pos = pos
                 pos += 1
                 get_func_name = "get"
                 deref = True
                 if peek_text(tokens, pos)=="&":
+                    lsp_pos = pos
                     if any(not r.immutable and not r.isprivate for r in rets):  get_func_name = "mutget"
                     deref = False
                     pos += 1
@@ -4469,11 +4495,12 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     get_func_name = "mutget"
                     deref = False
                 elif peek_text(tokens, pos)=="." and any(not r.immutable and not r.isprivate for r in rets):
+                    lsp_pos = pos
                     get_func_name = "mutget"
                     deref = True
                 if is_lsp and file.is_main_file:
-                    if get_func_name=="mutget": print_lsp_var(get(tokens, pos), "mut ptr {"+signature_like(rets+additional_rets, impl)+"}")
-                    else: print_lsp_var(get(tokens, pos), "ptr {"+signature_like(rets+additional_rets, impl)+"}")                      
+                    if get_func_name=="mutget": print_lsp_var(get(tokens, lsp_pos), "mut ptr {"+signature_like(rets+additional_rets, impl)+"}")
+                    else: print_lsp_var(get(tokens, lsp_pos), "ptr {"+signature_like(rets+additional_rets, impl)+"}")                      
                 
                 type = file.types.get(get_func_name, None)
                 if type is None: err_token.error("type", "missing implementation for '"+get_func_name+"'")
@@ -5097,7 +5124,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 progress += mem_size
             if try_var is not None: impl.implementation.append(CODEWORD_RBRACKET)
             found: list[Variable] = [] 
-            if is_lsp and file.is_main_file: print_lsp_var(var_token, signature_like([var],impl))
+            if is_lsp and file.is_main_file: print_lsp_field(var_token, [var], impl)
             return pos, found
 
 
@@ -5108,13 +5135,13 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         else:
             impl.assign(current, ret, current_token, strip_mutability=not is_mutable_assignment)
 
-        if is_lsp and file.is_main_file: print_lsp_var(var_token, signature_like(ret,impl))
+        if is_lsp and file.is_main_file: print_lsp_field(var_token, ret, impl)
 
         found: list[Variable] = [] # [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
         return pos, found
 
     if var:
-        if is_lsp and file.is_main_file: print_lsp_var(get(tokens, pos), signature_like([var],impl))
+        if is_lsp and file.is_main_file: print_lsp_field(get(tokens, pos), [var], impl)
         r = var
         if r.stabilized_name() in impl.invalidated: 
             current_token.error("safety", "the variable '"+pretty_name(r.stabilized_name())+"' could have been invalidated", reason=impl.invalidated[r.stabilized_name()], raason_message="due to")
@@ -5128,7 +5155,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         for r in found:
             if r.stabilized_name() in impl.invalidated:
                 current_token.error("safety", "the variable '"+pretty_name(r.stabilized_name())+"' could have been invalidated", reason=impl.invalidated[r.stabilized_name()], raason_message="due to")
-        if found and is_lsp and file.is_main_file: print_lsp_var(get(tokens, pos), signature_like(found,impl))
+        if found and is_lsp and file.is_main_file: print_lsp_field(get(tokens, pos), found, impl)
         if found or peek_text(tokens, pos+1)=="is": return await process_statement_operator(file, tokens, impl, pos+1, found, current_operator_priority) 
 
         # if it was a field, don't try type resolution but immediately fail now
@@ -5476,7 +5503,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 ret = resolve_call(file, impl, type, iterator_object+[indexor], get(tokens, in_pos)) 
                 if not as_pointer:# and not as_mutpointer:
                     _, ret = process_deref(file, pos, ret, impl, get(tokens, in_pos), explicit=False)
-                if is_lsp and file.is_main_file: print_lsp_var(vartok, signature_like(ret, impl))
+                if is_lsp and file.is_main_file: print_lsp_field(vartok, ret, impl)
                 impl.assign(varname, ret, current_token)
                 if impl.count_handled_tries[-1]==0: current_token.error("safety", "this 'try' statement does not guard against anything")
                 impl.implementation.extend([CodeWord(impl.is_parsing_a_try[-1].name+"__label"), CodeWord(":")]) 
@@ -5986,7 +6013,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         if callee.doc: printid("**"+strip_quotes(callee.doc[0])+"**")
                         if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
-                        spawned_error_codes = callee.gather_spawned_error_codes(set())
+                        spawned_error_codes = callee.spawned_error_codes
                         printid("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
                         # if(not impl.count_checkable_copies) and any(impl.vars[v].type==POINTER_TYPE for v in impl.rets+impl.args):
                         #     pass
@@ -6851,7 +6878,7 @@ async def main():
                     else: docs_file.write("*Defined by the compiler*\n")
                     if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                     docs_file.write("\n```rust\n"+callee.signature()+"\n```\n")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
-                    spawned_error_codes = callee.gather_spawned_error_codes(set())
+                    spawned_error_codes = callee.spawned_error_codes
                     docs_file.write("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n\n")
                     # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):                   
                     #     pass

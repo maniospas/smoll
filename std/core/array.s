@@ -25,7 +25,7 @@ def nat(nat16|nat32 x)
     {builtins::nat value = x;}
     return value
 
-def alloc(edit any[] buffer, nat|blank size, "dirty"|blank clear_policy)
+def alloc(edit any[] buffer, nat|blank size, "unsafe_first"|"dirty"|blank clear_policy, "unsafe_leaky"|blank leak_policy)
     doc "allocates a buffer"
     doc "Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,"
     doc "as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to"
@@ -34,13 +34,18 @@ def alloc(edit any[] buffer, nat|blank size, "dirty"|blank clear_policy)
         doc "This version allocates a buffer of ONE element, which can be used for stable indirection."
         size = 1
     defer
-        if exists buffer.unsafe_ptr buffer.unsafe_ptr.unsafe::free()
-    if buffer.unsafe_size==size
-        if size!=0 buffer.unsafe_ptr.unsafe::zero(0, buffer.unsafe_align.nat()*size)
+        if exists buffer.unsafe_ptr
+            buffer.unsafe_ptr.unsafe::free()
+    if buffer.unsafe_size==size and size!=0 
+        buffer.unsafe_ptr.unsafe::zero(0, buffer.unsafe_align.nat()*size)
         return buffer
-    if buffer.unsafe_size!=0 fail "cannot resize buffers with alloc; it promises no data reallocation"
+    if clear_policy is blank|"dirty"
+        if buffer.unsafe_size!=0 
+            fail "cannot resize buffers with alloc; it promises no data reallocation"
     bytes = buffer.unsafe_align.nat()*size
-    if bytes==0 fail "cannot allocate a buffer of unsized type"
+    if leak_policy is blank
+        if bytes==0
+            fail "cannot allocate a buffer of unsized type"
     buffer.unsafe_size = size
     buffer.unsafe_ptr = ref unsafe::alloc(bytes)&
     if clear_policy is blank
@@ -72,17 +77,20 @@ def resize(edit any[] buffer, nat size, "unsafe"|blank prunning)
 
 def last(edit any[] buffer)
     doc "mutable pointer to the last buffer element"
-    if 0==buffer.unsafe_size fail "out of bounds"
+    if 0==buffer.unsafe_size 
+        fail "out of bounds"
     return unsafe_mut buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1+buffer.unsafe_offset.nat())*buffer.unsafe_align.nat())
     
 def mutget(edit any[] buffer, nat i)
     doc "mutable pointer to buffer element"
-    if i>=buffer.unsafe_size fail "out of bounds"
+    if i>=buffer.unsafe_size 
+        fail "out of bounds"
     return unsafe_mut buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
     
 def get(any[] buffer, nat i)
     doc "immutable pointer to buffer element"
-    if i>=buffer.unsafe_size fail "out of bounds"
+    if i>=buffer.unsafe_size 
+        fail "out of bounds"
     return buffer.unsafe_ptr.unsafe::add(i*buffer.unsafe_align.nat()+buffer.unsafe_offset.nat())
 
 def len(any[] buffer)

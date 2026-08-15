@@ -114,4 +114,11 @@ def sum(effect edit float_allocator FLOATS, coo m, "col")
         result[entry.col] = result[entry.col]+entry.value
     return result
 
+def sum(coo m, "all")
+    doc "sum of all elements"
+    result = mut 0.0
+    for entry in m
+        result = result+entry.value
+    return result
+
 def matrix = mat|coo

@@ -310,9 +310,9 @@ def nn(str value)
     doc "to print without a new line."
     return (value, "")
 
-def add(effect edit char_allocator CHARS, str|cstr _s1, str|cstr _s2)
+def add(effect edit char_allocator\arena\circular CHARS, str|cstr _s1, str|cstr _s2)
     doc "concatenate two strings"
-    doc "The result is placed on a memory surface handled CHARS allocator effect."
+    doc "The result is placed on an allocator effect CHARS."
     s1 = str _s1
     s2 = str _s2
     surface = mut arena unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
@@ -321,9 +321,57 @@ def add(effect edit char_allocator CHARS, str|cstr _s1, str|cstr _s2)
     copy(surface, s2)
     return str(status surface from start)
 
+def add(effect edit arena<char::tag>|circular<char::tag> CHARS, str|cstr _s1, str|cstr _s2)
+    doc "concatenate two strings"
+    doc "The result is placed on an allocator effect CHARS."
+    doc "This implementation ensures that consecutively allocated strings, or"
+    doc "adding to strings placed at the end of buffers, does not needlessly"
+    doc "copy memory. This way, consecutive additions do not copy the previous"
+    doc "result before appending to it. For example, consider the following:"
+    doc "```"
+    doc "CHARS = edit arena alloc 10"
+    doc "s1 = copy 123"
+    doc "s2 = copy 456"
+    doc "s3 = s1+s2"
+    doc "result = s3+copy(78)+copy(9)"
+    doc "```"
+    doc "The snippet fits the result in a contiguous area on the arena's buffer,"
+    doc "with only one copying operation for each character. This does not"
+    doc "magically optimize all copying operations, but it does makes most"
+    doc "convenient optimizatins when allocating and immediately concatenating."
+
+    s1 = str _s1
+    s2 = str _s2
+    if s1.unsafe_ptr==CHARS.buf.unsafe_ptr and CHARS.pos==s1.dat.pos+s1.dat.length and CHARS.pos+s2.dat.length<CHARS.buf.unsafe_size
+        surface = mut arena unsafe_mut status CHARS.alloc len s2
+        copy(surface, s2)
+        return str(status surface from s1.dat.pos+0)
+    if s1.unsafe_ptr==CHARS.buf.unsafe_ptr and s2.unsafe_ptr==CHARS.buf.unsafe_ptr and s2.dat.pos==s1.dat.pos+s1.dat.length
+        return str(CHARS.buf, s2.dat.pos+s2.dat.length from s1.dat.pos)
+    surface = mut arena unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
+    copy(surface, s1)
+    copy(surface, s2)
+    return str(status surface from surface.pos+0)
+
 def empty(cstr c)
     doc "checks whether a cstr is not zero-initialized"
     return c=="" or not exists c
 
 def empty(str c)
     return 0==len c
+
+
+def copy(effect edit char_allocator CHARS, nat n)
+    v = mut n
+    digits = mut 1
+    while v>=10
+        v = v/10
+        digits = digits+1
+    surface = edit alloc(CHARS, digits)
+    v = n
+    for i in range of digits
+        dig = v.mod 10
+        {builtins::char digit='0'+dig;}
+        surface.buf[surface.pos+digits-(i+1)] = digit
+        v = v/10
+    return str(status surface len digits)

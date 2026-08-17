@@ -1,18 +1,10 @@
 import "std/core.s"
-import "tests/foo.s"
-
-def pair(nat a, nat b)
-    return compiler::args()
 
 def main()
     CLI = edit console()
-    p = pair(0,1)
-    x = mut 0
-    x = x+1
-    print x
-
-    print p.a
-    
-    print foo
-
-     
+    CHARS = edit arena alloc 10
+    s1 = copy "123"
+    s2 = copy "456"
+    s3 = copy "789"
+    if not try print (s1+s2+s3)
+        print "out of space"

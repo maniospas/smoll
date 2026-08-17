@@ -3837,8 +3837,10 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             tokens[pos].error("safety", "there is no clear priority order between 'and' and 'or'; be explicit with parentheses")
         if current_operator_priority==10 and op_priority==9: 
             tokens[pos].error("safety", "there is no clear priority order between 'and' and 'or'; be explicit with parentheses")
-        if current_operator_priority and current_operator_priority<op_priority:
+        if current_operator_priority and current_operator_priority<=op_priority:
             return pos, rets
+        # if current_operator_priority and current_operator_priority<=op_priority and current_operator_priority>=1 and current_operator_priority<=7:
+        #     return pos, rets
         op_token = tokens[pos]
         if current_operator_priority==7 and op_priority==7:
             op_token.error("safety", "there is no clear priority order between multiple equalities and inequalities; be explicit with parentheses")

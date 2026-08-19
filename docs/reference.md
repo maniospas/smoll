@@ -1158,7 +1158,9 @@ the type is inferred.
 
 In this setting, it is not allowed to wrongfully promote the buffer *buf* to
 being mutable; elevating buffer or -more generally- pointer permissions
-from constant to mutable is not allowed for safety.
+from constant to mutable is not allowed for safety. In the few cases where
+mutability is desired, you can use `unsafe_mut` to unsafely convert anything
+to a fully mutable copy, which allows bypassing even construction correctness.
 
 ```python
 import "std/core.s"
@@ -1179,10 +1181,9 @@ def main()
 <div class="console">
 <code class="output">
 [<span style="color:orange">+</span>] process      tests/test.s
-<span style="color:#F056AC">type error: could not resolve any call for 'mutget(const float[] {element size 8} {follows float ptr ..unsafe_ptr}, nat) -> any'</span>
+<span style="color:#F056AC">type error: could not resolve any call for 'mutget(float[], nat) -> mut any ptr' even though there is only one option</span>
     alternatives
-    - mutget(edit any[] {element size ?}, nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
-    - mutget(list, nat pos) -> (mut any ptr ret {follows any ptr l.buffer.unsafe_ptr})
+    - mutget(edit any[], nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 at tests/test.s line 5 column 12
     buf[1] = 1.0 # CREATES AN ERROR
        <span style="color:red">^</span>
@@ -2646,7 +2647,7 @@ def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/
 def main()
     CLI = edit console()
     CHARS = circular alloc KB 4
-    f = edit file::open web:get README
+    f = edit file::open web::get README
     size = mut 0
     for line in f
         size = size+len line

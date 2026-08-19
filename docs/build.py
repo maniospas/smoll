@@ -7,7 +7,31 @@ def export(path, target):
     text = text.replace("[Index](https://maniospas.github.io/smoll/index.html)", "[GitHub](https://github.com/maniospas/smoll)")
     text = text.replace("https://maniospas.github.io/smoll/", "")
 
-    html = markdown2.markdown(text, extras=['fenced-code-blocks', 'header-ids', 'smarty-pants', 'markdown-in-html', 'highlightpython-lang', 'cuddled-lists'])
+    html = markdown2.markdown(text, extras=['fenced-code-blocks', 'header-ids', 'smarty-pants', 'markdown-in-html', 'cuddled-lists'])
+    smoll_highlight_script = """
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        function escapeHtml(s){
+          return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+        function highlightSmoll(raw){
+          return escapeHtml(raw).replace(
+            /("(?:[^"\\\\]|\\\\.)*"|#.*|\\b(?:if|while|for|in|else|try|fail|mut|edit|unsafe_mut)\\b|\\b(?:def|local|import|repo|as)\\b|[+\\-*/%=<>!&|^~:]+)/g,
+            function(m){
+              if(m[0]==='#') return '<span style="color:#777777">'+m+'</span>';
+              if(m[0]==='"') return '<span style="color:#2c5b19">'+m+'</span>';
+              if(/^(if|while|for|in|else|try|fail|mut|edit|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
+              if(/^(def|local|import|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
+              return '<span style="color:#2e766b">'+m+'</span>';
+            }
+          );
+        }
+        document.querySelectorAll("pre > code").forEach(code => {
+          code.innerHTML = highlightSmoll(code.textContent);
+        });
+    });
+    </script>
+    """
 
     def convert_notice_boxes(html):
         def replacer(match):
@@ -277,7 +301,7 @@ def export(path, target):
             <a href="playground.html" style="font-weight:{'900' if 'playground' in target else '500'}">Playground</a>
             <a href="https://github.com/maniospas/smoll">GitHub</a>
         </nav>
-    """ + html + run_button_script + """
+    """ + html + run_button_script + smoll_highlight_script + """
     </body>
     </html>
     """

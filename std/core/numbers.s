@@ -38,7 +38,7 @@ def neq(Number x, Number y)
     return z
 
 def eq(compiler::catch x, compiler::catch y)
-    doc "eqqual to"
+    doc "equals"
     doc "Compares two error messages. This comparison is"
     doc "used only for comparing error messages produced"
     doc "by the same running program."

@@ -259,8 +259,6 @@
   <a href="reference.html" class="button">📚 Learn</a>
 </div>
 
-<img src="smol.png", style="width:50%"></img>
-
 <p class="smoll-section-label">Quickstart</p>
 
 <div class="codehilite">
@@ -270,10 +268,10 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">README</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md&quot;</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="c1"># effects to automatically pass around (some functions grab these by name)</span>
+    <span class="c1"># EFFECTS to automatically pass around (some functions grab these by name)</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">circular</span> <span class="n">alloc</span> <span class="mi">4096</span> 
-    <span class="n">f</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">file</span><span class="p">::</span><span class="nb">open</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span> <span class="c1"># parentheses optional for one argument</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">file</span><span class="p">::</span><span class="nb">open</span> <span class="n">web</span><span class="p">::</span><span class="n">get</span> <span class="n">README</span> <span class="c1"># parentheses optional for one argument</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span>
         <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">+</span><span class="nb">len</span> <span class="n">line</span>
@@ -287,11 +285,13 @@
 <div class="smoll-features">
   <div class="smoll-feature"><h3>Safe</h3><p>Automatically apply and guard resources. Opt into unsafe C only explicitly.</p></div>
   <div class="smoll-feature"><h3>Finite</h3><p>Tuple-based type system reads sequentially. Less wading through magic.</p></div>
-  <div class="smoll-feature"><h3>Ergonomic</h3><p>High-level syntax. Interceptable errors get out of the way.</p></div>
-  <div class="smoll-feature"><h3>Fast</h3><p>Scripting abstractions yet minimal memory indirection.</p></div>
+  <div class="smoll-feature"><h3>Fast</h3><p>Scripting abstractions, minimal memory indirection, ιnterceptable errors get out of the way.</p></div>
   <div class="smoll-feature"><h3>Duck and linear types</h3><p>Functions define types. Interact with those with zero runtime overhead.</p></div>
   <div class="smoll-feature"><h3>Supported</h3><p>Compiler, LSP, interpreter to test unsafe code, web import, web playground.</p></div>
+  <div class="smoll-feature"><img src="smol.png", style="width:90%"></img></div>
 </div>
+
+
 
 </div>
 
@@ -310,6 +310,29 @@
                 window.location.href = "playground.html?contents=" + encoded;
             });
             pre.appendChild(btn);
+        });
+    });
+    </script>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        function escapeHtml(s){
+          return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+        function highlightSmoll(raw){
+          return escapeHtml(raw).replace(
+            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|try|fail|mut|edit|unsafe_mut)\b|\b(?:def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
+            function(m){
+              if(m[0]==='#') return '<span style="color:#777777">'+m+'</span>';
+              if(m[0]==='"') return '<span style="color:#2c5b19">'+m+'</span>';
+              if(/^(if|while|for|in|else|try|fail|mut|edit|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
+              if(/^(def|local|import|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
+              return '<span style="color:#2e766b">'+m+'</span>';
+            }
+          );
+        }
+        document.querySelectorAll("pre > code").forEach(code => {
+          code.innerHTML = highlightSmoll(code.textContent);
         });
     });
     </script>

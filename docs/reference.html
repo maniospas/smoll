@@ -1423,7 +1423,9 @@ the type is inferred. </p>
 
 <p>In this setting, it is not allowed to wrongfully promote the buffer <em>buf</em> to
 being mutable; elevating buffer or -more generally- pointer permissions
-from constant to mutable is not allowed for safety.</p>
+from constant to mutable is not allowed for safety. In the few cases where
+mutability is desired, you can use <code>unsafe_mut</code> to unsafely convert anything
+to a fully mutable copy, which allows bypassing even construction correctness.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
@@ -1445,10 +1447,9 @@ from constant to mutable is not allowed for safety.</p>
 <div class="console">
 <code class="output">
 [<span style="color:orange">+</span>] process      tests/test.s
-<span style="color:#F056AC">type error: could not resolve any call for 'mutget(const float[] {element size 8} {follows float ptr ..unsafe_ptr}, nat) -> any'</span>
+<span style="color:#F056AC">type error: could not resolve any call for 'mutget(float[], nat) -> mut any ptr' even though there is only one option</span>
     alternatives
-    - mutget(edit any[] {element size ?}, nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
-    - mutget(list, nat pos) -> (mut any ptr ret {follows any ptr l.buffer.unsafe_ptr})
+    - mutget(edit any[], nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 at tests/test.s line 5 column 12
     buf[1] = 1.0 # CREATES AN ERROR
        <span style="color:red">^</span>
@@ -2955,7 +2956,7 @@ circular buffer reader for temprarily read lines, as it can go through arbitaril
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">CHARS</span> <span class="o">=</span> <span class="n">circular</span> <span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">file</span><span class="p">::</span><span class="nb">open</span> <span class="n">web</span><span class="p">:</span><span class="n">get</span> <span class="n">README</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">file</span><span class="p">::</span><span class="nb">open</span> <span class="n">web</span><span class="p">::</span><span class="n">get</span> <span class="n">README</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span>
         <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">+</span><span class="nb">len</span> <span class="n">line</span>
@@ -2982,6 +2983,29 @@ arguments to the iterator. This is useful when interweaving other kinds of strin
                 window.location.href = "playground.html?contents=" + encoded;
             });
             pre.appendChild(btn);
+        });
+    });
+    </script>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        function escapeHtml(s){
+          return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+        function highlightSmoll(raw){
+          return escapeHtml(raw).replace(
+            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|try|fail|mut|edit|unsafe_mut)\b|\b(?:def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
+            function(m){
+              if(m[0]==='#') return '<span style="color:#777777">'+m+'</span>';
+              if(m[0]==='"') return '<span style="color:#2c5b19">'+m+'</span>';
+              if(/^(if|while|for|in|else|try|fail|mut|edit|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
+              if(/^(def|local|import|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
+              return '<span style="color:#2e766b">'+m+'</span>';
+            }
+          );
+        }
+        document.querySelectorAll("pre > code").forEach(code => {
+          code.innerHTML = highlightSmoll(code.textContent);
         });
     });
     </script>

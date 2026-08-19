@@ -6873,7 +6873,7 @@ async def main():
                 docs_file.write("# "+union_type.name.replace("_", "\\_")+"\n")
                 for callee in sorted(list(set(union_type.variations)), key=lambda x:-id(x)):
                     if "____" in callee.name: continue
-                    docs_file.write("### "+callee.name.replace("_", "\\_"))
+                    if not callee.name.startswith("__t"): docs_file.write("### "+callee.name.replace("_", "\\_"))
                     if callee.doc: docs_file.write(" - "+strip_quotes(callee.doc[0])+"\n")
                     else: docs_file.write("\n")
                     if callee.at: docs_file.write("*Defined in: "+callee.at.file.path+" line "+str(callee.at.row)+"*\n")
@@ -6900,7 +6900,7 @@ async def main():
                     if callee.VM: docs_file.write("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*\n")
     elif not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)
-        if not main_type: print(f"{RED}error{RESET}: missing main type"); errexit()
+        if not main_type: print(f"{RED}error{RESET}: missing main function (did you mean to run with --doc)"); errexit()
         main_type_variations = [variation for variation in main_type.variations if variation.at.file==file]
         if len(main_type_variations) > 1: print(f"{RED}error{RESET}: more than one main type in this file"); errexit()
         if main_type_variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); errexit()

@@ -27,8 +27,6 @@
   <a href="reference.html" class="button">📚 Learn</a>
 </div>
 
-<img src="smol.png", style="width:50%"></img>
-
 <p class="smoll-section-label">Quickstart</p>
 
 ```python
@@ -38,10 +36,10 @@ import "std/io.s"
 
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 def main()
-    # effects to automatically pass around (some functions grab these by name)
+    # EFFECTS to automatically pass around (some functions grab these by name)
     CLI = edit console()
     CHARS = edit circular alloc 4096 
-    f = edit file::open web:get README # parentheses optional for one argument
+    f = edit file::open web::get README # parentheses optional for one argument
     size = mut 0
     for line in f
         size = size+len line
@@ -53,10 +51,12 @@ def main()
 <div class="smoll-features">
   <div class="smoll-feature"><h3>Safe</h3><p>Automatically apply and guard resources. Opt into unsafe C only explicitly.</p></div>
   <div class="smoll-feature"><h3>Finite</h3><p>Tuple-based type system reads sequentially. Less wading through magic.</p></div>
-  <div class="smoll-feature"><h3>Ergonomic</h3><p>High-level syntax. Interceptable errors get out of the way.</p></div>
-  <div class="smoll-feature"><h3>Fast</h3><p>Scripting abstractions yet minimal memory indirection.</p></div>
+  <div class="smoll-feature"><h3>Fast</h3><p>Scripting abstractions, minimal memory indirection, ιnterceptable errors get out of the way.</p></div>
   <div class="smoll-feature"><h3>Duck and linear types</h3><p>Functions define types. Interact with those with zero runtime overhead.</p></div>
   <div class="smoll-feature"><h3>Supported</h3><p>Compiler, LSP, interpreter to test unsafe code, web import, web playground.</p></div>
+  <div class="smoll-feature"><img src="smol.png", style="width:90%"></img></div>
 </div>
+
+
 
 </div>

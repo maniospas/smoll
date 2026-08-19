@@ -12,7 +12,36 @@ if(base64) {
     const decoded = atob(base64);
     editor.value='repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"\n'+decoded
 }
-else editor.value='repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"\nimport "std/core.s"\n\ndef main()\n    print "Hello world!"\n';
+else editor.value='repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"\nimport "std/core.s"\n\ndef main()\n    CLI = edit console()\n    print "Hello world!"\n';
+
+var hl = document.getElementById('highlight');
+var hlCode = document.getElementById('highlightCode');
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlight(){
+  var out = escapeHtml(editor.value).replace(
+    /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|try|fail|mut|edit|unsafe_mut)\b|\b(?:def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
+    function(m){
+      if(m[0]==='#') return '<span style="color:#777777">'+m+'</span>';
+      if(m[0]==='"') return '<span style="color:#2c5b19">'+m+'</span>';
+      if(/^(if|while|for|in|else|try|fail|mut|edit|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
+      if(/^(def|local|import|repo|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
+      return '<span style="color:#2e766b">'+m+'</span>';
+    }
+  );
+  hlCode.innerHTML = out + '\n';
+}
+
+editor.addEventListener('input', highlight);
+editor.addEventListener('scroll', function(){
+  hl.scrollTop = editor.scrollTop;
+  hl.scrollLeft = editor.scrollLeft;
+});
+
+
 editor.addEventListener('keydown',function(e){
   if(e.key==='Tab'){
     e.preventDefault();
@@ -298,5 +327,8 @@ btnClearCache.addEventListener('click', async function() {
   clog('Cache cleared (' + removed + ' entries)');
   await initPyodide();
 });
+
+
+highlight();
 
 })();

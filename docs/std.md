@@ -73,6 +73,7 @@
 [starts\_with](#starts\_with) 
 [ends\_with](#ends\_with) 
 [contains](#contains) 
+[empty](#empty) 
 [is\_number](#is\_number) 
 [rotl](#rotl) 
 [splitmix64](#splitmix64) 
@@ -142,15 +143,15 @@
 [draw](#draw) 
 [clear](#clear) 
 [text](#text) 
-[text\_rotated](#text\_rotated) 
+[sleep](#sleep) 
 [TextureData](#texturedata) 
 [Texture](#texture) 
 [open](#open) 
+[texture](#texture) 
 [circ](#circ) 
 [ellipse](#ellipse) 
 [rect](#rect) 
-[rect\_line](#rect\_line) 
-[circ\_line](#circ\_line) 
+[tri](#tri) 
 [dt](#dt) 
 [uptime](#uptime) 
 [key\_down](#key\_down) 
@@ -361,7 +362,7 @@ Level of abstraction:
 ### int - cast to int
 *Defined in: std/core/convert.s line 29*
 
-Overflows are mapped to negative integers and are not protected against.
+Overflows are mapped to negative integers without any numerical safeguards.
 
 ```rust
 int(nat) -> (int)
@@ -410,12 +411,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
+15. out of bounds
 18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 23. unexpected end of console read
 24. user input was not a float
-9. iteration end
-15. out of bounds
 
 ### int - converts a string to an integer
 *Defined in: std/core/convertstr.s line 149*
@@ -447,12 +447,12 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
+15. out of bounds
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
 26. invalid int conversion from empty string
 27. invalid int conversion from string with only a sign
 28. invalid integer int from non-number string
-15. out of bounds
 
 # nat
 ### nat - an unsigned integer value
@@ -462,17 +462,6 @@ Represents values in the range `0 to 2^64-1`.
 
 ```rust
 nat() -> (nat)
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### nat
-*Defined in: std/core/array.s line 24*
-
-```rust
-nat(nat16) -> (nat)
 ```
 Level of abstraction:
 
@@ -554,6 +543,28 @@ Potential errors:
 
 7. cannot convert negative float to nat
 
+### nat
+*Defined in: std/core/array.s line 24*
+
+```rust
+nat(nat32) -> (nat)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### nat
+*Defined in: std/core/array.s line 24*
+
+```rust
+nat(nat16) -> (nat)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 ### nat - reads an unsigned integer from the console
 *Defined in: std/core/convertstr.s line 60*
 
@@ -567,12 +578,10 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-23. unexpected end of console read
-24. user input was not a float
-9. iteration end
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+24. user input was not a float
 
 ### nat - converts a string to an unsigned integer
 *Defined in: std/core/convertstr.s line 172*
@@ -586,7 +595,6 @@ Level of abstraction:
 
 Potential errors:
 
-9. iteration end
 2. null pointer
 29. invalid nat conversion from empty string
 30. invalid nat conversion from non-number string
@@ -604,23 +612,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
+15. out of bounds
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
-9. iteration end
 29. invalid nat conversion from empty string
 30. invalid nat conversion from non-number string
-15. out of bounds
-
-### nat - retrieved unsigned number from 32 bits
-*Defined in: std/mini.s line 30*
-
-```rust
-nat(nat32) -> (nat)
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
 
 # nat32
 ### nat32 - a 32-bit unsigned integer value
@@ -636,8 +632,19 @@ Level of abstraction:
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+### nat32
+*Defined in: std/core/allocators.s line 142*
+
+```rust
+nat32(nat) -> (nat32)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 ### nat32 - convert unsigned number to 32 bits
-*Defined in: std/mini.s line 22*
+*Defined in: std/mini.s line 38*
 
 The conversion checks whether the previous value fits in the new one.
 If it does not, this operation can fail.
@@ -667,19 +674,8 @@ Level of abstraction:
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### nat16
-*Defined in: std/core/allocators.s line 126*
-
-```rust
-nat16(nat) -> (nat16)
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 ### nat16 - convert unsigned number to 16 bits
-*Defined in: std/mini.s line 14*
+*Defined in: std/mini.s line 30*
 
 The conversion checks whether the previous value fits in the new one.
 If it does not, this operation can fail.
@@ -710,7 +706,7 @@ Level of abstraction:
 
 
 ### nat8 - convert unsigned number to 8 bits
-*Defined in: std/mini.s line 6*
+*Defined in: std/mini.s line 22*
 
 The conversion checks whether the previous value fits in the new one.
 If it does not, this operation can fail.
@@ -790,6 +786,25 @@ Level of abstraction:
 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+### float - reads a float from the console
+*Defined in: std/core/convertstr.s line 80*
+
+```rust
+float(console) -> (float)
+```
+Level of abstraction:
+
+0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+23. unexpected end of console read
+24. user input was not a float
+
 ### float - converts a string to a float
 *Defined in: std/core/convertstr.s line 184*
 
@@ -828,26 +843,6 @@ Potential errors:
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
 31. invalid float conversion from empty string
-
-### float - reads a float from the console
-*Defined in: std/core/convertstr.s line 80*
-
-```rust
-float(console) -> (float)
-```
-Level of abstraction:
-
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-23. unexpected end of console read
-24. user input was not a float
-9. iteration end
-15. out of bounds
 
 # bool
 ### bool - boolean value
@@ -962,6 +957,67 @@ Level of abstraction:
 
 # eq
 ### eq - equals
+*Defined in: std/core/numbers.s line 56*
+
+Compares the address of two pointers.
+
+```rust
+eq(any ptr x, any ptr y) -> (bool)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### eq - equals
+*Defined in: std/core/numbers.s line 40*
+
+Compares two error messages. This comparison is
+used only for comparing error messages produced
+by the same running program.
+
+```rust
+eq(catch x, catch y) -> (bool)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### eq - equals
+*Defined in: std/core/numbers.s line 26*
+
+```rust
+eq(nat x, nat y) -> (bool)
+```
+Level of abstraction:
+
+0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### eq - equals
+*Defined in: std/core/numbers.s line 26*
+
+```rust
+eq(int x, int y) -> (bool)
+```
+Level of abstraction:
+
+0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### eq - equals
+*Defined in: std/core/numbers.s line 26*
+
+```rust
+eq(float x, float y) -> (bool)
+```
+Level of abstraction:
+
+0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### eq - equals
 *Defined in: std/core/bool.s line 82*
 
 ```rust
@@ -1069,64 +1125,14 @@ Level of abstraction:
 
 
 ### eq - equals
-*Defined in: std/core/numbers.s line 56*
-
-Compares the address of two pointers.
+*Defined in: std/core/string.s line 119*
 
 ```rust
-eq(any ptr x, any ptr y) -> (bool)
+eq(char x, char y) -> (bool)
 ```
 Level of abstraction:
 
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### eq - eqqual to
-*Defined in: std/core/numbers.s line 40*
-
-Compares two error messages. This comparison is
-used only for comparing error messages produced
-by the same running program.
-
-```rust
-eq(catch x, catch y) -> (bool)
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### eq - equals
-*Defined in: std/core/numbers.s line 26*
-
-```rust
-eq(nat x, nat y) -> (bool)
-```
-Level of abstraction:
-
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### eq - equals
-*Defined in: std/core/numbers.s line 26*
-
-```rust
-eq(int x, int y) -> (bool)
-```
-Level of abstraction:
-
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### eq - equals
-*Defined in: std/core/numbers.s line 26*
-
-```rust
-eq(float x, float y) -> (bool)
-```
-Level of abstraction:
-
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
 ### eq - equals
@@ -1185,18 +1191,79 @@ Level of abstraction:
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### eq - equals
-*Defined in: std/core/string.s line 119*
+# neq
+### neq - not equal
+*Defined in: std/core/numbers.s line 62*
+
+Compares the address of two pointers.
 
 ```rust
-eq(char x, char y) -> (bool)
+neq(any ptr x, any ptr y) -> (bool)
 ```
 Level of abstraction:
 
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-# neq
+### neq - not equal
+*Defined in: std/core/numbers.s line 48*
+
+Compares two error messages. This comparison is
+used only for comparing error messages produced
+by the same running program.
+
+```rust
+neq(catch x, catch y) -> (bool)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### neq - not equal
+*Defined in: std/core/numbers.s line 33*
+
+```rust
+neq(nat x, nat y) -> (bool)
+```
+Level of abstraction:
+
+0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### neq - not equal
+*Defined in: std/core/numbers.s line 33*
+
+```rust
+neq(int x, int y) -> (bool)
+```
+Level of abstraction:
+
+0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### neq - not equal
+*Defined in: std/core/numbers.s line 33*
+
+```rust
+neq(float x, float y) -> (bool)
+```
+Level of abstraction:
+
+0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### neq - not equal
+*Defined in: std/core/bool.s line 90*
+
+```rust
+neq(bool x, false y) -> (bool)
+```
+Level of abstraction:
+
+1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 ### neq - not equal
 *Defined in: std/core/bool.s line 90*
 
@@ -1285,76 +1352,15 @@ Level of abstraction:
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### neq - not equal
-*Defined in: std/core/numbers.s line 62*
-
-Compares the address of two pointers.
+### neq - not equals
+*Defined in: std/core/string.s line 124*
 
 ```rust
-neq(any ptr x, any ptr y) -> (bool)
+neq(char x, char y) -> (bool)
 ```
 Level of abstraction:
 
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### neq - not equal
-*Defined in: std/core/numbers.s line 48*
-
-Compares two error messages. This comparison is
-used only for comparing error messages produced
-by the same running program.
-
-```rust
-neq(catch x, catch y) -> (bool)
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### neq - not equal
-*Defined in: std/core/numbers.s line 33*
-
-```rust
-neq(nat x, nat y) -> (bool)
-```
-Level of abstraction:
-
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### neq - not equal
-*Defined in: std/core/numbers.s line 33*
-
-```rust
-neq(int x, int y) -> (bool)
-```
-Level of abstraction:
-
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### neq - not equal
-*Defined in: std/core/numbers.s line 33*
-
-```rust
-neq(float x, float y) -> (bool)
-```
-Level of abstraction:
-
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### neq - not equal
-*Defined in: std/core/bool.s line 90*
-
-```rust
-neq(bool x, false y) -> (bool)
-```
-Level of abstraction:
-
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
 ### neq - not equals
@@ -1411,17 +1417,6 @@ neq(str, str) -> (bool)
 Level of abstraction:
 
 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### neq - not equals
-*Defined in: std/core/string.s line 124*
-
-```rust
-neq(char x, char y) -> (bool)
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
 # not
@@ -1692,9 +1687,153 @@ Level of abstraction:
 
 
 ### add - concatenate two strings
+*Defined in: std/core/string.s line 324*
+
+The result is placed on an allocator effect CHARS.
+This implementation ensures that consecutively allocated strings, or
+adding to strings placed at the end of buffers, does not needlessly
+copy memory. This way, consecutive additions do not copy the previous
+result before appending to it. For example, consider the following:
+```
+CHARS = edit arena alloc 10
+s1 = copy 123
+s2 = copy 456
+s3 = s1+s2
+result = s3+copy(78)+copy(9)
+```
+The snippet fits the result in a contiguous area on the arena's buffer,
+with only one copying operation for each character. This does not
+magically optimize all copying operations, but it does makes most
+convenient optimizatins when allocating and immediately concatenating.
+
+```rust
+add(edit arena, cstr _s1, cstr _s2) -> (str) with effects CHARS
+```
+Level of abstraction:
+
+0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+6. nat subtraction would yield a negative
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 324*
+
+The result is placed on an allocator effect CHARS.
+This implementation ensures that consecutively allocated strings, or
+adding to strings placed at the end of buffers, does not needlessly
+copy memory. This way, consecutive additions do not copy the previous
+result before appending to it. For example, consider the following:
+```
+CHARS = edit arena alloc 10
+s1 = copy 123
+s2 = copy 456
+s3 = s1+s2
+result = s3+copy(78)+copy(9)
+```
+The snippet fits the result in a contiguous area on the arena's buffer,
+with only one copying operation for each character. This does not
+magically optimize all copying operations, but it does makes most
+convenient optimizatins when allocating and immediately concatenating.
+
+```rust
+add(edit arena, cstr _s1, str) -> (str) with effects CHARS
+```
+Level of abstraction:
+
+0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+6. nat subtraction would yield a negative
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 324*
+
+The result is placed on an allocator effect CHARS.
+This implementation ensures that consecutively allocated strings, or
+adding to strings placed at the end of buffers, does not needlessly
+copy memory. This way, consecutive additions do not copy the previous
+result before appending to it. For example, consider the following:
+```
+CHARS = edit arena alloc 10
+s1 = copy 123
+s2 = copy 456
+s3 = s1+s2
+result = s3+copy(78)+copy(9)
+```
+The snippet fits the result in a contiguous area on the arena's buffer,
+with only one copying operation for each character. This does not
+magically optimize all copying operations, but it does makes most
+convenient optimizatins when allocating and immediately concatenating.
+
+```rust
+add(edit arena, str, cstr _s2) -> (str) with effects CHARS
+```
+Level of abstraction:
+
+0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+6. nat subtraction would yield a negative
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 324*
+
+The result is placed on an allocator effect CHARS.
+This implementation ensures that consecutively allocated strings, or
+adding to strings placed at the end of buffers, does not needlessly
+copy memory. This way, consecutive additions do not copy the previous
+result before appending to it. For example, consider the following:
+```
+CHARS = edit arena alloc 10
+s1 = copy 123
+s2 = copy 456
+s3 = s1+s2
+result = s3+copy(78)+copy(9)
+```
+The snippet fits the result in a contiguous area on the arena's buffer,
+with only one copying operation for each character. This does not
+magically optimize all copying operations, but it does makes most
+convenient optimizatins when allocating and immediately concatenating.
+
+```rust
+add(edit arena, str, str) -> (str) with effects CHARS
+```
+Level of abstraction:
+
+0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+6. nat subtraction would yield a negative
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(edit list, cstr _s1, cstr _s2) -> (str) with effects CHARS
@@ -1718,7 +1857,7 @@ Potential errors:
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(edit list, cstr _s1, str) -> (str) with effects CHARS
@@ -1742,7 +1881,7 @@ Potential errors:
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(edit list, str, cstr _s2) -> (str) with effects CHARS
@@ -1766,7 +1905,7 @@ Potential errors:
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(edit list, str, str) -> (str) with effects CHARS
@@ -1790,7 +1929,7 @@ Potential errors:
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(edit circular, cstr _s1, cstr _s2) -> (str) with effects CHARS
@@ -1801,18 +1940,18 @@ Level of abstraction:
 
 Potential errors:
 
-16. arena is out of space
-17. does not fit in circular arena
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
+16. arena is out of space
+17. does not fit in circular arena
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(edit circular, cstr _s1, str) -> (str) with effects CHARS
@@ -1823,18 +1962,18 @@ Level of abstraction:
 
 Potential errors:
 
-16. arena is out of space
-17. does not fit in circular arena
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
+16. arena is out of space
+17. does not fit in circular arena
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(edit circular, str, cstr _s2) -> (str) with effects CHARS
@@ -1845,18 +1984,18 @@ Level of abstraction:
 
 Potential errors:
 
-16. arena is out of space
-17. does not fit in circular arena
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 15. out of bounds
+16. arena is out of space
+17. does not fit in circular arena
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(edit circular, str, str) -> (str) with effects CHARS
@@ -1867,102 +2006,18 @@ Level of abstraction:
 
 Potential errors:
 
+2. null pointer
+6. nat subtraction would yield a negative
+15. out of bounds
 16. arena is out of space
 17. does not fit in circular arena
-2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-15. out of bounds
+19. can only define strings on non-offset buffers
 
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
-
-```rust
-add(edit arena, cstr _s1, cstr _s2) -> (str) with effects CHARS
-```
-Level of abstraction:
-
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-16. arena is out of space
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-15. out of bounds
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 313*
-
-The result is placed on a memory surface handled CHARS allocator effect.
-
-```rust
-add(edit arena, cstr _s1, str) -> (str) with effects CHARS
-```
-Level of abstraction:
-
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-16. arena is out of space
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-15. out of bounds
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 313*
-
-The result is placed on a memory surface handled CHARS allocator effect.
-
-```rust
-add(edit arena, str, cstr _s2) -> (str) with effects CHARS
-```
-Level of abstraction:
-
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-16. arena is out of space
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-15. out of bounds
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 313*
-
-The result is placed on a memory surface handled CHARS allocator effect.
-
-```rust
-add(edit arena, str, str) -> (str) with effects CHARS
-```
-Level of abstraction:
-
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-16. arena is out of space
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-15. out of bounds
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 313*
-
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(new CHARS, cstr _s1, cstr _s2) -> (str) with effects CHARS
@@ -1976,8 +2031,8 @@ Potential errors:
 2. null pointer
 6. nat subtraction would yield a negative
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 15. out of bounds
 16. arena is out of space
 18. can only define strings on contiguous buffers
@@ -1992,7 +2047,7 @@ free(mut any ptr) -> ()
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(new CHARS, cstr _s1, str) -> (str) with effects CHARS
@@ -2006,8 +2061,8 @@ Potential errors:
 2. null pointer
 6. nat subtraction would yield a negative
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 15. out of bounds
 16. arena is out of space
 18. can only define strings on contiguous buffers
@@ -2022,7 +2077,7 @@ free(mut any ptr) -> ()
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(new CHARS, str, cstr _s2) -> (str) with effects CHARS
@@ -2036,8 +2091,8 @@ Potential errors:
 2. null pointer
 6. nat subtraction would yield a negative
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 15. out of bounds
 16. arena is out of space
 18. can only define strings on contiguous buffers
@@ -2052,7 +2107,7 @@ free(mut any ptr) -> ()
 ### add - concatenate two strings
 *Defined in: std/core/string.s line 313*
 
-The result is placed on a memory surface handled CHARS allocator effect.
+The result is placed on an allocator effect CHARS.
 
 ```rust
 add(new CHARS, str, str) -> (str) with effects CHARS
@@ -2066,8 +2121,8 @@ Potential errors:
 2. null pointer
 6. nat subtraction would yield a negative
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 15. out of bounds
 16. arena is out of space
 18. can only define strings on contiguous buffers
@@ -2080,7 +2135,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### add - vector addition
-*Defined in: std/sci/vec.s line 72*
+*Defined in: std/sci/vec.s line 88*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2100,7 +2155,7 @@ Potential errors:
 15. out of bounds
 
 ### add - vector addition
-*Defined in: std/sci/vec.s line 72*
+*Defined in: std/sci/vec.s line 88*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2120,7 +2175,7 @@ Potential errors:
 15. out of bounds
 
 ### add - vector addition
-*Defined in: std/sci/vec.s line 72*
+*Defined in: std/sci/vec.s line 88*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2133,10 +2188,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -2146,7 +2199,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### add - vector addition
-*Defined in: std/sci/vec.s line 61*
+*Defined in: std/sci/vec.s line 77*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2166,7 +2219,7 @@ Potential errors:
 15. out of bounds
 
 ### add - vector addition
-*Defined in: std/sci/vec.s line 61*
+*Defined in: std/sci/vec.s line 77*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2187,7 +2240,7 @@ Potential errors:
 15. out of bounds
 
 ### add - vector addition
-*Defined in: std/sci/vec.s line 61*
+*Defined in: std/sci/vec.s line 77*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2207,7 +2260,7 @@ Potential errors:
 15. out of bounds
 
 ### add - vector addition
-*Defined in: std/sci/vec.s line 61*
+*Defined in: std/sci/vec.s line 77*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2228,7 +2281,7 @@ Potential errors:
 15. out of bounds
 
 ### add - vector addition
-*Defined in: std/sci/vec.s line 61*
+*Defined in: std/sci/vec.s line 77*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2241,10 +2294,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -2254,7 +2305,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### add - vector addition
-*Defined in: std/sci/vec.s line 61*
+*Defined in: std/sci/vec.s line 77*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2268,9 +2319,7 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-13. cannot allocate a buffer of unsized type
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
 61. different vector sizes
 15. out of bounds
 
@@ -2281,6 +2330,19 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 # mul
+### mul - multiply with
+*Defined in: std/core/numbers.s line 81*
+
+Multiplies two numbers of the same type. This is an overload for the * operator.
+
+```rust
+mul(float x, float y) -> (float)
+```
+Level of abstraction:
+
+0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 ### mul - multiply with
 *Defined in: std/core/numbers.s line 81*
 
@@ -2307,21 +2369,8 @@ Level of abstraction:
 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### mul - multiply with
-*Defined in: std/core/numbers.s line 81*
-
-Multiplies two numbers of the same type. This is an overload for the * operator.
-
-```rust
-mul(float x, float y) -> (float)
-```
-Level of abstraction:
-
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 ### mul - vector multiplication
-*Defined in: std/sci/vec.s line 107*
+*Defined in: std/sci/vec.s line 123*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2341,7 +2390,7 @@ Potential errors:
 15. out of bounds
 
 ### mul - vector multiplication
-*Defined in: std/sci/vec.s line 107*
+*Defined in: std/sci/vec.s line 123*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2361,7 +2410,7 @@ Potential errors:
 15. out of bounds
 
 ### mul - vector multiplication
-*Defined in: std/sci/vec.s line 107*
+*Defined in: std/sci/vec.s line 123*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2374,10 +2423,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -2387,7 +2434,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### mul - vector multiplication
-*Defined in: std/sci/vec.s line 96*
+*Defined in: std/sci/vec.s line 112*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2407,7 +2454,7 @@ Potential errors:
 15. out of bounds
 
 ### mul - vector multiplication
-*Defined in: std/sci/vec.s line 96*
+*Defined in: std/sci/vec.s line 112*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2428,7 +2475,7 @@ Potential errors:
 15. out of bounds
 
 ### mul - vector multiplication
-*Defined in: std/sci/vec.s line 96*
+*Defined in: std/sci/vec.s line 112*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2448,7 +2495,7 @@ Potential errors:
 15. out of bounds
 
 ### mul - vector multiplication
-*Defined in: std/sci/vec.s line 96*
+*Defined in: std/sci/vec.s line 112*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2469,7 +2516,7 @@ Potential errors:
 15. out of bounds
 
 ### mul - vector multiplication
-*Defined in: std/sci/vec.s line 96*
+*Defined in: std/sci/vec.s line 112*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2482,10 +2529,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -2495,7 +2540,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### mul - vector multiplication
-*Defined in: std/sci/vec.s line 96*
+*Defined in: std/sci/vec.s line 112*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -2509,9 +2554,7 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-13. cannot allocate a buffer of unsized type
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
 61. different vector sizes
 15. out of bounds
 
@@ -2537,8 +2580,6 @@ Potential errors:
 2. null pointer
 66. column out of bounds
 69. inner dimensions must agree
-9. iteration end
-15. out of bounds
 17. does not fit in circular arena
 62. can only place matrices on contiguous buffers
 63. cannot place matrices on buffer offsets
@@ -2559,8 +2600,6 @@ Potential errors:
 2. null pointer
 66. column out of bounds
 69. inner dimensions must agree
-9. iteration end
-15. out of bounds
 16. arena is out of space
 62. can only place matrices on contiguous buffers
 63. cannot place matrices on buffer offsets
@@ -2581,11 +2620,9 @@ Potential errors:
 2. null pointer
 66. column out of bounds
 69. inner dimensions must agree
-9. iteration end
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -2652,8 +2689,6 @@ Potential errors:
 2. null pointer
 68. vector length must match matrix rows
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
 15. out of bounds
 
 
@@ -2715,8 +2750,6 @@ Potential errors:
 2. null pointer
 67. matrix columns must match vector length
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
 15. out of bounds
 
 
@@ -2726,7 +2759,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 103*
+*Defined in: std/sci/mat.s line 119*
 
 Grabs an allocator for the result as an effect.
 
@@ -2740,16 +2773,15 @@ Level of abstraction:
 Potential errors:
 
 65. row out of bounds
-2. null pointer
 66. column out of bounds
+2. null pointer
 69. inner dimensions must agree
-9. iteration end
 17. does not fit in circular arena
 62. can only place matrices on contiguous buffers
 63. cannot place matrices on buffer offsets
 
 ### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 103*
+*Defined in: std/sci/mat.s line 119*
 
 Grabs an allocator for the result as an effect.
 
@@ -2763,16 +2795,15 @@ Level of abstraction:
 Potential errors:
 
 65. row out of bounds
-2. null pointer
 66. column out of bounds
+2. null pointer
 69. inner dimensions must agree
-9. iteration end
 16. arena is out of space
 62. can only place matrices on contiguous buffers
 63. cannot place matrices on buffer offsets
 
 ### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 103*
+*Defined in: std/sci/mat.s line 119*
 
 Grabs an allocator for the result as an effect.
 
@@ -2786,13 +2817,12 @@ Level of abstraction:
 Potential errors:
 
 65. row out of bounds
-2. null pointer
 66. column out of bounds
+2. null pointer
 69. inner dimensions must agree
-9. iteration end
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -2801,7 +2831,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### mul - vector-matrix multiplication
-*Defined in: std/sci/mat.s line 91*
+*Defined in: std/sci/mat.s line 107*
 
 Grabs an allocator for the result as an effect.
 
@@ -2818,14 +2848,13 @@ Potential errors:
 2. null pointer
 66. column out of bounds
 68. vector length must match matrix rows
-9. iteration end
 15. out of bounds
 17. does not fit in circular arena
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 
 ### mul - vector-matrix multiplication
-*Defined in: std/sci/mat.s line 91*
+*Defined in: std/sci/mat.s line 107*
 
 Grabs an allocator for the result as an effect.
 
@@ -2842,14 +2871,13 @@ Potential errors:
 2. null pointer
 66. column out of bounds
 68. vector length must match matrix rows
-9. iteration end
 15. out of bounds
 16. arena is out of space
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 
 ### mul - vector-matrix multiplication
-*Defined in: std/sci/mat.s line 91*
+*Defined in: std/sci/mat.s line 107*
 
 Grabs an allocator for the result as an effect.
 
@@ -2866,10 +2894,7 @@ Potential errors:
 2. null pointer
 66. column out of bounds
 68. vector length must match matrix rows
-9. iteration end
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
 15. out of bounds
 
 
@@ -2879,7 +2904,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s line 79*
+*Defined in: std/sci/mat.s line 95*
 
 Grabs an allocator for the result as an effect.
 
@@ -2893,17 +2918,16 @@ Level of abstraction:
 Potential errors:
 
 65. row out of bounds
-2. null pointer
-67. matrix columns must match vector length
 66. column out of bounds
-9. iteration end
+67. matrix columns must match vector length
+2. null pointer
 15. out of bounds
 17. does not fit in circular arena
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 
 ### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s line 79*
+*Defined in: std/sci/mat.s line 95*
 
 Grabs an allocator for the result as an effect.
 
@@ -2917,17 +2941,16 @@ Level of abstraction:
 Potential errors:
 
 65. row out of bounds
-2. null pointer
-67. matrix columns must match vector length
 66. column out of bounds
-9. iteration end
+67. matrix columns must match vector length
+2. null pointer
 15. out of bounds
 16. arena is out of space
 59. can only place vectors on contiguous buffers
 60. cannot place vectors on buffer offsets
 
 ### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s line 79*
+*Defined in: std/sci/mat.s line 95*
 
 Grabs an allocator for the result as an effect.
 
@@ -2944,10 +2967,7 @@ Potential errors:
 2. null pointer
 67. matrix columns must match vector length
 66. column out of bounds
-9. iteration end
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
 15. out of bounds
 
 
@@ -3009,49 +3029,7 @@ Potential errors:
 4. division by zero
 
 ### div - vector division
-*Defined in: std/sci/vec.s line 144*
-
-Grabs a FLOATS allocator effect to store the result.
-
-```rust
-div(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
-```
-Level of abstraction:
-
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-17. does not fit in circular arena
-2. null pointer
-4. division by zero
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-15. out of bounds
-
-### div - vector division
-*Defined in: std/sci/vec.s line 144*
-
-Grabs a FLOATS allocator effect to store the result.
-
-```rust
-div(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
-```
-Level of abstraction:
-
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-16. arena is out of space
-2. null pointer
-4. division by zero
-59. can only place vectors on contiguous buffers
-60. cannot place vectors on buffer offsets
-15. out of bounds
-
-### div - vector division
-*Defined in: std/sci/vec.s line 144*
+*Defined in: std/sci/vec.s line 160*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3064,11 +3042,9 @@ Level of abstraction:
 
 Potential errors:
 
+10. allocation failed
 2. null pointer
 4. division by zero
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
 15. out of bounds
 
 
@@ -3078,7 +3054,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### div - vector division
-*Defined in: std/sci/vec.s line 132*
+*Defined in: std/sci/vec.s line 148*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3099,7 +3075,7 @@ Potential errors:
 15. out of bounds
 
 ### div - vector division
-*Defined in: std/sci/vec.s line 132*
+*Defined in: std/sci/vec.s line 148*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3121,7 +3097,7 @@ Potential errors:
 15. out of bounds
 
 ### div - vector division
-*Defined in: std/sci/vec.s line 132*
+*Defined in: std/sci/vec.s line 148*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3142,7 +3118,7 @@ Potential errors:
 15. out of bounds
 
 ### div - vector division
-*Defined in: std/sci/vec.s line 132*
+*Defined in: std/sci/vec.s line 148*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3164,7 +3140,7 @@ Potential errors:
 15. out of bounds
 
 ### div - vector division
-*Defined in: std/sci/vec.s line 132*
+*Defined in: std/sci/vec.s line 148*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3177,11 +3153,9 @@ Level of abstraction:
 
 Potential errors:
 
+10. allocation failed
 2. null pointer
 4. division by zero
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
 15. out of bounds
 
 
@@ -3191,7 +3165,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### div - vector division
-*Defined in: std/sci/vec.s line 132*
+*Defined in: std/sci/vec.s line 148*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3205,10 +3179,8 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-13. cannot allocate a buffer of unsized type
 4. division by zero
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
 61. different vector sizes
 15. out of bounds
 
@@ -3218,6 +3190,48 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
+### div - vector division
+*Defined in: std/sci/vec.s line 160*
+
+Grabs a FLOATS allocator effect to store the result.
+
+```rust
+div(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+17. does not fit in circular arena
+2. null pointer
+4. division by zero
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+15. out of bounds
+
+### div - vector division
+*Defined in: std/sci/vec.s line 160*
+
+Grabs a FLOATS allocator effect to store the result.
+
+```rust
+div(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+16. arena is out of space
+2. null pointer
+4. division by zero
+59. can only place vectors on contiguous buffers
+60. cannot place vectors on buffer offsets
+15. out of bounds
+
 # mod
 ### mod - modulo by
 *Defined in: std/core/numbers.s line 101*
@@ -3440,7 +3454,7 @@ Level of abstraction:
 
 
 ### sub - vector subtraction
-*Defined in: std/sci/vec.s line 88*
+*Defined in: std/sci/vec.s line 104*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3460,7 +3474,7 @@ Potential errors:
 15. out of bounds
 
 ### sub - vector subtraction
-*Defined in: std/sci/vec.s line 88*
+*Defined in: std/sci/vec.s line 104*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3480,7 +3494,7 @@ Potential errors:
 15. out of bounds
 
 ### sub - vector subtraction
-*Defined in: std/sci/vec.s line 88*
+*Defined in: std/sci/vec.s line 104*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3493,10 +3507,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -3506,7 +3518,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### sub - vector subtraction
-*Defined in: std/sci/vec.s line 77*
+*Defined in: std/sci/vec.s line 93*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3526,7 +3538,7 @@ Potential errors:
 15. out of bounds
 
 ### sub - vector subtraction
-*Defined in: std/sci/vec.s line 77*
+*Defined in: std/sci/vec.s line 93*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3547,7 +3559,7 @@ Potential errors:
 15. out of bounds
 
 ### sub - vector subtraction
-*Defined in: std/sci/vec.s line 77*
+*Defined in: std/sci/vec.s line 93*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3567,7 +3579,7 @@ Potential errors:
 15. out of bounds
 
 ### sub - vector subtraction
-*Defined in: std/sci/vec.s line 77*
+*Defined in: std/sci/vec.s line 93*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3588,7 +3600,7 @@ Potential errors:
 15. out of bounds
 
 ### sub - vector subtraction
-*Defined in: std/sci/vec.s line 77*
+*Defined in: std/sci/vec.s line 93*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3601,10 +3613,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -3614,7 +3624,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### sub - vector subtraction
-*Defined in: std/sci/vec.s line 77*
+*Defined in: std/sci/vec.s line 93*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3628,9 +3638,7 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-13. cannot allocate a buffer of unsized type
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
 61. different vector sizes
 15. out of bounds
 
@@ -3655,7 +3663,7 @@ Level of abstraction:
 
 
 ### pow
-*Defined in: std/sci/math.s line 73*
+*Defined in: std/sci/math.s line 89*
 
 ```rust
 pow(float x, float y) -> (float)
@@ -3666,7 +3674,7 @@ Level of abstraction:
 
 
 ### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 124*
+*Defined in: std/sci/vec.s line 140*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3686,7 +3694,7 @@ Potential errors:
 15. out of bounds
 
 ### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 124*
+*Defined in: std/sci/vec.s line 140*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3706,7 +3714,7 @@ Potential errors:
 15. out of bounds
 
 ### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 124*
+*Defined in: std/sci/vec.s line 140*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3719,10 +3727,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -3732,7 +3738,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 113*
+*Defined in: std/sci/vec.s line 129*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3752,7 +3758,7 @@ Potential errors:
 15. out of bounds
 
 ### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 113*
+*Defined in: std/sci/vec.s line 129*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3773,7 +3779,7 @@ Potential errors:
 15. out of bounds
 
 ### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 113*
+*Defined in: std/sci/vec.s line 129*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3793,7 +3799,7 @@ Potential errors:
 15. out of bounds
 
 ### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 113*
+*Defined in: std/sci/vec.s line 129*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3814,7 +3820,7 @@ Potential errors:
 15. out of bounds
 
 ### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 113*
+*Defined in: std/sci/vec.s line 129*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3827,10 +3833,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -3840,7 +3844,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 113*
+*Defined in: std/sci/vec.s line 129*
 
 Grabs a FLOATS allocator effect to store the result.
 
@@ -3854,9 +3858,7 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-13. cannot allocate a buffer of unsized type
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
 61. different vector sizes
 15. out of bounds
 
@@ -3992,7 +3994,7 @@ Level of abstraction:
 
 
 ### nn - no new line
-*Defined in: std/sci/vec.s line 215*
+*Defined in: std/sci/vec.s line 231*
 
 Given a value, creates a tuple of (value, \"\").
 This enables the pattern 'print nn value'
@@ -4226,44 +4228,6 @@ Level of abstraction:
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### print - print a vector
-*Defined in: std/sci/vec.s line 222*
-
-Prints as a row, such as [ 1.0  2.0  3.0 ]
-
-```rust
-print(console CLI, vec) -> () with effects CLI
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-9. iteration end
-2. null pointer
-6. nat subtraction would yield a negative
-15. out of bounds
-
-### print - print a vector
-*Defined in: std/sci/vec.s line 222*
-
-Prints as a row, such as [ 1.0  2.0  3.0 ]
-
-```rust
-print(console CLI, vec, cstr endl) -> () with effects CLI
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-9. iteration end
-2. null pointer
-6. nat subtraction would yield a negative
-15. out of bounds
-
 ### print - print sparse matrix
 *Defined in: std/sci/coo.s line 87*
 
@@ -4297,7 +4261,7 @@ No failing errors, but can catch these intercepted ones:
 2. null pointer
 
 ### print - print a matrix with aligned brackets
-*Defined in: std/sci/mat.s line 117*
+*Defined in: std/sci/mat.s line 133*
 
 single-row matrices stay on one line; taller ones get top/mid/bottom brackets
 
@@ -4311,13 +4275,12 @@ Level of abstraction:
 Potential errors:
 
 65. row out of bounds
-2. null pointer
 66. column out of bounds
+2. null pointer
 6. nat subtraction would yield a negative
-9. iteration end
 
 ### print - print a matrix with aligned brackets
-*Defined in: std/sci/mat.s line 117*
+*Defined in: std/sci/mat.s line 133*
 
 single-row matrices stay on one line; taller ones get top/mid/bottom brackets
 
@@ -4331,10 +4294,45 @@ Level of abstraction:
 Potential errors:
 
 65. row out of bounds
-2. null pointer
 66. column out of bounds
+2. null pointer
 6. nat subtraction would yield a negative
-9. iteration end
+
+### print - print a vector
+*Defined in: std/sci/vec.s line 238*
+
+Prints as a row, such as [ 1.0  2.0  3.0 ]
+
+```rust
+print(console CLI, vec) -> () with effects CLI
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+6. nat subtraction would yield a negative
+15. out of bounds
+
+### print - print a vector
+*Defined in: std/sci/vec.s line 238*
+
+Prints as a row, such as [ 1.0  2.0  3.0 ]
+
+```rust
+print(console CLI, vec, cstr endl) -> () with effects CLI
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+6. nat subtraction would yield a negative
+15. out of bounds
 
 # supports\_ansi
 ### supports\_ansi
@@ -4366,6 +4364,61 @@ Returned values defer use of the following functions:
 ```rust
 ```
 # set
+### set
+*Defined in: std/core/print.s line 182*
+
+```rust
+set(colors, "reset_underline") -> ()
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### set
+*Defined in: std/core/print.s line 180*
+
+```rust
+set(colors, "reset_bold") -> ()
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### set
+*Defined in: std/core/print.s line 178*
+
+```rust
+set(colors, "reset_bg") -> ()
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### set
+*Defined in: std/core/print.s line 176*
+
+```rust
+set(colors, "reset_color") -> ()
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### set
+*Defined in: std/core/print.s line 174*
+
+```rust
+set(colors, "reset") -> ()
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 ### set
 *Defined in: std/core/print.s line 172*
 
@@ -4696,73 +4749,7 @@ Level of abstraction:
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### set
-*Defined in: std/core/print.s line 182*
-
-```rust
-set(colors, "reset_underline") -> ()
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### set
-*Defined in: std/core/print.s line 180*
-
-```rust
-set(colors, "reset_bold") -> ()
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### set
-*Defined in: std/core/print.s line 178*
-
-```rust
-set(colors, "reset_bg") -> ()
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### set
-*Defined in: std/core/print.s line 176*
-
-```rust
-set(colors, "reset_color") -> ()
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### set
-*Defined in: std/core/print.s line 174*
-
-```rust
-set(colors, "reset") -> ()
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 # exists
-### exists - checks whether a cstr is not zero-initialized
-*Defined in: std/core/string.s line 30*
-
-```rust
-exists(cstr) -> (bool)
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 ### exists - checks that a pointer exists
 *Defined in: std/core/convert.s line 58*
 
@@ -4774,8 +4761,19 @@ Level of abstraction:
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
+### exists - checks whether a cstr is not zero-initialized
+*Defined in: std/core/string.s line 30*
+
+```rust
+exists(cstr) -> (bool)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 ### exists
-*Defined in: std/graphics.s line 114*
+*Defined in: std/graphics.s line 152*
 
 ```rust
 exists(Texture) -> (bool)
@@ -4972,19 +4970,8 @@ Potential errors:
 
 9. iteration end
 
-### next - Computes the next random number of a Rand sequence.
-*Defined in: std/rand.s line 88*
-
-```rust
-next(mut Rand) -> (float)
-```
-Level of abstraction:
-
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 ### next
-*Defined in: std/map.s line 38*
+*Defined in: std/map.s line 54*
 
 ```rust
 next(robinhood_nat_entry[], mut nat pos) -> (mut nat)
@@ -4999,7 +4986,7 @@ Potential errors:
 15. out of bounds
 
 ### next
-*Defined in: std/map.s line 38*
+*Defined in: std/map.s line 54*
 
 ```rust
 next(robinhood_str_entry[], mut nat pos) -> (mut str)
@@ -5013,63 +5000,18 @@ Potential errors:
 2. null pointer
 15. out of bounds
 
+### next - Computes the next random number of a Rand sequence.
+*Defined in: std/rand.s line 88*
+
+```rust
+next(mut Rand) -> (float)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 # get
-### get - get a list element pointer
-*Defined in: std/core/allocators.s line 77*
-
-```rust
-get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
-```
-Level of abstraction:
-
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-15. out of bounds
-
-### get - get a list element pointer
-*Defined in: std/core/allocators.s line 77*
-
-```rust
-get(circular, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
-```
-Level of abstraction:
-
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-15. out of bounds
-
-### get - get a list element pointer
-*Defined in: std/core/allocators.s line 54*
-
-```rust
-get(arena, nat pos) -> (any ptr {follows any ptr l.buf.unsafe_ptr})
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-15. out of bounds
-
-### get - immutable pointer to buffer element
-*Defined in: std/core/array.s line 83*
-
-```rust
-get(any[], nat i) -> (any ptr {follows any ptr buffer.unsafe_ptr})
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-15. out of bounds
-
 ### get - assert that a number plus range start lies in the range
 *Defined in: std/core/range.s line 54*
 
@@ -5087,6 +5029,62 @@ Potential errors:
 
 9. iteration end
 
+### get - get a list element pointer
+*Defined in: std/core/allocators.s line 93*
+
+```rust
+get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
+```
+Level of abstraction:
+
+2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+15. out of bounds
+
+### get - get a list element pointer
+*Defined in: std/core/allocators.s line 93*
+
+```rust
+get(circular, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
+```
+Level of abstraction:
+
+2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+15. out of bounds
+
+### get - get a list element pointer
+*Defined in: std/core/allocators.s line 70*
+
+```rust
+get(arena, nat pos) -> (any ptr {follows any ptr l.buf.unsafe_ptr})
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+15. out of bounds
+
+### get - immutable pointer to buffer element
+*Defined in: std/core/array.s line 90*
+
+```rust
+get(any[], nat i) -> (any ptr {follows any ptr buffer.unsafe_ptr})
+```
+Level of abstraction:
+
+1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+15. out of bounds
+
 ### get - a character in a string
 *Defined in: std/core/string.s line 243*
 
@@ -5099,26 +5097,7 @@ Level of abstraction:
 
 
 ### get
-*Defined in: std/io.s line 10*
-
-```rust
-get(edit circular, edit open, nat) -> (str) with effects CHARS
-```
-Level of abstraction:
-
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-38. end of file
-6. nat subtraction would yield a negative
-15. out of bounds
-
-### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit circular, edit terminal, nat) -> (str) with effects CHARS
@@ -5130,15 +5109,15 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
+19. can only define strings on non-offset buffers
 38. end of file
+6. nat subtraction would yield a negative
 15. out of bounds
 47. not open file
 
 ### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit circular, edit write, nat) -> (str) with effects CHARS
@@ -5150,15 +5129,15 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
+19. can only define strings on non-offset buffers
 38. end of file
+6. nat subtraction would yield a negative
 15. out of bounds
 47. not open file
 
 ### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit circular, edit write, nat) -> (str) with effects CHARS
@@ -5170,15 +5149,15 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
+19. can only define strings on non-offset buffers
 38. end of file
+6. nat subtraction would yield a negative
 15. out of bounds
 47. not open file
 
 ### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit circular, edit open, nat) -> (str) with effects CHARS
@@ -5190,15 +5169,15 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
+19. can only define strings on non-offset buffers
 38. end of file
+6. nat subtraction would yield a negative
 15. out of bounds
 47. not open file
 
 ### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit circular, edit open, nat) -> (str) with effects CHARS
@@ -5210,15 +5189,15 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
+19. can only define strings on non-offset buffers
 38. end of file
+6. nat subtraction would yield a negative
 15. out of bounds
 47. not open file
 
 ### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit arena, edit open, nat) -> (str) with effects CHARS
@@ -5230,14 +5209,14 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 38. end of file
 6. nat subtraction would yield a negative
 15. out of bounds
 
 ### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit arena, edit terminal, nat) -> (str) with effects CHARS
@@ -5249,15 +5228,15 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
+19. can only define strings on non-offset buffers
 38. end of file
+6. nat subtraction would yield a negative
 15. out of bounds
 47. not open file
 
 ### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit arena, edit write, nat) -> (str) with effects CHARS
@@ -5269,15 +5248,15 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
+19. can only define strings on non-offset buffers
 38. end of file
+6. nat subtraction would yield a negative
 15. out of bounds
 47. not open file
 
 ### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit arena, edit write, nat) -> (str) with effects CHARS
@@ -5289,15 +5268,15 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
+19. can only define strings on non-offset buffers
 38. end of file
+6. nat subtraction would yield a negative
 15. out of bounds
 47. not open file
 
 ### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit arena, edit open, nat) -> (str) with effects CHARS
@@ -5309,15 +5288,15 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
+19. can only define strings on non-offset buffers
 38. end of file
+6. nat subtraction would yield a negative
 15. out of bounds
 47. not open file
 
 ### get
-*Defined in: std/io.s line 10*
+*Defined in: std/io.s line 26*
 
 ```rust
 get(edit arena, edit open, nat) -> (str) with effects CHARS
@@ -5329,15 +5308,15 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
+19. can only define strings on non-offset buffers
 38. end of file
+6. nat subtraction would yield a negative
 15. out of bounds
 47. not open file
 
 ### get
-*Defined in: std/io.s line 7*
+*Defined in: std/io.s line 23*
 
 ```rust
 get(edit open, nat) -> (str)
@@ -5355,22 +5334,8 @@ Potential errors:
 18. can only define strings on contiguous buffers
 15. out of bounds
 
-### get - get a vector element at given position
-*Defined in: std/sci/vec.s line 50*
-
-```rust
-get(vec, nat i) -> (float ptr)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-15. out of bounds
-
 ### get - get a hash map entry
-*Defined in: std/map.s line 28*
+*Defined in: std/map.s line 44*
 
 Implemented for string or cstr keys but buffer of any values.
 
@@ -5385,13 +5350,12 @@ Potential errors:
 
 2. null pointer
 5. modulo by zero
-54. index not found
 6. nat subtraction would yield a negative
-9. iteration end
+54. index not found
 15. out of bounds
 
 ### get - get a hash map entry
-*Defined in: std/map.s line 18*
+*Defined in: std/map.s line 34*
 
 Implemented for string or cstr keys but buffer of any values.
 
@@ -5406,13 +5370,12 @@ Potential errors:
 
 2. null pointer
 5. modulo by zero
-54. index not found
 6. nat subtraction would yield a negative
-9. iteration end
+54. index not found
 15. out of bounds
 
 ### get - get a hash map entry
-*Defined in: std/map.s line 18*
+*Defined in: std/map.s line 34*
 
 Implemented for string or cstr keys but buffer of any values.
 
@@ -5426,13 +5389,45 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-5. modulo by zero
-6. nat subtraction would yield a negative
-9. iteration end
-15. out of bounds
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
+5. modulo by zero
+6. nat subtraction would yield a negative
 54. index not found
+15. out of bounds
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit circular, edit open, nat) -> (str) with effects CHARS
+```
+Level of abstraction:
+
+1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+38. end of file
+6. nat subtraction would yield a negative
+15. out of bounds
+
+### get - get a vector element at given position
+*Defined in: std/sci/vec.s line 66*
+
+```rust
+get(vec, nat i) -> (float ptr)
+```
+Level of abstraction:
+
+1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+15. out of bounds
 
 ### get - get a sparse element
 *Defined in: std/sci/coo.s line 43*
@@ -5449,7 +5444,7 @@ Potential errors:
 15. out of bounds
 
 ### get - reference to matrix element (i,j)
-*Defined in: std/sci/mat.s line 49*
+*Defined in: std/sci/mat.s line 65*
 
 ```rust
 get(mat, nat i, nat j) -> (float ptr)
@@ -5500,6 +5495,24 @@ Level of abstraction:
 
 
 # alloc
+### alloc - allocate memory
+*Defined in: std/unsafe.s line 19*
+
+Allocates a memory of the provided size in bytes.
+
+*Warning: Its usage in unsafe and guarded under std/unsafe.s.*
+
+```rust
+alloc(nat) -> (mut any ptr)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+
 ### alloc
 *Defined in: std/core/string.s line 26*
 
@@ -5513,8 +5526,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -5523,7 +5536,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### alloc - list allocation
-*Defined in: std/core/allocators.s line 110*
+*Defined in: std/core/allocators.s line 126*
 
 Creates room for one element.
 
@@ -5541,7 +5554,7 @@ Potential errors:
 14. cannot resize an unallocated or freed buffer
 
 ### alloc - list allocation
-*Defined in: std/core/allocators.s line 110*
+*Defined in: std/core/allocators.s line 126*
 
 ```rust
 alloc(edit list, nat length) -> (edit allocated)
@@ -5557,7 +5570,7 @@ Potential errors:
 14. cannot resize an unallocated or freed buffer
 
 ### alloc - circular arena allocation
-*Defined in: std/core/allocators.s line 96*
+*Defined in: std/core/allocators.s line 112*
 
 Creates room for one element.
 
@@ -5573,7 +5586,7 @@ Potential errors:
 17. does not fit in circular arena
 
 ### alloc - circular arena allocation
-*Defined in: std/core/allocators.s line 96*
+*Defined in: std/core/allocators.s line 112*
 
 ```rust
 alloc(edit circular, nat length) -> (edit allocated)
@@ -5587,7 +5600,7 @@ Potential errors:
 17. does not fit in circular arena
 
 ### alloc - arena allocation
-*Defined in: std/core/allocators.s line 85*
+*Defined in: std/core/allocators.s line 101*
 
 Creates room for one element.
 
@@ -5603,7 +5616,7 @@ Potential errors:
 16. arena is out of space
 
 ### alloc - arena allocation
-*Defined in: std/core/allocators.s line 85*
+*Defined in: std/core/allocators.s line 101*
 
 ```rust
 alloc(edit arena, nat length) -> (edit allocated)
@@ -5617,7 +5630,7 @@ Potential errors:
 16. arena is out of space
 
 ### alloc - allocate a char[] buffer
-*Defined in: std/core/array.s line 51*
+*Defined in: std/core/array.s line 56*
 
 ```rust
 alloc(nat) -> (edit char[])
@@ -5629,8 +5642,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -5656,8 +5669,34 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 28*
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use 'buffer.resize new_size' once a first non-zero allocation has been made.
+This version allocates a buffer of ONE element, which can be used for stable indirection.
+
+```rust
+alloc(edit any[], "unsafe_leaky") -> (edit any[])
+```
+Level of abstraction:
+
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -5683,8 +5722,85 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 28*
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use 'buffer.resize new_size' once a first non-zero allocation has been made.
+This version allocates a buffer of ONE element, which can be used for stable indirection.
+
+```rust
+alloc(edit any[], "dirty", "unsafe_leaky") -> (edit any[])
+```
+Level of abstraction:
+
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 28*
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use 'buffer.resize new_size' once a first non-zero allocation has been made.
+This version allocates a buffer of ONE element, which can be used for stable indirection.
+
+```rust
+alloc(edit any[], "unsafe_first") -> (edit any[])
+```
+Level of abstraction:
+
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 28*
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use 'buffer.resize new_size' once a first non-zero allocation has been made.
+This version allocates a buffer of ONE element, which can be used for stable indirection.
+
+```rust
+alloc(edit any[], "unsafe_first", "unsafe_leaky") -> (edit any[])
+```
+Level of abstraction:
+
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
 
 
 Returned values defer use of the following functions:
@@ -5709,8 +5825,33 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 28*
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use 'buffer.resize new_size' once a first non-zero allocation has been made.
+
+```rust
+alloc(edit any[], nat size, "unsafe_leaky") -> (edit any[])
+```
+Level of abstraction:
+
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -5735,8 +5876,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -5744,26 +5885,82 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
-### alloc - allocate memory
-*Defined in: std/unsafe.s line 19*
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 28*
 
-Allocates a memory of the provided size in bytes.
-
-*Warning: Its usage in unsafe and guarded under std/unsafe.s.*
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use 'buffer.resize new_size' once a first non-zero allocation has been made.
 
 ```rust
-alloc(nat) -> (mut any ptr)
+alloc(edit any[], nat size, "dirty", "unsafe_leaky") -> (edit any[])
 ```
 Level of abstraction:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 28*
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use 'buffer.resize new_size' once a first non-zero allocation has been made.
+
+```rust
+alloc(edit any[], nat size, "unsafe_first") -> (edit any[])
+```
+Level of abstraction:
+
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 28*
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use 'buffer.resize new_size' once a first non-zero allocation has been made.
+
+```rust
+alloc(edit any[], nat size, "unsafe_first", "unsafe_leaky") -> (edit any[])
+```
+Level of abstraction:
+
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 
 Potential errors:
 
 10. allocation failed
 
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
 ### alloc
-*Defined in: std/tag.s line 24*
+*Defined in: std/tag.s line 40*
 
 ```rust
 alloc(cstr) -> (mut char[])
@@ -5777,10 +5974,9 @@ Potential errors:
 2. null pointer
 71. empty input name
 72. cannot tag a structural type
-9. iteration end
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 15. out of bounds
 16. arena is out of space
 18. can only define strings on contiguous buffers
@@ -5793,7 +5989,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### alloc
-*Defined in: std/tag.s line 24*
+*Defined in: std/tag.s line 40*
 
 ```rust
 alloc(cstr surface, cstr obj) -> (mut char[])
@@ -5809,9 +6005,8 @@ Potential errors:
 72. cannot tag a structural type
 73. tag surface cannot be structural type
 10. allocation failed
-9. iteration end
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 15. out of bounds
 16. arena is out of space
 18. can only define strings on contiguous buffers
@@ -5825,7 +6020,7 @@ free(mut any ptr) -> ()
 ```
 # resize
 ### resize - resize the buffer
-*Defined in: std/core/array.s line 55*
+*Defined in: std/core/array.s line 60*
 
 For stability of data structures, this does nothing if the previous size is the same or less.
 If old size was zero, an error is created instead of allocating so that this does not leak
@@ -5844,7 +6039,7 @@ Potential errors:
 14. cannot resize an unallocated or freed buffer
 
 ### resize - resize the buffer
-*Defined in: std/core/array.s line 55*
+*Defined in: std/core/array.s line 60*
 
 For stability of data structures, this does nothing if the previous size is the same or less.
 If old size was zero, an error is created instead of allocating so that this does not leak
@@ -5863,7 +6058,7 @@ Potential errors:
 
 # last
 ### last - mutable pointer to the last buffer element
-*Defined in: std/core/array.s line 73*
+*Defined in: std/core/array.s line 78*
 
 ```rust
 last(edit any[]) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
@@ -5879,7 +6074,7 @@ Potential errors:
 
 # mutget
 ### mutget - get a list element pointer
-*Defined in: std/core/allocators.s line 81*
+*Defined in: std/core/allocators.s line 97*
 
 ```rust
 mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
@@ -5893,7 +6088,7 @@ Potential errors:
 15. out of bounds
 
 ### mutget - get a list element pointer
-*Defined in: std/core/allocators.s line 81*
+*Defined in: std/core/allocators.s line 97*
 
 ```rust
 mutget(edit circular, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
@@ -5907,7 +6102,7 @@ Potential errors:
 15. out of bounds
 
 ### mutget - get a mutable list element pointer
-*Defined in: std/core/allocators.s line 59*
+*Defined in: std/core/allocators.s line 75*
 
 ```rust
 mutget(edit arena, nat pos) -> (mut any ptr {follows any ptr l.buf.unsafe_ptr})
@@ -5921,7 +6116,7 @@ Potential errors:
 15. out of bounds
 
 ### mutget - mutable pointer to buffer element
-*Defined in: std/core/array.s line 78*
+*Defined in: std/core/array.s line 84*
 
 ```rust
 mutget(edit any[], nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
@@ -5934,22 +6129,8 @@ Potential errors:
 
 15. out of bounds
 
-### mutget - modify a vector element at given position
-*Defined in: std/sci/vec.s line 45*
-
-```rust
-mutget(edit vec, nat i) -> (mut float ptr)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-15. out of bounds
-
 ### mutget - get a mutable hash map entry
-*Defined in: std/map.s line 33*
+*Defined in: std/map.s line 49*
 
 Implemented for string or cstr keys but buffer of any values.
 
@@ -5966,11 +6147,10 @@ Potential errors:
 5. modulo by zero
 6. nat subtraction would yield a negative
 55. string buffer is full
-9. iteration end
 15. out of bounds
 
 ### mutget - get a mutable hash map entry
-*Defined in: std/map.s line 23*
+*Defined in: std/map.s line 39*
 
 Implemented for string or cstr keys but buffer of any values.
 
@@ -5987,11 +6167,10 @@ Potential errors:
 5. modulo by zero
 6. nat subtraction would yield a negative
 55. string buffer is full
-9. iteration end
 15. out of bounds
 
 ### mutget - get a mutable hash map entry
-*Defined in: std/map.s line 23*
+*Defined in: std/map.s line 39*
 
 Implemented for string or cstr keys but buffer of any values.
 
@@ -6005,13 +6184,26 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-5. modulo by zero
-6. nat subtraction would yield a negative
-9. iteration end
-15. out of bounds
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
+5. modulo by zero
+6. nat subtraction would yield a negative
 55. string buffer is full
+15. out of bounds
+
+### mutget - modify a vector element at given position
+*Defined in: std/sci/vec.s line 61*
+
+```rust
+mutget(edit vec, nat i) -> (mut float ptr)
+```
+Level of abstraction:
+
+1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+15. out of bounds
 
 ### mutget - mutable reference to a sparse element
 *Defined in: std/sci/coo.s line 48*
@@ -6028,7 +6220,7 @@ Potential errors:
 15. out of bounds
 
 ### mutget - mutable reference to matrix element (i,j)
-*Defined in: std/sci/mat.s line 43*
+*Defined in: std/sci/mat.s line 59*
 
 ```rust
 mutget(edit mat, nat i, nat j) -> (mut float ptr)
@@ -6055,7 +6247,7 @@ Level of abstraction:
 
 
 ### len - the number of buffer elements
-*Defined in: std/core/array.s line 88*
+*Defined in: std/core/array.s line 96*
 
 ```rust
 len(any[]) -> (nat)
@@ -6066,7 +6258,7 @@ Level of abstraction:
 
 
 ### len - vectot length
-*Defined in: std/sci/vec.s line 41*
+*Defined in: std/sci/vec.s line 57*
 
 ```rust
 len(vec) -> (nat)
@@ -6078,7 +6270,7 @@ Level of abstraction:
 
 # new
 ### new - allocations on new bufs
-*Defined in: std/core/allocators.s line 5*
+*Defined in: std/core/allocators.s line 21*
 
 ```rust
 new() -> (new)
@@ -6101,7 +6293,7 @@ Level of abstraction:
 
 
 ### arena - a buffer and mutable position pair
-*Defined in: std/core/allocators.s line 21*
+*Defined in: std/core/allocators.s line 37*
 
 The position starts from 0. This structure is often used
 to track the size of allocated data within the buffer.
@@ -6120,7 +6312,7 @@ Level of abstraction:
 
 
 ### arena - a buffer and mutable position pair
-*Defined in: std/core/allocators.s line 9*
+*Defined in: std/core/allocators.s line 25*
 
 This structure is often used to track the size of allocated
 data within the buffer.
@@ -6139,10 +6331,10 @@ Level of abstraction:
 
 
 ### arena
-*Defined in: std/sci/vec.s line 7*
+*Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float") -> (edit arena)
+arena("float__t4t") -> (edit arena)
 ```
 Level of abstraction:
 
@@ -6150,7 +6342,84 @@ Level of abstraction:
 
 
 ### arena
-*Defined in: std/sci/vec.s line 241*
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t2557t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t2491t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t2212t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t619t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t577t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t573t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t569t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 257*
 
 ```rust
 arena(edit vec) -> (edit arena)
@@ -6162,7 +6431,7 @@ Level of abstraction:
 
 # gc
 ### gc - a garbage collector for an arena
-*Defined in: std/core/allocators.s line 32*
+*Defined in: std/core/allocators.s line 48*
 
 ```rust
 gc(edit arena) -> ()
@@ -6174,7 +6443,7 @@ Level of abstraction:
 
 # length
 ### length - allocated arena size
-*Defined in: std/core/allocators.s line 39*
+*Defined in: std/core/allocators.s line 55*
 
 This is not the total arena size, but rather the number
 of elements actively in use.
@@ -6189,7 +6458,7 @@ Level of abstraction:
 
 # allocated
 ### allocated
-*Defined in: std/core/allocators.s line 45*
+*Defined in: std/core/allocators.s line 61*
 
 ```rust
 allocated(edit any[], nat pos) -> (edit allocated)
@@ -6201,7 +6470,7 @@ Level of abstraction:
 
 # status
 ### status - convert to a nameless buffer and position pair
-*Defined in: std/core/allocators.s line 48*
+*Defined in: std/core/allocators.s line 64*
 
 This unpacking is used to pass an arena's state or allocated
 memory data as part of structural input.
@@ -6215,7 +6484,7 @@ Level of abstraction:
 
 
 ### status - convert to a nameless buffer and position pair
-*Defined in: std/core/allocators.s line 48*
+*Defined in: std/core/allocators.s line 64*
 
 This unpacking is used to pass an arena's state or allocated
 memory data as part of structural input.
@@ -6241,7 +6510,7 @@ Level of abstraction:
 
 
 ### circular - circular buffer
-*Defined in: std/core/allocators.s line 64*
+*Defined in: std/core/allocators.s line 80*
 
 ```rust
 circular(edit any[]) -> (edit circular)
@@ -6252,10 +6521,87 @@ Level of abstraction:
 
 
 ### circular
-*Defined in: std/sci/vec.s line 8*
+*Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float") -> (edit circular)
+circular("float__t2557t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t2491t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t2212t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t619t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t577t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t573t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t569t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t4t") -> (edit circular)
 ```
 Level of abstraction:
 
@@ -6276,8 +6622,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -6286,7 +6632,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### list - list buffer management
-*Defined in: std/core/allocators.s line 69*
+*Defined in: std/core/allocators.s line 85*
 
 List defined over a mutable buf that is automatically managed and resized.
 A capacity is maintained so that resizes are not performed too frequently.
@@ -6301,8 +6647,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -6311,10 +6657,10 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### list
-*Defined in: std/sci/vec.s line 9*
+*Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float") -> (edit list)
+list("float__t2557t") -> (edit list)
 ```
 Level of abstraction:
 
@@ -6323,8 +6669,162 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### list
+*Defined in: std/sci/vec.s line 25*
+
+```rust
+list("float__t2491t") -> (edit list)
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### list
+*Defined in: std/sci/vec.s line 25*
+
+```rust
+list("float__t2212t") -> (edit list)
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### list
+*Defined in: std/sci/vec.s line 25*
+
+```rust
+list("float__t619t") -> (edit list)
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### list
+*Defined in: std/sci/vec.s line 25*
+
+```rust
+list("float__t577t") -> (edit list)
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### list
+*Defined in: std/sci/vec.s line 25*
+
+```rust
+list("float__t573t") -> (edit list)
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### list
+*Defined in: std/sci/vec.s line 25*
+
+```rust
+list("float__t569t") -> (edit list)
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### list
+*Defined in: std/sci/vec.s line 25*
+
+```rust
+list("float__t4t") -> (edit list)
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -6334,7 +6834,7 @@ free(mut any ptr) -> ()
 ```
 # at
 ### at - get a mutable pointer to the last buffer element
-*Defined in: std/core/allocators.s line 122*
+*Defined in: std/core/allocators.s line 138*
 
 ```rust
 at(edit allocated) -> (mut any ptr {follows any ptr surface.buf.unsafe_ptr})
@@ -6347,34 +6847,8 @@ Potential errors:
 
 15. out of bounds
 
-### at
-*Defined in: std/sci/vec.s line 58*
-
-```rust
-at(vec, nat i) -> (float)
-```
-Level of abstraction:
-
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### at
-*Defined in: std/sci/vec.s line 55*
-
-```rust
-at(float number, nat i) -> (float)
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 ### at - find or add an item in a robinhood_entry list
-*Defined in: std/hash.s line 72*
+*Defined in: std/hash.s line 88*
 
 ```rust
 at(edit robinhood_nat_entry[], nat _k) -> (mut nat)
@@ -6389,11 +6863,10 @@ Potential errors:
 5. modulo by zero
 6. nat subtraction would yield a negative
 55. string buffer is full
-9. iteration end
 15. out of bounds
 
 ### at - find or add an item in a robinhood_entry list
-*Defined in: std/hash.s line 72*
+*Defined in: std/hash.s line 88*
 
 ```rust
 at(edit robinhood_str_entry[], str) -> (mut nat)
@@ -6408,11 +6881,10 @@ Potential errors:
 5. modulo by zero
 6. nat subtraction would yield a negative
 55. string buffer is full
-9. iteration end
 15. out of bounds
 
 ### at - find or add an item in a robinhood_entry list
-*Defined in: std/hash.s line 72*
+*Defined in: std/hash.s line 88*
 
 ```rust
 at(edit robinhood_str_entry[], cstr _k) -> (mut nat)
@@ -6423,18 +6895,43 @@ Level of abstraction:
 
 Potential errors:
 
+18. can only define strings on contiguous buffers
 2. null pointer
+19. can only define strings on non-offset buffers
 5. modulo by zero
 6. nat subtraction would yield a negative
-9. iteration end
-15. out of bounds
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 55. string buffer is full
+15. out of bounds
+
+### at
+*Defined in: std/sci/vec.s line 74*
+
+```rust
+at(vec, nat i) -> (float)
+```
+Level of abstraction:
+
+2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### at
+*Defined in: std/sci/vec.s line 71*
+
+```rust
+at(float number, nat i) -> (float)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # slice
 ### slice - a buffer subregion of an arena
-*Defined in: std/core/allocators.s line 130*
+*Defined in: std/core/allocators.s line 146*
 
 This allocates a region of a given number of elements
 within an arena and returns a buffer interface wrapping
@@ -6470,8 +6967,8 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 22. slice out of string bounds
 6. nat subtraction would yield a negative
 15. out of bounds
@@ -6494,8 +6991,8 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 22. slice out of string bounds
 6. nat subtraction would yield a negative
 15. out of bounds
@@ -6514,8 +7011,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -6546,7 +7043,7 @@ Level of abstraction:
 
 
 ### new - allocations on new bufs
-*Defined in: std/core/allocators.s line 5*
+*Defined in: std/core/allocators.s line 21*
 
 ```rust
 new() -> (new)
@@ -6569,7 +7066,7 @@ Level of abstraction:
 
 
 ### strdat
-*Defined in: std/mini.s line 41*
+*Defined in: std/mini.s line 57*
 
 ```rust
 strdat(nat _pos, nat _length) -> (nat16 pos, nat16 length)
@@ -6767,12 +7264,12 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
+6. nat subtraction would yield a negative
+15. out of bounds
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
 23. unexpected end of console read
 25. read string does not fit on buffer
-15. out of bounds
 
 ### str - reads a string from the console
 *Defined in: std/core/convertstr.s line 114*
@@ -6794,8 +7291,8 @@ Potential errors:
 6. nat subtraction would yield a negative
 10. allocation failed
 11. reallocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 14. cannot resize an unallocated or freed buffer
 15. out of bounds
 18. can only define strings on contiguous buffers
@@ -6809,7 +7306,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### str - create a compact str
-*Defined in: std/mini.s line 54*
+*Defined in: std/mini.s line 70*
 
 The created str variation should be used only for storng and
 retrieving data with 'unpack' for memory efficiency.
@@ -6830,7 +7327,7 @@ Potential errors:
 15. out of bounds
 
 ### str - create a compact str
-*Defined in: std/mini.s line 46*
+*Defined in: std/mini.s line 62*
 
 The created str variation should be used only for storng and
 retrieving data with 'unpack' for memory efficiency.
@@ -6860,12 +7357,12 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 4. division by zero
-18. can only define strings on contiguous buffers
 11. reallocation failed
 14. cannot resize an unallocated or freed buffer
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 
 ### copy - copy a string to a new buffer
 *Defined in: std/core/string.s line 129*
@@ -6933,8 +7430,8 @@ Potential errors:
 
 16. arena is out of space
 2. null pointer
-18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
+18. can only define strings on contiguous buffers
 15. out of bounds
 
 ### copy - copy a string to a new buffer
@@ -6966,12 +7463,12 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+15. out of bounds
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
 
 
 Returned values defer use of the following functions:
@@ -6994,8 +7491,101 @@ Potential errors:
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+### copy
+*Defined in: std/core/string.s line 364*
+
+```rust
+copy(edit list, nat n) -> (str) with effects CHARS
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+5. modulo by zero
+6. nat subtraction would yield a negative
+11. reallocation failed
+14. cannot resize an unallocated or freed buffer
+15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### copy
+*Defined in: std/core/string.s line 364*
+
+```rust
+copy(edit circular, nat n) -> (str) with effects CHARS
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+5. modulo by zero
+6. nat subtraction would yield a negative
+15. out of bounds
+17. does not fit in circular arena
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### copy
+*Defined in: std/core/string.s line 364*
+
+```rust
+copy(edit arena, nat n) -> (str) with effects CHARS
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+5. modulo by zero
+6. nat subtraction would yield a negative
+15. out of bounds
+16. arena is out of space
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+
+### copy
+*Defined in: std/core/string.s line 364*
+
+```rust
+copy(new CHARS, nat n) -> (str) with effects CHARS
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+5. modulo by zero
+6. nat subtraction would yield a negative
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 
 
 Returned values defer use of the following functions:
@@ -7004,7 +7594,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### copy - copy a vector
-*Defined in: std/sci/vec.s line 233*
+*Defined in: std/sci/vec.s line 249*
 
 Grabs a FLOATS for the result as an effect.
 
@@ -7024,7 +7614,7 @@ Potential errors:
 15. out of bounds
 
 ### copy - copy a vector
-*Defined in: std/sci/vec.s line 233*
+*Defined in: std/sci/vec.s line 249*
 
 Grabs a FLOATS for the result as an effect.
 
@@ -7044,7 +7634,7 @@ Potential errors:
 15. out of bounds
 
 ### copy - copy a vector
-*Defined in: std/sci/vec.s line 233*
+*Defined in: std/sci/vec.s line 249*
 
 Grabs a FLOATS for the result as an effect.
 
@@ -7057,10 +7647,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -7088,8 +7676,8 @@ Potential errors:
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -7113,9 +7701,9 @@ Level of abstraction:
 
 Potential errors:
 
+2. null pointer
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
-2. null pointer
 21. string buffer out of memory
 15. out of bounds
 
@@ -7190,8 +7778,8 @@ Potential errors:
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -7228,8 +7816,8 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 22. slice out of string bounds
 6. nat subtraction would yield a negative
 15. out of bounds
@@ -7247,11 +7835,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-22. slice out of string bounds
 6. nat subtraction would yield a negative
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+22. slice out of string bounds
 
 ### starts\_with - check whether a string startswith a particular substring sequence
 *Defined in: std/core/string.s line 268*
@@ -7266,11 +7854,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-22. slice out of string bounds
 6. nat subtraction would yield a negative
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+22. slice out of string bounds
 
 ### starts\_with - check whether a string startswith a particular substring sequence
 *Defined in: std/core/string.s line 268*
@@ -7285,11 +7873,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
-22. slice out of string bounds
 6. nat subtraction would yield a negative
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+22. slice out of string bounds
 
 # ends\_with
 ### ends\_with - check whether a string ends with a particular substring sequence
@@ -7305,8 +7893,8 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 6. nat subtraction would yield a negative
 22. slice out of string bounds
 15. out of bounds
@@ -7324,11 +7912,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. slice out of string bounds
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+22. slice out of string bounds
 
 ### ends\_with - check whether a string ends with a particular substring sequence
 *Defined in: std/core/string.s line 276*
@@ -7343,11 +7931,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. slice out of string bounds
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+22. slice out of string bounds
 
 ### ends\_with - check whether a string ends with a particular substring sequence
 *Defined in: std/core/string.s line 276*
@@ -7362,11 +7950,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. slice out of string bounds
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+22. slice out of string bounds
 
 # contains
 ### contains - check whether a string contains a needle substring
@@ -7382,11 +7970,10 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
 18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
 6. nat subtraction would yield a negative
 22. slice out of string bounds
-9. iteration end
 15. out of bounds
 
 ### contains - check whether a string contains a needle substring
@@ -7402,12 +7989,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. slice out of string bounds
-9. iteration end
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+22. slice out of string bounds
 
 ### contains - check whether a string contains a needle substring
 *Defined in: std/core/string.s line 294*
@@ -7422,12 +8008,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. slice out of string bounds
-9. iteration end
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+22. slice out of string bounds
 
 ### contains - check whether a string contains a needle substring
 *Defined in: std/core/string.s line 294*
@@ -7442,12 +8027,11 @@ Level of abstraction:
 Potential errors:
 
 2. null pointer
-19. can only define strings on non-offset buffers
-18. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. slice out of string bounds
-9. iteration end
 15. out of bounds
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+22. slice out of string bounds
 
 ### contains - check whether a string contains a needle character
 *Defined in: std/core/string.s line 286*
@@ -7461,7 +8045,6 @@ Level of abstraction:
 
 Potential errors:
 
-9. iteration end
 2. null pointer
 
 ### contains - check whether a string contains a needle character
@@ -7476,11 +8059,33 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 19. can only define strings on non-offset buffers
+2. null pointer
 18. can only define strings on contiguous buffers
-9. iteration end
 15. out of bounds
+
+# empty
+### empty
+*Defined in: std/core/string.s line 360*
+
+```rust
+empty(str) -> (bool)
+```
+Level of abstraction:
+
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### empty - checks whether a cstr is not zero-initialized
+*Defined in: std/core/string.s line 356*
+
+```rust
+empty(cstr) -> (bool)
+```
+Level of abstraction:
+
+1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
 
 # is\_number
 ### is\_number
@@ -7611,32 +8216,131 @@ Level of abstraction:
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 176*
+### float - cast to float
+*Defined in: std/core/convert.s line 95*
 
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+Converts a bit representation to the corresponding float number.
 
 ```rust
-cstr(cstr cstr, str) -> (cstr)
+float(bits) -> (float)
 ```
 Level of abstraction:
 
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 176*
+### nat - cast to nat
+*Defined in: std/core/convert.s line 84*
 
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+Converts a bit representation to the corresponding natural number.
 
 ```rust
-cstr(unsafe_temp) -> (cstr)
+nat(bits) -> (nat)
+```
+Level of abstraction:
+
+1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 51*
+
+Converting a character to a natural number considers
+its bit representation interpreted as an unsigned number.
+
+```rust
+nat(char) -> (nat)
 ```
 Level of abstraction:
 
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 40*
+
+Converting to natural numbers loses information.
+ Failed on negative input because it typically indicates a later error in buffer indexing.
+
+```rust
+nat(nat) -> (nat)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 40*
+
+Converting to natural numbers loses information.
+ Failed on negative input because it typically indicates a later error in buffer indexing.
+
+```rust
+nat(int) -> (nat)
+```
+Level of abstraction:
+
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+8. cannot convert negative int to nat
+
+### nat - cast to nat
+*Defined in: std/core/convert.s line 40*
+
+Converting to natural numbers loses information.
+ Failed on negative input because it typically indicates a later error in buffer indexing.
+
+```rust
+nat(float) -> (nat)
+```
+Level of abstraction:
+
+0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+7. cannot convert negative float to nat
+
+### float - cast to float
+*Defined in: std/core/convert.s line 20*
+
+May lose information because floats are not exact representation of all integers.
+
+```rust
+float(nat) -> (float)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### float - cast to float
+*Defined in: std/core/convert.s line 20*
+
+May lose information because floats are not exact representation of all integers.
+
+```rust
+float(int) -> (float)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### float - cast to float
+*Defined in: std/core/convert.s line 20*
+
+Serves as a tautology function for code that parses on multiple number types.
+
+```rust
+float(float) -> (float)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
 ### str - convert to string
@@ -7812,6 +8516,17 @@ Level of abstraction:
 *Defined in: std/core/array.s line 24*
 
 ```rust
+nat(nat32) -> (nat)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### nat
+*Defined in: std/core/array.s line 24*
+
+```rust
 nat(nat16) -> (nat)
 ```
 Level of abstraction:
@@ -7819,136 +8534,37 @@ Level of abstraction:
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### float - cast to float
-*Defined in: std/core/convert.s line 95*
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 176*
 
-Converts a bit representation to the corresponding float number.
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 
 ```rust
-float(bits) -> (float)
+cstr(cstr cstr, str) -> (cstr)
 ```
 Level of abstraction:
 
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### nat - cast to nat
-*Defined in: std/core/convert.s line 84*
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 176*
 
-Converts a bit representation to the corresponding natural number.
-
-```rust
-nat(bits) -> (nat)
-```
-Level of abstraction:
-
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 51*
-
-Converting a character to a natural number considers
-its bit representation interpreted as an unsigned number.
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 
 ```rust
-nat(char) -> (nat)
+cstr(unsafe_temp) -> (cstr)
 ```
 Level of abstraction:
 
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
-
-Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
-
-```rust
-nat(nat) -> (nat)
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
-
-Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
-
-```rust
-nat(int) -> (nat)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-8. cannot convert negative int to nat
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
-
-Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
-
-```rust
-nat(float) -> (nat)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-7. cannot convert negative float to nat
-
-### float - cast to float
-*Defined in: std/core/convert.s line 20*
-
-May lose information because floats are not exact representation of all integers.
-
-```rust
-float(nat) -> (float)
-```
-Level of abstraction:
-
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### float - cast to float
-*Defined in: std/core/convert.s line 20*
-
-May lose information because floats are not exact representation of all integers.
-
-```rust
-float(int) -> (float)
-```
-Level of abstraction:
-
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### float - cast to float
-*Defined in: std/core/convert.s line 20*
-
-Serves as a tautology function for code that parses on multiple number types.
-
-```rust
-float(float) -> (float)
-```
-Level of abstraction:
-
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
 # hash
 ### hash
-*Defined in: std/hash.s line 13*
+*Defined in: std/hash.s line 29*
 
 ```rust
 hash(nat k, nat size) -> (nat)
@@ -7962,7 +8578,7 @@ Potential errors:
 5. modulo by zero
 
 ### hash
-*Defined in: std/hash.s line 7*
+*Defined in: std/hash.s line 23*
 
 ```rust
 hash(str, nat size) -> (nat)
@@ -7973,13 +8589,12 @@ Level of abstraction:
 
 Potential errors:
 
-9. iteration end
 2. null pointer
 5. modulo by zero
 
 # to\_hash\_base
 ### to\_hash\_base
-*Defined in: std/hash.s line 27*
+*Defined in: std/hash.s line 43*
 
 ```rust
 to_hash_base(nat) -> (bits)
@@ -7990,7 +8605,7 @@ Level of abstraction:
 
 
 ### to\_hash\_base
-*Defined in: std/hash.s line 27*
+*Defined in: std/hash.s line 43*
 
 ```rust
 to_hash_base(int) -> (bits)
@@ -8001,7 +8616,7 @@ Level of abstraction:
 
 
 ### to\_hash\_base
-*Defined in: std/hash.s line 27*
+*Defined in: std/hash.s line 43*
 
 ```rust
 to_hash_base(float) -> (bits)
@@ -8012,7 +8627,7 @@ Level of abstraction:
 
 
 ### to\_hash\_base
-*Defined in: std/hash.s line 24*
+*Defined in: std/hash.s line 40*
 
 ```rust
 to_hash_base(cstr) -> (str)
@@ -8029,7 +8644,7 @@ Potential errors:
 15. out of bounds
 
 ### to\_hash\_base
-*Defined in: std/hash.s line 24*
+*Defined in: std/hash.s line 40*
 
 ```rust
 to_hash_base(str) -> (str)
@@ -8041,7 +8656,7 @@ Level of abstraction:
 
 # robinhood\_str\_entry
 ### robinhood\_str\_entry
-*Defined in: std/hash.s line 30*
+*Defined in: std/hash.s line 46*
 
 ```rust
 robinhood_str_entry(str, nat cost) -> (str, nat cost)
@@ -8053,7 +8668,7 @@ Level of abstraction:
 
 # robinhood\_nat\_entry
 ### robinhood\_nat\_entry
-*Defined in: std/hash.s line 33*
+*Defined in: std/hash.s line 49*
 
 ```rust
 robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
@@ -8065,7 +8680,7 @@ Level of abstraction:
 
 # robinhood\_entry
 ### robinhood\_nat\_entry
-*Defined in: std/hash.s line 33*
+*Defined in: std/hash.s line 49*
 
 ```rust
 robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
@@ -8076,7 +8691,7 @@ Level of abstraction:
 
 
 ### robinhood\_str\_entry
-*Defined in: std/hash.s line 30*
+*Defined in: std/hash.s line 46*
 
 ```rust
 robinhood_str_entry(str, nat cost) -> (str, nat cost)
@@ -8088,7 +8703,7 @@ Level of abstraction:
 
 # raw
 ### raw
-*Defined in: std/hash.s line 44*
+*Defined in: std/hash.s line 60*
 
 ```rust
 raw(cstr) -> (str)
@@ -8105,7 +8720,7 @@ Potential errors:
 15. out of bounds
 
 ### raw
-*Defined in: std/hash.s line 41*
+*Defined in: std/hash.s line 57*
 
 ```rust
 raw(nat) -> (nat)
@@ -8116,7 +8731,7 @@ Level of abstraction:
 
 
 ### raw
-*Defined in: std/hash.s line 41*
+*Defined in: std/hash.s line 57*
 
 ```rust
 raw(str) -> (str)
@@ -8127,7 +8742,7 @@ Level of abstraction:
 
 
 ### raw
-*Defined in: std/hash.s line 38*
+*Defined in: std/hash.s line 54*
 
 ```rust
 raw(nat s, nat cost) -> (nat)
@@ -8138,7 +8753,7 @@ Level of abstraction:
 
 
 ### raw
-*Defined in: std/hash.s line 38*
+*Defined in: std/hash.s line 54*
 
 ```rust
 raw(str, nat cost) -> (str)
@@ -8150,7 +8765,7 @@ Level of abstraction:
 
 # is\_zero
 ### is\_zero
-*Defined in: std/hash.s line 50*
+*Defined in: std/hash.s line 66*
 
 ```rust
 is_zero(nat) -> (bool)
@@ -8161,7 +8776,7 @@ Level of abstraction:
 
 
 ### is\_zero
-*Defined in: std/hash.s line 47*
+*Defined in: std/hash.s line 63*
 
 ```rust
 is_zero(str) -> (bool)
@@ -8173,47 +8788,7 @@ Level of abstraction:
 
 # find
 ### find - find an item in a robinhood_entry list
-*Defined in: std/hash.s line 53*
-
-```rust
-find(robinhood_str_entry[], str) -> (mut nat)
-```
-Level of abstraction:
-
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-5. modulo by zero
-54. index not found
-6. nat subtraction would yield a negative
-9. iteration end
-15. out of bounds
-
-### find - find an item in a robinhood_entry list
-*Defined in: std/hash.s line 53*
-
-```rust
-find(robinhood_str_entry[], cstr _k) -> (mut nat)
-```
-Level of abstraction:
-
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-5. modulo by zero
-6. nat subtraction would yield a negative
-9. iteration end
-15. out of bounds
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-54. index not found
-
-### find - find an item in a robinhood_entry list
-*Defined in: std/hash.s line 53*
+*Defined in: std/hash.s line 69*
 
 ```rust
 find(nat[], nat _k) -> (mut nat)
@@ -8226,13 +8801,12 @@ Potential errors:
 
 2. null pointer
 5. modulo by zero
-54. index not found
 6. nat subtraction would yield a negative
-9. iteration end
+54. index not found
 15. out of bounds
 
 ### find - find an item in a robinhood_entry list
-*Defined in: std/hash.s line 53*
+*Defined in: std/hash.s line 69*
 
 ```rust
 find(str[], str) -> (mut nat)
@@ -8245,13 +8819,12 @@ Potential errors:
 
 2. null pointer
 5. modulo by zero
-54. index not found
 6. nat subtraction would yield a negative
-9. iteration end
+54. index not found
 15. out of bounds
 
 ### find - find an item in a robinhood_entry list
-*Defined in: std/hash.s line 53*
+*Defined in: std/hash.s line 69*
 
 ```rust
 find(str[], cstr _k) -> (mut nat)
@@ -8262,17 +8835,16 @@ Level of abstraction:
 
 Potential errors:
 
+18. can only define strings on contiguous buffers
 2. null pointer
+19. can only define strings on non-offset buffers
 5. modulo by zero
 6. nat subtraction would yield a negative
-9. iteration end
-15. out of bounds
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
 54. index not found
+15. out of bounds
 
 ### find - find an item in a robinhood_entry list
-*Defined in: std/hash.s line 53*
+*Defined in: std/hash.s line 69*
 
 ```rust
 find(robinhood_nat_entry[], nat _k) -> (mut nat)
@@ -8285,14 +8857,51 @@ Potential errors:
 
 2. null pointer
 5. modulo by zero
-54. index not found
 6. nat subtraction would yield a negative
-9. iteration end
+54. index not found
+15. out of bounds
+
+### find - find an item in a robinhood_entry list
+*Defined in: std/hash.s line 69*
+
+```rust
+find(robinhood_str_entry[], str) -> (mut nat)
+```
+Level of abstraction:
+
+0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+5. modulo by zero
+6. nat subtraction would yield a negative
+54. index not found
+15. out of bounds
+
+### find - find an item in a robinhood_entry list
+*Defined in: std/hash.s line 69*
+
+```rust
+find(robinhood_str_entry[], cstr _k) -> (mut nat)
+```
+Level of abstraction:
+
+0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+18. can only define strings on contiguous buffers
+2. null pointer
+19. can only define strings on non-offset buffers
+5. modulo by zero
+6. nat subtraction would yield a negative
+54. index not found
 15. out of bounds
 
 # strmap
 ### strmap - a string map
-*Defined in: std/map.s line 4*
+*Defined in: std/map.s line 20*
 
 Maps string indexes to the buffer provided using a robinhood scheme.
 Map size is static and cannot be adjusted after initialization.
@@ -8307,8 +8916,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -8318,7 +8927,7 @@ free(mut any ptr) -> ()
 ```
 # natmap
 ### natmap - a natural number map
-*Defined in: std/map.s line 11*
+*Defined in: std/map.s line 27*
 
 Maps number indexes to the buffer provided using a robinhood scheme.
 Map size is static and cannot be adjusted after initialization.
@@ -8333,8 +8942,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -8344,7 +8953,7 @@ free(mut any ptr) -> ()
 ```
 # unpack
 ### unpack
-*Defined in: std/mini.s line 66*
+*Defined in: std/mini.s line 82*
 
 ```rust
 unpack(char[], nat16 dat.pos, nat16 dat.length) -> (str)
@@ -8358,7 +8967,7 @@ Potential errors:
 20. string does not fit on buffer
 
 ### unpack - unpack a compact str
-*Defined in: std/mini.s line 60*
+*Defined in: std/mini.s line 76*
 
 The created compact str is unpacked into its 'nat'-using representation
 that is more efficient for computations in 64-bit architectures.
@@ -8373,7 +8982,7 @@ Level of abstraction:
 
 # abs
 ### abs
-*Defined in: std/sci/math.s line 11*
+*Defined in: std/sci/math.s line 27*
 
 ```rust
 abs(int) -> (int)
@@ -8384,7 +8993,7 @@ Level of abstraction:
 
 
 ### abs
-*Defined in: std/sci/math.s line 4*
+*Defined in: std/sci/math.s line 20*
 
 ```rust
 abs(float) -> (float)
@@ -8396,7 +9005,7 @@ Level of abstraction:
 
 # sqrt
 ### sqrt
-*Defined in: std/sci/math.s line 18*
+*Defined in: std/sci/math.s line 34*
 
 ```rust
 sqrt(float) -> (float)
@@ -8408,7 +9017,7 @@ Level of abstraction:
 
 # sin
 ### sin
-*Defined in: std/sci/math.s line 23*
+*Defined in: std/sci/math.s line 39*
 
 ```rust
 sin(float) -> (float)
@@ -8420,7 +9029,7 @@ Level of abstraction:
 
 # cos
 ### cos
-*Defined in: std/sci/math.s line 28*
+*Defined in: std/sci/math.s line 44*
 
 ```rust
 cos(float) -> (float)
@@ -8432,7 +9041,7 @@ Level of abstraction:
 
 # log
 ### log
-*Defined in: std/sci/math.s line 33*
+*Defined in: std/sci/math.s line 49*
 
 ```rust
 log(float) -> (float)
@@ -8444,7 +9053,7 @@ Level of abstraction:
 
 # tan
 ### tan
-*Defined in: std/sci/math.s line 38*
+*Defined in: std/sci/math.s line 54*
 
 ```rust
 tan(float) -> (float)
@@ -8456,7 +9065,7 @@ Level of abstraction:
 
 # floor
 ### floor
-*Defined in: std/sci/math.s line 43*
+*Defined in: std/sci/math.s line 59*
 
 ```rust
 floor(float) -> (int)
@@ -8468,7 +9077,7 @@ Level of abstraction:
 
 # asin
 ### asin
-*Defined in: std/sci/math.s line 48*
+*Defined in: std/sci/math.s line 64*
 
 ```rust
 asin(float) -> (float)
@@ -8480,7 +9089,7 @@ Level of abstraction:
 
 # acos
 ### acos
-*Defined in: std/sci/math.s line 53*
+*Defined in: std/sci/math.s line 69*
 
 ```rust
 acos(float) -> (float)
@@ -8492,7 +9101,7 @@ Level of abstraction:
 
 # atan
 ### atan
-*Defined in: std/sci/math.s line 63*
+*Defined in: std/sci/math.s line 79*
 
 ```rust
 atan(float x, float y) -> (float)
@@ -8503,7 +9112,7 @@ Level of abstraction:
 
 
 ### atan
-*Defined in: std/sci/math.s line 58*
+*Defined in: std/sci/math.s line 74*
 
 ```rust
 atan(float) -> (float)
@@ -8515,7 +9124,7 @@ Level of abstraction:
 
 # exp
 ### exp
-*Defined in: std/sci/math.s line 68*
+*Defined in: std/sci/math.s line 84*
 
 ```rust
 exp(float) -> (float)
@@ -8527,7 +9136,7 @@ Level of abstraction:
 
 # isnan
 ### isnan
-*Defined in: std/sci/math.s line 78*
+*Defined in: std/sci/math.s line 94*
 
 ```rust
 isnan(float) -> (bool)
@@ -8540,7 +9149,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[math.isnan(x)]`*
 # isinf
 ### isinf
-*Defined in: std/sci/math.s line 84*
+*Defined in: std/sci/math.s line 100*
 
 ```rust
 isinf(float) -> (bool)
@@ -8552,8 +9161,21 @@ Level of abstraction:
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[math.isinf(x)]`*
 # vec
+### vec - vector type declaration
+*Defined in: std/sci/unsafe.s line 19*
+
+Warning: directly calling this constructor without safety checks is unsafe.
+
+```rust
+vec(float ptr unsafe_ptr, nat pos, nat length) -> (mut vec)
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 ### vec - vector allocation
-*Defined in: std/sci/vec.s line 32*
+*Defined in: std/sci/vec.s line 48*
 
 ```rust
 vec(edit circular, nat length) -> (mut vec) with effects FLOATS
@@ -8569,7 +9191,7 @@ Potential errors:
 60. cannot place vectors on buffer offsets
 
 ### vec - vector allocation
-*Defined in: std/sci/vec.s line 32*
+*Defined in: std/sci/vec.s line 48*
 
 ```rust
 vec(edit circular, nat length, "dirty") -> (mut vec) with effects FLOATS
@@ -8585,7 +9207,7 @@ Potential errors:
 60. cannot place vectors on buffer offsets
 
 ### vec - vector allocation
-*Defined in: std/sci/vec.s line 32*
+*Defined in: std/sci/vec.s line 48*
 
 ```rust
 vec(edit arena, nat length) -> (mut vec) with effects FLOATS
@@ -8601,7 +9223,7 @@ Potential errors:
 60. cannot place vectors on buffer offsets
 
 ### vec - vector allocation
-*Defined in: std/sci/vec.s line 32*
+*Defined in: std/sci/vec.s line 48*
 
 ```rust
 vec(edit arena, nat length, "dirty") -> (mut vec) with effects FLOATS
@@ -8617,7 +9239,7 @@ Potential errors:
 60. cannot place vectors on buffer offsets
 
 ### vec - treat a float buffer as a vector
-*Defined in: std/sci/vec.s line 20*
+*Defined in: std/sci/vec.s line 36*
 
 ```rust
 vec(edit float[]) -> (mut vec)
@@ -8632,7 +9254,7 @@ Potential errors:
 60. cannot place vectors on buffer offsets
 
 ### vec - vector on a new buffer
-*Defined in: std/sci/vec.s line 12*
+*Defined in: std/sci/vec.s line 28*
 
 Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer.
 
@@ -8646,8 +9268,6 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
 
 
 Returned values defer use of the following functions:
@@ -8656,7 +9276,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### vec - vector on a new buffer
-*Defined in: std/sci/vec.s line 12*
+*Defined in: std/sci/vec.s line 28*
 
 Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer.
 
@@ -8670,8 +9290,6 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
 
 
 Returned values defer use of the following functions:
@@ -8679,21 +9297,8 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
-### vec - vector type declaration
-*Defined in: std/sci/unsafe.s line 3*
-
-Warning: directly calling this constructor without safety checks is unsafe.
-
-```rust
-vec(float ptr unsafe_ptr, nat pos, nat length) -> (mut vec)
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 ### vec - view a matrix as a vector
-*Defined in: std/sci/mat.s line 66*
+*Defined in: std/sci/mat.s line 82*
 
 ```rust
 vec(mat) -> (mut vec)
@@ -8705,7 +9310,7 @@ Level of abstraction:
 
 # mat
 ### mat - matrix type declaration
-*Defined in: std/sci/unsafe.s line 8*
+*Defined in: std/sci/unsafe.s line 24*
 
 Warning: directly calling this constructor without safety checks is unsafe.
 
@@ -8718,7 +9323,7 @@ Level of abstraction:
 
 
 ### mat - view a vector as a matrix on the same memory
-*Defined in: std/sci/mat.s line 55*
+*Defined in: std/sci/mat.s line 71*
 
 A 'type \"row\"' or 'type \"col\"' marker is needed
 to indicate the new matrix's orientation.
@@ -8732,7 +9337,7 @@ Level of abstraction:
 
 
 ### mat - view a vector as a matrix on the same memory
-*Defined in: std/sci/mat.s line 55*
+*Defined in: std/sci/mat.s line 71*
 
 A 'type \"row\"' or 'type \"col\"' marker is needed
 to indicate the new matrix's orientation.
@@ -8746,7 +9351,7 @@ Level of abstraction:
 
 
 ### mat - matrix on an existing float[] buffer
-*Defined in: std/sci/mat.s line 37*
+*Defined in: std/sci/mat.s line 53*
 
 ```rust
 mat(edit float[], nat rows) -> (mut mat)
@@ -8764,7 +9369,7 @@ Potential errors:
 63. cannot place matrices on buffer offsets
 
 ### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 21*
+*Defined in: std/sci/mat.s line 37*
 
 ```rust
 mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
@@ -8780,7 +9385,7 @@ Potential errors:
 63. cannot place matrices on buffer offsets
 
 ### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 21*
+*Defined in: std/sci/mat.s line 37*
 
 ```rust
 mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
@@ -8796,7 +9401,7 @@ Potential errors:
 63. cannot place matrices on buffer offsets
 
 ### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 21*
+*Defined in: std/sci/mat.s line 37*
 
 ```rust
 mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
@@ -8812,7 +9417,7 @@ Potential errors:
 63. cannot place matrices on buffer offsets
 
 ### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 21*
+*Defined in: std/sci/mat.s line 37*
 
 ```rust
 mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
@@ -8828,7 +9433,7 @@ Potential errors:
 63. cannot place matrices on buffer offsets
 
 ### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 14*
+*Defined in: std/sci/mat.s line 30*
 
 ```rust
 mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
@@ -8840,8 +9445,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -8850,7 +9455,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 14*
+*Defined in: std/sci/mat.s line 30*
 
 ```rust
 mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
@@ -8862,8 +9467,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -8873,7 +9478,7 @@ free(mut any ptr) -> ()
 ```
 # sparse\_element
 ### sparse\_element
-*Defined in: std/sci/unsafe.s line 13*
+*Defined in: std/sci/unsafe.s line 29*
 
 ```rust
 sparse_element(nat row, nat col, float value) -> (nat row, nat col, float value)
@@ -8885,7 +9490,7 @@ Level of abstraction:
 
 # coo
 ### coo - coo sparse matrix type declaration
-*Defined in: std/sci/unsafe.s line 15*
+*Defined in: std/sci/unsafe.s line 31*
 
 Warning: directly calling this constructor without safety checks is unsafe.
 
@@ -8923,8 +9528,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -8934,7 +9539,7 @@ free(mut any ptr) -> ()
 ```
 # float\_allocator
 ### new - allocations on new bufs
-*Defined in: std/core/allocators.s line 5*
+*Defined in: std/core/allocators.s line 21*
 
 ```rust
 new() -> (new)
@@ -8944,11 +9549,99 @@ Level of abstraction:
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-### circular
-*Defined in: std/sci/vec.s line 8*
+### arena
+*Defined in: std/sci/vec.s line 23*
 
 ```rust
-circular("float") -> (edit circular)
+arena("float__t4t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t2557t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t2491t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t2212t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t619t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t577t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t573t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t569t") -> (edit circular)
+```
+Level of abstraction:
+
+0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t4t") -> (edit circular)
 ```
 Level of abstraction:
 
@@ -8956,10 +9649,76 @@ Level of abstraction:
 
 
 ### arena
-*Defined in: std/sci/vec.s line 7*
+*Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float") -> (edit arena)
+arena("float__t2557t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t2491t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t2212t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t619t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t577t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t573t") -> (edit arena)
+```
+Level of abstraction:
+
+0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t569t") -> (edit arena)
 ```
 Level of abstraction:
 
@@ -8968,7 +9727,7 @@ Level of abstraction:
 
 # constvec
 ### constvec - treat an immutable float buffer as an immutable vector
-*Defined in: std/sci/vec.s line 26*
+*Defined in: std/sci/vec.s line 42*
 
 ```rust
 constvec(float[]) -> (vec)
@@ -8984,979 +9743,7 @@ Potential errors:
 
 # reduce
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec) -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec) -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "mul", "l2") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "mul", "sqr") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "mul", "abs") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "mul") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "add", "l2") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "add", "sqr") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "add", "abs") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "add") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "l2") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "sqr") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec, "abs") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, vec) -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", "l2") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", "sqr") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", "abs") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "add", "l2") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "add", "sqr") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "add", "abs") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "add") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "l2") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sqr") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "abs") -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec) -> (float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "mul", "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "mul", "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "mul", "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "mul") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "add", "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "add", "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "add", "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "add") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "rel", vec, "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -9978,7 +9765,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10000,7 +9787,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10022,7 +9809,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10043,7 +9830,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10064,7 +9851,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10085,7 +9872,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10106,7 +9893,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10127,7 +9914,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10148,7 +9935,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10169,7 +9956,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10190,7 +9977,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10211,7 +9998,7 @@ Potential errors:
 15. out of bounds
 
 ### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 152*
+*Defined in: std/sci/vec.s line 168*
 
 You can specify an additive or multiplicative reduction,
 as well as some transformation that can be applied.
@@ -10231,9 +10018,981 @@ Potential errors:
 2. null pointer
 15. out of bounds
 
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "abs") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec) -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "l2") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "sqr") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "abs") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "l2") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "sqr") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "abs") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "l2") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "sqr") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "abs") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec) -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "mul", "l2") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "mul", "sqr") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "mul", "abs") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "mul") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "add", "l2") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "add", "sqr") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "add", "abs") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "add") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "l2") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "sqr") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec, "abs") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, vec) -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", "l2") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", "sqr") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", "abs") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "add", "l2") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "add", "sqr") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "add", "abs") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "add") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "l2") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sqr") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "abs") -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec) -> (float)
+```
+Level of abstraction:
+
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "mul", "l2") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "mul", "sqr") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "mul", "abs") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "mul") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "add", "l2") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "add", "sqr") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "add", "abs") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "add") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 168*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "rel", vec, "l2") -> (float)
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
 # dot
 ### dot - dot product
-*Defined in: std/sci/vec.s line 188*
+*Defined in: std/sci/vec.s line 204*
 
 ```rust
 dot(vec, vec) -> (float)
@@ -10248,16 +11007,19 @@ Potential errors:
 15. out of bounds
 
 # sum
-### sum - sum
-*Defined in: std/sci/vec.s line 192*
+### sum - sum of all elements
+*Defined in: std/sci/coo.s line 117*
 
 ```rust
-sum(vec) -> (float)
+sum(coo, "all") -> (mut float)
 ```
 Level of abstraction:
 
-2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
 
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
 
 ### sum - sum of each column
 *Defined in: std/sci/coo.s line 109*
@@ -10313,10 +11075,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -10379,10 +11139,8 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+2. null pointer
 15. out of bounds
 
 
@@ -10391,9 +11149,20 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
+### sum - sum
+*Defined in: std/sci/vec.s line 208*
+
+```rust
+sum(vec) -> (float)
+```
+Level of abstraction:
+
+2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
 # mean
 ### mean - mean value
-*Defined in: std/sci/vec.s line 196*
+*Defined in: std/sci/vec.s line 212*
 
 ```rust
 mean(vec) -> (float)
@@ -10404,12 +11173,11 @@ Level of abstraction:
 
 Potential errors:
 
-2. null pointer
 4. division by zero
 
 # var
 ### var - variance
-*Defined in: std/sci/vec.s line 200*
+*Defined in: std/sci/vec.s line 216*
 
 ```rust
 var(vec) -> (float)
@@ -10422,11 +11190,10 @@ Potential errors:
 
 2. null pointer
 4. division by zero
-15. out of bounds
 
 # std
 ### std - standard deviation
-*Defined in: std/sci/vec.s line 211*
+*Defined in: std/sci/vec.s line 227*
 
 ```rust
 std(vec) -> (float)
@@ -10439,11 +11206,10 @@ Potential errors:
 
 2. null pointer
 4. division by zero
-15. out of bounds
 
 # self
 ### self
-*Defined in: std/sci/vec.s line 248*
+*Defined in: std/sci/vec.s line 264*
 
 ```rust
 self(edit vec) -> (edit arena, edit vec)
@@ -10455,10 +11221,10 @@ Level of abstraction:
 
 # rows
 ### rows - number of rows
-*Defined in: std/sci/mat.s line 6*
+*Defined in: std/sci/coo.s line 22*
 
 ```rust
-rows(mat) -> (nat)
+rows(coo) -> (nat)
 ```
 Level of abstraction:
 
@@ -10466,10 +11232,10 @@ Level of abstraction:
 
 
 ### rows - number of rows
-*Defined in: std/sci/coo.s line 22*
+*Defined in: std/sci/mat.s line 22*
 
 ```rust
-rows(coo) -> (nat)
+rows(mat) -> (nat)
 ```
 Level of abstraction:
 
@@ -10489,7 +11255,7 @@ Level of abstraction:
 
 
 ### cols - number of columns
-*Defined in: std/sci/mat.s line 10*
+*Defined in: std/sci/mat.s line 26*
 
 ```rust
 cols(mat) -> (nat)
@@ -10501,7 +11267,7 @@ Level of abstraction:
 
 # constmat
 ### constmat - immutable matrix on an immutable float[] buffer
-*Defined in: std/sci/mat.s line 31*
+*Defined in: std/sci/mat.s line 47*
 
 ```rust
 constmat(float[], nat rows) -> (mat)
@@ -10520,7 +11286,7 @@ Potential errors:
 
 # mutvec
 ### mutvec - view a matrix as a vector
-*Defined in: std/sci/mat.s line 70*
+*Defined in: std/sci/mat.s line 86*
 
 ```rust
 mutvec(mat) -> (mut vec)
@@ -10532,7 +11298,7 @@ Level of abstraction:
 
 # row
 ### row - view matrix row as a vector
-*Defined in: std/sci/mat.s line 74*
+*Defined in: std/sci/mat.s line 90*
 
 ```rust
 row(mat, nat i) -> (mut vec)
@@ -10574,7 +11340,6 @@ Potential errors:
 2. null pointer
 65. row out of bounds
 66. column out of bounds
-15. out of bounds
 62. can only place matrices on contiguous buffers
 63. cannot place matrices on buffer offsets
 
@@ -10594,9 +11359,8 @@ Potential errors:
 65. row out of bounds
 2. null pointer
 66. column out of bounds
-63. cannot place matrices on buffer offsets
 62. can only place matrices on contiguous buffers
-15. out of bounds
+63. cannot place matrices on buffer offsets
 
 ### todense - convert to dense mat
 *Defined in: std/sci/coo.s line 80*
@@ -10614,9 +11378,8 @@ Potential errors:
 2. null pointer
 66. column out of bounds
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -10626,7 +11389,7 @@ free(mut any ptr) -> ()
 ```
 # matrix
 ### coo - coo sparse matrix type declaration
-*Defined in: std/sci/unsafe.s line 15*
+*Defined in: std/sci/unsafe.s line 31*
 
 Warning: directly calling this constructor without safety checks is unsafe.
 
@@ -10639,7 +11402,7 @@ Level of abstraction:
 
 
 ### mat - matrix type declaration
-*Defined in: std/sci/unsafe.s line 8*
+*Defined in: std/sci/unsafe.s line 24*
 
 Warning: directly calling this constructor without safety checks is unsafe.
 
@@ -10677,8 +11440,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -10687,7 +11450,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### mat - view a vector as a matrix on the same memory
-*Defined in: std/sci/mat.s line 55*
+*Defined in: std/sci/mat.s line 71*
 
 A 'type \"row\"' or 'type \"col\"' marker is needed
 to indicate the new matrix's orientation.
@@ -10701,7 +11464,7 @@ Level of abstraction:
 
 
 ### mat - view a vector as a matrix on the same memory
-*Defined in: std/sci/mat.s line 55*
+*Defined in: std/sci/mat.s line 71*
 
 A 'type \"row\"' or 'type \"col\"' marker is needed
 to indicate the new matrix's orientation.
@@ -10715,7 +11478,7 @@ Level of abstraction:
 
 
 ### mat - matrix on an existing float[] buffer
-*Defined in: std/sci/mat.s line 37*
+*Defined in: std/sci/mat.s line 53*
 
 ```rust
 mat(edit float[], nat rows) -> (mut mat)
@@ -10733,7 +11496,7 @@ Potential errors:
 63. cannot place matrices on buffer offsets
 
 ### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 21*
+*Defined in: std/sci/mat.s line 37*
 
 ```rust
 mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
@@ -10749,7 +11512,7 @@ Potential errors:
 63. cannot place matrices on buffer offsets
 
 ### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 21*
+*Defined in: std/sci/mat.s line 37*
 
 ```rust
 mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
@@ -10765,7 +11528,7 @@ Potential errors:
 63. cannot place matrices on buffer offsets
 
 ### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 21*
+*Defined in: std/sci/mat.s line 37*
 
 ```rust
 mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
@@ -10781,7 +11544,7 @@ Potential errors:
 63. cannot place matrices on buffer offsets
 
 ### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 21*
+*Defined in: std/sci/mat.s line 37*
 
 ```rust
 mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
@@ -10797,7 +11560,7 @@ Potential errors:
 63. cannot place matrices on buffer offsets
 
 ### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 14*
+*Defined in: std/sci/mat.s line 30*
 
 ```rust
 mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
@@ -10809,8 +11572,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -10819,7 +11582,7 @@ exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
 ### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 14*
+*Defined in: std/sci/mat.s line 30*
 
 ```rust
 mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
@@ -10831,8 +11594,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -10842,7 +11605,7 @@ free(mut any ptr) -> ()
 ```
 # tagged
 ### tagged - blank tag structure
-*Defined in: std/tag.s line 4*
+*Defined in: std/tag.s line 20*
 
 Ensures that 'tag ptr' has a unique type and allocates at least a cstr's
 (a pointer's) worth of storage so that tag checking is always valid.
@@ -10857,7 +11620,7 @@ Level of abstraction:
 
 # unsafe\_match
 ### unsafe\_match
-*Defined in: std/tag.s line 10*
+*Defined in: std/tag.s line 26*
 
 ```rust
 unsafe_match(tagged ptr obj, cstr name, any ptr type) -> (mut any ptr {follows any ptr type})
@@ -10873,7 +11636,7 @@ Potential errors:
 
 # unsafe\_defer\_free
 ### unsafe\_defer\_free
-*Defined in: std/tag.s line 15*
+*Defined in: std/tag.s line 31*
 
 ```rust
 unsafe_defer_free(mut tagged ptr) -> (mut tagged ptr)
@@ -10890,7 +11653,7 @@ free(mut any ptr) -> ()
 ```
 # tagged\_alloc
 ### tagged\_alloc
-*Defined in: std/tag.s line 20*
+*Defined in: std/tag.s line 36*
 
 ```rust
 tagged_alloc(edit arena, nat size) -> (mut char ptr)
@@ -10906,7 +11669,7 @@ Potential errors:
 
 # match
 ### match
-*Defined in: std/tag.s line 47*
+*Defined in: std/tag.s line 63*
 
 ```rust
 match(cstr obj, cstr type_name) -> (mut char[])
@@ -10917,14 +11680,14 @@ Level of abstraction:
 
 Potential errors:
 
-16. arena is out of space
 2. null pointer
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+15. out of bounds
+16. arena is out of space
 18. can only define strings on contiguous buffers
 19. can only define strings on non-offset buffers
-10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
-15. out of bounds
 
 
 Returned values defer use of the following functions:
@@ -10986,7 +11749,7 @@ Level of abstraction:
 
 # color
 ### color
-*Defined in: std/graphics.s line 5*
+*Defined in: std/graphics.s line 21*
 
 ```rust
 color(nat _r, nat _g, nat _b) -> (nat8 r, nat8 g, nat8 b, nat8 a)
@@ -11000,7 +11763,7 @@ Potential errors:
 56. nat value too large to pack in nat8
 
 ### color
-*Defined in: std/graphics.s line 5*
+*Defined in: std/graphics.s line 21*
 
 ```rust
 color(nat _r, nat _g, nat _b, nat _a) -> (nat8 r, nat8 g, nat8 b, nat8 a)
@@ -11015,7 +11778,7 @@ Potential errors:
 
 # position
 ### position
-*Defined in: std/graphics.s line 14*
+*Defined in: std/graphics.s line 30*
 
 ```rust
 position(float x, float y) -> (float x, float y)
@@ -11027,7 +11790,7 @@ Level of abstraction:
 
 # size
 ### size
-*Defined in: std/graphics.s line 17*
+*Defined in: std/graphics.s line 33*
 
 ```rust
 size(float width, float height) -> (float width, float height)
@@ -11039,7 +11802,7 @@ Level of abstraction:
 
 # unsafe\_open\_window
 ### unsafe\_open\_window
-*Defined in: std/graphics.s line 20*
+*Defined in: std/graphics.s line 36*
 
 ```rust
 unsafe_open_window(float size.width, float size.height, cstr title, cstr font_path) -> ()
@@ -11052,7 +11815,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `(pyray.set_trace_log_level(pyray.LOG_NONE), pyray.init_window(int($size__width),int($size__height),$title),pyray.set_target_fps(60),memory.set_global('font', pyray.load_font_ex($font_path,128,None,0) if $font_path else pyray.get_font_default()))`*
 # window
 ### window
-*Defined in: std/graphics.s line 33*
+*Defined in: std/graphics.s line 49*
 
 ```rust
 window(float size.width, float size.height, cstr title, cstr font_path) -> (edit window)
@@ -11064,7 +11827,7 @@ Level of abstraction:
 
 # is\_open
 ### is\_open
-*Defined in: std/graphics.s line 40*
+*Defined in: std/graphics.s line 72*
 
 ```rust
 is_open(edit window) -> (bool) with effects WINDOW
@@ -11077,7 +11840,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[not pyray.window_should_close()]`*
 # unsafe\_begin\_drawing
 ### unsafe\_begin\_drawing
-*Defined in: std/graphics.s line 45*
+*Defined in: std/graphics.s line 77*
 
 ```rust
 unsafe_begin_drawing() -> ()
@@ -11090,7 +11853,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.begin_drawing()`*
 # unsafe\_end\_drawing
 ### unsafe\_end\_drawing
-*Defined in: std/graphics.s line 49*
+*Defined in: std/graphics.s line 81*
 
 ```rust
 unsafe_end_drawing() -> ()
@@ -11103,53 +11866,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.end_drawing()`*
 # draw
 ### draw
-*Defined in: std/graphics.s line 152*
-
-```rust
-draw(edit window, Texture, float pos.x, float pos.y, float rotation, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-4. division by zero
-15. out of bounds
-
-### draw
-*Defined in: std/graphics.s line 140*
-
-```rust
-draw(edit window, Texture, float pos.x, float pos.y, float rotation, float scale, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### draw
-*Defined in: std/graphics.s line 130*
-
-```rust
-draw(edit window, Texture, float pos.x, float pos.y, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### draw
-*Defined in: std/graphics.s line 53*
+*Defined in: std/graphics.s line 87*
 
 ```rust
 draw(edit window) -> (bool) with effects WINDOW
@@ -11169,7 +11886,7 @@ unsafe_end_drawing() -> ()
 ```
 # clear
 ### clear
-*Defined in: std/graphics.s line 62*
+*Defined in: std/graphics.s line 96*
 
 ```rust
 clear(edit window, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -11182,7 +11899,31 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.clear_background(pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # text
 ### text
-*Defined in: std/graphics.s line 79*
+*Defined in: std/graphics.s line 126*
+
+```rust
+text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
+### text
+*Defined in: std/graphics.s line 126*
+
+```rust
+text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
+### text
+*Defined in: std/graphics.s line 113*
 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -11194,7 +11935,7 @@ Level of abstraction:
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_ex(memory.globals['font'],str($txt),pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### text
-*Defined in: std/graphics.s line 79*
+*Defined in: std/graphics.s line 113*
 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -11206,7 +11947,7 @@ Level of abstraction:
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_ex(memory.globals['font'],str($txt),pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### text
-*Defined in: std/graphics.s line 66*
+*Defined in: std/graphics.s line 100*
 
 ```rust
 text(edit window, cstr txt, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
@@ -11217,34 +11958,22 @@ Level of abstraction:
 
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_ex(memory.globals['font'],$txt,pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
-# text\_rotated
-### text\_rotated
-*Defined in: std/graphics.s line 92*
+# sleep
+### sleep
+*Defined in: std/graphics.s line 141*
 
 ```rust
-text_rotated(edit window, str, float pos.x, float pos.y, float origin.x, float origin.y, float rotation, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+sleep(nat) -> ()
 ```
 Level of abstraction:
 
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
-### text\_rotated
-*Defined in: std/graphics.s line 92*
-
-```rust
-text_rotated(edit window, str, float pos.x, float pos.y, float origin.x, float origin.y, float rotation, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
-```
-Level of abstraction:
-
-0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `time.sleep($seconds*0.001)`*
 # TextureData
 ### TextureData
-*Defined in: std/graphics.s line 107*
+*Defined in: std/graphics.s line 145*
 
 ```rust
 TextureData(nat id, float size.width, float size.height, nat mipmaps, nat format) -> (nat id, float size.width, float size.height, nat mipmaps, nat format)
@@ -11256,7 +11985,7 @@ Level of abstraction:
 
 # Texture
 ### Texture
-*Defined in: std/graphics.s line 110*
+*Defined in: std/graphics.s line 148*
 
 ```rust
 Texture(nat id, float size.width, float size.height, nat mipmaps, nat format) -> (Texture)
@@ -11268,8 +11997,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -11279,7 +12008,7 @@ free(mut any ptr) -> ()
 ```
 # open
 ### open
-*Defined in: std/graphics.s line 117*
+*Defined in: std/graphics.s line 155*
 
 ```rust
 open(cstr) -> (Texture)
@@ -11291,8 +12020,8 @@ Level of abstraction:
 Potential errors:
 
 10. allocation failed
-12. cannot resize buffers with alloc; it promises no data reallocation
-13. cannot allocate a buffer of unsized type
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
 
 
 Returned values defer use of the following functions:
@@ -11300,12 +12029,89 @@ Returned values defer use of the following functions:
 exists(any ptr) -> (bool)
 free(mut any ptr) -> ()
 ```
-# circ
-### circ
-*Defined in: std/graphics.s line 166*
+# texture
+### texture
+*Defined in: std/graphics.s line 217*
 
 ```rust
-circ(edit window, float pos.x, float pos.y, float radius, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+texture(edit window, Texture, float pos.x, float pos.y, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### texture
+*Defined in: std/graphics.s line 204*
+
+```rust
+texture(edit window, Texture, float pos.x, float pos.y, float scale, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### texture
+*Defined in: std/graphics.s line 190*
+
+```rust
+texture(edit window, Texture, float pos.x, float pos.y, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float rotation) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+4. division by zero
+15. out of bounds
+
+### texture
+*Defined in: std/graphics.s line 178*
+
+```rust
+texture(edit window, Texture, float pos.x, float pos.y, float scale, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float rotation) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### texture
+*Defined in: std/graphics.s line 168*
+
+```rust
+texture(edit window, Texture, float pos.x, float pos.y, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+# circ
+### circ
+*Defined in: std/graphics.s line 230*
+
+```rust
+circ(edit window, float pos.x, float pos.y, float radius, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
 Level of abstraction:
 
@@ -11313,12 +12119,35 @@ Level of abstraction:
 
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_circle_v(pyray.Vector2($pos__x,$pos__y),$radius,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
-# ellipse
-### ellipse
-*Defined in: std/graphics.s line 176*
+### circ
+*Defined in: std/graphics.s line 306*
 
 ```rust
-ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+circ(edit window, float pos.x, float pos.y, float radius, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
+# ellipse
+### ellipse
+*Defined in: std/graphics.s line 250*
+
+```rust
+ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+### ellipse
+*Defined in: std/graphics.s line 240*
+
+```rust
+ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
 Level of abstraction:
 
@@ -11327,23 +12156,21 @@ Level of abstraction:
 
 # rect
 ### rect
-*Defined in: std/graphics.s line 186*
+*Defined in: std/graphics.s line 274*
 
 ```rust
-rect(edit window, float pos.x, float pos.y, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
 Level of abstraction:
 
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))`*
-# rect\_line
-### rect\_line
-*Defined in: std/graphics.s line 196*
+### rect
+*Defined in: std/graphics.s line 270*
 
 ```rust
-rect_line(edit window, float pos.x, float pos.y, float size.width, float size.height, nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
 Level of abstraction:
 
@@ -11351,22 +12178,46 @@ Level of abstraction:
 
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_rectangle_lines_ex(pyray.Rectangle($pos__x,$pos__y,$size__width,$size__height),$thickness,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
-# circ\_line
-### circ\_line
-*Defined in: std/graphics.s line 200*
+### rect
+*Defined in: std/graphics.s line 260*
 
 ```rust
-circ_line(edit window, float pos.x, float pos.y, nat radius, nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
 Level of abstraction:
 
 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 
 
-*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))`*
+# tri
+### tri
+*Defined in: std/graphics.s line 295*
+
+```rust
+tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, float p3.y, "line", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_triangle_lines(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),pyray.Vector2($p3__x,$p3__y),pyray.Color($color__r,$color__g,$color__b,$color__a))`*
+### tri
+*Defined in: std/graphics.s line 284*
+
+```rust
+tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, float p3.y, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+```
+Level of abstraction:
+
+0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_triangle(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),pyray.Vector2($p3__x,$p3__y),pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # dt
 ### dt
-*Defined in: std/graphics.s line 217*
+*Defined in: std/graphics.s line 323*
 
 ```rust
 dt(window) -> (float) with effects WINDOW
@@ -11379,7 +12230,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.get_frame_time()]`*
 # uptime
 ### uptime
-*Defined in: std/graphics.s line 222*
+*Defined in: std/graphics.s line 328*
 
 ```rust
 uptime(window) -> (float) with effects WINDOW
@@ -11392,7 +12243,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.get_time()]`*
 # key\_down
 ### key\_down
-*Defined in: std/graphics.s line 227*
+*Defined in: std/graphics.s line 333*
 
 ```rust
 key_down(window, nat key) -> (bool) with effects WINDOW
@@ -11405,7 +12256,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_key_down($key)]`*
 # key\_pressed
 ### key\_pressed
-*Defined in: std/graphics.s line 232*
+*Defined in: std/graphics.s line 338*
 
 ```rust
 key_pressed(edit window, nat key) -> (bool) with effects WINDOW
@@ -11418,7 +12269,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_key_pressed($key)]`*
 # key\_released
 ### key\_released
-*Defined in: std/graphics.s line 237*
+*Defined in: std/graphics.s line 343*
 
 ```rust
 key_released(edit window, nat key) -> (bool) with effects WINDOW
@@ -11431,7 +12282,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_key_released($key)]`*
 # mouse\_pos
 ### mouse\_pos
-*Defined in: std/graphics.s line 242*
+*Defined in: std/graphics.s line 348*
 
 ```rust
 mouse_pos(window) -> (float x, float y) with effects WINDOW
@@ -11444,7 +12295,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[(lambda p=pyray.get_mouse_position():(p.x,p.y))()]`*
 # mouse\_down
 ### mouse\_down
-*Defined in: std/graphics.s line 250*
+*Defined in: std/graphics.s line 356*
 
 ```rust
 mouse_down(window, nat button) -> (bool) with effects WINDOW
@@ -11457,7 +12308,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_mouse_button_down($button)]`*
 # mouse\_pressed
 ### mouse\_pressed
-*Defined in: std/graphics.s line 255*
+*Defined in: std/graphics.s line 361*
 
 ```rust
 mouse_pressed(edit window, nat button) -> (bool) with effects WINDOW
@@ -11470,7 +12321,7 @@ Level of abstraction:
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_mouse_button_pressed($button)]`*
 # mouse\_wheel
 ### mouse\_wheel
-*Defined in: std/graphics.s line 260*
+*Defined in: std/graphics.s line 366*
 
 ```rust
 mouse_wheel(window) -> (float) with effects WINDOW
@@ -11482,8 +12333,8 @@ Level of abstraction:
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.get_mouse_wheel_move()]`*
 # KEY\_NULL
-### \_\_t7790t
-*Defined in: std/graphics.s line 265*
+
+*Defined in: std/graphics.s line 371*
 
 ```rust
 () -> (0)
@@ -11494,8 +12345,8 @@ Level of abstraction:
 
 
 # KEY\_APOSTROPHE
-### \_\_t7793t
-*Defined in: std/graphics.s line 266*
+
+*Defined in: std/graphics.s line 372*
 
 ```rust
 () -> (39)
@@ -11506,8 +12357,8 @@ Level of abstraction:
 
 
 # KEY\_COMMA
-### \_\_t7796t
-*Defined in: std/graphics.s line 267*
+
+*Defined in: std/graphics.s line 373*
 
 ```rust
 () -> (44)
@@ -11518,8 +12369,8 @@ Level of abstraction:
 
 
 # KEY\_MINUS
-### \_\_t7799t
-*Defined in: std/graphics.s line 268*
+
+*Defined in: std/graphics.s line 374*
 
 ```rust
 () -> (45)
@@ -11530,8 +12381,8 @@ Level of abstraction:
 
 
 # KEY\_PERIOD
-### \_\_t7802t
-*Defined in: std/graphics.s line 269*
+
+*Defined in: std/graphics.s line 375*
 
 ```rust
 () -> (46)
@@ -11542,8 +12393,8 @@ Level of abstraction:
 
 
 # KEY\_SLASH
-### \_\_t7805t
-*Defined in: std/graphics.s line 270*
+
+*Defined in: std/graphics.s line 376*
 
 ```rust
 () -> (47)
@@ -11554,8 +12405,8 @@ Level of abstraction:
 
 
 # KEY\_ZERO
-### \_\_t7808t
-*Defined in: std/graphics.s line 271*
+
+*Defined in: std/graphics.s line 377*
 
 ```rust
 () -> (48)
@@ -11566,8 +12417,8 @@ Level of abstraction:
 
 
 # KEY\_ONE
-### \_\_t7811t
-*Defined in: std/graphics.s line 272*
+
+*Defined in: std/graphics.s line 378*
 
 ```rust
 () -> (49)
@@ -11578,8 +12429,8 @@ Level of abstraction:
 
 
 # KEY\_TWO
-### \_\_t7814t
-*Defined in: std/graphics.s line 273*
+
+*Defined in: std/graphics.s line 379*
 
 ```rust
 () -> (50)
@@ -11590,8 +12441,8 @@ Level of abstraction:
 
 
 # KEY\_THREE
-### \_\_t7817t
-*Defined in: std/graphics.s line 274*
+
+*Defined in: std/graphics.s line 380*
 
 ```rust
 () -> (51)
@@ -11602,8 +12453,8 @@ Level of abstraction:
 
 
 # KEY\_FOUR
-### \_\_t7820t
-*Defined in: std/graphics.s line 275*
+
+*Defined in: std/graphics.s line 381*
 
 ```rust
 () -> (52)
@@ -11614,8 +12465,8 @@ Level of abstraction:
 
 
 # KEY\_FIVE
-### \_\_t7823t
-*Defined in: std/graphics.s line 276*
+
+*Defined in: std/graphics.s line 382*
 
 ```rust
 () -> (53)
@@ -11626,8 +12477,8 @@ Level of abstraction:
 
 
 # KEY\_SIX
-### \_\_t7826t
-*Defined in: std/graphics.s line 277*
+
+*Defined in: std/graphics.s line 383*
 
 ```rust
 () -> (54)
@@ -11638,8 +12489,8 @@ Level of abstraction:
 
 
 # KEY\_SEVEN
-### \_\_t7829t
-*Defined in: std/graphics.s line 278*
+
+*Defined in: std/graphics.s line 384*
 
 ```rust
 () -> (55)
@@ -11650,8 +12501,8 @@ Level of abstraction:
 
 
 # KEY\_EIGHT
-### \_\_t7832t
-*Defined in: std/graphics.s line 279*
+
+*Defined in: std/graphics.s line 385*
 
 ```rust
 () -> (56)
@@ -11662,8 +12513,8 @@ Level of abstraction:
 
 
 # KEY\_NINE
-### \_\_t7835t
-*Defined in: std/graphics.s line 280*
+
+*Defined in: std/graphics.s line 386*
 
 ```rust
 () -> (57)
@@ -11674,8 +12525,8 @@ Level of abstraction:
 
 
 # KEY\_SEMICOLON
-### \_\_t7838t
-*Defined in: std/graphics.s line 281*
+
+*Defined in: std/graphics.s line 387*
 
 ```rust
 () -> (59)
@@ -11686,8 +12537,8 @@ Level of abstraction:
 
 
 # KEY\_EQUAL
-### \_\_t7841t
-*Defined in: std/graphics.s line 282*
+
+*Defined in: std/graphics.s line 388*
 
 ```rust
 () -> (61)
@@ -11698,8 +12549,8 @@ Level of abstraction:
 
 
 # KEY\_A
-### \_\_t7844t
-*Defined in: std/graphics.s line 283*
+
+*Defined in: std/graphics.s line 389*
 
 ```rust
 () -> (65)
@@ -11710,8 +12561,8 @@ Level of abstraction:
 
 
 # KEY\_B
-### \_\_t7847t
-*Defined in: std/graphics.s line 284*
+
+*Defined in: std/graphics.s line 390*
 
 ```rust
 () -> (66)
@@ -11722,8 +12573,8 @@ Level of abstraction:
 
 
 # KEY\_C
-### \_\_t7850t
-*Defined in: std/graphics.s line 285*
+
+*Defined in: std/graphics.s line 391*
 
 ```rust
 () -> (67)
@@ -11734,8 +12585,8 @@ Level of abstraction:
 
 
 # KEY\_D
-### \_\_t7853t
-*Defined in: std/graphics.s line 286*
+
+*Defined in: std/graphics.s line 392*
 
 ```rust
 () -> (68)
@@ -11746,8 +12597,8 @@ Level of abstraction:
 
 
 # KEY\_E
-### \_\_t7856t
-*Defined in: std/graphics.s line 287*
+
+*Defined in: std/graphics.s line 393*
 
 ```rust
 () -> (69)
@@ -11758,8 +12609,8 @@ Level of abstraction:
 
 
 # KEY\_F
-### \_\_t7859t
-*Defined in: std/graphics.s line 288*
+
+*Defined in: std/graphics.s line 394*
 
 ```rust
 () -> (70)
@@ -11770,8 +12621,8 @@ Level of abstraction:
 
 
 # KEY\_G
-### \_\_t7862t
-*Defined in: std/graphics.s line 289*
+
+*Defined in: std/graphics.s line 395*
 
 ```rust
 () -> (71)
@@ -11782,8 +12633,8 @@ Level of abstraction:
 
 
 # KEY\_H
-### \_\_t7865t
-*Defined in: std/graphics.s line 290*
+
+*Defined in: std/graphics.s line 396*
 
 ```rust
 () -> (72)
@@ -11794,8 +12645,8 @@ Level of abstraction:
 
 
 # KEY\_I
-### \_\_t7868t
-*Defined in: std/graphics.s line 291*
+
+*Defined in: std/graphics.s line 397*
 
 ```rust
 () -> (73)
@@ -11806,8 +12657,8 @@ Level of abstraction:
 
 
 # KEY\_J
-### \_\_t7871t
-*Defined in: std/graphics.s line 292*
+
+*Defined in: std/graphics.s line 398*
 
 ```rust
 () -> (74)
@@ -11818,8 +12669,8 @@ Level of abstraction:
 
 
 # KEY\_K
-### \_\_t7874t
-*Defined in: std/graphics.s line 293*
+
+*Defined in: std/graphics.s line 399*
 
 ```rust
 () -> (75)
@@ -11830,8 +12681,8 @@ Level of abstraction:
 
 
 # KEY\_L
-### \_\_t7877t
-*Defined in: std/graphics.s line 294*
+
+*Defined in: std/graphics.s line 400*
 
 ```rust
 () -> (76)
@@ -11842,8 +12693,8 @@ Level of abstraction:
 
 
 # KEY\_M
-### \_\_t7880t
-*Defined in: std/graphics.s line 295*
+
+*Defined in: std/graphics.s line 401*
 
 ```rust
 () -> (77)
@@ -11854,8 +12705,8 @@ Level of abstraction:
 
 
 # KEY\_N
-### \_\_t7883t
-*Defined in: std/graphics.s line 296*
+
+*Defined in: std/graphics.s line 402*
 
 ```rust
 () -> (78)
@@ -11866,8 +12717,8 @@ Level of abstraction:
 
 
 # KEY\_O
-### \_\_t7886t
-*Defined in: std/graphics.s line 297*
+
+*Defined in: std/graphics.s line 403*
 
 ```rust
 () -> (79)
@@ -11878,8 +12729,8 @@ Level of abstraction:
 
 
 # KEY\_P
-### \_\_t7889t
-*Defined in: std/graphics.s line 298*
+
+*Defined in: std/graphics.s line 404*
 
 ```rust
 () -> (80)
@@ -11890,8 +12741,8 @@ Level of abstraction:
 
 
 # KEY\_Q
-### \_\_t7892t
-*Defined in: std/graphics.s line 299*
+
+*Defined in: std/graphics.s line 405*
 
 ```rust
 () -> (81)
@@ -11902,8 +12753,8 @@ Level of abstraction:
 
 
 # KEY\_R
-### \_\_t7895t
-*Defined in: std/graphics.s line 300*
+
+*Defined in: std/graphics.s line 406*
 
 ```rust
 () -> (82)
@@ -11914,8 +12765,8 @@ Level of abstraction:
 
 
 # KEY\_S
-### \_\_t7898t
-*Defined in: std/graphics.s line 301*
+
+*Defined in: std/graphics.s line 407*
 
 ```rust
 () -> (83)
@@ -11926,8 +12777,8 @@ Level of abstraction:
 
 
 # KEY\_T
-### \_\_t7901t
-*Defined in: std/graphics.s line 302*
+
+*Defined in: std/graphics.s line 408*
 
 ```rust
 () -> (84)
@@ -11938,8 +12789,8 @@ Level of abstraction:
 
 
 # KEY\_U
-### \_\_t7904t
-*Defined in: std/graphics.s line 303*
+
+*Defined in: std/graphics.s line 409*
 
 ```rust
 () -> (85)
@@ -11950,8 +12801,8 @@ Level of abstraction:
 
 
 # KEY\_V
-### \_\_t7907t
-*Defined in: std/graphics.s line 304*
+
+*Defined in: std/graphics.s line 410*
 
 ```rust
 () -> (86)
@@ -11962,8 +12813,8 @@ Level of abstraction:
 
 
 # KEY\_W
-### \_\_t7910t
-*Defined in: std/graphics.s line 305*
+
+*Defined in: std/graphics.s line 411*
 
 ```rust
 () -> (87)
@@ -11974,8 +12825,8 @@ Level of abstraction:
 
 
 # KEY\_X
-### \_\_t7913t
-*Defined in: std/graphics.s line 306*
+
+*Defined in: std/graphics.s line 412*
 
 ```rust
 () -> (88)
@@ -11986,8 +12837,8 @@ Level of abstraction:
 
 
 # KEY\_Y
-### \_\_t7916t
-*Defined in: std/graphics.s line 307*
+
+*Defined in: std/graphics.s line 413*
 
 ```rust
 () -> (89)
@@ -11998,8 +12849,8 @@ Level of abstraction:
 
 
 # KEY\_Z
-### \_\_t7919t
-*Defined in: std/graphics.s line 308*
+
+*Defined in: std/graphics.s line 414*
 
 ```rust
 () -> (90)
@@ -12010,8 +12861,8 @@ Level of abstraction:
 
 
 # KEY\_LEFT\_BRACKET
-### \_\_t7922t
-*Defined in: std/graphics.s line 309*
+
+*Defined in: std/graphics.s line 415*
 
 ```rust
 () -> (91)
@@ -12022,8 +12873,8 @@ Level of abstraction:
 
 
 # KEY\_BACKSLASH
-### \_\_t7925t
-*Defined in: std/graphics.s line 310*
+
+*Defined in: std/graphics.s line 416*
 
 ```rust
 () -> (92)
@@ -12034,8 +12885,8 @@ Level of abstraction:
 
 
 # KEY\_RIGHT\_BRACKET
-### \_\_t7928t
-*Defined in: std/graphics.s line 311*
+
+*Defined in: std/graphics.s line 417*
 
 ```rust
 () -> (93)
@@ -12046,8 +12897,8 @@ Level of abstraction:
 
 
 # KEY\_GRAVE
-### \_\_t7931t
-*Defined in: std/graphics.s line 312*
+
+*Defined in: std/graphics.s line 418*
 
 ```rust
 () -> (96)
@@ -12058,8 +12909,8 @@ Level of abstraction:
 
 
 # KEY\_SPACE
-### \_\_t7934t
-*Defined in: std/graphics.s line 313*
+
+*Defined in: std/graphics.s line 419*
 
 ```rust
 () -> (32)
@@ -12070,8 +12921,8 @@ Level of abstraction:
 
 
 # KEY\_ESCAPE
-### \_\_t7937t
-*Defined in: std/graphics.s line 314*
+
+*Defined in: std/graphics.s line 420*
 
 ```rust
 () -> (256)
@@ -12082,8 +12933,8 @@ Level of abstraction:
 
 
 # KEY\_ENTER
-### \_\_t7940t
-*Defined in: std/graphics.s line 315*
+
+*Defined in: std/graphics.s line 421*
 
 ```rust
 () -> (257)
@@ -12094,8 +12945,8 @@ Level of abstraction:
 
 
 # KEY\_TAB
-### \_\_t7943t
-*Defined in: std/graphics.s line 316*
+
+*Defined in: std/graphics.s line 422*
 
 ```rust
 () -> (258)
@@ -12106,8 +12957,8 @@ Level of abstraction:
 
 
 # KEY\_BACKSPACE
-### \_\_t7946t
-*Defined in: std/graphics.s line 317*
+
+*Defined in: std/graphics.s line 423*
 
 ```rust
 () -> (259)
@@ -12118,8 +12969,8 @@ Level of abstraction:
 
 
 # KEY\_INSERT
-### \_\_t7949t
-*Defined in: std/graphics.s line 318*
+
+*Defined in: std/graphics.s line 424*
 
 ```rust
 () -> (260)
@@ -12130,8 +12981,8 @@ Level of abstraction:
 
 
 # KEY\_DELETE
-### \_\_t7952t
-*Defined in: std/graphics.s line 319*
+
+*Defined in: std/graphics.s line 425*
 
 ```rust
 () -> (261)
@@ -12142,8 +12993,8 @@ Level of abstraction:
 
 
 # KEY\_RIGHT
-### \_\_t7955t
-*Defined in: std/graphics.s line 320*
+
+*Defined in: std/graphics.s line 426*
 
 ```rust
 () -> (262)
@@ -12154,8 +13005,8 @@ Level of abstraction:
 
 
 # KEY\_LEFT
-### \_\_t7958t
-*Defined in: std/graphics.s line 321*
+
+*Defined in: std/graphics.s line 427*
 
 ```rust
 () -> (263)
@@ -12166,8 +13017,8 @@ Level of abstraction:
 
 
 # KEY\_DOWN
-### \_\_t7961t
-*Defined in: std/graphics.s line 322*
+
+*Defined in: std/graphics.s line 428*
 
 ```rust
 () -> (264)
@@ -12178,8 +13029,8 @@ Level of abstraction:
 
 
 # KEY\_UP
-### \_\_t7964t
-*Defined in: std/graphics.s line 323*
+
+*Defined in: std/graphics.s line 429*
 
 ```rust
 () -> (265)
@@ -12190,8 +13041,8 @@ Level of abstraction:
 
 
 # KEY\_PAGE\_UP
-### \_\_t7967t
-*Defined in: std/graphics.s line 324*
+
+*Defined in: std/graphics.s line 430*
 
 ```rust
 () -> (266)
@@ -12202,8 +13053,8 @@ Level of abstraction:
 
 
 # KEY\_PAGE\_DOWN
-### \_\_t7970t
-*Defined in: std/graphics.s line 325*
+
+*Defined in: std/graphics.s line 431*
 
 ```rust
 () -> (267)
@@ -12214,8 +13065,8 @@ Level of abstraction:
 
 
 # KEY\_HOME
-### \_\_t7973t
-*Defined in: std/graphics.s line 326*
+
+*Defined in: std/graphics.s line 432*
 
 ```rust
 () -> (268)
@@ -12226,8 +13077,8 @@ Level of abstraction:
 
 
 # KEY\_END
-### \_\_t7976t
-*Defined in: std/graphics.s line 327*
+
+*Defined in: std/graphics.s line 433*
 
 ```rust
 () -> (269)
@@ -12238,8 +13089,8 @@ Level of abstraction:
 
 
 # KEY\_CAPS\_LOCK
-### \_\_t7979t
-*Defined in: std/graphics.s line 328*
+
+*Defined in: std/graphics.s line 434*
 
 ```rust
 () -> (280)
@@ -12250,8 +13101,8 @@ Level of abstraction:
 
 
 # KEY\_SCROLL\_LOCK
-### \_\_t7982t
-*Defined in: std/graphics.s line 329*
+
+*Defined in: std/graphics.s line 435*
 
 ```rust
 () -> (281)
@@ -12262,8 +13113,8 @@ Level of abstraction:
 
 
 # KEY\_NUM\_LOCK
-### \_\_t7985t
-*Defined in: std/graphics.s line 330*
+
+*Defined in: std/graphics.s line 436*
 
 ```rust
 () -> (282)
@@ -12274,8 +13125,8 @@ Level of abstraction:
 
 
 # KEY\_PRINT\_SCREEN
-### \_\_t7988t
-*Defined in: std/graphics.s line 331*
+
+*Defined in: std/graphics.s line 437*
 
 ```rust
 () -> (283)
@@ -12286,8 +13137,8 @@ Level of abstraction:
 
 
 # KEY\_PAUSE
-### \_\_t7991t
-*Defined in: std/graphics.s line 332*
+
+*Defined in: std/graphics.s line 438*
 
 ```rust
 () -> (284)
@@ -12298,8 +13149,8 @@ Level of abstraction:
 
 
 # KEY\_F1
-### \_\_t7994t
-*Defined in: std/graphics.s line 333*
+
+*Defined in: std/graphics.s line 439*
 
 ```rust
 () -> (290)
@@ -12310,8 +13161,8 @@ Level of abstraction:
 
 
 # KEY\_F2
-### \_\_t7997t
-*Defined in: std/graphics.s line 334*
+
+*Defined in: std/graphics.s line 440*
 
 ```rust
 () -> (291)
@@ -12322,8 +13173,8 @@ Level of abstraction:
 
 
 # KEY\_F3
-### \_\_t8000t
-*Defined in: std/graphics.s line 335*
+
+*Defined in: std/graphics.s line 441*
 
 ```rust
 () -> (292)
@@ -12334,8 +13185,8 @@ Level of abstraction:
 
 
 # KEY\_F4
-### \_\_t8003t
-*Defined in: std/graphics.s line 336*
+
+*Defined in: std/graphics.s line 442*
 
 ```rust
 () -> (293)
@@ -12346,8 +13197,8 @@ Level of abstraction:
 
 
 # KEY\_F5
-### \_\_t8006t
-*Defined in: std/graphics.s line 337*
+
+*Defined in: std/graphics.s line 443*
 
 ```rust
 () -> (294)
@@ -12358,8 +13209,8 @@ Level of abstraction:
 
 
 # KEY\_F6
-### \_\_t8009t
-*Defined in: std/graphics.s line 338*
+
+*Defined in: std/graphics.s line 444*
 
 ```rust
 () -> (295)
@@ -12370,8 +13221,8 @@ Level of abstraction:
 
 
 # KEY\_F7
-### \_\_t8012t
-*Defined in: std/graphics.s line 339*
+
+*Defined in: std/graphics.s line 445*
 
 ```rust
 () -> (296)
@@ -12382,8 +13233,8 @@ Level of abstraction:
 
 
 # KEY\_F8
-### \_\_t8015t
-*Defined in: std/graphics.s line 340*
+
+*Defined in: std/graphics.s line 446*
 
 ```rust
 () -> (297)
@@ -12394,8 +13245,8 @@ Level of abstraction:
 
 
 # KEY\_F9
-### \_\_t8018t
-*Defined in: std/graphics.s line 341*
+
+*Defined in: std/graphics.s line 447*
 
 ```rust
 () -> (298)
@@ -12406,8 +13257,8 @@ Level of abstraction:
 
 
 # KEY\_F10
-### \_\_t8021t
-*Defined in: std/graphics.s line 342*
+
+*Defined in: std/graphics.s line 448*
 
 ```rust
 () -> (299)
@@ -12418,8 +13269,8 @@ Level of abstraction:
 
 
 # KEY\_F11
-### \_\_t8024t
-*Defined in: std/graphics.s line 343*
+
+*Defined in: std/graphics.s line 449*
 
 ```rust
 () -> (300)
@@ -12430,8 +13281,8 @@ Level of abstraction:
 
 
 # KEY\_F12
-### \_\_t8027t
-*Defined in: std/graphics.s line 344*
+
+*Defined in: std/graphics.s line 450*
 
 ```rust
 () -> (301)
@@ -12442,8 +13293,8 @@ Level of abstraction:
 
 
 # KEY\_LEFT\_SHIFT
-### \_\_t8030t
-*Defined in: std/graphics.s line 345*
+
+*Defined in: std/graphics.s line 451*
 
 ```rust
 () -> (340)
@@ -12454,8 +13305,8 @@ Level of abstraction:
 
 
 # KEY\_LEFT\_CONTROL
-### \_\_t8033t
-*Defined in: std/graphics.s line 346*
+
+*Defined in: std/graphics.s line 452*
 
 ```rust
 () -> (341)
@@ -12466,8 +13317,8 @@ Level of abstraction:
 
 
 # KEY\_LEFT\_ALT
-### \_\_t8036t
-*Defined in: std/graphics.s line 347*
+
+*Defined in: std/graphics.s line 453*
 
 ```rust
 () -> (342)
@@ -12478,8 +13329,8 @@ Level of abstraction:
 
 
 # KEY\_LEFT\_SUPER
-### \_\_t8039t
-*Defined in: std/graphics.s line 348*
+
+*Defined in: std/graphics.s line 454*
 
 ```rust
 () -> (343)
@@ -12490,8 +13341,8 @@ Level of abstraction:
 
 
 # KEY\_RIGHT\_SHIFT
-### \_\_t8042t
-*Defined in: std/graphics.s line 349*
+
+*Defined in: std/graphics.s line 455*
 
 ```rust
 () -> (344)
@@ -12502,8 +13353,8 @@ Level of abstraction:
 
 
 # KEY\_RIGHT\_CONTROL
-### \_\_t8045t
-*Defined in: std/graphics.s line 350*
+
+*Defined in: std/graphics.s line 456*
 
 ```rust
 () -> (345)
@@ -12514,8 +13365,8 @@ Level of abstraction:
 
 
 # KEY\_RIGHT\_ALT
-### \_\_t8048t
-*Defined in: std/graphics.s line 351*
+
+*Defined in: std/graphics.s line 457*
 
 ```rust
 () -> (346)
@@ -12526,8 +13377,8 @@ Level of abstraction:
 
 
 # KEY\_RIGHT\_SUPER
-### \_\_t8051t
-*Defined in: std/graphics.s line 352*
+
+*Defined in: std/graphics.s line 458*
 
 ```rust
 () -> (347)
@@ -12538,8 +13389,8 @@ Level of abstraction:
 
 
 # KEY\_KB\_MENU
-### \_\_t8054t
-*Defined in: std/graphics.s line 353*
+
+*Defined in: std/graphics.s line 459*
 
 ```rust
 () -> (348)
@@ -12550,8 +13401,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_0
-### \_\_t8057t
-*Defined in: std/graphics.s line 354*
+
+*Defined in: std/graphics.s line 460*
 
 ```rust
 () -> (320)
@@ -12562,8 +13413,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_1
-### \_\_t8060t
-*Defined in: std/graphics.s line 355*
+
+*Defined in: std/graphics.s line 461*
 
 ```rust
 () -> (321)
@@ -12574,8 +13425,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_2
-### \_\_t8063t
-*Defined in: std/graphics.s line 356*
+
+*Defined in: std/graphics.s line 462*
 
 ```rust
 () -> (322)
@@ -12586,8 +13437,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_3
-### \_\_t8066t
-*Defined in: std/graphics.s line 357*
+
+*Defined in: std/graphics.s line 463*
 
 ```rust
 () -> (323)
@@ -12598,8 +13449,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_4
-### \_\_t8069t
-*Defined in: std/graphics.s line 358*
+
+*Defined in: std/graphics.s line 464*
 
 ```rust
 () -> (324)
@@ -12610,8 +13461,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_5
-### \_\_t8072t
-*Defined in: std/graphics.s line 359*
+
+*Defined in: std/graphics.s line 465*
 
 ```rust
 () -> (325)
@@ -12622,8 +13473,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_6
-### \_\_t8075t
-*Defined in: std/graphics.s line 360*
+
+*Defined in: std/graphics.s line 466*
 
 ```rust
 () -> (326)
@@ -12634,8 +13485,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_7
-### \_\_t8078t
-*Defined in: std/graphics.s line 361*
+
+*Defined in: std/graphics.s line 467*
 
 ```rust
 () -> (327)
@@ -12646,8 +13497,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_8
-### \_\_t8081t
-*Defined in: std/graphics.s line 362*
+
+*Defined in: std/graphics.s line 468*
 
 ```rust
 () -> (328)
@@ -12658,8 +13509,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_9
-### \_\_t8084t
-*Defined in: std/graphics.s line 363*
+
+*Defined in: std/graphics.s line 469*
 
 ```rust
 () -> (329)
@@ -12670,8 +13521,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_DECIMAL
-### \_\_t8087t
-*Defined in: std/graphics.s line 364*
+
+*Defined in: std/graphics.s line 470*
 
 ```rust
 () -> (330)
@@ -12682,8 +13533,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_DIVIDE
-### \_\_t8090t
-*Defined in: std/graphics.s line 365*
+
+*Defined in: std/graphics.s line 471*
 
 ```rust
 () -> (331)
@@ -12694,8 +13545,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_MULTIPLY
-### \_\_t8093t
-*Defined in: std/graphics.s line 366*
+
+*Defined in: std/graphics.s line 472*
 
 ```rust
 () -> (332)
@@ -12706,8 +13557,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_SUBTRACT
-### \_\_t8096t
-*Defined in: std/graphics.s line 367*
+
+*Defined in: std/graphics.s line 473*
 
 ```rust
 () -> (333)
@@ -12718,8 +13569,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_ADD
-### \_\_t8099t
-*Defined in: std/graphics.s line 368*
+
+*Defined in: std/graphics.s line 474*
 
 ```rust
 () -> (334)
@@ -12730,8 +13581,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_ENTER
-### \_\_t8102t
-*Defined in: std/graphics.s line 369*
+
+*Defined in: std/graphics.s line 475*
 
 ```rust
 () -> (335)
@@ -12742,8 +13593,8 @@ Level of abstraction:
 
 
 # KEY\_KP\_EQUAL
-### \_\_t8105t
-*Defined in: std/graphics.s line 370*
+
+*Defined in: std/graphics.s line 476*
 
 ```rust
 () -> (336)
@@ -12754,8 +13605,8 @@ Level of abstraction:
 
 
 # KEY\_BACK
-### \_\_t8108t
-*Defined in: std/graphics.s line 371*
+
+*Defined in: std/graphics.s line 477*
 
 ```rust
 () -> (4)
@@ -12766,8 +13617,8 @@ Level of abstraction:
 
 
 # KEY\_MENU
-### \_\_t8111t
-*Defined in: std/graphics.s line 372*
+
+*Defined in: std/graphics.s line 478*
 
 ```rust
 () -> (5)
@@ -12778,8 +13629,8 @@ Level of abstraction:
 
 
 # KEY\_VOLUME\_UP
-### \_\_t8114t
-*Defined in: std/graphics.s line 373*
+
+*Defined in: std/graphics.s line 479*
 
 ```rust
 () -> (24)
@@ -12790,8 +13641,8 @@ Level of abstraction:
 
 
 # KEY\_VOLUME\_DOWN
-### \_\_t8117t
-*Defined in: std/graphics.s line 374*
+
+*Defined in: std/graphics.s line 480*
 
 ```rust
 () -> (25)

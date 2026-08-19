@@ -776,6 +776,7 @@ equality lowers to just a memory address comparison underneath.
 import "std/core.s"
 
 def main()
+    CLI = edit console()
     print "hello"=="hello"
 ```
 
@@ -798,7 +799,7 @@ def receive(effect edit console CLI, str|cstr _message)
     if _message=="hello"
         print "they said hello!"
     else
-        print nn "indecipherable message of length"
+        print nn "non-hello message of length: "
         print len message
 
 def main()

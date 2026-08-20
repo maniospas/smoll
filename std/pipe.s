@@ -48,15 +48,33 @@ def with(pipe ptr obj)
 local def pipe_ptr(pipe ptr value)
     return compiler::args()
 
-local def unsafe_join(mut any ptr handle)
-    {thread_join(handle);}
+def system_thread(any ptr unsafe_ptr)
+    return class unsafe_ptr
 
-def thread(pipe_ptr->blank func, pipe ptr input)
-    {builtins::compiler::ptr _handle = thread_create((thread_func_t)func, (void*)input);}
-    handle = unsafe_mut _handle
+def unsafe_spawn(pipe_ptr->blank func, pipe ptr input)
+    {builtins::compiler::ptr _unsafe_ptr = thread_create((thread_func_t)func, (void*)input);}
+    unsafe_ptr = edit _unsafe_ptr
+    return system_thread unsafe_ptr
+
+def join(edit system_thread thread)
+    if exists thread.unsafe_ptr
+        {thread_join(thread__unsafe_ptr);}
+
+def cpu(nat cores)
+    return singleton cores
+
+def growing_thread_pool(edit cpu cpu)
+    threads = mut arena system_thread[].alloc cpu.cores
+    joined = mut false
     defer
-        unsafe_join(handle)
-    return handle
+        if not joined for i in range of len threads.buf try join threads.buf[i]
+        joined = true
+    unsafe_return class(cpu, threads, joined)
+
+def thread(effect edit growing_thread_pool THREADS, pipe_ptr->blank func, pipe ptr input)
+    spawned = edit unsafe_spawn(func, input)
+    (at alloc THREADS.threads) = spawned
+    return spawned
 
 def unsafe_pipe_match(with obj, cstr name, any ptr type)
     found = compiler::deref obj.obj.value

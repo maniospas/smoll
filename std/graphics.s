@@ -61,6 +61,7 @@ def window(size size, cstr title, cstr font_path)
         {"-lraylib"}
         {"-sUSE_GLFW=3"}
         {"-sASYNCIFY"}
+        {"-sASYNCIFY_STACK_SIZE=65536"}
         {"-flto"}
     else
         {"-lraylib"}

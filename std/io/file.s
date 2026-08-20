@@ -23,6 +23,7 @@ def open(str|cstr _path)
     if compiler::back type "emcc"
         {"-sFETCH"}
         {"-sASYNCIFY"}
+        {"-sASYNCIFY_STACK_SIZE=65536"}
         {"-sFORCE_FILESYSTEM=1"}
         {"-lidbfs.js"}
     path = cstr unsafe_temp _path

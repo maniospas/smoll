@@ -40,7 +40,7 @@ def unsafe_console()
     debug::unsafe_singletons()
     return CLI
 
-def flush(effect edit console CLI)
+def print(effect edit console CLI, "flush")
     doc "flushes the print buffer on the console"
     {fflush(stdout);}
 

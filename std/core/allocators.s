@@ -82,16 +82,24 @@ def circular(edit any[] buf)
     pos = mut 0
     return class(buf, pos)
 
-def list(edit any[] _buf)
+def list(edit any[] _buf, blank|"external" init_strategy)
     doc "list buffer management"
     doc "List defined over a mutable buf that is automatically managed and resized."
     doc "A capacity is maintained so that resizes are not performed too frequently."
-    buf = mut _buf.alloc 1
-    length = mut len buf
+    if init_strategy is blank
+        buf = mut _buf.alloc 1
+    else
+        buf = mut _buf
+    length = mut 0
     return class(buf, length)
 
+def len(list self)
+    return self.length
+    
 def get(circular|list self, nat pos)
     doc "get a list element pointer"
+    if self is list and pos>=self.length
+        fail "out of bounds"
     return self.buf[pos]&
 
 def mutget(edit circular|list self, nat pos)

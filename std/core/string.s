@@ -145,7 +145,7 @@ def copy_null_terminated(effect new CHARS, str other)
     compiler::unsafe_declare_deep_copy_only()
     return str(buf, 0, other.dat.length, other.dat.first)
 
-def unsafe_temp(str other)
+def unsafe_temp(str|blank prefix, str other)
     doc "convert a string to a temporary null-terminated (cstr,str) pair"
     doc "This function's return is meant to be passed to operating system calls,"
     doc "or return from compt with the pattern 'cstr unsafe_temp string_value'."
@@ -162,10 +162,29 @@ def unsafe_temp(str other)
     doc "passing data to 'system' or 'compt'.*"
     doc ""
     doc "*Info: This is safe to run during 'compt' in that the latter will fail gracefully.*"
-    str = new().copy_null_terminated(other)
-    _ret = str.unsafe_ptr.unsafe::add str.dat.pos
-    {builtins::cstr cstr = _ret;}
-    return class(cstr, str)
+    
+    if prefix is blank
+        str = new().copy_null_terminated(other)
+        _ret = str.unsafe_ptr.unsafe::add str.dat.pos
+        {builtins::cstr cstr = _ret;}
+        return class(cstr, str)
+    else
+        buf = alloc(char[], 1+other.dat.length+prefix.dat.length)
+        {memcpy(buf__unsafe_ptr, prefix__unsafe_ptr+prefix__dat__pos, prefix__dat__length);}
+        {memcpy(buf__unsafe_ptr+prefix__dat__length, other__unsafe_ptr+other__dat__pos, other__dat__length);}
+        {builtins::compiler::ptr endpos = buf__unsafe_ptr+other__dat__length+prefix__dat__length;}
+        {*endpos = 0;}
+        compiler::unsafe_declare_deep_copy_only()
+        if prefix.dat.length==0 
+            first_character = prefix.dat.first
+        else 
+            first_character = other.dat.first
+        str = str(buf, 0, other.dat.length, first_character)
+        _ret = str.unsafe_ptr.unsafe::add str.dat.pos
+        {builtins::cstr cstr = _ret;}
+        return class(cstr, str)
+
+
 
 def unsafe_temp(cstr cstr)
     doc "tautology function for cstr"

@@ -17,6 +17,9 @@
 local import "std/core.s"
 local import "std/unsafe.s" as unsafe
 
+local def string_pair(str head, str body)
+    return compiler::args()
+
 def is_dir(cstr path)
     doc "checks whether a path points to an existing directory"
     VM "[os.path.is_dir($path)]"
@@ -26,7 +29,7 @@ def is_dir(cstr path)
     {builtins::bool exists = __smo_is_dir(path);}
     return exists
 
-def is_dir(str path)
+def is_dir(str|string_pair path)
     doc "checks whether a path points to an existing directory"
     if compiler::back type "emcc"
         {"-sFORCE_FILESYSTEM=1"}
@@ -42,7 +45,7 @@ def create_dir(cstr path)
     {builtins::bool result = __smo_create_dir(path);}
     if not result fail "failed to create directory"
 
-def create_dir(str path)
+def create_dir(str|string_pair path)
     create_dir cstr unsafe_temp path
 
 def is_file(cstr path)
@@ -51,9 +54,9 @@ def is_file(cstr path)
     {builtins::bool exists = __smo_is_file(path);}
     return exists
 
-def is_file(str _path)
+def is_file(str|string_pair path)
     doc "checks whether a path points to an existing file"
-    return is_file cstr unsafe_temp _path
+    return is_file cstr unsafe_temp path
 
 def wait_file(cstr path)
     doc "checks whether a path points to an existing file"
@@ -66,11 +69,11 @@ def wait_file(cstr path)
         exists = is_file path
     return exists
 
-def wait_file(str _path)
+def wait_file(str|string_pair _path)
     doc "checks whether a path points to an existing file"
     return is_file cstr unsafe_temp _path
 
-def remove(str|cstr _path)
+def remove(str|cstr|string_pair _path)
     doc "removes a file at a path, fails if it cannot be removed"
     path = cstr unsafe_temp _path
     if is_file path
@@ -96,7 +99,7 @@ def open(cstr path)
     if not exists unsafe_ptr fail "failed to open file"
     return class(unsafe_mut unsafe_ptr)
 
-def open(str path)
+def open(str|string_pair path)
     return open cstr unsafe_temp path
 
 local def raw_entry(edit open f) # this function returns a content pointer, but this does not allow safe comparisons

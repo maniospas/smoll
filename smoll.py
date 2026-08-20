@@ -5566,9 +5566,43 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
                 else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
 
-            for should_invalid in impl.accumulating_defers[-1]:
-                if impl.invalidated.get(should_invalid) is None:
-                    impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
+            # for should_invalid in impl.accumulating_defers[-1]:
+            #     if impl.invalidated.get(should_invalid) is None:
+            #         impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
+                    
+            rets = [should_invalid for should_invalid in impl.accumulating_defers[-1] if impl.invalidated.get(should_invalid) is None]
+            if rets:
+                invalidated = set()
+                for val in impl.vars.values():
+                    varname = val.stabilized_name()
+                    if impl.get_assignment(varname, rets):
+                        invalidated.add(val)
+                        impl.invalidated[varname] = name
+                for invalid_type in impl.invalidate_types_on_defer: # TODO: track defers for each variable to be deleted
+                    for varname, val in impl.vars.items():
+                        if val.type.invalidated_by == invalid_type:# and not varname.endswith("__unsafe_ptr"):
+                            impl.invalidated[val.stabilized_name()] = name
+                            if val.name in impl.args: name.error("safety", "cannot invalidate associated argument '"+pretty_name(varname)+"'")
+
+                to_remove = list()
+                for defer in impl.defers:
+                    if not any(v in defer for v in invalidated): continue
+                    for v in defer:
+                        if isinstance(v, Variable):
+                            for arg in impl.args:
+                                if (not impl.vars[arg].immutable) and (impl.get_assignment(arg, [v]) or impl.get_required_accompany(impl.vars[arg])): 
+                                    name.error("safety", "this 'del' would evoke a defer that would invalidate the mutable argument '"+pretty_name(arg)+"'")
+                    impl.implementation.extend(defer)
+                    to_remove.append(defer)
+                for v in invalidated:
+                    if v.name in impl.args and not v.immutable and v.type.builtin:
+                        impl.implementation.extend([
+                            v, 
+                            CODEWORD_EQUALS,
+                            CODEWORD_ZERO,
+                            CODEWORD_SEMICOLON
+                        ])
+                for defer in to_remove: impl.defers.remove(defer)
 
             impl.implementation.append(CODEWORD_RBRACKET)
             impl.for_counter.pop()
@@ -5615,9 +5649,45 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
                 else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
             
-            for should_invalid in impl.accumulating_defers[-1]:
-                if impl.invalidated.get(should_invalid) is None:
-                    impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
+            # for should_invalid in impl.accumulating_defers[-1]:
+            #     if impl.invalidated.get(should_invalid) is None:
+            #         impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
+
+            rets = [should_invalid for should_invalid in impl.accumulating_defers[-1] if impl.invalidated.get(should_invalid) is None]
+            if rets:
+                invalidated = set()
+                for val in impl.vars.values():
+                    varname = val.stabilized_name()
+                    if impl.get_assignment(varname, rets):
+                        invalidated.add(val)
+                        impl.invalidated[varname] = name
+                for invalid_type in impl.invalidate_types_on_defer: # TODO: track defers for each variable to be deleted
+                    for varname, val in impl.vars.items():
+                        if val.type.invalidated_by == invalid_type:# and not varname.endswith("__unsafe_ptr"):
+                            impl.invalidated[val.stabilized_name()] = name
+                            if val.name in impl.args: name.error("safety", "cannot invalidate associated argument '"+pretty_name(varname)+"'")
+
+                to_remove = list()
+                for defer in impl.defers:
+                    if not any(v in defer for v in invalidated): continue
+                    for v in defer:
+                        if isinstance(v, Variable):
+                            for arg in impl.args:
+                                if (not impl.vars[arg].immutable) and (impl.get_assignment(arg, [v]) or impl.get_required_accompany(impl.vars[arg])): 
+                                    name.error("safety", "this 'del' would evoke a defer that would invalidate the mutable argument '"+pretty_name(arg)+"'")
+                    impl.implementation.extend(defer)
+                    to_remove.append(defer)
+                for v in invalidated:
+                    if v.name in impl.args and not v.immutable and v.type.builtin:
+                        impl.implementation.extend([
+                            v, 
+                            CODEWORD_EQUALS,
+                            CODEWORD_ZERO,
+                            CODEWORD_SEMICOLON
+                        ])
+                for defer in to_remove: impl.defers.remove(defer)
+                
+
 
             impl.implementation.append(CODEWORD_RBRACKET)
             impl.nesting.pop()

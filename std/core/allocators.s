@@ -45,14 +45,6 @@ def arena(edit any[] buf)
     doc "with another allocator)."
     return arena(buf, 0)
 
-def gc(edit arena arn)
-    doc "a garbage collector for an arena"
-    tracked_position = 0+arn.pos
-    compiler::unsafe_declare_deep_copy_only()
-    defer
-        arn.pos = tracked_position+0
-    return tracked_position
-
 def length(arena arn)
     doc "allocated arena size"
     doc "This is not the total arena size, but rather the number"

@@ -1,24 +1,25 @@
 import "std/core.s"
+import "std/scope.s"
 
 def test1(edit arena<char::tag> arn)
-    gc arn
+    reuse arn
     arn.slice(5)
 
 def test2(edit arena<char::tag> CHARS)
-    gc CHARS
+    reuse CHARS
     return "test"+"2"
 
 def test3(edit arena<char::tag> CHARS)
     return copy test2(CHARS)
 
 def test4(edit arena<char::tag> arn)
-    gc arn
+    reuse arn
     ret = [test3 arn]
     compiler::unsafe_declare_deep_copy_only()
     return ret 
 
 def test5(effect edit console CLI, edit arena<char::tag> arn)
-    gc arn
+    reuse arn
     x = test4 arn
     z = x[0]&
     print compiler::deref z#[0]

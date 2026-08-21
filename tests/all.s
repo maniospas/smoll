@@ -3,6 +3,7 @@ import "std/io.s"::dir::is_dir
 import "std/io.s"::dir::open
 import "std/io.s"::get
 import "std/test.s"
+import "std/scope.s"
 
 
 def main()
@@ -15,11 +16,11 @@ def main()
     failures = mut 0
     for path in open test_root
         if path==".." or not is_dir(test_root, path) continue
-        gc CHARS # start from the same position at each iteration (defers a reset)
+        reuse CHARS # start from the same position at each iteration (defers a reset)
         dir_path = test_root+path+"/"
         for entry in open dir_path
             if not ends_with(entry, ".s") continue
-            gc CHARS
+            reuse CHARS
             counter = counter+1
             if not test command_base+dir_path+entry 
                 failures = failures+1

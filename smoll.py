@@ -995,6 +995,14 @@ class ImplementedType:
             return None
             error_token.error("type", "cannot assign more than one values to variable '"+varname+"'")
         existing = self.vars.get(varname, None)
+        if existing is not None and varname in self.invalidated:
+            if existing.type!=value[0].type:
+                error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'\nPerhaps you meant to place a value on a pointer with the pattern '"+existing.name+" = ...'")
+            # if varname in self.rets:
+            #     error_token.error("type", "cannot replace")
+            del self.invalidated[varname]             
+            existing = None
+
         if not existing:
             if top_entry and "__" in varname and not varname.startswith("__t"):
                 if not any(v.startswith(varname) for v in self.vars.keys()):
@@ -5772,9 +5780,9 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                     var = diff_vars_if.get(k, None)
                     if var is None: continue
                     if var.type!=v.type:
-                        tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable with different types '"+k+"'")
+                        tokens[if_pos].error("safety", "the conditional blocks starting here declares a variable with different types '"+pretty_name(k)+"'")
                     if (var.isprivate or var.immutable)!=(v.isprivate or v.immutable):
-                        tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable but assume differently whether it is packed in a class '"+k+"' - perhaps try to 'const' it first")
+                        tokens[if_pos].error("safety", "the conditional blocks starting here declares a variable but assume differently whether it is packed in a class '"+pretty_name(k)+"' - perhaps try to 'const' it first")
                     # if var.immutable!=v.immutable:
                     #     tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable but assume differently whether it is immutable '"+k+"'") 
                 for k, v in diff_vars_if.items():

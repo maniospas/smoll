@@ -7,6 +7,7 @@ def main()
     buf1.resize 20
 
     buf2 = mut local buf1
+    buf2.resize(30) # SHOULD FAIL even through the ref, because we detached with 'local'
     buf2[0] = 1.0
 
     print len buf1

@@ -10,7 +10,7 @@ def main()
     test_root = str "./tests/passing/"
     CLI = edit console()
     colors = colors CLI
-    CHARS = edit arena alloc 64
+    CHARS = edit arena alloc 128
     command_base = copy "./smoll --cleanup " # suffices to make clever string building additions
     counter  = mut 0
     failures = mut 0
@@ -22,7 +22,8 @@ def main()
             if not ends_with(entry, ".s") continue
             reuse CHARS
             counter = counter+1
-            if not test command_base+dir_path+entry 
+            should_fail = entry.contains "_fail_"
+            if not test(command_base+dir_path+entry, should_fail)
                 failures = failures+1
 
     # final report

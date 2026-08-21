@@ -18,7 +18,8 @@ def main()
     f[0] = 1.0 # move data to pointer
     print f[0]
     f0 = f[0]&
-    (last f.resize 2) = compiler::deref f0
+    drf = compiler::deref f0
+    (last f.resize 2) = drf
 
 
     p = mut Field[].alloc 1

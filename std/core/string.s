@@ -338,9 +338,11 @@ def add(effect edit char_allocator\arena\circular CHARS, str|cstr _s1, str|cstr 
     charalloc = unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
     surface = mut arena charalloc
     start = surface.pos+0
+    unsafe_valid CHARS
+    unsafe_valid s1
+    unsafe_valid s2
     copy(surface, s1)
     copy(surface, s2)
-    unsafe_valid CHARS
     return str(status surface from start)
 
 def add(effect edit arena<char::tag>|circular<char::tag> CHARS, str|cstr _s1, str|cstr _s2)

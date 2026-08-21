@@ -24,12 +24,18 @@ local def print_marker(effect edit colors colors, "success"|"failure"|"pending" 
     set(colors reset)
     print nn "] "
 
-def test(effect edit colors colors, str command)
+def test(effect edit colors colors, str command, bool|blank should_fail)
     CLI = edit colors.CLI
     print_marker type "pending"
     print nn command
     print type "flush"
-    error = run command
+    error = mut run command
+    if not should_fail is blank
+        if should_fail
+            if exists error
+                error = cstr()
+            else
+                error = "no errors found, but the run should be failing (contains _fail_ in its name)"
     print nn "\r"
     if exists error
         print_marker type "failure"

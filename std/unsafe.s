@@ -28,7 +28,11 @@ def alloc(nat bytes)
 def realloc(any ptr allocated, nat bytes)
     doc "reallocate memory"
     doc "Reallocates an allocated memory pointer, potentially invalidating"
-    doc "the original one without any safety."
+    doc "the original one without any safety. As a stopgap measure against"
+    doc "unforeseen complications, this function is set to invalidate all"
+    doc "pointers in the calling context and parrent contexts, BESIDES"
+    doc "calling function mutable arguments and calling function outputs,"
+    doc "as those have the intent of immediate reuse."
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
     {if(allocated){builtins::compiler::ptr new_allocated = realloc(allocated, bytes);}}

@@ -2634,22 +2634,22 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         # creates invalidations
         # if callee.invalidate_types_when_called:
         #     print(impl.name, callee.name, callee.invalidate_types_when_called)
-        if (not callee.vars[callee.args[varpos]].immutable) and POINTER_TYPE in callee.invalidate_types_when_called:
-            for val in impl.vars.values():
-                v = val.stabilized_name()
-                v_assignment = impl.get_assignment(v, [var.name])
-                if val in vars: continue
-                if v_assignment is None: continue
-                if v_assignment!=v: continue # TODO: don't invalidate mutable args that are reset
-                impl.invalidated[v] = error_token
-                if val.immutable: continue
-                #print(impl.name, callee.name, var.name)
-                # impl.implementation.extend([
-                #     impl.vars[v], 
-                #     CODEWORD_EQUALS,
-                #     CODEWORD_ZERO,
-                #     CODEWORD_SEMICOLON
-                # ])
+        # if (not callee.vars[callee.args[varpos]].immutable) and POINTER_TYPE in callee.invalidate_types_when_called:
+        #     for val in impl.vars.values():
+        #         v = val.stabilized_name()
+        #         v_assignment = impl.get_assignment(v, [var.name])
+        #         if val in vars: continue
+        #         if v_assignment is None: continue
+        #         if v_assignment!=v: continue # TODO: don't invalidate mutable args that are reset
+        #         impl.invalidated[v] = error_token
+        #         #if val.immutable: continue
+        #         #print(impl.name, callee.name, var.name)
+        #         # impl.implementation.extend([
+        #         #     impl.vars[v], 
+        #         #     CODEWORD_EQUALS,
+        #         #     CODEWORD_ZERO,
+        #         #     CODEWORD_SEMICOLON
+        #         # ])
 
         if (not callee.vars[callee.args[varpos]].immutable) and (not callee.vars[callee.args[varpos]].isprivate) and callee.args[varpos] not in callee.refargs:
             defer_vars = {var for defer in impl.defers+impl.returned_defers for var in defer if isinstance(var, Variable)}
@@ -2739,10 +2739,12 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
 
     add_to_invalidators: set[Variable] = set()
     for invalid_type in callee.invalidate_types_when_called:
-        for varname, val in impl.vars.items():
-            #if any(v.name==varname for v in vars): continue
-            if val.type.invalidated_by == invalid_type and not val.immutable:# and not varname.endswith("__unsafe_ptr"):
-                impl.invalidated[val.stabilized_name()] = error_token
+        for _, val in impl.vars.items():
+            varname = val.stabilized_name()
+            if any(v.name==varname and (not callee.vars[v2].immutable or v2 in callee.rets) for v, v2 in zip(vars, callee.args)): continue
+            #if not val.immutable and any(v.name==val.name for v in vars): continue
+            if val.type.invalidated_by == invalid_type:# and not val.immutable:# and not varname.endswith("__unsafe_ptr"):
+                impl.invalidated[varname] = error_token
                 #add_to_invalidators.add(val)
                 
     if impl.is_parsing_a_defer:

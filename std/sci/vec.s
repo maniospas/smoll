@@ -58,21 +58,26 @@ def len(vec v)
     doc "vectot length"
     return v.length
 
-def mutget(edit vec v, nat i)
+def mutget(edit vec v, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "modify a vector element at given position"
-    if i>=v.length fail "out of bounds"
+    if inbounds_guarantee is blank
+        if i>=v.length fail "out of bounds"
     return unsafe_mut v.unsafe_ptr+8*(i+v.pos)
 
-def get(vec v, nat i)
+def get(vec v, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "get a vector element at given position"
-    if i>=v.length fail "out of bounds"
+    if inbounds_guarantee is blank
+        if i>=v.length fail "out of bounds"
+    else
+        doc ""
+        doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
     return v.unsafe_ptr+8*(i+v.pos)
 
 local def at(float number, nat i)
     return number
 
 local def at(vec v, nat i)
-    return v[i]
+    return v[i unsafe_assume_inbounds]
 
 def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector addition"
@@ -82,7 +87,7 @@ def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     v = edit vec(v1.length dirty)
     for value in v1
         i = compiler::for_counter()
-        v[i] = value+v2.at i
+        v[i unsafe_assume_inbounds] = value+v2.at i
     return v
 
 def add(effect edit float_allocator FLOATS, float v1, vec v2)
@@ -98,7 +103,7 @@ def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     v = edit vec(v1.length dirty)
     for value in v1
         i = compiler::for_counter()
-        v[i] = value-v2.at i
+        v[i unsafe_assume_inbounds] = value-v2.at i
     return v
 
 def sub(effect edit float_allocator FLOATS, float v1, vec v2)
@@ -106,7 +111,8 @@ def sub(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "Grabs a FLOATS allocator effect to store the result."
     v = edit vec v2.length
     for value in v2
-        v[compiler::for_counter()] = v1-value
+        i = compiler::for_counter()
+        v[i unsafe_assume_inbounds] = v1-value
     return v
 
 def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
@@ -117,7 +123,7 @@ def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     v = edit vec(v1.length dirty)
     for value in v1
         i = compiler::for_counter()
-        v[i] = value*v2.at i
+        v[i unsafe_assume_inbounds] = value*v2.at i
     return v
 
 def mul(effect edit float_allocator FLOATS, float v1, vec v2)
@@ -134,7 +140,7 @@ def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     v = edit vec(v1.length dirty)
     for value in v1
         i = compiler::for_counter()
-        v[i] = pow(value, v2.at i)
+        v[i unsafe_assume_inbounds] = pow(value, v2.at i)
     return v
 
 def pow(effect edit float_allocator FLOATS, float v1, vec v2)
@@ -142,7 +148,8 @@ def pow(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "Grabs a FLOATS allocator effect to store the result."
     v = edit vec(v2.length dirty)
     for value in v2
-        v[compiler::for_counter()] = pow(v1, value)
+        i = compiler::for_counter()
+        v[i unsafe_assume_inbounds] = pow(v1, value)
     return v
 
 def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
@@ -154,7 +161,7 @@ def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     p1 = v1.unsafe_ptr
     for value in v1
         i = compiler::for_counter()
-        v[i] = value/v2.at i
+        v[i unsafe_assume_inbounds] = value/v2.at i
     return v
 
 def div(effect edit float_allocator FLOATS, float v1, vec v2)
@@ -162,7 +169,8 @@ def div(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "Grabs a FLOATS allocator effect to store the result."
     v = edit vec(v2.length dirty)
     for value in v2
-        v[compiler::for_counter()] = v1/value
+        i = compiler::for_counter()
+        v[i unsafe_assume_inbounds] = v1/value
     return v
     
 def reduce(vec v, blank|"mul"|"sub"|"rel" comparison, blank|vec v2, blank|"add"|"mul" reduction, blank|"abs"|"sqr"|"l2" transform)
@@ -207,11 +215,11 @@ def dot(vec v1, vec v2)
 
 def sum(vec v)
     doc "sum"
-    return v.reduce(type "add")
+    return v.reduce(() add)
 
 def mean(vec v)
     doc "mean value"
-    return v.reduce(type "add")/float len v
+    return v.reduce(() add)/float len v
 
 def var(vec v)
     doc "variance"
@@ -242,7 +250,7 @@ def print(effect edit console CLI, vec v, cstr|blank endl)
         endl = "\n"
     print nn "[ "
     for i in range of v.length
-        print nn v[i]
+        print nn v[i unsafe_assume_inbounds]
         if i<v.length-1 print nn "  "
     print (" ]", endl)
 
@@ -251,7 +259,8 @@ def copy(effect edit float_allocator FLOATS, vec v)
     doc "Grabs a FLOATS for the result as an effect."
     result = edit vec(v.length dirty)
     for value in v
-        result[compiler::for_counter()] = value
+        i = compiler::for_counter()
+        result[i unsafe_assume_inbounds] = value
     return result
 
 def arena(edit vec v)

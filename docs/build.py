@@ -168,6 +168,7 @@ def export(path, target):
             overflow-y:auto;
             font-size:0.9rem;
             z-index:1000;
+            height: 100vh;
         }
         .toc i {color: #888}
         pre {

@@ -86,24 +86,26 @@ def mul(Number x, Number y)
     {type(x) z=x*y;}
     return z
 
-def div(Number x, Number y)
+def div(Number x, Number y, "unsafe_assume_nonzero"|blank nonzero_guarantee)
     doc "divide by"
     doc "Divides two numbers of the same type. This is an overload for the / operator."
     if is_different(x,y)
         compiler::skip()
-    {type(x) zero = 0;}
-    if y==zero
-        doc "Safeguards against division by zero."
-        fail "division by zero"
+    if nonzero_guarantee is blank
+        {type(x) zero = 0;}
+        if y==zero
+            doc "Safeguards against division by zero."
+            fail "division by zero"
     {type(x) z=x/y;}
     return z
 
-def mod(nat x, nat y)
+def mod(nat x, nat y, "unsafe_assume_nonzero"|blank nonzero_guarantee)
     doc "modulo by"
     doc "Computes the modulo between two natural numbers. This is an overload for the % operator."
-    {type(x) zero = 0;}
-    if y==zero
-        fail "modulo by zero"
+    if nonzero_guarantee is blank
+        {type(x) zero = 0;}
+        if y==zero
+            fail "modulo by zero"
     {type(x) z=x%y;}
     return z
 
@@ -148,6 +150,10 @@ def sub(Number x, Number y)
         doc "Natural numbers are safeguarded against acquiring negative results, which would overflow."
     if x is nat and x<y
         fail "nat subtraction would yield a negative"
+    {type(x) z=x-y;}
+    return z
+
+def sub(nat x, nat y, "assume_smaller")
     {type(x) z=x-y;}
     return z
 

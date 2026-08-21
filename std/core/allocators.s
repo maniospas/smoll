@@ -60,15 +60,25 @@ def status(arena|allocated self)
     doc "memory data as part of structural input."
     return (local self.buf, local self.pos)
 
-def get(arena l, nat pos)
+def get(arena l, nat pos, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "get a list element pointer"
-    if pos>=l.pos fail "out of bounds"
-    return l.buf[pos]&
+    if inbounds_guarantee is blank
+        if pos>=l.pos fail "out of bounds"
+        return l.buf[pos]&
+    else
+        doc ""
+        doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
+        return l.buf[pos, inbounds_guarantee]&
 
-def mutget(edit arena l, nat pos)
+def mutget(edit arena l, nat pos, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "get a mutable list element pointer"
-    if pos>=l.pos fail "out of bounds"
-    return l.buf[pos]&
+    if inbounds_guarantee is blank
+        if pos>=l.pos fail "out of bounds"
+        return l.buf[pos]&
+    else
+        doc ""
+        doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
+        return l.buf[pos, inbounds_guarantee]&
 
 def circular(edit any[] buf)
     doc "circular buffer"
@@ -91,8 +101,9 @@ def len(list self)
     
 def get(circular|list self, nat pos)
     doc "get a list element pointer"
-    if self is list and pos>=self.length
-        fail "out of bounds"
+    if self is list and inbounds_guarantee is blank
+        if pos>=self.length
+            fail "out of bounds"
     return self.buf[pos]&
 
 def mutget(edit circular|list self, nat pos)

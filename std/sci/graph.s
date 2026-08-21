@@ -49,7 +49,7 @@ def get(ppr ppr, nat i)
     doc "next graph filer parameter"
     doc "Parameters obtained this way do not correspond to the filter polynomial coefficients"
     doc "but rather on factorization coefficient."
-    if i>=ppr.max_iters fail "out of bounds"
+    if i>=ppr.max_iters fail "computational budget reached"
     return ppr.alpha
 
 def filter(ppr config, matrix m, vec p0)

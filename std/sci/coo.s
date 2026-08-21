@@ -40,14 +40,22 @@ def coo(nat rows, nat cols, nat nnz)
 def coo(sparse_element[] elements, nat rows, nat cols)
     return coo(elements.unsafe_ptr, rows, cols, len elements)
 
-def get(coo m, nat k)
+def get(coo m, nat k, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "get a sparse element"
-    if k>=m.nnz fail "out of bounds"
+    if inbounds_guarantee is blank
+        if k>=m.nnz fail "out of bounds"
+    else
+        doc ""
+        doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
     return m.unsafe_ptr+k*24
 
-def mutget(edit coo m, nat k)
+def mutget(edit coo m, nat k, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "mutable reference to a sparse element"
-    if k>=m.nnz fail "out of bounds"
+    if inbounds_guarantee is blank
+        if k>=m.nnz fail "out of bounds"
+    else
+        doc ""
+        doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
     return unsafe_mut m.unsafe_ptr+k*24
 
 def mul(effect edit float_allocator FLOATS, coo m, vec v)

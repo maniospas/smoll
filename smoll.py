@@ -4521,10 +4521,26 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
         elif op=="[":
             async def process_get(pos: int, rets: list[Variable]):
                 err_token = tokens[pos]
-                pos, additional_rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
-                while peek_text(tokens, pos)==",":
-                    pos, comma_rets = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
-                    additional_rets += comma_rets
+                ret = []
+                while True:
+                    prev_pos = pos
+                    pos += 1
+                    if peek_text(tokens, pos)=="]": break
+                    pos, segment = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
+                    pos, segment = await process_statement_operator(file, tokens, impl, pos, segment, current_operator_priority=0)
+                    ret.extend(segment)
+                    peek = peek_text(tokens, pos)
+                    if peek=="]": break
+                    if peek==",":
+                        continue
+                    littype = literal_types.get("\""+peek+"\"", None)
+                    if littype is None: get(tokens, prev_pos).error("syntax", "expecting comma, closing bracket, or keyword derived from a cstr literal type but got: '"+peek+"'")
+                    if is_lsp and file.is_main_file: print_lsp_keyword(get(tokens, pos), "**literal type**\n\nThis is a shorthand to adding a 'type \""+peek+"\"' argument here.")
+                    litvar = Variable(create_temp(), littype.variations[0])
+                    impl.vars[litvar.name] = litvar
+                    ret.append(litvar)
+                additional_rets = ret
+
                 if peek_text(tokens, pos)!="]": err_token.error("syntax", "missing closing ']'")
                 lsp_pos = pos
                 pos += 1

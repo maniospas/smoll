@@ -97,6 +97,7 @@
             overflow-y:auto;
             font-size:0.9rem;
             z-index:1000;
+            height: 100vh;
         }
         .toc i {color: #888}
         pre {
@@ -250,7 +251,7 @@
 <em>2.1.</em> <a href="#buffers">buffers</a><br>
 <em>2.2.</em> <a href="#pointers">{pointers}</a><br>
 <em>2.3.</em> <a href="#substructures">{substructures}</a><br>
-<em>2.4.</em> <a href="#stable-references">stable references</a><br>
+<em>2.4.</em> <a href="#stable-references">{stable references}</a><br>
 <em>2.5.</em> <a href="#try-and-fail">try and fail</a><br>
 <em>2.6.</em> <a href="#iterators">{iterators}</a><br>
 <em>2.7.</em> <a href="#defer">{defer}</a><br>
@@ -1636,6 +1637,8 @@ an example:</p>
 
 <h2 id="stable-references">stable references</h2>
 
+<div class="notice-box box-warning"><strong>Warning:</strong> This is an advanced feature for working with dynamically moved resources. It is raraly needed and can be skipped.</div>
+
 <p>You can work with data that reference other data
 in that they are updated together. This is similar
 to pointers, but comes under the safety 
@@ -1693,7 +1696,7 @@ this requires stable handling through <code>ref</code>.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">ref</span> <span class="n">alloc</span> <span class="p">(</span><span class="n">mut</span> <span class="nb">float</span><span class="p">[],</span> <span class="mi">10</span><span class="p">)</span> <span class="c1"># &#39;ref&#39; is mandatory to resize later</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">ref</span> <span class="n">alloc</span> <span class="p">(</span><span class="nb">float</span><span class="p">[],</span> <span class="mi">10</span><span class="p">)</span> <span class="c1"># &#39;ref&#39; is mandatory to resize later</span>
     <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="n">buf</span><span class="o">.</span><span class="n">resize</span> <span class="mi">20</span>
     <span class="nb">print</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1703,10 +1706,11 @@ this requires stable handling through <code>ref</code>.</p>
 <p>Below is a more complicated example, where a list is used
 to dynamically manage a buffer and resize it as needed.</p>
 
-<p>Without <code>ref</code>, the compiler would complain that the 
+<p>Without <code>ref</code> (for example, if one used <code>mut</code> instead), 
+the compiler would complain that the 
 potential resizing of the second copy could 
 (in this case: would) invalidate the buffer version
-that the string <code>s1</code> know about. However, thanks to 
+that the string <code>s1</code> knows about. However, thanks to 
 the stable reference, the buffer is automatically updated
 for strings copied onto it.</p>
 
@@ -1714,7 +1718,7 @@ for strings copied onto it.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">()</span>
-    <span class="n">mem</span> <span class="o">=</span> <span class="nb">list</span> <span class="n">ref</span> <span class="n">mut</span> <span class="n">char</span><span class="p">[]</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="n">ref</span> <span class="nb">list</span> <span class="n">char</span><span class="p">[]</span>
     <span class="n">s1</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;123&quot;</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="n">mem</span><span class="o">.</span><span class="n">copy</span> <span class="s2">&quot;456&quot;</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>
@@ -1727,7 +1731,7 @@ for strings copied onto it.</p>
 </code></pre>
 </div>
 
-<p>You can -and often should- mark the arguments of functions
+<p>You sometime should mark the arguments of functions
 with <code>ref</code> instead of <code>mut</code> or <code>const</code> to indicate that the
 <em>contents</em> of memory pointers or other resources might change
 but that their internals are safeguarded. This is not usually

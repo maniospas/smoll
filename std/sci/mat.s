@@ -62,10 +62,14 @@ def mutget(edit mat m, nat i, nat j)
     if j>=m.cols fail "column out of bounds"
     return unsafe_mut m.unsafe_ptr+8*(m.pos+i*m.stride+j)
 
-def get(mat m, nat i, nat j)
+def get(mat m, nat i, nat j, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "reference to matrix element (i,j)"
-    if i>=m.rows fail "row out of bounds"
-    if j>=m.cols fail "column out of bounds"
+    if inbounds_guarantee is blank
+        if i>=m.rows fail "row out of bounds"
+        if j>=m.cols fail "column out of bounds"
+    else
+        doc ""
+        doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
     return m.unsafe_ptr+8*(m.pos+i*m.stride+j)
 
 def mat(vec v, "row"|"col" orientation)
@@ -100,7 +104,7 @@ def mul(effect edit float_allocator FLOATS, mat m, vec v)
     for i in range of m.rows
         acc = mut 0.0
         for j in range of m.cols
-            acc = acc+m[i,j]*v[j]
+            acc = acc+m[i,j unsafe_assume_inbounds]*v[j unsafe_assume_inbounds]
         result[i] = acc
     return result
 
@@ -112,7 +116,7 @@ def mul(effect edit float_allocator FLOATS, vec v, mat m)
     for j in range of m.cols
         acc = mut 0.0
         for i in range of m.rows
-            acc = acc+v[i]*m[i,j]
+            acc = acc+v[i unsafe_assume_inbounds]*m[i,j unsafe_assume_inbounds]
         result[j] = acc
     return result
 
@@ -126,7 +130,7 @@ def mul(effect edit float_allocator FLOATS, mat m1, mat m2)
             acc = mut 0.0
             it_k = range of m1.cols
             for k in range of m1.cols
-                acc = acc+m1[i,k]*m2[k,j]
+                acc = acc+m1[i,k unsafe_assume_inbounds]*m2[k,j unsafe_assume_inbounds]
             result[i,j] = acc
     return result
 
@@ -141,7 +145,7 @@ def print(effect edit console CLI, mat m, cstr|blank endl)
         if m.rows>1 and i>0 and i<m.rows-1 print ("⎢ ", "")
         if m.rows>1 and i==m.rows-1 print ("⎣ ", "")
         for j in range of m.cols
-            print (m[i,j], "")
+            print (m[i,j unsafe_assume_inbounds], "")
             if j<m.cols-1 print ("  ", "")
         if m.rows==1 print (" ]", "")
         if m.rows>1 and i==0 print (" ⎤", "")

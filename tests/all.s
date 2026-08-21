@@ -6,31 +6,29 @@ import "std/test.s"
 
 
 def main()
-    root = str "./tests/passing/"
+    test_root = str "./tests/passing/"
     CLI = edit console()
     colors = colors CLI
+    CHARS = edit arena alloc 64
+    command_base = copy "./smoll --cleanup " # suffices to make clever string building additions
 
     counter  = mut 0
     failures = mut 0
-    for path in open root
-        if path==".." or not is_dir(root, path)
-            continue
-        CHARS = edit arena char[].alloc 256 # build the command onto it
-        copy "./smoll --cleanup "
-        allocator_pos = CHARS.pos
-        root+path+"/"
-        dir = edit open str(status CHARS from allocator_pos)
-        for entry in dir
-            if not ends_with(entry, ".s")
+    for path in open test_root
+        if path==".." or not is_dir(test_root, path) continue
+        gc CHARS
+        dir_path = test_root+path+"/"
+        for entry in open dir_path
+            if not ends_with(entry, ".s") 
                 continue
+            gc CHARS
             counter = counter+1
-            command = CHARS.buf.str endpos copy(local CHARS, str entry)
-            if not test command
+            if not test command_base+dir_path+entry 
                 failures = failures+1
-    
+
     # final report
     if failures==0
-        set(colors green) print nn "SUCCESS "
+        set(colors green) print nn "PASSING "
         set(colors reset) print nn "no errors across "
     else
         set(colors red)   print nn "FAILED "

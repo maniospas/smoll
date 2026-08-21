@@ -42,7 +42,7 @@ def free(mut any ptr allocated)
     doc "Frees allocated memory."
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
-    {if(allocated){free(allocated);}}
+    {if(allocated){free(allocated);allocated=0;}}
 
 def zero(any ptr allocated, nat from, nat to)
     doc "set memory to zero"

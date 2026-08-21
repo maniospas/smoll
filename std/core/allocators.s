@@ -47,10 +47,11 @@ def arena(edit any[] buf)
 
 def gc(edit arena arn)
     doc "a garbage collector for an arena"
-    tracked_position = arn.pos
+    tracked_position = 0+arn.pos
     compiler::unsafe_declare_deep_copy_only()
     defer
-        arn.pos = tracked_position
+        arn.pos = tracked_position+0
+    return tracked_position
 
 def length(arena arn)
     doc "allocated arena size"

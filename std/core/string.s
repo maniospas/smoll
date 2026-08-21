@@ -367,10 +367,12 @@ def add(effect edit arena<char::tag>|circular<char::tag> CHARS, str|cstr _s1, st
         return str(status surface from s1.dat.pos+0)
     if s1.unsafe_ptr==CHARS.buf.unsafe_ptr and s2.unsafe_ptr==CHARS.buf.unsafe_ptr and s2.dat.pos==s1.dat.pos+s1.dat.length
         return str(CHARS.buf, s2.dat.pos+s2.dat.length from s1.dat.pos)
+    
+    prev_pos = CHARS.pos
     surface = mut arena unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
     copy(surface, s1)
     copy(surface, s2)
-    return str(status surface from surface.pos+0)
+    return str(status surface from prev_pos+0)
 
 def empty(cstr c)
     doc "checks whether a cstr is not zero-initialized"

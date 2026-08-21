@@ -1,11 +1,8 @@
 import "std/core.s"
 
 def test()
-    z = edit nat[].alloc 10
-    for i in range of 10
-        z[5] = 5
-        if i==5
-            return z
+    if true
+        unsafe_console().print ["12", "@3"][1]
 
 def main()
     CLI = edit console()

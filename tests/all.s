@@ -11,16 +11,14 @@ def main()
     colors = colors CLI
     CHARS = edit arena alloc 64
     command_base = copy "./smoll --cleanup " # suffices to make clever string building additions
-
     counter  = mut 0
     failures = mut 0
     for path in open test_root
         if path==".." or not is_dir(test_root, path) continue
-        gc CHARS
+        gc CHARS # start from the same position at each iteration (defers a reset)
         dir_path = test_root+path+"/"
         for entry in open dir_path
-            if not ends_with(entry, ".s") 
-                continue
+            if not ends_with(entry, ".s") continue
             gc CHARS
             counter = counter+1
             if not test command_base+dir_path+entry 

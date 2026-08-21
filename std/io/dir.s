@@ -22,7 +22,7 @@ local def string_pair(str head, str body)
 
 def is_dir(cstr path)
     doc "checks whether a path points to an existing directory"
-    VM "[os.path.is_dir($path)]"
+    VM "[os.path.isdir($path)]"
     if compiler::back type "emcc"
         {"-sFORCE_FILESYSTEM=1"}
         {"-lidbfs.js"}

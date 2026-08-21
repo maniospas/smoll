@@ -5284,6 +5284,51 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         return await process_statement_operator(file, tokens, impl, pos, varsret, current_operator_priority)
     return await process_statement_operator(file, tokens, impl, pos+1, [var], current_operator_priority)
 
+def release_defers(impl: ImplementedType, at: Token):
+    name = at
+    rets = [should_invalid for should_invalid in impl.accumulating_defers[-1]]
+    for should_invalid in rets:
+        if impl.invalidated.get(should_invalid) is not None and (impl.vars[should_invalid].immutable or impl.vars[should_invalid].type==POINTER_TYPE) and impl.invalidated.get(should_invalid).text!="del":
+            impl.accumulating_defers[-1][should_invalid].error("safety", "an automatic defer is overruled later by another defer for immutable variable '"+pretty_name(should_invalid)+"'", reason=impl.invalidated.get(should_invalid), raason_message="due to being released in the loop", suggestions=["create a (temporary) copy", "use 'unsafe_valid' if you are sure about pointer and immutable field validity", "initialize the resource before the loop"])
+    if rets:
+        invalidated = set()
+        for val in impl.vars.values():
+            varname = val.stabilized_name()
+            if impl.get_assignment(varname, rets):
+                invalidated.add(val)
+                impl.invalidated[varname] = name
+        for invalid_type in impl.invalidate_types_on_defer: # TODO: track defers for each variable to be deleted
+            for varname, val in impl.vars.items():
+                if val.type.invalidated_by == invalid_type:# and not varname.endswith("__unsafe_ptr"):
+                    impl.invalidated[val.stabilized_name()] = name
+                    if val.name in impl.args: name.error("safety", "cannot invalidate associated argument '"+pretty_name(varname)+"'")
+
+        to_remove = list()
+        for defer in impl.defers:
+            if not any(v in defer for v in invalidated if v.immutable or v.type==POINTER_TYPE): continue
+            for v in defer:
+                if isinstance(v, Variable):
+                    for arg in impl.args:
+                        if (not impl.vars[arg].immutable) and (impl.get_assignment(arg, [v]) or impl.get_required_accompany(impl.vars[arg])): 
+                            name.error("safety", "this 'del' would evoke a defer that would invalidate the mutable argument '"+pretty_name(arg)+"'")
+            impl.implementation.extend(defer)
+            to_remove.append(defer)
+        if not to_remove:
+            for should_invalid in rets:
+                if impl.invalidated.get(should_invalid) is None:
+                    impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del' at end of loop", "initialize the resource before the loop"])
+        for v in invalidated:
+            if v.name in impl.args and not v.immutable and v.type.builtin:
+                impl.implementation.extend([
+                    v, 
+                    CODEWORD_EQUALS,
+                    CODEWORD_ZERO,
+                    CODEWORD_SEMICOLON
+                ])
+        for defer in to_remove: impl.defers.remove(defer)
+
+
+
 async def process_body(file: File, tokens: list[Token], pos: int, impl: ImplementedType, one_line: bool=False):
     def skip_statement(file: File, tokens: list[Token], pos: int):
         get(tokens, pos).error("safety", "this statement needs to start in a new line because it could be skipped (for now, skipping relies on code block indentation to properly end)")
@@ -5362,7 +5407,8 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 #    name.error("safety", "the first return must occur conditionally in recursive functions: 'rec "+impl.name+"'")
                 for acc in impl.accumulating_defers[1:]:
                     for k,v in acc.items():
-                        name.error("safety", "cannot return while there are outstanding defers in a loop for variable '"+pretty_name(k)+"'", reason=v, suggestions=["initialize before the loop", "release the variable with 'del' if not involved in returns (you take the responsibility for leaks)"])
+                        if not impl.invalidated.get(k):
+                            name.error("safety", "cannot return while there are outstanding defers for the variable '"+pretty_name(k)+"'", reason=v, suggestions=["initialize at the top nesting level", "release the variable with 'del' if not involved in returns"])
 
                 pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
                 pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
@@ -5375,7 +5421,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             continue
         if name.text=="del":
             if is_lsp and file.is_main_file: print_lsp_keyword(name, "invalidates the subsequent value, potentially calling deferred destructors")
-            if impl.is_parsing_a_defer: name.error("safety", "cannot call 'del' within a 'defer', as this would at most delay the latter")
+            if impl.is_parsing_a_defer: name.error("safety", "cannot 'del' within a 'defer', as this would at most delay the latter")
             async def process_del(pos: int):
                 # if impl.has_returned_once: name.error("safety", "cannot 'del' if you have already returned")
                 # if impl.nesting: name.error("safety", "cannot 'del' within conditions or loops")
@@ -5383,23 +5429,25 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
                 rets = [r.name for r in ret]
                 invalidated = set()
+                accum_defers = list(impl.accumulating_defers[-1].keys())
                 for val in impl.vars.values():
                     varname = val.stabilized_name()
-                    if impl.get_assignment(varname, rets):
-                        invalidated.add(val)
-                        impl.invalidated[varname] = name
-                        # if varname in impl.args: name.error("safety", "cannot invalidate the associated function argument '"+pretty_name(varname)+"'")
-                        # for r in impl.args:
-                        #     if val in impl.get_required_accompany(impl.vars[r]):
-                        #         name.error("safety", "would invalidate associated function argument '"+pretty_name(val.name)+"'")
-                    # elif any(val in impl.get_required_accompany(impl.vars[r]) for r in rets):
-                    #     invalidated.add(val)
-                    #     impl.invalidated[varname] = name
-                        # if varname in impl.args: name.error("safety", "would invalidate the associated function argument '"+pretty_name(varname)+"'")
-                        # for r in impl.args:
-                        #     if val in impl.get_required_accompany(impl.vars[r]):
-                        #         name.error("safety", "would invalidate associated function argument '"+pretty_name(val.name)+"'")
+                    assignment = impl.get_assignment(varname, rets)
+                    if not assignment: continue
+                    if not impl.get_assignment(varname, accum_defers):
+                        #print(accum_defers, varname,assignment)
+                        defervarname = varname
+                        if any(defervarname in deflevel for deflevel in impl.accumulating_defers):
+                            name.error("safety", "cannot 'del' a variable '"+pretty_name(defervarname)+"' that has not been initialized at exactly this nesting level", reason=impl.accumulating_defers[-1].get(defervarname, None))
+                                    
+                    invalidated.add(val)
+                    impl.invalidated[varname] = name
 
+                # rhandled = [val.name for val in invalidated if val.name not in impl.accumulating_defers[-1]]
+                # if len(rhandled)==len(invalidated):
+                #     name.error("safety", "cannot 'del' a variable that has not been initialized at exactly this nesting level")
+                
+                    
                 for invalid_type in impl.invalidate_types_on_defer: # TODO: track defers for each variable to be deleted
                     for varname, val in impl.vars.items():
                         if val.type.invalidated_by == invalid_type:# and not varname.endswith("__unsafe_ptr"):
@@ -5588,47 +5636,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             #     if impl.invalidated.get(should_invalid) is None:
             #         impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
             
-            rets = [should_invalid for should_invalid in impl.accumulating_defers[-1]]
-            for should_invalid in rets:
-                if impl.invalidated.get(should_invalid) is not None and (impl.vars[should_invalid].immutable or impl.vars[should_invalid].type==POINTER_TYPE) and impl.invalidated.get(should_invalid).text!="del":
-                    impl.accumulating_defers[-1][should_invalid].error("safety", "an automatic defer is overruled later by another defer for variable '"+pretty_name(should_invalid)+"'", reason=impl.invalidated.get(should_invalid), raason_message="due to being released in the loop", suggestions=["create a (temporary) copy", "use 'unsafe_valid' if you are sure about pointer and immutable field validity", "initialize the resource before the loop"])
-            if rets:
-                invalidated = set()
-                for val in impl.vars.values():
-                    varname = val.stabilized_name()
-                    if impl.get_assignment(varname, rets):
-                        invalidated.add(val)
-                        impl.invalidated[varname] = name
-                for invalid_type in impl.invalidate_types_on_defer: # TODO: track defers for each variable to be deleted
-                    for varname, val in impl.vars.items():
-                        if val.type.invalidated_by == invalid_type:# and not varname.endswith("__unsafe_ptr"):
-                            impl.invalidated[val.stabilized_name()] = name
-                            if val.name in impl.args: name.error("safety", "cannot invalidate associated argument '"+pretty_name(varname)+"'")
-
-                to_remove = list()
-                for defer in impl.defers:
-                    if not any(v in defer for v in invalidated if v.immutable or v.type==POINTER_TYPE): continue
-                    for v in defer:
-                        if isinstance(v, Variable):
-                            for arg in impl.args:
-                                if (not impl.vars[arg].immutable) and (impl.get_assignment(arg, [v]) or impl.get_required_accompany(impl.vars[arg])): 
-                                    name.error("safety", "this 'del' would evoke a defer that would invalidate the mutable argument '"+pretty_name(arg)+"'")
-                    impl.implementation.extend(defer)
-                    to_remove.append(defer)
-                if not to_remove:
-                    for should_invalid in rets:
-                        if impl.invalidated.get(should_invalid) is None:
-                            impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del' at end of loop", "initialize the resource before the loop"])
-            
-                for v in invalidated:
-                    if v.name in impl.args and not v.immutable and v.type.builtin:
-                        impl.implementation.extend([
-                            v, 
-                            CODEWORD_EQUALS,
-                            CODEWORD_ZERO,
-                            CODEWORD_SEMICOLON
-                        ])
-                for defer in to_remove: impl.defers.remove(defer)
+            release_defers(impl, name)
             impl.implementation.append(CODEWORD_RBRACKET)
             impl.for_counter.pop()
             impl.nesting.pop()
@@ -5678,46 +5686,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             #     if impl.invalidated.get(should_invalid) is None:
             #         impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
 
-            rets = [should_invalid for should_invalid in impl.accumulating_defers[-1]]
-            for should_invalid in rets:
-                if impl.invalidated.get(should_invalid) is not None and (impl.vars[should_invalid].immutable or impl.vars[should_invalid].type==POINTER_TYPE) and impl.invalidated.get(should_invalid).text!="del":
-                    impl.accumulating_defers[-1][should_invalid].error("safety", "an automatic defer is overruled later by another defer for immutable variable '"+pretty_name(should_invalid)+"'", reason=impl.invalidated.get(should_invalid), raason_message="due to being released in the loop", suggestions=["create a (temporary) copy", "use 'unsafe_valid' if you are sure about pointer and immutable field validity", "initialize the resource before the loop"])
-            if rets:
-                invalidated = set()
-                for val in impl.vars.values():
-                    varname = val.stabilized_name()
-                    if impl.get_assignment(varname, rets):
-                        invalidated.add(val)
-                        impl.invalidated[varname] = name
-                for invalid_type in impl.invalidate_types_on_defer: # TODO: track defers for each variable to be deleted
-                    for varname, val in impl.vars.items():
-                        if val.type.invalidated_by == invalid_type:# and not varname.endswith("__unsafe_ptr"):
-                            impl.invalidated[val.stabilized_name()] = name
-                            if val.name in impl.args: name.error("safety", "cannot invalidate associated argument '"+pretty_name(varname)+"'")
-
-                to_remove = list()
-                for defer in impl.defers:
-                    if not any(v in defer for v in invalidated if v.immutable or v.type==POINTER_TYPE): continue
-                    for v in defer:
-                        if isinstance(v, Variable):
-                            for arg in impl.args:
-                                if (not impl.vars[arg].immutable) and (impl.get_assignment(arg, [v]) or impl.get_required_accompany(impl.vars[arg])): 
-                                    name.error("safety", "this 'del' would evoke a defer that would invalidate the mutable argument '"+pretty_name(arg)+"'")
-                    impl.implementation.extend(defer)
-                    to_remove.append(defer)
-                if not to_remove:
-                    for should_invalid in rets:
-                        if impl.invalidated.get(should_invalid) is None:
-                            impl.accumulating_defers[-1][should_invalid].error("safety", "this creates a leaking resource '"+pretty_name(should_invalid)+"'", reason=name, raason_message="due to being part of a loop", suggestions=["release the resource with 'del' at end of loop", "initialize the resource before the loop"])
-                for v in invalidated:
-                    if v.name in impl.args and not v.immutable and v.type.builtin:
-                        impl.implementation.extend([
-                            v, 
-                            CODEWORD_EQUALS,
-                            CODEWORD_ZERO,
-                            CODEWORD_SEMICOLON
-                        ])
-                for defer in to_remove: impl.defers.remove(defer)
+            release_defers(impl, name)
 
 
             impl.implementation.append(CODEWORD_RBRACKET)
@@ -5777,9 +5746,12 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             # ])
             previous_vars = {k: v for k, v in impl.vars.items()}
             impl.nesting.append("if")
+            impl.accumulating_defers.append(dict())
             if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
             else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
+            release_defers(impl, name)
             impl.nesting.pop()
+            impl.accumulating_defers.pop()
             impl.implementation.append(CODEWORD_RBRACKET)
             if peek_text(tokens, pos)=="else":
                 if is_lsp and file.is_main_file: print_lsp_keyword(get(tokens,pos), "**else**\n\nAlternative to conditional statement.")
@@ -5789,8 +5761,11 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 impl.implementation.extend([CODEWORD_ELSE, CODEWORD_LBRACKET])
                 pos += 1
                 impl.nesting.append("if")
+                impl.accumulating_defers.append(dict())
                 if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
                 else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
+                release_defers(impl, name)
+                impl.accumulating_defers.pop()
                 impl.nesting.pop()
                 impl.implementation.append(CODEWORD_RBRACKET)
                 for k, v in impl.vars.items():

@@ -132,6 +132,7 @@ def copy(effect edit char_allocator CHARS, str|cstr _other)
     surface = alloc(CHARS, len other)
     {memcpy(surface__buf__unsafe_ptr+surface__pos+surface__buf__unsafe_offset, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     compiler::unsafe_declare_deep_copy_only()
+    unsafe_valid CHARS
     return str(surface.buf, surface.pos, other.dat.length, other.dat.first)
 
 def copy_null_terminated(effect new CHARS, str other)
@@ -334,10 +335,12 @@ def add(effect edit char_allocator\arena\circular CHARS, str|cstr _s1, str|cstr 
     doc "The result is placed on an allocator effect CHARS."
     s1 = str _s1
     s2 = str _s2
-    surface = mut arena unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
+    charalloc = unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
+    surface = mut arena charalloc
     start = surface.pos+0
     copy(surface, s1)
     copy(surface, s2)
+    unsafe_valid CHARS
     return str(status surface from start)
 
 def add(effect edit arena<char::tag>|circular<char::tag> CHARS, str|cstr _s1, str|cstr _s2)
@@ -395,4 +398,5 @@ def copy(effect edit char_allocator CHARS, nat n)
         {builtins::char digit='0'+dig;}
         surface.buf[surface.pos+digits-(i+1)] = digit
         v = v/10
+    unsafe_valid CHARS
     return str(status surface len digits)

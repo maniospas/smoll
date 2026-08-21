@@ -6,8 +6,8 @@
 typedef void (*__smoll_func_ptr_type)(void);
 int __t_argc;
 char** __t_argv;
-const char* const __t2688t="123";
 const char* const __t2690t="456";
+const char* const __t2688t="123";
 const char* const __t403t="\n";
 static const char* __t_all_errcodes[35] = {"noerr",
 "error",

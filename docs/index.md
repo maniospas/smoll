@@ -36,10 +36,12 @@ import "std/io.s"
 
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 def main()
-    # EFFECTS to automatically pass around (some functions grab these by name)
+    # EFFECTS to automatically pass around (some functions grab these by name).
     CLI = edit console()
-    CHARS = edit circular alloc 4096 
-    f = edit file::open web::get README # parentheses optional for one argument
+    CHARS = edit circular alloc 4096
+
+    # Easy function synthesis because parentheses are optional for one argument.
+    f = edit file::open web::get README
     size = mut 0
     for line in f
         size = size+len line

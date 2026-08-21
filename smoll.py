@@ -2629,21 +2629,27 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if (var_pointer_type is None or var_pointer_type==ANY_TYPE) and other_pointer_type is not None and other_pointer_type!=ANY_TYPE:
             impl._pointer_types[var.name] = other_pointer_type
 
-        # invalidate everything assigned to the same mutable pointer if the function actually requires it as mutable and the function
-        # creates invalidationsimpl
+        # invalidate everything assigned to the same mutable pointer if the function 
+        # actually requires it as mutable and the function
+        # creates invalidations
+        # if callee.invalidate_types_when_called:
+        #     print(impl.name, callee.name, callee.invalidate_types_when_called)
         if (not callee.vars[callee.args[varpos]].immutable) and POINTER_TYPE in callee.invalidate_types_when_called:
             for val in impl.vars.values():
                 v = val.stabilized_name()
                 v_assignment = impl.get_assignment(v, [var.name])
-                if val not in vars and v_assignment is not None and v_assignment!=v: # TODO: don't invalidate mutable args that are reset
-                    impl.invalidated[v] = error_token
-                    if not val.immutable:
-                        impl.implementation.extend([
-                            impl.vars[v], 
-                            CODEWORD_EQUALS,
-                            CODEWORD_ZERO,
-                            CODEWORD_SEMICOLON
-                        ])
+                if val in vars: continue
+                if v_assignment is None: continue
+                if v_assignment!=v: continue # TODO: don't invalidate mutable args that are reset
+                impl.invalidated[v] = error_token
+                if val.immutable: continue
+                #print(impl.name, callee.name, var.name)
+                # impl.implementation.extend([
+                #     impl.vars[v], 
+                #     CODEWORD_EQUALS,
+                #     CODEWORD_ZERO,
+                #     CODEWORD_SEMICOLON
+                # ])
 
         if (not callee.vars[callee.args[varpos]].immutable) and (not callee.vars[callee.args[varpos]].isprivate) and callee.args[varpos] not in callee.refargs:
             defer_vars = {var for defer in impl.defers+impl.returned_defers for var in defer if isinstance(var, Variable)}
@@ -2734,9 +2740,10 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     add_to_invalidators: set[Variable] = set()
     for invalid_type in callee.invalidate_types_when_called:
         for varname, val in impl.vars.items():
-            if val.type.invalidated_by == invalid_type:# and not varname.endswith("__unsafe_ptr"):
+            #if any(v.name==varname for v in vars): continue
+            if val.type.invalidated_by == invalid_type and not val.immutable:# and not varname.endswith("__unsafe_ptr"):
                 impl.invalidated[val.stabilized_name()] = error_token
-                add_to_invalidators.add(val)
+                #add_to_invalidators.add(val)
                 
     if impl.is_parsing_a_defer:
         for p in callee.invalidate_types_when_called:
@@ -4995,12 +5002,12 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         next_tok_prefix = next_tok.text+"__"
         len_next_tok_prefix = len(next_tok_prefix)
         ret = [var for var in impl.vars.values() if var.name==next_tok.text or var.name[:len_next_tok_prefix]==next_tok_prefix]
-        didsomething = False
+        #didsomething = False
         for r in ret:
             if r.name in impl.invalidated:
                 del impl.invalidated[r.name]
-                didsomething = True
-        if not didsomething: current_token.error("safety", "this 'unsafe_valid' statement does nothing (the variable is valid already)")
+                #didsomething = True
+        #if not didsomething: current_token.error("safety", "this 'unsafe_valid' statement does nothing (the variable is valid already)")
         
         return await process_statement_operator(file, tokens, impl, pos+2, ret, current_operator_priority)
     if current=="const":
@@ -5008,18 +5015,18 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         return await process_statement_operator(file, tokens, impl, pos, [r.immutable_copy() for r in ret], current_operator_priority)
     if current == "INVALIDATE":
-        if is_lsp and file.is_main_file: print_lsp_keyword(current_token, "**INVALIDATE**\n\nInvalides all data of the subsequent type that are not __unsafe_ptr; DO NOT USE THIS KEYWORD unless you are trying to enforce some safety patterns on exceptionally unsafe code, such as pointer invalidation whenever memory is reallocated or freed.")
+        if is_lsp and file.is_main_file: print_lsp_keyword(current_token, "**INVALIDATE**\n\nInvalides all mutable data of the subsequent type AT THE CALLING SITE; DO NOT USE THIS KEYWORD unless you are trying to enforce some safety patterns on exceptionally unsafe code, such as pointer invalidation whenever memory is reallocated or freed.")
         pos, type = await process_linear_type(file, tokens, pos+1, impl=impl)
-        for varname, val in impl.vars.items():
-            if val.type in type.variations:# and not varname.endswith("__unsafe_ptr"):
-                impl.invalidated[val.stabilized_name()] = current_token
-                if not val.immutable:
-                    impl.implementation.extend([
-                        val, 
-                        CODEWORD_EQUALS,
-                        CODEWORD_ZERO,
-                        CODEWORD_SEMICOLON
-                    ])
+        # for varname, val in impl.vars.items():
+        #     if val.type in type.variations:# and not varname.endswith("__unsafe_ptr"):
+        #         impl.invalidated[val.stabilized_name()] = current_token
+        #         if not val.immutable:
+        #             impl.implementation.extend([
+        #                 val, 
+        #                 CODEWORD_EQUALS,
+        #                 CODEWORD_ZERO,
+        #                 CODEWORD_SEMICOLON
+        #             ])
         if impl.is_parsing_a_defer: impl.invalidate_types_on_defer.extend(type.variations)
         else: impl.invalidate_types_when_called.extend(type.variations)
         return pos, []
@@ -6756,7 +6763,7 @@ NODEPENDENCY_TYPE.doc.append("declare that this function has no memory dependenc
 NODEPENDENCY_TYPE.doc.append("This can be placed anywhere within a function to state")
 NODEPENDENCY_TYPE.doc.append("that it does not couple memory but only copies or ignores")
 NODEPENDENCY_TYPE.doc.append("memory regions. This allows the compiler to not create")
-NODEPENDENCY_TYPE.doc.append("return errors about needing the simultaneous returned of")
+NODEPENDENCY_TYPE.doc.append("return errors about needing the simultaneous return of")
 NODEPENDENCY_TYPE.doc.append("coupled memory regions. Note that this completely invalidates")
 NODEPENDENCY_TYPE.doc.append("any notion of memory safety on the called function and it is")
 NODEPENDENCY_TYPE.doc.append("wrong, for example, to create copy-ers of")

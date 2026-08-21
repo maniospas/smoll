@@ -35,6 +35,7 @@ def realloc(any ptr allocated, nat bytes)
     {else{new_allocated=malloc(bytes);}}
     if not exists new_allocated fail "reallocation failed"
     {allocated=new_allocated;}
+    INVALIDATE compiler::ptr
     return new_allocated.compiler::unsafe_attach_type(allocated)
 
 def free(mut any ptr allocated)

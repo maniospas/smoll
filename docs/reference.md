@@ -19,7 +19,7 @@ _1.12._ [compile-time evaluation](#compile-time-evaluation)
 _2.1._ [buffers](#buffers)<br>
 _2.2._ [{pointers}](#pointers)<br>
 _2.3._ [{substructures}](#substructures)<br>
-_2.4._ [stable references](#stable-references)<br>
+_2.4._ [{stable references}](#stable-references)<br>
 _2.5._ [try and fail](#try-and-fail)<br>
 _2.6._ [{iterators}](#iterators)<br>
 _2.7._ [{defer}](#defer)<br>
@@ -1366,6 +1366,8 @@ def main()
 
 ## stable references
 
+*Warning: This is an advanced feature for working with dynamically moved resources. It is raraly needed and can be skipped.*
+
 You can work with data that reference other data
 in that they are updated together. This is similar
 to pointers, but comes under the safety 
@@ -1422,7 +1424,7 @@ import "std/core.s"
 
 def main()
     CLI = edit console()
-    buf = ref alloc (mut float[], 10) # 'ref' is mandatory to resize later
+    buf = ref alloc (float[], 10) # 'ref' is mandatory to resize later
     buf[1] = 1.0
     buf.resize 20
     print buf[1]
@@ -1431,10 +1433,11 @@ def main()
 Below is a more complicated example, where a list is used
 to dynamically manage a buffer and resize it as needed.
 
-Without `ref`, the compiler would complain that the 
+Without `ref` (for example, if one used `mut` instead), 
+the compiler would complain that the 
 potential resizing of the second copy could 
 (in this case: would) invalidate the buffer version
-that the string `s1` know about. However, thanks to 
+that the string `s1` knows about. However, thanks to 
 the stable reference, the buffer is automatically updated
 for strings copied onto it.
 
@@ -1442,7 +1445,7 @@ for strings copied onto it.
 import "std/core.s"
 
 def test()
-    mem = list ref mut char[]
+    mem = ref list char[]
     s1 = mem.copy "123"
     s2 = mem.copy "456"
     return (s1,s2)
@@ -1454,7 +1457,7 @@ def main()
     print s.s2
 ```
 
-You can -and often should- mark the arguments of functions
+You sometime should mark the arguments of functions
 with `ref` instead of `mut` or `const` to indicate that the
 *contents* of memory pointers or other resources might change
 but that their internals are safeguarded. This is not usually

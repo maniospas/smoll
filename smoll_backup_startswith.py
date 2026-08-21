@@ -20,7 +20,6 @@
 #
 # Profile with:
 # time python  -m cProfile -s cumulative -o out.prof smoll.py docs/std.s --docs
-# time python  -m cProfile -s cumulative -o out.prof smoll.py main.s --docs
 # flameprof out.prof > flame.svg
 # snakeviz out.prof
 
@@ -717,7 +716,7 @@ class Variable(CodeSegment):
         if self.isprivate!=other.isprivate: return False
         #if self.type.builtin and self.name!=other.name: return False # skip name matching
         return True
-    def is_temp(self): return self.name[:3]=="__t"
+    def is_temp(self): return self.name.startswith("__t")
     def stable_copy(self):
         return Variable(self.name, self.type, self.immutable, self.isprivate, self.name, self.token)
     def stabilized_name(self) -> str:
@@ -988,11 +987,10 @@ class ImplementedType:
         if len(value)==0: error_token.error("type", "no expression value to assign to variable '"+varname+"'")
         if len(value)>1:
             len_common_prefix = longest_common_prefix_len([var.name for var in value])
-            len_varname = len(varname)
-            if top_entry and "__" in varname and varname[:3]!="__t":
-                if not any(v[:len_varname]==varname for v in self.vars.keys()):
+            if top_entry and "__" in varname and not varname.startswith("__t"):
+                if not any(v.startswith(varname) for v in self.vars.keys()):
                     split = varname.rsplit("__",1)[0]
-                    error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'", suggestions=[pretty_name(v) for v in self.vars if v[:len(split)]==split] if split else None)
+                    error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'", suggestions=[pretty_name(v) for v in self.vars if v.startswith(split)] if split else None)
             for var in value: self.assign(varname+"__"+var.name[len_common_prefix:], [var], error_token, perform_immutability_checks, False, strip_mutability)
             return None
             error_token.error("type", "cannot assign more than one values to variable '"+varname+"'")
@@ -1006,14 +1004,12 @@ class ImplementedType:
             existing = None
 
         if not existing:
-            len_varname = len(varname)
-            if top_entry and "__" in varname and varname[:3]!="__t":
-                if not any(v[:len_varname]==varname for v in self.vars.keys()):
+            if top_entry and "__" in varname and not varname.startswith("__t"):
+                if not any(v.startswith(varname) for v in self.vars.keys()):
                     split = varname.rsplit("__",1)[0]
-                    error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'", suggestions=[pretty_name(v) for v in self.vars if v[:len(split)]==split] if split else None)
+                    error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'", suggestions=[pretty_name(v) for v in self.vars if v.startswith(split)] if split else None)
             current_prefix = varname+"__"
-            len_current_prefix = len_varname+2
-            found = [val for varname, val in self.vars.items() if varname[:len_current_prefix]==current_prefix]
+            found = [val for varname, val in self.vars.items() if varname.startswith(current_prefix)]
             if found:
                 if len(found)!=len(value): error_token.error("type", "cannot overwrite tuple with one of different length")
                 for i in range(len(value)): self.assign(found[i].name, [value[i]], error_token, perform_immutability_checks, top_entry=False, strip_mutability=strip_mutability)
@@ -1147,7 +1143,7 @@ class ImplementedType:
         if self.has_returned_once and len(self.rets)!=len(value):
             error_token.error("type", "this value returned here is a different type than previous returns '"+signature_like([self.vars[ret] for ret in self.rets])+"' vs '"+signature_like(value)+"'")
         for pos, arg in enumerate(value):
-            if arg.name[:3]!="__t": self.return_names[arg.name] = pos
+            if not arg.name.startswith("__t"): self.return_names[arg.name] = pos
             if self.has_returned_once: 
                 #v1 = self.vars[self.rets[pos]]
                 # if is_safe and v1.type==POINTER_TYPE and arg.type==POINTER_TYPE:
@@ -1330,12 +1326,12 @@ class ImplementedType:
                 if k in global_var2cstr: 
                     cstr_global = global_var2cstr[k]
                     return memory.named_alloc_value(k, cstr_global[1:-1])
-                if len(k)>=2 and k[0]=="\"" and k[-1]=="\"":
+                if len(k)>=2 and k.startswith("\"") and k.endswith("\""):
                     return memory.named_alloc_value(k, k[1:-1])
-                if len(k)>=2 and k[0]=="'" and k[-1]=="'":
+                if len(k)>=2 and k.startswith("'") and k.endswith("'"):
                     try:
                         inner = k[1:-1]
-                        if inner[:1]=="\\":
+                        if inner.startswith("\\"):
                             escape_map = {
                                 'n': 10, 't': 9, 'r': 13, '0': 0,
                                 '\\': 92, '\'': 39, '"': 34,
@@ -1347,8 +1343,8 @@ class ImplementedType:
                     except: self.at.error("interpreter", "failed to understand character "+k)
                 try:
                     s = tok.tostring().rstrip('UuLl')
-                    if s[:2]=='0x' or s[:2]=='0X': int_ret = int(s, 16)
-                    elif len(s) > 1 and s[:0]=='0': int_ret = int(s, 8)
+                    if s.startswith('0x') or s.startswith('0X'): int_ret = int(s, 16)
+                    elif s.startswith('0') and len(s) > 1: int_ret = int(s, 8)
                     else: int_ret = int(s, 10)
                     return int_ret
                 except: pass
@@ -2224,9 +2220,8 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
             vars: list[Variable] = list()
             for effect_var in variation.effect_names: 
                 effect_var_prefix = effect_var+"__"
-                len_effect_var_prefix = len(effect_var)+2
                 for var in impl.vars.values():
-                    if var.name==effect_var or var.name[:len_effect_var_prefix]==effect_var_prefix: vars.append(var)
+                    if var.name==effect_var or var.name.startswith(effect_var_prefix): vars.append(var)
                 if len(vars)+len(argument_vars)>=len(variation.args): break
             vars.extend(argument_vars)
         else: vars = argument_vars
@@ -2279,10 +2274,8 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
             if len(argument_vars)<len(variation.args):
                 vars: list[Variable] = list()
                 for effect_var in variation.effect_names: 
-                    effect_var_prefix = effect_var+"__"
-                    len_effect_var_prefix = len(effect_var)+2
                     for var in impl.vars.values():
-                        if var.name==effect_var or var.name[:len_effect_var_prefix]==effect_var_prefix: vars.append(var)
+                        if var.name==effect_var or var.name.startswith(effect_var+"__"): vars.append(var)
                     if len(vars)+len(argument_vars)>=len(variation.args): break
                 vars.extend(argument_vars)
             else: vars = argument_vars
@@ -2558,10 +2551,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if len(vars)<len(callee.args):
         gathered_vars: list[Variable] = list()
         for effect_var in callee.effect_names:
-            effect_var_prefix = effect_var+"__"
-            len_effect_var_prefix = len(effect_var)+2
             for var in impl.vars.values():
-                if var.name==effect_var or var.name[:len_effect_var_prefix]==effect_var_prefix: 
+                if var.name==effect_var or var.name.startswith(effect_var+"__"): 
                     if var.stabilized_name() in impl.invalidated:
                         error_token.error("safety", "'"+pretty_name(var.stabilized_name())+"' has been invalidated", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
                     gathered_vars.append(var)
@@ -3345,8 +3336,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                             return pos+1, ret
                         tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural variable with the same name exists '"+signature_like([var] if var else obj, impl)+"'")
                     varname = name+"__"
-                    len_varname = len(name)+2
-                    vars = [r for r in impl.vars.values() if r.name[:len_varname]==varname]
+                    vars = [r for r in impl.vars.values() if r.name.startswith(varname)]
                     if vars and ((vars[0].type.builtin and len(obj)==1) or len(vars[0].type.rets)==len(vars)):
                         ret = UnionType(vars[0].type.name, at=vars[0].type.at)
                         ret.variations.append(vars[0].type)
@@ -3354,8 +3344,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                     if vars: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural or nominal variable with the same name exists '"+signature_like(vars, impl)+"'")
                 suggestions = [candidate.signature() for candidate in candidates]+[("\""+file.path+"\"::" if not file.is_main_file else "")+k+" (namespace)" for k in file.namespaces]
                 if impl is not None:
-                    len_name = len(name)
-                    varsuggestions = {name+var[len(name):].split("__")[0]+" (variable)" for var in impl.vars if var[:len_name]==name}
+                    varsuggestions = {name+var[len(name):].split("__")[0]+" (variable)" for var in impl.vars if var.startswith(name)}
                     if name in varsuggestions:
                         tokens[pos].error("type", "cannot use variable as type: '"+pretty_name(name)+"'")
                     suggestions = list(varsuggestions)+suggestions
@@ -3982,9 +3971,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             if is_lsp and file.is_main_file: print_lsp_keyword(and_token, "evaluates to the same type as the right hand side: '"+signature_like(rets,impl)+"'")
             
             pack_name = create_temp()
-            len_pack_name = len(pack_name)
             impl.assign(pack_name, rets, op_token)
-            rets = [v for k, v in impl.vars.items() if k[:len_pack_name]==pack_name]
+            rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
             impl.implementation.append(CODEWORD_RBRACKET)
             if "while" in impl.nesting:
                 impl.implementation.extend([CODEWORD_ELSE, CODEWORD_LBRACKET])
@@ -4024,9 +4012,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             if is_lsp and file.is_main_file: print_lsp_keyword(or_token, "evaluates to the same type as the right hand side: '"+signature_like(rets,impl)+"'")
             
             pack_name = create_temp()
-            len_pack_name = len(pack_name)
             impl.assign(pack_name, rets, op_token)
-            rets = [v for k, v in impl.vars.items() if k[:len_pack_name]==pack_name]
+            rets = [v for k, v in impl.vars.items() if k.startswith(pack_name)]
             impl.implementation.extend([
                 CODEWORD_RBRACKET,
                 CODEWORD_ELSE,
@@ -4204,15 +4191,13 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 return pos, rets
             pos, rets = await process_is(pos, rets)
             continue
-        peek_next_prefix = peek_next+"__"
-        len_peek_next_prefix = len(peek_next)+2
         if op=="." and (
             (len(rets)==5 and rets[0].type.is_buffer_of
                 and not peek_text(tokens, pos+1) in ["unsafe_ptr", "unsafe_size", "unsafe_align", "unsafe_offset"] 
-                and any(preview==peek_next or preview[:len_peek_next_prefix]==peek_next_prefix for preview in rets[0].type.is_buffer_of.rets)) 
+                and any(preview==peek_next or preview.startswith(peek_next+"__") for preview in rets[0].type.is_buffer_of.rets)) 
             or (len(rets)==1 and rets[0].type==POINTER_TYPE 
                 and impl.get_pointer_type(rets[0]) not in NONE_OR_ANY 
-                and any(preview==peek_next or preview[:len_peek_next_prefix]==peek_next_prefix for preview in impl.get_pointer_type(rets[0]).rets))
+                and any(preview==peek_next or preview.startswith(peek_next+"__") for preview in impl.get_pointer_type(rets[0]).rets))
         ):
             if is_lsp and file.is_main_file: print_lsp_keyword(op_token, "**memory field**\n\nRetrieves a safe offset to a buffer or pointer based on its type's content layout.")
             def process_substructure(pos: int, rets: list[Variable]):
@@ -4229,14 +4214,13 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     max_pos_plus_one = 0 # non-inclusive
                     count = 0
                     prefix = field_name+"__"
-                    len_prefix = len(field_name)+2
                     for i, rname in enumerate(associated_type.rets):
                         if field_name==rname:
                             min_pos = i
                             max_pos_plus_one = i+1
                             count = 1
                             break
-                        if rname[:len_prefix]==prefix:
+                        if rname.startswith(prefix):
                             min_pos = min(min_pos, i)
                             max_pos_plus_one = max(max_pos_plus_one, i+1)
                             count += 1
@@ -4324,14 +4308,13 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 max_pos_plus_one = 0 # non-inclusive
                 count = 0
                 prefix = field_name+"__"
-                len_prefix = len(field_name)+2
                 for i, rname in enumerate(associated_type.rets):
                     if field_name==rname:
                         min_pos = i
                         max_pos_plus_one = i+1
                         count = 1
                         break
-                    if rname[:len_prefix]==prefix:
+                    if rname.startswith(prefix):
                         min_pos = min(min_pos, i)
                         max_pos_plus_one = max(max_pos_plus_one, i+1)
                         count += 1
@@ -4449,8 +4432,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 while peek_text(tokens, pos+1) == ".":
                     pos += 2
                     peek = current+"__"+get(tokens, pos).text
-                    len_peek = len(peek)
-                    if not any(v[:len_peek]==peek for v in impl.vars) and peek_text(tokens, pos+1)!="is":
+                    if not any(v.startswith(peek) for v in impl.vars) and peek_text(tokens, pos+1)!="is":
                         pos -= 2
                         call_continuation = True
                         break
@@ -4463,8 +4445,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 var = impl.vars.get(current, None)
                 if var is None:
                     current_prefix = current+"__"
-                    len_current_prefix = len(current)+2
-                    rets = [r for r in rets if r.name[:len_current_prefix]==current_prefix]
+                    rets = [r for r in rets if r.name.startswith(current_prefix)]
                     if rets and is_lsp and file.is_main_file: print_lsp_field(get(tokens, pos-1), rets, impl)
                     if rets and call_continuation:
                         start_call = get(tokens,pos+1)
@@ -4482,7 +4463,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     candidates: list[ImplementedType] = list()
                     max_candidate_common_length = 0
                     for varname in impl.vars:
-                        if varname[:3]=="__t" or "____t" in varname: continue
+                        if varname.startswith("__t") or "____t" in varname: continue
                         common_length = longest_common_prefix_len([varname, current])
                         if common_length>max_candidate_common_length: 
                             candidates = list()
@@ -4907,9 +4888,8 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if len(ret)==0:
             current_token.error("safety", "next value is blank")
         tmp = create_temp()
-        len_tmp = len(tmp)
         impl.assign(tmp, ret, current_token)
-        ret = [r for r in impl.vars.values() if r.name[:len_tmp]==tmp]
+        ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
         if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'mut'. And the current value consists only of references, so it does nothing.")
         mutated = [r.mutable_copy(tokens[prev_pos]) if r.stabilized_name()==r.name else r for r in ret]
         return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
@@ -4922,10 +4902,9 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if len(ret)==0:
             current_token.error("safety", "next value is blank")
         tmp = create_temp()
-        len_tmp = len(tmp)
         #prev_ret = ret
         impl.assign(tmp, ret, current_token)
-        ret = [r for r in impl.vars.values() if r.name[:len_tmp]==tmp]
+        ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
         if not any(r.immutable or r.isprivate for r in ret): 
             current_token.error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
         if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'edit' but the current value consists only of references")
@@ -4972,9 +4951,8 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         if len(ret)==0: current_token.error("safety", "next value is blank")
         tmp = create_temp()
-        len_tmp = len(tmp)
         impl.assign(tmp, ret, current_token)
-        ret = [r for r in impl.vars.values() if r.name[:len_tmp]==tmp]
+        ret = [r for r in impl.vars.values() if r.name.startswith(tmp)]
         ret = impl.stabilize(ret)
         return await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
     if current=="ref":
@@ -4992,9 +4970,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if is_lsp and file.is_main_file: print_lsp_decorator(current_token, "**unsafe revalidation**\n\nDeclares that the following value will be treated as valid from hereon, even if it would have normally been invalidated. YOU HAVE BEEN WARNED.")
         prev_pos = pos
         next_tok = get(tokens, pos+1)
-        next_tok_prefix = next_tok.text+"__"
-        len_next_tok_prefix = len(next_tok_prefix)
-        ret = [var for var in impl.vars.values() if var.name==next_tok.text or var.name[:len_next_tok_prefix]==next_tok_prefix]
+        ret = [var for var in impl.vars.values() if var.name==next_tok.text or var.name.startswith(next_tok.text+"__")]
         didsomething = False
         for r in ret:
             if r.name in impl.invalidated:
@@ -5074,8 +5050,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if current in impl.vars: break
         pos += 2
         peek = current+"__"+get(tokens, pos).text
-        len_peek = len(peek)
-        if not any(v[:len_peek]==peek for v in impl.vars) and peek_text(tokens, pos+1)!="=":
+        if not any(v.startswith(peek) for v in impl.vars) and peek_text(tokens, pos+1)!="=":
             pos -= 2
             break
         current = peek
@@ -5172,8 +5147,8 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             if is_lsp and file.is_main_file: print_lsp_field(var_token, [var], impl)
             return pos, found
 
-        len_current_prefix = len(current_prefix)
-        previous = [val for varname, val in impl.vars.items() if varname[:len_current_prefix]==current_prefix]
+
+        previous = [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
         if len(previous)!=len(ret) and previous: current_token.error("type", "cannot set an incompatible type on '"+pretty_name(current)+"' previous type was '"+signature_like(previous, impl)+"' and cannot be replaced by '"+signature_like(ret, impl)+"'")
         if previous:
             for p, r in zip(previous, ret): impl.assign(p.name, [r], current_token)
@@ -5195,8 +5170,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         # first try to see if this is a group of values
         # if not found but followed by 'is' consider it of type void
         current_prefix = current+"__"
-        len_current_prefix = len(current)+2
-        found = [val for varname, val in impl.vars.items() if varname[:len_current_prefix]==current_prefix]
+        found = [val for varname, val in impl.vars.items() if varname.startswith(current_prefix)]
         #found = impl.stabilize(found)
         for r in found:
             if r.stabilized_name() in impl.invalidated:
@@ -5209,7 +5183,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             field_candidates: list[str] = list()
             max_candidate_common_length = 0
             for varname in impl.vars:
-                if varname[:3]=="__t" or "____t" in varname: continue
+                if varname.startswith("__t") or "____t" in varname: continue
                 common_length = longest_common_prefix_len([varname, current])
                 if common_length>max_candidate_common_length: 
                     field_candidates = list()
@@ -5843,7 +5817,7 @@ def process_repo(file: File, tokens: list[Token], pos: int):
     path = url_token.text[1:len(url_token.text)-1]
     if repositories.get(symbol)==path: return pos
     for repo in repositories:
-        if repo[:len(symbol)]==symbol or symbol[:len(repo)]==repo: 
+        if repo.startswith(symbol) or symbol.startswith(repo): 
             local_token.error("syntax", "cannot have overlap between new and old repos '"+symbol+"' and '"+repo+"'")
     if not file.is_main_file:
         if symbol not in repositories:
@@ -6300,11 +6274,11 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
 async def resolve_name(path: str, at_token: Token|None) -> str:
     symbol = path
     for repo, url in repositories.items():
-        if path[:len(repo)]==repo:
+        if path.startswith(repo):
             path = url+path[len(repo):]
             symbol = path # TODO: decide between this and the commented implementation (this one is a tad slower but more flexible)
             break
-    if path[:8]=="https://" or path[:7]=="http://":
+    if path.startswith("https://") or path.startswith("http://"):
         if symbol==path: 
             symbol = "./.cache"+urllib.parse.urlsplit(path).path
             if os.path.exists(symbol): return symbol
@@ -6336,7 +6310,7 @@ def _load(file: File, is_main_file: bool=False, err_token:Token|None=None) -> tu
             count_spaces = len(line)
             line = line.strip(" \t")
             count_spaces -= len(line)
-            if not len(line) or line[:2]=="//" or line[0]=="#" or line=="\n": continue
+            if not len(line) or line.startswith("//") or line.startswith("#") or line=="\n": continue
             prev_nesting_level = nesting_levels[len(nesting_levels)-1]
             has_space = " " in line[:(count_spaces+1)] 
             has_tab = "\t" in line[:(count_spaces+1)]
@@ -6350,7 +6324,7 @@ def _load(file: File, is_main_file: bool=False, err_token:Token|None=None) -> tu
                 if has_tabs: 
                     Token(START_TOKEN, file, row, count_spaces+1).error("syntax", "you are using spaces for this line's indentation, but previous lines used tabs")
                 has_spaces = True
-            if bracket_depth == 0 or (line[:1]=="]" or line[:1]==")"):
+            if bracket_depth == 0 or (line.startswith("]") or line.startswith(")")):
                 while count_spaces < prev_nesting_level:
                     tokens.append(Token(END_TOKEN, file, row, prev_nesting_level+1))
                     error_nesting_level = prev_nesting_level
@@ -6983,7 +6957,7 @@ async def main():
                 docs_file.write("# "+union_type.name.replace("_", "\\_")+"\n")
                 for callee in sorted(list(set(union_type.variations)), key=lambda x:-id(x)):
                     if "____" in callee.name: continue
-                    if callee.name[:3]!="__t": docs_file.write("### "+callee.name.replace("_", "\\_"))
+                    if not callee.name.startswith("__t"): docs_file.write("### "+callee.name.replace("_", "\\_"))
                     if callee.doc: docs_file.write(" - "+strip_quotes(callee.doc[0])+"\n")
                     else: docs_file.write("\n")
                     if callee.at: docs_file.write("*Defined in: "+callee.at.file.path+" line "+str(callee.at.row)+"*\n")

@@ -18,7 +18,7 @@ var hl = document.getElementById('highlight');
 var hlCode = document.getElementById('highlightCode');
 
 function escapeHtml(s){
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return s;//.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function highlight(){

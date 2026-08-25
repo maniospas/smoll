@@ -14,8 +14,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
-local import "std/core/builtinsext.s"
-local import "std/unsafe.s" as unsafe
+local import std.core.builtinsext
+local import std.unsafe as unsafe
 
 # a convention to make pointer operations safe outside the unsafe:: namespace
 # is that we GUARANTEE that non-zero pointers to a memory region contain

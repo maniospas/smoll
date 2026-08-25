@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import "std/graphics.s"
 import "std/io.s"
 

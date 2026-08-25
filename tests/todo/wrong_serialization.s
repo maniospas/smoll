@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import "std/sci.s"
 
 def ones = compt vec [1.0, 1.0]

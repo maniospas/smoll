@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
     print nn compiler::value greeting

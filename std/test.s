@@ -1,5 +1,5 @@
-local import "std/core.s"
-local import "std/io.s"
+local import std.core
+local import std.io
 
 
 local def run(effect edit console CLI, cstr|str command)

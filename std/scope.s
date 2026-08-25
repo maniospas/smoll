@@ -14,8 +14,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-local import "std/core/numbers.s"
-local import "std/core/allocators.s"
+local import std.core.numbers
+local import std.core.allocators
 
 local def nop(Number x)
     return ()

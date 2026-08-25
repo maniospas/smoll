@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def test(arena<char::tag>->str creator)
     CHARS = edit arena char[].alloc 128

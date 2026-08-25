@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 rec wooo(effect edit console CLI) 

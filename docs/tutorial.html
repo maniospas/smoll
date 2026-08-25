@@ -251,7 +251,7 @@ the language keeps track of code blocks.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">repo</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/&quot;</span> <span class="k">as</span> <span class="s2">&quot;std/&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
@@ -265,7 +265,7 @@ generated strings that appear during runtime. To convert this string into a runt
 string <em>type</em> called <code>str</code> just call a namesake function like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">greeting</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;hello world!&quot;</span>
@@ -306,7 +306,7 @@ operation by interweaving C code in there (we will not cover how in this tutoria
 By the way, text after <code>#</code> are line comments and ignored.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="nb">print</span> <span class="mf">1.0</span><span class="o">+</span><span class="mf">2.0</span><span class="o">-</span><span class="mf">3.0</span> <span class="c1"># prints 0.0</span>
@@ -323,7 +323,7 @@ By the way, text after <code>#</code> are line comments and ignored.</p>
 executed based given a condition. Conditions evaluate to a <code>bool</code> type.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
@@ -357,7 +357,7 @@ those arguments. For example, given that all <code>print</code> versions allow a
 use instead of the line break character, you can do the following.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>

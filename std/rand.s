@@ -21,7 +21,7 @@
 # - added automatic seeding
 # The same license is applied to changes.
 
-local import "std/core.s"
+local import std.core
 
 local def rotl(nat x, nat k)
     {builtins::nat left = x << k;}

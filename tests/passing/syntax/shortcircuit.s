@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def point(float x, float y)
     return compiler::args()

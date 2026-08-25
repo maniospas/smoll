@@ -14,8 +14,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-import "std/core.s"
-import "std/mini.s"
+import std.core
+import std.mini
 import "std/extern/raysupport.h"
 
 def color(nat _r, nat _g, nat _b, nat|blank _a)

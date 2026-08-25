@@ -42,7 +42,7 @@ An example that shows several language features follows.
 ```python
 # test.s
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def CHUNK_SIZE = 4096

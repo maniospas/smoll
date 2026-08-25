@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def inc(nat x, blank|1|2 inc)
     if inc is blank

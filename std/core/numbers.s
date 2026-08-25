@@ -15,8 +15,8 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
 import "builtins"
-import "std/extern.s"
-import "std/core/bool.s"
+import std.extern
+import std.core.bool
 
 def Number = float|int|nat
 

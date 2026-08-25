@@ -14,10 +14,10 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-local import "std/core.s"
-local import "std/sci/vec.s"
-local import "std/sci/unsafe.s"
-local import "std/unsafe.s" as unsafe
+local import std.core
+local import std.sci.vec
+local import std.sci.unsafe
+local import std.unsafe as unsafe
 
 def rows(mat m)
     doc "number of rows"

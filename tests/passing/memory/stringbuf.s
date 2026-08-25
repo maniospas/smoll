@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def Person(nat id, str name, str surname)
   return class(name,surname)

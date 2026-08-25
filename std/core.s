@@ -15,15 +15,15 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
 import "builtins"
-import "std/core/bool.s"
-import "std/core/numbers.s"
-import "std/core/print.s"
-import "std/core/convert.s"
-import "std/core/range.s"
-import "std/core/units.s"
+import std.core.bool
+import std.core.numbers
+import std.core.print
+import std.core.convert
+import std.core.range
+import std.core.units
 
-import "std/core/string.s"
-import "std/core/array.s"
-import "std/core/convertstr.s"
-import "std/core/error.s"
+import std.core.string
+import std.core.array
+import std.core.convertstr
+import std.core.error
 

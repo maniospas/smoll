@@ -14,11 +14,11 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-local import "std/core.s"
-local import "std/sci/math.s"
-local import "std/sci/vec.s"
-local import "std/sci/mat.s"
-local import "std/sci/coo.s"
+local import std.core
+local import std.sci.math
+local import std.sci.vec
+local import std.sci.mat
+local import std.sci.coo
 
 def ppr(float alpha, nat|blank max_iters, float|blank tol)
     doc "personalized PageRank"

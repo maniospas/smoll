@@ -15,7 +15,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
 local import "builtins"
-local import "std/extern.s"
+local import std.extern
 
 def eq(bool x, bool y)
     doc "equals"

@@ -14,9 +14,9 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-import "std/core.s"
-import "std/unsafe.s" as unsafe
-import "std/extern/curl.h"
+local import std.core
+local import std.unsafe as unsafe
+local import "std/extern/curl.h"
 
 local def response(nat status, str body)
     return compiler::args()

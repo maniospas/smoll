@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import "std/sci.s"
 
 def transform(matrix m, vec x, float offset)

@@ -622,7 +622,8 @@ def print_lsp_string(tok):
     printid(os.path.abspath(tok.file.resolved_path))
     print(tok.row)
     print(tok.col)
-    printid("a string literal")
+    printid("***string literal***\n\nHas the following value:\n```rust")
+    printid(tok.text+"\n```")
 
 def print_lsp_literal(tok: "Token", name: str, defined: Optional["Token"]=None):
     if defined is None: defined = tok
@@ -3785,7 +3786,7 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
         ret = UnionType(type.name+"::"+reflection_token_text, at=reflection_token)
         ret.variations = variations
         type = ret
-    if peek_text(tokens, pos)=="ptr":
+    if peek_text(tokens, pos)=="ptr" and parentheses:
         ret = UnionType(type.name+" ptr", at=get(tokens, pos))
         for variation in type.variations:
             impl = ImplementedType(variation.name+" ptr", at=ret.at)
@@ -5892,9 +5893,25 @@ def process_repo(file: File, tokens: list[Token], pos: int):
 async def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
     pos += 1
     name_token = get(tokens, pos)
+    if peek_text(tokens, pos+1)==".":
+        name_token_text = name_token.text
+        pos += 1
+        while peek_text(tokens, pos)==".":
+            pos += 1
+            name_token_text += "/"+peek_text(tokens,pos)
+            pos += 1
+        pos -= 1
+        name_token_text = name_token_text+".s"
+        start_call = name_token
+        call_token = get(tokens, pos)
+        if start_call.file==call_token.file and start_call.row==call_token.row: 
+            name_token = Token("\""+name_token_text+"\"", start_call.file, start_call.row, start_call.col)
+        else:
+            name_token = call_token
+
     if not name_token.is_string(): 
         namespace = file.namespaces.get(name_token.text, None)
-        if namespace is None: tokens[pos].error("syntax", "import expects a cstr filename or a known namespace but got '"+name_token.text+"'")
+        if namespace is None: tokens[pos].error("syntax", "import expects a cstr filename, a known namespace, or dot-separate path but got '"+name_token.text+"'")
         assert isinstance(namespace, File)
         imported: File|UnionType = namespace
     else: 

@@ -294,7 +294,7 @@ and not merely perform some diagnostic action. For example, we would not
 be able to print without it.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="c1"># this is a line comment, by the way</span>
@@ -314,7 +314,7 @@ file too. This way, you can only explicitly declare third-party code sources.</p
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">repo</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/&quot;</span> <span class="k">as</span> <span class="s2">&quot;std/&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -327,7 +327,7 @@ contents only via the namespace name followed by the <code>::</code> notation. T
 below and is more verbose, bue helps avoid confusion of where function come from.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -346,7 +346,7 @@ is introduced in each file, as opposed to files that aggregate
 available programming interfaces in one place.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">local</span> <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">::</span><span class="nb">print</span>
+<pre><span></span><code><span class="n">local</span> <span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span><span class="p">::</span><span class="nb">print</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -364,7 +364,7 @@ like below. Actually, commas within parentheses designate
 tuples and all functions just accept one tuple as argument.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -382,7 +382,7 @@ within namespaces.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="c1"># atypical import for core - for demonstration</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="k">as</span> <span class="n">core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">core</span><span class="p">::</span><span class="n">console</span><span class="p">()</span> 
@@ -408,7 +408,7 @@ this tuple also sets the optional second argument determinin line ending.
 The default ending is otherwise <em>"\n"</em>.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -439,7 +439,7 @@ as it is the more restricted -and hence less destructive-
 of the two permission levels. See more on edit permissions <a href="#type-mutability">later</a>.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -464,7 +464,7 @@ in the code, these are always natural numbers. This is
 a deliberate choise to enforce memory safety later.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">toinfinity</span><span class="p">(</span><span class="n">nat</span> <span class="n">start</span><span class="p">)</span>
     <span class="n">pos</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">start</span>
@@ -500,7 +500,7 @@ field values (e.g., a character buffer and its used size) is
 important to safeguard.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
@@ -525,7 +525,7 @@ deviation of all encounted floats, but not any <code>(float, float, nat)</code>
 triple should be allowed.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span> <span class="c1"># for pow</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">std_data</span><span class="p">()</span>
@@ -562,7 +562,7 @@ the <code>compiler::args()</code> function to return a tuple of all arguments.
 This is exemplified below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span> 
     <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
@@ -585,7 +585,7 @@ where this singleton is used to also read a float number. Similar
 methods exist for reading strings on buffers, or other number types.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -607,7 +607,7 @@ we can modify modify mutable fields only if <code>t</code> has mutation or edit
 permissions.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">1</span>
@@ -628,7 +628,7 @@ That is, they cannot be modified or be the source of memory content
 modifications.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Test</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">1</span>
@@ -649,7 +649,7 @@ modifications.</p>
 mutable fields without allowing a full variable rewrite use <code>edit</code>.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">1</span>
@@ -678,7 +678,7 @@ be prematurely terminated with <code>break</code>, or skipped with
 <code>continue</code>.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -699,7 +699,7 @@ will be only one value set to those variables. If no value is
 set, the variable is zero-initialized.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -711,7 +711,7 @@ set, the variable is zero-initialized.</p>
 </div>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -730,7 +730,7 @@ Here is a simple example.
 <strong>Please do not write code like this demonstration.</strong></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -769,7 +769,7 @@ Underneath, they desugar to <a href="#try-and-fail">error code semantics</a>.
 More on iterators later but here is how they look like.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -789,7 +789,7 @@ like normal, but have two more properties:</p>
 <p>Below is an example that highlights the short-circuiting properties of logical operators.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
@@ -841,7 +841,7 @@ doing so in more complicated cases means that reading the program sequentially
 does not work; the programmer needs to reason about unbounded problems.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">wooo</span><span class="p">()</span> <span class="c1"># CREATES AN ERROR - should have been &#39;rec&#39;</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -884,7 +884,7 @@ one function in a chain of multiple ones needs to be declared
 as recursive.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="n">rec</span> <span class="n">fib</span><span class="p">(</span><span class="n">nat</span> <span class="n">n</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span><span class="mi">1</span>
@@ -908,7 +908,7 @@ section. For now, just it suffices to say that &#8220;never&#8221; does not actu
 mean never.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span> <span class="c1"># not the ideal way to pass the console - see next section</span>
     <span class="k">if</span> <span class="n">false</span> <span class="k">return</span> <span class="n">blank</span><span class="p">()</span>
@@ -943,7 +943,7 @@ accidental implicit behavior. By convention, CAPITALIZE effect names so that ass
 is made explicit by the code.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">effect</span> <span class="n">nat</span> <span class="n">INCREMENT</span><span class="p">,</span> <span class="n">effect</span> <span class="n">mut</span> <span class="n">nat</span> <span class="n">COUNTER</span><span class="p">,</span> <span class="n">nat</span> <span class="n">number</span><span class="p">)</span>
     <span class="n">COUNTER</span> <span class="o">=</span> <span class="n">COUNTER</span><span class="o">+</span><span class="mi">1</span>
@@ -966,7 +966,7 @@ a program. The added boilerplate is well worth the effort; even the console
 initialization is used to ensure that a printable console exists.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;hello world&quot;</span>
@@ -996,8 +996,8 @@ will be added in the future.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">::</span><span class="nb">print</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">::</span><span class="n">console</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span><span class="p">::</span><span class="nb">print</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span><span class="p">::</span><span class="n">console</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span> <span class="n">y</span><span class="p">)</span>
     <span class="p">{</span><span class="n">builtins</span><span class="p">::</span><span class="nb">float</span> <span class="n">z</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;}</span>
@@ -1016,8 +1016,8 @@ An example follows.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;builtins&quot;</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">::</span><span class="nb">print</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span><span class="p">::</span><span class="n">console</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span><span class="p">::</span><span class="nb">print</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span><span class="p">::</span><span class="n">console</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Number</span> <span class="o">=</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">unsafe_add</span><span class="p">(</span><span class="n">Number</span> <span class="n">x</span><span class="p">,</span> <span class="n">Number</span> <span class="n">y</span><span class="p">)</span>
@@ -1046,7 +1046,7 @@ that are not numbers with the &#8216;` symbol, which is the mathematical
 symbol for set differces.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span> <span class="c1"># defines Number like above</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span> <span class="c1"># defines Number like above</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">natpair</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">compiler</span><span class="p">;:</span><span class="n">args</span><span class="p">()</span>
@@ -1086,7 +1086,7 @@ out of the ordinary. By the way, prefer CAPITALIZING
 literal types (so capitals indicate either effects or literals).</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">INCREMENT</span> <span class="o">=</span> <span class="mi">1</span>
 
@@ -1105,7 +1105,7 @@ the literal&#8217;s type by evaluating <code>type value</code>, where value
 can be a string or number literal.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">VERSION</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span>
 
@@ -1134,7 +1134,7 @@ This way, you can extract values from the type system.
 An example that restricts how functions are called is presented next.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">inc</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">inc</span> <span class="ow">is</span> <span class="n">blank</span>  <span class="c1"># check if exists - see next section</span>
@@ -1156,7 +1156,7 @@ overhead, literal types may be resolved
 to several runtime checks.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">ENUM</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">|</span><span class="s2">&quot;B&quot;</span><span class="o">|</span><span class="s2">&quot;C&quot;</span>
 
@@ -1191,7 +1191,7 @@ back-to-back, you need use a placeholder with no outputs as an argument,
 like the <code>()</code> expression. But you can still have a literal at the end of an expression.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
@@ -1231,7 +1231,7 @@ body is not parsed.</p>
 as the standard library&#8217;s core. Below is an example of a conditional check.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">typed_print</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">nat</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="o">|</span><span class="n">cstr</span> <span class="n">value</span><span class="p">)</span> 
     <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">nat</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span>
@@ -1257,7 +1257,7 @@ and their fallback values. In the next example, the defined function uses
 either an increment value of one, or a value provided as second argument. </p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span><span class="o">|</span><span class="n">blank</span> <span class="n">value</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">blank</span>
@@ -1287,7 +1287,7 @@ variations and eventually keeps 6 of them. Both conditional checks in the exampl
 occur only during compilation and do not affect running time.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Num</span> <span class="o">=</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">Num</span> <span class="n">x</span><span class="p">,</span> <span class="n">Num</span><span class="o">|</span><span class="n">blank</span> <span class="n">value</span><span class="p">)</span> <span class="c1"># equivalent: def inc(float|int|nat x, float|int|nat|blank value) </span>
@@ -1312,7 +1312,7 @@ compilation time. This evaluation uses a lightweight built-in interpreter
 and is initiated with the <code>compt</code> keyword. Next is an example.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">VALUES</span> <span class="o">=</span> <span class="n">compt</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -1327,7 +1327,7 @@ is robust against even unsafe functions by showing errors when
 things go wrong.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">CONSTANT</span> <span class="o">=</span> <span class="n">compt</span> <span class="n">cstr</span> <span class="n">unsafe_temp</span> <span class="n">add</span><span class="p">(</span><span class="n">arena</span> <span class="n">alloc</span> <span class="mi">128</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot; world!&quot;</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -1346,7 +1346,7 @@ is important to see that a constant data segment is ported over to
 runtime.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">ones</span> <span class="o">=</span> <span class="n">compt</span> <span class="n">vec</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
@@ -1363,7 +1363,7 @@ runtime.</p>
 <p>Lastly, leverage this mechanism to run code during compilations, like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">compt</span> <span class="nb">print</span> <span class="s2">&quot;compiling&quot;</span>
@@ -1402,7 +1402,7 @@ when writing numbers like <code>1</code> to avoid a whole area of logic bugs ass
 with negative indexes. Next is an example of buffer usage.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1429,7 +1429,7 @@ mutability is desired, you can use <code>unsafe_mut</code> to unsafely convert a
 to a fully mutable copy, which allows bypassing even construction correctness.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">()</span>
     <span class="n">buf</span> <span class="o">=</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">2</span>
@@ -1469,7 +1469,7 @@ for generic buffers and automatically converted back into
 the input buffer type.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="nb">any</span><span class="p">[]</span> <span class="n">buffer</span><span class="p">)</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1486,7 +1486,7 @@ on a buffer type, declare an intermediate
 type like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">named_buffer</span><span class="p">(</span><span class="nb">str</span> <span class="n">name</span><span class="p">,</span> <span class="n">edit</span> <span class="nb">any</span><span class="p">[]</span> <span class="n">buf</span><span class="p">)</span>
     <span class="k">return</span> <span class="k">class</span><span class="w"> </span><span class="nc">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
@@ -1515,7 +1515,7 @@ normally. Under the hood, the currently available <code>alloc</code> function
 is used to make the allocation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">cstr</span><span class="p">[]</span> <span class="n">sentences</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span>
@@ -1573,7 +1573,7 @@ needs to be moved quickly. Use buffers otherwise. </p>
 a pointer to it. Then that is moved around via its memory address. </p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">mut</span> <span class="nb">float</span> <span class="n">ptr</span> <span class="n">element</span><span class="p">)</span>
     <span class="n">element</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span>
@@ -1616,7 +1616,7 @@ obtaining necessary offsets within allocated memory. Below is
 an example:</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Point2D</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
@@ -1654,7 +1654,7 @@ still performed.</p>
 syntax like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1692,7 +1692,7 @@ example where a buffer needs to be resized and
 this requires stable handling through <code>ref</code>.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1715,7 +1715,7 @@ the stable reference, the buffer is automatically updated
 for strings copied onto it.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">()</span>
     <span class="n">mem</span> <span class="o">=</span> <span class="n">ref</span> <span class="nb">list</span> <span class="n">char</span><span class="p">[]</span>
@@ -1750,7 +1750,7 @@ caller and so on. Mutable arguments are left unaffected on failure too.
 You can manually <code>fail</code> like so:</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">always_fail</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;we are failing&quot;</span>
@@ -1771,7 +1771,7 @@ a function does not fail up to a certain point, place the <code>debug::nocatch()
 assertion. There are various other compiler assertions too, which are covered later.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1797,7 +1797,7 @@ functions are just zero-initialized, but <code>try</code> has a boolean outcome 
 an error is intercepted. Below is an example that safeguards against failing allocation.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">vector</span><span class="p">(</span><span class="n">nat</span> <span class="n">size</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">size</span>
@@ -1815,7 +1815,7 @@ mechanism for trying to produce next values. Below is an example.
 <code>for</code> loops are syntactic desugar to something similar.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1838,7 +1838,7 @@ the previous section&#8217;s last example; the <code>for</code> loop
 is converted into a <code>while try</code>.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1854,7 +1854,7 @@ that are natural numbers. In truth, the range ieration
 examples is equivalent to the next one.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1871,7 +1871,7 @@ dereferenced so that you can readily iterate across buffers,
 like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1890,7 +1890,7 @@ permissions can only after this qualifier, equality, and
 returns.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">solution</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">mut</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
@@ -1931,7 +1931,7 @@ even if errors are created in the interim.
 Below is a simple example.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1948,7 +1948,7 @@ example, this is typically used to close resources like
 open files and processes.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -1969,7 +1969,7 @@ of its own. This way, you can obtain the error and check that it exists
 simultaneously.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span> <span class="k">as</span> <span class="n">io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -1989,7 +1989,7 @@ But, importantly, they <em>are</em> obtained from deferred statements triggered 
 <code>del</code>. The next snippet demonstrates how to clear errors and check on them.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">bye_error</span><span class="p">()</span>
@@ -2020,7 +2020,7 @@ additions involving vectors, which is used by the <code>+</code> operator,
 is declared as <code>add(effect edit vec_allocator allocator, vec v1, vec v2)</code>.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2063,7 +2063,7 @@ of the function <code>inc</code>, as well as the <code>compiler::call</code> bui
 to call a functor with given arguments. The retrieval into a factor should be unique.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">two</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">c</span><span class="p">)</span>
     <span class="n">one</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">0</span>
@@ -2081,7 +2081,7 @@ to call a functor with given arguments. The retrieval into a factor should be un
 <p>Here is a different example.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">pair</span><span class="p">(</span><span class="n">nat</span><span class="p">,</span> <span class="n">nat</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
@@ -2109,7 +2109,7 @@ of the <code>add</code> function are retrieved in different situations to extrac
 functors based on arguments.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">call_one</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span> 
     <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
@@ -2151,7 +2151,7 @@ Do note that youcan use it with literal types to print messages too.
 For example, one pattern usable for debuggining is the following.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2174,7 +2174,7 @@ complicated comparison - this is skipped because the difference in the types of 
 suffices to make a judgement, even if enums usually require runtime checking.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test1</span><span class="p">(</span><span class="n">nat</span> <span class="n">a</span><span class="p">,</span> <span class="n">nat</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="o">|</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
@@ -2212,7 +2212,7 @@ all recursive functions as potentially failing. This way, future versions can ha
 platform-dependent error codes for unbounded recursion that exceeds system resource limits.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="nb">range</span> <span class="n">SAFETY</span><span class="p">,</span> <span class="n">nat</span> <span class="n">i</span><span class="p">)</span>
     <span class="nb">next</span> <span class="n">SAFETY</span>
@@ -2236,7 +2236,7 @@ function creates an error if it is called after such an interrupt. For safety,
 this function asks for user input on whether the program should be terminated.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
@@ -2269,7 +2269,7 @@ alongside pointer data assignment allows for quick pushing of elements at the en
 growing lists.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2294,7 +2294,7 @@ the circular buffer is an arena that restarts once full.</p>
 below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2326,7 +2326,7 @@ strings. Theoretically, this extracts the size and first
 character too, but such data are ignored if not needed.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2338,7 +2338,7 @@ character too, but such data are ignored if not needed.</p>
 This creates errors on failure.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2352,7 +2352,7 @@ This structure is used a lot when creating buffers for memory management and is 
 will also use them to store <code>float</code> vector contents.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2367,7 +2367,7 @@ Recall that effects are arguments that are automatically retrieved from the call
 location based on their name.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2385,7 +2385,7 @@ and the compiler would correctly point that out and refuse to progress
 on an erroneous program.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2403,7 +2403,7 @@ of automatically passing CHARS (normal effect behavior) this function be treated
 as a <code>+</code> operation like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2423,7 +2423,7 @@ structurally matched to the variation <code>str(char[] buffer, nat end, "from", 
 There also exists the variation <code>str(char[] buffer, nat start, "to", nat length)</code>.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2449,7 +2449,7 @@ always-presented. For now, map size is fixed. Place contents and iterate through
 like below. Map initialization takes any allocated buffer and creates a similarly-sized map.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2480,7 +2480,7 @@ line, like below. This needs a <code>char[]</code> buffer
 store lines.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2498,7 +2498,7 @@ store lines.</p>
 or even defer its deletion to when the file is no longer in use.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2517,7 +2517,7 @@ contents of those strings may be corrupted even if they remain memory
 safe.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2536,7 +2536,7 @@ safe.</p>
 that fails on non-zero error code can be evoked like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2550,7 +2550,7 @@ that fails on non-zero error code can be evoked like below.</p>
 similarly to files.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2568,7 +2568,7 @@ check on this with <code>compiler::catch()</code>.  To propagate or otherwise
 handle the intercepted errors, use a pattern like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2593,7 +2593,7 @@ random <code>nat</code> number, or -if no argument is provided- creates a mutabl
 system clock as a source of entropy. Here is an example.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/rand.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2610,7 +2610,7 @@ secure random numbers (these are NOT secure). Initialize it per <code>Rand()</co
 retrieve next random values.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/rand.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2657,7 +2657,7 @@ to <code>65535</code> length and elements, hereby consuming 12 instead of 25 byt
 when organized in a string buffer.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/mini.s&quot;</span> <span class="k">as</span> <span class="n">mini</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[]</span> <span class="n">buff</span><span class="p">)</span>
@@ -2692,7 +2692,7 @@ file. Let us start with a quick preview of a vector. Vector elements can be
 set and read as if working on buffers, but additional operations are provided.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2710,7 +2710,7 @@ on circular buffer constructs that restart from the starting position
 after the end.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">safe_main</span><span class="p">()</span>
@@ -2742,7 +2742,7 @@ Matrix multiplication and matrix-vector multiplication are also
 implemented.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2805,7 +2805,7 @@ type suites the provided data. This makes code more portable if you want to swit
 the future.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -2833,7 +2833,7 @@ via <em>raylib</em>. Below is an example that moves sevral circles
 around in a window.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span> <span class="k">as</span> <span class="n">sci</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/graphics.s&quot;</span> <span class="k">as</span> <span class="n">graphics</span>
 
@@ -2913,7 +2913,7 @@ which can be caught afterwards to check for successful termination.</p>
 <div class="notice-box box-warning"><strong>Warning:</strong> System commands are not available in the online playground.</div>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">cstr</span><span class="o">|</span><span class="nb">str</span> <span class="n">command</span><span class="p">)</span>
@@ -2952,7 +2952,7 @@ until that point the <code>"\n"</code> character may not be present at the line&
 circular buffer reader for temprarily read lines, as it can go through arbitarily-sized files.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">README</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md&quot;</span>

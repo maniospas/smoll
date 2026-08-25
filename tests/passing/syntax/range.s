@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import "std/core/range.s" as range
 
 def main()

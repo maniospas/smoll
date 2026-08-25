@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 rec fib(nat n)
   if n<=1 return 1

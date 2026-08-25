@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def test()
     mem = mut list char[] # SHOULD FAIL: ref is needed here

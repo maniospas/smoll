@@ -15,9 +15,9 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 local import "builtins"
-local import "std/core/numbers.s"
-local import "std/core/array.s"
-local import "std/core/string.s" as string
+local import std.core.numbers
+local import std.core.array
+local import std.core.string as string
 
 def nat8(nat x)
     doc "convert unsigned number to 8 bits"

@@ -15,9 +15,9 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
 import "builtins"
-import "std/extern.s"
-import "std/core/bool.s"
-import "std/core/numbers.s"
-import "std/core/print.s"
-import "std/core/convert.s"
-import "std/core/range.s"
+import std.extern
+import std.core.bool
+import std.core.numbers
+import std.core.print
+import std.core.convert
+import std.core.range

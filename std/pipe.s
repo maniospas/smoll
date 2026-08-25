@@ -14,8 +14,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-import "std/core.s"
-import "std/unsafe.s" as unsafe
+import std.core
+import std.unsafe as unsafe
 import "std/extern/mutex.h"
 
 def pipe(cstr value)

@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def swap(mut any ptr x, mut any ptr y)
     z = mut x

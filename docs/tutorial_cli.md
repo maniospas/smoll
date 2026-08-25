@@ -38,7 +38,7 @@ you may also create an `unsafe_console()` anywhere but that is unsafe in the fac
 conditions.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     # this is a line comment
@@ -65,7 +65,7 @@ permission, meaning that it is not a constant -the default- but that we may muta
 Finally, the `console` type of the argument is declared, followed by its name.
 
 ```python
-import "std/core.s"
+import std.core
 
 def greet(effect edit console CLI)
     print "hello world!"
@@ -83,7 +83,7 @@ of the same type. So we need to write '1.0' with the dot to indicate a float num
 from the console is not an automatic effect, to avoid doing so accidentally.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -107,7 +107,7 @@ under the `debug::` and `compiler::` namespaces that help us interact with the c
 for debugging and more dynamic programs.
 
 ```python
-import "std/core.s"
+import std.core
 
 def read_number(effect edit console CLI, cstr message)
     print nn message
@@ -127,7 +127,7 @@ The above can also be converted into a safe loop that waits for successful user
 input by substituting the `if` with a `while` loop, like below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def read_number(effect edit console CLI, cstr message)
     print nn message
@@ -150,7 +150,7 @@ Also use the dot notation to access type fields per `data.field`. In the example
 is the type of quoted text; see the next section about more dynamic strings.
 
 ```python
-import "std/core.s"
+import std.core
 
 def employee(cstr name, cstr surname)
     return (name, surname)
@@ -174,7 +174,7 @@ This notation is zero cost in that it does not affect runtime.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def employee(cstr name, cstr surname)
     return class(name, surname)
@@ -213,7 +213,7 @@ This time, we are passing the allocator automatically to string creation methods
 But enough talking. Here is some code.
 
 ```python
-import "std/core.s"
+import std.core
 
 def greet(effect edit console CLI, str name)
     print nn "hello "
@@ -234,7 +234,7 @@ Notice the conversion of `cstr` quoted literals to the string
 type. This does not allocate memory at all.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -257,7 +257,7 @@ in general, like below. Unset contents are in a valid zero-initialized state
 (zero numbers, empty strings, etc.).
 
 ```python
-import "std/core.s"
+import std.core
 
 def employee(cstr name, cstr surname)
     return class(name, surname)
@@ -281,7 +281,7 @@ the `arena` function. Allocators produced this way will keep using the buffer fo
 until it is full, at which point an error will be created.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -301,7 +301,7 @@ outcomes stored in a large buffer. But the result can be copied on
 a new memory location via the -you guessed it- `new()` allocator.
 
 ```python
-import "std/core.s"
+import std.core
 
 def create_greeting()
     CHARS = edit arena char[].alloc 4096
@@ -323,7 +323,7 @@ and finally treat the whole arena buffer as a string. And below is how to
 implement this ideal scenario.
 
 ```python
-import "std/core.s"
+import std.core
 
 def create_greeting()
     # create str representation of cstr to get their length with 'len'
@@ -360,7 +360,7 @@ a `for` loop goes through all buffer elements.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def create_greeting()
     parts = [
@@ -388,7 +388,7 @@ allocating the list of strings. Evaluate your practical needs accordingly. For e
 you may prefer to just ... print the strings instead of concatenating them beforehand.
 
 ```python
-import "std/core.s"
+import std.core
 
 def total_length(str[] parts)
     size = mut 0
@@ -424,7 +424,7 @@ would create an error.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -460,7 +460,7 @@ same conceptual name to similar operations.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def double_it(nat x) # natural numbers = unsigned integers
     return x*2
@@ -479,7 +479,7 @@ alternatives. That is, the above implementation can be rewritten
 like below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def double_it(nat|float x)
     return x+x
@@ -504,7 +504,7 @@ but let us not take up time here because
 this is more of a curio than a frequently occurring pattern.
 
 ```python
-import "std/core.s"
+import std.core
 
 def like(nat value, nat|float prototype)
     return nat|float value->type prototype
@@ -525,7 +525,7 @@ This check is resolved during compilation, meaning that it does
 not affect runtime performance whatsoever.
 
 ```python
-import "std/core.s"
+import std.core
 
 def double_nat(nat|float x)
     # this function only doubles naturals
@@ -548,7 +548,7 @@ be overwritten by convention.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def inc(float x, float|blank by)
     if by is blank
@@ -574,7 +574,7 @@ useful. First get a glimpse of what they look like.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def greeting = "hello world!"
 def main()
@@ -600,7 +600,7 @@ is worth stressing: *only the same literal types are matched* when resolving
 polymorphic functions.
 
 ```python
-import "std/core.s"
+import std.core
 
 def message("hello" _useless_var)
     return "hello world!"
@@ -618,7 +618,7 @@ Actually, variable names are optional in function signatures, so you can rewrite
 the above like so.
 
 ```python
-import "std/core.s"
+import std.core
 
 def message("hello")
     return "hello world!"
@@ -644,7 +644,7 @@ with no runtime overhead. Oh, and you can also type-check with `is` normally! Th
 same mechanism as above grants us zero-cost literal comparison.
 
 ```python
-import "std/core.s"
+import std.core
 
 def greet(effect edit console CLI, "hello"|"hi" greeting)
     print nn compiler::value greeting
@@ -665,7 +665,7 @@ as an argument. Here is a simple example.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def print(effect edit console CLI, float start, "upto", float end)
     print nn "["
@@ -709,7 +709,7 @@ Due to literal keywords being only comma replacements,
 you can only find them within parentheses.
 
 ```python
-import "std/core.s"
+import std.core
 
 def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"world" world, blank|"."|"!" punctuation)
     print nn compiler::value greeting
@@ -749,7 +749,7 @@ reset the console to printing black-and-white once colorization ends,
 even in case of failures.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -773,7 +773,7 @@ the same representations are stored in the same addresses, and therefore
 equality lowers to just a memory address comparison underneath.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -792,7 +792,7 @@ with an underscore. Only strings admit a `len` operation, as implementing the la
 for `cstr` and repeating it can be a hidden expense.
 
 ```python
-import "std/core.s"
+import std.core
 
 def receive(effect edit console CLI, str|cstr _message)
     message = str _message
@@ -817,7 +817,7 @@ its index per `"mystring"[idx]`. Everything remains safe in that at most errors
 will be created.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -839,7 +839,7 @@ construct the proper position range using an explicit
 string literal qualifier to convey intent, like below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -861,7 +861,7 @@ as command line arguments passed to the running program as a `cstr[]` buffer.
 Below is an example.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def main()
@@ -892,7 +892,7 @@ This is shown below. In this particular example, we also use a `CHARS`
 buffer to place strings there.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/map.s"
 
 def main()
@@ -924,7 +924,7 @@ In fact, the map forms a dependency to that memory and cannot be moved
 to other functions without that company.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/map.s"
 
 def create_map()
@@ -947,7 +947,7 @@ creating a never-called dummy function that constructs an empty
 map, like below.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/map.s"
 
 def create_map()
@@ -988,7 +988,7 @@ newly read lines only at the managed buffer.
 
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def main()

@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import compiler # fast usage of: literal, call, abstract
 
 def call_one(nat->nat->nat x)

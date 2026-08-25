@@ -39,7 +39,7 @@ are float numbers. See below for colors.
 
 
 ```python
-import "std/core.s"
+import std.core
 import "std/graphics.s"
 
 def main()
@@ -62,7 +62,7 @@ Finally, `color` is used to cast color values from natural number tuples to `nat
 with either transparency or not.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/graphics.s"
 
 def main()
@@ -155,7 +155,7 @@ from your own server via the following pattern. This is curated so that
 you can wait on multiple files at once, and they will be retrieved asynchronously.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def main()

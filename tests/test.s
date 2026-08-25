@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def point(nat x, nat y)
     return class compiler::args()

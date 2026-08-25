@@ -15,7 +15,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
 local import "builtins"
-local import "std/core/numbers.s"
+local import std.core.numbers
 
 def float(Number x)
     doc "cast to float"

@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def inc(mut float x)
     x = x+1.0

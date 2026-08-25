@@ -14,10 +14,10 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-local import "std/core.s"
-local import "std/sci/math.s"
-local import "std/sci/unsafe.s"
-local import "std/unsafe.s" as unsafe
+local import std.core
+local import std.sci.math
+local import std.sci.unsafe
+local import std.unsafe as unsafe
 local import "std/unsafe.s"::add
 
 def arena(float::tag)    return arena float[]

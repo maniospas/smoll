@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import "std/io.s"::dir::is_dir
 import "std/io.s"::dir::open
 import "std/io.s"::get

@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def fp(float ptr value) 
     return class value

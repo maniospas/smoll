@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def call_one(nat->nat->nat x)
     return compiler::call(x,1)

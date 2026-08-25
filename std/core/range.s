@@ -14,7 +14,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
-local import "std/core/numbers.s"
+local import std.core.numbers
 
 def of(nat to)
     doc "yields a pair of nats"

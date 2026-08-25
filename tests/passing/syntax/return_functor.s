@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import "std/unsafe.s" as unsafe
 
 def generic(nat size, compiler::ptr->blank constructor, compiler::ptr->blank deallocator)

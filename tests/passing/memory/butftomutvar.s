@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def user(str name, nat _x, nat y)
     values = mut nat[]

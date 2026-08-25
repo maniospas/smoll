@@ -62,7 +62,7 @@ and not merely perform some diagnostic action. For example, we would not
 be able to print without it.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     # this is a line comment, by the way
@@ -81,7 +81,7 @@ file too. This way, you can only explicitly declare third-party code sources.
 
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console() 
@@ -93,7 +93,7 @@ contents only via the namespace name followed by the `::` notation. This is show
 below and is more verbose, bue helps avoid confusion of where function come from.
 
 ```python
-import "std/core.s" as core
+import std.core as core
 
 def main()
     CLI = edit console() 
@@ -111,7 +111,7 @@ is introduced in each file, as opposed to files that aggregate
 available programming interfaces in one place.
 
 ```python
-local import "std/core.s"::print
+local import std.core::print
 
 def main()
     CLI = edit console() 
@@ -130,7 +130,7 @@ tuples and all functions just accept one tuple as argument.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console() 
@@ -147,7 +147,7 @@ within namespaces.
 
 ```python
 # atypical import for core - for demonstration
-import "std/core.s" as core
+import std.core as core
 
 def main()
     CLI = edit core::console() 
@@ -172,7 +172,7 @@ this tuple also sets the optional second argument determinin line ending.
 The default ending is otherwise *"\n"*.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console() 
@@ -203,7 +203,7 @@ as it is the more restricted -and hence less destructive-
 of the two permission levels. See more on edit permissions [later](#type-mutability).
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console() 
@@ -228,7 +228,7 @@ in the code, these are always natural numbers. This is
 a deliberate choise to enforce memory safety later.
 
 ```python
-import "std/core.s"
+import std.core
 
 def toinfinity(nat start)
     pos = mut start
@@ -264,7 +264,7 @@ important to safeguard.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def point(float x, float y)
     return class(x,y)
@@ -290,7 +290,7 @@ triple should be allowed.
 
 ```python
 
-import "std/core.s"
+import std.core
 import "std/sci.s" # for pow
 
 def std_data()
@@ -326,7 +326,7 @@ the `compiler::args()` function to return a tuple of all arguments.
 This is exemplified below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def point(float x, float y) 
     return compiler::args()
@@ -348,7 +348,7 @@ where this singleton is used to also read a float number. Similar
 methods exist for reading strings on buffers, or other number types.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console() 
@@ -369,7 +369,7 @@ we can modify modify mutable fields only if `t` has mutation or edit
 permissions.
 
 ```python
-import "std/core.s"
+import std.core
 
 def test()
     x = mut 1
@@ -389,7 +389,7 @@ That is, they cannot be modified or be the source of memory content
 modifications.
 
 ```python
-import "std/core.s"
+import std.core
 
 def Test()
     x = mut 1
@@ -409,7 +409,7 @@ It has been already mentioned, but worth repeating: to preserve mutation for
 mutable fields without allowing a full variable rewrite use `edit`.
 
 ```python
-import "std/core.s"
+import std.core
 
 def test()
     x = mut 1
@@ -438,7 +438,7 @@ be prematurely terminated with `break`, or skipped with
 `continue`.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console() 
@@ -458,7 +458,7 @@ will be only one value set to those variables. If no value is
 set, the variable is zero-initialized.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -469,7 +469,7 @@ def main()
 ```
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -487,7 +487,7 @@ Here is a simple example.
 **Please do not write code like this demonstration.**
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console() 
@@ -523,7 +523,7 @@ Underneath, they desugar to [error code semantics](#try-and-fail).
 More on iterators later but here is how they look like.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console() 
@@ -540,7 +540,7 @@ like normal, but have two more properties:
 Below is an example that highlights the short-circuiting properties of logical operators.
 
 ```python
-import "std/core.s"
+import std.core
 
 def point(float x, float y)
     return compiler::args()
@@ -590,7 +590,7 @@ doing so in more complicated cases means that reading the program sequentially
 does not work; the programmer needs to reason about unbounded problems.
 
 ```python
-import "std/core.s"
+import std.core
 
 def wooo() # CREATES AN ERROR - should have been 'rec'
     CLI = edit console()
@@ -633,7 +633,7 @@ one function in a chain of multiple ones needs to be declared
 as recursive.
 
 ```python
-import "std/core.s"
+import std.core
 
 rec fib(nat n)
     if n<=1
@@ -657,7 +657,7 @@ section. For now, just it suffices to say that "never" does not actually
 mean never.
 
 ```python
-import "std/core.s"
+import std.core
 
 rec wooo(edit console CLI) # not the ideal way to pass the console - see next section
     if false return blank()
@@ -693,7 +693,7 @@ accidental implicit behavior. By convention, CAPITALIZE effect names so that ass
 is made explicit by the code.
 
 ```python
-import "std/core.s"
+import std.core
 
 def inc(effect nat INCREMENT, effect mut nat COUNTER, nat number)
     COUNTER = COUNTER+1
@@ -716,7 +716,7 @@ initialization is used to ensure that a printable console exists.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def greet(effect edit console CLI)
     print "hello world"
@@ -746,8 +746,8 @@ will be added in the future.
 
 ```python
 import "builtins"
-import "std/core.s"::print
-import "std/core.s"::console
+import std.core::print
+import std.core::console
 
 def unsafe_add(float x, float|int y)
     {builtins::float z=x+y;}
@@ -765,8 +765,8 @@ An example follows.
 
 ```python
 import "builtins"
-import "std/core.s"::print
-import "std/core.s"::console
+import std.core::print
+import std.core::console
 
 def Number = float|int|nat
 def unsafe_add(Number x, Number y)
@@ -795,7 +795,7 @@ that are not numbers with the '\` symbol, which is the mathematical
 symbol for set differces.
 
 ```python
-import "std/core.s" # defines Number like above
+import std.core # defines Number like above
 
 def natpair(nat x, nat y)
     return compiler;:args()
@@ -834,7 +834,7 @@ out of the ordinary. By the way, prefer CAPITALIZING
 literal types (so capitals indicate either effects or literals).
 
 ```python
-import "std/core.s"
+import std.core
 
 def INCREMENT = 1
 
@@ -852,7 +852,7 @@ the literal's type by evaluating `type value`, where value
 can be a string or number literal.
 
 ```python
-import "std/core.s"
+import std.core
 
 def VERSION = "two"
 
@@ -880,7 +880,7 @@ This way, you can extract values from the type system.
 An example that restricts how functions are called is presented next.
 
 ```python
-import "std/core.s"
+import std.core
 
 def inc(nat x, blank|1|2 inc)
     if inc is blank  # check if exists - see next section
@@ -901,7 +901,7 @@ overhead, literal types may be resolved
 to several runtime checks.
 
 ```python
-import "std/core.s"
+import std.core
 
 def ENUM = "A"|"B"|"C"
 
@@ -935,7 +935,7 @@ back-to-back, you need use a placeholder with no outputs as an argument,
 like the `()` expression. But you can still have a literal at the end of an expression.
 
 ```python
-import "std/core.s"
+import std.core
 
 def modify(mut nat x, "add", "one")
     x = x+1
@@ -974,7 +974,7 @@ At the same time, you can mingle them together with other condition checking,
 as the standard library's core. Below is an example of a conditional check.
 
 ```python
-import "std/core.s"
+import std.core
 
 def typed_print(effect edit console CLI, nat|int|float|cstr value) 
     if value is nat|int|float
@@ -999,7 +999,7 @@ and their fallback values. In the next example, the defined function uses
 either an increment value of one, or a value provided as second argument. 
 
 ```python
-import "std/core.s"
+import std.core
 
 def inc(nat x, nat|blank value)
     if value is blank
@@ -1026,7 +1026,7 @@ variations and eventually keeps 6 of them. Both conditional checks in the exampl
 occur only during compilation and do not affect running time.
 
 ```python
-import "std/core.s"
+import std.core
 
 def Num = float|int|nat
 def inc(Num x, Num|blank value) # equivalent: def inc(float|int|nat x, float|int|nat|blank value) 
@@ -1050,7 +1050,7 @@ compilation time. This evaluation uses a lightweight built-in interpreter
 and is initiated with the `compt` keyword. Next is an example.
 
 ```python
-import "std/core.s"
+import std.core
 
 def VALUES = compt (1,2)
 def main()
@@ -1064,7 +1064,7 @@ is robust against even unsafe functions by showing errors when
 things go wrong.
 
 ```python
-import "std/core.s"
+import std.core
 
 def CONSTANT = compt cstr unsafe_temp add(arena alloc 128, "hello", " world!")
 def main()
@@ -1082,7 +1082,7 @@ is important to see that a constant data segment is ported over to
 runtime.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/sci.s"
 
 def ones = compt vec [1.0, 1.0]
@@ -1098,7 +1098,7 @@ def main()
 Lastly, leverage this mechanism to run code during compilations, like below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     compt print "compiling"
@@ -1137,7 +1137,7 @@ when writing numbers like `1` to avoid a whole area of logic bugs associated
 with negative indexes. Next is an example of buffer usage.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -1163,7 +1163,7 @@ mutability is desired, you can use `unsafe_mut` to unsafely convert anything
 to a fully mutable copy, which allows bypassing even construction correctness.
 
 ```python
-import "std/core.s"
+import std.core
 
 def create()
     buf = float[].alloc 2
@@ -1202,7 +1202,7 @@ for generic buffers and automatically converted back into
 the input buffer type.
 
 ```python
-import "std/core.s"
+import std.core
 
 def print(any[] buffer)
     CLI = edit console()
@@ -1218,7 +1218,7 @@ on a buffer type, declare an intermediate
 type like below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def named_buffer(str name, edit any[] buf)
     return class compiler::args()
@@ -1246,7 +1246,7 @@ normally. Under the hood, the currently available `alloc` function
 is used to make the allocation.
 
 ```python
-import "std/core.s"
+import std.core
 
 def print(effect edit console CLI, cstr[] sentences)
     for sentence in sentences
@@ -1303,7 +1303,7 @@ Below is an example that creates a buffer of one element and immediately retriev
 a pointer to it. Then that is moved around via its memory address. 
 
 ```python
-import "std/core.s"
+import std.core
 
 def inc(mut float ptr element)
     element = 1.0+compiler::deref element
@@ -1346,7 +1346,7 @@ an example:
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def Point2D(float x, float y)
     return class(x,y)
@@ -1383,7 +1383,7 @@ To convert some data to a reference use the `ref value`
 syntax like below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -1420,7 +1420,7 @@ example where a buffer needs to be resized and
 this requires stable handling through `ref`.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -1442,7 +1442,7 @@ the stable reference, the buffer is automatically updated
 for strings copied onto it.
 
 ```python
-import "std/core.s"
+import std.core
 
 def test()
     mem = ref list char[]
@@ -1477,7 +1477,7 @@ caller and so on. Mutable arguments are left unaffected on failure too.
 You can manually `fail` like so:
 
 ```python
-import "std/core.s"
+import std.core
 
 def always_fail(effect edit console CLI)
     print "we are failing"
@@ -1497,7 +1497,7 @@ a function does not fail up to a certain point, place the `debug::nocatch()`
 assertion. There are various other compiler assertions too, which are covered later.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -1522,7 +1522,7 @@ functions are just zero-initialized, but `try` has a boolean outcome that shows 
 an error is intercepted. Below is an example that safeguards against failing allocation.
 
 ```python
-import "std/core.s"
+import std.core
 
 def vector(nat size)
     return float[].alloc size
@@ -1539,7 +1539,7 @@ mechanism for trying to produce next values. Below is an example.
 `for` loops are syntactic desugar to something similar.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -1561,7 +1561,7 @@ the previous section's last example; the `for` loop
 is converted into a `while try`.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -1576,7 +1576,7 @@ that are natural numbers. In truth, the range ieration
 examples is equivalent to the next one.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -1592,7 +1592,7 @@ dereferenced so that you can readily iterate across buffers,
 like below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -1610,7 +1610,7 @@ permissions can only after this qualifier, equality, and
 returns.
 
 ```python
-import "std/core.s"
+import std.core
 
 def solution(mut nat x, mut nat y)
     return compiler::args()
@@ -1650,7 +1650,7 @@ even if errors are created in the interim.
 Below is a simple example.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -1666,7 +1666,7 @@ example, this is typically used to close resources like
 open files and processes.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s":process as process
 
 def main()
@@ -1687,7 +1687,7 @@ of its own. This way, you can obtain the error and check that it exists
 simultaneously.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s" as io
 
 def main()
@@ -1708,7 +1708,7 @@ But, importantly, they *are* obtained from deferred statements triggered by
 
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s":process as process
 
 def bye_error()
@@ -1738,7 +1738,7 @@ additions involving vectors, which is used by the `+` operator,
 is declared as `add(effect edit vec_allocator allocator, vec v1, vec v2)`.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/sci.s"
 
 def main()
@@ -1780,7 +1780,7 @@ of the function `inc`, as well as the `compiler::call` builtin function
 to call a functor with given arguments. The retrieval into a factor should be unique.
 
 ```python
-import "std/core.s"
+import std.core
 
 def two(nat->nat c)
     one = c.compiler::call 0
@@ -1797,7 +1797,7 @@ def main()
 Here is a different example.
 
 ```python
-import "std/core.s"
+import std.core
 
 def pair(nat, nat)
     return compiler::args()
@@ -1824,7 +1824,7 @@ of the `add` function are retrieved in different situations to extract
 functors based on arguments.
 
 ```python
-import "std/core.s"
+import std.core
 
 def call_one(nat->nat->nat x) 
     return x.compiler::call 1
@@ -1866,7 +1866,7 @@ Do note that youcan use it with literal types to print messages too.
 For example, one pattern usable for debuggining is the following.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -1888,7 +1888,7 @@ complicated comparison - this is skipped because the difference in the types of 
 suffices to make a judgement, even if enums usually require runtime checking.
 
 ```python
-import "std/core.s"
+import std.core
 
 def test1(nat a, nat b, "one"|"two")
     return compiler::args()
@@ -1926,7 +1926,7 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
 
 
 ```python
-import "std/core.s"
+import std.core
 
 rec wooo(effect edit range SAFETY, nat i)
     next SAFETY
@@ -1950,7 +1950,7 @@ this function asks for user input on whether the program should be terminated.
 
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 rec wooo(effect edit console CLI)
@@ -1983,7 +1983,7 @@ alongside pointer data assignment allows for quick pushing of elements at the en
 growing lists.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -2007,7 +2007,7 @@ Specifically for arenas, it is possible to obtain a sub-buffer view of a slice, 
 below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -2038,7 +2038,7 @@ strings. Theoretically, this extracts the size and first
 character too, but such data are ignored if not needed.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -2048,7 +2048,7 @@ You can convert string contents to numeric types.
 This creates errors on failure.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -2061,7 +2061,7 @@ This structure is used a lot when creating buffers for memory management and is 
 will also use them to store `float` vector contents.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -2075,7 +2075,7 @@ Recall that effects are arguments that are automatically retrieved from the call
 location based on their name.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -2092,7 +2092,7 @@ and the compiler would correctly point that out and refuse to progress
 on an erroneous program.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -2109,7 +2109,7 @@ of automatically passing CHARS (normal effect behavior) this function be treated
 as a `+` operation like below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -2128,7 +2128,7 @@ structurally matched to the variation `str(char[] buffer, nat end, "from", nat s
 There also exists the variation `str(char[] buffer, nat start, "to", nat length)`.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()
@@ -2154,7 +2154,7 @@ always-presented. For now, map size is fixed. Place contents and iterate through
 like below. Map initialization takes any allocated buffer and creates a similarly-sized map.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/map.s"
 
 def main()
@@ -2185,7 +2185,7 @@ line, like below. This needs a `char[]` buffer
 store lines.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def main()
@@ -2202,7 +2202,7 @@ Similarly, create a file for writing like below. Can also delete it,
 or even defer its deletion to when the file is no longer in use.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def main()
@@ -2220,7 +2220,7 @@ contents of those strings may be corrupted even if they remain memory
 safe.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def main()
@@ -2238,7 +2238,7 @@ Processes can also be read similarly to files. To begin with, a blocking system 
 that fails on non-zero error code can be evoked like below.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def main()
@@ -2251,7 +2251,7 @@ One can also open and communicate with running processes
 similarly to files.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s":process as proc
 
 def main()
@@ -2268,7 +2268,7 @@ check on this with `compiler::catch()`.  To propagate or otherwise
 handle the intercepted errors, use a pattern like below.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s":process as proc
 
 def main()
@@ -2292,7 +2292,7 @@ random `nat` number, or -if no argument is provided- creates a mutable seed that
 system clock as a source of entropy. Here is an example.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/rand.s"
 
 def main()
@@ -2308,7 +2308,7 @@ secure random numbers (these are NOT secure). Initialize it per `Rand()` and cal
 retrieve next random values.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/rand.s"
 
 def main()
@@ -2353,7 +2353,7 @@ to `65535` length and elements, hereby consuming 12 instead of 25 bytes per elem
 when organized in a string buffer.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/mini.s" as mini
 
 def concat(mini:str[] buff)
@@ -2387,7 +2387,7 @@ file. Let us start with a quick preview of a vector. Vector elements can be
 set and read as if working on buffers, but additional operations are provided.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/sci.s"
 
 def main()
@@ -2404,7 +2404,7 @@ on circular buffer constructs that restart from the starting position
 after the end.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/sci.s"
 
 def safe_main()
@@ -2435,7 +2435,7 @@ Matrix multiplication and matrix-vector multiplication are also
 implemented.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/sci.s"
 
 def main()
@@ -2497,7 +2497,7 @@ type suites the provided data. This makes code more portable if you want to swit
 the future.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/sci.s"
 
 def main()
@@ -2525,7 +2525,7 @@ around in a window.
 
 
 ```python
-import "std/core.s"
+import std.core
 import "std/sci.s" as sci
 import "std/graphics.s" as graphics
 
@@ -2604,7 +2604,7 @@ which can be caught afterwards to check for successful termination.
 *Warning: System commands are not available in the online playground.*
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def run(cstr|str command)
@@ -2642,7 +2642,7 @@ until that point the `"\n"` character may not be present at the line's ending. P
 circular buffer reader for temprarily read lines, as it can go through arbitarily-sized files.
 
 ```python
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"

@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def inc(float|int|nat x, float|int|nat|blank value)
     if value is blank

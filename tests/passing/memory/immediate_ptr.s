@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def main()
     CLI = edit console()

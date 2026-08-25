@@ -14,7 +14,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-local import "std/core.s"
+local import std.core
 
 def vec(float ptr unsafe_ptr, nat pos, nat length)
     doc "vector type declaration"

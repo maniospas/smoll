@@ -14,8 +14,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-local import "std/core.s"
-local import "std/hash.s" as hash
+local import std.core
+local import std.hash as hash
 
 def strmap(edit any[] values)
     doc "a string map"

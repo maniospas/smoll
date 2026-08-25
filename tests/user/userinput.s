@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def read_version(effect edit console CLI)
     print nn "compiled version: "

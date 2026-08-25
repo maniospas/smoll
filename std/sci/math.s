@@ -15,7 +15,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 local import "std/extern/math.h"
-local import "std/core.s"
+local import std.core
 
 def abs(float x)
     if x<0.0 return neg x

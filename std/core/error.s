@@ -14,7 +14,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
-local import "std/core/builtinsext.s"
+local import std.core.builtinsext
 
 def cstr(compiler::catch value)
     doc "a cstr description of an error code"

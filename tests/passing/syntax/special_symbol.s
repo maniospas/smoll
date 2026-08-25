@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 def ^ = compiler::deref
 
 def pair(cstr x, cstr y)

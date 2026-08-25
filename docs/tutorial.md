@@ -19,7 +19,7 @@ the language keeps track of code blocks.
 
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
-import "std/core.s"
+import std.core
 
 def main()
     print "hello world!"
@@ -33,7 +33,7 @@ string *type* called `str` just call a namesake function like below.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     greeting = str "hello world!"
@@ -73,7 +73,7 @@ operation by interweaving C code in there (we will not cover how in this tutoria
 By the way, text after `#` are line comments and ignored.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     print 1.0+2.0-3.0 # prints 0.0
@@ -89,7 +89,7 @@ There are `if-else` conditional statements to change what is being
 executed based given a condition. Conditions evaluate to a `bool` type.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     x = 1.0-2.0
@@ -125,7 +125,7 @@ those arguments. For example, given that all `print` versions allow an optional 
 use instead of the line break character, you can do the following.
 
 ```python
-import "std/core.s"
+import std.core
 
 def main()
     print ("hello", " ")

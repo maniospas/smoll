@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def total_length(str[] parts)
     size = mut 0

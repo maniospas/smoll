@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def print(effect edit console CLI, cstr[] sentences)
     for sentence in sentences

@@ -259,7 +259,7 @@ The <code>CLI</code> effect is also a <em>singleton</em> in that only one can be
 
 <div class="codehilite">
 <pre><span></span><code><span class="c1"># our program - this is a line comment</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;hello &quot;</span> <span class="c1"># adds an empty string instead of new line at end of print </span>
@@ -279,7 +279,7 @@ as a nominal type that can not be matched to the outputs of other functions
 via the <code>class</code> notation. Retrieve results with the dot notation too.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">employee</span><span class="p">(</span><span class="nb">str</span> <span class="n">name</span><span class="p">,</span> <span class="nb">str</span> <span class="n">surname</span><span class="p">,</span> <span class="n">nat</span> <span class="n">age</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">surname</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
@@ -306,7 +306,7 @@ Conversely, to create a functor from a function name, use the <code>type</code>
 keyword. Next is an example.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">pair</span><span class="p">(</span><span class="n">nat</span><span class="p">,</span><span class="n">nat</span><span class="p">)</span>  <span class="c1"># no function body assumes that arguments are returned</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">pair</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition</span><span class="p">)</span>
@@ -327,7 +327,7 @@ its <code>type</code> would not be unique. Specialize on required argument types
 the <code>&lt;...&gt;</code> notation to enclose a valid input signature. Like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">pair</span><span class="p">(</span><span class="n">nat</span><span class="p">,</span><span class="n">nat</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">pair</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition</span><span class="p">)</span>
@@ -353,7 +353,7 @@ a well-controlled selection. This lets the type system resolve everything with
 zero-cost abstractions and function pointers under the hood. Below is an example.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
@@ -383,7 +383,7 @@ vertical dash <code>|</code> shows type alternatives. The builtin
 <code>compiler::value</code> retrieves back a value from a literal type.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
@@ -410,7 +410,7 @@ no runtime cost. However, you can strip away the literal type information
 from functors using the <code>compiler::abstract</code> function.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
@@ -438,7 +438,7 @@ values using the <code>def name = ...</code> syntax for defining
 types instead of functions.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
@@ -481,7 +481,7 @@ would print <em>0</em> because try forcefully tries to implement every declared 
 call, substituting failures with zero-initialized values.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">addition_generator</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">addition_generator</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">10</span> <span class="c1"># will return a &quot;null&quot; functor</span>

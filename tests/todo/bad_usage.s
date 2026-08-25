@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import "std/sci.s"
 
 def next(nat->nat->nat addition_generator)

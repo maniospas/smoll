@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 
 def test1(edit arena<char::tag> arn)
     gc arn

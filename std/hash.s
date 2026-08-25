@@ -14,9 +14,9 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-local import "std/core/builtinsext.s"
-local import "std/core/string.s"
-local import "std/core/array.s"
+local import std.core.builtinsext
+local import std.core.string
+local import std.core.array
 
 def Hashable = nat|float|cstr|str
 

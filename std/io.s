@@ -14,11 +14,11 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-import "std/io/process.s" as process
-import "std/io/file.s" as file
-import "std/io/dir.s" as dir
-import "std/io/web.s" as web
-local import "std/core.s"
+import std.io.process as process
+import std.io.file as file
+import std.io.dir as dir
+import std.io.web as web
+local import std.core
 
 def get(edit dir::open data, nat) 
     return dir::entry data

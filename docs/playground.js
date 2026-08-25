@@ -12,7 +12,7 @@ if(base64) {
     const decoded = atob(base64);
     editor.value='repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"\n'+decoded
 }
-else editor.value='repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"\nimport "std/core.s"\n\ndef main()\n    CLI = edit console()\n    print "Hello world!"\n';
+else editor.value='repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"\nimport std.core\n\ndef main()\n    CLI = edit console()\n    print "Hello world!"\n';
 
 var hl = document.getElementById('highlight');
 var hlCode = document.getElementById('highlightCode');

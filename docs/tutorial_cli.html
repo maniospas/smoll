@@ -270,7 +270,7 @@ you may also create an <code>unsafe_console()</code> anywhere but that is unsafe
 conditions.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="c1"># this is a line comment</span>
@@ -298,7 +298,7 @@ permission, meaning that it is not a constant -the default- but that we may muta
 Finally, the <code>console</code> type of the argument is declared, followed by its name.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
@@ -317,7 +317,7 @@ of the same type. So we need to write &#8216;1.0&#8217; with the dot to indicate
 from the console is not an automatic effect, to avoid doing so accidentally.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -342,7 +342,7 @@ under the <code>debug::</code> and <code>compiler::</code> namespaces that help 
 for debugging and more dynamic programs.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">read_number</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">message</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">message</span>
@@ -363,7 +363,7 @@ for debugging and more dynamic programs.</p>
 input by substituting the <code>if</code> with a <code>while</code> loop, like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">read_number</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">message</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">message</span>
@@ -387,7 +387,7 @@ Also use the dot notation to access type fields per <code>data.field</code>. In 
 is the type of quoted text; see the next section about more dynamic strings.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">employee</span><span class="p">(</span><span class="n">cstr</span> <span class="n">name</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">surname</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">surname</span><span class="p">)</span>
@@ -411,7 +411,7 @@ tied to their name identifier, by using the <code>class</code> notation like bel
 This notation is zero cost in that it does not affect runtime.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">employee</span><span class="p">(</span><span class="n">cstr</span> <span class="n">name</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">surname</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">surname</span><span class="p">)</span>
@@ -451,7 +451,7 @@ This time, we are passing the allocator automatically to string creation methods
 But enough talking. Here is some code.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="nb">str</span> <span class="n">name</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;hello &quot;</span>
@@ -473,7 +473,7 @@ Notice the conversion of <code>cstr</code> quoted literals to the string
 type. This does not allocate memory at all.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -497,7 +497,7 @@ in general, like below. Unset contents are in a valid zero-initialized state
 (zero numbers, empty strings, etc.).</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">employee</span><span class="p">(</span><span class="n">cstr</span> <span class="n">name</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">surname</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">surname</span><span class="p">)</span>
@@ -521,7 +521,7 @@ the <code>arena</code> function. Allocators produced this way will keep using th
 until it is full, at which point an error will be created.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -542,7 +542,7 @@ outcomes stored in a large buffer. But the result can be copied on
 a new memory location via the -you guessed it- <code>new()</code> allocator.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_greeting</span><span class="p">()</span>
     <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
@@ -565,7 +565,7 @@ and finally treat the whole arena buffer as a string. And below is how to
 implement this ideal scenario.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_greeting</span><span class="p">()</span>
     <span class="c1"># create str representation of cstr to get their length with &#39;len&#39;</span>
@@ -602,7 +602,7 @@ is mentioned for completeness but not used in our running example. Instead, belo
 a <code>for</code> loop goes through all buffer elements.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_greeting</span><span class="p">()</span>
     <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span>
@@ -631,7 +631,7 @@ allocating the list of strings. Evaluate your practical needs accordingly. For e
 you may prefer to just &#8230; print the strings instead of concatenating them beforehand.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">total_length</span><span class="p">(</span><span class="nb">str</span><span class="p">[]</span> <span class="n">parts</span><span class="p">)</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
@@ -667,7 +667,7 @@ The example below runs in only 80 bytes, whereas any less size than <code>CHARS 
 would create an error.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -702,7 +702,7 @@ This is known as polymorphism. Here is an example, though usually we assign the
 same conceptual name to similar operations.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">double_it</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span> <span class="c1"># natural numbers = unsigned integers</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
@@ -722,7 +722,7 @@ alternatives. That is, the above implementation can be rewritten
 like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">double_it</span><span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">x</span>
@@ -748,7 +748,7 @@ but let us not take up time here because
 this is more of a curio than a frequently occurring pattern.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">like</span><span class="p">(</span><span class="n">nat</span> <span class="n">value</span><span class="p">,</span> <span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">prototype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">value</span><span class="o">-&gt;</span><span class="nb">type</span> <span class="n">prototype</span>
@@ -770,7 +770,7 @@ This check is resolved during compilation, meaning that it does
 not affect runtime performance whatsoever.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">double_nat</span><span class="p">(</span><span class="n">nat</span><span class="o">|</span><span class="nb">float</span> <span class="n">x</span><span class="p">)</span>
     <span class="c1"># this function only doubles naturals</span>
@@ -793,7 +793,7 @@ the next snippet. Blank variables can
 be overwritten by convention.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="o">|</span><span class="n">blank</span> <span class="n">by</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">by</span> <span class="ow">is</span> <span class="n">blank</span>
@@ -818,7 +818,7 @@ types. Remember the <code>from</code> from earlier? This is defined via literals
 useful. First get a glimpse of what they look like.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">greeting</span> <span class="o">=</span> <span class="s2">&quot;hello world!&quot;</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -845,7 +845,7 @@ is worth stressing: <em>only the same literal types are matched</em> when resolv
 polymorphic functions.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span> <span class="n">_useless_var</span><span class="p">)</span>
     <span class="k">return</span> <span class="s2">&quot;hello world!&quot;</span>
@@ -864,7 +864,7 @@ polymorphic functions.</p>
 the above like so.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="s2">&quot;hello world!&quot;</span>
@@ -891,7 +891,7 @@ with no runtime overhead. Oh, and you can also type-check with <code>is</code> n
 same mechanism as above grants us zero-cost literal comparison.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="o">|</span><span class="s2">&quot;hi&quot;</span> <span class="n">greeting</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">greeting</span>
@@ -912,7 +912,7 @@ the comma. This counts as interweaving the keyword&#8217;s corresponding literal
 as an argument. Here is a simple example.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="nb">float</span> <span class="n">start</span><span class="p">,</span> <span class="s2">&quot;upto&quot;</span><span class="p">,</span> <span class="nb">float</span> <span class="n">end</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;[&quot;</span>
@@ -957,7 +957,7 @@ Due to literal keywords being only comma replacements,
 you can only find them within parentheses.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="o">|</span><span class="s2">&quot;hi&quot;</span> <span class="n">greeting</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="s2">&quot;world&quot;</span> <span class="n">world</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="s2">&quot;.&quot;</span><span class="o">|</span><span class="s2">&quot;!&quot;</span> <span class="n">punctuation</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">greeting</span>
@@ -998,7 +998,7 @@ reset the console to printing black-and-white once colorization ends,
 even in case of failures.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1023,7 +1023,7 @@ the same representations are stored in the same addresses, and therefore
 equality lowers to just a memory address comparison underneath.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1043,7 +1043,7 @@ with an underscore. Only strings admit a <code>len</code> operation, as implemen
 for <code>cstr</code> and repeating it can be a hidden expense.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">receive</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">,</span> <span class="nb">str</span><span class="o">|</span><span class="n">cstr</span> <span class="n">_message</span><span class="p">)</span>
     <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span> <span class="n">_message</span>
@@ -1069,7 +1069,7 @@ its index per <code>"mystring"[idx]</code>. Everything remains safe in that at m
 will be created.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1092,7 +1092,7 @@ construct the proper position range using an explicit
 string literal qualifier to convey intent, like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1115,7 +1115,7 @@ as command line arguments passed to the running program as a <code>cstr[]</code>
 Below is an example.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -1146,7 +1146,7 @@ This is shown below. In this particular example, we also use a <code>CHARS</code
 buffer to place strings there.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -1179,7 +1179,7 @@ In fact, the map forms a dependency to that memory and cannot be moved
 to other functions without that company.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_map</span><span class="p">()</span>
@@ -1203,7 +1203,7 @@ creating a never-called dummy function that constructs an empty
 map, like below.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_map</span><span class="p">()</span>
@@ -1244,7 +1244,7 @@ arena, where the former creates an error when out of space, and latter places al
 newly read lines only at the managed buffer.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/core.s&quot;</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>

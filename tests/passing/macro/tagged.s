@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import "std/tag.s"
 import compiler::varname as vrn
 import compiler::deref

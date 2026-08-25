@@ -1,4 +1,4 @@
-import "std/core.s"
+import std.core
 import "std/map.s"
 
 def OPTIONS = "zero"|"one"|"two"

@@ -31,7 +31,7 @@
 
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
-import "std/core.s"
+import std.core
 import "std/io.s"
 
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"

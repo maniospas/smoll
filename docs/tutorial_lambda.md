@@ -25,7 +25,7 @@ The `CLI` effect is also a *singleton* in that only one can be created in your p
 
 ```python
 # our program - this is a line comment
-import "std/core.s"
+import std.core
 
 def greet(effect edit console CLI)
     print nn "hello " # adds an empty string instead of new line at end of print 
@@ -44,7 +44,7 @@ as a nominal type that can not be matched to the outputs of other functions
 via the `class` notation. Retrieve results with the dot notation too.
 
 ```python
-import "std/core.s"
+import std.core
 
 def employee(str name, str surname, nat age)
     return class(name, surname, age)
@@ -70,7 +70,7 @@ Conversely, to create a functor from a function name, use the `type`
 keyword. Next is an example.
 
 ```python
-import "std/core.s"
+import std.core
 
 def pair(nat,nat)  # no function body assumes that arguments are returned
 def next(nat x, pair->nat addition)
@@ -90,7 +90,7 @@ its `type` would not be unique. Specialize on required argument types using
 the `<...>` notation to enclose a valid input signature. Like below.
 
 ```python
-import "std/core.s"
+import std.core
 
 def pair(nat,nat)
 def next(nat x, pair->nat addition)
@@ -115,7 +115,7 @@ a well-controlled selection. This lets the type system resolve everything with
 zero-cost abstractions and function pointers under the hood. Below is an example.
 
 ```python
-import "std/core.s"
+import std.core
 
 def next(nat->nat->nat addition_generator)
     return addition_generator.compiler::call 1
@@ -144,7 +144,7 @@ vertical dash `|` shows type alternatives. The builtin
 `compiler::value` retrieves back a value from a literal type.
 
 ```python
-import "std/core.s"
+import std.core
 
 def next(nat->nat->nat addition_generator)
     return addition_generator.compiler::call 1
@@ -171,7 +171,7 @@ from functors using the `compiler::abstract` function.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def next(nat->nat->nat addition_generator)
     return addition_generator.compiler::call 1
@@ -199,7 +199,7 @@ types instead of functions.
 
 
 ```python
-import "std/core.s"
+import std.core
 
 def next(nat->nat->nat addition_generator)
     return addition_generator.compiler::call 1
@@ -242,7 +242,7 @@ would print *0* because try forcefully tries to implement every declared functio
 call, substituting failures with zero-initialized values.
 
 ```python
-import "std/core.s"
+import std.core
 
 def next(nat->nat->nat addition_generator)
     return addition_generator.compiler::call 10 # will return a "null" functor

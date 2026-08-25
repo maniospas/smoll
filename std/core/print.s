@@ -15,7 +15,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
 
 import "builtins"
-import "std/extern.s"
+import std.extern
 
 def console()
     doc "references the system console"

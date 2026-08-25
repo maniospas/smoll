@@ -3785,12 +3785,23 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
         ret = UnionType(type.name+"::"+reflection_token_text, at=reflection_token)
         ret.variations = variations
         type = ret
+    if peek_text(tokens, pos)=="ptr":
+        ret = UnionType(type.name+" ptr", at=get(tokens, pos))
+        for variation in type.variations:
+            impl = ImplementedType(variation.name+" ptr", at=ret.at)
+            impl.rets.append("value")
+            impl.vars["value"] = Variable("value", POINTER_TYPE)
+            impl.set_pointer_type(impl.vars["value"], variation)
+            ret.variations.append(impl)
+        type = ret
+        pos = pos+1
     if peek_text(tokens, pos)=="->":
         pos += 1
         functor_token = get(tokens, pos)
         pos, output_type = await process_linear_type(file, tokens, pos, show_lsp, reduce_to_unique_variations, impl=impl)
         type = create_functor(type, output_type, functor_token)
     if parentheses:
+        if peek_text(tokens, pos)==",": get(tokens, pos).error("syntax", "fully anonymous structural type declarations are not yet supported; for the time being, define a function with the return type and use it here")
         if peek_text(tokens, pos)!=")": get(tokens, start_pos-1).error("type", "unclosed type definition parenthesis")
         pos += 1
     if peek_text(tokens, pos) == "|":
@@ -5053,7 +5064,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
     #     pos, ret = process_deref(file, pos, ret, impl, current_token)
     #     return await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
     if current == "class":
-        if is_lsp and file.is_main_file: print_lsp_decorator(current_token, "**class declaration**\n\npacks into a type class unique to this function")
+        if is_lsp and file.is_main_file: print_lsp_decorator(current_token, "**class declaration**\n\npacks into a type class unique to this function (multiple function definitions create multiple classes)")
         if impl.has_retrieved_singleton: current_token.error("safety", "cannot create both a singleton and a class for the same function", reason=impl.has_retrieved_singleton, raason_message="due to")
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         tmp = create_temp()
@@ -6582,6 +6593,17 @@ async def load(path, is_main_file=False, err_token=None):
     return file
 
 def unload(path: str):
+    delete_cached_functors: set[str] = set()
+    for k, v in cached_factors_for_comparison.items():
+        if v.at is not None and v.at.file.path==path: delete_cached_functors.add(k)
+    for k in delete_cached_functors:
+        del cached_factors_for_comparison[k]
+    delete_cached_literals: set[str] = set()
+    for k, v in literal_types.items():
+        if v.at is not None and v.at.file.path==path: delete_cached_literals.add(k)
+    for k in delete_cached_literals:
+        del literal_types[k]
+
     del load_mtimes[path]
     if path in dependents:
         for dependent in list(dependents[path]):
@@ -6715,6 +6737,12 @@ DEREF_TYPE.doc.append("This function is automatically overloaded for all pointer
 DEREF_TYPE.doc.append("Cannot dereference `any ptr` data, as their type becomes unknown in their processing context.")
 DEREF_TYPE.vars["ptr"] = Variable("ptr", POINTER_TYPE)
 DEREF_TYPE.args.append("ptr")
+
+# METHOD_TYPE = ImplementedType("method")
+# METHOD_TYPE.doc.append("declares that the argument is a method")
+# METHOD_TYPE.vars["self"] = Variable("self", POINTER_TYPE)
+# METHOD_TYPE.vars["called"] = Variable("self", POINTER_TYPE)
+# METHOD_TYPE.rets.append("ptr")
 
 ABSTRACT_TYPE = ImplementedType("abstract")
 ABSTRACT_TYPE.doc.append("Abstracts a functor by removing all literal type references.")

@@ -29,7 +29,7 @@ def alloc(edit any[] buffer, nat|blank size, "unsafe_first"|"dirty"|blank clear_
     doc "allocates a buffer"
     doc "Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,"
     doc "as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to"
-    doc "allocate again, or use 'buffer.resize new_size' once a first non-zero allocation has been made."
+    doc "allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made."
     if size is blank
         doc "This version allocates a buffer of ONE element."
         size = 1
@@ -80,14 +80,14 @@ def resize(edit any[] buffer, nat size, "unsafe"|blank prunning)
 
 def last(edit any[] buffer)
     doc "mutable pointer to the last buffer element"
-    if 0==buffer.unsafe_size 
+    if not try adjusted_size=buffer.unsafe_size-1
         fail "out of bounds"
-    return unsafe_mut buffer.unsafe_ptr.unsafe::add((buffer.unsafe_size-1+buffer.unsafe_offset.nat())*buffer.unsafe_align.nat())
+    return unsafe_mut buffer.unsafe_ptr.unsafe::add((adjusted_size+buffer.unsafe_offset.nat())*buffer.unsafe_align.nat())
     
 def mutget(edit any[] buffer, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "mutable pointer to buffer element"
     doc "This uses pointer arithmetics to index the buffer, basically performing the operation"
-    doc "'i*buffer.unsafe_align+buffer.unsafe_offset'. Fresh buffers have zero offset and alignment"
+    doc "`i*buffer.unsafe_align+buffer.unsafe_offset`. Fresh buffers have zero offset and alignment"
     doc "equal to element size, but more complicated situations arise in situations where sub-buffers"
     doc "are retrieved or sliced."
     if inbounds_guarantee is blank
@@ -100,7 +100,7 @@ def mutget(edit any[] buffer, nat i, "unsafe_assume_inbounds"|blank inbounds_gua
 def get(any[] buffer, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "immutable pointer to buffer element"
     doc "This uses pointer arithmetics to index the buffer, basically performing the operation"
-    doc "'i*buffer.unsafe_align+buffer.unsafe_offset'. Fresh buffers have zero offset and alignment"
+    doc "`i*buffer.unsafe_align+buffer.unsafe_offset`. Fresh buffers have zero offset and alignment"
     doc "equal to element size, but more complicated situations arise in situations where sub-buffers"
     doc "are retrieved or sliced."
     if inbounds_guarantee is blank

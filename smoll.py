@@ -612,16 +612,18 @@ def print_lsp_field(tok, rets, impl):
     printid("**variable**\n\nHas the following type:\n```rust")
     printid(signature+"\n```")
 
-def print_lsp_string(tok, reduced_length=0, title="string literal"):
+def print_lsp_string(tok: "Token", reduced_length=0, title="string literal", original_tok: Optional["Token"]=None):
+    if original_tok is None: original_tok = tok
+    assert original_tok is not None
     print("---")
     printid("string")
     printid(os.path.abspath(tok.file.resolved_path))
     print(tok.row)
     print(tok.col)
     print(len(tok.text)-reduced_length)
-    printid(os.path.abspath(tok.file.resolved_path))
-    print(tok.row)
-    print(tok.col)
+    printid(os.path.abspath(original_tok.file.resolved_path))
+    print(original_tok.row)
+    print(original_tok.col)
     printid("***"+title+"***\n\nHas the following value:\n```rust")
     printid(tok.text+"\n```")
 
@@ -2330,7 +2332,8 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
         spawned_error_codes = callee.spawned_error_codes
-        printid("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
+        if callee.max_abstraction_level:
+            printid("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
         # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):
         #     #printid("When this function is called, it does not create a memory dependecy.\n")
         #     pass
@@ -3156,6 +3159,12 @@ def find_unique_variations(variations: list[ImplementedType]):
                     if vv.type != iv.type or (vv.immutable or vv.isprivate) != (iv.immutable or iv.isprivate):
                         is_same = False
                         break
+                    if vv.type is POINTER_TYPE:
+                        vv_ptr_type = variation.get_pointer_type(vv)
+                        iv_ptr_type = impl.get_pointer_type(iv)
+                        if vv_ptr_type!=iv_ptr_type: 
+                            is_same = False
+                            break
             if is_same:
                 already_parsed = True
                 break
@@ -3786,17 +3795,24 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
         ret = UnionType(type.name+"::"+reflection_token_text, at=reflection_token)
         ret.variations = variations
         type = ret
-    if peek_text(tokens, pos)=="ptr" and parentheses:
+    if peek_text(tokens, pos)=="&":
+        immutable = False
+        # if peek_text(tokens, pos+1)=="&":
+        #     pos = pos+1
+        #     immutable = False
+        if is_lsp and file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "**pointer**\n\na pointer to the type resolved up to here (equivalent to a function returning a mut ptr of the type; still needs a mut qualifier when used as argument)")
         ret = UnionType(type.name+" ptr", at=get(tokens, pos))
         for variation in type.variations:
             impl = ImplementedType(variation.name+" ptr", at=ret.at)
             impl.rets.append("value")
-            impl.vars["value"] = Variable("value", POINTER_TYPE)
-            impl.set_pointer_type(impl.vars["value"], variation)
+            impl.vars["value"] = Variable("value", POINTER_TYPE, immutable=immutable)
+            if variation is not ANY_TYPE:
+                impl.set_pointer_type(impl.vars["value"], variation)
             ret.variations.append(impl)
         type = ret
         pos = pos+1
     if peek_text(tokens, pos)=="->":
+        if is_lsp and file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "**abstract functor**\n\nresolves to a functor type between left-hand-side arguments and right-hand-side returns")     
         pos += 1
         functor_token = get(tokens, pos)
         pos, output_type = await process_linear_type(file, tokens, pos, show_lsp, reduce_to_unique_variations, impl=impl)
@@ -3815,11 +3831,11 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
         ret.variations = list(dict.fromkeys(ret.variations))#list(set(ret.variations))
         if reduce_to_unique_variations: ret.variations = find_unique_variations(ret.variations)
         type = ret
-    elif peek_text(tokens, pos) == "&":
+    elif peek_text(tokens, pos) == "^":
         if is_lsp and file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "**common type**\n\ncommon elements of the type unions")
         prev_pos = pos
         pos, alternatives = await process_linear_type(file, tokens, pos+1, show_lsp, reduce_to_unique_variations=False, impl=impl)
-        ret = UnionType(type.name+"&"+alternatives.name, at=get(tokens, prev_pos))
+        ret = UnionType(type.name+"^"+alternatives.name, at=get(tokens, prev_pos))
         alternative_variations = set(alternatives.variations)
         ret.variations = [variation for variation in type.variations if variation in alternative_variations]
         type = ret
@@ -5893,7 +5909,9 @@ def process_repo(file: File, tokens: list[Token], pos: int):
 async def process_import(file: File, tokens: list[Token], pos: int, is_local: bool):
     pos += 1
     name_token = get(tokens, pos)
+    reduced_token_size = 0
     if peek_text(tokens, pos+1)==".":
+        reduced_token_size = 4
         name_token_text = name_token.text
         pos += 1
         while peek_text(tokens, pos)==".":
@@ -5915,7 +5933,6 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         assert isinstance(namespace, File)
         imported: File|UnionType = namespace
     else: 
-        if is_lsp and file.is_main_file: print_lsp_string(name_token, 4, "imported path")
         name = name_token.text
         name = name[1:len(name)-1]
         prev_name = name
@@ -5928,9 +5945,11 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
             new_file = File(name)
             new_file.is_extern_file = True
             externals.append(new_file)
+            if is_lsp and file.is_main_file: print_lsp_string(name_token, reduced_token_size, "imported C file")
             return pos+1, new_file
         #if not name.endswith(".s") and not name.endswith(".smoll"): name_token.error("safety", "expecting a .s or .smoll (for smoll source code) or .h or .c (for C dependent source code) file extension but got '"+name+"'")
         imported = await load(name, err_token=name_token)
+        if is_lsp and file.is_main_file: print_lsp_string(name_token, reduced_token_size, "imported path", Token("", imported, 1, 1))
         name = prev_name
         imported.path = name
     pos += 1
@@ -6144,8 +6163,18 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                     is_same = len(variation.args)==len(impl.args)
                     if is_same:
                         for variation_arg, impl_arg in zip(variation.args, impl.args):
-                            if not variation.vars[variation_arg].is_same(impl.vars[impl_arg]):
+                            vv = variation.vars[variation_arg]
+                            iv = impl.vars[impl_arg]
+                            if not vv.is_same(iv):
                                 is_same = False
+                                break
+                            if is_same:
+                                if vv.type is POINTER_TYPE:
+                                    vv_ptr_type = variation.get_pointer_type(vv)
+                                    iv_ptr_type = impl.get_pointer_type(iv)
+                                    if vv_ptr_type!=iv_ptr_type: 
+                                        is_same = False
+                                        break
                     if is_same:
                         already_parsed = variation_position
                         break
@@ -6182,7 +6211,8 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
                         spawned_error_codes = callee.spawned_error_codes
-                        printid("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
+                        if callee.max_abstraction_level:
+                            printid("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
                         # if(not impl.count_checkable_copies) and any(impl.vars[v].type==POINTER_TYPE for v in impl.rets+impl.args):
                         #     pass
                         #     #printid("When this function is called, it does not create a memory dependecy.\n")
@@ -7064,7 +7094,8 @@ async def main():
                     if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                     docs_file.write("\n```rust\n"+callee.signature()+"\n```\n")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
                     spawned_error_codes = callee.spawned_error_codes
-                    docs_file.write("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n\n")
+                    if callee.max_abstraction_level!=0:
+                        docs_file.write("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n\n")
                     # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):                   
                     #     pass
                     #     #docs_file.write("When this function is called, it does not create a memory dependecy.\n\n")

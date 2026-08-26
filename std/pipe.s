@@ -29,15 +29,15 @@ def mutex_size()
     {builtins::nat mutex_size = sizeof(mutex_t);}
     return mutex_size
 
-def unsafe_pipe_lock(pipe ptr obj)
+def unsafe_pipe_lock(pipe& obj)
     mutex_ptr = obj.unsafe::add(pipe::size)
     {mutex_lock((mutex_t*)mutex_ptr);}
 
-def unsafe_pipe_unlock(pipe ptr obj)
+def unsafe_pipe_unlock(pipe& obj)
     mutex_ptr = obj.unsafe::add(pipe::size)
     {mutex_unlock((mutex_t*)mutex_ptr);}
 
-def with(pipe ptr obj)
+def with(pipe& obj)
     doc "gain ownership of a pipe"
     doc "This blocks other threads from accessing its data."
     unsafe_pipe_lock obj
@@ -45,13 +45,10 @@ def with(pipe ptr obj)
         unsafe_pipe_unlock obj
     return class(obj)
 
-local def pipe_ptr(pipe ptr value)
-    return compiler::args()
-
-def system_thread(any ptr unsafe_ptr)
+def system_thread(any& unsafe_ptr)
     return class unsafe_ptr
 
-def unsafe_spawn(pipe_ptr->blank func, pipe ptr input)
+def unsafe_spawn(pipe&->blank func, pipe& input)
     {builtins::compiler::ptr _unsafe_ptr = thread_create((thread_func_t)func, (void*)input);}
     unsafe_ptr = edit _unsafe_ptr
     return system_thread unsafe_ptr
@@ -67,26 +64,28 @@ def growing_thread_pool(edit cpu cpu)
     threads = mut arena system_thread[].alloc cpu.cores
     joined = mut false
     defer
-        if not joined for i in range of len threads.buf try join threads.buf[i]
+        if not joined
+            for i in range of len threads.buf
+                try join threads.buf[i]
         joined = true
     unsafe_return class(cpu, threads, joined)
 
-def thread(effect edit growing_thread_pool THREADS, pipe_ptr->blank func, pipe ptr input)
+def thread(effect edit growing_thread_pool THREADS, pipe&->blank func, pipe& input)
     spawned = edit unsafe_spawn(func, input)
     (at alloc THREADS.threads) = spawned
     return spawned
 
-def unsafe_pipe_match(with obj, cstr name, any ptr type)
+def unsafe_pipe_match(with obj, cstr name, any& type)
     found = compiler::deref obj.obj.value
     if found!=name fail "does not match"
     return unsafe_mut obj.obj.unsafe::add(pipe::size+mutex_size()).compiler::unsafe_attach_type(type)
 
-def unsafe_pipe_defer_free(mut pipe ptr obj)
+def unsafe_pipe_defer_free(mut pipe& obj)
     defer
         unsafe::free obj
     return obj
 
-def unsafe_pipe_mutax_init(mut pipe ptr obj)
+def unsafe_pipe_mutax_init(mut pipe& obj)
     mutex_ptr_construct = obj.unsafe::add(pipe::size)
     {mutex_init((mutex_t*)mutex_ptr_construct);}
     defer

@@ -1,16 +1,17 @@
 import std.core
+import compiler as cp
 
 def point(nat x, nat y)
-    return class compiler::args()
+    return class cp::args()
 
-def test(point ptr self, point ptr->nat func)
-    return func.compiler::call self
+def test(point& self, point&->nat func)
+    return func.cp::call self
 
-def l1(point ptr _p)
-    p = compiler::deref _p
+def l1(point& _p)
+    p = cp::deref _p
     return p.x+p.y
 
 def main()
     CLI = edit console()
     p = last [point(1,2)]
-    print test (p, compiler::abstract type l1)
+    print test (p, cp::abstract type l1)

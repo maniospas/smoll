@@ -271,7 +271,7 @@ are float numbers. See below for colors.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/graphics.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.graphics</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">WINDOW</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">window</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="s2">&quot;example&quot;</span><span class="p">,</span> <span class="s2">&quot;std/ArianaVioleta-dz2K.ttf&quot;</span><span class="p">)</span>
@@ -295,7 +295,7 @@ with either transparency or not.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/graphics.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.graphics</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">WINDOW</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">window</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="s2">&quot;overlap&quot;</span><span class="p">,</span> <span class="s2">&quot;std/ArianaVioleta-dz2K.ttf&quot;</span><span class="p">)</span>
@@ -383,7 +383,7 @@ you can wait on multiple files at once, and they will be retrieved asynchronousl
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="k">while</span> <span class="ow">not</span> <span class="nb">dir</span><span class="p">::</span><span class="n">wait_file</span> <span class="s2">&quot;myfile.txt&quot;</span> <span class="n">blank</span><span class="p">()</span> <span class="c1"># wait until this file becomes available</span>

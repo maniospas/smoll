@@ -282,8 +282,9 @@
 
 <h2 id="import">import</h2>
 
-<p>Here is how to directly import and reuse another source code
-file: the <code>print</code> and <code>console</code> functions are imported from the core. 
+<p>To directly import and reuse another source code file provide a dot-separated
+path to a specific file, like in the example below. Alternatively, provide the exact path in
+quotations. In the example, the <code>print</code> and <code>console</code> functions are imported from the core. 
 Assigning to the CLI variable tells the program to print to the
 host terminal. This is an <a href="#effects">effect</a>, though before learning about
 those just treat it as boilerplate for simple programs.</p>
@@ -294,7 +295,7 @@ and not merely perform some diagnostic action. For example, we would not
 be able to print without it.</p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span> <span class="c1"># equivalent to import &quot;std/core.s&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="c1"># this is a line comment, by the way</span>
@@ -526,7 +527,7 @@ triple should be allowed.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span> <span class="c1"># for pow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.sci</span><span class="p">::</span><span class="nb">pow</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">std_data</span><span class="p">()</span>
     <span class="nb">sum</span> <span class="o">=</span> <span class="n">mut</span> <span class="mf">0.0</span>
@@ -1347,7 +1348,7 @@ runtime.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.sci</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">ones</span> <span class="o">=</span> <span class="n">compt</span> <span class="n">vec</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -1949,7 +1950,7 @@ open files and processes.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1970,7 +1971,7 @@ simultaneously.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span> <span class="k">as</span> <span class="n">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1990,7 +1991,7 @@ But, importantly, they <em>are</em> obtained from deferred statements triggered 
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">bye_error</span><span class="p">()</span>
     <span class="n">fail</span> <span class="s2">&quot;bye!&quot;</span> 
@@ -2021,7 +2022,7 @@ is declared as <code>add(effect edit vec_allocator allocator, vec v1, vec v2)</c
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.sci</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2230,14 +2231,14 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
 
 <p>A mechanism that already exists for <em>smoλ</em> programs is that the SIGINT signal,
 which is produced by the user pressing ctrl+C, requires manual handling. The
-signal handler is imported from the <code>"std/io.s"</code> module and requires a mutable 
+signal handler is imported from the <code>std.io</code> module and requires a mutable 
 <code>console CLI</code> effect to listen to the console interrupt. Then, the <code>process::interrupt_point()</code>
 function creates an error if it is called after such an interrupt. For safety,
 this function asks for user input on whether the program should be terminated.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
 
 <span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="n">console</span> <span class="n">CLI</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">false</span> <span class="k">return</span> <span class="n">blank</span><span class="p">()</span>
@@ -2450,7 +2451,7 @@ like below. Map initialization takes any allocated buffer and creates a similarl
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.map</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2481,7 +2482,7 @@ store lines.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2499,7 +2500,7 @@ or even defer its deletion to when the file is no longer in use.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2518,7 +2519,7 @@ safe.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2537,7 +2538,7 @@ that fails on non-zero error code can be evoked like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2551,7 +2552,7 @@ similarly to files.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2569,7 +2570,7 @@ handle the intercepted errors, use a pattern like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2594,7 +2595,7 @@ system clock as a source of entropy. Here is an example.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/rand.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.rand</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2611,7 +2612,7 @@ retrieve next random values.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/rand.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.rand</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2658,7 +2659,7 @@ when organized in a string buffer.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/mini.s&quot;</span> <span class="k">as</span> <span class="n">mini</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.mini</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mini</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="n">mini</span><span class="p">:</span><span class="nb">str</span><span class="p">[]</span> <span class="n">buff</span><span class="p">)</span>
     <span class="n">mem</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">KB</span> <span class="mi">4</span>
@@ -2693,7 +2694,7 @@ set and read as if working on buffers, but additional operations are provided.</
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.sci</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2711,7 +2712,7 @@ after the end.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.sci</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">safe_main</span><span class="p">()</span>
     <span class="n">allocator</span>  <span class="o">=</span> <span class="n">ref</span> <span class="n">circular</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">200</span> <span class="c1"># used by vector operation effects</span>
@@ -2743,7 +2744,7 @@ implemented.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.sci</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2806,7 +2807,7 @@ the future.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.sci</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2834,8 +2835,8 @@ around in a window.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/sci.s&quot;</span> <span class="k">as</span> <span class="n">sci</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/graphics.s&quot;</span> <span class="k">as</span> <span class="n">graphics</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.sci</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sci</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.graphics</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">graphics</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Circle</span><span class="p">(</span><span class="nb">float</span> <span class="n">_cx</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_cy</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_vx</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_vy</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_radius</span><span class="p">)</span>
     <span class="n">cx</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_cx</span>
@@ -2914,7 +2915,7 @@ which can be caught afterwards to check for successful termination.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">cstr</span><span class="o">|</span><span class="nb">str</span> <span class="n">command</span><span class="p">)</span>
     <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">::</span><span class="nb">open</span> <span class="n">command</span>
@@ -2953,7 +2954,7 @@ circular buffer reader for temprarily read lines, as it can go through arbitaril
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">README</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md&quot;</span>
 

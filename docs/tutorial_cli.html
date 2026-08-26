@@ -1107,7 +1107,7 @@ string literal qualifier to convey intent, like below.</p>
 
 <p>Since we are in the subject of string manipulation, now is a good time
 to mention that we can import some more command line functionality from the
-process namespace that is part of <code>"std/io.s"</code>. That gives access
+process namespace that is part of <code>std.io"</code>. That gives access
 to the ability to run system commands per <code>process::system "ls"</code> or even
 read their outputs as if you would files. But the relevant part is 
 that we can retrieve the operating system name as a <code>cstr</code> value, as well
@@ -1116,7 +1116,7 @@ Below is an example.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1136,7 +1136,7 @@ data structures can be encoded to those formats.</p>
 <div class="notice-box box-info"><strong>Info:</strong> Future versions will also support custom hash functions, but this implementation will remain as the most efficient option that avoids inlining.</div>
 
 <p>The simplest map structures are of fixed size and can be found under
-<code>"std/map.s"</code>. Creating them requires passing an allocated buffer
+<code>std.map"</code>. Creating them requires passing an allocated buffer
 to the map, that will be used to store map values. The map is hereby
 constructed on the heap with keys that match its number of values.
 Note that all values could be used with gaps between them.</p>
@@ -1147,7 +1147,7 @@ buffer to place strings there.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.map</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1180,7 +1180,7 @@ to other functions without that company.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.map</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_map</span><span class="p">()</span>
     <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
@@ -1204,7 +1204,7 @@ map, like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/map.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.map</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_map</span><span class="p">()</span>
     <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">char</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">4096</span>
@@ -1236,7 +1236,7 @@ map, like below.</p>
 
 <h2 id="files">files</h2>
 
-<p>Gain access to the file system by importing <code>"std/io.s"</code>, which creates
+<p>Gain access to the file system by importing <code>std.io</code>, which creates
 namespaces for file, directory, and process handling. Open files and iterate
 through their lines like below. Notice usage of a <code>CHARS</code> effect to tell
 the iterator where to place read lines. This can only be an arena or a circular
@@ -1245,7 +1245,7 @@ newly read lines only at the managed buffer.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="s2">&quot;std/io.s&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span><span class="s2">&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>

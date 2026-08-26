@@ -1,5 +1,5 @@
 import std.core
-import "std/rand.s" as rand
+import std.rand as rand
 
 def main()
     CLI = edit console()

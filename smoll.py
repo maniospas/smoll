@@ -612,17 +612,17 @@ def print_lsp_field(tok, rets, impl):
     printid("**variable**\n\nHas the following type:\n```rust")
     printid(signature+"\n```")
 
-def print_lsp_string(tok):
+def print_lsp_string(tok, reduced_length=0, title="string literal"):
     print("---")
     printid("string")
     printid(os.path.abspath(tok.file.resolved_path))
     print(tok.row)
     print(tok.col)
-    print(len(tok.text))
+    print(len(tok.text)-reduced_length)
     printid(os.path.abspath(tok.file.resolved_path))
     print(tok.row)
     print(tok.col)
-    printid("***string literal***\n\nHas the following value:\n```rust")
+    printid("***"+title+"***\n\nHas the following value:\n```rust")
     printid(tok.text+"\n```")
 
 def print_lsp_literal(tok: "Token", name: str, defined: Optional["Token"]=None):
@@ -5915,7 +5915,7 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         assert isinstance(namespace, File)
         imported: File|UnionType = namespace
     else: 
-        if is_lsp and file.is_main_file: print_lsp_string(name_token)
+        if is_lsp and file.is_main_file: print_lsp_string(name_token, 4, "imported path")
         name = name_token.text
         name = name[1:len(name)-1]
         prev_name = name
@@ -5937,7 +5937,10 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
     if peek_text(tokens, pos)=="::":
         if not isinstance(imported, File): get(tokens, pos).error("import", "expecting file before ':' but got type '"+name+"'")
         assert isinstance(imported, File)
+        prev_token = tokens[pos-1]
+        tokens[pos-1] = name_token
         pos, imported = await process_type(imported, tokens, pos - 1) # go back and process properly
+        tokens[pos-1] = prev_token
     as_mode = peek_text(tokens, pos)=="as"
     if as_mode:
         if is_lsp and file.is_main_file: print_lsp_keyword(get(tokens, pos), "declares a name")
@@ -6285,27 +6288,27 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
                 defname = get(tokens, i+1)
                 i, imported = await process_import(file, tokens, i, is_local=is_local)
                 if is_lsp and file.is_main_file:
-                    print_lsp_keyword(tok, "**import**\n\nimports a namespace or function")
-                    print("---")
-                    # position in processed file
-                    printid("namespace") # type of token: namespace, string, keyword, function, variable
-                    printid(os.path.abspath(defname.file.path))
-                    print(defname.row)
-                    print(defname.col)
-                    endtok = get(tokens,i-1)
-                    assert endtok.row==defname.row
-                    print(endtok.col-defname.col+len(endtok.text)) # token length
-                    # defined at
-                    if isinstance(imported, File):
-                        printid(os.path.abspath(imported.path))
-                        print(1)
-                        print(1)
-                    else:
-                        printid(os.path.abspath(imported.at.file.path))
-                        print(imported.at.row)
-                        print(imported.at.col)
-                    # message (may span multiple lines))
-                    printid("imported path")
+                    print_lsp_keyword(tok, "**import**\n\nimports code from another file.\nThe import can be a full file, a namespace inside a file accessed via `::`, or a function.")
+                    # print("---")
+                    # # position in processed file
+                    # printid("namespace") # type of token: namespace, string, keyword, function, variable
+                    # printid(os.path.abspath(defname.file.path))
+                    # print(defname.row)
+                    # print(defname.col)
+                    # endtok = get(tokens,i-1)
+                    # assert endtok.row==defname.row
+                    # print(endtok.col-defname.col+len(endtok.text)) # token length
+                    # # defined at
+                    # if isinstance(imported, File):
+                    #     printid(os.path.abspath(imported.path))
+                    #     print(1)
+                    #     print(1)
+                    # else:
+                    #     printid(os.path.abspath(imported.at.file.path))
+                    #     print(imported.at.row)
+                    #     print(imported.at.col)
+                    # # message (may span multiple lines))
+                    # printid("imported path")
             elif tok.text=="repo":
                 if is_local: tok.error("syntax", "cannot declare a repo as 'local'")
                 if has_made_def: tok.error("safety", "can declare repos before the file's first definition", reason=first_def_tok, raason_message="first definition at")

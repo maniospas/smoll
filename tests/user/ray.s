@@ -1,6 +1,6 @@
 import std.core
-import "std/sci.s" as sci
-import "std/graphics.s"
+import std.sci as sci
+import std.graphics
 
 def circle(float _cx, float _cy, float _vx, float _vy, float _radius)
     cx = mut _cx

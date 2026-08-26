@@ -1,5 +1,5 @@
 import std.core
-import "std/mini.s" as mini
+import std.mini as mini
 
 
 def concat(mini::str[] buff)

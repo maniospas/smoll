@@ -40,7 +40,7 @@ are float numbers. See below for colors.
 
 ```python
 import std.core
-import "std/graphics.s"
+import std.graphics
 
 def main()
     WINDOW = edit window(800.0, 600.0, "example", "std/ArianaVioleta-dz2K.ttf")
@@ -63,7 +63,7 @@ with either transparency or not.
 
 ```python
 import std.core
-import "std/graphics.s"
+import std.graphics
 
 def main()
     WINDOW = edit window(800.0, 600.0, "overlap", "std/ArianaVioleta-dz2K.ttf")
@@ -156,7 +156,7 @@ you can wait on multiple files at once, and they will be retrieved asynchronousl
 
 ```python
 import std.core
-import "std/io.s"
+import std.io
 
 def main()
     while not dir::wait_file "myfile.txt" blank() # wait until this file becomes available

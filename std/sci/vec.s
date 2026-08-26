@@ -18,7 +18,7 @@ local import std.core
 local import std.sci.math
 local import std.sci.unsafe
 local import std.unsafe as unsafe
-local import "std/unsafe.s"::add
+local import std.unsafe::add
 
 def arena(float::tag)    return arena float[]
 def circular(float::tag) return circular float[]

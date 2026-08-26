@@ -1,5 +1,5 @@
 import std.core
-import "std/sci.s"
+import std.sci
 
 def next(nat->nat->nat addition_generator)
     return addition_generator.compiler::call 3 # will return a "null" functor

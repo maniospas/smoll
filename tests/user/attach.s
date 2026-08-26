@@ -1,5 +1,5 @@
 import std.core
-import "std/sci.s"
+import std.sci
 
 def transform(matrix m, vec x, float offset)
     FLOATS = edit arena float[].alloc 2*len x

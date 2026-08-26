@@ -50,8 +50,9 @@ _3.11._ [process and web](#process-and-web)<br>
 
 ## import
 
-Here is how to directly import and reuse another source code
-file: the `print` and `console` functions are imported from the core. 
+To directly import and reuse another source code file provide a dot-separated
+path to a specific file, like in the example below. Alternatively, provide the exact path in
+quotations. In the example, the `print` and `console` functions are imported from the core. 
 Assigning to the CLI variable tells the program to print to the
 host terminal. This is an [effect](#effects), though before learning about
 those just treat it as boilerplate for simple programs.
@@ -62,7 +63,7 @@ and not merely perform some diagnostic action. For example, we would not
 be able to print without it.
 
 ```python
-import std.core
+import std.core # equivalent to import "std/core.s"
 
 def main()
     # this is a line comment, by the way
@@ -291,7 +292,7 @@ triple should be allowed.
 ```python
 
 import std.core
-import "std/sci.s" # for pow
+import std.sci::pow
 
 def std_data()
     sum = mut 0.0
@@ -1083,7 +1084,7 @@ runtime.
 
 ```python
 import std.core
-import "std/sci.s"
+import std.sci
 
 def ones = compt vec [1.0, 1.0]
 def main()
@@ -1667,7 +1668,7 @@ open files and processes.
 
 ```python
 import std.core
-import "std/io.s":process as process
+import std.io:process as process
 
 def main()
     CLI = edit console()
@@ -1688,7 +1689,7 @@ simultaneously.
 
 ```python
 import std.core
-import "std/io.s" as io
+import std.io as io
 
 def main()
     CLI = edit console()
@@ -1709,7 +1710,7 @@ But, importantly, they *are* obtained from deferred statements triggered by
 
 ```python
 import std.core
-import "std/io.s":process as process
+import std.io:process as process
 
 def bye_error()
     fail "bye!" 
@@ -1739,7 +1740,7 @@ is declared as `add(effect edit vec_allocator allocator, vec v1, vec v2)`.
 
 ```python
 import std.core
-import "std/sci.s"
+import std.sci
 
 def main()
     CLI = edit console()
@@ -1943,7 +1944,7 @@ def main()
 
 A mechanism that already exists for *smoλ* programs is that the SIGINT signal,
 which is produced by the user pressing ctrl+C, requires manual handling. The
-signal handler is imported from the `"std/io.s"` module and requires a mutable 
+signal handler is imported from the `std.io` module and requires a mutable 
 `console CLI` effect to listen to the console interrupt. Then, the `process::interrupt_point()`
 function creates an error if it is called after such an interrupt. For safety,
 this function asks for user input on whether the program should be terminated.
@@ -1951,7 +1952,7 @@ this function asks for user input on whether the program should be terminated.
 
 ```python
 import std.core
-import "std/io.s"
+import std.io
 
 rec wooo(effect edit console CLI)
     if false return blank()
@@ -2155,7 +2156,7 @@ like below. Map initialization takes any allocated buffer and creates a similarl
 
 ```python
 import std.core
-import "std/map.s"
+import std.map
 
 def main()
     CLI = edit console()
@@ -2186,7 +2187,7 @@ store lines.
 
 ```python
 import std.core
-import "std/io.s"
+import std.io
 
 def main()
     CLI = edit console()
@@ -2203,7 +2204,7 @@ or even defer its deletion to when the file is no longer in use.
 
 ```python
 import std.core
-import "std/io.s"
+import std.io
 
 def main()
     CLI = edit console()
@@ -2221,7 +2222,7 @@ safe.
 
 ```python
 import std.core
-import "std/io.s"
+import std.io
 
 def main()
     CLI = edit console()
@@ -2239,7 +2240,7 @@ that fails on non-zero error code can be evoked like below.
 
 ```python
 import std.core
-import "std/io.s"
+import std.io
 
 def main()
     CLI = edit console()
@@ -2252,7 +2253,7 @@ similarly to files.
 
 ```python
 import std.core
-import "std/io.s":process as proc
+import std.io:process as proc
 
 def main()
     CLI = edit console()
@@ -2269,7 +2270,7 @@ handle the intercepted errors, use a pattern like below.
 
 ```python
 import std.core
-import "std/io.s":process as proc
+import std.io:process as proc
 
 def main()
     CLI = edit console()
@@ -2293,7 +2294,7 @@ system clock as a source of entropy. Here is an example.
 
 ```python
 import std.core
-import "std/rand.s"
+import std.rand
 
 def main()
     CLI = edit console()
@@ -2309,7 +2310,7 @@ retrieve next random values.
 
 ```python
 import std.core
-import "std/rand.s"
+import std.rand
 
 def main()
     CLI = edit console()
@@ -2354,7 +2355,7 @@ when organized in a string buffer.
 
 ```python
 import std.core
-import "std/mini.s" as mini
+import std.mini as mini
 
 def concat(mini:str[] buff)
     mem = edit arena char[].alloc KB 4
@@ -2388,7 +2389,7 @@ set and read as if working on buffers, but additional operations are provided.
 
 ```python
 import std.core
-import "std/sci.s"
+import std.sci
 
 def main()
     CLI = edit console()
@@ -2405,7 +2406,7 @@ after the end.
 
 ```python
 import std.core
-import "std/sci.s"
+import std.sci
 
 def safe_main()
     allocator  = ref circular float[].alloc 200 # used by vector operation effects
@@ -2436,7 +2437,7 @@ implemented.
 
 ```python
 import std.core
-import "std/sci.s"
+import std.sci
 
 def main()
     CLI = edit console()
@@ -2498,7 +2499,7 @@ the future.
 
 ```python
 import std.core
-import "std/sci.s"
+import std.sci
 
 def main()
     CLI = edit console()
@@ -2526,8 +2527,8 @@ around in a window.
 
 ```python
 import std.core
-import "std/sci.s" as sci
-import "std/graphics.s" as graphics
+import std.sci as sci
+import std.graphics as graphics
 
 def Circle(float _cx, float _cy, float _vx, float _vy, float _radius)
     cx = mut _cx
@@ -2605,7 +2606,7 @@ which can be caught afterwards to check for successful termination.
 
 ```python
 import std.core
-import "std/io.s"
+import std.io
 
 def run(cstr|str command)
     proc = mut process::open command
@@ -2643,7 +2644,7 @@ circular buffer reader for temprarily read lines, as it can go through arbitaril
 
 ```python
 import std.core
-import "std/io.s"
+import std.io
 
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 

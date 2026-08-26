@@ -1,5 +1,5 @@
 import std.core
-import "std/pipe.s"
+import std.pipe
 def @ = compiler::varname
 def ^ = compiler::deref
 

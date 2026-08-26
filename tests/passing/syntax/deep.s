@@ -1,5 +1,5 @@
 import std.core
-import "std/scope.s"
+import std.scope
 
 def test1(edit arena<char::tag> arn)
     reuse arn

@@ -1,5 +1,5 @@
 import std.core
-import "std/tag.s"
+import std.tag
 import compiler::varname as vrn
 
 def test1(nat x, nat y)

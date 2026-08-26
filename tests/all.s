@@ -1,9 +1,9 @@
 import std.core
-import "std/io.s"::dir::is_dir
-import "std/io.s"::dir::open
-import "std/io.s"::get
-import "std/test.s"
-import "std/scope.s"
+import std.io::dir::is_dir
+import std.io::dir::open
+import std.io::get
+import std.test
+import std.scope
 
 
 def main()

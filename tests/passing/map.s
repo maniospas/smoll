@@ -1,5 +1,5 @@
 import std.core
-import "std/map.s"
+import std.map
 
 def strstrmap(nat size)
     return strmap alloc(str[], size)

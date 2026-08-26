@@ -1,5 +1,5 @@
 import std.core
-import "std/io.s"
+import std.io
 
 rec wooo(effect edit console CLI) 
     if false return blank()

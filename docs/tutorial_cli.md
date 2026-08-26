@@ -853,7 +853,7 @@ def main()
 
 Since we are in the subject of string manipulation, now is a good time
 to mention that we can import some more command line functionality from the
-process namespace that is part of `"std/io.s"`. That gives access
+process namespace that is part of `std.io"`. That gives access
 to the ability to run system commands per `process::system "ls"` or even
 read their outputs as if you would files. But the relevant part is 
 that we can retrieve the operating system name as a `cstr` value, as well
@@ -862,7 +862,7 @@ Below is an example.
 
 ```python
 import std.core
-import "std/io.s"
+import std.io
 
 def main()
     CLI = edit console()
@@ -882,7 +882,7 @@ data structures can be encoded to those formats.
 *Info: Future versions will also support custom hash functions, but this implementation will remain as the most efficient option that avoids inlining.*
 
 The simplest map structures are of fixed size and can be found under
-`"std/map.s"`. Creating them requires passing an allocated buffer
+`std.map"`. Creating them requires passing an allocated buffer
 to the map, that will be used to store map values. The map is hereby
 constructed on the heap with keys that match its number of values.
 Note that all values could be used with gaps between them.
@@ -893,7 +893,7 @@ buffer to place strings there.
 
 ```python
 import std.core
-import "std/map.s"
+import std.map
 
 def main()
     CLI = edit console()
@@ -925,7 +925,7 @@ to other functions without that company.
 
 ```python
 import std.core
-import "std/map.s"
+import std.map
 
 def create_map()
     CHARS = edit arena char[].alloc 4096
@@ -948,7 +948,7 @@ map, like below.
 
 ```python
 import std.core
-import "std/map.s"
+import std.map
 
 def create_map()
     CHARS = edit arena char[].alloc 4096
@@ -979,7 +979,7 @@ def main()
 
 ## files
 
-Gain access to the file system by importing `"std/io.s"`, which creates
+Gain access to the file system by importing `std.io`, which creates
 namespaces for file, directory, and process handling. Open files and iterate
 through their lines like below. Notice usage of a `CHARS` effect to tell
 the iterator where to place read lines. This can only be an arena or a circular
@@ -989,7 +989,7 @@ newly read lines only at the managed buffer.
 
 ```python
 import std.core
-import "std/io.s"
+import std.io"
 
 def main()
     CLI = edit console()

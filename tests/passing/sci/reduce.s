@@ -1,5 +1,5 @@
 import std.core
-import "std/sci.s"
+import std.sci
 
 def ∅ = compt blank() # blank literal is equivalent to '()'
 def main()

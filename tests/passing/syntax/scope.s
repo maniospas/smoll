@@ -1,5 +1,5 @@
 import std.core
-import "std/scope.s"
+import std.scope
 
 def test()
     x = mut 0

@@ -1,5 +1,5 @@
-import "std/core/builtinsext.s"
-import "std/core/error.s"
+import std.core.builtinsext
+import std.core.error
 
 def main()
     CLI = edit console()

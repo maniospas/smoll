@@ -43,7 +43,7 @@ An example that shows several language features follows.
 # test.s
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import std.core
-import "std/io.s"
+import std/io
 
 def CHUNK_SIZE = 4096
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"

@@ -1,5 +1,5 @@
 import std.core
-import "std/sci.s"
+import std.sci
 
 def ones = compt vec [1.0, 1.0]
 def main()

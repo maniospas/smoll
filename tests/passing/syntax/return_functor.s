@@ -1,5 +1,5 @@
 import std.core
-import "std/unsafe.s" as unsafe
+import std.unsafe as unsafe
 
 def generic(nat size, compiler::ptr->blank constructor, compiler::ptr->blank deallocator)
     data = unsafe::alloc size

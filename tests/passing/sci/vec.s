@@ -1,5 +1,5 @@
 import std.core
-import "std/sci.s"
+import std.sci
 
 def safe_main(effect edit console CLI)
     FLOATS  = ref float[].alloc(200).circular() # effects can grab it by name

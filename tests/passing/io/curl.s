@@ -1,5 +1,5 @@
 import std.core
-import "std/net.s"
+import std.net
 
 def main()
     CLI = edit console()

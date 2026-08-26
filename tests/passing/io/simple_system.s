@@ -1,5 +1,5 @@
 import std.core
-import "std/io.s"::process as process
+import std.io::process as process
 
 def main()
     CLI = edit console()

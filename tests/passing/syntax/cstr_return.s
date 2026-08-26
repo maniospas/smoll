@@ -1,5 +1,5 @@
 import std.core
-import "std/tag.s"
+import std.tag
 
 def choose(nat x)
     if x==0 return "hello"

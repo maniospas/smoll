@@ -1,5 +1,5 @@
 import std.core
-import "std/core/range.s" as range
+import std.core.range as range
 
 def main()
     CLI = edit console()

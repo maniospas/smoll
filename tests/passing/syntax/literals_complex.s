@@ -1,5 +1,5 @@
 import std.core
-import "std/map.s"
+import std.map
 
 def OPTIONS = "zero"|"one"|"two"
 

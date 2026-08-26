@@ -1,6 +1,6 @@
 import std.core
-import "std/graphics.s"
-import "std/io.s"
+import std.graphics
+import std.io
 
 def main()
     WINDOW = edit window(800.0, 600.0, "test", "std/ArianaVioleta-dz2K.ttf")

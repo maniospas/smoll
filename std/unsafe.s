@@ -16,6 +16,12 @@
 
 local import std.core.builtinsext
 
+def neq(any ptr x, any ptr y)
+    doc "not equal"
+    doc "Compares the address of two pointers."
+    {builtins::bool z=(x!=y);}
+    return z
+
 def alloc(nat bytes)
     doc "allocate memory"
     doc "Allocates a memory of the provided size in bytes."

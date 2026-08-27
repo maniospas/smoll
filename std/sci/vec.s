@@ -84,7 +84,7 @@ def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length
         fail "different vector sizes"
-    v = edit vec(v1.length dirty)
+    v = mut vec(v1.length dirty)
     for value in v1
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = value+v2.at i
@@ -100,7 +100,7 @@ def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = edit vec(v1.length dirty)
+    v = mut vec(v1.length dirty)
     for value in v1
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = value-v2.at i
@@ -109,7 +109,7 @@ def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 def sub(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector subtraction"
     doc "Grabs a FLOATS allocator effect to store the result."
-    v = edit vec v2.length
+    v = mut vec v2.length
     for value in v2
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = v1-value
@@ -120,7 +120,7 @@ def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = edit vec(v1.length dirty)
+    v = mut vec(v1.length dirty)
     for value in v1
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = value*v2.at i
@@ -137,7 +137,7 @@ def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = edit vec(v1.length dirty)
+    v = mut vec(v1.length dirty)
     for value in v1
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = pow(value, v2.at i)
@@ -146,7 +146,7 @@ def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 def pow(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector exponentiation"
     doc "Grabs a FLOATS allocator effect to store the result."
-    v = edit vec(v2.length dirty)
+    v = mut vec(v2.length dirty)
     for value in v2
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = pow(v1, value)
@@ -157,7 +157,7 @@ def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length 
         fail "different vector sizes"
-    v = edit vec(v1.length dirty)
+    v = mut vec(v1.length dirty)
     p1 = v1.unsafe_ptr
     for value in v1
         i = compiler::for_counter()
@@ -167,7 +167,7 @@ def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
 def div(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector division"
     doc "Grabs a FLOATS allocator effect to store the result."
-    v = edit vec(v2.length dirty)
+    v = mut vec(v2.length dirty)
     for value in v2
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = v1/value
@@ -257,7 +257,7 @@ def print(effect edit console CLI, vec v, cstr|blank endl)
 def copy(effect edit float_allocator FLOATS, vec v)
     doc "copy a vector"
     doc "Grabs a FLOATS for the result as an effect."
-    result = edit vec(v.length dirty)
+    result = mut vec(v.length dirty)
     for value in v
         i = compiler::for_counter()
         result[i unsafe_assume_inbounds] = value
@@ -270,5 +270,5 @@ def arena(edit vec v)
     pos = mut v.pos
     return arena(buf, pos)
 
-def self(edit vec v)
+def self(mut vec v)
     return (arena(v), v)

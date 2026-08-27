@@ -42,7 +42,8 @@ def write(str|cstr _path)
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
         if compiler::back type "emcc"
             {__smo_flush_fs();}
-    if not exists unsafe_ptr fail "failed to create file"
+    if not exists unsafe_ptr
+        fail "failed to create file"
     return class(unsafe_mut unsafe_ptr)
 
 def terminal()

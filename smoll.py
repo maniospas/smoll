@@ -686,16 +686,14 @@ class CallPointer(CodeSegment):
 #@mypyc_attr(acyclic=True)
 class Variable(CodeSegment):
     def __init__(self, name: str, type: "ImplementedType", immutable: bool=True, isprivate: bool=False, _references: str|None=None, token: Optional["Token"]=None):
-        # assert isinstance(immutable, bool)
-        # assert isinstance(isprivate, bool)
-        # assert not _references or isinstance(references, str)
-       
         self.name = name
         self.type = type
         self.immutable = immutable
         self.isprivate = isprivate
         self._references = _references
         self.token = token
+    def force_immutable(self, is_field: bool): 
+        return self.immutable or (self.isprivate and is_field)
     def tostring(self): return self.name
     def copy(self, prefix: str): return Variable(prefix+"__"+self.name, self.type, self.immutable, self.isprivate, self._references)
     def renamed_copy(self, new_name: str, token: Optional["Token"]=None): return Variable(new_name, self.type, self.immutable, self.isprivate, self._references, token if token else self.token)
@@ -705,12 +703,27 @@ class Variable(CodeSegment):
         if error_token and self._references: # this should not appear when 'mut' is used for both mutation and safe mutation
             error_token.error("safety", "cannot make a reference mutable '"+pretty_name(self.name), suggestions=["use 'safe_mut' instead", "use 'ref mut' instead of 'mut ref'"])
         return Variable(self.name, self.type, False, self.isprivate if error_token else False, self._references, error_token if error_token else self.token)
+    def nonprivate_copy(self):
+        return Variable(self.name, self.type, self.immutable, False, self._references, self.token)
+        
     def editable_copy(self):
-        if self.type is POINTER_TYPE and self.immutable: 
+        if self.type.builtin:
             return self
+        # if self.isprivate and not self.immutable:
+        #     return self
         if self._references:
             return self
-        return Variable(self.name, self.type, self.immutable and not self.isprivate, self.isprivate, self._references, self.token)
+        return Variable(self.name, self.type, False, True, self._references, self.token)
+
+    def has_editable_copy(self):
+        if self.type.builtin:
+            return False
+        # if not self.immutable:
+        #     return False
+        if self._references:
+            return False
+        return True
+
     def immutable_copy(self): return Variable(self.name, self.type, True, self.isprivate, self._references, self.token)
     def private_copy(self): return Variable(self.name, self.type, self.immutable, True, self._references, self.token)
     def is_same(self, other: "Variable"):
@@ -982,7 +995,7 @@ class ImplementedType:
         rets = signature_like([self.vars[arg] for arg in self.rets], impl=self, monomorphic=True)
         return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" with effects "+','.join(self.effect_names) if self.effect_names else "")
 
-    def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True, strip_mutability: bool=False):
+    def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True, strip_mutability: bool=False, is_field: bool=True):
         # for segment in varname.split("--"):
         #     if segment in ["def", "repo", "import", "return", "mut", "unsafe_mut", "const", "edit", "rec"]:
         #         error_token.error("safety", "keyword '"+segment+"' cannot be assigned to")
@@ -992,17 +1005,22 @@ class ImplementedType:
         if len(value)>1:
             len_common_prefix = longest_common_prefix_len([var.name for var in value])
             len_varname = len(varname)
-            if top_entry and "__" in varname and varname[:3]!="__t":
-                if not any(v[:len_varname]==varname for v in self.vars.keys()):
+            if top_entry and varname[:3]!="__t" and "__" in varname:
+                if not any(v[:len_varname]==varname for v in self.vars):
                     split = varname.rsplit("__",1)[0]
                     error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'", suggestions=[pretty_name(v) for v in self.vars if v[:len(split)]==split] if split else None)
-            for var in value: self.assign(varname+"__"+var.name[len_common_prefix:], [var], error_token, perform_immutability_checks, False, strip_mutability)
+            placeholder: list[Variable] = [None]
+            for var in value:
+                var_is_field = is_field and not var.type.builtin
+                placeholder[0] = var
+                self.assign(varname+"__"+var.name[len_common_prefix:], placeholder, error_token, perform_immutability_checks=perform_immutability_checks, top_entry=False, strip_mutability=strip_mutability, is_field=var_is_field)
             return None
             error_token.error("type", "cannot assign more than one values to variable '"+varname+"'")
         existing = self.vars.get(varname, None)
+        value0 = value[0]
         if existing is not None and varname in self.invalidated:
-            if existing.type!=value[0].type:
-                error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'\nPerhaps you meant to place a value on a pointer with the pattern '"+existing.name+" = ...'")
+            if existing.type!=value0.type:
+                error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value0.type.signature()+"'\nPerhaps you meant to place a value on a pointer with the pattern '"+existing.name+" = ...'")
             # if varname in self.rets:
             #     error_token.error("type", "cannot replace")
             del self.invalidated[varname]             
@@ -1011,7 +1029,7 @@ class ImplementedType:
         if not existing:
             len_varname = len(varname)
             if top_entry and "__" in varname and varname[:3]!="__t":
-                if not any(v[:len_varname]==varname for v in self.vars.keys()):
+                if not any(v[:len_varname]==varname for v in self.vars):
                     split = varname.rsplit("__",1)[0]
                     error_token.error("type", "trying to add a field that the type does not have '"+pretty_name(varname)+"'", suggestions=[pretty_name(v) for v in self.vars if v[:len(split)]==split] if split else None)
             current_prefix = varname+"__"
@@ -1019,51 +1037,56 @@ class ImplementedType:
             found = [val for varname, val in self.vars.items() if varname[:len_current_prefix]==current_prefix]
             if found:
                 if len(found)!=len(value): error_token.error("type", "cannot overwrite tuple with one of different length")
-                for i in range(len(value)): self.assign(found[i].name, [value[i]], error_token, perform_immutability_checks, top_entry=False, strip_mutability=strip_mutability)
+                placeholder: list[Variable] = [None]
+                for i in range(len(value)): 
+                    placeholder[0] = var
+                    self.assign(found[i].name, placeholder, error_token, perform_immutability_checks=perform_immutability_checks, top_entry=False, strip_mutability=strip_mutability)
                 return None
-        if existing is not None and existing.type!=value[0].type: 
+        if existing is not None and existing.type!=value0.type: 
             if existing.type == POINTER_TYPE:
-                error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'\nPerhaps you meant to place a value on a pointer with the pattern '"+existing.name+" = ...'")
-            if existing.type.is_buffer_of and value[0].type.is_buffer_of and match_structure_with(existing.type.is_buffer_of, value[0].type.is_buffer_of): 
+                error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value0.type.signature()+"'\nPerhaps you meant to place a value on a pointer with the pattern '"+existing.name+" = ...'")
+            if existing.type.is_buffer_of and value0.type.is_buffer_of and match_structure_with(existing.type.is_buffer_of, value0.type.is_buffer_of): 
                 pass
-            else: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value[0].type.signature()+"'")
-        if perform_immutability_checks and existing and existing.immutable: 
+            else: error_token.error("type", "mismatching types '"+existing.type.signature()+"' vs '"+value0.type.signature()+"'")
+        if perform_immutability_checks and existing is not None and existing.force_immutable(is_field): 
             # allow overwrting a variable by itself, especially if the overwriting is a reference to the same thing
-            if (self.get_assignment(existing.stabilized_name(), [value[0].stabilized_name()]) or self.get_assignment(value[0].stabilized_name(), [existing.stabilized_name()])) or (existing.type==value[0].type and not existing.type.builtin): pass
-            elif not existing.type.builtin and "____" in varname: error_token.error("safety", "cannot overwrite immutable class instance '"+pretty_name(varname.split("____")[0])+"'")
+            if (self.get_assignment(existing.stabilized_name(), [value0.stabilized_name()]) or self.get_assignment(value0.stabilized_name(), [existing.stabilized_name()])): pass # or (existing.type==value0.type and not existing.type.builtin and (not existing.immutable or not existing.isprivate)): pass
+            elif not existing.type.builtin and "____" in varname: 
+                #raise Exception()
+                error_token.error("safety", "cannot overwrite const or edit value '"+pretty_name(varname.split("____")[0])+"'")
             else: error_token.error("safety", "cannot overwrite immutable variable '"+pretty_name(varname)+"' unless with itself or a directly equal value")
-        if existing and existing._references is not None and value[0]._references!=existing._references and perform_immutability_checks:
+        if existing is not None and existing._references is not None and value0._references!=existing._references and perform_immutability_checks:
             error_token.error("safety", "variable '"+pretty_name(existing.name.split("____")[0])+"' is an in-scope reference to '"+pretty_name(existing._references.split("____")[0])+"' and can only get assigned another reference to the same variable (this does nothing but is handy for handling tuples that contain references)")
-        if existing and not existing.immutable and value[0].immutable:
-            value[0] = value[0].mutable_copy(error_token)
-        if strip_mutability and not existing: existing = value[0].renamed_copy(varname, error_token).immutable_copy()
-        else: existing = value[0].renamed_copy(varname, error_token)
+        if existing is not None and not existing.force_immutable(is_field) and value0.force_immutable(is_field):
+            value0 = value0.mutable_copy(error_token)
+        if strip_mutability and existing is None: existing = value0.renamed_copy(varname, error_token).immutable_copy()
+        else: existing = value0.renamed_copy(varname, error_token)
         self.vars[varname] = existing
         if existing.type is POINTER_TYPE:
             if existing.stabilized_name() in self.invalidated: del self.invalidated[existing.stabilized_name()]
             existing_pointer_type = self.get_pointer_type(existing)
-            other_pointer_type = self.get_pointer_type(value[0])
+            other_pointer_type = self.get_pointer_type(value0)
             if existing_pointer_type not in NONE_OR_ANY:
                 if existing_pointer_type!=other_pointer_type and (other_pointer_type is None or not match_structure_with(existing_pointer_type, other_pointer_type)):
                     error_token.error("safety", "cannot overwrite pointer with different type '"+existing_pointer_type.signature()+"' vs '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
             else:
-                self.set_pointer_depedency(existing, value[0])
+                self.set_pointer_depedency(existing, value0)
         accumulated_defer = self.accumulating_defers[-1].get(existing.name, None)
-        if accumulated_defer is not None: # important to do this before setting dependent_assignments
-            if not self.get_assignment(existing.name, [value[0].name]):
-                error_token.error("safety", "this creates a leaking resource '"+pretty_name(value[0].name)+"'", reason=accumulated_defer, raason_message="due to overwriting", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
-        accumulated_defer = self.accumulating_defers[-1].get(value[0].stabilized_name(), None)
+        if accumulated_defer is not None and len(self.accumulating_defers)>=2: # important to do this before setting dependent_assignments
+            if not self.get_assignment(existing.name, [value0.name]):
+                error_token.error("safety", "this creates a leaking resource '"+pretty_name(value0.name)+"'", reason=accumulated_defer, raason_message="due to overwriting", suggestions=["release the resource with 'del'", "initialize the resource before the loop"])
+        accumulated_defer = self.accumulating_defers[-1].get(value0.stabilized_name(), None)
         if accumulated_defer is not None:
             self.accumulating_defers[-1][existing.name] = accumulated_defer
         already_assigned = False
-        if value[0].stabilized_name() in self.required_accompany: self.required_accompany[existing.stabilized_name()] = self.required_accompany[value[0].stabilized_name()]
+        if value0.stabilized_name() in self.required_accompany: self.required_accompany[existing.stabilized_name()] = self.required_accompany[value0.stabilized_name()]
         self._assignment_graph = None
-        self.dependent_assignments[existing.name] = value[0].stabilized_name()
+        self.dependent_assignments[existing.name] = value0.stabilized_name()
         if not already_assigned and existing.type.builtin and (existing._references is None or not perform_immutability_checks): 
             if existing.name in self.refargs: self.refargs.remove(existing.name)
-            #self.implementation.extend([existing, CODEWORD_EQUALS, value[0], CODEWORD_SEMICOLON])
+            #self.implementation.extend([existing, CODEWORD_EQUALS, value0, CODEWORD_SEMICOLON])
             PREALLOCATED_ASSIGN_PATTERN[0] = existing
-            PREALLOCATED_ASSIGN_PATTERN[2] = value[0]
+            PREALLOCATED_ASSIGN_PATTERN[2] = value0
             self.implementation.extend(PREALLOCATED_ASSIGN_PATTERN)
 
 
@@ -1136,12 +1159,6 @@ class ImplementedType:
                 if v.name in global_var2cstr:
                     var = v.renamed_copy(create_temp())
                     self.vars[var.name] = var
-                    # self.implementation.extend([
-                    #     var,
-                    #     CODEWORD_EQUALS,
-                    #     v,
-                    #     CODEWORD_SEMICOLON
-                    # ])
                     PREALLOCATED_ASSIGN_PATTERN[0] = var
                     PREALLOCATED_ASSIGN_PATTERN[2] = v
                     self.implementation.extend(PREALLOCATED_ASSIGN_PATTERN)
@@ -2206,6 +2223,10 @@ def peek_text(tokens: list[Token], pos: int) -> str:
     return tokens[pos].text
 
 def match_structure_with(x: ImplementedType, y: ImplementedType):
+    if x is y: return True
+    if x is None: return False
+    if y is None: return False
+    if (x is ANY_TYPE)!=(y is ANY_TYPE): return False
     assert isinstance(x, ImplementedType)
     assert isinstance(y, ImplementedType)
     if len(x.rets)!=len(y.rets): return False
@@ -2663,7 +2684,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             if v_assignment and v_assignment in defer_var_names and v not in defer_var_names:
                 error_token.error("safety", "You are passing a pointer '"+pretty_name(v)+"' for mutation that has been obtained from a different pointer associated with a 'defer' '"+pretty_name(v_assignment)+"'", reason=impl.vars[v_assignment].token, suggestions=["create a 'ref' to the pointer just after resource allocation", "a common standard library pattern is 'buf=ref alloc(mut float[], 10)' before 'buf.resize 20'"], raason_message="should 'ref' the result of")
     
-    # second, check that arguments that have been tied together are, indeed tied together
+    # second, check that arguments that have been tied together are, indeed, tied together
     if callee!=SAME_CONTENTS_TYPE:
         for arg_pos, arg in enumerate(callee.args):
             v = callee.vars[arg]
@@ -2728,8 +2749,8 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 continue
             #if impl.name=="mutget":
             #    print(var.name, var.isprivate, var.immutable)
-            if var.isprivate: error_token.error("safety", "an immutable class field '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
-            elif var.immutable: error_token.error("type", "an immutable variable '"+pretty_name(vars[varpos].name)+"' would be modified by mutable '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
+            # if var.isprivate: error_token.error("safety", "an immutable class field '"+pretty_name(vars[varpos].name)+"' would be modified by mutable argument '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
+            # elif var.immutable: error_token.error("type", "an immutable variable '"+pretty_name(vars[varpos].name)+"' would be modified by mutable argument '"+pretty_name(callee_arg.name)+"'", reason=callee.at)
             impl.implementation.extend([CODEWORD_AMP, var, CODEWORD_COMMA])
 
     if callee.defers and callee.invalidate_types_on_defer:
@@ -3162,7 +3183,7 @@ def find_unique_variations(variations: list[ImplementedType]):
                     if vv.type is POINTER_TYPE:
                         vv_ptr_type = variation.get_pointer_type(vv)
                         iv_ptr_type = impl.get_pointer_type(iv)
-                        if vv_ptr_type!=iv_ptr_type: 
+                        if not match_structure_with(vv_ptr_type, iv_ptr_type): 
                             is_same = False
                             break
             if is_same:
@@ -4576,7 +4597,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 deref = True
                 if peek_text(tokens, pos)=="&":
                     lsp_pos = pos
-                    if any(not r.immutable and not r.isprivate for r in rets):  get_func_name = "mutget"
+                    if any(not r.immutable and not r.isprivate for r in rets): get_func_name = "mutget"
                     deref = False
                     pos += 1
                 elif peek_text(tokens, pos)=="=":
@@ -4586,6 +4607,8 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     lsp_pos = pos
                     get_func_name = "mutget"
                     deref = True
+                else:
+                    if any(not r.immutable and not r.isprivate for r in rets): get_func_name = "mutget"
                 if is_lsp and file.is_main_file:
                     if get_func_name=="mutget": print_lsp_var(get(tokens, lsp_pos), "mut ptr {"+signature_like(rets+additional_rets, impl)+"}")
                     else: print_lsp_var(get(tokens, lsp_pos), "ptr {"+signature_like(rets+additional_rets, impl)+"}")                      
@@ -4964,11 +4987,18 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         impl.assign(tmp, ret, current_token)
         ret = [r for r in impl.vars.values() if r.name[:len_tmp]==tmp]
         if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'mut'. And the current value consists only of references, so it does nothing.")
-        mutated = [r.mutable_copy(tokens[prev_pos]) if r.stabilized_name()==r.name else r for r in ret]
-        return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
+        # for r in ret: 
+        #     if r.stabilized_name()==r.name and r.isprivate and not r.type.builtin:
+        #         current_token.error("safety", "cannot promote to 'mut' a variable '"+pretty_name(r.name)+"' that is generated with only 'edit' permissions")
+        ret = [r.mutable_copy(tokens[prev_pos]) if r.stabilized_name()==r.name else r for r in ret]
+        if ret and len(ret[0].type.rets)==len(ret) and ret[0].stabilized_name()==ret[0].name:
+            ret[0] = ret[0].mutable_copy(None)
+        for m in ret:
+            impl.vars[m.name] = m
+        return await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
     
     if current=="edit":
-        if is_lsp and file.is_main_file: print_lsp_decorator(current_token, "**editable**\n\nDeclares that the following value cannot be overwritten, but its fields and pointer contents may be modified. Creates an error if such treatment is unsafe.")
+        if is_lsp and file.is_main_file: print_lsp_decorator(current_token, "**editable**\n\nDeclares that the following value cannot be overwritten, but its mutable fields (including mutable fields coming from mutable or editable fields) and pointer contents may be modified. Creates an error if such treatment is unsafe.")
         if peek_text(tokens, pos-1) not in ["=", "local", "return"]: current_token.error("safety", "'edit' can only follow an assignment, 'local', or 'return' symbol (temporary variables retain 'edit' status)")
         prev_pos = pos
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
@@ -4976,14 +5006,24 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             current_token.error("safety", "next value is blank")
         tmp = create_temp()
         len_tmp = len(tmp)
-        #prev_ret = ret
         impl.assign(tmp, ret, current_token)
         ret = [r for r in impl.vars.values() if r.name[:len_tmp]==tmp]
-        if not any(r.immutable or r.isprivate for r in ret): 
-            current_token.error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
-        if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'edit' but the current value consists only of references")
-        mutated = [r.editable_copy() if r.stabilized_name()==r.name else r for r in ret]
-        return await process_statement_operator(file, tokens, impl, pos, mutated, current_operator_priority)
+        if all(r.stabilized_name()!=r.name for r in ret): current_token.error("safety", "references defined with 'ref' are skipped (not mutated) when adding mutation with 'mut'. And the current value consists only of references, so it does nothing.")
+        ret = [r.mutable_copy(tokens[prev_pos]) if r.stabilized_name()==r.name else r for r in ret]
+        i = 0
+        has_changes = False
+        while i<len(ret):
+            r = ret[i]
+            if r.stabilized_name()==r.name and r.has_editable_copy(): 
+                has_changes = True
+                ret[i] = r.editable_copy()
+            i = i+max(1,len(r.type.rets))
+        if not has_changes:
+            current_token.error("safety", "'edit' would be the same as 'mut' here; prefer the latter")
+        #ret = [r.editable_copy() if r.stabilized_name()==r.name else r for r in ret]
+        for m in ret:
+            impl.vars[m.name] = m
+        return await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
     
     # if current=="functor":
     #     pos, all_variations = await process_linear_type(file, tokens, pos+1, reduce_to_unique_variations=False, show_lsp=True, impl=impl)
@@ -5088,7 +5128,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         var_class = Variable(tmp, impl, token=current_token)
         impl.vars[tmp] = var_class
         impl.has_retrieved_class = current_token
-        return await process_statement_operator(file, tokens, impl, pos, [var_class]+[r.private_copy() if r.immutable else r for r in ret], current_operator_priority)
+        return await process_statement_operator(file, tokens, impl, pos, [var_class]+[r.private_copy() if r.immutable and r.type.builtin else r for r in ret], current_operator_priority)
 
     if current == "singleton":
         if is_lsp and file.is_main_file: print_lsp_decorator(current_token, "**singleton class declaration**\n\npacks into a type class unique to this function, while further setting this function as a singleton resource")
@@ -5098,7 +5138,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         var_class = Variable(tmp, impl, token=current_token)
         impl.has_retrieved_singleton = current_token
         impl.vars[tmp] = var_class
-        return await process_statement_operator(file, tokens, impl, pos, [var_class]+[r.private_copy() if r.immutable else r for r in ret], current_operator_priority)
+        return await process_statement_operator(file, tokens, impl, pos, [var_class]+[r.private_copy() if r.immutable and r.type.builtin else r for r in ret], current_operator_priority)
 
     if current == "(":
         ret = list()
@@ -5228,8 +5268,18 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         len_current_prefix = len(current_prefix)
         previous = [val for varname, val in impl.vars.items() if varname[:len_current_prefix]==current_prefix]
         if len(previous)!=len(ret) and previous: current_token.error("type", "cannot set an incompatible type on '"+pretty_name(current)+"' previous type was '"+signature_like(previous, impl)+"' and cannot be replaced by '"+signature_like(ret, impl)+"'")
+        
         if previous:
-            for p, r in zip(previous, ret): impl.assign(p.name, [r], current_token)
+            placeholder: list[Variable] = [None]
+            accumulator = 0
+            for p, r in zip(previous, ret):
+                var_is_field = True
+                if p.type.builtin:
+                    var_is_field = False
+                    accumulator = len(r.type.rets)
+                placeholder[0] = r
+                impl.assign(p.name, placeholder, current_token, is_field=var_is_field)
+                accumulator = accumulator-1
         else:
             impl.assign(current, ret, current_token, strip_mutability=not is_mutable_assignment)
 
@@ -6172,7 +6222,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                                 if vv.type is POINTER_TYPE:
                                     vv_ptr_type = variation.get_pointer_type(vv)
                                     iv_ptr_type = impl.get_pointer_type(iv)
-                                    if vv_ptr_type!=iv_ptr_type: 
+                                    if not match_structure_with(vv_ptr_type, iv_ptr_type): 
                                         is_same = False
                                         break
                     if is_same:
@@ -7003,9 +7053,27 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
         generated_c_funcs.append(transpiled)
     header += "typedef void (*__smoll_func_ptr_type)(void);\n"
-    if entry_point: 
+    if entry_point:
         header += "int __t_argc;\nchar** __t_argv;\n"
-        generated_c_funcs.append(f"""int main(int argc, char** argv) {{__t_argc = argc;__t_argv = argv;DECLARE_HANDLERS;{entry_point}();return 0;}}""")
+        if main_defs[0].needs_failure_mode:
+            generated_c_funcs.append(
+                f"""int main(int argc, char** argv) {{
+                    __t_argc = argc;
+                    __t_argv = argv;
+                    DECLARE_HANDLERS;
+                    return {entry_point}();
+                }}"""
+            )
+        else:
+            generated_c_funcs.append(
+                f"""int main(int argc, char** argv) {{
+                    __t_argc = argc;
+                    __t_argv = argv;
+                    DECLARE_HANDLERS;
+                    {entry_point}();
+                    return 0;
+                }}"""
+            )
     body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
     src_path.write_text(header + globs + set_errcodes + define_errors + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")

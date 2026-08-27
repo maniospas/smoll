@@ -1,10 +1,13 @@
 import std.core
 import std.ptrpeek
 
+def point(nat x, nat y)
+    return class compiler::args()
+
 def main()  
     CLI = edit console()
-    x = last [0]
-    y = last [1]
-    debug::print x
-    debug::print y
-    print x+y
+    a = last [point(0,0)]
+    b = last [point(1,1)]
+    debug::print a
+    debug::print b
+    print a.x+b.x

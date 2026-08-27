@@ -1,7 +1,9 @@
 import std.core
-import std.io as io
+import std.io
 
 def main()
-    f = edit io::file::write "tmp.txt"
-    f.io::file::print "hello world"
+    if dir::is_file "tmp.txt"
+        dir::remove "tmp.txt"
+    f = edit file::write "tmp.txt"
+    f.file::print "hello world"
     

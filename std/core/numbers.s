@@ -59,12 +59,6 @@ def eq(any ptr x, any ptr y)
     {builtins::bool z=(x==y);}
     return z
 
-def neq(any ptr x, any ptr y)
-    doc "not equal"
-    doc "Compares the address of two pointers."
-    {builtins::bool z=(x!=y);}
-    return z
-
 def neg(Number x)
     doc "negative of a number"
     {type(x) z=(0-x);}

@@ -1,17 +1,16 @@
 import std.core
-import compiler as cp
+import std.sci.vec
 
-def point(nat x, nat y)
-    return class cp::args()
 
-def test(point& self, point&->nat func)
-    return func.cp::call self
-
-def l1(point& _p)
-    p = cp::deref _p
-    return p.x+p.y
+def structure(nat length)
+    v = edit alloc length
+    return class (v,length)
 
 def main()
     CLI = edit console()
-    p = last [point(1,2)]
-    print test (p, cp::abstract type l1)
+    f = mut float[]
+    p0 = new().vec 10
+
+    FLOATS = mut arena ref float[].alloc(5*len p0 unsafe_first () unsafe_leaky)
+    prev_p = mut copy p0
+    prev_p = copy p0

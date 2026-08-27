@@ -50,7 +50,7 @@ def system_thread(any& unsafe_ptr)
 
 def unsafe_spawn(pipe&->blank func, pipe& input)
     {builtins::compiler::ptr _unsafe_ptr = thread_create((thread_func_t)func, (void*)input);}
-    unsafe_ptr = edit _unsafe_ptr
+    unsafe_ptr = unsafe_mut _unsafe_ptr
     return system_thread unsafe_ptr
 
 def join(edit system_thread thread)

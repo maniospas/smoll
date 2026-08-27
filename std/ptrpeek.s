@@ -44,6 +44,18 @@ def eq(String& x, String& y)
     doc "overloads an operator while dereferencing pointer data"
     return cp::deref(x)==cp::deref y
 
+def neq(String& x, String y) 
+    doc "overloads an operator while dereferencing pointer data"
+    return y!=cp::deref x
+    
+def neq(String x, String& y)
+    doc "overloads an operator while dereferencing pointer data"
+    return x!=cp::deref y
+
+def neq(String& x, String& y) 
+    doc "overloads an operator while dereferencing pointer data"
+    return cp::deref(x)!=cp::deref y
+
 def eq(NumberOrPtr _x, NumberOrPtr _y)
     doc "overloads an operator while dereferencing pointer data"
     x = to_number _x

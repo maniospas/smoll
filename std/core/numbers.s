@@ -148,6 +148,14 @@ def sub(Number x, Number y)
     return z
 
 def sub(nat x, nat y, "assume_smaller")
+    doc "subtract by"
+    doc "Subtracts two natural numbers without underflow check. This is an overload for the - operator,"
+    doc "for example used like below. This overload never fails and instead adds 0xFFFFFFFFFFFFFFFF to"
+    doc "the result if it would produce a negative."
+    doc "```rust"
+    doc "0-(1 assume_smaller)"
+    doc "```"
+    doc "======================="
     {type(x) z=x-y;}
     return z
 

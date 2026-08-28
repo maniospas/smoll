@@ -70,7 +70,7 @@ def open(cstr cmd)
             {unsafe_ptr = 0;}
             if status!=int 0
                 try fail "process terminated with unhandled non-zero exit code"
-    return class(unsafe_ptr)
+    return class unsafe_ptr
 
 def open(str cmd)
     doc "create a system process"
@@ -92,7 +92,7 @@ def chunk(char[] buf, mut nat|blank pos, open f)
     if bytes_open==0 fail "end of file"
     prev_pos = const pos
     pos = pos+bytes_open
-    return str(buf, prev_pos, type "len", bytes_open)
+    return str(buf, prev_pos len bytes_open)
 
 def line(effect edit arena<char::tag>|circular<char::tag> CHARS, open f)
     doc "next line"
@@ -136,4 +136,5 @@ def system(effect edit console CLI, cstr|str _cmd)
     doc "Runs a system command and waits until that completes."
     doc "Fails if the return code is non-zero, but does not expose that code."
     result = system_return safe cstr unsafe_temp _cmd
-    if result!=int 0 fail "system call failed"
+    if result!=int 0 
+        fail "system call failed"

@@ -2350,11 +2350,11 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         print(at.col)
         # message (may span multiple lines))
         if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
+        if callee.max_abstraction_level:
+            printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+")")  
         if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
         spawned_error_codes = callee.spawned_error_codes
-        if callee.max_abstraction_level:
-            printid("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
         # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):
         #     #printid("When this function is called, it does not create a memory dependecy.\n")
         #     pass
@@ -6258,11 +6258,11 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         print(name_token.col)
                         # message (may span multiple lines))
                         if callee.doc: printid("**"+strip_quotes(callee.doc[0])+"**")
+                        if callee.max_abstraction_level:
+                            printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+")")     
                         if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
                         spawned_error_codes = callee.spawned_error_codes
-                        if callee.max_abstraction_level:
-                            printid("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
                         # if(not impl.count_checkable_copies) and any(impl.vars[v].type==POINTER_TYPE for v in impl.rets+impl.args):
                         #     pass
                         #     #printid("When this function is called, it does not create a memory dependecy.\n")
@@ -6819,10 +6819,10 @@ TRUE_TYPE = ImplementedType("true", "int")
 TRUE_TYPE._memory_size = 0
 FAIL_TYPE = ImplementedType("skip")
 FAIL_TYPE.doc.append("skip definition and verify branchless code")
-FAIL_TYPE.doc.append("Branchless code refers loops or conditions that are eliminated during compilation as either always true or always false, based on type analysis and data analysis. This is meaningful for compiling different versions of functions based on specific conditions occuring. This function is hard-wired to create an error if it is called withing a condition or loop that has not been eliminated this way. Otherwise, it skips the current function definition.")
+FAIL_TYPE.doc.append("Branchless code refers loops or conditions that are eliminated during compilation as either always true or always false, based on type analysis and data analysis. This is meaningful for compiling different versions of functions based on specific conditions occuring. This function is hard-wired to create an error if it is called within a condition or loop that has not been eliminated this way. Otherwise, it skips the current function definition.")
 SUCCESS_TYPE = ImplementedType("branchless")
 SUCCESS_TYPE.doc.append("verify branchless code")
-SUCCESS_TYPE.doc.append("Branchless code refers loops or conditions that are eliminated during compilation as either always true or always false, based on type analysis and data analysis. This is meaningful for compiling different versions of functions based on specific conditions occuring. This function is hard-wired to create an error if it is called withing a condition or loop that has not been eliminated this way.")
+SUCCESS_TYPE.doc.append("Branchless code refers loops or conditions that are eliminated during compilation as either always true or always false, based on type analysis and data analysis. This is meaningful for compiling different versions of functions based on specific conditions occuring. This function is hard-wired to create an error if it is called within a condition or loop that has not been eliminated this way.")
 UNSAFE_EFFECTS_TYPE = ImplementedType("unsafe_singletons")
 UNSAFE_EFFECTS_TYPE.doc.append("remove singleton safety")
 UNSAFE_EFFECTS_TYPE.doc.append("Removes all currently accumulated singleton information. Mainly useful for creating unsafe singletons for debug purposes.")
@@ -7164,6 +7164,7 @@ async def main():
                     spawned_error_codes = callee.spawned_error_codes
                     if callee.max_abstraction_level!=0:
                         docs_file.write("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n\n")
+                    
                     # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):                   
                     #     pass
                     #     #docs_file.write("When this function is called, it does not create a memory dependecy.\n\n")

@@ -25,6 +25,11 @@ local def print_marker(effect edit colors colors, "success"|"failure"|"pending" 
     print nn "] "
 
 def test(effect edit colors colors, str command, bool|blank should_fail)
+    doc "prints and tests a system command"
+    doc "Returns whether the command succeeded or not."
+    doc "The command itself is prepended by a waiting symbols,"
+    doc "that is converted to a success or failure one, depending"
+    doc "on the command's exit code."
     CLI = edit colors.CLI
     print_marker type "pending"
     print nn command

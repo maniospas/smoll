@@ -4,7 +4,11 @@ import std.rand
 import std.hash
 import std.map
 import std.mini
+import std.net
 import std.sci
 import std.tag
+import std.pipe
 import std.unsafe
 import std.graphics
+import std.ptrpeek
+import std.test

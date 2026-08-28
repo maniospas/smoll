@@ -32,7 +32,7 @@ def open(str|cstr _path)
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
     if not exists unsafe_ptr
         fail "failed to open file"
-    return class(unsafe_mut unsafe_ptr)
+    return class unsafe_mut unsafe_ptr
 
 def write(str|cstr _path)
     path = cstr unsafe_temp _path
@@ -44,7 +44,7 @@ def write(str|cstr _path)
             {__smo_flush_fs();}
     if not exists unsafe_ptr
         fail "failed to create file"
-    return class(unsafe_mut unsafe_ptr)
+    return class unsafe_mut unsafe_ptr
 
 def terminal()
     doc "opens a new system writable interactive terminal, fails if no display is available"
@@ -53,8 +53,9 @@ def terminal()
     {builtins::compiler::ptr unsafe_ptr = __smo_open_console();}
     defer
         {__smo_close_console((FILE*)unsafe_ptr); unsafe_ptr=0;}
-    if not exists unsafe_ptr fail "failed to open new terminal"
-    return class(unsafe_mut unsafe_ptr)
+    if not exists unsafe_ptr
+        fail "failed to open new terminal"
+    return class unsafe_mut unsafe_ptr
 
 def File = open|write|terminal
 
@@ -87,7 +88,7 @@ def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     if bytes_open==0 fail "end of file"
     prev_pos = const pos
     pos = pos+bytes_open
-    return str(buf, prev_pos, type "len", bytes_open)
+    return str(buf, prev_pos len bytes_open)
 
 def line(effect edit arena<char::tag>|circular<char::tag> CHARS, edit File f)
     doc "next line"

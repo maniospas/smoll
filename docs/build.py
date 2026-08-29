@@ -60,8 +60,8 @@ def export(path, target):
             btn.style.cssText = "position:absolute;bottom:8px;right:8px;cursor:pointer;";
             btn.addEventListener("click", () => {
                 const code = pre.querySelector("code")?.innerText ?? pre.innerText;
-                const encoded = btoa(unescape(encodeURIComponent(code)));
-                window.location.href = "playground.html?contents=" + encoded;
+                const encoded = btoa(String.fromCharCode(...new TextEncoder().encode(code)));
+                window.location.href = "playground.html?contents=" + encodeURIComponent(encoded);
             });
             pre.appendChild(btn);
         });

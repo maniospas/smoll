@@ -2351,9 +2351,9 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         # message (may span multiple lines))
         if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
         if callee.max_abstraction_level:
-            printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+")")  
-        if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
+            printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+", size "+str(len(callee.implementation))+")")  
         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+        if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
         spawned_error_codes = callee.spawned_error_codes
         # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):
         #     #printid("When this function is called, it does not create a memory dependecy.\n")
@@ -6259,9 +6259,9 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         # message (may span multiple lines))
                         if callee.doc: printid("**"+strip_quotes(callee.doc[0])+"**")
                         if callee.max_abstraction_level:
-                            printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+")")     
-                        if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
+                            printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+", size "+str(len(callee.implementation))+")")
                         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+                        if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                         spawned_error_codes = callee.spawned_error_codes
                         # if(not impl.count_checkable_copies) and any(impl.vars[v].type==POINTER_TYPE for v in impl.rets+impl.args):
                         #     pass
@@ -7162,9 +7162,10 @@ async def main():
                     if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                     docs_file.write("\n```rust\n"+callee.signature()+"\n```\n")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
                     spawned_error_codes = callee.spawned_error_codes
-                    if callee.max_abstraction_level!=0:
-                        docs_file.write("Level of abstraction:\n\n"+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n\n")
-                    
+                    docs_file.write("Complexity:\n\n")
+                    docs_file.write("- Level of abstraction: "+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
+                    docs_file.write("- SSA variables: "+str(len(callee.vars))+"\n")
+                    docs_file.write("- Transpiled C size: "+str(len(callee.implementation))+"\n\n")
                     # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):                   
                     #     pass
                     #     #docs_file.write("When this function is called, it does not create a memory dependecy.\n\n")

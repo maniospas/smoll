@@ -303,6 +303,12 @@
 ```rust
 cstr() -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s line 205*
@@ -313,6 +319,12 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 ```rust
 cstr(cstr cstr, str) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
 
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s line 205*
@@ -323,6 +335,12 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 ```rust
 cstr(unsafe_temp) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s line 205*
@@ -333,6 +351,12 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 ```rust
 cstr(unsafe_temp) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 
 ### cstr - a cstr description of an error code
 *Defined in: std/core/error.s line 19*
@@ -348,6 +372,12 @@ location.
 ```rust
 cstr(catch) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # int
 ### int - a signed integer value
@@ -358,6 +388,12 @@ Represents values in the range `2^-63 to 2^63-1`.
 ```rust
 int() -> (int)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### int - cast to int
 *Defined in: std/core/convert.s line 89*
@@ -367,6 +403,12 @@ Converts a bit representation to the corresponding integer.
 ```rust
 int(bits) -> (int)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
+
 
 ### int - cast to int
 *Defined in: std/core/convert.s line 29*
@@ -376,6 +418,12 @@ Overflows are mapped to negative integers without any numerical safeguards.
 ```rust
 int(nat) -> (int)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 7
+
 
 ### int - cast to int
 *Defined in: std/core/convert.s line 29*
@@ -385,6 +433,12 @@ Serves as a tautology function for code that parses on multiple number types.
 ```rust
 int(int) -> (int)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 7
+
 
 ### int - cast to int
 *Defined in: std/core/convert.s line 29*
@@ -394,6 +448,12 @@ May lose information due to truncating.
 ```rust
 int(float) -> (int)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 7
+
 
 ### int - converts a string to an integer
 *Defined in: std/core/convertstr.s line 149*
@@ -401,9 +461,11 @@ int(float) -> (int)
 ```rust
 int(str) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 62
+- Transpiled C size: 604
 
 Potential errors:
 
@@ -419,9 +481,11 @@ Potential errors:
 ```rust
 int(cstr) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 58
+- Transpiled C size: 598
 
 Potential errors:
 
@@ -437,9 +501,11 @@ Potential errors:
 ```rust
 int(console) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 50
+- Transpiled C size: 527
 
 Potential errors:
 
@@ -457,6 +523,12 @@ Represents values in the range `0 to 2^64-1`.
 ```rust
 nat() -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### nat
 *Defined in: std/core/array.s line 24*
@@ -464,6 +536,12 @@ nat() -> (nat)
 ```rust
 nat(nat32) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
 
 ### nat
 *Defined in: std/core/array.s line 24*
@@ -471,6 +549,12 @@ nat(nat32) -> (nat)
 ```rust
 nat(nat16) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 84*
@@ -480,9 +564,11 @@ Converts a bit representation to the corresponding natural number.
 ```rust
 nat(bits) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
 
 
 ### nat - cast to nat
@@ -494,6 +580,12 @@ its bit representation interpreted as an unsigned number.
 ```rust
 nat(char) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 40*
@@ -504,6 +596,12 @@ Converting to natural numbers loses information.
 ```rust
 nat(nat) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 7
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 40*
@@ -514,9 +612,11 @@ Converting to natural numbers loses information.
 ```rust
 nat(int) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 42
 
 Potential errors:
 
@@ -531,9 +631,11 @@ Converting to natural numbers loses information.
 ```rust
 nat(float) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 42
 
 Potential errors:
 
@@ -545,9 +647,11 @@ Potential errors:
 ```rust
 nat(str) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 328
 
 Potential errors:
 
@@ -562,9 +666,11 @@ Potential errors:
 ```rust
 nat(cstr) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 322
 
 Potential errors:
 
@@ -579,9 +685,11 @@ Potential errors:
 ```rust
 nat(console) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 390
 
 Potential errors:
 
@@ -598,6 +706,12 @@ Represents values in the range `0 to 2^32-1`.
 ```rust
 nat32() -> (nat32)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### nat32
 *Defined in: std/core/allocators.s line 154*
@@ -605,6 +719,12 @@ nat32() -> (nat32)
 ```rust
 nat32(nat) -> (nat32)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
 
 ### nat32 - convert unsigned number to 32 bits
 *Defined in: std/mini.s line 38*
@@ -615,9 +735,11 @@ If it does not, this operation can fail.
 ```rust
 nat32(nat) -> (nat32)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 34
 
 Potential errors:
 
@@ -632,6 +754,12 @@ Represents values in the range `0 to 2^16-1`.
 ```rust
 nat16() -> (nat16)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### nat16 - convert unsigned number to 16 bits
 *Defined in: std/mini.s line 30*
@@ -642,9 +770,11 @@ If it does not, this operation can fail.
 ```rust
 nat16(nat) -> (nat16)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 34
 
 Potential errors:
 
@@ -659,6 +789,12 @@ Represents values in the range `0 to 255`.
 ```rust
 nat8() -> (nat8)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### nat8 - convert unsigned number to 8 bits
 *Defined in: std/mini.s line 22*
@@ -669,9 +805,11 @@ If it does not, this operation can fail.
 ```rust
 nat8(nat) -> (nat8)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 34
 
 Potential errors:
 
@@ -684,6 +822,12 @@ Potential errors:
 ```rust
 float() -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 95*
@@ -693,6 +837,12 @@ Converts a bit representation to the corresponding float number.
 ```rust
 float(bits) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 18
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 20*
@@ -702,9 +852,11 @@ May lose information because floats are not exact representation of all integers
 ```rust
 float(nat) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 15
 
 
 ### float - cast to float
@@ -715,9 +867,11 @@ May lose information because floats are not exact representation of all integers
 ```rust
 float(int) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 15
 
 
 ### float - cast to float
@@ -728,9 +882,11 @@ Serves as a tautology function for code that parses on multiple number types.
 ```rust
 float(float) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 15
 
 
 ### float - converts a string to a float
@@ -739,9 +895,11 @@ Level of abstraction:
 ```rust
 float(cstr) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 85
+- Transpiled C size: 922
 
 Potential errors:
 
@@ -758,9 +916,11 @@ Potential errors:
 ```rust
 float(console) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 67
+- Transpiled C size: 722
 
 Potential errors:
 
@@ -775,9 +935,11 @@ Potential errors:
 ```rust
 float(str) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 89
+- Transpiled C size: 928
 
 Potential errors:
 
@@ -797,6 +959,12 @@ Can only be `true` or `false`.
 ```rust
 bool() -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # err
 ### err
@@ -805,6 +973,12 @@ bool() -> (bool)
 ```rust
 err() -> (err)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # blank
 ### blank - empty tuple
@@ -815,6 +989,12 @@ This is the type of non-existent variables, empty parantheses, and functions of 
 ```rust
 blank() -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 0
+- Transpiled C size: 0
+
 
 # char
 ### char - a character
@@ -825,6 +1005,12 @@ Represents characters in the numeric range `0 to 255`.
 ```rust
 char() -> (char)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### char - treat as character
 *Defined in: std/core/string.s line 113*
@@ -835,6 +1021,12 @@ for example to write `c = char \"C\"`.
 ```rust
 char(cstr) -> (char)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 14
+
 
 ### char - treat as character
 *Defined in: std/core/string.s line 107*
@@ -845,6 +1037,12 @@ for example to write `c = char str \"C\"`.
 ```rust
 char(str) -> (char)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 ### char
 *Defined in: std/core/convertstr.s line 24*
@@ -852,6 +1050,12 @@ char(str) -> (char)
 ```rust
 char(console) -> (char)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 34
+
 Potential errors:
 
 23. unexpected end of console read
@@ -866,6 +1070,12 @@ This type ordains special treatment by the compiler.
 ```rust
 any() -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 0
+- Transpiled C size: 0
+
 
 # eq
 ### eq - equals
@@ -874,9 +1084,11 @@ any() -> ()
 ```rust
 eq(bool value, false) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
 
 
 ### eq - equals
@@ -885,9 +1097,11 @@ Level of abstraction:
 ```rust
 eq(false, bool value) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
 
 
 ### eq - equals
@@ -896,6 +1110,12 @@ Level of abstraction:
 ```rust
 eq(bool value, true) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 70*
@@ -903,6 +1123,12 @@ eq(bool value, true) -> (bool)
 ```rust
 eq(true, bool value) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 ### eq - equals
 *Defined in: std/core/bool.s line 51*
@@ -912,9 +1138,11 @@ This is a compile-time operation that does not evoke any runtime booleans.
 ```rust
 eq(false, true) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
 
 
 ### eq - equals
@@ -925,9 +1153,11 @@ This is a compile-time operation that does not evoke any runtime booleans.
 ```rust
 eq(true, false) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
 
 
 ### eq - equals
@@ -938,9 +1168,11 @@ This is a compile-time operation that does not evoke any runtime booleans.
 ```rust
 eq(false, false) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
 
 
 ### eq - equals
@@ -951,9 +1183,11 @@ This is a compile-time operation that does not evoke any runtime booleans.
 ```rust
 eq(true, true) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
 
 
 ### eq - equals
@@ -962,6 +1196,12 @@ Level of abstraction:
 ```rust
 eq(bool x, bool y) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
 
 ### eq - equals
 *Defined in: std/core/numbers.s line 56*
@@ -971,6 +1211,12 @@ Compares the address of two pointers.
 ```rust
 eq(any ptr x, any ptr y) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
 
 ### eq - equals
 *Defined in: std/core/numbers.s line 40*
@@ -982,6 +1228,12 @@ by the same running program.
 ```rust
 eq(catch x, catch y) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
 
 ### eq - equals
 *Defined in: std/core/numbers.s line 26*
@@ -989,9 +1241,11 @@ eq(catch x, catch y) -> (bool)
 ```rust
 eq(nat x, nat y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### eq - equals
@@ -1000,9 +1254,11 @@ Level of abstraction:
 ```rust
 eq(int x, int y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### eq - equals
@@ -1011,9 +1267,11 @@ Level of abstraction:
 ```rust
 eq(float x, float y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### eq - equals
@@ -1022,9 +1280,11 @@ Level of abstraction:
 ```rust
 eq(cstr x, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 77
 
 
 ### eq - equals
@@ -1033,9 +1293,11 @@ Level of abstraction:
 ```rust
 eq(str, cstr y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 77
 
 
 ### eq - equals
@@ -1062,9 +1324,11 @@ yield false.
 ```rust
 eq(str, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 105
 
 
 ### eq - equals
@@ -1078,6 +1342,12 @@ two same-content cstr will always have the same memory address.
 ```rust
 eq(cstr x, cstr y) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
 
 ### eq - equals
 *Defined in: std/core/string.s line 120*
@@ -1085,244 +1355,12 @@ eq(cstr x, cstr y) -> (bool)
 ```rust
 eq(char x, char y) -> (bool)
 ```
+Complexity:
 
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 39*
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
 
-```rust
-eq(cstr x, cstr ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 39*
-
-```rust
-eq(cstr x, str ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 39*
-
-```rust
-eq(str, cstr ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 39*
-
-```rust
-eq(str, str ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 35*
-
-```rust
-eq(cstr ptr x, cstr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 35*
-
-```rust
-eq(cstr ptr x, str) -> (bool)
-```
-Level of abstraction:
-
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 35*
-
-```rust
-eq(str ptr x, cstr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 35*
-
-```rust
-eq(str ptr x, str) -> (bool)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(nat _x, nat ptr _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(int _x, int ptr _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(float _x, float ptr _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(nat ptr _x, nat _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(nat ptr _x, nat ptr _y) -> (bool)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(int ptr _x, int _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(int ptr _x, int ptr _y) -> (bool)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(float ptr _x, float _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(float ptr _x, float ptr _y) -> (bool)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
 
 ### eq - overloads an operator while dereferencing pointer data
 *Defined in: std/ptrpeek.s line 43*
@@ -1330,9 +1368,11 @@ Potential errors:
 ```rust
 eq(cstr ptr x, cstr ptr y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 61
 
 Potential errors:
 
@@ -1344,9 +1384,11 @@ Potential errors:
 ```rust
 eq(cstr ptr x, str ptr y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 103
 
 Potential errors:
 
@@ -1358,9 +1400,11 @@ Potential errors:
 ```rust
 eq(str ptr x, cstr ptr y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 103
 
 Potential errors:
 
@@ -1372,9 +1416,283 @@ Potential errors:
 ```rust
 eq(str ptr x, str ptr y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 145
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 39*
+
+```rust
+eq(cstr x, cstr ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 37
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 39*
+
+```rust
+eq(cstr x, str ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 39*
+
+```rust
+eq(str, cstr ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 43
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 39*
+
+```rust
+eq(str, str ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 85
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 35*
+
+```rust
+eq(cstr ptr x, cstr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 37
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 35*
+
+```rust
+eq(cstr ptr x, str) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 43
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 35*
+
+```rust
+eq(str ptr x, cstr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 35*
+
+```rust
+eq(str ptr x, str) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 85
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(nat _x, nat ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(int _x, int ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(float _x, float ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(nat ptr _x, nat _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(nat ptr _x, nat ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(int ptr _x, int _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(int ptr _x, int ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(float ptr _x, float _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(float ptr _x, float ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -1387,9 +1705,11 @@ Potential errors:
 ```rust
 neq(true x, bool y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
 
 
 ### neq - not equal
@@ -1398,9 +1718,11 @@ Level of abstraction:
 ```rust
 neq(false x, false y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
 
 
 ### neq - not equal
@@ -1409,9 +1731,11 @@ Level of abstraction:
 ```rust
 neq(false x, true y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
 
 
 ### neq - not equal
@@ -1420,9 +1744,11 @@ Level of abstraction:
 ```rust
 neq(true x, false y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
 
 
 ### neq - not equal
@@ -1431,9 +1757,11 @@ Level of abstraction:
 ```rust
 neq(true x, true y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
 
 
 ### neq - not equal
@@ -1442,6 +1770,12 @@ Level of abstraction:
 ```rust
 neq(bool x, bool y) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
 
 ### neq - not equal
 *Defined in: std/core/numbers.s line 48*
@@ -1453,6 +1787,12 @@ by the same running program.
 ```rust
 neq(catch x, catch y) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
 
 ### neq - not equal
 *Defined in: std/core/numbers.s line 33*
@@ -1460,9 +1800,11 @@ neq(catch x, catch y) -> (bool)
 ```rust
 neq(nat x, nat y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### neq - not equal
@@ -1471,9 +1813,11 @@ Level of abstraction:
 ```rust
 neq(int x, int y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### neq - not equal
@@ -1482,9 +1826,11 @@ Level of abstraction:
 ```rust
 neq(float x, float y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### neq - not equal
@@ -1493,9 +1839,11 @@ Level of abstraction:
 ```rust
 neq(bool x, false y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
 
 
 ### neq - not equal
@@ -1504,9 +1852,11 @@ Level of abstraction:
 ```rust
 neq(bool x, true y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
 
 
 ### neq - not equal
@@ -1515,9 +1865,11 @@ Level of abstraction:
 ```rust
 neq(false x, bool y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
 
 
 ### neq - not equal
@@ -1528,6 +1880,12 @@ Compares the address of two pointers.
 ```rust
 neq(any ptr x, any ptr y) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
 
 ### neq - not equals
 *Defined in: std/core/string.s line 287*
@@ -1537,9 +1895,11 @@ Negates the outcome of equality checks between cstr and strings.
 ```rust
 neq(cstr x, cstr y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
 
 
 ### neq - not equals
@@ -1550,9 +1910,11 @@ Negates the outcome of equality checks between cstr and strings.
 ```rust
 neq(cstr x, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 27
 
 
 ### neq - not equals
@@ -1563,9 +1925,11 @@ Negates the outcome of equality checks between cstr and strings.
 ```rust
 neq(str, cstr y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 27
 
 
 ### neq - not equals
@@ -1576,9 +1940,11 @@ Negates the outcome of equality checks between cstr and strings.
 ```rust
 neq(str, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 33
 
 
 ### neq - not equals
@@ -1587,244 +1953,12 @@ Level of abstraction:
 ```rust
 neq(char x, char y) -> (bool)
 ```
+Complexity:
 
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
 
-```rust
-neq(nat _x, nat ptr _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(int _x, int ptr _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(float _x, float ptr _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(nat ptr _x, nat _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(nat ptr _x, nat ptr _y) -> (bool)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(int ptr _x, int _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(int ptr _x, int ptr _y) -> (bool)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(float ptr _x, float _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(float ptr _x, float ptr _y) -> (bool)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 55*
-
-```rust
-neq(cstr ptr x, cstr ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 55*
-
-```rust
-neq(cstr ptr x, str ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 55*
-
-```rust
-neq(str ptr x, cstr ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 55*
-
-```rust
-neq(str ptr x, str ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 51*
-
-```rust
-neq(cstr x, cstr ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 51*
-
-```rust
-neq(cstr x, str ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 51*
-
-```rust
-neq(str, cstr ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 51*
-
-```rust
-neq(str, str ptr y) -> (bool)
-```
-Level of abstraction:
-
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
 
 ### neq - overloads an operator while dereferencing pointer data
 *Defined in: std/ptrpeek.s line 47*
@@ -1832,9 +1966,11 @@ Potential errors:
 ```rust
 neq(cstr ptr x, cstr y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 37
 
 Potential errors:
 
@@ -1846,9 +1982,11 @@ Potential errors:
 ```rust
 neq(cstr ptr x, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 43
 
 Potential errors:
 
@@ -1860,9 +1998,11 @@ Potential errors:
 ```rust
 neq(str ptr x, cstr y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -1874,9 +2014,283 @@ Potential errors:
 ```rust
 neq(str ptr x, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 85
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(nat _x, nat ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(int _x, int ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(float _x, float ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(nat ptr _x, nat _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(nat ptr _x, nat ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(int ptr _x, int _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(int ptr _x, int ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(float ptr _x, float _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(float ptr _x, float ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 55*
+
+```rust
+neq(cstr ptr x, cstr ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 61
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 55*
+
+```rust
+neq(cstr ptr x, str ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 103
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 55*
+
+```rust
+neq(str ptr x, cstr ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 103
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 55*
+
+```rust
+neq(str ptr x, str ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 145
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 51*
+
+```rust
+neq(cstr x, cstr ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 37
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 51*
+
+```rust
+neq(cstr x, str ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 51*
+
+```rust
+neq(str, cstr ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 43
+
+Potential errors:
+
+2. null pointer
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 51*
+
+```rust
+neq(str, str ptr y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 85
 
 Potential errors:
 
@@ -1891,9 +2305,11 @@ This is a compile-time operation on the compiler::false type rather than a runti
 ```rust
 not(false) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 9
 
 
 ### not - logical inverse
@@ -1904,9 +2320,11 @@ This is a compile-time operation on the compiler::true type rather than a runtim
 ```rust
 not(true) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 9
 
 
 ### not - logical inverse
@@ -1917,6 +2335,12 @@ This operates on boolean values at runtime.
 ```rust
 not(bool) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 14
+
 
 # Number
 ### nat - an unsigned integer value
@@ -1927,6 +2351,12 @@ Represents values in the range `0 to 2^64-1`.
 ```rust
 nat() -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### float
 *Defined in: builtins line 1*
@@ -1934,6 +2364,12 @@ nat() -> (nat)
 ```rust
 float() -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### int - a signed integer value
 *Defined in: builtins line 1*
@@ -1943,6 +2379,12 @@ Represents values in the range `2^-63 to 2^63-1`.
 ```rust
 int() -> (int)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # is\_different
 ### is\_different
@@ -1951,9 +2393,11 @@ int() -> (int)
 ```rust
 is_different(nat x, nat y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
 
 
 ### is\_different
@@ -1962,9 +2406,11 @@ Level of abstraction:
 ```rust
 is_different(nat x, int y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
 
 
 ### is\_different
@@ -1973,9 +2419,11 @@ Level of abstraction:
 ```rust
 is_different(nat x, float y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
 
 
 ### is\_different
@@ -1984,9 +2432,11 @@ Level of abstraction:
 ```rust
 is_different(int x, nat y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
 
 
 ### is\_different
@@ -1995,9 +2445,11 @@ Level of abstraction:
 ```rust
 is_different(int x, int y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
 
 
 ### is\_different
@@ -2006,9 +2458,11 @@ Level of abstraction:
 ```rust
 is_different(int x, float y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
 
 
 ### is\_different
@@ -2017,9 +2471,11 @@ Level of abstraction:
 ```rust
 is_different(float x, nat y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
 
 
 ### is\_different
@@ -2028,9 +2484,11 @@ Level of abstraction:
 ```rust
 is_different(float x, int y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
 
 
 ### is\_different
@@ -2039,9 +2497,11 @@ Level of abstraction:
 ```rust
 is_different(float x, float y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
 
 
 # neg
@@ -2051,6 +2511,12 @@ Level of abstraction:
 ```rust
 neg(nat) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 11
+
 
 ### neg - negative of a number
 *Defined in: std/core/numbers.s line 62*
@@ -2058,6 +2524,12 @@ neg(nat) -> (nat)
 ```rust
 neg(int) -> (int)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 11
+
 
 ### neg - negative of a number
 *Defined in: std/core/numbers.s line 62*
@@ -2065,6 +2537,12 @@ neg(int) -> (int)
 ```rust
 neg(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 11
+
 
 # add
 ### add - add
@@ -2075,9 +2553,11 @@ Adds two numbers of the same type. This is an overload for the + operator.
 ```rust
 add(nat x, nat y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### add - add
@@ -2088,9 +2568,11 @@ Adds two numbers of the same type. This is an overload for the + operator.
 ```rust
 add(int x, int y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### add - add
@@ -2101,9 +2583,11 @@ Adds two numbers of the same type. This is an overload for the + operator.
 ```rust
 add(float x, float y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### add - pointer addition
@@ -2116,9 +2600,11 @@ Adds a natural number offset to a pointer.
 ```rust
 add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### add - concatenate two strings
@@ -2144,9 +2630,11 @@ convenient optimizatins when allocating and immediately concatenating.
 ```rust
 add(edit arena, cstr _s1, cstr _s2) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 158
+- Transpiled C size: 952
 
 Potential errors:
 
@@ -2180,9 +2668,11 @@ convenient optimizatins when allocating and immediately concatenating.
 ```rust
 add(edit arena, cstr _s1, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 162
+- Transpiled C size: 958
 
 Potential errors:
 
@@ -2216,9 +2706,11 @@ convenient optimizatins when allocating and immediately concatenating.
 ```rust
 add(edit arena, str, cstr _s2) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 162
+- Transpiled C size: 958
 
 Potential errors:
 
@@ -2252,9 +2744,11 @@ convenient optimizatins when allocating and immediately concatenating.
 ```rust
 add(edit arena, str, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 166
+- Transpiled C size: 964
 
 Potential errors:
 
@@ -2279,9 +2773,11 @@ yet safe and fast code.
 ```rust
 add(edit list, cstr _s1, cstr _s2) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 97
+- Transpiled C size: 455
 
 Potential errors:
 
@@ -2309,9 +2805,11 @@ yet safe and fast code.
 ```rust
 add(edit list, cstr _s1, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 101
+- Transpiled C size: 461
 
 Potential errors:
 
@@ -2339,9 +2837,11 @@ yet safe and fast code.
 ```rust
 add(edit list, str, cstr _s2) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 101
+- Transpiled C size: 461
 
 Potential errors:
 
@@ -2369,9 +2869,11 @@ yet safe and fast code.
 ```rust
 add(edit list, str, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 105
+- Transpiled C size: 467
 
 Potential errors:
 
@@ -2399,9 +2901,11 @@ yet safe and fast code.
 ```rust
 add(edit circular, cstr _s1, cstr _s2) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 97
+- Transpiled C size: 455
 
 Potential errors:
 
@@ -2427,9 +2931,11 @@ yet safe and fast code.
 ```rust
 add(edit circular, cstr _s1, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 101
+- Transpiled C size: 461
 
 Potential errors:
 
@@ -2455,9 +2961,11 @@ yet safe and fast code.
 ```rust
 add(edit circular, str, cstr _s2) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 101
+- Transpiled C size: 461
 
 Potential errors:
 
@@ -2483,9 +2991,11 @@ yet safe and fast code.
 ```rust
 add(edit circular, str, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 105
+- Transpiled C size: 467
 
 Potential errors:
 
@@ -2511,9 +3021,11 @@ yet safe and fast code.
 ```rust
 add(new CHARS, cstr _s1, cstr _s2) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 91
+- Transpiled C size: 440
 
 Potential errors:
 
@@ -2546,9 +3058,11 @@ yet safe and fast code.
 ```rust
 add(new CHARS, cstr _s1, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 95
+- Transpiled C size: 446
 
 Potential errors:
 
@@ -2581,9 +3095,11 @@ yet safe and fast code.
 ```rust
 add(new CHARS, str, cstr _s2) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 95
+- Transpiled C size: 446
 
 Potential errors:
 
@@ -2616,9 +3132,11 @@ yet safe and fast code.
 ```rust
 add(new CHARS, str, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 99
+- Transpiled C size: 452
 
 Potential errors:
 
@@ -2645,9 +3163,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 add(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 49
 
 Potential errors:
 
@@ -2664,9 +3184,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 add(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 49
 
 Potential errors:
 
@@ -2683,9 +3205,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 add(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 34
 
 Potential errors:
 
@@ -2705,9 +3229,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 add(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 225
 
 Potential errors:
 
@@ -2724,9 +3250,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 add(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 263
 
 Potential errors:
 
@@ -2744,9 +3272,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 add(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 225
 
 Potential errors:
 
@@ -2763,9 +3293,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 add(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 263
 
 Potential errors:
 
@@ -2783,9 +3315,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 add(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 210
 
 Potential errors:
 
@@ -2805,9 +3339,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 add(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 248
 
 Potential errors:
 
@@ -2826,9 +3362,11 @@ free(mut any ptr) -> ()
 ```rust
 add(nat _x, nat ptr _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -2840,9 +3378,11 @@ Potential errors:
 ```rust
 add(int _x, int ptr _y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -2854,9 +3394,11 @@ Potential errors:
 ```rust
 add(float _x, float ptr _y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -2868,9 +3410,11 @@ Potential errors:
 ```rust
 add(nat ptr _x, nat _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -2882,9 +3426,11 @@ Potential errors:
 ```rust
 add(nat ptr _x, nat ptr _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -2896,9 +3442,11 @@ Potential errors:
 ```rust
 add(int ptr _x, int _y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -2910,9 +3458,11 @@ Potential errors:
 ```rust
 add(int ptr _x, int ptr _y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -2924,9 +3474,11 @@ Potential errors:
 ```rust
 add(float ptr _x, float _y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -2938,9 +3490,11 @@ Potential errors:
 ```rust
 add(float ptr _x, float ptr _y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -2955,9 +3509,11 @@ Multiplies two numbers of the same type. This is an overload for the * operator.
 ```rust
 mul(nat x, nat y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### mul - multiply with
@@ -2968,9 +3524,11 @@ Multiplies two numbers of the same type. This is an overload for the * operator.
 ```rust
 mul(int x, int y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### mul - multiply with
@@ -2981,9 +3539,11 @@ Multiplies two numbers of the same type. This is an overload for the * operator.
 ```rust
 mul(float x, float y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### mul - vector multiplication
@@ -2994,9 +3554,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 mul(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 49
 
 Potential errors:
 
@@ -3013,9 +3575,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 mul(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 49
 
 Potential errors:
 
@@ -3032,9 +3596,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 mul(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 34
 
 Potential errors:
 
@@ -3054,9 +3620,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 mul(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 225
 
 Potential errors:
 
@@ -3073,9 +3641,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 mul(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 263
 
 Potential errors:
 
@@ -3093,9 +3663,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 mul(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 225
 
 Potential errors:
 
@@ -3112,9 +3684,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 mul(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 263
 
 Potential errors:
 
@@ -3132,9 +3706,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 mul(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 210
 
 Potential errors:
 
@@ -3154,9 +3730,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 mul(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 248
 
 Potential errors:
 
@@ -3175,9 +3753,11 @@ free(mut any ptr) -> ()
 ```rust
 mul(edit circular, coo, mat) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 62
+- Transpiled C size: 520
 
 Potential errors:
 
@@ -3195,9 +3775,11 @@ Potential errors:
 ```rust
 mul(edit arena, coo, mat) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 62
+- Transpiled C size: 520
 
 Potential errors:
 
@@ -3215,9 +3797,11 @@ Potential errors:
 ```rust
 mul(new FLOATS, coo, mat) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 56
+- Transpiled C size: 505
 
 Potential errors:
 
@@ -3242,9 +3826,11 @@ free(mut any ptr) -> ()
 ```rust
 mul(edit circular, vec, coo) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 46
+- Transpiled C size: 388
 
 Potential errors:
 
@@ -3263,9 +3849,11 @@ Potential errors:
 ```rust
 mul(edit arena, vec, coo) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 46
+- Transpiled C size: 388
 
 Potential errors:
 
@@ -3284,9 +3872,11 @@ Potential errors:
 ```rust
 mul(new FLOATS, vec, coo) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 373
 
 Potential errors:
 
@@ -3306,9 +3896,11 @@ free(mut any ptr) -> ()
 ```rust
 mul(edit circular, coo, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 388
 
 Potential errors:
 
@@ -3325,9 +3917,11 @@ Potential errors:
 ```rust
 mul(edit arena, coo, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 388
 
 Potential errors:
 
@@ -3344,9 +3938,11 @@ Potential errors:
 ```rust
 mul(new FLOATS, coo, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 373
 
 Potential errors:
 
@@ -3368,9 +3964,11 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit circular, mat, mat) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 85
+- Transpiled C size: 596
 
 Potential errors:
 
@@ -3390,9 +3988,11 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit arena, mat, mat) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 85
+- Transpiled C size: 596
 
 Potential errors:
 
@@ -3412,9 +4012,11 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(new FLOATS, mat, mat) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 79
+- Transpiled C size: 581
 
 Potential errors:
 
@@ -3439,9 +4041,11 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit circular, vec, mat) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 60
+- Transpiled C size: 438
 
 Potential errors:
 
@@ -3460,9 +4064,11 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit arena, vec, mat) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 60
+- Transpiled C size: 438
 
 Potential errors:
 
@@ -3481,9 +4087,11 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(new FLOATS, vec, mat) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 54
+- Transpiled C size: 423
 
 Potential errors:
 
@@ -3505,9 +4113,11 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit circular, mat, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 60
+- Transpiled C size: 438
 
 Potential errors:
 
@@ -3526,9 +4136,11 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(edit arena, mat, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 60
+- Transpiled C size: 438
 
 Potential errors:
 
@@ -3547,9 +4159,11 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(new FLOATS, mat, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 54
+- Transpiled C size: 423
 
 Potential errors:
 
@@ -3567,39 +4181,13 @@ free(mut any ptr) -> ()
 *Defined in: std/ptrpeek.s line 103*
 
 ```rust
-mul(nat _x, nat ptr _y) -> (nat)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### mul - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 103*
-
-```rust
-mul(int _x, int ptr _y) -> (int)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### mul - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 103*
-
-```rust
 mul(float _x, float ptr _y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -3611,9 +4199,11 @@ Potential errors:
 ```rust
 mul(nat ptr _x, nat _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -3625,9 +4215,11 @@ Potential errors:
 ```rust
 mul(nat ptr _x, nat ptr _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -3639,9 +4231,11 @@ Potential errors:
 ```rust
 mul(int ptr _x, int _y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -3653,9 +4247,11 @@ Potential errors:
 ```rust
 mul(int ptr _x, int ptr _y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -3667,9 +4263,11 @@ Potential errors:
 ```rust
 mul(float ptr _x, float _y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -3681,9 +4279,43 @@ Potential errors:
 ```rust
 mul(float ptr _x, float ptr _y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### mul - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 103*
+
+```rust
+mul(nat _x, nat ptr _y) -> (nat)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### mul - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 103*
+
+```rust
+mul(int _x, int ptr _y) -> (int)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -3699,9 +4331,11 @@ Safeguards against division by zero.
 ```rust
 div(nat x, nat y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 46
 
 Potential errors:
 
@@ -3715,9 +4349,11 @@ Divides two numbers of the same type. This is an overload for the / operator.
 ```rust
 div(nat x, nat y, "unsafe_assume_nonzero") -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 19
 
 
 ### div - divide by
@@ -3729,9 +4365,11 @@ Safeguards against division by zero.
 ```rust
 div(int x, int y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 46
 
 Potential errors:
 
@@ -3745,9 +4383,11 @@ Divides two numbers of the same type. This is an overload for the / operator.
 ```rust
 div(int x, int y, "unsafe_assume_nonzero") -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 19
 
 
 ### div - divide by
@@ -3759,9 +4399,11 @@ Safeguards against division by zero.
 ```rust
 div(float x, float y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 46
 
 Potential errors:
 
@@ -3775,9 +4417,11 @@ Divides two numbers of the same type. This is an overload for the / operator.
 ```rust
 div(float x, float y, "unsafe_assume_nonzero") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 19
 
 
 ### div - vector division
@@ -3788,9 +4432,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 div(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 226
 
 Potential errors:
 
@@ -3808,9 +4454,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 div(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 226
 
 Potential errors:
 
@@ -3828,9 +4476,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 div(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 211
 
 Potential errors:
 
@@ -3851,9 +4501,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 div(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 240
 
 Potential errors:
 
@@ -3871,9 +4523,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 div(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 278
 
 Potential errors:
 
@@ -3892,9 +4546,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 div(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 240
 
 Potential errors:
 
@@ -3912,9 +4568,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 div(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 278
 
 Potential errors:
 
@@ -3933,9 +4591,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 div(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 31
+- Transpiled C size: 225
 
 Potential errors:
 
@@ -3956,9 +4616,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 div(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 35
+- Transpiled C size: 263
 
 Potential errors:
 
@@ -3978,9 +4640,11 @@ free(mut any ptr) -> ()
 ```rust
 div(nat _x, nat ptr _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -3993,9 +4657,11 @@ Potential errors:
 ```rust
 div(int _x, int ptr _y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4008,9 +4674,11 @@ Potential errors:
 ```rust
 div(float _x, float ptr _y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4023,9 +4691,11 @@ Potential errors:
 ```rust
 div(nat ptr _x, nat _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4038,9 +4708,11 @@ Potential errors:
 ```rust
 div(nat ptr _x, nat ptr _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 90
 
 Potential errors:
 
@@ -4053,9 +4725,11 @@ Potential errors:
 ```rust
 div(int ptr _x, int _y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4068,9 +4742,11 @@ Potential errors:
 ```rust
 div(int ptr _x, int ptr _y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 90
 
 Potential errors:
 
@@ -4083,9 +4759,11 @@ Potential errors:
 ```rust
 div(float ptr _x, float _y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4098,9 +4776,11 @@ Potential errors:
 ```rust
 div(float ptr _x, float ptr _y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 90
 
 Potential errors:
 
@@ -4116,9 +4796,11 @@ Computes the modulo between two natural numbers. This is an overload for the % o
 ```rust
 mod(nat x, nat y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 36
 
 Potential errors:
 
@@ -4132,6 +4814,12 @@ Computes the modulo between two natural numbers. This is an overload for the % o
 ```rust
 mod(nat x, nat y, "unsafe_assume_nonzero") -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
+
 
 # lt
 ### lt - less than
@@ -4142,9 +4830,11 @@ Compares two numbers of the same type. This is an overload for the < operator.
 ```rust
 lt(nat x, nat y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### lt - less than
@@ -4155,9 +4845,11 @@ Compares two numbers of the same type. This is an overload for the < operator.
 ```rust
 lt(int x, int y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### lt - less than
@@ -4168,9 +4860,11 @@ Compares two numbers of the same type. This is an overload for the < operator.
 ```rust
 lt(float x, float y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### lt - overloads an operator while dereferencing pointer data
@@ -4179,9 +4873,11 @@ Level of abstraction:
 ```rust
 lt(nat _x, nat ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4193,9 +4889,11 @@ Potential errors:
 ```rust
 lt(int _x, int ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4207,9 +4905,11 @@ Potential errors:
 ```rust
 lt(float _x, float ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4221,9 +4921,11 @@ Potential errors:
 ```rust
 lt(nat ptr _x, nat _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4235,9 +4937,11 @@ Potential errors:
 ```rust
 lt(nat ptr _x, nat ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4249,9 +4953,11 @@ Potential errors:
 ```rust
 lt(int ptr _x, int _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4263,9 +4969,11 @@ Potential errors:
 ```rust
 lt(int ptr _x, int ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4277,9 +4985,11 @@ Potential errors:
 ```rust
 lt(float ptr _x, float _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4291,9 +5001,11 @@ Potential errors:
 ```rust
 lt(float ptr _x, float ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4308,9 +5020,11 @@ greater than
 ```rust
 gt(nat x, nat y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### gt - Compares two numbers of the same type. This is an overload for the > operator.
@@ -4321,9 +5035,11 @@ greater than
 ```rust
 gt(int x, int y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### gt - Compares two numbers of the same type. This is an overload for the > operator.
@@ -4334,66 +5050,12 @@ greater than
 ```rust
 gt(float x, float y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
-gt(int ptr _x, int _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
-gt(int ptr _x, int ptr _y) -> (bool)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
-gt(float ptr _x, float _y) -> (bool)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
-gt(float ptr _x, float ptr _y) -> (bool)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
 
 ### gt - overloads an operator while dereferencing pointer data
 *Defined in: std/ptrpeek.s line 133*
@@ -4401,9 +5063,11 @@ Potential errors:
 ```rust
 gt(nat _x, nat ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4415,9 +5079,11 @@ Potential errors:
 ```rust
 gt(int _x, int ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4429,9 +5095,11 @@ Potential errors:
 ```rust
 gt(float _x, float ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4443,9 +5111,11 @@ Potential errors:
 ```rust
 gt(nat ptr _x, nat _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4457,9 +5127,75 @@ Potential errors:
 ```rust
 gt(nat ptr _x, nat ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
+gt(int ptr _x, int _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
+gt(int ptr _x, int ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
+gt(float ptr _x, float _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
+gt(float ptr _x, float ptr _y) -> (bool)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4474,9 +5210,11 @@ Compares two numbers of the same type. This is an overload for the <= operator.
 ```rust
 le(nat x, nat y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### le - less than or equal to
@@ -4487,9 +5225,11 @@ Compares two numbers of the same type. This is an overload for the <= operator.
 ```rust
 le(int x, int y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### le - less than or equal to
@@ -4500,9 +5240,11 @@ Compares two numbers of the same type. This is an overload for the <= operator.
 ```rust
 le(float x, float y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### le - overloads an operator while dereferencing pointer data
@@ -4511,9 +5253,11 @@ Level of abstraction:
 ```rust
 le(nat _x, nat ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4525,9 +5269,11 @@ Potential errors:
 ```rust
 le(int _x, int ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4539,9 +5285,11 @@ Potential errors:
 ```rust
 le(float _x, float ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4553,9 +5301,11 @@ Potential errors:
 ```rust
 le(nat ptr _x, nat _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4567,9 +5317,11 @@ Potential errors:
 ```rust
 le(nat ptr _x, nat ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4581,9 +5333,11 @@ Potential errors:
 ```rust
 le(int ptr _x, int _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4595,9 +5349,11 @@ Potential errors:
 ```rust
 le(int ptr _x, int ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4609,9 +5365,11 @@ Potential errors:
 ```rust
 le(float ptr _x, float _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4623,9 +5381,11 @@ Potential errors:
 ```rust
 le(float ptr _x, float ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4640,9 +5400,11 @@ Compares two numbers of the same type. This is an overload for the >= operator.
 ```rust
 ge(nat x, nat y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### ge - greater than or equal to
@@ -4653,9 +5415,11 @@ Compares two numbers of the same type. This is an overload for the >= operator.
 ```rust
 ge(int x, int y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### ge - greater than or equal to
@@ -4666,9 +5430,11 @@ Compares two numbers of the same type. This is an overload for the >= operator.
 ```rust
 ge(float x, float y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
 
 ### ge - overloads an operator while dereferencing pointer data
@@ -4677,9 +5443,11 @@ Level of abstraction:
 ```rust
 ge(nat _x, nat ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4691,9 +5459,11 @@ Potential errors:
 ```rust
 ge(int _x, int ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4705,9 +5475,11 @@ Potential errors:
 ```rust
 ge(float _x, float ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4719,9 +5491,11 @@ Potential errors:
 ```rust
 ge(nat ptr _x, nat _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4733,9 +5507,11 @@ Potential errors:
 ```rust
 ge(nat ptr _x, nat ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4747,9 +5523,11 @@ Potential errors:
 ```rust
 ge(int ptr _x, int _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4761,9 +5539,11 @@ Potential errors:
 ```rust
 ge(int ptr _x, int ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4775,9 +5555,11 @@ Potential errors:
 ```rust
 ge(float ptr _x, float _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -4789,9 +5571,11 @@ Potential errors:
 ```rust
 ge(float ptr _x, float ptr _y) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -4807,11 +5591,16 @@ the result if it would produce a negative.
 ```rust
 0-(1 assume_smaller)
 ```
-=======================
 
 ```rust
 sub(nat x, nat y, "assume_smaller") -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
 
 ### sub - subtract by
 *Defined in: std/core/numbers.s line 138*
@@ -4822,9 +5611,11 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 ```rust
 sub(nat x, nat y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 42
 
 Potential errors:
 
@@ -4838,9 +5629,11 @@ Subtracts two numbers of the same type. This is an overload for the - operator.
 ```rust
 sub(int x, int y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 19
 
 
 ### sub - subtract by
@@ -4851,9 +5644,11 @@ Subtracts two numbers of the same type. This is an overload for the - operator.
 ```rust
 sub(float x, float y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 19
 
 
 ### sub - vector subtraction
@@ -4864,9 +5659,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 sub(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 215
 
 Potential errors:
 
@@ -4883,9 +5680,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 sub(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 215
 
 Potential errors:
 
@@ -4902,9 +5701,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 sub(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 27
+- Transpiled C size: 200
 
 Potential errors:
 
@@ -4924,9 +5725,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 sub(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 225
 
 Potential errors:
 
@@ -4943,9 +5746,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 sub(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 263
 
 Potential errors:
 
@@ -4963,9 +5768,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 sub(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 225
 
 Potential errors:
 
@@ -4982,9 +5789,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 sub(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 263
 
 Potential errors:
 
@@ -5002,9 +5811,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 sub(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 210
 
 Potential errors:
 
@@ -5024,9 +5835,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 sub(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 248
 
 Potential errors:
 
@@ -5043,67 +5856,13 @@ free(mut any ptr) -> ()
 *Defined in: std/ptrpeek.s line 93*
 
 ```rust
-sub(int ptr _x, int _y) -> (int)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(int ptr _x, int ptr _y) -> (int)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(float ptr _x, float _y) -> (float)
-```
-Level of abstraction:
-
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(float ptr _x, float ptr _y) -> (float)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
 sub(nat _x, nat ptr _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -5116,9 +5875,11 @@ Potential errors:
 ```rust
 sub(int _x, int ptr _y) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -5130,9 +5891,11 @@ Potential errors:
 ```rust
 sub(float _x, float ptr _y) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 Potential errors:
 
@@ -5144,9 +5907,11 @@ Potential errors:
 ```rust
 sub(nat ptr _x, nat _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 Potential errors:
 
@@ -5159,27 +5924,95 @@ Potential errors:
 ```rust
 sub(nat ptr _x, nat ptr _y) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 90
 
 Potential errors:
 
 2. null pointer
 6. nat subtraction would yield a negative
 
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(int ptr _x, int _y) -> (int)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(int ptr _x, int ptr _y) -> (int)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(float ptr _x, float _y) -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+Potential errors:
+
+2. null pointer
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(float ptr _x, float ptr _y) -> (float)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+Potential errors:
+
+2. null pointer
+
 # pow
 ### pow - exponentiate by
-*Defined in: std/core/numbers.s line 162*
+*Defined in: std/core/numbers.s line 161*
 
 Exponentiates a natural number by another.
 
 ```rust
 pow(nat x, nat y) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 84
 
 
 ### pow
@@ -5188,6 +6021,12 @@ Level of abstraction:
 ```rust
 pow(float x, float y) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 12
+
 
 ### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 135*
@@ -5197,9 +6036,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 pow(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 263
 
 Potential errors:
 
@@ -5217,9 +6058,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 pow(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 225
 
 Potential errors:
 
@@ -5236,9 +6079,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 pow(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 263
 
 Potential errors:
 
@@ -5256,9 +6101,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 pow(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 210
 
 Potential errors:
 
@@ -5278,9 +6125,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 pow(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 248
 
 Potential errors:
 
@@ -5301,9 +6150,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 pow(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 215
 
 Potential errors:
 
@@ -5320,9 +6171,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 pow(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 215
 
 Potential errors:
 
@@ -5339,9 +6192,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 pow(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 200
 
 Potential errors:
 
@@ -5361,9 +6216,11 @@ Grabs a FLOATS allocator effect to store the result.
 ```rust
 pow(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 225
 
 Potential errors:
 
@@ -5389,6 +6246,12 @@ Quickly print internals for debugging with `unsafe_console()`.
 ```rust
 console() -> (console)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 3
+
 
 # unsafe\_console
 ### unsafe\_console - references the system console unsafely
@@ -5400,9 +6263,11 @@ without needing to evoke an effect to pass the normally singleton console.
 ```rust
 unsafe_console() -> (mut console)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
 
 
 # print
@@ -5414,6 +6279,12 @@ Automatically ends the line too.
 ```rust
 print(console CLI, false) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 11
+
 
 ### print - prints a boolean
 *Defined in: std/core/print.s line 97*
@@ -5421,6 +6292,12 @@ print(console CLI, false) -> () with effects CLI
 ```rust
 print(console CLI, false, cstr endl) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 7
+
 
 ### print - prints a boolean
 *Defined in: std/core/print.s line 90*
@@ -5430,6 +6307,12 @@ Automatically ends the line too.
 ```rust
 print(console CLI, true) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 11
+
 
 ### print - prints a boolean
 *Defined in: std/core/print.s line 90*
@@ -5437,6 +6320,12 @@ print(console CLI, true) -> () with effects CLI
 ```rust
 print(console CLI, true, cstr endl) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 7
+
 
 ### print - prints a boolean
 *Defined in: std/core/print.s line 83*
@@ -5446,6 +6335,12 @@ Automatically ends the line too.
 ```rust
 print(console CLI, bool value) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 31
+
 
 ### print - prints a boolean
 *Defined in: std/core/print.s line 83*
@@ -5453,6 +6348,12 @@ print(console CLI, bool value) -> () with effects CLI
 ```rust
 print(console CLI, bool value, cstr endl) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 27
+
 
 ### print - prints an unsigned integer
 *Defined in: std/core/print.s line 76*
@@ -5462,6 +6363,12 @@ Automatically ends the line too.
 ```rust
 print(console CLI, nat value) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 13
+
 
 ### print - prints an unsigned integer
 *Defined in: std/core/print.s line 76*
@@ -5469,6 +6376,12 @@ print(console CLI, nat value) -> () with effects CLI
 ```rust
 print(console CLI, nat value, cstr endl) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
 
 ### print - prints an integer
 *Defined in: std/core/print.s line 69*
@@ -5478,6 +6391,12 @@ Automatically ends the line too.
 ```rust
 print(console CLI, int value) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 13
+
 
 ### print - prints an integer
 *Defined in: std/core/print.s line 69*
@@ -5485,6 +6404,12 @@ print(console CLI, int value) -> () with effects CLI
 ```rust
 print(console CLI, int value, cstr endl) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
 
 ### print - prints a float
 *Defined in: std/core/print.s line 61*
@@ -5495,6 +6420,12 @@ Automatically ends the line too.
 ```rust
 print(console CLI, float value) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 13
+
 
 ### print - prints a float
 *Defined in: std/core/print.s line 61*
@@ -5504,6 +6435,12 @@ To pre-specified 6 decimal digits.
 ```rust
 print(console CLI, float value, cstr endl) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
 
 ### print - prints a cstr
 *Defined in: std/core/print.s line 54*
@@ -5513,6 +6450,12 @@ Automatically ends the line too.
 ```rust
 print(console CLI, cstr value) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 13
+
 
 ### print - prints a cstr
 *Defined in: std/core/print.s line 54*
@@ -5520,6 +6463,12 @@ print(console CLI, cstr value) -> () with effects CLI
 ```rust
 print(console CLI, cstr value, cstr endl) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
 
 ### print - flushes the print buffer on the console
 *Defined in: std/core/print.s line 43*
@@ -5527,6 +6476,12 @@ print(console CLI, cstr value, cstr endl) -> () with effects CLI
 ```rust
 print(console CLI, "flush") -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 5
+
 
 ### print - print a character
 *Defined in: std/core/string.s line 323*
@@ -5536,6 +6491,12 @@ Ends the line too.
 ```rust
 print(console CLI, char c) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 13
+
 
 ### print - print a character
 *Defined in: std/core/string.s line 323*
@@ -5543,6 +6504,12 @@ print(console CLI, char c) -> () with effects CLI
 ```rust
 print(console CLI, char c, cstr endl) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
 
 ### print - print a string
 *Defined in: std/core/string.s line 309*
@@ -5552,6 +6519,12 @@ Ends the line too.
 ```rust
 print(console CLI, str) -> () with effects CLI
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 17
+
 
 ### print - print a string
 *Defined in: std/core/string.s line 309*
@@ -5559,40 +6532,12 @@ print(console CLI, str) -> () with effects CLI
 ```rust
 print(console CLI, str, cstr endl) -> () with effects CLI
 ```
+Complexity:
 
-### print - print a vector
-*Defined in: std/sci/vec.s line 246*
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 13
 
-Prints as a row, such as [ 1.0  2.0  3.0 ]
-
-```rust
-print(console CLI, vec) -> () with effects CLI
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-6. nat subtraction would yield a negative
-
-### print - print a vector
-*Defined in: std/sci/vec.s line 246*
-
-Prints as a row, such as [ 1.0  2.0  3.0 ]
-
-```rust
-print(console CLI, vec, cstr endl) -> () with effects CLI
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-6. nat subtraction would yield a negative
 
 ### print - print sparse matrix
 *Defined in: std/sci/coo.s line 95*
@@ -5602,9 +6547,11 @@ Prints it as coordinate as list: (i, j): v
 ```rust
 print(console CLI, coo) -> () with effects CLI
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 182
 
 No failing errors, but can catch these intercepted ones:
 
@@ -5618,9 +6565,11 @@ Prints it as coordinate as list: (i, j): v
 ```rust
 print(console CLI, coo, cstr endl) -> () with effects CLI
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 178
 
 No failing errors, but can catch these intercepted ones:
 
@@ -5634,9 +6583,11 @@ single-row matrices stay on one line; taller ones get top/mid/bottom brackets
 ```rust
 print(console CLI, mat) -> () with effects CLI
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 88
+- Transpiled C size: 838
 
 Potential errors:
 
@@ -5651,9 +6602,49 @@ single-row matrices stay on one line; taller ones get top/mid/bottom brackets
 ```rust
 print(console CLI, mat, cstr endl) -> () with effects CLI
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 87
+- Transpiled C size: 834
+
+Potential errors:
+
+2. null pointer
+6. nat subtraction would yield a negative
+
+### print - print a vector
+*Defined in: std/sci/vec.s line 246*
+
+Prints as a row, such as [ 1.0  2.0  3.0 ]
+
+```rust
+print(console CLI, vec) -> () with effects CLI
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 234
+
+Potential errors:
+
+2. null pointer
+6. nat subtraction would yield a negative
+
+### print - print a vector
+*Defined in: std/sci/vec.s line 246*
+
+Prints as a row, such as [ 1.0  2.0  3.0 ]
+
+```rust
+print(console CLI, vec, cstr endl) -> () with effects CLI
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 31
+- Transpiled C size: 230
 
 Potential errors:
 
@@ -5671,6 +6662,12 @@ to print without automatically adding a new line.
 ```rust
 nn(nat) -> (nat value, cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
+
 
 ### nn - no new line
 *Defined in: std/core/print.s line 47*
@@ -5682,6 +6679,12 @@ to print without automatically adding a new line.
 ```rust
 nn(int) -> (int value, cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
+
 
 ### nn - no new line
 *Defined in: std/core/print.s line 47*
@@ -5693,6 +6696,12 @@ to print without automatically adding a new line.
 ```rust
 nn(float) -> (float value, cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
+
 
 ### nn - no new line
 *Defined in: std/core/print.s line 47*
@@ -5704,6 +6713,12 @@ to print without automatically adding a new line.
 ```rust
 nn(cstr) -> (cstr value, cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
+
 
 ### nn - no new line
 *Defined in: std/core/string.s line 383*
@@ -5715,6 +6730,12 @@ to print without a new line.
 ```rust
 nn(str) -> (str, cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 7
+
 
 ### nn - no new line
 *Defined in: std/sci/vec.s line 239*
@@ -5726,6 +6747,12 @@ to print without a new line.
 ```rust
 nn(vec) -> (vec, cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 7
+
 
 # supports\_ansi
 ### supports\_ansi
@@ -5734,6 +6761,12 @@ nn(vec) -> (vec, cstr)
 ```rust
 supports_ansi(console) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 9
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[supports_ansi()]`*
 # colors
@@ -5743,9 +6776,11 @@ supports_ansi(console) -> (bool)
 ```rust
 colors(console) -> (colors)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 13
 
 
 
@@ -5759,6 +6794,12 @@ Returned values defer use of the following functions:
 ```rust
 set(colors, "bg_white") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 154*
@@ -5766,6 +6807,12 @@ set(colors, "bg_white") -> ()
 ```rust
 set(colors, "bg_cyan") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 152*
@@ -5773,6 +6820,12 @@ set(colors, "bg_cyan") -> ()
 ```rust
 set(colors, "bg_magenta") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 150*
@@ -5780,6 +6833,12 @@ set(colors, "bg_magenta") -> ()
 ```rust
 set(colors, "bg_blue") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 148*
@@ -5787,6 +6846,12 @@ set(colors, "bg_blue") -> ()
 ```rust
 set(colors, "bg_yellow") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 146*
@@ -5794,6 +6859,12 @@ set(colors, "bg_yellow") -> ()
 ```rust
 set(colors, "bg_green") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 144*
@@ -5801,6 +6872,12 @@ set(colors, "bg_green") -> ()
 ```rust
 set(colors, "bg_red") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 142*
@@ -5808,6 +6885,12 @@ set(colors, "bg_red") -> ()
 ```rust
 set(colors, "bright_white") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 140*
@@ -5815,6 +6898,12 @@ set(colors, "bright_white") -> ()
 ```rust
 set(colors, "bright_cyan") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 138*
@@ -5822,6 +6911,12 @@ set(colors, "bright_cyan") -> ()
 ```rust
 set(colors, "bright_magenta") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 136*
@@ -5829,6 +6924,12 @@ set(colors, "bright_magenta") -> ()
 ```rust
 set(colors, "bright_blue") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 134*
@@ -5836,6 +6937,12 @@ set(colors, "bright_blue") -> ()
 ```rust
 set(colors, "bright_yellow") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 132*
@@ -5843,6 +6950,12 @@ set(colors, "bright_yellow") -> ()
 ```rust
 set(colors, "bright_green") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 130*
@@ -5850,6 +6963,12 @@ set(colors, "bright_green") -> ()
 ```rust
 set(colors, "bright_red") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 128*
@@ -5857,6 +6976,12 @@ set(colors, "bright_red") -> ()
 ```rust
 set(colors, "black") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 126*
@@ -5864,6 +6989,12 @@ set(colors, "black") -> ()
 ```rust
 set(colors, "white") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 124*
@@ -5871,6 +7002,12 @@ set(colors, "white") -> ()
 ```rust
 set(colors, "cyan") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 122*
@@ -5878,6 +7015,12 @@ set(colors, "cyan") -> ()
 ```rust
 set(colors, "magenta") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 120*
@@ -5885,6 +7028,12 @@ set(colors, "magenta") -> ()
 ```rust
 set(colors, "blue") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 118*
@@ -5892,6 +7041,12 @@ set(colors, "blue") -> ()
 ```rust
 set(colors, "yellow") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 116*
@@ -5899,6 +7054,12 @@ set(colors, "yellow") -> ()
 ```rust
 set(colors, "green") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 114*
@@ -5906,6 +7067,12 @@ set(colors, "green") -> ()
 ```rust
 set(colors, "red") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 182*
@@ -5913,6 +7080,12 @@ set(colors, "red") -> ()
 ```rust
 set(colors, "reset_underline") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 180*
@@ -5920,6 +7093,12 @@ set(colors, "reset_underline") -> ()
 ```rust
 set(colors, "reset_bold") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 178*
@@ -5927,6 +7106,12 @@ set(colors, "reset_bold") -> ()
 ```rust
 set(colors, "reset_bg") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 176*
@@ -5934,6 +7119,12 @@ set(colors, "reset_bg") -> ()
 ```rust
 set(colors, "reset_color") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 174*
@@ -5941,6 +7132,12 @@ set(colors, "reset_color") -> ()
 ```rust
 set(colors, "reset") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 172*
@@ -5948,6 +7145,12 @@ set(colors, "reset") -> ()
 ```rust
 set(colors, "strikethrough") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 170*
@@ -5955,6 +7158,12 @@ set(colors, "strikethrough") -> ()
 ```rust
 set(colors, "reverse") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 168*
@@ -5962,6 +7171,12 @@ set(colors, "reverse") -> ()
 ```rust
 set(colors, "blink") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 166*
@@ -5969,6 +7184,12 @@ set(colors, "blink") -> ()
 ```rust
 set(colors, "underline") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 164*
@@ -5976,6 +7197,12 @@ set(colors, "underline") -> ()
 ```rust
 set(colors, "italic") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 162*
@@ -5983,6 +7210,12 @@ set(colors, "italic") -> ()
 ```rust
 set(colors, "dim") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 160*
@@ -5990,6 +7223,12 @@ set(colors, "dim") -> ()
 ```rust
 set(colors, "bold") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 ### set
 *Defined in: std/core/print.s line 158*
@@ -5997,6 +7236,12 @@ set(colors, "bold") -> ()
 ```rust
 set(colors, "bg_black") -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
 
 # exists
 ### exists - checks that a pointer exists
@@ -6005,6 +7250,12 @@ set(colors, "bg_black") -> ()
 ```rust
 exists(any ptr) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 9
+
 
 ### exists - checks whether a cstr is not zero-initialized
 *Defined in: std/core/string.s line 30*
@@ -6012,6 +7263,12 @@ exists(any ptr) -> (bool)
 ```rust
 exists(cstr) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 9
+
 
 ### exists
 *Defined in: std/graphics.s line 153*
@@ -6019,9 +7276,11 @@ exists(cstr) -> (bool)
 ```rust
 exists(Texture) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 31
 
 
 # bits
@@ -6034,9 +7293,11 @@ arithmetics and bitwise operations.
 ```rust
 bits(float) -> (bits)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 26
 
 
 ### bits - bit representation
@@ -6048,9 +7309,11 @@ arithmetics and bitwise operations.
 ```rust
 bits(int) -> (bits)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 15
 
 
 ### bits - bit representation
@@ -6062,6 +7325,12 @@ arithmetics and bitwise operations.
 ```rust
 bits(nat) -> (bits)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 # lshift
 ### lshift - left shift
@@ -6070,9 +7339,11 @@ bits(nat) -> (bits)
 ```rust
 lshift(bits, nat y) -> (bits)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 19
 
 
 # rshift
@@ -6082,9 +7353,11 @@ Level of abstraction:
 ```rust
 rshift(bits, nat y) -> (bits)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 19
 
 
 # xor
@@ -6094,9 +7367,11 @@ Level of abstraction:
 ```rust
 xor(bits, bits) -> (bits)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 19
 
 
 # band
@@ -6106,9 +7381,11 @@ Level of abstraction:
 ```rust
 band(bits, bits) -> (bits)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 19
 
 
 # bor
@@ -6118,9 +7395,11 @@ Level of abstraction:
 ```rust
 bor(bits, bits) -> (bits)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 19
 
 
 # of
@@ -6132,9 +7411,11 @@ Represents the range [from, from+length] where 'from' and 'length' are the argum
 ```rust
 of(nat from, "len", nat length) -> (nat from, nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 13
 
 
 ### of - yields a pair of nats
@@ -6145,9 +7426,11 @@ Represents the range [from, to] where 'from' and 'to' are the arguments.
 ```rust
 of(nat from, "upto", nat to) -> (nat from, nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 17
 
 
 ### of - yields a pair of nats
@@ -6158,6 +7441,12 @@ Represents the range [from, to) where 'from' and 'to' are the arguments.
 ```rust
 of(nat from, "to", nat to) -> (nat from, nat to)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 3
+
 
 ### of - yields a pair of nats
 *Defined in: std/core/range.s line 19*
@@ -6167,6 +7456,12 @@ Represents the range [0, to) where 'to' its  its arguments.
 ```rust
 of(nat) -> (nat, nat to)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
 
 # range
 ### range - constructs a range
@@ -6177,6 +7472,12 @@ Endpoints are natural numbers (unsigned integers). This is handy for several kin
 ```rust
 range(nat _from, nat to) -> (edit range)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 11
+
 
 # next
 ### next - next range number
@@ -6187,9 +7488,11 @@ This increments the r.from position and returns the previous one.
 ```rust
 next(edit range) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 48
 
 Potential errors:
 
@@ -6201,9 +7504,11 @@ Potential errors:
 ```rust
 next(robinhood_nat_entry[], mut nat pos) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 346
 
 Potential errors:
 
@@ -6216,9 +7521,11 @@ Potential errors:
 ```rust
 next(robinhood_str_entry[], mut nat pos) -> (mut str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 62
+- Transpiled C size: 556
 
 Potential errors:
 
@@ -6231,9 +7538,11 @@ Potential errors:
 ```rust
 next(mut Rand) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 79
 
 
 # get
@@ -6248,9 +7557,11 @@ are retrieved or sliced.
 ```rust
 get(any[], nat i) -> (any ptr {follows any ptr buffer.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 72
 
 Potential errors:
 
@@ -6269,9 +7580,11 @@ are retrieved or sliced.
 ```rust
 get(any[], nat i, "unsafe_assume_inbounds") -> (any ptr {follows any ptr buffer.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 49
 
 
 ### get - assert that a number plus range start lies in the range
@@ -6283,9 +7596,11 @@ per a pattern like `for i in range 10 ...`.
 ```rust
 get(range, nat _pos) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 40
 
 Potential errors:
 
@@ -6297,9 +7612,11 @@ Potential errors:
 ```rust
 get(str, nat i) -> (char ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 46
 
 Potential errors:
 
@@ -6311,9 +7628,11 @@ Potential errors:
 ```rust
 get(str, nat i, "unsafe_assume_inbounds") -> (char ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 23
 
 
 ### get - get a list element pointer
@@ -6322,9 +7641,11 @@ Level of abstraction:
 ```rust
 get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 53
 
 Potential errors:
 
@@ -6336,9 +7657,11 @@ Potential errors:
 ```rust
 get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 53
 
 Potential errors:
 
@@ -6350,9 +7673,11 @@ Potential errors:
 ```rust
 get(circular, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 30
 
 Potential errors:
 
@@ -6364,9 +7689,11 @@ Potential errors:
 ```rust
 get(arena, nat pos) -> (any ptr {follows any ptr l.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 53
 
 Potential errors:
 
@@ -6381,9 +7708,11 @@ Potential errors:
 ```rust
 get(arena, nat pos, "unsafe_assume_inbounds") -> (any ptr {follows any ptr l.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 19
 
 
 ### get - get a hash map entry
@@ -6394,9 +7723,11 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 get(robinhood_nat_entry[], any[], nat key) -> (any ptr {follows any ptr values.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 57
 
 Potential errors:
 
@@ -6414,9 +7745,11 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 get(robinhood_str_entry[], any[], str) -> (any ptr {follows any ptr values.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 86
 
 Potential errors:
 
@@ -6434,9 +7767,11 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 get(robinhood_str_entry[], any[], cstr key) -> (any ptr {follows any ptr values.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 80
 
 Potential errors:
 
@@ -6452,9 +7787,11 @@ Potential errors:
 ```rust
 get(edit circular, edit open, nat) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 46
 
 Potential errors:
 
@@ -6471,29 +7808,11 @@ Potential errors:
 ```rust
 get(edit circular, edit terminal, nat) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-38. end of file
-6. nat subtraction would yield a negative
-15. out of bounds
-47. not open file
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit circular, edit write, nat) -> (str) with effects CHARS
-```
-Level of abstraction:
-
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
 
 Potential errors:
 
@@ -6511,9 +7830,33 @@ Potential errors:
 ```rust
 get(edit circular, edit write, nat) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+Potential errors:
+
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+38. end of file
+6. nat subtraction would yield a negative
+15. out of bounds
+47. not open file
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit circular, edit write, nat) -> (str) with effects CHARS
+```
+Complexity:
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
 
 Potential errors:
 
@@ -6531,9 +7874,11 @@ Potential errors:
 ```rust
 get(edit circular, edit open, nat) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
 
 Potential errors:
 
@@ -6551,9 +7896,11 @@ Potential errors:
 ```rust
 get(edit circular, edit open, nat) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
 
 Potential errors:
 
@@ -6571,9 +7918,11 @@ Potential errors:
 ```rust
 get(edit arena, edit open, nat) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 46
 
 Potential errors:
 
@@ -6590,29 +7939,11 @@ Potential errors:
 ```rust
 get(edit arena, edit terminal, nat) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-38. end of file
-6. nat subtraction would yield a negative
-15. out of bounds
-47. not open file
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit arena, edit write, nat) -> (str) with effects CHARS
-```
-Level of abstraction:
-
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
 
 Potential errors:
 
@@ -6630,9 +7961,33 @@ Potential errors:
 ```rust
 get(edit arena, edit write, nat) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+Potential errors:
+
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+38. end of file
+6. nat subtraction would yield a negative
+15. out of bounds
+47. not open file
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit arena, edit write, nat) -> (str) with effects CHARS
+```
+Complexity:
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
 
 Potential errors:
 
@@ -6650,9 +8005,11 @@ Potential errors:
 ```rust
 get(edit arena, edit open, nat) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
 
 Potential errors:
 
@@ -6670,9 +8027,11 @@ Potential errors:
 ```rust
 get(edit arena, edit open, nat) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
 
 Potential errors:
 
@@ -6690,9 +8049,11 @@ Potential errors:
 ```rust
 get(edit open, nat) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-2 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 2 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 32
 
 Potential errors:
 
@@ -6705,9 +8066,11 @@ Potential errors:
 ```rust
 get(edit circular, cstr url) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 75
 
 Potential errors:
 
@@ -6725,9 +8088,11 @@ Potential errors:
 ```rust
 get(edit circular, str) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 81
 
 Potential errors:
 
@@ -6748,9 +8113,11 @@ Potential errors:
 ```rust
 get(edit arena, cstr url) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 75
 
 Potential errors:
 
@@ -6768,9 +8135,11 @@ Potential errors:
 ```rust
 get(edit arena, str) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 81
 
 Potential errors:
 
@@ -6791,9 +8160,11 @@ Potential errors:
 ```rust
 get(new CHARS, cstr url) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 60
 
 Potential errors:
 
@@ -6817,9 +8188,11 @@ free(mut any ptr) -> ()
 ```rust
 get(new CHARS, str) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 66
 
 Potential errors:
 
@@ -6846,9 +8219,11 @@ free(mut any ptr) -> ()
 ```rust
 get(vec, nat i) -> (float ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 60
 
 Potential errors:
 
@@ -6863,9 +8238,43 @@ Potential errors:
 ```rust
 get(vec, nat i, "unsafe_assume_inbounds") -> (float ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 37
+
+
+### get - get a sparse element
+*Defined in: std/sci/coo.s line 43*
+
+```rust
+get(coo, nat k) -> (sparse_element ptr)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 50
+
+Potential errors:
+
+15. out of bounds
+
+### get - get a sparse element
+*Defined in: std/sci/coo.s line 43*
+
+
+*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
+```rust
+get(coo, nat k, "unsafe_assume_inbounds") -> (sparse_element ptr)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 27
 
 
 ### get - reference to matrix element (i,j)
@@ -6874,9 +8283,11 @@ Level of abstraction:
 ```rust
 get(mat, nat i, nat j) -> (float ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 103
 
 Potential errors:
 
@@ -6892,37 +8303,11 @@ Potential errors:
 ```rust
 get(mat, nat i, nat j, "unsafe_assume_inbounds") -> (float ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### get - get a sparse element
-*Defined in: std/sci/coo.s line 43*
-
-```rust
-get(coo, nat k) -> (sparse_element ptr)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-15. out of bounds
-
-### get - get a sparse element
-*Defined in: std/sci/coo.s line 43*
-
-
-*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
-
-```rust
-get(coo, nat k, "unsafe_assume_inbounds") -> (sparse_element ptr)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 57
 
 
 # KB
@@ -6932,9 +8317,11 @@ Level of abstraction:
 ```rust
 KB(nat) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 17
 
 
 # MB
@@ -6944,9 +8331,11 @@ Level of abstraction:
 ```rust
 MB(nat) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 31
 
 
 # GB
@@ -6956,9 +8345,11 @@ Level of abstraction:
 ```rust
 GB(nat) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 45
 
 
 # alloc
@@ -6968,9 +8359,11 @@ Level of abstraction:
 ```rust
 alloc(nat) -> (edit char[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 58
 
 Potential errors:
 
@@ -6994,9 +8387,11 @@ This version allocates a buffer of ONE element.
 ```rust
 alloc(edit any[]) -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 27
+- Transpiled C size: 217
 
 Potential errors:
 
@@ -7020,9 +8415,11 @@ This version allocates a buffer of ONE element.
 ```rust
 alloc(edit any[], "unsafe_leaky") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 190
 
 Potential errors:
 
@@ -7045,9 +8442,11 @@ This version allocates a buffer of ONE element.
 ```rust
 alloc(edit any[], "dirty") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 29
+- Transpiled C size: 236
 
 Potential errors:
 
@@ -7071,9 +8470,11 @@ This version allocates a buffer of ONE element.
 ```rust
 alloc(edit any[], "dirty", "unsafe_leaky") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 209
 
 Potential errors:
 
@@ -7096,9 +8497,11 @@ This version allocates a buffer of ONE element.
 ```rust
 alloc(edit any[], "unsafe_first") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 25
+- Transpiled C size: 177
 
 Potential errors:
 
@@ -7121,9 +8524,11 @@ This version allocates a buffer of ONE element.
 ```rust
 alloc(edit any[], "unsafe_first", "unsafe_leaky") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 24
+- Transpiled C size: 150
 
 Potential errors:
 
@@ -7144,9 +8549,11 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 ```rust
 alloc(edit any[], nat size) -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 209
 
 Potential errors:
 
@@ -7169,9 +8576,11 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 ```rust
 alloc(edit any[], nat size, "unsafe_leaky") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 25
+- Transpiled C size: 182
 
 Potential errors:
 
@@ -7193,9 +8602,11 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 ```rust
 alloc(edit any[], nat size, "dirty") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 228
 
 Potential errors:
 
@@ -7218,9 +8629,11 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 ```rust
 alloc(edit any[], nat size, "dirty", "unsafe_leaky") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 27
+- Transpiled C size: 201
 
 Potential errors:
 
@@ -7242,9 +8655,11 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 ```rust
 alloc(edit any[], nat size, "unsafe_first") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 24
+- Transpiled C size: 169
 
 Potential errors:
 
@@ -7266,9 +8681,11 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 ```rust
 alloc(edit any[], nat size, "unsafe_first", "unsafe_leaky") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 23
+- Transpiled C size: 142
 
 Potential errors:
 
@@ -7289,9 +8706,11 @@ Allocates a memory of the provided size in bytes.
 ```rust
 alloc(nat) -> (mut any ptr)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 39
 
 Potential errors:
 
@@ -7303,9 +8722,11 @@ Potential errors:
 ```rust
 alloc(new CHARS, nat length) -> (edit allocated) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 94
 
 Potential errors:
 
@@ -7326,9 +8747,11 @@ Creates room for one element.
 ```rust
 alloc(edit list) -> (edit allocated)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 214
 
 Potential errors:
 
@@ -7342,9 +8765,11 @@ Potential errors:
 ```rust
 alloc(edit list, nat length) -> (edit allocated)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 206
 
 Potential errors:
 
@@ -7360,9 +8785,11 @@ Creates room for one element.
 ```rust
 alloc(edit list) -> (edit allocated)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 214
 
 Potential errors:
 
@@ -7376,9 +8803,11 @@ Potential errors:
 ```rust
 alloc(edit list, nat length) -> (edit allocated)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 206
 
 Potential errors:
 
@@ -7394,9 +8823,11 @@ Creates room for one element.
 ```rust
 alloc(edit circular) -> (edit allocated)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 165
 
 Potential errors:
 
@@ -7408,9 +8839,11 @@ Potential errors:
 ```rust
 alloc(edit circular, nat length) -> (edit allocated)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 27
+- Transpiled C size: 157
 
 Potential errors:
 
@@ -7424,9 +8857,11 @@ Creates room for one element.
 ```rust
 alloc(edit arena) -> (edit allocated)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 24
+- Transpiled C size: 116
 
 Potential errors:
 
@@ -7438,9 +8873,11 @@ Potential errors:
 ```rust
 alloc(edit arena, nat length) -> (edit allocated)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 23
+- Transpiled C size: 108
 
 Potential errors:
 
@@ -7452,9 +8889,11 @@ Potential errors:
 ```rust
 alloc(cstr) -> (mut char[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 98
+- Transpiled C size: 627
 
 Potential errors:
 
@@ -7480,9 +8919,11 @@ free(mut any ptr) -> ()
 ```rust
 alloc(cstr surface, cstr obj) -> (mut char[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 112
+- Transpiled C size: 755
 
 Potential errors:
 
@@ -7514,9 +8955,11 @@ resources.
 ```rust
 resize(edit any[], nat size) -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 163
 
 Potential errors:
 
@@ -7533,9 +8976,11 @@ resources.
 ```rust
 resize(edit any[], nat size, "unsafe") -> (edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 101
 
 Potential errors:
 
@@ -7548,9 +8993,11 @@ Potential errors:
 ```rust
 last(edit any[]) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 111
 
 Potential errors:
 
@@ -7568,9 +9015,11 @@ are retrieved or sliced.
 ```rust
 mutget(edit any[], nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 72
 
 Potential errors:
 
@@ -7589,9 +9038,11 @@ are retrieved or sliced.
 ```rust
 mutget(edit any[], nat i, "unsafe_assume_inbounds") -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 49
 
 
 ### mutget - get a list element pointer
@@ -7600,9 +9051,11 @@ Level of abstraction:
 ```rust
 mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 34
 
 Potential errors:
 
@@ -7614,9 +9067,11 @@ Potential errors:
 ```rust
 mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 34
 
 Potential errors:
 
@@ -7628,9 +9083,11 @@ Potential errors:
 ```rust
 mutget(edit circular, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 34
 
 Potential errors:
 
@@ -7642,9 +9099,11 @@ Potential errors:
 ```rust
 mutget(edit arena, nat pos) -> (mut any ptr {follows any ptr l.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 57
 
 Potential errors:
 
@@ -7659,9 +9118,11 @@ Potential errors:
 ```rust
 mutget(edit arena, nat pos, "unsafe_assume_inbounds") -> (mut any ptr {follows any ptr l.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 23
 
 
 ### mutget - get a mutable hash map entry
@@ -7672,9 +9133,11 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 mutget(edit robinhood_nat_entry[], edit any[], nat key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 65
 
 Potential errors:
 
@@ -7692,9 +9155,11 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 mutget(edit robinhood_str_entry[], edit any[], str) -> (mut any ptr {follows any ptr values.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 94
 
 Potential errors:
 
@@ -7712,9 +9177,11 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 mutget(edit robinhood_str_entry[], edit any[], cstr key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 88
 
 Potential errors:
 
@@ -7730,9 +9197,11 @@ Potential errors:
 ```rust
 mutget(edit vec, nat i) -> (mut float ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 60
 
 Potential errors:
 
@@ -7744,25 +9213,12 @@ Potential errors:
 ```rust
 mutget(edit vec, nat i, "unsafe_assume_inbounds") -> (mut float ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 37
 
-
-### mutget - mutable reference to matrix element (i,j)
-*Defined in: std/sci/mat.s line 59*
-
-```rust
-mutget(edit mat, nat i, nat j) -> (mut float ptr)
-```
-Level of abstraction:
-
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-67. row out of bounds
-68. column out of bounds
 
 ### mutget - mutable reference to a sparse element
 *Defined in: std/sci/coo.s line 52*
@@ -7770,9 +9226,11 @@ Potential errors:
 ```rust
 mutget(edit coo, nat k) -> (mut sparse_element ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 50
 
 Potential errors:
 
@@ -7787,10 +9245,29 @@ Potential errors:
 ```rust
 mutget(edit coo, nat k, "unsafe_assume_inbounds") -> (mut sparse_element ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 27
 
+
+### mutget - mutable reference to matrix element (i,j)
+*Defined in: std/sci/mat.s line 59*
+
+```rust
+mutget(edit mat, nat i, nat j) -> (mut float ptr)
+```
+Complexity:
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 103
+
+Potential errors:
+
+67. row out of bounds
+68. column out of bounds
 
 # len
 ### len - the number of buffer elements
@@ -7799,6 +9276,12 @@ Level of abstraction:
 ```rust
 len(any[]) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 ### len - string length
 *Defined in: std/core/string.s line 103*
@@ -7806,6 +9289,12 @@ len(any[]) -> (nat)
 ```rust
 len(str) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 ### len
 *Defined in: std/core/allocators.s line 99*
@@ -7813,6 +9302,12 @@ len(str) -> (nat)
 ```rust
 len(list) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 
 ### len
 *Defined in: std/core/allocators.s line 99*
@@ -7820,6 +9315,12 @@ len(list) -> (nat)
 ```rust
 len(list) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 
 ### len - vectot length
 *Defined in: std/sci/vec.s line 57*
@@ -7827,6 +9328,12 @@ len(list) -> (nat)
 ```rust
 len(vec) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 3
+
 
 # new
 ### new - allocations on new bufs
@@ -7835,6 +9342,12 @@ len(vec) -> (nat)
 ```rust
 new() -> (new)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 3
+
 
 # arena
 ### arena
@@ -7843,9 +9356,11 @@ new() -> (new)
 ```rust
 arena("char__t9t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena - a buffer and mutable position pair
@@ -7862,9 +9377,11 @@ with another allocator).
 ```rust
 arena(edit any[]) -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 39
 
 
 ### arena - a buffer and mutable position pair
@@ -7881,6 +9398,12 @@ with another allocator).
 ```rust
 arena(edit any[], nat _pos) -> (edit arena)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 11
+
 
 ### arena
 *Defined in: std/sci/vec.s line 23*
@@ -7888,9 +9411,11 @@ arena(edit any[], nat _pos) -> (edit arena)
 ```rust
 arena("float__t2721t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -7899,9 +9424,11 @@ Level of abstraction:
 ```rust
 arena("float__t2655t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -7910,9 +9437,11 @@ Level of abstraction:
 ```rust
 arena("float__t2376t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -7921,9 +9450,11 @@ Level of abstraction:
 ```rust
 arena("float__t661t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -7932,9 +9463,11 @@ Level of abstraction:
 ```rust
 arena("float__t619t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -7943,9 +9476,11 @@ Level of abstraction:
 ```rust
 arena("float__t615t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -7954,9 +9489,11 @@ Level of abstraction:
 ```rust
 arena("float__t611t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -7965,9 +9502,11 @@ Level of abstraction:
 ```rust
 arena("float__t4t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -7976,9 +9515,11 @@ Level of abstraction:
 ```rust
 arena(edit vec) -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 120
 
 
 # length
@@ -7991,6 +9532,12 @@ of elements actively in use.
 ```rust
 length(arena) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 
 # allocated
 ### allocated
@@ -7999,6 +9546,12 @@ length(arena) -> (nat)
 ```rust
 allocated(edit any[], nat pos) -> (edit allocated)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 
 # status
 ### status - convert to a nameless buffer and position pair
@@ -8010,6 +9563,12 @@ memory data as part of structural input.
 ```rust
 status(allocated) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 23
+
 
 ### status - convert to a nameless buffer and position pair
 *Defined in: std/core/allocators.s line 57*
@@ -8020,6 +9579,12 @@ memory data as part of structural input.
 ```rust
 status(arena) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 23
+
 
 # circular
 ### circular
@@ -8028,9 +9593,11 @@ status(arena) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat)
 ```rust
 circular("char__t9t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular - circular buffer
@@ -8039,6 +9606,12 @@ Level of abstraction:
 ```rust
 circular(edit any[]) -> (edit circular)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 15
+
 
 ### circular
 *Defined in: std/sci/vec.s line 24*
@@ -8046,9 +9619,11 @@ circular(edit any[]) -> (edit circular)
 ```rust
 circular("float__t2721t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -8057,9 +9632,11 @@ Level of abstraction:
 ```rust
 circular("float__t2655t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -8068,9 +9645,11 @@ Level of abstraction:
 ```rust
 circular("float__t2376t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -8079,9 +9658,11 @@ Level of abstraction:
 ```rust
 circular("float__t661t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -8090,9 +9671,11 @@ Level of abstraction:
 ```rust
 circular("float__t619t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -8101,9 +9684,11 @@ Level of abstraction:
 ```rust
 circular("float__t615t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -8112,9 +9697,11 @@ Level of abstraction:
 ```rust
 circular("float__t611t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -8123,9 +9710,11 @@ Level of abstraction:
 ```rust
 circular("float__t4t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 # list
@@ -8135,9 +9724,11 @@ Level of abstraction:
 ```rust
 list("char__t9t") -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
 
 Potential errors:
 
@@ -8159,6 +9750,12 @@ A capacity is maintained so that resizes are not performed too frequently.
 ```rust
 list(edit any[], "external") -> (edit list)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 47
+
 
 ### list - list buffer management
 *Defined in: std/core/allocators.s line 88*
@@ -8169,9 +9766,11 @@ A capacity is maintained so that resizes are not performed too frequently.
 ```rust
 list(edit any[]) -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 91
 
 Potential errors:
 
@@ -8190,9 +9789,11 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t2721t") -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
 
 Potential errors:
 
@@ -8211,9 +9812,11 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t2655t") -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
 
 Potential errors:
 
@@ -8232,9 +9835,11 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t2376t") -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
 
 Potential errors:
 
@@ -8253,9 +9858,11 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t661t") -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
 
 Potential errors:
 
@@ -8274,9 +9881,11 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t619t") -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
 
 Potential errors:
 
@@ -8295,9 +9904,11 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t615t") -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
 
 Potential errors:
 
@@ -8316,9 +9927,11 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t611t") -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
 
 Potential errors:
 
@@ -8337,9 +9950,11 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t4t") -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
 
 Potential errors:
 
@@ -8359,9 +9974,11 @@ free(mut any ptr) -> ()
 ```rust
 at(edit allocated) -> (mut any ptr {follows any ptr surface.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 34
 
 Potential errors:
 
@@ -8373,9 +9990,11 @@ Potential errors:
 ```rust
 at(edit robinhood_nat_entry[], nat _k) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 54
+- Transpiled C size: 721
 
 Potential errors:
 
@@ -8391,9 +10010,11 @@ Potential errors:
 ```rust
 at(edit robinhood_str_entry[], str) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 102
+- Transpiled C size: 1054
 
 Potential errors:
 
@@ -8409,9 +10030,11 @@ Potential errors:
 ```rust
 at(edit robinhood_str_entry[], cstr _k) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 98
+- Transpiled C size: 1048
 
 Potential errors:
 
@@ -8427,9 +10050,11 @@ Potential errors:
 ```rust
 at(vec, nat i) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 41
 
 Potential errors:
 
@@ -8441,6 +10066,12 @@ Potential errors:
 ```rust
 at(float number, nat i) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 # slice
 ### slice - get a substring view into a string
@@ -8454,9 +10085,11 @@ memory, such as circular buffers.
 ```rust
 slice(str, nat from, nat to) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 286
 
 Potential errors:
 
@@ -8475,9 +10108,11 @@ memory, such as circular buffers.
 ```rust
 slice(cstr _s, nat from, nat to) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 280
 
 Potential errors:
 
@@ -8496,9 +10131,11 @@ heap.
 ```rust
 slice(edit arena, nat length) -> (mut any[] {follows any ptr surface.buf.unsafe_ptr})
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 44
+- Transpiled C size: 173
 
 Potential errors:
 
@@ -8511,6 +10148,12 @@ Potential errors:
 ```rust
 new() -> (new)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 3
+
 
 ### list
 *Defined in: std/core/string.s line 25*
@@ -8518,9 +10161,11 @@ new() -> (new)
 ```rust
 list("char__t9t") -> (edit list)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
 
 Potential errors:
 
@@ -8539,9 +10184,11 @@ free(mut any ptr) -> ()
 ```rust
 circular("char__t9t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -8550,9 +10197,11 @@ Level of abstraction:
 ```rust
 arena("char__t9t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 # strdat
@@ -8562,6 +10211,12 @@ Level of abstraction:
 ```rust
 strdat(nat pos, nat length, char first) -> (nat pos, nat length, char first)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 3
+
 
 ### strdat
 *Defined in: std/mini.s line 57*
@@ -8569,9 +10224,11 @@ strdat(nat pos, nat length, char first) -> (nat pos, nat length, char first)
 ```rust
 strdat(nat _pos, nat _length) -> (nat16 pos, nat16 length)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 49
 
 Potential errors:
 
@@ -8587,9 +10244,11 @@ Subsequent comparisons no longer use the underlying pointer value.
 ```rust
 str(cstr) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 169
 
 
 ### str - a string residing on a buffer
@@ -8602,9 +10261,11 @@ on comparisons of unequal strings.
 ```rust
 str(char[], nat endpos, "from", nat pos) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 62
 
 Potential errors:
 
@@ -8624,9 +10285,11 @@ on comparisons of unequal strings.
 ```rust
 str(char[], nat pos, "to", nat endpos) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 143
 
 Potential errors:
 
@@ -8646,9 +10309,11 @@ on comparisons of unequal strings.
 ```rust
 str(char[], nat pos, "len", nat length) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 118
 
 Potential errors:
 
@@ -8663,6 +10328,12 @@ Potential errors:
 ```rust
 str(str) -> (str)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 ### str - a string residing on the full breadth of a buffer
 *Defined in: std/core/string.s line 55*
@@ -8670,9 +10341,11 @@ str(str) -> (str)
 ```rust
 str(char[]) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 165
 
 Potential errors:
 
@@ -8688,9 +10361,11 @@ Potential errors:
 ```rust
 str(char[], nat length) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 147
 
 Potential errors:
 
@@ -8706,9 +10381,11 @@ Potential errors:
 ```rust
 str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 100
 
 Potential errors:
 
@@ -8721,9 +10398,11 @@ Potential errors:
 ```rust
 str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 43
 
 
 ### str - a string residing on a buffer
@@ -8732,6 +10411,12 @@ Level of abstraction:
 ```rust
 str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 ### str - reads a string from the console
 *Defined in: std/core/convertstr.s line 114*
@@ -8741,9 +10426,11 @@ The read string is placed on an arena while consuming only the necessarily minim
 ```rust
 str(edit arena, console console) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 47
+- Transpiled C size: 279
 
 Potential errors:
 
@@ -8764,9 +10451,11 @@ The resulting memory will consume exactly the required size in bytes.
 ```rust
 str(new CHARS, console console) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 79
+- Transpiled C size: 486
 
 Potential errors:
 
@@ -8797,9 +10486,11 @@ retrieving data with 'unpack' for memory efficiency.
 ```rust
 str(cstr) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 51
 
 Potential errors:
 
@@ -8814,9 +10505,11 @@ retrieving data with 'unpack' for memory efficiency.
 ```rust
 str(str) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 39
 
 Potential errors:
 
@@ -8828,9 +10521,11 @@ Potential errors:
 ```rust
 str(cstr ptr) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 44
 
 Potential errors:
 
@@ -8842,9 +10537,11 @@ Potential errors:
 ```rust
 str(str ptr) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 86
 
 Potential errors:
 
@@ -8866,9 +10563,11 @@ without runtime failures; they always preserve their size.
 ```rust
 copy(edit list, cstr _other) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 171
 
 Potential errors:
 
@@ -8893,9 +10592,11 @@ without runtime failures; they always preserve their size.
 ```rust
 copy(edit list, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 177
 
 Potential errors:
 
@@ -8920,9 +10621,11 @@ without runtime failures; they always preserve their size.
 ```rust
 copy(edit circular, cstr _other) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 171
 
 Potential errors:
 
@@ -8945,9 +10648,11 @@ without runtime failures; they always preserve their size.
 ```rust
 copy(edit circular, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 177
 
 Potential errors:
 
@@ -8970,9 +10675,11 @@ without runtime failures; they always preserve their size.
 ```rust
 copy(edit arena, cstr _other) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 171
 
 Potential errors:
 
@@ -8995,9 +10702,11 @@ without runtime failures; they always preserve their size.
 ```rust
 copy(edit arena, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 177
 
 Potential errors:
 
@@ -9020,9 +10729,11 @@ without runtime failures; they always preserve their size.
 ```rust
 copy(new CHARS, cstr _other) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 156
 
 Potential errors:
 
@@ -9052,9 +10763,11 @@ without runtime failures; they always preserve their size.
 ```rust
 copy(new CHARS, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 162
 
 Potential errors:
 
@@ -9082,9 +10795,11 @@ s = copy 123
 ```rust
 copy(edit list, nat n) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 79
+- Transpiled C size: 476
 
 Potential errors:
 
@@ -9110,9 +10825,11 @@ s = copy 123
 ```rust
 copy(edit circular, nat n) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 79
+- Transpiled C size: 476
 
 Potential errors:
 
@@ -9136,9 +10853,11 @@ s = copy 123
 ```rust
 copy(edit arena, nat n) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 79
+- Transpiled C size: 476
 
 Potential errors:
 
@@ -9162,9 +10881,11 @@ s = copy 123
 ```rust
 copy(new CHARS, nat n) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 73
+- Transpiled C size: 461
 
 Potential errors:
 
@@ -9190,9 +10911,11 @@ Grabs a FLOATS for the result as an effect.
 ```rust
 copy(edit circular, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 205
 
 Potential errors:
 
@@ -9209,9 +10932,11 @@ Grabs a FLOATS for the result as an effect.
 ```rust
 copy(edit arena, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 205
 
 Potential errors:
 
@@ -9228,9 +10953,11 @@ Grabs a FLOATS for the result as an effect.
 ```rust
 copy(new FLOATS, vec) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 190
 
 Potential errors:
 
@@ -9253,9 +10980,11 @@ This operation may fail if the string does not fit the current allocation - pref
 ```rust
 copy_null_terminated(edit arena, cstr _other) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 35
+- Transpiled C size: 205
 
 Potential errors:
 
@@ -9273,9 +11002,11 @@ This operation may fail if the string does not fit the current allocation - pref
 ```rust
 copy_null_terminated(edit arena, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 211
 
 Potential errors:
 
@@ -9292,9 +11023,11 @@ This is mainly useful for supporting 'cstr unsafe_temp'.
 ```rust
 copy_null_terminated(new CHARS, str) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 31
+- Transpiled C size: 168
 
 Potential errors:
 
@@ -9318,9 +11051,11 @@ This is mainly used as a stt-input counterpart for converting str|cstr to cstr.
 ```rust
 unsafe_temp(cstr) -> (cstr cstr, str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 36
 
 
 ### unsafe\_temp - convert a string to a temporary null-terminated (cstr,str) pair
@@ -9345,9 +11080,11 @@ passing data to 'compt' or 'macro'.*
 ```rust
 unsafe_temp(str) -> (unsafe_temp)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 75
 
 Potential errors:
 
@@ -9384,9 +11121,11 @@ passing data to 'compt' or 'macro'.*
 ```rust
 unsafe_temp(str, str) -> (unsafe_temp)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 48
+- Transpiled C size: 244
 
 Potential errors:
 
@@ -9411,9 +11150,11 @@ enclosing buffer.
 ```rust
 endpos(str) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 13
 
 
 # revalidate
@@ -9442,9 +11183,11 @@ print s2.dat.first # prints 2
 ```rust
 revalidate(str) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 24
 
 
 # starts\_with
@@ -9454,9 +11197,11 @@ Level of abstraction:
 ```rust
 starts_with(str, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 213
 
 Potential errors:
 
@@ -9470,9 +11215,11 @@ Potential errors:
 ```rust
 starts_with(str, cstr _needle) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 207
 
 Potential errors:
 
@@ -9486,9 +11233,11 @@ Potential errors:
 ```rust
 starts_with(cstr _stack, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 207
 
 Potential errors:
 
@@ -9502,9 +11251,11 @@ Potential errors:
 ```rust
 starts_with(cstr _stack, cstr _needle) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 201
 
 Potential errors:
 
@@ -9519,9 +11270,11 @@ Potential errors:
 ```rust
 ends_with(str, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 47
+- Transpiled C size: 223
 
 Potential errors:
 
@@ -9535,9 +11288,11 @@ Potential errors:
 ```rust
 ends_with(str, cstr _needle) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 217
 
 Potential errors:
 
@@ -9551,9 +11306,11 @@ Potential errors:
 ```rust
 ends_with(cstr _stack, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 217
 
 Potential errors:
 
@@ -9567,9 +11324,11 @@ Potential errors:
 ```rust
 ends_with(cstr _stack, cstr _needle) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 211
 
 Potential errors:
 
@@ -9584,9 +11343,11 @@ Potential errors:
 ```rust
 contains(str, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 60
+- Transpiled C size: 356
 
 
 ### contains - check whether a string contains a needle substring
@@ -9595,9 +11356,11 @@ Level of abstraction:
 ```rust
 contains(str, cstr _needle) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 56
+- Transpiled C size: 350
 
 
 ### contains - check whether a string contains a needle substring
@@ -9606,9 +11369,11 @@ Level of abstraction:
 ```rust
 contains(cstr _stack, str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 56
+- Transpiled C size: 350
 
 
 ### contains - check whether a string contains a needle substring
@@ -9617,9 +11382,11 @@ Level of abstraction:
 ```rust
 contains(cstr _stack, cstr _needle) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 52
+- Transpiled C size: 344
 
 
 ### contains - check whether a string contains a needle character
@@ -9628,9 +11395,11 @@ Level of abstraction:
 ```rust
 contains(str, char needle) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 255
 
 Potential errors:
 
@@ -9643,9 +11412,11 @@ Potential errors:
 ```rust
 contains(cstr _stack, char needle) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 29
+- Transpiled C size: 249
 
 Potential errors:
 
@@ -9662,9 +11433,11 @@ than casting to a string.
 ```rust
 empty(str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 31
 
 
 ### empty - checks that a cstr does not have any characters
@@ -9678,9 +11451,11 @@ as there is no need to actually traverse the character contents.
 ```rust
 empty(cstr) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 59
 
 
 # is\_number
@@ -9690,6 +11465,12 @@ Level of abstraction:
 ```rust
 is_number(char) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 29
+
 
 # rotl
 ### rotl
@@ -9698,6 +11479,12 @@ is_number(char) -> (bool)
 ```rust
 rotl(nat x, nat k) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 27
+
 
 # splitmix64
 ### splitmix64 - time seed
@@ -9709,6 +11496,12 @@ as the source of entropy.
 ```rust
 splitmix64() -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 62
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[time.time_ns()]`*
 ### splitmix64 - next random number
@@ -9726,6 +11519,12 @@ not random).
 ```rust
 splitmix64(mut nat) -> (mut nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 65
+
 
 # Rand
 ### Rand - random number generator
@@ -9739,9 +11538,11 @@ on four u64 state fields. This version defaults to a time-based seed. Its period
 ```rust
 Rand() -> (edit Rand)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 26
 
 
 ### Rand - random number generator
@@ -9755,9 +11556,11 @@ on four u64 state fields. The version is seed-initalized. Its period is 2^256-1.
 ```rust
 Rand(nat) -> (edit Rand)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 79
 
 
 # Hashable
@@ -9769,6 +11572,12 @@ Represents values in the range `0 to 2^64-1`.
 ```rust
 nat() -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### float
 *Defined in: builtins line 1*
@@ -9776,6 +11585,12 @@ nat() -> (nat)
 ```rust
 float() -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### cstr - constant string
 *Defined in: builtins line 1*
@@ -9783,6 +11598,12 @@ float() -> (float)
 ```rust
 cstr() -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### nat
 *Defined in: std/core/array.s line 24*
@@ -9790,6 +11611,12 @@ cstr() -> (cstr)
 ```rust
 nat(nat32) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
 
 ### nat
 *Defined in: std/core/array.s line 24*
@@ -9797,6 +11624,12 @@ nat(nat32) -> (nat)
 ```rust
 nat(nat16) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 95*
@@ -9806,6 +11639,12 @@ Converts a bit representation to the corresponding float number.
 ```rust
 float(bits) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 18
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 84*
@@ -9815,9 +11654,11 @@ Converts a bit representation to the corresponding natural number.
 ```rust
 nat(bits) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
 
 
 ### nat - cast to nat
@@ -9829,6 +11670,12 @@ its bit representation interpreted as an unsigned number.
 ```rust
 nat(char) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 40*
@@ -9839,6 +11686,12 @@ Converting to natural numbers loses information.
 ```rust
 nat(nat) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 7
+
 
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 40*
@@ -9849,9 +11702,11 @@ Converting to natural numbers loses information.
 ```rust
 nat(int) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 42
 
 Potential errors:
 
@@ -9866,9 +11721,11 @@ Converting to natural numbers loses information.
 ```rust
 nat(float) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 42
 
 Potential errors:
 
@@ -9882,9 +11739,11 @@ May lose information because floats are not exact representation of all integers
 ```rust
 float(nat) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 15
 
 
 ### float - cast to float
@@ -9895,9 +11754,11 @@ May lose information because floats are not exact representation of all integers
 ```rust
 float(int) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 15
 
 
 ### float - cast to float
@@ -9908,9 +11769,11 @@ Serves as a tautology function for code that parses on multiple number types.
 ```rust
 float(float) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 15
 
 
 ### cstr - extract the cstr from unsafe_temp string
@@ -9922,6 +11785,12 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 ```rust
 cstr(cstr cstr, str) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
 
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s line 205*
@@ -9932,6 +11801,12 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 ```rust
 cstr(unsafe_temp) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s line 205*
@@ -9942,6 +11817,12 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 ```rust
 cstr(unsafe_temp) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 
 ### str - convert to string
 *Defined in: std/core/string.s line 91*
@@ -9952,9 +11833,11 @@ Subsequent comparisons no longer use the underlying pointer value.
 ```rust
 str(cstr) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 169
 
 
 ### str - a string residing on a buffer
@@ -9967,9 +11850,11 @@ on comparisons of unequal strings.
 ```rust
 str(char[], nat endpos, "from", nat pos) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 62
 
 Potential errors:
 
@@ -9989,9 +11874,11 @@ on comparisons of unequal strings.
 ```rust
 str(char[], nat pos, "to", nat endpos) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 143
 
 Potential errors:
 
@@ -10011,9 +11898,11 @@ on comparisons of unequal strings.
 ```rust
 str(char[], nat pos, "len", nat length) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 118
 
 Potential errors:
 
@@ -10028,6 +11917,12 @@ Potential errors:
 ```rust
 str(str) -> (str)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 ### str - a string residing on the full breadth of a buffer
 *Defined in: std/core/string.s line 55*
@@ -10035,9 +11930,11 @@ str(str) -> (str)
 ```rust
 str(char[]) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 165
 
 Potential errors:
 
@@ -10053,9 +11950,11 @@ Potential errors:
 ```rust
 str(char[], nat length) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 147
 
 Potential errors:
 
@@ -10071,9 +11970,11 @@ Potential errors:
 ```rust
 str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 100
 
 Potential errors:
 
@@ -10086,9 +11987,11 @@ Potential errors:
 ```rust
 str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 43
 
 
 ### str - a string residing on a buffer
@@ -10097,6 +12000,12 @@ Level of abstraction:
 ```rust
 str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 # hash
 ### hash
@@ -10105,9 +12014,11 @@ str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```rust
 hash(nat k, nat size) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 35
+- Transpiled C size: 200
 
 Potential errors:
 
@@ -10119,9 +12030,11 @@ Potential errors:
 ```rust
 hash(str, nat size) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 31
+- Transpiled C size: 253
 
 Potential errors:
 
@@ -10136,9 +12049,11 @@ Potential errors:
 ```rust
 to_hash_base(nat) -> (bits)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
 
 
 ### to\_hash\_base
@@ -10147,9 +12062,11 @@ Level of abstraction:
 ```rust
 to_hash_base(int) -> (bits)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
 
 
 ### to\_hash\_base
@@ -10158,9 +12075,11 @@ Level of abstraction:
 ```rust
 to_hash_base(float) -> (bits)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
 
 
 ### to\_hash\_base
@@ -10169,9 +12088,11 @@ Level of abstraction:
 ```rust
 to_hash_base(cstr) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 20
 
 
 ### to\_hash\_base
@@ -10180,9 +12101,11 @@ Level of abstraction:
 ```rust
 to_hash_base(str) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 26
 
 
 # robinhood\_str\_entry
@@ -10192,6 +12115,12 @@ Level of abstraction:
 ```rust
 robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
 
 # robinhood\_nat\_entry
 ### robinhood\_nat\_entry
@@ -10200,6 +12129,12 @@ robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```rust
 robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 # robinhood\_entry
 ### robinhood\_nat\_entry
@@ -10208,6 +12143,12 @@ robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```rust
 robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 ### robinhood\_str\_entry
 *Defined in: std/hash.s line 46*
@@ -10215,6 +12156,12 @@ robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```rust
 robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
 
 # raw
 ### raw
@@ -10223,9 +12170,11 @@ robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```rust
 raw(cstr) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 20
 
 
 ### raw
@@ -10234,6 +12183,12 @@ Level of abstraction:
 ```rust
 raw(nat) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 3
+
 
 ### raw
 *Defined in: std/hash.s line 57*
@@ -10241,6 +12196,12 @@ raw(nat) -> (nat)
 ```rust
 raw(str) -> (str)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 ### raw
 *Defined in: std/hash.s line 54*
@@ -10248,6 +12209,12 @@ raw(str) -> (str)
 ```rust
 raw(nat s, nat cost) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 ### raw
 *Defined in: std/hash.s line 54*
@@ -10255,6 +12222,12 @@ raw(nat s, nat cost) -> (nat)
 ```rust
 raw(str, nat cost) -> (str)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
 
 # is\_zero
 ### is\_zero
@@ -10263,9 +12236,11 @@ raw(str, nat cost) -> (str)
 ```rust
 is_zero(nat) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 17
 
 
 ### is\_zero
@@ -10274,9 +12249,11 @@ Level of abstraction:
 ```rust
 is_zero(str) -> (bool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 31
 
 
 # find
@@ -10286,9 +12263,11 @@ Level of abstraction:
 ```rust
 find(nat[], nat _k) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 439
 
 Potential errors:
 
@@ -10304,9 +12283,11 @@ Potential errors:
 ```rust
 find(str[], str) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 79
+- Transpiled C size: 625
 
 Potential errors:
 
@@ -10322,9 +12303,11 @@ Potential errors:
 ```rust
 find(str[], cstr _k) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 75
+- Transpiled C size: 619
 
 Potential errors:
 
@@ -10340,9 +12323,11 @@ Potential errors:
 ```rust
 find(robinhood_nat_entry[], nat _k) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 46
+- Transpiled C size: 473
 
 Potential errors:
 
@@ -10358,9 +12343,11 @@ Potential errors:
 ```rust
 find(robinhood_str_entry[], str) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 82
+- Transpiled C size: 659
 
 Potential errors:
 
@@ -10376,9 +12363,11 @@ Potential errors:
 ```rust
 find(robinhood_str_entry[], cstr _k) -> (mut nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 78
+- Transpiled C size: 653
 
 Potential errors:
 
@@ -10398,9 +12387,11 @@ Map size is static and cannot be adjusted after initialization.
 ```rust
 strmap(edit any[]) -> (mut robinhood_str_entry[], edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 104
 
 Potential errors:
 
@@ -10423,9 +12414,11 @@ Map size is static and cannot be adjusted after initialization.
 ```rust
 natmap(edit any[]) -> (mut robinhood_nat_entry[], edit any[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 104
 
 Potential errors:
 
@@ -10445,9 +12438,11 @@ free(mut any ptr) -> ()
 ```rust
 unpack(char[], nat16 dat.pos, nat16 dat.length) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 19
+- Transpiled C size: 95
 
 Potential errors:
 
@@ -10462,9 +12457,11 @@ that is more efficient for computations in 64-bit architectures.
 ```rust
 unpack(str) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 40
 
 
 # post
@@ -10476,9 +12473,11 @@ The default application/json content type is used.
 ```rust
 post(edit circular, cstr url, cstr _body) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 123
 
 Potential errors:
 
@@ -10496,9 +12495,11 @@ Potential errors:
 ```rust
 post(edit circular, cstr url, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 119
 
 Potential errors:
 
@@ -10518,9 +12519,11 @@ The default application/json content type is used.
 ```rust
 post(edit circular, cstr url, str) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 140
 
 Potential errors:
 
@@ -10541,9 +12544,11 @@ Potential errors:
 ```rust
 post(edit circular, cstr url, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 136
 
 Potential errors:
 
@@ -10566,9 +12571,11 @@ The default application/json content type is used.
 ```rust
 post(edit circular, str, cstr _body) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 129
 
 Potential errors:
 
@@ -10589,9 +12596,11 @@ Potential errors:
 ```rust
 post(edit circular, str, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 125
 
 Potential errors:
 
@@ -10614,9 +12623,11 @@ The default application/json content type is used.
 ```rust
 post(edit circular, str, str) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 146
 
 Potential errors:
 
@@ -10637,9 +12648,11 @@ Potential errors:
 ```rust
 post(edit circular, str, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 142
 
 Potential errors:
 
@@ -10662,9 +12675,11 @@ The default application/json content type is used.
 ```rust
 post(edit arena, cstr url, cstr _body) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 123
 
 Potential errors:
 
@@ -10682,9 +12697,11 @@ Potential errors:
 ```rust
 post(edit arena, cstr url, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 119
 
 Potential errors:
 
@@ -10704,9 +12721,11 @@ The default application/json content type is used.
 ```rust
 post(edit arena, cstr url, str) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 140
 
 Potential errors:
 
@@ -10727,9 +12746,11 @@ Potential errors:
 ```rust
 post(edit arena, cstr url, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 136
 
 Potential errors:
 
@@ -10752,9 +12773,11 @@ The default application/json content type is used.
 ```rust
 post(edit arena, str, cstr _body) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 129
 
 Potential errors:
 
@@ -10775,9 +12798,11 @@ Potential errors:
 ```rust
 post(edit arena, str, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 125
 
 Potential errors:
 
@@ -10800,9 +12825,11 @@ The default application/json content type is used.
 ```rust
 post(edit arena, str, str) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 146
 
 Potential errors:
 
@@ -10823,9 +12850,11 @@ Potential errors:
 ```rust
 post(edit arena, str, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 142
 
 Potential errors:
 
@@ -10848,9 +12877,11 @@ The default application/json content type is used.
 ```rust
 post(new CHARS, cstr url, cstr _body) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 29
+- Transpiled C size: 108
 
 Potential errors:
 
@@ -10874,9 +12905,11 @@ free(mut any ptr) -> ()
 ```rust
 post(new CHARS, cstr url, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 104
 
 Potential errors:
 
@@ -10902,9 +12935,11 @@ The default application/json content type is used.
 ```rust
 post(new CHARS, cstr url, str) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 125
 
 Potential errors:
 
@@ -10931,9 +12966,11 @@ free(mut any ptr) -> ()
 ```rust
 post(new CHARS, cstr url, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 121
 
 Potential errors:
 
@@ -10962,9 +12999,11 @@ The default application/json content type is used.
 ```rust
 post(new CHARS, str, cstr _body) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 114
 
 Potential errors:
 
@@ -10991,9 +13030,11 @@ free(mut any ptr) -> ()
 ```rust
 post(new CHARS, str, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 110
 
 Potential errors:
 
@@ -11022,9 +13063,11 @@ The default application/json content type is used.
 ```rust
 post(new CHARS, str, str) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 131
 
 Potential errors:
 
@@ -11051,9 +13094,11 @@ free(mut any ptr) -> ()
 ```rust
 post(new CHARS, str, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 127
 
 Potential errors:
 
@@ -11081,9 +13126,11 @@ free(mut any ptr) -> ()
 ```rust
 abs(int) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 46
 
 
 ### abs
@@ -11092,9 +13139,11 @@ Level of abstraction:
 ```rust
 abs(float) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 38
 
 
 # sqrt
@@ -11104,6 +13153,12 @@ Level of abstraction:
 ```rust
 sqrt(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # sin
 ### sin
@@ -11112,6 +13167,12 @@ sqrt(float) -> (float)
 ```rust
 sin(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # cos
 ### cos
@@ -11120,6 +13181,12 @@ sin(float) -> (float)
 ```rust
 cos(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # log
 ### log
@@ -11128,6 +13195,12 @@ cos(float) -> (float)
 ```rust
 log(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # tan
 ### tan
@@ -11136,6 +13209,12 @@ log(float) -> (float)
 ```rust
 tan(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # floor
 ### floor
@@ -11144,6 +13223,12 @@ tan(float) -> (float)
 ```rust
 floor(float) -> (int)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # asin
 ### asin
@@ -11152,6 +13237,12 @@ floor(float) -> (int)
 ```rust
 asin(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # acos
 ### acos
@@ -11160,6 +13251,12 @@ asin(float) -> (float)
 ```rust
 acos(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # atan
 ### atan
@@ -11168,6 +13265,12 @@ acos(float) -> (float)
 ```rust
 atan(float x, float y) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 12
+
 
 ### atan
 *Defined in: std/sci/math.s line 74*
@@ -11175,6 +13278,12 @@ atan(float x, float y) -> (float)
 ```rust
 atan(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # exp
 ### exp
@@ -11183,6 +13292,12 @@ atan(float) -> (float)
 ```rust
 exp(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # isnan
 ### isnan
@@ -11191,6 +13306,12 @@ exp(float) -> (float)
 ```rust
 isnan(float) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 14
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[math.isnan(x)]`*
 # isinf
@@ -11200,6 +13321,12 @@ isnan(float) -> (bool)
 ```rust
 isinf(float) -> (bool)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 14
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[math.isinf(x)]`*
 # vec
@@ -11211,6 +13338,12 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 vec(float ptr unsafe_ptr, nat pos, nat length) -> (mut vec)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 15
+
 
 ### vec - vector allocation
 *Defined in: std/sci/vec.s line 48*
@@ -11218,9 +13351,11 @@ vec(float ptr unsafe_ptr, nat pos, nat length) -> (mut vec)
 ```rust
 vec(edit circular, nat length) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 204
 
 Potential errors:
 
@@ -11234,9 +13369,11 @@ Potential errors:
 ```rust
 vec(edit circular, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 157
 
 Potential errors:
 
@@ -11250,9 +13387,11 @@ Potential errors:
 ```rust
 vec(edit arena, nat length) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 204
 
 Potential errors:
 
@@ -11266,9 +13405,11 @@ Potential errors:
 ```rust
 vec(edit arena, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 157
 
 Potential errors:
 
@@ -11282,9 +13423,11 @@ Potential errors:
 ```rust
 vec(edit float[]) -> (mut vec)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 109
 
 Potential errors:
 
@@ -11299,9 +13442,11 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 ```rust
 vec(new FLOATS, nat length) -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 123
 
 Potential errors:
 
@@ -11320,9 +13465,11 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 ```rust
 vec(new FLOATS, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 96
 
 Potential errors:
 
@@ -11339,9 +13486,11 @@ free(mut any ptr) -> ()
 ```rust
 vec(mat) -> (mut vec)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 31
 
 
 # mat
@@ -11353,6 +13502,44 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride) -> (mut mat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 23
+
+
+### mat - view a vector as a matrix on the same memory
+*Defined in: std/sci/mat.s line 75*
+
+A 'type \"row\"' or 'type \"col\"' marker is needed
+to indicate the new matrix's orientation.
+
+```rust
+mat(vec, "col") -> (mut mat)
+```
+Complexity:
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 91
+
+
+### mat - view a vector as a matrix on the same memory
+*Defined in: std/sci/mat.s line 75*
+
+A 'type \"row\"' or 'type \"col\"' marker is needed
+to indicate the new matrix's orientation.
+
+```rust
+mat(vec, "row") -> (mut mat)
+```
+Complexity:
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 87
+
 
 ### mat - matrix on an existing float[] buffer
 *Defined in: std/sci/mat.s line 53*
@@ -11360,9 +13547,11 @@ mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride) -> (mut mat)
 ```rust
 mat(edit float[], nat rows) -> (mut mat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 167
 
 Potential errors:
 
@@ -11378,9 +13567,11 @@ Potential errors:
 ```rust
 mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 228
 
 Potential errors:
 
@@ -11394,9 +13585,11 @@ Potential errors:
 ```rust
 mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
 
 Potential errors:
 
@@ -11410,9 +13603,11 @@ Potential errors:
 ```rust
 mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 228
 
 Potential errors:
 
@@ -11426,9 +13621,11 @@ Potential errors:
 ```rust
 mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
 
 Potential errors:
 
@@ -11442,9 +13639,11 @@ Potential errors:
 ```rust
 mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 157
 
 Potential errors:
 
@@ -11463,9 +13662,11 @@ free(mut any ptr) -> ()
 ```rust
 mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 29
+- Transpiled C size: 116
 
 Potential errors:
 
@@ -11478,34 +13679,6 @@ Returned values defer use of the following functions:
 ```rust
 free(mut any ptr) -> ()
 ```
-### mat - view a vector as a matrix on the same memory
-*Defined in: std/sci/mat.s line 75*
-
-A 'type \"row\"' or 'type \"col\"' marker is needed
-to indicate the new matrix's orientation.
-
-```rust
-mat(vec, "col") -> (mut mat)
-```
-Level of abstraction:
-
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### mat - view a vector as a matrix on the same memory
-*Defined in: std/sci/mat.s line 75*
-
-A 'type \"row\"' or 'type \"col\"' marker is needed
-to indicate the new matrix's orientation.
-
-```rust
-mat(vec, "row") -> (mut mat)
-```
-Level of abstraction:
-
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
 # sparse\_element
 ### sparse\_element
 *Defined in: std/sci/unsafe.s line 29*
@@ -11513,6 +13686,12 @@ Level of abstraction:
 ```rust
 sparse_element(nat row, nat col, float value) -> (nat row, nat col, float value)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 3
+
 
 # coo
 ### coo - coo sparse matrix type declaration
@@ -11523,6 +13702,12 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 coo(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz) -> (mut coo)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 19
+
 
 ### coo
 *Defined in: std/sci/coo.s line 40*
@@ -11530,9 +13715,11 @@ coo(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz) -> (mut coo)
 ```rust
 coo(sparse_element[], nat rows, nat cols) -> (mut coo)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 40
 
 
 ### coo - allocate a sparse matrix
@@ -11543,9 +13730,11 @@ This creates a new buffer of sparse elements for convenience.
 ```rust
 coo(nat rows, nat cols, nat nnz) -> (mut coo)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 23
+- Transpiled C size: 97
 
 Potential errors:
 
@@ -11565,6 +13754,12 @@ free(mut any ptr) -> ()
 ```rust
 new() -> (new)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 3
+
 
 ### circular
 *Defined in: std/sci/vec.s line 24*
@@ -11572,9 +13767,11 @@ new() -> (new)
 ```rust
 circular("float__t2721t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -11583,9 +13780,11 @@ Level of abstraction:
 ```rust
 circular("float__t2655t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -11594,9 +13793,11 @@ Level of abstraction:
 ```rust
 circular("float__t2376t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -11605,9 +13806,11 @@ Level of abstraction:
 ```rust
 circular("float__t661t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -11616,9 +13819,11 @@ Level of abstraction:
 ```rust
 circular("float__t619t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -11627,9 +13832,11 @@ Level of abstraction:
 ```rust
 circular("float__t615t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -11638,9 +13845,11 @@ Level of abstraction:
 ```rust
 circular("float__t611t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### circular
@@ -11649,9 +13858,11 @@ Level of abstraction:
 ```rust
 circular("float__t4t") -> (edit circular)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -11660,9 +13871,11 @@ Level of abstraction:
 ```rust
 arena("float__t2721t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -11671,9 +13884,11 @@ Level of abstraction:
 ```rust
 arena("float__t2655t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -11682,9 +13897,11 @@ Level of abstraction:
 ```rust
 arena("float__t2376t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -11693,9 +13910,11 @@ Level of abstraction:
 ```rust
 arena("float__t661t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -11704,9 +13923,11 @@ Level of abstraction:
 ```rust
 arena("float__t619t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -11715,9 +13936,11 @@ Level of abstraction:
 ```rust
 arena("float__t615t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -11726,9 +13949,11 @@ Level of abstraction:
 ```rust
 arena("float__t611t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 ### arena
@@ -11737,9 +13962,11 @@ Level of abstraction:
 ```rust
 arena("float__t4t") -> (edit arena)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
 
 
 # constvec
@@ -11749,9 +13976,11 @@ Level of abstraction:
 ```rust
 constvec(float[]) -> (vec)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 109
 
 Potential errors:
 
@@ -11769,11 +13998,565 @@ without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
 
 ```rust
+reduce(vec, "sub", vec, "mul", "l2") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 48
+- Transpiled C size: 391
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul", "sqr") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 341
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul", "abs") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 339
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add", "l2") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 48
+- Transpiled C size: 391
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add", "sqr") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 341
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "mul") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 295
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add", "abs") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 339
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "add") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 295
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "l2") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 44
+- Transpiled C size: 327
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "sqr") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 277
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec, "abs") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 275
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "sub", vec) -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 231
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "l2") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 47
+- Transpiled C size: 391
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "sqr") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 44
+- Transpiled C size: 341
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul", "abs") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 44
+- Transpiled C size: 339
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "mul") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 295
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "l2") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 48
+- Transpiled C size: 391
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "sqr") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 341
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add", "abs") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 339
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "add") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 295
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "l2") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 44
+- Transpiled C size: 327
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "sqr") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 277
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec, "abs") -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 275
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
+reduce(vec, "mul", vec) -> (float)
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 231
+
+Potential errors:
+
+2. null pointer
+15. out of bounds
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+```rust
 reduce(vec, vec, "mul", "l2") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 292
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11791,9 +14574,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "mul", "sqr") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 242
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11811,9 +14596,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "mul", "abs") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 240
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11831,9 +14618,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "mul") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 196
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11851,9 +14640,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "add", "l2") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 292
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11871,9 +14662,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "add", "sqr") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 242
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11891,9 +14684,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "add", "abs") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 240
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11911,9 +14706,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "add") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 196
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11931,9 +14728,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "l2") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 228
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11951,9 +14750,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "sqr") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 178
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11971,9 +14772,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec, "abs") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 176
 
 No failing errors, but can catch these intercepted ones:
 
@@ -11991,9 +14794,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, vec) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 132
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12011,9 +14816,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", "l2") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 300
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12031,9 +14838,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", "sqr") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 250
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12051,9 +14860,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul", "abs") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 248
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12071,9 +14882,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "mul") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 204
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12091,9 +14904,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "add", "l2") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 300
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12111,9 +14926,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "add", "sqr") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 250
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12131,9 +14948,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "add", "abs") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 248
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12151,9 +14970,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "add") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 204
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12171,9 +14992,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "l2") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 35
+- Transpiled C size: 236
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12191,9 +15014,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "sqr") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 186
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12211,9 +15036,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "abs") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 184
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12231,9 +15058,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 140
 
 No failing errors, but can catch these intercepted ones:
 
@@ -12251,9 +15080,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "mul", "l2") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 56
+- Transpiled C size: 501
 
 Potential errors:
 
@@ -12273,9 +15104,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "mul", "sqr") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 451
 
 Potential errors:
 
@@ -12295,9 +15128,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "mul", "abs") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 449
 
 Potential errors:
 
@@ -12317,9 +15152,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "mul") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 49
+- Transpiled C size: 405
 
 Potential errors:
 
@@ -12339,9 +15176,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "add", "l2") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 56
+- Transpiled C size: 501
 
 Potential errors:
 
@@ -12361,9 +15200,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "add", "sqr") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 451
 
 Potential errors:
 
@@ -12383,9 +15224,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "add", "abs") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 449
 
 Potential errors:
 
@@ -12405,9 +15248,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "add") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 49
+- Transpiled C size: 405
 
 Potential errors:
 
@@ -12427,9 +15272,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "l2") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 52
+- Transpiled C size: 437
 
 Potential errors:
 
@@ -12449,9 +15296,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "sqr") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 49
+- Transpiled C size: 387
 
 Potential errors:
 
@@ -12471,9 +15320,11 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec, "abs") -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 49
+- Transpiled C size: 385
 
 Potential errors:
 
@@ -12493,518 +15344,16 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 reduce(vec, "rel", vec) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 341
 
 Potential errors:
 
 2. null pointer
 4. division by zero
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul", "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul", "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul", "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add", "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add", "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "mul") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add", "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "add") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec, "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "sub", vec) -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul", "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "mul") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add", "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "add") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "l2") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "sqr") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec, "abs") -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
-15. out of bounds
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-```rust
-reduce(vec, "mul", vec) -> (float)
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-2. null pointer
 15. out of bounds
 
 # dot
@@ -13014,9 +15363,11 @@ Potential errors:
 ```rust
 dot(vec, vec) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 32
 
 Potential errors:
 
@@ -13024,71 +15375,6 @@ Potential errors:
 15. out of bounds
 
 # sum
-### sum - sum
-*Defined in: std/sci/vec.s line 216*
-
-```rust
-sum(vec) -> (float)
-```
-Level of abstraction:
-
-2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-
-### sum - sum of all elements
-*Defined in: std/sci/coo.s line 125*
-
-```rust
-sum(coo, "all") -> (mut float)
-```
-Level of abstraction:
-
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-No failing errors, but can catch these intercepted ones:
-
-2. null pointer
-
-### sum - sum of each column
-*Defined in: std/sci/coo.s line 117*
-
-result[j] = sum of all stored values in column j
-
-```rust
-sum(edit circular, coo, "col") -> (mut vec) with effects FLOATS
-```
-Level of abstraction:
-
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-17. does not fit in circular arena
-2. null pointer
-61. can only place vectors on contiguous buffers
-62. cannot place vectors on buffer offsets
-15. out of bounds
-
-### sum - sum of each column
-*Defined in: std/sci/coo.s line 117*
-
-result[j] = sum of all stored values in column j
-
-```rust
-sum(edit arena, coo, "col") -> (mut vec) with effects FLOATS
-```
-Level of abstraction:
-
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-16. arena is out of space
-2. null pointer
-61. can only place vectors on contiguous buffers
-62. cannot place vectors on buffer offsets
-15. out of bounds
-
 ### sum - sum of each column
 *Defined in: std/sci/coo.s line 117*
 
@@ -13097,9 +15383,11 @@ result[j] = sum of all stored values in column j
 ```rust
 sum(new FLOATS, coo, "col") -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 291
 
 Potential errors:
 
@@ -13120,9 +15408,11 @@ result[i] = sum of all stored values in row i
 ```rust
 sum(edit circular, coo, "row") -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 306
 
 Potential errors:
 
@@ -13140,9 +15430,11 @@ result[i] = sum of all stored values in row i
 ```rust
 sum(edit arena, coo, "row") -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 306
 
 Potential errors:
 
@@ -13160,9 +15452,11 @@ result[i] = sum of all stored values in row i
 ```rust
 sum(new FLOATS, coo, "row") -> (mut vec) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 291
 
 Potential errors:
 
@@ -13175,6 +15469,79 @@ Returned values defer use of the following functions:
 ```rust
 free(mut any ptr) -> ()
 ```
+### sum - sum
+*Defined in: std/sci/vec.s line 216*
+
+```rust
+sum(vec) -> (float)
+```
+Complexity:
+
+- Level of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 15
+
+
+### sum - sum of all elements
+*Defined in: std/sci/coo.s line 125*
+
+```rust
+sum(coo, "all") -> (mut float)
+```
+Complexity:
+
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 19
+- Transpiled C size: 158
+
+No failing errors, but can catch these intercepted ones:
+
+2. null pointer
+
+### sum - sum of each column
+*Defined in: std/sci/coo.s line 117*
+
+result[j] = sum of all stored values in column j
+
+```rust
+sum(edit circular, coo, "col") -> (mut vec) with effects FLOATS
+```
+Complexity:
+
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 306
+
+Potential errors:
+
+17. does not fit in circular arena
+2. null pointer
+61. can only place vectors on contiguous buffers
+62. cannot place vectors on buffer offsets
+15. out of bounds
+
+### sum - sum of each column
+*Defined in: std/sci/coo.s line 117*
+
+result[j] = sum of all stored values in column j
+
+```rust
+sum(edit arena, coo, "col") -> (mut vec) with effects FLOATS
+```
+Complexity:
+
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 306
+
+Potential errors:
+
+16. arena is out of space
+2. null pointer
+61. can only place vectors on contiguous buffers
+62. cannot place vectors on buffer offsets
+15. out of bounds
+
 # mean
 ### mean - mean value
 *Defined in: std/sci/vec.s line 220*
@@ -13182,9 +15549,11 @@ free(mut any ptr) -> ()
 ```rust
 mean(vec) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 56
 
 Potential errors:
 
@@ -13197,9 +15566,11 @@ Potential errors:
 ```rust
 var(vec) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 25
+- Transpiled C size: 250
 
 Potential errors:
 
@@ -13213,9 +15584,11 @@ Potential errors:
 ```rust
 std(vec) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 34
 
 Potential errors:
 
@@ -13229,40 +15602,66 @@ Potential errors:
 ```rust
 self(mut vec) -> (edit arena, mut vec)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 28
 
 
 # rows
-### rows - number of rows
-*Defined in: std/sci/mat.s line 22*
-
-```rust
-rows(mat) -> (nat)
-```
-
 ### rows - number of rows
 *Defined in: std/sci/coo.s line 22*
 
 ```rust
 rows(coo) -> (nat)
 ```
+Complexity:
 
-# cols
-### cols - number of columns
-*Defined in: std/sci/mat.s line 26*
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
+
+### rows - number of rows
+*Defined in: std/sci/mat.s line 22*
 
 ```rust
-cols(mat) -> (nat)
+rows(mat) -> (nat)
 ```
+Complexity:
 
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
+
+# cols
 ### cols - number of columns
 *Defined in: std/sci/coo.s line 26*
 
 ```rust
 cols(coo) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
+
+### cols - number of columns
+*Defined in: std/sci/mat.s line 26*
+
+```rust
+cols(mat) -> (nat)
+```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
 
 # constmat
 ### constmat - immutable matrix on an immutable float[] buffer
@@ -13271,9 +15670,11 @@ cols(coo) -> (nat)
 ```rust
 constmat(float[], nat rows) -> (mat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 167
 
 Potential errors:
 
@@ -13290,9 +15691,11 @@ Potential errors:
 ```rust
 mutvec(mat) -> (mut vec)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 31
 
 
 # row
@@ -13302,9 +15705,11 @@ Level of abstraction:
 ```rust
 row(mat, nat i) -> (mut vec)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 14
+- Transpiled C size: 64
 
 Potential errors:
 
@@ -13317,6 +15722,12 @@ Potential errors:
 ```rust
 nnz(coo) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 # todense
 ### todense - convert to dense mat
@@ -13325,9 +15736,11 @@ nnz(coo) -> (nat)
 ```rust
 todense(edit circular, coo) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 276
 
 Potential errors:
 
@@ -13344,9 +15757,11 @@ Potential errors:
 ```rust
 todense(edit arena, coo) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 276
 
 Potential errors:
 
@@ -13363,9 +15778,11 @@ Potential errors:
 ```rust
 todense(new FLOATS, coo) -> (mut mat) with effects FLOATS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 261
 
 Potential errors:
 
@@ -13390,6 +15807,12 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride) -> (mut mat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 23
+
 
 ### coo - coo sparse matrix type declaration
 *Defined in: std/sci/unsafe.s line 32*
@@ -13399,140 +15822,24 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 coo(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz) -> (mut coo)
 ```
+Complexity:
 
-### mat - matrix on an existing float[] buffer
-*Defined in: std/sci/mat.s line 53*
-
-```rust
-mat(edit float[], nat rows) -> (mut mat)
-```
-Level of abstraction:
-
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-64. can only place matrices on contiguous buffers
-65. cannot place matrices on buffer offsets
-66. buffer size not divisible by vector rows
-16. arena is out of space
-4. division by zero
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-64. can only place matrices on contiguous buffers
-65. cannot place matrices on buffer offsets
-17. does not fit in circular arena
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-64. can only place matrices on contiguous buffers
-65. cannot place matrices on buffer offsets
-17. does not fit in circular arena
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-64. can only place matrices on contiguous buffers
-65. cannot place matrices on buffer offsets
-16. arena is out of space
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-64. can only place matrices on contiguous buffers
-65. cannot place matrices on buffer offsets
-16. arena is out of space
-
-### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 30*
-
-```rust
-mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-10. allocation failed
-12. cannot allocate a buffer of unsized type
-13. cannot resize buffers with alloc; it promises no data reallocation
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 19
 
 
-Returned values defer use of the following functions:
-```rust
-free(mut any ptr) -> ()
-```
-### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 30*
-
-```rust
-mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-10. allocation failed
-12. cannot allocate a buffer of unsized type
-13. cannot resize buffers with alloc; it promises no data reallocation
-
-
-Returned values defer use of the following functions:
-```rust
-free(mut any ptr) -> ()
-```
 ### coo
 *Defined in: std/sci/coo.s line 40*
 
 ```rust
 coo(sparse_element[], nat rows, nat cols) -> (mut coo)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 40
 
 
 ### coo - allocate a sparse matrix
@@ -13543,9 +15850,11 @@ This creates a new buffer of sparse elements for convenience.
 ```rust
 coo(nat rows, nat cols, nat nnz) -> (mut coo)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 23
+- Transpiled C size: 97
 
 Potential errors:
 
@@ -13567,9 +15876,11 @@ to indicate the new matrix's orientation.
 ```rust
 mat(vec, "col") -> (mut mat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 91
 
 
 ### mat - view a vector as a matrix on the same memory
@@ -13581,11 +15892,151 @@ to indicate the new matrix's orientation.
 ```rust
 mat(vec, "row") -> (mut mat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 87
 
 
+### mat - matrix on an existing float[] buffer
+*Defined in: std/sci/mat.s line 53*
+
+```rust
+mat(edit float[], nat rows) -> (mut mat)
+```
+Complexity:
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 167
+
+Potential errors:
+
+64. can only place matrices on contiguous buffers
+65. cannot place matrices on buffer offsets
+66. buffer size not divisible by vector rows
+16. arena is out of space
+4. division by zero
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 228
+
+Potential errors:
+
+64. can only place matrices on contiguous buffers
+65. cannot place matrices on buffer offsets
+17. does not fit in circular arena
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
+
+Potential errors:
+
+64. can only place matrices on contiguous buffers
+65. cannot place matrices on buffer offsets
+17. does not fit in circular arena
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 228
+
+Potential errors:
+
+64. can only place matrices on contiguous buffers
+65. cannot place matrices on buffer offsets
+16. arena is out of space
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
+
+Potential errors:
+
+64. can only place matrices on contiguous buffers
+65. cannot place matrices on buffer offsets
+16. arena is out of space
+
+### mat - matrix on a fresh buffer
+*Defined in: std/sci/mat.s line 30*
+
+```rust
+mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 157
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+free(mut any ptr) -> ()
+```
+### mat - matrix on a fresh buffer
+*Defined in: std/sci/mat.s line 30*
+
+```rust
+mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 29
+- Transpiled C size: 116
+
+Potential errors:
+
+10. allocation failed
+12. cannot allocate a buffer of unsized type
+13. cannot resize buffers with alloc; it promises no data reallocation
+
+
+Returned values defer use of the following functions:
+```rust
+free(mut any ptr) -> ()
+```
 # tagged
 ### tagged - blank tag structure
 *Defined in: std/tag.s line 20*
@@ -13596,6 +16047,12 @@ Ensures that 'tag ptr' has a unique type and allocates at least a cstr's
 ```rust
 tagged(cstr) -> (tagged)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 # unsafe\_match
 ### unsafe\_match
@@ -13604,9 +16061,11 @@ tagged(cstr) -> (tagged)
 ```rust
 unsafe_match(tagged ptr obj, cstr name, any ptr type) -> (mut any ptr {follows any ptr type})
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 98
 
 Potential errors:
 
@@ -13620,9 +16079,11 @@ Potential errors:
 ```rust
 unsafe_defer_free(mut tagged ptr) -> (mut tagged ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 3
 
 
 
@@ -13637,9 +16098,11 @@ free(mut any ptr) -> ()
 ```rust
 tagged_alloc(edit arena, nat size) -> (mut char ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 120
 
 Potential errors:
 
@@ -13653,9 +16116,11 @@ Potential errors:
 ```rust
 match(cstr obj, cstr type_name) -> (mut char[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 73
+- Transpiled C size: 433
 
 Potential errors:
 
@@ -13677,9 +16142,11 @@ free(mut any ptr) -> ()
 ```rust
 match(cstr obj, cstr type_name) -> (mut char[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 73
+- Transpiled C size: 433
 
 Potential errors:
 
@@ -13706,6 +16173,12 @@ mutex checking are always valid.
 ```rust
 pipe(cstr) -> (pipe)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 # mutex\_size
 ### mutex\_size
@@ -13714,6 +16187,12 @@ pipe(cstr) -> (pipe)
 ```rust
 mutex_size() -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 10
+
 
 # unsafe\_pipe\_lock
 ### unsafe\_pipe\_lock
@@ -13722,9 +16201,11 @@ mutex_size() -> (nat)
 ```rust
 unsafe_pipe_lock(pipe ptr) -> ()
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 27
 
 
 # unsafe\_pipe\_unlock
@@ -13734,9 +16215,11 @@ Level of abstraction:
 ```rust
 unsafe_pipe_unlock(pipe ptr) -> ()
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 27
 
 
 # with
@@ -13748,9 +16231,11 @@ This blocks other threads from accessing its data.
 ```rust
 with(pipe ptr) -> (with)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 8
 
 
 
@@ -13765,6 +16250,12 @@ unsafe_pipe_unlock(pipe ptr) -> ()
 ```rust
 system_thread(any ptr) -> (system_thread)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 # unsafe\_spawn
 ### unsafe\_spawn
@@ -13773,9 +16264,11 @@ system_thread(any ptr) -> (system_thread)
 ```rust
 unsafe_spawn((pipe ptr) -> () func, pipe ptr input) -> (system_thread)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 31
 
 
 # join
@@ -13785,9 +16278,11 @@ Level of abstraction:
 ```rust
 join(system_thread) -> ()
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 19
 
 
 # cpu
@@ -13797,6 +16292,12 @@ Level of abstraction:
 ```rust
 cpu(nat) -> (cpu)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 # growing\_thread\_pool
 ### growing\_thread\_pool
@@ -13805,9 +16306,11 @@ cpu(nat) -> (cpu)
 ```rust
 growing_thread_pool(cpu) -> (edit growing_thread_pool)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 140
 
 Potential errors:
 
@@ -13837,9 +16340,11 @@ join(system_thread) -> ()
 ```rust
 thread(edit growing_thread_pool, (pipe ptr) -> () func, pipe ptr input) -> (mut system_thread) with effects THREADS
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 27
+- Transpiled C size: 120
 
 Potential errors:
 
@@ -13854,9 +16359,11 @@ Potential errors:
 ```rust
 unsafe_pipe_match(with, cstr name, any ptr type) -> (mut any ptr {follows any ptr type})
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 114
 
 Potential errors:
 
@@ -13870,9 +16377,11 @@ Potential errors:
 ```rust
 unsafe_pipe_defer_free(mut pipe ptr) -> (mut pipe ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 3
 
 
 
@@ -13887,9 +16396,11 @@ free(mut any ptr) -> ()
 ```rust
 unsafe_pipe_mutax_init(mut pipe ptr) -> (mut pipe ptr)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 30
 
 
 
@@ -13904,9 +16415,11 @@ add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
 ```rust
 pipe_alloc(edit arena, nat size) -> (mut char ptr)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 120
 
 Potential errors:
 
@@ -13920,9 +16433,11 @@ Potential errors:
 ```rust
 shared(cstr) -> (mut char[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 98
+- Transpiled C size: 627
 
 Potential errors:
 
@@ -13948,9 +16463,11 @@ free(mut any ptr) -> ()
 ```rust
 shared(cstr surface, cstr obj) -> (mut char[])
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 112
+- Transpiled C size: 755
 
 Potential errors:
 
@@ -13987,9 +16504,11 @@ as those have the intent of immediate reuse.
 ```rust
 realloc(any ptr allocated, nat bytes) -> (any ptr {follows any ptr allocated})
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 71
 
 Potential errors:
 
@@ -14006,6 +16525,12 @@ Frees allocated memory.
 ```rust
 free(mut any ptr) -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 15
+
 
 # zero
 ### zero - set memory to zero
@@ -14018,6 +16543,12 @@ Memsets a memory region to zero.
 ```rust
 zero(any ptr allocated, nat from, nat to) -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
 
 # color
 ### color
@@ -14026,9 +16557,11 @@ zero(any ptr allocated, nat from, nat to) -> ()
 ```rust
 color(nat _r, nat _g, nat _b) -> (nat8 r, nat8 g, nat8 b, nat8 a)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 14
+- Transpiled C size: 103
 
 Potential errors:
 
@@ -14040,9 +16573,11 @@ Potential errors:
 ```rust
 color(nat _r, nat _g, nat _b, nat _a) -> (nat8 r, nat8 g, nat8 b, nat8 a)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 95
 
 Potential errors:
 
@@ -14055,6 +16590,12 @@ Potential errors:
 ```rust
 position(float x, float y) -> (float x, float y)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 # size
 ### size
@@ -14063,6 +16604,12 @@ position(float x, float y) -> (float x, float y)
 ```rust
 size(float width, float height) -> (float width, float height)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 # unsafe\_open\_window
 ### unsafe\_open\_window
@@ -14071,9 +16618,11 @@ size(float width, float height) -> (float width, float height)
 ```rust
 unsafe_open_window(float size.width, float size.height, cstr title, cstr font_path) -> ()
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 104
 
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `(pyray.set_trace_log_level(pyray.LOG_NONE), pyray.init_window(int($size__width),int($size__height),$title),pyray.set_target_fps(60),memory.set_global('font', pyray.load_font_ex($font_path,128,None,0) if $font_path else pyray.get_font_default()))`*
@@ -14084,9 +16633,11 @@ Level of abstraction:
 ```rust
 window(float size.width, float size.height, cstr title, cstr font_path) -> (edit window)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 26
 
 
 # is\_open
@@ -14096,9 +16647,11 @@ Level of abstraction:
 ```rust
 is_open(edit window) -> (bool) with effects WINDOW
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 17
 
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[not pyray.window_should_close()]`*
@@ -14109,6 +16662,12 @@ Level of abstraction:
 ```rust
 unsafe_begin_drawing() -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 0
+- Transpiled C size: 4
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.begin_drawing()`*
 # unsafe\_end\_drawing
@@ -14118,6 +16677,12 @@ unsafe_begin_drawing() -> ()
 ```rust
 unsafe_end_drawing() -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 4
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.end_drawing()`*
 # draw
@@ -14127,9 +16692,11 @@ unsafe_end_drawing() -> ()
 ```rust
 draw(edit window) -> (bool) with effects WINDOW
 ```
-Level of abstraction:
+Complexity:
 
-1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 28
 
 Potential errors:
 
@@ -14147,6 +16714,12 @@ unsafe_end_drawing() -> ()
 ```rust
 clear(edit window, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 16
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.clear_background(pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # text
@@ -14156,6 +16729,12 @@ clear(edit window, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> ()
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 53
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### text
@@ -14164,6 +16743,12 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 53
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### text
@@ -14172,6 +16757,12 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 42
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_ex(memory.globals['font'],str($txt),pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### text
@@ -14180,6 +16771,12 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 42
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_ex(memory.globals['font'],str($txt),pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### text
@@ -14188,6 +16785,12 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 ```rust
 text(edit window, cstr txt, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 35
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_text_ex(memory.globals['font'],$txt,pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # sleep
@@ -14197,6 +16800,12 @@ text(edit window, cstr txt, float pos.x, float pos.y, float size, nat8 color.r, 
 ```rust
 sleep(nat) -> ()
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 13
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `time.sleep($seconds*0.001)`*
 # TextureData
@@ -14206,6 +16815,12 @@ sleep(nat) -> ()
 ```rust
 TextureData(nat id, float size.width, float size.height, nat mipmaps, nat format) -> (nat id, float size.width, float size.height, nat mipmaps, nat format)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 # Texture
 ### Texture
@@ -14214,9 +16829,11 @@ TextureData(nat id, float size.width, float size.height, nat mipmaps, nat format
 ```rust
 Texture(nat id, float size.width, float size.height, nat mipmaps, nat format) -> (Texture)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 136
 
 Potential errors:
 
@@ -14236,9 +16853,11 @@ free(mut any ptr) -> ()
 ```rust
 open(cstr) -> (Texture)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 14
+- Transpiled C size: 87
 
 Potential errors:
 
@@ -14258,9 +16877,11 @@ free(mut any ptr) -> ()
 ```rust
 texture(edit window, Texture, float pos.x, float pos.y, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 258
 
 Potential errors:
 
@@ -14273,9 +16894,11 @@ Potential errors:
 ```rust
 texture(edit window, Texture, float pos.x, float pos.y, float scale, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 262
 
 Potential errors:
 
@@ -14288,9 +16911,11 @@ Potential errors:
 ```rust
 texture(edit window, Texture, float pos.x, float pos.y, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float rotation) -> () with effects WINDOW
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 44
+- Transpiled C size: 285
 
 Potential errors:
 
@@ -14304,9 +16929,11 @@ Potential errors:
 ```rust
 texture(edit window, Texture, float pos.x, float pos.y, float scale, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float rotation) -> () with effects WINDOW
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 219
 
 Potential errors:
 
@@ -14319,9 +16946,11 @@ Potential errors:
 ```rust
 texture(edit window, Texture, float pos.x, float pos.y, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 201
 
 Potential errors:
 
@@ -14335,6 +16964,12 @@ Potential errors:
 ```rust
 circ(edit window, float pos.x, float pos.y, float radius, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 69
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### circ
@@ -14343,6 +16978,12 @@ circ(edit window, float pos.x, float pos.y, float radius, "line", nat thickness,
 ```rust
 circ(edit window, float pos.x, float pos.y, float radius, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 36
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_circle_v(pyray.Vector2($pos__x,$pos__y),$radius,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # ellipse
@@ -14352,6 +16993,12 @@ circ(edit window, float pos.x, float pos.y, float radius, "solid", nat8 color.r,
 ```rust
 ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 36
+
 
 ### ellipse
 *Defined in: std/graphics.s line 241*
@@ -14359,6 +17006,12 @@ ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, "
 ```rust
 ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 14
+- Transpiled C size: 41
+
 
 # rect
 ### rect
@@ -14367,6 +17020,12 @@ ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, "
 ```rust
 rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 58
+
 
 ### rect
 *Defined in: std/graphics.s line 271*
@@ -14374,6 +17033,12 @@ rect(edit window, float pos.x, float pos.y, float size.width, float size.height,
 ```rust
 rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 46
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_rectangle_lines_ex(pyray.Rectangle($pos__x,$pos__y,$size__width,$size__height),$thickness,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### rect
@@ -14382,6 +17047,12 @@ rect(edit window, float pos.x, float pos.y, float size.width, float size.height,
 ```rust
 rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 14
+- Transpiled C size: 24
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # tri
@@ -14391,6 +17062,12 @@ rect(edit window, float pos.x, float pos.y, float size.width, float size.height,
 ```rust
 tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, float p3.y, "line", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 61
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_triangle_lines(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),pyray.Vector2($p3__x,$p3__y),pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### tri
@@ -14399,6 +17076,12 @@ tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, flo
 ```rust
 tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, float p3.y, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 61
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_triangle(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),pyray.Vector2($p3__x,$p3__y),pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # dt
@@ -14408,6 +17091,12 @@ tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, flo
 ```rust
 dt(window) -> (float) with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 9
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.get_frame_time()]`*
 # uptime
@@ -14417,6 +17106,12 @@ dt(window) -> (float) with effects WINDOW
 ```rust
 uptime(window) -> (float) with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 9
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.get_time()]`*
 # key\_down
@@ -14426,6 +17121,12 @@ uptime(window) -> (float) with effects WINDOW
 ```rust
 key_down(window, nat key) -> (bool) with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 10
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_key_down($key)]`*
 # key\_pressed
@@ -14435,6 +17136,12 @@ key_down(window, nat key) -> (bool) with effects WINDOW
 ```rust
 key_pressed(edit window, nat key) -> (bool) with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 10
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_key_pressed($key)]`*
 # key\_released
@@ -14444,6 +17151,12 @@ key_pressed(edit window, nat key) -> (bool) with effects WINDOW
 ```rust
 key_released(edit window, nat key) -> (bool) with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 10
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_key_released($key)]`*
 # mouse\_pos
@@ -14453,9 +17166,11 @@ key_released(edit window, nat key) -> (bool) with effects WINDOW
 ```rust
 mouse_pos(window) -> (float x, float y) with effects WINDOW
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 28
 
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[(lambda p=pyray.get_mouse_position():(p.x,p.y))()]`*
@@ -14466,6 +17181,12 @@ Level of abstraction:
 ```rust
 mouse_down(window, nat button) -> (bool) with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 10
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_mouse_button_down($button)]`*
 # mouse\_pressed
@@ -14475,6 +17196,12 @@ mouse_down(window, nat button) -> (bool) with effects WINDOW
 ```rust
 mouse_pressed(edit window, nat button) -> (bool) with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 10
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.is_mouse_button_pressed($button)]`*
 # mouse\_wheel
@@ -14484,6 +17211,12 @@ mouse_pressed(edit window, nat button) -> (bool) with effects WINDOW
 ```rust
 mouse_wheel(window) -> (float) with effects WINDOW
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 9
+
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[pyray.get_mouse_wheel_move()]`*
 # KEY\_NULL
@@ -14493,6 +17226,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (0)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_APOSTROPHE
 
@@ -14501,6 +17240,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (39)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_COMMA
 
@@ -14509,6 +17254,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (44)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_MINUS
 
@@ -14517,6 +17268,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (45)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_PERIOD
 
@@ -14525,6 +17282,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (46)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_SLASH
 
@@ -14533,6 +17296,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (47)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_ZERO
 
@@ -14541,6 +17310,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (48)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_ONE
 
@@ -14549,6 +17324,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (49)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_TWO
 
@@ -14557,6 +17338,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (50)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_THREE
 
@@ -14565,6 +17352,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (51)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_FOUR
 
@@ -14573,6 +17366,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (52)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_FIVE
 
@@ -14581,6 +17380,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (53)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_SIX
 
@@ -14589,6 +17394,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (54)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_SEVEN
 
@@ -14597,6 +17408,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (55)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_EIGHT
 
@@ -14605,6 +17422,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (56)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_NINE
 
@@ -14613,6 +17436,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (57)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_SEMICOLON
 
@@ -14621,6 +17450,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (59)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_EQUAL
 
@@ -14629,6 +17464,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (61)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_A
 
@@ -14637,6 +17478,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (65)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_B
 
@@ -14645,6 +17492,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (66)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_C
 
@@ -14653,6 +17506,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (67)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_D
 
@@ -14661,6 +17520,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (68)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_E
 
@@ -14669,6 +17534,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (69)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F
 
@@ -14677,6 +17548,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (70)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_G
 
@@ -14685,6 +17562,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (71)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_H
 
@@ -14693,6 +17576,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (72)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_I
 
@@ -14701,6 +17590,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (73)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_J
 
@@ -14709,6 +17604,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (74)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_K
 
@@ -14717,6 +17618,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (75)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_L
 
@@ -14725,6 +17632,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (76)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_M
 
@@ -14733,6 +17646,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (77)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_N
 
@@ -14741,6 +17660,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (78)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_O
 
@@ -14749,6 +17674,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (79)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_P
 
@@ -14757,6 +17688,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (80)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_Q
 
@@ -14765,6 +17702,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (81)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_R
 
@@ -14773,6 +17716,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (82)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_S
 
@@ -14781,6 +17730,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (83)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_T
 
@@ -14789,6 +17744,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (84)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_U
 
@@ -14797,6 +17758,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (85)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_V
 
@@ -14805,6 +17772,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (86)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_W
 
@@ -14813,6 +17786,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (87)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_X
 
@@ -14821,6 +17800,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (88)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_Y
 
@@ -14829,6 +17814,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (89)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_Z
 
@@ -14837,6 +17828,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (90)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_LEFT\_BRACKET
 
@@ -14845,6 +17842,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (91)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_BACKSLASH
 
@@ -14853,6 +17856,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (92)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_RIGHT\_BRACKET
 
@@ -14861,6 +17870,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (93)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_GRAVE
 
@@ -14869,6 +17884,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (96)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_SPACE
 
@@ -14877,6 +17898,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (32)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_ESCAPE
 
@@ -14885,6 +17912,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (256)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_ENTER
 
@@ -14893,6 +17926,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (257)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_TAB
 
@@ -14901,6 +17940,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (258)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_BACKSPACE
 
@@ -14909,6 +17954,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (259)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_INSERT
 
@@ -14917,6 +17968,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (260)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_DELETE
 
@@ -14925,6 +17982,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (261)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_RIGHT
 
@@ -14933,6 +17996,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (262)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_LEFT
 
@@ -14941,6 +18010,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (263)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_DOWN
 
@@ -14949,6 +18024,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (264)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_UP
 
@@ -14957,6 +18038,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (265)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_PAGE\_UP
 
@@ -14965,6 +18052,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (266)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_PAGE\_DOWN
 
@@ -14973,6 +18066,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (267)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_HOME
 
@@ -14981,6 +18080,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (268)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_END
 
@@ -14989,6 +18094,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (269)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_CAPS\_LOCK
 
@@ -14997,6 +18108,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (280)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_SCROLL\_LOCK
 
@@ -15005,6 +18122,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (281)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_NUM\_LOCK
 
@@ -15013,6 +18136,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (282)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_PRINT\_SCREEN
 
@@ -15021,6 +18150,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (283)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_PAUSE
 
@@ -15029,6 +18164,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (284)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F1
 
@@ -15037,6 +18178,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (290)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F2
 
@@ -15045,6 +18192,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (291)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F3
 
@@ -15053,6 +18206,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (292)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F4
 
@@ -15061,6 +18220,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (293)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F5
 
@@ -15069,6 +18234,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (294)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F6
 
@@ -15077,6 +18248,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (295)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F7
 
@@ -15085,6 +18262,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (296)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F8
 
@@ -15093,6 +18276,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (297)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F9
 
@@ -15101,6 +18290,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (298)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F10
 
@@ -15109,6 +18304,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (299)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F11
 
@@ -15117,6 +18318,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (300)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_F12
 
@@ -15125,6 +18332,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (301)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_LEFT\_SHIFT
 
@@ -15133,6 +18346,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (340)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_LEFT\_CONTROL
 
@@ -15141,6 +18360,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (341)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_LEFT\_ALT
 
@@ -15149,6 +18374,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (342)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_LEFT\_SUPER
 
@@ -15157,6 +18388,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (343)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_RIGHT\_SHIFT
 
@@ -15165,6 +18402,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (344)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_RIGHT\_CONTROL
 
@@ -15173,6 +18416,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (345)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_RIGHT\_ALT
 
@@ -15181,6 +18430,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (346)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_RIGHT\_SUPER
 
@@ -15189,6 +18444,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (347)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KB\_MENU
 
@@ -15197,6 +18458,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (348)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_0
 
@@ -15205,6 +18472,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (320)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_1
 
@@ -15213,6 +18486,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (321)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_2
 
@@ -15221,6 +18500,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (322)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_3
 
@@ -15229,6 +18514,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (323)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_4
 
@@ -15237,6 +18528,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (324)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_5
 
@@ -15245,6 +18542,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (325)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_6
 
@@ -15253,6 +18556,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (326)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_7
 
@@ -15261,6 +18570,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (327)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_8
 
@@ -15269,6 +18584,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (328)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_9
 
@@ -15277,6 +18598,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (329)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_DECIMAL
 
@@ -15285,6 +18612,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (330)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_DIVIDE
 
@@ -15293,6 +18626,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (331)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_MULTIPLY
 
@@ -15301,6 +18640,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (332)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_SUBTRACT
 
@@ -15309,6 +18654,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (333)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_ADD
 
@@ -15317,6 +18668,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (334)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_ENTER
 
@@ -15325,6 +18682,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (335)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_KP\_EQUAL
 
@@ -15333,6 +18696,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (336)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_BACK
 
@@ -15341,6 +18710,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (4)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_MENU
 
@@ -15349,6 +18724,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (5)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_VOLUME\_UP
 
@@ -15357,6 +18738,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (24)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # KEY\_VOLUME\_DOWN
 
@@ -15365,6 +18752,12 @@ mouse_wheel(window) -> (float) with effects WINDOW
 ```rust
 () -> (25)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # NumberOrPtr
 ### nat - an unsigned integer value
@@ -15375,6 +18768,12 @@ Represents values in the range `0 to 2^64-1`.
 ```rust
 nat() -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### float
 *Defined in: builtins line 1*
@@ -15382,6 +18781,12 @@ nat() -> (nat)
 ```rust
 float() -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### int - a signed integer value
 *Defined in: builtins line 1*
@@ -15391,6 +18796,12 @@ Represents values in the range `2^-63 to 2^63-1`.
 ```rust
 int() -> (int)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### nat ptr
 *Defined in: std/ptrpeek.s line 20*
@@ -15398,6 +18809,12 @@ int() -> (int)
 ```rust
 nat ptr() -> (mut nat ptr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### int ptr
 *Defined in: std/ptrpeek.s line 20*
@@ -15405,6 +18822,12 @@ nat ptr() -> (mut nat ptr)
 ```rust
 int ptr() -> (mut int ptr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### float ptr
 *Defined in: std/ptrpeek.s line 20*
@@ -15412,6 +18835,12 @@ int ptr() -> (mut int ptr)
 ```rust
 float ptr() -> (mut float ptr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 # to\_number
 ### to\_number
@@ -15420,6 +18849,12 @@ float ptr() -> (mut float ptr)
 ```rust
 to_number(nat) -> (nat)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 ### to\_number
 *Defined in: std/ptrpeek.s line 21*
@@ -15427,6 +18862,12 @@ to_number(nat) -> (nat)
 ```rust
 to_number(int) -> (int)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 ### to\_number
 *Defined in: std/ptrpeek.s line 21*
@@ -15434,6 +18875,12 @@ to_number(int) -> (int)
 ```rust
 to_number(float) -> (float)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 
 ### to\_number
 *Defined in: std/ptrpeek.s line 21*
@@ -15441,9 +18888,11 @@ to_number(float) -> (float)
 ```rust
 to_number(nat ptr) -> (nat)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 27
 
 Potential errors:
 
@@ -15455,9 +18904,11 @@ Potential errors:
 ```rust
 to_number(int ptr) -> (int)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 27
 
 Potential errors:
 
@@ -15469,9 +18920,11 @@ Potential errors:
 ```rust
 to_number(float ptr) -> (float)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 27
 
 Potential errors:
 
@@ -15484,9 +18937,11 @@ Potential errors:
 ```rust
 already_defined(nat x, nat y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15495,9 +18950,11 @@ Level of abstraction:
 ```rust
 already_defined(nat x, int y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15506,9 +18963,11 @@ Level of abstraction:
 ```rust
 already_defined(nat x, float y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15517,9 +18976,11 @@ Level of abstraction:
 ```rust
 already_defined(nat x, nat ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15528,9 +18989,11 @@ Level of abstraction:
 ```rust
 already_defined(nat x, int ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15539,9 +19002,11 @@ Level of abstraction:
 ```rust
 already_defined(nat x, float ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15550,9 +19015,11 @@ Level of abstraction:
 ```rust
 already_defined(int x, nat y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15561,9 +19028,11 @@ Level of abstraction:
 ```rust
 already_defined(int x, int y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15572,9 +19041,11 @@ Level of abstraction:
 ```rust
 already_defined(int x, float y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15583,9 +19054,11 @@ Level of abstraction:
 ```rust
 already_defined(int x, nat ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15594,9 +19067,11 @@ Level of abstraction:
 ```rust
 already_defined(int x, int ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15605,9 +19080,11 @@ Level of abstraction:
 ```rust
 already_defined(int x, float ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15616,9 +19093,11 @@ Level of abstraction:
 ```rust
 already_defined(float x, nat y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15627,9 +19106,11 @@ Level of abstraction:
 ```rust
 already_defined(float x, int y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15638,9 +19119,11 @@ Level of abstraction:
 ```rust
 already_defined(float x, float y) -> (true)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15649,9 +19132,11 @@ Level of abstraction:
 ```rust
 already_defined(float x, nat ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15660,9 +19145,11 @@ Level of abstraction:
 ```rust
 already_defined(float x, int ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15671,9 +19158,11 @@ Level of abstraction:
 ```rust
 already_defined(float x, float ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15682,9 +19171,11 @@ Level of abstraction:
 ```rust
 already_defined(nat ptr x, nat y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15693,9 +19184,11 @@ Level of abstraction:
 ```rust
 already_defined(nat ptr x, int y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15704,9 +19197,11 @@ Level of abstraction:
 ```rust
 already_defined(nat ptr x, float y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15715,9 +19210,11 @@ Level of abstraction:
 ```rust
 already_defined(nat ptr x, nat ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15726,9 +19223,11 @@ Level of abstraction:
 ```rust
 already_defined(nat ptr x, int ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15737,9 +19236,11 @@ Level of abstraction:
 ```rust
 already_defined(nat ptr x, float ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15748,9 +19249,11 @@ Level of abstraction:
 ```rust
 already_defined(int ptr x, nat y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15759,9 +19262,11 @@ Level of abstraction:
 ```rust
 already_defined(int ptr x, int y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15770,9 +19275,11 @@ Level of abstraction:
 ```rust
 already_defined(int ptr x, float y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15781,9 +19288,11 @@ Level of abstraction:
 ```rust
 already_defined(int ptr x, nat ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15792,9 +19301,11 @@ Level of abstraction:
 ```rust
 already_defined(int ptr x, int ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15803,9 +19314,11 @@ Level of abstraction:
 ```rust
 already_defined(int ptr x, float ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15814,9 +19327,11 @@ Level of abstraction:
 ```rust
 already_defined(float ptr x, nat y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15825,9 +19340,11 @@ Level of abstraction:
 ```rust
 already_defined(float ptr x, int y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15836,9 +19353,11 @@ Level of abstraction:
 ```rust
 already_defined(float ptr x, float y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15847,9 +19366,11 @@ Level of abstraction:
 ```rust
 already_defined(float ptr x, nat ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15858,9 +19379,11 @@ Level of abstraction:
 ```rust
 already_defined(float ptr x, int ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 ### already\_defined
@@ -15869,9 +19392,11 @@ Level of abstraction:
 ```rust
 already_defined(float ptr x, float ptr y) -> (false)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
 
 
 # String
@@ -15881,6 +19406,12 @@ Level of abstraction:
 ```rust
 cstr() -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 1
+- Transpiled C size: 0
+
 
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s line 205*
@@ -15891,6 +19422,12 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 ```rust
 cstr(cstr cstr, str) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
 
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s line 205*
@@ -15901,6 +19438,12 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 ```rust
 cstr(unsafe_temp) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 
 ### cstr - extract the cstr from unsafe_temp string
 *Defined in: std/core/string.s line 205*
@@ -15911,6 +19454,12 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 ```rust
 cstr(unsafe_temp) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 
 ### str - convert to string
 *Defined in: std/core/string.s line 91*
@@ -15921,9 +19470,11 @@ Subsequent comparisons no longer use the underlying pointer value.
 ```rust
 str(cstr) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 169
 
 
 ### str - a string residing on a buffer
@@ -15936,9 +19487,11 @@ on comparisons of unequal strings.
 ```rust
 str(char[], nat endpos, "from", nat pos) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 62
 
 Potential errors:
 
@@ -15958,9 +19511,11 @@ on comparisons of unequal strings.
 ```rust
 str(char[], nat pos, "to", nat endpos) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 143
 
 Potential errors:
 
@@ -15980,9 +19535,11 @@ on comparisons of unequal strings.
 ```rust
 str(char[], nat pos, "len", nat length) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 118
 
 Potential errors:
 
@@ -15997,6 +19554,12 @@ Potential errors:
 ```rust
 str(str) -> (str)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 ### str - a string residing on the full breadth of a buffer
 *Defined in: std/core/string.s line 55*
@@ -16004,9 +19567,11 @@ str(str) -> (str)
 ```rust
 str(char[]) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 165
 
 Potential errors:
 
@@ -16022,9 +19587,11 @@ Potential errors:
 ```rust
 str(char[], nat length) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 147
 
 Potential errors:
 
@@ -16040,9 +19607,11 @@ Potential errors:
 ```rust
 str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 100
 
 Potential errors:
 
@@ -16055,9 +19624,11 @@ Potential errors:
 ```rust
 str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 43
 
 
 ### str - a string residing on a buffer
@@ -16066,6 +19637,12 @@ Level of abstraction:
 ```rust
 str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 
 ### str - reads a string from the console
 *Defined in: std/core/convertstr.s line 114*
@@ -16075,9 +19652,11 @@ The read string is placed on an arena while consuming only the necessarily minim
 ```rust
 str(edit arena, console console) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 47
+- Transpiled C size: 279
 
 Potential errors:
 
@@ -16098,9 +19677,11 @@ The resulting memory will consume exactly the required size in bytes.
 ```rust
 str(new CHARS, console console) -> (str) with effects CHARS
 ```
-Level of abstraction:
+Complexity:
 
-0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 79
+- Transpiled C size: 486
 
 Potential errors:
 
@@ -16136,17 +19717,42 @@ location.
 ```rust
 cstr(catch) -> (cstr)
 ```
+Complexity:
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
 
 # run
 ### run
 *Defined in: std/test.s line 5*
 
 ```rust
+run(console CLI, cstr command) -> (cstr) with effects CLI
+```
+Complexity:
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 154
+
+Potential errors:
+
+36. failed to start process
+37. process terminated with unhandled non-zero exit code
+
+### run
+*Defined in: std/test.s line 5*
+
+```rust
 run(console CLI, str) -> (cstr) with effects CLI
 ```
-Level of abstraction:
+Complexity:
 
-0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 160
 
 Potential errors:
 
@@ -16158,21 +19764,6 @@ Potential errors:
 12. cannot allocate a buffer of unsized type
 13. cannot resize buffers with alloc; it promises no data reallocation
 
-### run
-*Defined in: std/test.s line 5*
-
-```rust
-run(console CLI, cstr command) -> (cstr) with effects CLI
-```
-Level of abstraction:
-
-0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-
-Potential errors:
-
-36. failed to start process
-37. process terminated with unhandled non-zero exit code
-
 # print\_marker
 ### print\_marker
 *Defined in: std/test.s line 12*
@@ -16180,9 +19771,11 @@ Potential errors:
 ```rust
 print_marker(colors, "pending") -> () with effects colors
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 96
 
 
 ### print\_marker
@@ -16191,9 +19784,11 @@ Level of abstraction:
 ```rust
 print_marker(colors, "failure") -> () with effects colors
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 96
 
 
 ### print\_marker
@@ -16202,9 +19797,11 @@ Level of abstraction:
 ```rust
 print_marker(colors, "success") -> () with effects colors
 ```
-Level of abstraction:
+Complexity:
 
-0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 96
 
 
 # test
@@ -16219,9 +19816,11 @@ on the command's exit code.
 ```rust
 test(colors, str) -> (bool) with effects colors
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 35
+- Transpiled C size: 182
 
 Potential errors:
 
@@ -16244,9 +19843,11 @@ on the command's exit code.
 ```rust
 test(colors, str, bool should_fail) -> (bool) with effects colors
 ```
-Level of abstraction:
+Complexity:
 
-0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 219
 
 Potential errors:
 

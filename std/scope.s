@@ -17,10 +17,10 @@
 local import std.core.numbers
 local import std.core.allocators
 
-local def nop(Number x)
+local def invalidate_at_scope_end(Number x)
     return ()
 
-local def nop(any ptr x)
+local def invalidate_at_scope_end(any ptr x)
     return x
 
 def reuse(Number x)
@@ -28,7 +28,7 @@ def reuse(Number x)
     doc "Declares a locally scoped variable that gets invalidated when out of scope."
     doc "This allows reusing the same symbol later. There is no impact on the value."
     defer
-        nop x
+        invalidate_at_scope_end x
     return x
 
 def reuse(any ptr x)
@@ -36,7 +36,7 @@ def reuse(any ptr x)
     doc "Declares a locally scoped variable that gets invalidated when out of scope."
     doc "This allows reusing the same symbol later. There is no impact on the value."
     defer
-        nop x
+        invalidate_at_scope_end x
     return x
 
 def reuse(edit arena arn)

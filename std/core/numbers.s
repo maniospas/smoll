@@ -155,7 +155,6 @@ def sub(nat x, nat y, "assume_smaller")
     doc "```rust"
     doc "0-(1 assume_smaller)"
     doc "```"
-    doc "======================="
     {type(x) z=x-y;}
     return z
 

@@ -1291,11 +1291,11 @@ enumerate the iteration&#8217;s progress.</p>
         }
         function highlightSmoll(raw){
           return escapeHtml(raw).replace(
-            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|return|try|fail|mut|edit|unsafe_mut)\b|\b(?:def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
+            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|return|try|type|fail|mut|edit|unsafe_mut)\b|\b(?:def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
             function(m){
               if(m[0]==='#') return '<span style="color:#777777">'+m+'</span>';
               if(m[0]==='"') return '<span style="color:#2c5b19">'+m+'</span>';
-              if(/^(if|while|for|return|in|else|try|fail|mut|edit|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
+              if(/^(if|while|for|return|in|else|try|type|fail|mut|edit|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
               if(/^(def|local|import|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
               return '<span style="color:#2e766b">'+m+'</span>';
             }

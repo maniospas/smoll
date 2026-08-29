@@ -1788,7 +1788,20 @@ class ImplementedType:
                         if impl[endpos].tostring()=="}": depth -= 1
                     if condition:
                         ret = await process_block(impl, pos+1, endpos-1)
-                        if ret: return ret
+                        if ret: 
+                            target_label = ret
+                            if ret=="__t_failure" or ret=="__t_skip_returns": return ret
+                            found = False
+                            pos = endpos
+                            while pos<=npos:
+                                if impl[pos].tostring()==":" and impl[pos-1].tostring()==target_label:
+                                    found = True
+                                    break
+                                pos = pos+1
+                            if not found: return target_label
+                            pos = pos+1
+                            prev_pos = pos
+                            continue
                     pos = endpos+1
                     if endpos<npos and impl[pos].tostring()=="else":
                         if pos>npos: self.at.error("malformed smollC", "Missing 'else' code body.")
@@ -1803,7 +1816,20 @@ class ImplementedType:
                             if impl[endpos].tostring()=="}": depth -= 1
                         if not condition:
                             ret = await process_block(impl, pos+1, endpos-1)
-                            if ret: return ret
+                            if ret: 
+                                target_label = ret
+                                if ret=="__t_failure" or ret=="__t_skip_returns": return ret
+                                pos = endpos
+                                found = False
+                                while pos<=npos:
+                                    if impl[pos].tostring()==":" and impl[pos-1].tostring()==target_label:
+                                        found = True
+                                        break
+                                    pos = pos+1
+                                if not found: return target_label
+                                pos = pos+1
+                                prev_pos = pos
+                                continue
                         pos = endpos+1
                     prev_pos = pos
                     continue
@@ -1905,7 +1931,11 @@ class ImplementedType:
                             test_value = memory.named_alloc_value(args[pos], cstr_global[1:-1])
                         else: test_value = 0
                     values[pos] = test_value
-            for defer in reversed(self.defers): await process_block(defer, 0, len(defer)-1)
+            elif ret:
+                self.at.error("interpreter", "failed to goto label: "+str(ret))
+            for defer in reversed(self.defers): 
+                ret = await process_block(defer, 0, len(defer)-1)
+                if ret: self.at.error("interpreter", "failed to goto label: "+str(ret))
         self.can_try_interpreter = True
         return local_vars.get("__t_errcode", 0)
 

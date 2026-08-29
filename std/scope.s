@@ -46,5 +46,5 @@ def reuse(edit arena arn)
     tracked_position = 0+arn.pos
     compiler::unsafe_declare_deep_copy_only()
     defer
-        arn.pos = tracked_position+0
+        arn.pos = tracked_position-(0 assume_smaller)
     return tracked_position

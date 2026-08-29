@@ -362,7 +362,9 @@ only downloads permitted by the main file are allowed.</i></p>
             btn.style.cssText = "position:absolute;bottom:8px;right:8px;cursor:pointer;";
             btn.addEventListener("click", () => {
                 const code = pre.querySelector("code")?.innerText ?? pre.innerText;
-                const encoded = btoa(unescape(encodeURIComponent(code)));
+                const encoded = btoa(
+                    String.fromCharCode(...new TextEncoder().encode(code))
+                ).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
                 window.location.href = "playground.html?contents=" + encoded;
             });
             pre.appendChild(btn);

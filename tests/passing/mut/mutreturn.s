@@ -1,4 +1,5 @@
 import std.core
+import std.test
 import compiler as cp
 
 def unit(str name, nat combat)
@@ -31,5 +32,5 @@ def test()
 def main()
     CLI = edit console()
     r = test()
-    print r.myparty.units[0].name
-    print r.parties[1].units[0].name
+    assert(r.myparty.units[0].name=="name1", "original object returned")
+    assert(r.parties[1].units[0].name=="name2", "overwritten buffer returned")

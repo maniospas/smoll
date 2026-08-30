@@ -1,4 +1,5 @@
 import std.core
+import std.test
 
 def main()
     CLI = edit console()
@@ -7,4 +8,4 @@ def main()
     s2 = copy 456
     s3 = s1+s2
     result = s3+copy(78)+copy(9)
-    print result
+    assert(result=="123456789", "properly concatenated string")

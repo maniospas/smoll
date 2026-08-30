@@ -20,6 +20,7 @@ local import std.unsafe as unsafe
 def os_name() 
     doc "the operating system name"
     doc "One of \"linux\", \"windows\", \"mac\"."
+    VM "[memory.write_cstr(os.name)]"
     {builtins::cstr ret=__temp_osname;}
     return ret
 

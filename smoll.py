@@ -1381,6 +1381,13 @@ class ImplementedType:
                     return 0
                 if k == "__t_complain": return 0 # may not be a var yet
                 if k == "__t_errcode": return 0 # no error code set
+                if k == "__t_argv":
+                    argv_address = memory.write_cstr(str(global_args.source))
+                    argv_pointer = memory.alloc(8)
+                    memory.write_uint64(argv_pointer, argv_address)
+                    return argv_pointer
+                if k == "__t_argc":
+                    return 1
                 return self.at.error("interpreter", "failed to parse '"+k+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
             elif impl[pos+1].tostring()=="=":
                 varname = impl[pos].tostring()
@@ -6785,6 +6792,7 @@ parser.add_argument("--back", action="store", help="Choose a backend compiler am
 parser.add_argument("--vmkb", action="store", type=int, default=256, help="VM memory in kilobytes.",)
 parser.add_argument("--vmrec", action="store", type=int, default=16, help="VM recursion budget.",)
 args, extra_args = parser.parse_known_args()
+global_args = args
 debug_mode = args.debug
 cleanup_mode = args.cleanup
 docs_mode = args.docs

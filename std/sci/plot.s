@@ -1,20 +1,44 @@
 local import std.graphics
 local import std.core
 local import std.sci.vec
+local import std.scope
+
+def range(float _min, float _max)
+    return class (
+        assigned min = mut _min,
+        assigned max = mut _max
+    )
 
 def area(effect edit window WINDOW, position pos, size size)
-    return class compiler::args()
+    return class (
+        compiler::args(),
+        assigned x_range = mut range(0.0,0.0),
+        assigned y_range = mut range(0.0,0.0)
+    )
 
+def fit(effect mut area AREA, float x, "horizontal")
+    if AREA.x_range.min>x AREA.x_range.min = x
+    if AREA.x_range.max<x AREA.x_range.max = x
+
+def fit(effect mut area AREA, float y, "vertical")
+    if AREA.y_range.min>y AREA.y_range.min = y
+    if AREA.y_range.max<y AREA.y_range.max = y
+
+def fit(effect mut area AREA, vec v, "horizontal"|"vertical" dim)
+    fit(min v, dim)
+    fit(max v, dim)
+    return AREA
+    
 def area(effect edit window WINDOW)
     return area(80.0, 30.0, WINDOW.size.width-120.0, WINDOW.size.height-70.0)
 
-def plot_config("line"|"scatter" method, color|blank _line_color)
+def plot_config("line"|"scatter" _method, color|blank _line_color)
     if _line_color is blank
         line_color = mut color(255, 255, 255)
     else
         line_color = mut _line_color
     return class(
-        method, 
+        assigned method = mut compiler::value _method, 
         line_color, 
         assigned line_thickness = mut 2.0,
         assigned axes_thickness = mut 3.0, 
@@ -23,7 +47,8 @@ def plot_config("line"|"scatter" method, color|blank _line_color)
         assigned point_radius = mut 5.0,
         assigned grid_tics = mut 10,
         assigned title_x = mut "",
-        assigned title_y = mut ""
+        assigned title_y = mut "",
+        assigned font_size = mut 16.0
     )
 
 def plot(effect area AREA, vec x, vec y, plot_config config)
@@ -32,10 +57,11 @@ def plot(effect area AREA, vec x, vec y, plot_config config)
         fail "plot vectors must have the same length"
     if len(x) < 2
         return ()
-    xmin = min x
-    xmax = max x
-    ymin = min y
-    ymax = max y
+    
+    xmin = AREA.x_range.min #min x
+    xmax = AREA.x_range.max #max x
+    ymin = AREA.y_range.min #min y
+    ymax = AREA.y_range.max #max y
 
     dx = mut xmax - xmin
     dy = mut ymax - ymin
@@ -58,7 +84,7 @@ def plot(effect area AREA, vec x, vec y, plot_config config)
     # tics and grid
     CHARS = edit circular alloc 128
     tic_size = config.point_radius
-    tic_text_size = 14.0
+    tic_text_size = config.font_size
     tics = config.grid_tics
     if tics!=0 for j in range(0, tics+1)
         t = float(j)/float(tics)
@@ -74,15 +100,17 @@ def plot(effect area AREA, vec x, vec y, plot_config config)
         y_text = copy(ynumber)
         text(WINDOW, y_text, position(axis_x+tic_size+2.0-(0.8*tic_text_size*float len y_text), py), tic_text_size, config.axes_color)
 
-    if method is "line"
+    if config.method=="line"
         for i in range(1, len x)
-            try x1 = AREA.pos.x + (((x[i-1]-xmin)/dx)*AREA.size.width)
-            try y1 = AREA.pos.y + AREA.size.height - (((y[i-1] - ymin)/dy)*AREA.size.height)
+            reuse i
+            try x1 = reuse AREA.pos.x + (((x[i-1]-xmin)/dx)*AREA.size.width)
+            try y1 = reuse AREA.pos.y + AREA.size.height - (((y[i-1] - ymin)/dy)*AREA.size.height)
+            try x2 = reuse AREA.pos.x + (((x[i] - xmin)/dx)*AREA.size.width)
+            try y2 = reuse AREA.pos.y + AREA.size.height - (((y[i] - ymin)/dy)*AREA.size.height)
+            line(x1, y1, x2, y2, config.line_thickness, config.line_color)
+    
+    if config.point_radius>0.0
+        for i in range of len x
             try x2 = AREA.pos.x + (((x[i] - xmin)/dx)*AREA.size.width)
             try y2 = AREA.pos.y + AREA.size.height - (((y[i] - ymin)/dy)*AREA.size.height)
-            line(x1, y1, x2, y2, config.thickness, config.line_color)
-    
-    for i in range of len x
-        try x2 = AREA.pos.x + (((x[i] - xmin)/dx)*AREA.size.width)
-        try y2 = AREA.pos.y + AREA.size.height - (((y[i] - ymin)/dy)*AREA.size.height)
-        circ(x2, y2, 5.0 line nat config.line_thickness, config.line_color)
+            circ(x2, y2, 5.0 line nat config.line_thickness, config.line_color)

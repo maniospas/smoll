@@ -1,4 +1,5 @@
 import std.core
+import std.test
 import compiler as cp
 
 def Point(float x, float y)
@@ -8,10 +9,10 @@ def Field(Point a, Point b)
     return (a,b)
 
 def print(effect edit console CLI, Field ptr f)
-    print(cp::deref f.a.x, ",")
-    print(cp::deref f.a.y, ",")
-    print(cp::deref f.b.x, ",")
-    print(cp::deref f.b.y)
+    assert(1.0==cp::deref f.a.x, "correctly derefed f.a.x")
+    assert(2.0==cp::deref f.a.y, "correctly derefed f.a.y")
+    assert(3.0==cp::deref f.b.x, "correctly derefed f.b.x")
+    assert(4.0==cp::deref f.b.y, "correctly derefed f.b.y")
 
 def main()
     CLI = edit console()
@@ -27,5 +28,8 @@ def main()
     p[0] = (1.0,2.0,3.0,4.0)
     print p[0]&
     
-    n = last [1.0]
-    print cp::deref n
+    n = last [1.0, 2.0, 3.0]
+    assert(3.0==cp::deref n, "correctly pointing to last element of buffer")
+
+    s = last [1.0]
+    assert(1.0==cp::deref s, "correctly pointing to single element of buffer")

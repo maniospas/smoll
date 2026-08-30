@@ -1,4 +1,5 @@
 import std.core
+import std.test
 
 def Person(nat id, str name, str surname)
   return class(name,surname)
@@ -17,9 +18,10 @@ def test(effect edit console CLI)
   people[0] = Person(0, buf.copy "it's a me", buf.copy "mario")
   print people[0]
   dat = people.name.dat # only the data segments of strings
+  assert(people.name[0]=="it's a me", "moved string to buffer")
   return (buf, dat)
 
 def main()
   CLI = edit console()
   t = test()
-  print str(t.buf.buf, t.dat[0])
+  assert(str(t.buf.buf, t.dat[0])=="it's a me", "string reconstructed from its data and buffer")

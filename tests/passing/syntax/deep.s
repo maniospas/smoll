@@ -1,5 +1,6 @@
 import std.core
 import std.scope
+import std.test
 
 def test1(edit arena<char::tag> arn)
     reuse arn
@@ -22,15 +23,13 @@ def test5(effect edit console CLI, edit arena<char::tag> arn)
     reuse arn
     x = test4 arn
     z = x[0]&
-    print compiler::deref z#[0]
-    print nn "consumed at end of test5: "
-    print len arn
+    assert("test2"==compiler::deref z, "correct operations on arena")
+    assert(10==len arn, "proper consumption before test ends")
 
 def main()
     CLI = edit console()
     arn = edit arena alloc 1024
     test1 arn
-    print arn.pos
-    print nn "consumed after test1: "
+    assert(arn.pos==0, "no consumption after reuse")
     test5 arn
-    print nn "consumed after test5: "
+    assert(arn.pos==0, "no consumption after complicated reuse")

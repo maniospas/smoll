@@ -9,7 +9,7 @@ local def run(effect edit console CLI, cstr|str command)
         return cstr error
     return cstr()
 
-local def print_marker(effect edit colors colors, "success"|"failure"|"pending" status)
+def print_marker(effect edit colors colors, "success"|"failure"|"pending" status)
     CLI = edit colors.CLI
     print nn "["
     if status is "success"
@@ -24,6 +24,38 @@ local def print_marker(effect edit colors colors, "success"|"failure"|"pending" 
     set(colors reset)
     print nn "] "
 
+local def restore_stdout(int saved_stdout)
+    {fflush(stdout);}
+    {dup2(saved_stdout, STDOUT_FILENO);}
+    {close(saved_stdout);}
+
+def stdout_to_err(effect edit console CLI)
+    {builtins::int saved_stdout = dup(STDOUT_FILENO);}
+    {fflush(stdout);}
+    {dup2(STDERR_FILENO, STDOUT_FILENO);}
+    defer
+        restore_stdout saved_stdout
+    return saved_stdout
+
+
+def assert(effect edit console CLI, bool condition, cstr text)
+    stdout_to_err()
+    colors = edit colors CLI
+    #print ""
+    # print nn compt process::args()[0]
+    print nn " |- "
+    if not condition
+        print_marker type "failure"
+        print nn "assertion failed: "
+        print text
+        # print nn "\r"
+        # print type "flush"
+        fail "assertion failed"
+    print_marker type "success"
+    print text
+    # print nn "\r"
+    # print type "flush"
+
 def test(effect edit colors colors, str command, bool|blank should_fail)
     doc "prints and tests a system command"
     doc "Returns whether the command succeeded or not."
@@ -31,9 +63,7 @@ def test(effect edit colors colors, str command, bool|blank should_fail)
     doc "that is converted to a success or failure one, depending"
     doc "on the command's exit code."
     CLI = edit colors.CLI
-    print_marker type "pending"
-    print nn command
-    print type "flush"
+    print command
     error = mut run command
     if not should_fail is blank
         if should_fail
@@ -41,13 +71,11 @@ def test(effect edit colors colors, str command, bool|blank should_fail)
                 error = cstr()
             else
                 error = "no errors found, but the run should be failing (contains _fail_ in its name)"
-    print nn "\r"
+    print nn " |- "
     if exists error
         print_marker type "failure"
-        print ""
-        print nn "    "
         print error
         return false
     print_marker type "success"
-    print ""
+    print "completed"
     return true

@@ -468,7 +468,7 @@ import std.core
 def main()
     CLI = edit console()
     CHARS = edit arena alloc 1024
-    lengths = nat[].alloc 2 # equivalent to 'alloc(nat[], 2)'
+    lengths = edit nat[].alloc 2 # equivalent to 'edit alloc(nat[], 2)'
     for s in [
         "hello "+"world",
         str "hello again"

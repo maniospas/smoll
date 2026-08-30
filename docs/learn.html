@@ -712,7 +712,7 @@ lengths on another buffer.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">alloc</span> <span class="mi">1024</span>
-    <span class="n">lengths</span> <span class="o">=</span> <span class="n">nat</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">2</span> <span class="c1"># equivalent to &#39;alloc(nat[], 2)&#39;</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">nat</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">2</span> <span class="c1"># equivalent to &#39;edit alloc(nat[], 2)&#39;</span>
     <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span>
         <span class="s2">&quot;hello &quot;</span><span class="o">+</span><span class="s2">&quot;world&quot;</span><span class="p">,</span>
         <span class="nb">str</span> <span class="s2">&quot;hello again&quot;</span>

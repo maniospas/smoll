@@ -208,7 +208,7 @@
     </head>
     <body>
         <nav class="topbar">
-            <a href="index.html" style="position:absolute;left:20px;font-weight:900">Smoλ</a>
+            <a href="index.html" style="position:absolute;left:20px;font-weight:500">Smoλ</a>
             <a href="install.html" style="font-weight:500">Install</a>
             <div class="dropdown">
                 <a href="#" style="font-weight:500">Tutorials</a>
@@ -224,80 +224,150 @@
             <div class="dropdown">
                 <a href="#" style="font-weight:500">Documentation</a>
                 <div class="dropdown-menu">
-                    <a href="learn.html" style="font-weight:400">Learn</a>
-                    <a href="reference.html" style="font-weight:400">Reference guide</a>
+                    <a href="reference.html" style="font-weight:400">Learn</a>
                     <a href="std.html" style="font-weight:400">Standard library</a>
                 </div>
             </div>
             <a href="playground.html" style="font-weight:500">Playground</a>
             <a href="https://github.com/maniospas/smoll">GitHub</a>
         </nav>
-    <div>
+    <h1 id="learn">Learn</h1>
 
-<style>
-.smoll-hero { padding-top: 4rem;padding-bottom:1rem;}
-.smoll-name { letter-spacing: -0.02em; margin: 0 0 0.5rem; color: #444; }
-.smoll-name span { color: #888; }ffont
-.smoll-tagline { color: #666; max-width: 560px; }
-.smoll-desc { color: #666; max-width: 600px;  }
-.smoll-divider { border: none; border-top: 1px solid #eee; }
-.smoll-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem 2rem; }
-.smoll-section-label { font-size: 0.9rem; text-transform: uppercase; color: #aaa; margin-top:2rem;}
-.smoll-features { border:1px solid #444;padding-left:20px;padding-right:20px;border-radius:15px;}
-@media (prefers-color-scheme: dark) {
-  .smoll-name { color: #c9d1d9; }
-  .smoll-name span { color: #666; }
-  .smoll-tagline, .smoll-desc, .smoll-feature p { color: #8b949e; }
-  .smoll-divider { border-top-color: #21262d; }
-}
-</style>
+<p>We will cover the basics of <em>smoλ</em> here. This covers the few features that are responsible
+for most code written in the language. Find more things in the langauge&#8217;s 
+<a href="reference.html">reference</a>.</p>
 
+<h3 id="hello-world">hello world!</h3>
 
+<p>Our first program consists -traditionally- of printing a greeting statement.
+We use the <code>repo</code> instruction to tell the language that it should automatically download
+code under <em>std/</em> from a corresponding web URL (download code is stored in a <em>.cache</em> folder).
+Following examples will not have this command for brevity.</p>
 
-<div class="smoll-hero">
-  <h1 class="smoll-name">smo<span>λ</span></h1>
-  <p class="smoll-tagline">Script ergonomics and safety at wire speed.</p>
-  <a href="install.html" class="button">➔ Install</a>
-  <a href="learn.html" class="button">📚 Learn</a>
-</div>
-
-<p class="smoll-section-label">Quickstart</p>
+<p>Then, the prorgam imports the standard library&#8217;s collections of basic yet useful functions, 
+and defines a <code>main</code> function to serve as the
+entrant point of our program. The function&#8217;s body is indended, which is how
+the language keeps track of code blocks.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">repo</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/&quot;</span> <span class="k">as</span> <span class="s2">&quot;std/&quot;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">README</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md&quot;</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="c1"># EFFECTS to automatically pass around (some functions grab these by name).</span>
-    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">circular</span> <span class="n">alloc</span> <span class="mi">4096</span>
-
-    <span class="c1"># Easy function synthesis because parentheses are optional for one argument.</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">file</span><span class="p">::</span><span class="nb">open</span> <span class="n">web</span><span class="p">::</span><span class="n">get</span> <span class="n">README</span>
-    <span class="n">size</span> <span class="o">=</span> <span class="n">mut</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span>
-        <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">+</span><span class="nb">len</span> <span class="n">line</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="s2">&quot; bytes downloaded</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
 </code></pre>
 </div>
 
+<p>The program above calls the <code>print</code> function with a string greeting in quotations. As
+<em>smoλ</em> is compiled, there is a great deal of difference on whether strings
+are string literals known during compilation -we call these <code>cstr</code>- or dynamically
+generated strings that appear during runtime. To convert this string into a runtime
+string <em>type</em> called <code>str</code> just call a namesake function like below.</p>
 
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
-<p class="smoll-section-label">Features</p>
-<div class="smoll-features">
-  <div class="smoll-feature"><h3>Safe</h3><p>Automatically apply and guard resources. Opt into unsafe C only explicitly.</p></div>
-  <div class="smoll-feature"><h3>Finite</h3><p>Tuple-based type system reads sequentially. Less wading through magic.</p></div>
-  <div class="smoll-feature"><h3>Fast</h3><p>Scripting abstractions, minimal memory indirection, ιnterceptable errors get out of the way.</p></div>
-  <div class="smoll-feature"><h3>Duck and algebraic types</h3><p>Functions define types. Interact with those with zero runtime overhead.</p></div>
-  <div class="smoll-feature"><h3>Supported</h3><p>Compiler, LSP, interpreter to test unsafe code, web import, web playground.</p></div>
-  <div class="smoll-feature"><img src="smol.png", style="width:90%"></img></div>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">greeting</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;hello world!&quot;</span>
+    <span class="nb">print</span> <span class="n">greeting</span>
+</code></pre>
 </div>
 
+<p>The snippet sneakily introduces the concept of variables too, by storing the
+string value on a variable called <em>greeting</em>. A different <code>print</code> function
+is also used that is compatible with the string type, but the code largely looks
+the same. However, if you wanted to hear about any other differences, the language
+is too good for that yet: it recognizes that the created <code>str</code> is known during
+compilation and thus takes special action to ensure that the created program
+becomes equivalent to the first one.</p>
 
+<h3 id="numbers">numbers</h3>
 
+<p>Before continuing with strings and how they can be created -and manipulated- 
+dynamically, let us skim over some more basics. First, let us talk about numbers. Usually you will
+use one of the <em>Number</em> types <code>float</code>, <code>int</code>, <code>nat</code>. These use 64 bits to represent
+floating point numbers, integers, and natural numbers (also known as unsigned integers 
+or non-negative intgers if you are more of a math person).</p>
+
+<p><em>Smoλ</em> takes a principled stance of not allowing you to mix these types unintendedly,
+because this is how bad things happen in compiled code (like <em>1.0</em> not having the same bit
+representation as <em>1</em>). To begin with, you can declare floats by writing a decimal 
+number like <code>1.0</code> and natural numbers by writing them without decimals like <em>1</em>. You cannot
+represent integers and need to convert with them from the other types. This is deliberate
+because natural numbers are used for a lot of stuff in programming with regards to indexing
+memory; their usage makes some nice optimizations possible while staying safe.</p>
+
+<p>Below is an example that uses different numbers, as well as some basic arithmetic
+operations on those. Convert number formats to 
+others (as well as from <code>cstr</code> and <code>str</code> data) by using the numer type as a function. 
+We sill need to import the standard library&#8217;s core because this
+is where those operations are implemented - you can even make your own version of all
+operation by interweaving C code in there (we will not cover how in this tutorial)! 
+By the way, text after <code>#</code> are line comments and ignored.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="mf">1.0</span><span class="o">+</span><span class="mf">2.0</span><span class="o">-</span><span class="mf">3.0</span> <span class="c1"># prints 0.0</span>
+    <span class="nb">print</span> <span class="mi">1</span><span class="o">+</span><span class="mi">2</span>
+    <span class="n">int_zero</span> <span class="o">=</span> <span class="nb">int</span> <span class="mi">0</span>
+    <span class="nb">print</span> <span class="n">int_zero</span><span class="o">-</span><span class="nb">int</span> <span class="mi">1</span> <span class="c1"># prints 1</span>
+    <span class="nb">print</span> <span class="mi">1</span><span class="o">+</span><span class="n">nat</span> <span class="s2">&quot;2&quot;</span>      <span class="c1"># prints 3</span>
+</code></pre>
 </div>
+
+<h2 id="conditions-and-loops">conditions and loops</h2>
+
+<p>There are <code>if-else</code> conditional statements to change what is being
+executed based given a condition. Conditions evaluate to a <code>bool</code> type.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mi">0</span>
+        <span class="nb">print</span> <span class="s2">&quot;x is negative</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;done</span><span class="se">\n</span><span class="s2">&quot;</span>
+</code></pre>
+</div>
+
+<h2 id="errors">errors</h2>
+
+<p>Since we are still talking about numbers,it is a good time to also talk about errors, like division by zero.
+Ok, we will ignore floats where division by zero is well-defined, and consider expressions like <code>1/0</code>.
+Functions -division in this case- can fail freely and you should not bother too much about that, 
+unless you know of a way to recover from failure or need to do something special. You will never have leaking
+resources from failure (e.g., memory leaks), so you can continue with your program like normal if
+you decide to handle them.</p>
+
+<p>To check whether an expression has any errors, start it with a <code>try</code> </p>
+
+<h3 id="tuples-and-functions">tuples and functions</h3>
+
+<p>Above we wrote <code>print int_zero-int 1</code> with the understanding that <em>smoλ</em> functions are called 
+for the result following them. Place expressions in parentheses to make functions call only those,
+for example per <code>print int(0)-int(1)</code>. In fact, parantheses are a means of definining tuples, which
+is what we call sequences of a fixed number of values with potentially different types. Up to now, 
+we basically used tuples of one element, where parentheses are not usually needed.</p>
+
+<p>But functions may require several inputs too! In that case, pass to those function a tuple of 
+those arguments. For example, given that all <code>print</code> versions allow an optional second <code>cstr</code> argument to
+use instead of the line break character, you can do the following.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s2">&quot;world!</span>
+</code></pre>
+</div>
+
+<h3 id="buffers">buffers</h3>
+
+<p>Ok, so how do we actually create a string during </p>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {

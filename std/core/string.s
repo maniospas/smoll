@@ -24,7 +24,9 @@ def arena(char::tag)    return arena char[]
 def circular(char::tag) return circular char[]
 def list(char::tag)     return list char[]
 local def alloc(effect edit new CHARS, nat length) 
-    return allocated(char[].alloc length, 0)
+    if not try ret = allocated(char[].alloc length, 0)
+        fail "allocation failed"
+    return ret
 def char_allocator = new|arena<char::tag>|circular<char::tag>|list<char::tag>
 
 def exists(cstr c)
@@ -432,9 +434,14 @@ def add(effect edit char_allocator\arena\circular CHARS, str|cstr _s1, str|cstr 
     unsafe_valid CHARS
     unsafe_valid s1
     unsafe_valid s2
-    copy(surface, s1)
-    copy(surface, s2)
-    return str(status surface from start)
+    if CHARS is new
+        try copy(surface, s1)
+        try copy(surface, s2)
+    else
+        copy(surface, s1)
+        copy(surface, s2)
+    try ret = str(status surface from start)
+    return ret
 
 def add(effect edit arena<char::tag>|circular<char::tag> CHARS, str|cstr _s1, str|cstr _s2)
     doc "concatenate two strings"
@@ -468,7 +475,8 @@ def add(effect edit arena<char::tag>|circular<char::tag> CHARS, str|cstr _s1, st
     surface = mut arena unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
     copy(surface, s1)
     copy(surface, s2)
-    return str(status surface from prev_pos+0)
+    try ret = str(status surface from prev_pos+0)
+    return ret
 
 def empty(cstr c)
     doc "checks that a cstr does not have any characters"

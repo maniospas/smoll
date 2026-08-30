@@ -809,7 +809,7 @@ def main()
 
 *Warning: You can skip the more complicated aspects of the type system in the rest of this subsection. Unlike `|`, they are only rarely needed, especially in well-structured code that defines types incrementally.*
 
-*Smoλ* also implements a linear type system, but this
+*Smoλ* also implements an algebraic type system, but this
 was hidden till this point because it is not fundamental to understanding the
 language. Practically, linear typing means
 that -in addition to type unions- you can also get the intersection

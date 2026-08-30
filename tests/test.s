@@ -1,12 +1,18 @@
+
 import std.core
 
-def point()
-    return class (
-        assigned x = mut 0,
-        assigned y = mut 0,
-    )
+def greeting(effect edit char_allocator CHARS)
+    return "hello "+"world"
 
 def main()
     CLI = edit console()
-    p = point()
-    print p.x
+    CHARS = edit arena alloc 1024
+    a = 1
+    b = 0
+    if true
+        message = greeting()
+        print a-b
+    else
+        message = greeting()
+        print 0
+    print message

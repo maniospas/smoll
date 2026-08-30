@@ -4,7 +4,21 @@ We will cover the basics of *smoλ* here. This covers the few features that are 
 for most code written in the language. Find a complete list of 
 concepts in the <a href="reference.html">reference guide</a>.
 
-### hello world!
+<div class="toc" markdown="1">
+
+_1._ [hello world!](#hello-world) <br>
+_2._ [numbers](#numbers) <br>
+_3._ [conditions and loops](#conditions-and-loops) <br>
+_4._ [errors](#errors) <br>
+_5._ [tuples and functions](#tuples-and-functions) <br>
+_6._ [strings](#strings)<br>
+_7._ [recursion](#recursion) <br>
+_8._ [types](#types) <br>
+_9._ [what next?](#what-next) <br>
+
+</div>
+
+## hello world!
 
 Our first program consists -traditionally- of printing a greeting statement.
 We use the `repo` instruction to tell the language that it should automatically download
@@ -13,7 +27,7 @@ Following examples will not have this command for brevity.
 
 Then, the program imports the standard library's collections of basic yet useful functions, 
 and defines a `main` function to serve as the
-entrant point of our program. The function's body is indented, which is how
+entry point of our program. The function's body is indented, which is how
 the language tracks code blocks.
 
 
@@ -54,7 +68,7 @@ the same. Do note that the language recognizes `str` as known during
 compilation and thus ensures that the created program
 becomes equivalent to the first one without needing memory allocation. Yet.
 
-### numbers
+## numbers
 
 Before continuing with strings and how they can be created -and manipulated- 
 dynamically, let us skim over some more basics. First: numbers. Usually you will
@@ -62,7 +76,7 @@ use one of `float`, `int`, `nat` that use 64 bits to correspondingly represent
 floating point numbers, integers, and natural numbers. Natural numbers
 are also known as unsigned integers or non-negative integers if you are more of a math person.
 
-*Smoλ* takes a principled stance of not allowing you to mix these types unintendedly,
+*Smoλ* takes a principled stance of not allowing you to mix these types unintentionally,
 because this is how bad things happen in compiled code (like *1.0* not having the same bit
 representation as *1*). To begin with, you can declare floats by writing a decimal 
 number like `1.0` and natural numbers by writing them without decimals like *1*. You cannot
@@ -162,7 +176,7 @@ def main()
 ```
 
 
-### tuples and functions
+## tuples and functions
 
 Place expressions in parentheses to make functions call only those,
 for example per `print int(0)-int(1)`; if one wrote `print int 0-int 1`,
@@ -210,7 +224,7 @@ def main()
 ```
 
 The above snippet is deceptively simple in that *smoλ* tries its best to not
-annoy you with the conditions required for memory deallocation. In particular,
+annoy you with manual memory management requirements. In particular,
 it *defers* releasing the allocated memory back to the operating system
 to a later point, where the outcome of `greeting()` is no longer used. To see
 this, mouse-over the greeting function's name if the language's LSP is enabled,
@@ -222,7 +236,7 @@ involved in the program. The function's documentation would look like this:
 greeting() -> (str)
 
 Potential errors:
-10. allocation failed
+1.  allocation failed
 
 Returned values defer use of the following functions:
 free(mut any ptr) -> ()
@@ -307,3 +321,176 @@ def main()
     print message
 ```
 
+## recursion
+
+Recursion is an important capability of programming languages, but at
+the same time dangerous in that it can easily create unbounded programs. 
+*Smoλ* aims to make it somewhat harder to write such programs, while
+also ensuring that understanding function types can be achieved
+by reading ONCE top-to-bottom.
+
+Recursive functions are defined with the `rec`
+keyword and are able to call all subsequent functions 
+in the same file, including themselves. Importantly,
+they can do so *only after their first return*, which
+helps determine their type. In a pinch, write 
+`if false return ...` to create a "ghost" return that is 
+never called, but do prefer having a first return as an
+escape hatch.
+
+Recursive functions are traditionally exemplified with an inefficiently-implemented
+Fibonacci function, and we do so below.
+
+```python
+import std.core
+
+rec fib(nat n)
+    if n<=1
+        return 1
+    return fib(n-1)+fib(n-2)
+
+def main()
+    CLI = edit console()
+    print fib 8
+```
+
+
+## types
+
+Up to now we were limited to builtin numbers and strings. But you can also
+define your own types. First, each function can return a tuple instead of
+a single value. Like below, where tuple members can be accessed with the dot
+notation.
+
+```python
+import std.core
+
+def point(nat x, nat y)
+    return (x,y)  # or compiler::args() to get a tuple of the arguments
+
+def main()
+    CLI = edit console()
+    p = point(1,2)
+    print p.x # prints 1
+    print p.y # prints 2
+```
+
+Tuples are automatically unpacked into raw data. That is, *smoλ*
+defaults to *structural typing* function outputs. However, one
+can actually create nominal types, which can NOT structurally
+matched to data of the same shape, by declaring a tuple as a class.
+
+```python
+import std.core
+
+def point(nat x, nat y)
+    return class compiler::args()
+
+def main()
+    CLI = edit console()
+    p = point(1,2)
+    print p.x # prints 1
+    print p.y # prints 2
+```
+
+
+All data encountered until now have been immutable in that
+variable values cannot be modified. There 
+are two mechanisms for elevated permissions, `edit` that we 
+have partly encountered already and `mut`. Of the two, `edit`
+allows modifying data structure values only, whereas `mut`
+allows replacing the whole structure. These qualifiers can
+only be placed in function declarations or after the `=` symbol.
+
+```python
+import std.core
+
+def mutable_point(nat _x, nat _y)
+    x = mut _x
+    y = mut _y
+    x = x+1 # can replace only if 'mut'
+    y = y+1
+    return class (x, y)
+
+def main()
+    CLI = edit console()
+    p = edit mutable_point(1,2)
+    p.x = p.y+10 # can modify because 'p' can be edited and 'p.x' can be mutated
+    print p.x    # prints 13
+```
+
+Finally, a handy shortcut when declaring data structures is that 
+you can use the shorthand `assigned var = value` to also retrieve
+an assigned variable after setting it to a value. By convention,
+prefix arguments that you are going to transform with an underscore.
+
+
+```python
+import std.core
+
+def mutable_point(nat _x, nat _Y)
+    return class (
+        assigned x=mut _x+1,
+        assigned y=mut _y+1
+    )
+
+def main()
+    CLI = edit console()
+    p = edit mutable_point(1,2)
+    p.x = p.y+10 # can modify because 'p' can be edited and 'p.x' can be mutated
+    print p.x    # prints 13
+```
+
+## what next?
+
+This material covered the very basics of *smoλ*. However, there are
+other aspects of the type system and standard library's core 
+that can also contribute to simple programs, like file handling. 
+Not to mention of concepts like conditional compilation and
+compile-time evaluation.
+
+More memory concepts include safe buffer
+and pointer management for more types than simple characters. 
+More information can be found 
+in the reference guide, and the standard library's manual under
+the **Documentation** menu above. Also try the **Tutorials** for
+specific aspects of the language.
+
+One can create buffers and arenas for
+other data types, as well as arithmetic vectors and string maps.
+As a small appetizer, here is an example that creates a buffer
+of a fixed number of elements using `[]`, and saves some string
+lengths on another buffer.
+
+```python
+import std.core
+
+def main()
+    CLI = edit console()
+    CHARS = edit arena alloc 1024
+    lengths = nat[].alloc 2 # equivalent to 'alloc(nat[], 2)'
+    for s in [
+        "hello "+"world",
+        str "hello again"
+    ]   
+        print s+"!"
+        lengths[compiler::for_counter()] = len s+"!"
+    for l in lengths
+        print l
+```
+
+
+<!-- 
+Recusrsion may be achieved through usage of *functors*,
+which are basically a means for passing abstract functions
+around. These are normal variables with types of the form
+`input_type->output_type` and can be called with the
+`compiler::call` function like below. More on functors
+and compiler functions in the <a href="reference.html">reference guide</a>.
+
+```python
+import std.core
+
+def call(nat->nat inc)
+
+``` -->

@@ -40,9 +40,7 @@ def arena(edit any[] buf)
     doc "to track the size of allocated data within the buffer."
     doc "Contrary to circular buffers, arenas are not freed automatically"
     doc "and therefore eventually run out of space. However, they come"
-    doc "with data integrity guarantees. Attach a garbage"
-    doc "collector to an arena per `gc arena alloc 4` (or construct it"
-    doc "with another allocator)."
+    doc "with data integrity guarantees."
     return arena(buf, 0)
 
 def len(arena arn)

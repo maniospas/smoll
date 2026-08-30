@@ -24,7 +24,7 @@ def arena(char::tag)    return arena char[]
 def circular(char::tag) return circular char[]
 def list(char::tag)     return list char[]
 local def alloc(effect edit new CHARS, nat length) 
-    if not try ret = allocated(char[].alloc length, 0)
+    if not try ret = mut allocated(char[].alloc length, 0)
         fail "allocation failed"
     return ret
 def char_allocator = new|arena<char::tag>|circular<char::tag>|list<char::tag>
@@ -511,7 +511,7 @@ def copy(effect edit char_allocator CHARS, nat n)
     digits = mut 1
     while v>=10
         v = v/(10 unsafe_assume_nonzero)
-        digits = digits+1
+        digits = digits+1 
     surface = edit alloc(CHARS, digits)
     v = n
     for i in range of digits

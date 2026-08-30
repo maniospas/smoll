@@ -238,7 +238,21 @@
 for most code written in the language. Find a complete list of 
 concepts in the <a href="reference.html">reference guide</a>.</p>
 
-<h3 id="hello-world">hello world!</h3>
+<div class="toc">
+
+<p><em>1.</em> <a href="#hello-world">hello world!</a> <br>
+<em>2.</em> <a href="#numbers">numbers</a> <br>
+<em>3.</em> <a href="#conditions-and-loops">conditions and loops</a> <br>
+<em>4.</em> <a href="#errors">errors</a> <br>
+<em>5.</em> <a href="#tuples-and-functions">tuples and functions</a> <br>
+<em>6.</em> <a href="#strings">strings</a><br>
+<em>7.</em> <a href="#recursion">recursion</a> <br>
+<em>8.</em> <a href="#types">types</a> <br>
+<em>9.</em> <a href="#what-next">what next?</a> <br></p>
+
+</div>
+
+<h2 id="hello-world">hello world!</h2>
 
 <p>Our first program consists -traditionally- of printing a greeting statement.
 We use the <code>repo</code> instruction to tell the language that it should automatically download
@@ -247,7 +261,7 @@ Following examples will not have this command for brevity.</p>
 
 <p>Then, the program imports the standard library&#8217;s collections of basic yet useful functions, 
 and defines a <code>main</code> function to serve as the
-entrant point of our program. The function&#8217;s body is indented, which is how
+entry point of our program. The function&#8217;s body is indented, which is how
 the language tracks code blocks.</p>
 
 <div class="codehilite">
@@ -287,7 +301,7 @@ the same. Do note that the language recognizes <code>str</code> as known during
 compilation and thus ensures that the created program
 becomes equivalent to the first one without needing memory allocation. Yet.</p>
 
-<h3 id="numbers">numbers</h3>
+<h2 id="numbers">numbers</h2>
 
 <p>Before continuing with strings and how they can be created -and manipulated- 
 dynamically, let us skim over some more basics. First: numbers. Usually you will
@@ -295,7 +309,7 @@ use one of <code>float</code>, <code>int</code>, <code>nat</code> that use 64 bi
 floating point numbers, integers, and natural numbers. Natural numbers
 are also known as unsigned integers or non-negative integers if you are more of a math person.</p>
 
-<p><em>Smoλ</em> takes a principled stance of not allowing you to mix these types unintendedly,
+<p><em>Smoλ</em> takes a principled stance of not allowing you to mix these types unintentionally,
 because this is how bad things happen in compiled code (like <em>1.0</em> not having the same bit
 representation as <em>1</em>). To begin with, you can declare floats by writing a decimal 
 number like <code>1.0</code> and natural numbers by writing them without decimals like <em>1</em>. You cannot
@@ -399,7 +413,7 @@ safely.</p>
 </code></pre>
 </div>
 
-<h3 id="tuples-and-functions">tuples and functions</h3>
+<h2 id="tuples-and-functions">tuples and functions</h2>
 
 <p>Place expressions in parentheses to make functions call only those,
 for example per <code>print int(0)-int(1)</code>; if one wrote <code>print int 0-int 1</code>,
@@ -449,7 +463,7 @@ them as arguments.</p>
 </div>
 
 <p>The above snippet is deceptively simple in that <em>smoλ</em> tries its best to not
-annoy you with the conditions required for memory deallocation. In particular,
+annoy you with manual memory management requirements. In particular,
 it <em>defers</em> releasing the allocated memory back to the operating system
 to a later point, where the outcome of <code>greeting()</code> is no longer used. To see
 this, mouse-over the greeting function&#8217;s name if the language&#8217;s LSP is enabled,
@@ -461,7 +475,7 @@ involved in the program. The function&#8217;s documentation would look like this
 <span class="n">greeting</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 
 <span class="n">Potential</span> <span class="n">errors</span><span class="p">:</span>
-<span class="mf">10.</span> <span class="n">allocation</span> <span class="n">failed</span>
+<span class="mf">1.</span>  <span class="n">allocation</span> <span class="n">failed</span>
 
 <span class="n">Returned</span> <span class="n">values</span> <span class="n">defer</span> <span class="n">use</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">functions</span><span class="p">:</span>
 <span class="n">free</span><span class="p">(</span><span class="n">mut</span> <span class="nb">any</span> <span class="n">ptr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()</span>
@@ -548,6 +562,182 @@ necessarily expecting that as an argument. Effects can only be placed before oth
     <span class="nb">print</span> <span class="n">message</span>
 </code></pre>
 </div>
+
+<h2 id="recursion">recursion</h2>
+
+<p>Recursion is an important capability of programming languages, but at
+the same time dangerous in that it can easily create unbounded programs. 
+<em>Smoλ</em> aims to make it somewhat harder to write such programs, while
+also ensuring that understanding function types can be achieved
+by reading ONCE top-to-bottom.</p>
+
+<p>Recursive functions are defined with the <code>rec</code>
+keyword and are able to call all subsequent functions 
+in the same file, including themselves. Importantly,
+they can do so <em>only after their first return</em>, which
+helps determine their type. In a pinch, write 
+<code>if false return ...</code> to create a &#8220;ghost&#8221; return that is 
+never called, but do prefer having a first return as an
+escape hatch.</p>
+
+<p>Recursive functions are traditionally exemplified with an inefficiently-implemented
+Fibonacci function, and we do so below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="n">rec</span> <span class="n">fib</span><span class="p">(</span><span class="n">nat</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">fib</span> <span class="mi">8</span>
+</code></pre>
+</div>
+
+<h2 id="types">types</h2>
+
+<p>Up to now we were limited to builtin numbers and strings. But you can also
+define your own types. First, each function can return a tuple instead of
+a single value. Like below, where tuple members can be accessed with the dot
+notation.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>  <span class="c1"># or compiler::args() to get a tuple of the arguments</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">point</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="c1"># prints 1</span>
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="c1"># prints 2</span>
+</code></pre>
+</div>
+
+<p>Tuples are automatically unpacked into raw data. That is, <em>smoλ</em>
+defaults to <em>structural typing</em> function outputs. However, one
+can actually create nominal types, which can NOT structurally
+matched to data of the same shape, by declaring a tuple as a class.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="k">class</span><span class="w"> </span><span class="nc">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">point</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="c1"># prints 1</span>
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="c1"># prints 2</span>
+</code></pre>
+</div>
+
+<p>All data encountered until now have been immutable in that
+variable values cannot be modified. There 
+are two mechanisms for elevated permissions, <code>edit</code> that we 
+have partly encountered already and <code>mut</code>. Of the two, <code>edit</code>
+allows modifying data structure values only, whereas <code>mut</code>
+allows replacing the whole structure. These qualifiers can
+only be placed in function declarations or after the <code>=</code> symbol.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mutable_point</span><span class="p">(</span><span class="n">nat</span> <span class="n">_x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">_y</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_x</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_y</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># can replace only if &#39;mut&#39;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">+</span><span class="mi">1</span>
+    <span class="k">return</span> <span class="k">class</span><span class="w"> </span><span class="err">(</span><span class="nc">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">mutable_point</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="mi">10</span> <span class="c1"># can modify because &#39;p&#39; can be edited and &#39;p.x&#39; can be mutated</span>
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span>    <span class="c1"># prints 13</span>
+</code></pre>
+</div>
+
+<p>Finally, a handy shortcut when declaring data structures is that 
+you can use the shorthand <code>assigned var = value</code> to also retrieve
+an assigned variable after setting it to a value. By convention,
+prefix arguments that you are going to transform with an underscore.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mutable_point</span><span class="p">(</span><span class="n">nat</span> <span class="n">_x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">_Y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="k">class</span><span class="w"> </span><span class="err">(</span>
+        <span class="n">assigned</span> <span class="n">x</span><span class="o">=</span><span class="n">mut</span> <span class="n">_x</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">assigned</span> <span class="n">y</span><span class="o">=</span><span class="n">mut</span> <span class="n">_y</span><span class="o">+</span><span class="mi">1</span>
+    <span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">mutable_point</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="mi">10</span> <span class="c1"># can modify because &#39;p&#39; can be edited and &#39;p.x&#39; can be mutated</span>
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span>    <span class="c1"># prints 13</span>
+</code></pre>
+</div>
+
+<h2 id="what-next">what next?</h2>
+
+<p>This material covered the very basics of <em>smoλ</em>. However, there are
+other aspects of the type system and standard library&#8217;s core 
+that can also contribute to simple programs, like file handling. 
+Not to mention of concepts like conditional compilation and
+compile-time evaluation.</p>
+
+<p>More memory concepts include safe buffer
+and pointer management for more types than simple characters. 
+More information can be found 
+in the reference guide, and the standard library&#8217;s manual under
+the <strong>Documentation</strong> menu above. Also try the <strong>Tutorials</strong> for
+specific aspects of the language.</p>
+
+<p>One can create buffers and arenas for
+other data types, as well as arithmetic vectors and string maps.
+As a small appetizer, here is an example that creates a buffer
+of a fixed number of elements using <code>[]</code>, and saves some string
+lengths on another buffer.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">arena</span> <span class="n">alloc</span> <span class="mi">1024</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="n">nat</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">2</span> <span class="c1"># equivalent to &#39;alloc(nat[], 2)&#39;</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="s2">&quot;hello &quot;</span><span class="o">+</span><span class="s2">&quot;world&quot;</span><span class="p">,</span>
+        <span class="nb">str</span> <span class="s2">&quot;hello again&quot;</span>
+    <span class="p">]</span>   
+        <span class="nb">print</span> <span class="n">s</span><span class="o">+</span><span class="s2">&quot;!&quot;</span>
+        <span class="n">lengths</span><span class="p">[</span><span class="n">compiler</span><span class="p">::</span><span class="n">for_counter</span><span class="p">()]</span> <span class="o">=</span> <span class="nb">len</span> <span class="n">s</span><span class="o">+</span><span class="s2">&quot;!&quot;</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lengths</span>
+        <span class="nb">print</span> <span class="n">l</span>
+</code></pre>
+</div>
+
+<!-- 
+Recusrsion may be achieved through usage of *functors*,
+which are basically a means for passing abstract functions
+around. These are normal variables with types of the form
+`input_type->output_type` and can be called with the
+`compiler::call` function like below. More on functors
+and compiler functions in the <a href="reference.html">reference guide</a>.
+
+```python
+import std.core
+
+def call(nat->nat inc)
+
+``` -->
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {

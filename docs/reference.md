@@ -178,7 +178,7 @@ import std.core
 def main()
     CLI = edit console() 
     print nn "hello " # equivalent to print("hello", "")
-    print "world!" 
+    print "world!"
 ```
 
 
@@ -319,6 +319,27 @@ def main()
     print std data # prints 0.612826
 ```
 
+Above, there was some redundancy when declaring initialized variables that
+are subsquently returned in `std_data`. You can use the helper `assigned var = expression`
+pattern to perform an assignment that also returns value `var`, like below.
+
+```python
+import std.core
+
+def point(float _x, float _y)
+    return class( 
+        assigned x = mut _x, # adding mut permissions
+        assigned y = mut _y
+    )
+
+def main()
+    CLI = edit console()
+    p = edit point(0.0, 0.0)
+    p.x = 1.0
+    print p.x
+```
+
+
 Use `singleton` instead of `class` to further
 ensure that the function runs at most once in your program.
 By the way, sometimes we want to declare types via functions
@@ -328,12 +349,13 @@ This is exemplified below.
 
 ```python
 import std.core
+import compiler as cp
 
 def point(float x, float y) 
-    return compiler::args()
+    return cp::args()
 
 def field(point a, point b) 
-    return compiler::args()
+    return cp::args()
 
 def main()
     CLI = edit console() 
@@ -542,15 +564,20 @@ Below is an example that highlights the short-circuiting properties of logical o
 
 ```python
 import std.core
+import compiler as cp
 
 def point(float x, float y)
-    return compiler::args()
+    return cp::args()
+
 def add(point p1, point p2)
     return point(p1.x+p2.x, p1.y+p2.y)
+
 def all_positives(point p)
     return p.x>0.0 and p.y>0.0
+
 def not(point p)
     return point(1.0-p.x, 1.0-p.y)
+
 def main()
     CLI = edit console() 
     p = mut point(10.0, 20.0)
@@ -882,11 +909,12 @@ An example that restricts how functions are called is presented next.
 
 ```python
 import std.core
+import compiler as cp
 
 def inc(nat x, blank|1|2 inc)
     if inc is blank  # check if exists - see next section
         inc = type 1 # literal convertible
-    return x+compiler::value inc
+    return x+cp::value inc
 
 def main()
     CLI = edit console()
@@ -903,14 +931,15 @@ to several runtime checks.
 
 ```python
 import std.core
+import compiler as cp
 
 def ENUM = "A"|"B"|"C"
 
 def answer_schemas(ENUM first, ENUM second, nat minutes_to_answer)
-    return compiler::args()
+    return cp::args()
 
 def answers(cstr first, cstr second, nat minutes_to_answer)
-    return compiler::args()
+    return cp::args()
 
 def main()
     CLI = edit console()
@@ -1028,13 +1057,15 @@ occur only during compilation and do not affect running time.
 
 ```python
 import std.core
+import compiler as cp
 
 def Num = float|int|nat
+
 def inc(Num x, Num|blank value) # equivalent: def inc(float|int|nat x, float|int|nat|blank value) 
     if value is blank
         value = Num 1->type x # one with the same number format as x
     if not value is type x
-        compiler::skip() # skip invalid 'inc' definitions
+        cp::skip() # skip invalid 'inc' definitions
     return x+value
 
 def main()
@@ -1220,9 +1251,10 @@ type like below.
 
 ```python
 import std.core
+import compiler as cp
 
 def named_buffer(str name, edit any[] buf)
-    return class compiler::args()
+    return class cp::args()
 
 def named_strbuffer()
     return named_buffer(str "", str[])
@@ -1305,16 +1337,17 @@ a pointer to it. Then that is moved around via its memory address.
 
 ```python
 import std.core
+import compiler as cp
 
 def inc(mut float ptr element)
-    element = 1.0+compiler::deref element
+    element = 1.0+cp::deref element
 
 def main()
     CLI = edit console()
     element = mut [0.0]& # equivalent to element = [0.0][0]& 
-    print compiler::deref element # prints 0.0
+    print cp::deref element # prints 0.0
     inc element
-    print compiler::deref element # prints 1,0
+    print cp::deref element # prints 1,0
 ```
 
 Creating many pointers this way is inefficient in that it produce a lot of small allocations.
@@ -1612,9 +1645,10 @@ returns.
 
 ```python
 import std.core
+import compiler as cp
 
 def solution(mut nat x, mut nat y)
-    return compiler::args()
+    return cp::args()
     
 def get(mut solution s, nat) # skip the iteration index argument
     s.x = (s.x+1)/2
@@ -1690,11 +1724,12 @@ simultaneously.
 ```python
 import std.core
 import std.io as io
+import compiler as cp
 
 def main()
     CLI = edit console()
     try print 2*3-20 # nat cannot become negative
-    if try error = compiler::catch()
+    if try error = cp::catch()
         print "cannot substract two nat numbers and obtain a negative result"
 ```
 
@@ -1710,7 +1745,8 @@ But, importantly, they *are* obtained from deferred statements triggered by
 
 ```python
 import std.core
-import std.io:process as process
+import std.io.process as process
+import compiler as cp
 
 def bye_error()
     fail "bye!" 
@@ -1721,7 +1757,7 @@ def main()
     try bye_error()
     del proc
 
-    if try error = compiler::catch()
+    if try error = cp::catch()
         print cstr error # prints 'bye!' if no process error
         fail error       # can fail with error codes too
 ```
@@ -1782,10 +1818,11 @@ to call a functor with given arguments. The retrieval into a factor should be un
 
 ```python
 import std.core
+import compiler as cp
 
 def two(nat->nat c)
-    one = c.compiler::call 0
-    return c.compiler::call one
+    one = c.cp::call 0
+    return c.cp::call one
 
 def inc(nat x)
     return x+1
@@ -1799,14 +1836,15 @@ Here is a different example.
 
 ```python
 import std.core
+import compiler as cp
 
 def pair(nat, nat)
-    return compiler::args()
+    return cp::args()
 
 def least(nat[] numbers, pair->bool order)
     ret = mut numbers[0]
     for number in numbers
-        if order.compiler::call(number,ret) ret = number
+        if order.cp::call(number,ret) ret = number
     return ret
 
 def min(nat x, nat y)
@@ -1826,22 +1864,23 @@ functors based on arguments.
 
 ```python
 import std.core
+import compiler as cp
 
 def call_one(nat->nat->nat x) 
-    return x.compiler::call 1
+    return x.cp::call 1
 
 def add(nat x, 0|1|2 y) 
-    return x+compiler::value y
+    return x+cp::value y
     
 def add(nat x) 
-    if x==0 return compiler::abstract type add<nat,0>
-    if x==1 return compiler::abstract type add<nat,1>
-    if x==2 return compiler::abstract type add<nat,2>
+    if x==0 return cp::abstract type add<nat,0>
+    if x==1 return cp::abstract type add<nat,1>
+    if x==2 return cp::abstract type add<nat,2>
 
 def main()
     CLI = console()
     x = call_one type add<nat>
-    print x.compiler::call 5 # prints 6
+    print x.cp::call 5 # prints 6
 ```
 
 
@@ -1890,12 +1929,13 @@ suffices to make a judgement, even if enums usually require runtime checking.
 
 ```python
 import std.core
+import compiler as cp
 
 def test1(nat a, nat b, "one"|"two")
-    return compiler::args()
+    return cp::args()
     
 def test2(float a, float b, "one"|"two")
-    return compiler::args()
+    return cp::args()
 
 def main()
     CLI = edit console()
@@ -1928,6 +1968,7 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
 
 ```python
 import std.core
+import compiler as cp
 
 rec wooo(effect edit range SAFETY, nat i)
     next SAFETY
@@ -1938,7 +1979,7 @@ def main()
     CLI = edit console()
     SAFETY = range of 14 # recursive depth limit in playground
     try wooo 0
-    if try error = compiler::catch()
+    if try error = cp::catch()
         print cstr error # prints 'iteration end'
 ```
 
@@ -2270,13 +2311,14 @@ handle the intercepted errors, use a pattern like below.
 
 ```python
 import std.core
-import std.io:process as proc
+import std.io.process as proc
+import compiler as cp
 
 def main()
     CLI = edit console()
     process = proc:process "ls"
     del process
-    if try error = compiler::catch()
+    if try error = cp.catch()
         fail error # can fail on error codes too
 ```
 
@@ -2407,6 +2449,7 @@ after the end.
 ```python
 import std.core
 import std.sci
+import compiler as cp
 
 def safe_main()
     allocator  = ref circular float[].alloc 200 # used by vector operation effects
@@ -2425,7 +2468,7 @@ def safe_main()
 def main()
     CLI = edit console()
     try safe_main()
-    if try error=compiler::catch()
+    if try error=cp::catch()
         print cstr error
 ```
 
@@ -2528,7 +2571,8 @@ around in a window.
 ```python
 import std.core
 import std.sci as sci
-import std.graphics as graphics
+import std.graphics as g
+import compiler as cp
 
 def Circle(float _cx, float _cy, float _vx, float _vy, float _radius)
     cx = mut _cx
@@ -2539,7 +2583,7 @@ def Circle(float _cx, float _cy, float _vx, float _vy, float _radius)
     return (cx,cy,vx,vy,radius)
 
 def process(mut Circle ptr _self, float dt)
-    self = compiler::deref _self
+    self = cp::deref _self
     self.cx = self.cx + self.vx * dt
     self.cy = self.cy + self.vy * dt
     if self.cx - self.radius < 0.0
@@ -2556,18 +2600,17 @@ def process(mut Circle ptr _self, float dt)
         self.vy = 0.0-(sci::abs self.vy)
     _self = self
 
-def draw(Circle self, edit graphics:Window win)
-    white  = graphics:Color(255, 255, 255)
-    teal   = graphics:Color(0,   200, 180)
-    shadow = graphics:Color(0,   200, 180, 60)
+def draw(Circle self, edit g::Window win)
+    white  = g::Color(255, 255, 255)
+    teal   = g::Color(0,   200, 180)
+    shadow = g::Color(0,   200, 180, 60)
     pos = (self.cx, self.cy)
-    win
-    .graphics:circ(self.cx + 4.0, self.cy + 4.0, self.radius, shadow)
-    .graphics:circ(pos, self.radius, teal)
-    .graphics:circ_line(pos, nat self.radius, 2, white)
+    g::circ(self.cx + 4.0, self.cy + 4.0, self.radius, shadow)
+    g::circ(pos, self.radius, teal)
+    g::circ_line(pos, nat self.radius, 2, white)
 
 def main()
-    win = graphics:Size(800.0, 600.0).graphics:Window "Circles"
+    win = g::Window("Circles", 800.0, 600.0)
 
     N = 1000
     circles = edit Circle[].alloc N
@@ -2576,14 +2619,13 @@ def main()
         create_circle = Circle(400.0, 300.0, 200.0-i, 160.0+i, 30.0)
 
     while graphics:is_open win
-        dt = graphics:dt()
+        dt = g::dt()
         for proc_circle& in circles # mutable pointer
             proc_circle.process dt
         frame = graphics:draw win
-        win.graphics:clear graphics:Color(20, 20, 60)
+        g::clear graphics:Color(20, 20, 60)
         for draw_circle in circles
             draw_circle.draw win
-        del frame
 ```
 
 ## process and web
@@ -2606,7 +2648,8 @@ which can be caught afterwards to check for successful termination.
 
 ```python
 import std.core
-import std.io
+import std.io.dir as dir
+import std.io.process as process
 
 def run(cstr|str command)
     proc = mut process::open command

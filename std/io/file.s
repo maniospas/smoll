@@ -129,3 +129,9 @@ def print(edit terminal|write f, str|cstr text, cstr|blank endl)
     f._print str text
     if endl!=""
         f._print str endl
+
+def print(edit write f, "flush")
+    doc "flushes file contents to the disk"
+    {builtins::bool success = (__smo_fflush((FILE*)f__unsafe_ptr)!=-1);}
+    if not success
+        fail "failed to flush file contents"

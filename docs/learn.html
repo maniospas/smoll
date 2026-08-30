@@ -222,9 +222,10 @@
                 </div>
             </div>
             <div class="dropdown">
-                <a href="#" style="font-weight:500">Documentation</a>
+                <a href="#" style="font-weight:900">Documentation</a>
                 <div class="dropdown-menu">
-                    <a href="reference.html" style="font-weight:400">Learn</a>
+                    <a href="learn.html" style="font-weight:900">Learn</a>
+                    <a href="reference.html" style="font-weight:400">Reference guide</a>
                     <a href="std.html" style="font-weight:400">Standard library</a>
                 </div>
             </div>
@@ -234,8 +235,8 @@
     <h1 id="learn">Learn</h1>
 
 <p>We will cover the basics of <em>smoλ</em> here. This covers the few features that are responsible
-for most code written in the language. Find more things in the langauge&#8217;s 
-<a href="reference.html">reference</a>.</p>
+for most code written in the language. Find a complete list of 
+concepts in the <a href="reference.html">reference guide</a>.</p>
 
 <h3 id="hello-world">hello world!</h3>
 
@@ -247,47 +248,52 @@ Following examples will not have this command for brevity.</p>
 <p>Then, the prorgam imports the standard library&#8217;s collections of basic yet useful functions, 
 and defines a <code>main</code> function to serve as the
 entrant point of our program. The function&#8217;s body is indended, which is how
-the language keeps track of code blocks.</p>
+the language tracks code blocks.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">repo</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/&quot;</span> <span class="k">as</span> <span class="s2">&quot;std/&quot;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="nb">print</span> <span class="s2">&quot;hello world!&quot;</span>
 </code></pre>
 </div>
 
-<p>The program above calls the <code>print</code> function with a string greeting in quotations. As
-<em>smoλ</em> is compiled, there is a great deal of difference on whether strings
+<p>The program above defines <code>CLI</code> as a variable that can edit the console.
+It then calls the <code>print</code> function with a string greeting in quotations. 
+This function automatically grabs the <code>CLI</code> variable by name from the calling
+context; this is called an <em>effect</em> and covered later.</p>
+
+<p>As <em>smoλ</em> is compiled, there is a great deal of difference on whether strings
 are string literals known during compilation -we call these <code>cstr</code>- or dynamically
 generated strings that appear during runtime. To convert this string into a runtime
-string <em>type</em> called <code>str</code> just call a namesake function like below.</p>
+string type called <code>str</code> just call a namesake function like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">greeting</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;hello world!&quot;</span>
     <span class="nb">print</span> <span class="n">greeting</span>
 </code></pre>
 </div>
 
-<p>The snippet sneakily introduces the concept of variables too, by storing the
+<p>We have sneakily introduced the concept of variables too, by storing the
 string value on a variable called <em>greeting</em>. A different <code>print</code> function
-is also used that is compatible with the string type, but the code largely looks
-the same. However, if you wanted to hear about any other differences, the language
-is too good for that yet: it recognizes that the created <code>str</code> is known during
-compilation and thus takes special action to ensure that the created program
-becomes equivalent to the first one.</p>
+is also used for the string type, but the code largely looks
+the same. Do note that the language recognizes <code>str</code> as known during
+compilation and thus ensures that the created program
+becomes equivalent to the first one without needing memory allocation. Yet.</p>
 
 <h3 id="numbers">numbers</h3>
 
 <p>Before continuing with strings and how they can be created -and manipulated- 
-dynamically, let us skim over some more basics. First, let us talk about numbers. Usually you will
-use one of the <em>Number</em> types <code>float</code>, <code>int</code>, <code>nat</code>. These use 64 bits to represent
-floating point numbers, integers, and natural numbers (also known as unsigned integers 
-or non-negative intgers if you are more of a math person).</p>
+dynamically, let us skim over some more basics. First: numbers. Usually you will
+use one of <code>float</code>, <code>int</code>, <code>nat</code> that use 64 bits to correspondingly represent
+floating point numbers, integers, and natural numbers. Natural numbers
+are also known as unsigned integers or non-negative intgers if you are more of a math person.</p>
 
 <p><em>Smoλ</em> takes a principled stance of not allowing you to mix these types unintendedly,
 because this is how bad things happen in compiled code (like <em>1.0</em> not having the same bit
@@ -309,6 +315,7 @@ By the way, text after <code>#</code> are line comments and ignored.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="nb">print</span> <span class="mf">1.0</span><span class="o">+</span><span class="mf">2.0</span><span class="o">-</span><span class="mf">3.0</span> <span class="c1"># prints 0.0</span>
     <span class="nb">print</span> <span class="mi">1</span><span class="o">+</span><span class="mi">2</span>
     <span class="n">int_zero</span> <span class="o">=</span> <span class="nb">int</span> <span class="mi">0</span>
@@ -326,6 +333,7 @@ executed based given a condition. Conditions evaluate to a <code>bool</code> typ
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mi">0</span>
         <span class="nb">print</span> <span class="s2">&quot;x is negative</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -333,22 +341,71 @@ executed based given a condition. Conditions evaluate to a <code>bool</code> typ
 </code></pre>
 </div>
 
+<p>Loops can be have the form of either <code>while condition body</code>, which looks
+similar to above, or an iterator-based form shown below. Parentheses are 
+optional when passing one argument to a function, which allows us to
+construct a natural number range, which normally takes exactly two arguments,
+by calling the <code>of</code> function to construct a range from <code>0</code> to <code>10</code> (non-inclusive).</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span> <span class="n">of</span> <span class="mi">10</span>
+        <span class="nb">print</span> <span class="n">x</span>
+</code></pre>
+</div>
+
+<p>The <code>of</code> function support various kinds of range constructions that 
+help code be more explicit. Next are some patterns that use 
+a concept called literal keywords <em>to, upto, len</em> for explicitness.
+(See the <a href="reference.html">reference guide</a> on how to define such
+keywords for your own functions.)</p>
+
+<ul>
+<li><code>range of 10</code> becomes <code>range(0,10)</code> </li>
+<li><code>range of (1 to 10)</code> becomes <code>range(1,10)</code> </li>
+<li><code>range of (1 upto 10)</code> becomes <code>range(1,11)</code> </li>
+<li><code>range of (2 len 10)</code> becomes <code>range(2,12)</code></li>
+</ul>
+
 <h2 id="errors">errors</h2>
 
-<p>Since we are still talking about numbers,it is a good time to also talk about errors, like division by zero.
+<p>Since we are still talking about numbers, it is a good time to also talk about errors, like division by zero.
 Ok, we will ignore floats where division by zero is well-defined, and consider expressions like <code>1/0</code>.
 Functions -division in this case- can fail freely and you should not bother too much about that, 
 unless you know of a way to recover from failure or need to do something special. You will never have leaking
 resources from failure (e.g., memory leaks), so you can continue with your program like normal if
-you decide to handle them.</p>
+you decide to handle them. Errors include natural number substraction that would create a negative.</p>
 
-<p>To check whether an expression has any errors, start it with a <code>try</code> </p>
+<p>To check whether an expression has any errors, start it with <code>try</code>. The outcome is a boolean value
+that can be checked for success, for example in a condition. Otherwise, errors cascade in the
+call stack, until they are intercepted from some caller. Erroring is safe in that it does not
+leak resources by automatically releasing them. At worst, your whole program will terminate
+safely.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="k">try</span> <span class="n">result</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span>
+        <span class="nb">print</span> <span class="s2">&quot;failed to sustract&quot;</span>
+    <span class="k">else</span>
+        <span class="nb">print</span> <span class="n">result</span>
+</code></pre>
+</div>
 
 <h3 id="tuples-and-functions">tuples and functions</h3>
 
-<p>Above we wrote <code>print int_zero-int 1</code> with the understanding that <em>smoλ</em> functions are called 
-for the result following them. Place expressions in parentheses to make functions call only those,
-for example per <code>print int(0)-int(1)</code>. In fact, parantheses are a means of definining tuples, which
+<p>Place expressions in parentheses to make functions call only those,
+for example per <code>print int(0)-int(1)</code>; if one wrote <code>print int 0-int 1</code>,
+it would be interpreted per
+<code>print(int( 0-int(1) ))</code>, and the compiler would complain that an <em>int</em>
+cannot be substracted from a natural number in the middle.</p>
+
+<p>In general, all functions accept one argument and parantheses are just a means of definining tuples, which
 is what we call sequences of a fixed number of values with potentially different types. Up to now, 
 we basically used tuples of one element, where parentheses are not usually needed.</p>
 
@@ -360,14 +417,11 @@ use instead of the line break character, you can do the following.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;hello &quot;</span> <span class="c1"># nn creats the tuple (&quot;hello &quot;, &quot;&quot;)</span>
     <span class="nb">print</span> <span class="s2">&quot;world!</span>
 </code></pre>
 </div>
-
-<h3 id="buffers">buffers</h3>
-
-<p>Ok, so how do we actually create a string during </p>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {

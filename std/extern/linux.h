@@ -77,6 +77,18 @@ static inline int __smo_remove_file(const char* path) {
     return remove(path) == 0;
 }
 
+static int __smo_fflush(FILE *fp)
+{
+    if (!fp) {
+        return -1;
+    }
+
+    if (fflush(fp) != 0)
+        return -1;
+
+    return fsync(fileno(fp));
+}
+
 /* ── console open/close (pty + xterm/konsole) ──
  *
  * Matches the reference implementation exactly:

@@ -78,6 +78,19 @@ static inline int __smo_remove_file(const char* path) {
     return remove(path) == 0;
 }
 
+static int __smo_fflush(FILE *fp)
+{
+    if (!fp) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (fflush(fp) != 0)
+        return -1;
+
+    return _commit(_fileno(fp));
+}
+
 /* ── console open/close ── */
 static inline FILE* __smo_open_console(void) {
     AllocConsole();

@@ -224,7 +224,8 @@
             <div class="dropdown">
                 <a href="#" style="font-weight:900">Documentation</a>
                 <div class="dropdown-menu">
-                    <a href="reference.html" style="font-weight:900">Learn</a>
+                    <a href="learn.html" style="font-weight:400">Learn</a>
+                    <a href="reference.html" style="font-weight:900">Reference guide</a>
                     <a href="std.html" style="font-weight:400">Standard library</a>
                 </div>
             </div>
@@ -414,7 +415,7 @@ The default ending is otherwise <em>"\n"</em>.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;hello &quot;</span> <span class="c1"># equivalent to print(&quot;hello&quot;, &quot;&quot;)</span>
-    <span class="nb">print</span> <span class="s2">&quot;world!&quot;</span> 
+    <span class="nb">print</span> <span class="s2">&quot;world!&quot;</span>
 </code></pre>
 </div>
 
@@ -555,6 +556,27 @@ triple should be allowed.</p>
 </code></pre>
 </div>
 
+<p>Above, there was some redundancy when declaring initialized variables that
+are subsquently returned in <code>std_data</code>. You can use the helper <code>assigned var = expression</code>
+pattern to perform an assignment that also returns value <code>var</code>, like below.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">_x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">class</span><span class="p">(</span> 
+        <span class="n">assigned</span> <span class="n">x</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_x</span><span class="p">,</span> <span class="c1"># adding mut permissions</span>
+        <span class="n">assigned</span> <span class="n">y</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_y</span>
+    <span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">point</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span>
+</code></pre>
+</div>
+
 <p>Use <code>singleton</code> instead of <code>class</code> to further
 ensure that the function runs at most once in your program.
 By the way, sometimes we want to declare types via functions
@@ -564,12 +586,13 @@ This is exemplified below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span> 
-    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">field</span><span class="p">(</span><span class="n">point</span> <span class="n">a</span><span class="p">,</span> <span class="n">point</span> <span class="n">b</span><span class="p">)</span> 
-    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
@@ -791,15 +814,20 @@ like normal, but have two more properties:</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">,</span> <span class="nb">float</span> <span class="n">y</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">point</span> <span class="n">p1</span><span class="p">,</span> <span class="n">point</span> <span class="n">p2</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">point</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">p2</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">p1</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="n">p2</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">all_positives</span><span class="p">(</span><span class="n">point</span> <span class="n">p</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="o">&gt;</span><span class="mf">0.0</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="o">&gt;</span><span class="mf">0.0</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">not</span><span class="p">(</span><span class="n">point</span> <span class="n">p</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">point</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">-</span><span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> 
     <span class="n">p</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">point</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">)</span>
@@ -1136,11 +1164,12 @@ An example that restricts how functions are called is presented next.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">blank</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">inc</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">inc</span> <span class="ow">is</span> <span class="n">blank</span>  <span class="c1"># check if exists - see next section</span>
         <span class="n">inc</span> <span class="o">=</span> <span class="nb">type</span> <span class="mi">1</span> <span class="c1"># literal convertible</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">inc</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">cp</span><span class="p">::</span><span class="n">value</span> <span class="n">inc</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1158,14 +1187,15 @@ to several runtime checks.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">ENUM</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">|</span><span class="s2">&quot;B&quot;</span><span class="o">|</span><span class="s2">&quot;C&quot;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">answer_schemas</span><span class="p">(</span><span class="n">ENUM</span> <span class="n">first</span><span class="p">,</span> <span class="n">ENUM</span> <span class="n">second</span><span class="p">,</span> <span class="n">nat</span> <span class="n">minutes_to_answer</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">answers</span><span class="p">(</span><span class="n">cstr</span> <span class="n">first</span><span class="p">,</span> <span class="n">cstr</span> <span class="n">second</span><span class="p">,</span> <span class="n">nat</span> <span class="n">minutes_to_answer</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -1289,13 +1319,15 @@ occur only during compilation and do not affect running time.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Num</span> <span class="o">=</span> <span class="nb">float</span><span class="o">|</span><span class="nb">int</span><span class="o">|</span><span class="n">nat</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">Num</span> <span class="n">x</span><span class="p">,</span> <span class="n">Num</span><span class="o">|</span><span class="n">blank</span> <span class="n">value</span><span class="p">)</span> <span class="c1"># equivalent: def inc(float|int|nat x, float|int|nat|blank value) </span>
     <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">blank</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">Num</span> <span class="mi">1</span><span class="o">-&gt;</span><span class="nb">type</span> <span class="n">x</span> <span class="c1"># one with the same number format as x</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">is</span> <span class="nb">type</span> <span class="n">x</span>
-        <span class="n">compiler</span><span class="p">::</span><span class="n">skip</span><span class="p">()</span> <span class="c1"># skip invalid &#39;inc&#39; definitions</span>
+        <span class="n">cp</span><span class="p">::</span><span class="n">skip</span><span class="p">()</span> <span class="c1"># skip invalid &#39;inc&#39; definitions</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">value</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -1488,9 +1520,10 @@ type like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">named_buffer</span><span class="p">(</span><span class="nb">str</span> <span class="n">name</span><span class="p">,</span> <span class="n">edit</span> <span class="nb">any</span><span class="p">[]</span> <span class="n">buf</span><span class="p">)</span>
-    <span class="k">return</span> <span class="k">class</span><span class="w"> </span><span class="nc">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="k">class</span><span class="w"> </span><span class="nc">cp</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">named_strbuffer</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">named_buffer</span><span class="p">(</span><span class="nb">str</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">[])</span>
@@ -1575,16 +1608,17 @@ a pointer to it. Then that is moved around via its memory address. </p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">mut</span> <span class="nb">float</span> <span class="n">ptr</span> <span class="n">element</span><span class="p">)</span>
-    <span class="n">element</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span>
+    <span class="n">element</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">+</span><span class="n">cp</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">element</span> <span class="o">=</span> <span class="n">mut</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">&amp;</span> <span class="c1"># equivalent to element = [0.0][0]&amp; </span>
-    <span class="nb">print</span> <span class="n">compiler</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span> <span class="c1"># prints 0.0</span>
+    <span class="nb">print</span> <span class="n">cp</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span> <span class="c1"># prints 0.0</span>
     <span class="n">inc</span> <span class="n">element</span>
-    <span class="nb">print</span> <span class="n">compiler</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span> <span class="c1"># prints 1,0</span>
+    <span class="nb">print</span> <span class="n">cp</span><span class="p">::</span><span class="n">deref</span> <span class="n">element</span> <span class="c1"># prints 1,0</span>
 </code></pre>
 </div>
 
@@ -1892,9 +1926,10 @@ returns.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">solution</span><span class="p">(</span><span class="n">mut</span> <span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">mut</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">mut</span> <span class="n">solution</span> <span class="n">s</span><span class="p">,</span> <span class="n">nat</span><span class="p">)</span> <span class="c1"># skip the iteration index argument</span>
     <span class="n">s</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
@@ -1972,11 +2007,12 @@ simultaneously.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="k">try</span> <span class="nb">print</span> <span class="mi">2</span><span class="o">*</span><span class="mi">3</span><span class="o">-</span><span class="mi">20</span> <span class="c1"># nat cannot become negative</span>
-    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">cp</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="s2">&quot;cannot substract two nat numbers and obtain a negative result&quot;</span>
 </code></pre>
 </div>
@@ -1991,7 +2027,8 @@ But, importantly, they <em>are</em> obtained from deferred statements triggered 
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">process</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io.process</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">process</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">bye_error</span><span class="p">()</span>
     <span class="n">fail</span> <span class="s2">&quot;bye!&quot;</span> 
@@ -2002,7 +2039,7 @@ But, importantly, they <em>are</em> obtained from deferred statements triggered 
     <span class="k">try</span> <span class="n">bye_error</span><span class="p">()</span>
     <span class="k">del</span> <span class="n">proc</span>
 
-    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">cp</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span> <span class="c1"># prints &#39;bye!&#39; if no process error</span>
         <span class="n">fail</span> <span class="n">error</span>       <span class="c1"># can fail with error codes too</span>
 </code></pre>
@@ -2065,10 +2102,11 @@ to call a functor with given arguments. The retrieval into a factor should be un
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">two</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">c</span><span class="p">)</span>
-    <span class="n">one</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">0</span>
-    <span class="k">return</span> <span class="n">c</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="n">one</span>
+    <span class="n">one</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">cp</span><span class="p">::</span><span class="n">call</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">c</span><span class="o">.</span><span class="n">cp</span><span class="p">::</span><span class="n">call</span> <span class="n">one</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
@@ -2083,14 +2121,15 @@ to call a functor with given arguments. The retrieval into a factor should be un
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">pair</span><span class="p">(</span><span class="n">nat</span><span class="p">,</span> <span class="n">nat</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">least</span><span class="p">(</span><span class="n">nat</span><span class="p">[]</span> <span class="n">numbers</span><span class="p">,</span> <span class="n">pair</span><span class="o">-&gt;</span><span class="nb">bool</span> <span class="n">order</span><span class="p">)</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">numbers</span>
-        <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span><span class="p">(</span><span class="n">number</span><span class="p">,</span><span class="n">ret</span><span class="p">)</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">number</span>
+        <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">cp</span><span class="p">::</span><span class="n">call</span><span class="p">(</span><span class="n">number</span><span class="p">,</span><span class="n">ret</span><span class="p">)</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">number</span>
     <span class="k">return</span> <span class="n">ret</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">min</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="n">nat</span> <span class="n">y</span><span class="p">)</span>
@@ -2111,22 +2150,23 @@ functors based on arguments.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">call_one</span><span class="p">(</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span><span class="o">-&gt;</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span> 
-    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">cp</span><span class="p">::</span><span class="n">call</span> <span class="mi">1</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span> <span class="n">y</span><span class="p">)</span> 
-    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">compiler</span><span class="p">::</span><span class="n">value</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">cp</span><span class="p">::</span><span class="n">value</span> <span class="n">y</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span> 
-    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">0</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span>
-    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span>
-    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">2</span> <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">0</span> <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">1</span> <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">2</span> <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">abstract</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">call_one</span> <span class="nb">type</span> <span class="n">add</span><span class="o">&lt;</span><span class="n">nat</span><span class="o">&gt;</span>
-    <span class="nb">print</span> <span class="n">x</span><span class="o">.</span><span class="n">compiler</span><span class="p">::</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
+    <span class="nb">print</span> <span class="n">x</span><span class="o">.</span><span class="n">cp</span><span class="p">::</span><span class="n">call</span> <span class="mi">5</span> <span class="c1"># prints 6</span>
 </code></pre>
 </div>
 
@@ -2176,12 +2216,13 @@ suffices to make a judgement, even if enums usually require runtime checking.</p
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test1</span><span class="p">(</span><span class="n">nat</span> <span class="n">a</span><span class="p">,</span> <span class="n">nat</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="o">|</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test2</span><span class="p">(</span><span class="nb">float</span> <span class="n">a</span><span class="p">,</span> <span class="nb">float</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="o">|</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">compiler</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cp</span><span class="p">::</span><span class="n">args</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
@@ -2214,6 +2255,7 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="n">rec</span> <span class="n">wooo</span><span class="p">(</span><span class="n">effect</span> <span class="n">edit</span> <span class="nb">range</span> <span class="n">SAFETY</span><span class="p">,</span> <span class="n">nat</span> <span class="n">i</span><span class="p">)</span>
     <span class="nb">next</span> <span class="n">SAFETY</span>
@@ -2224,7 +2266,7 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">SAFETY</span> <span class="o">=</span> <span class="nb">range</span> <span class="n">of</span> <span class="mi">14</span> <span class="c1"># recursive depth limit in playground</span>
     <span class="k">try</span> <span class="n">wooo</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">cp</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span> <span class="c1"># prints &#39;iteration end&#39;</span>
 </code></pre>
 </div>
@@ -2570,13 +2612,14 @@ handle the intercepted errors, use a pattern like below.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span><span class="p">:</span><span class="n">process</span> <span class="k">as</span> <span class="n">proc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io.process</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">proc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">process</span> <span class="o">=</span> <span class="n">proc</span><span class="p">:</span><span class="n">process</span> <span class="s2">&quot;ls&quot;</span>
     <span class="k">del</span> <span class="n">process</span>
-    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">catch</span><span class="p">()</span>
         <span class="n">fail</span> <span class="n">error</span> <span class="c1"># can fail on error codes too</span>
 </code></pre>
 </div>
@@ -2713,6 +2756,7 @@ after the end.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">std.sci</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">safe_main</span><span class="p">()</span>
     <span class="n">allocator</span>  <span class="o">=</span> <span class="n">ref</span> <span class="n">circular</span> <span class="nb">float</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="mi">200</span> <span class="c1"># used by vector operation effects</span>
@@ -2731,7 +2775,7 @@ after the end.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="k">try</span> <span class="n">safe_main</span><span class="p">()</span>
-    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span><span class="o">=</span><span class="n">compiler</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="k">try</span> <span class="n">error</span><span class="o">=</span><span class="n">cp</span><span class="p">::</span><span class="n">catch</span><span class="p">()</span>
         <span class="nb">print</span> <span class="n">cstr</span> <span class="n">error</span>
 </code></pre>
 </div>
@@ -2836,7 +2880,8 @@ around in a window.</p>
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">std.sci</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sci</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">std.graphics</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">graphics</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.graphics</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">g</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">Circle</span><span class="p">(</span><span class="nb">float</span> <span class="n">_cx</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_cy</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_vx</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_vy</span><span class="p">,</span> <span class="nb">float</span> <span class="n">_radius</span><span class="p">)</span>
     <span class="n">cx</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">_cx</span>
@@ -2847,7 +2892,7 @@ around in a window.</p>
     <span class="k">return</span> <span class="p">(</span><span class="n">cx</span><span class="p">,</span><span class="n">cy</span><span class="p">,</span><span class="n">vx</span><span class="p">,</span><span class="n">vy</span><span class="p">,</span><span class="n">radius</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="n">mut</span> <span class="n">Circle</span> <span class="n">ptr</span> <span class="n">_self</span><span class="p">,</span> <span class="nb">float</span> <span class="n">dt</span><span class="p">)</span>
-    <span class="bp">self</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">::</span><span class="n">deref</span> <span class="n">_self</span>
+    <span class="bp">self</span> <span class="o">=</span> <span class="n">cp</span><span class="p">::</span><span class="n">deref</span> <span class="n">_self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vx</span> <span class="o">*</span> <span class="n">dt</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vy</span> <span class="o">*</span> <span class="n">dt</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
@@ -2864,18 +2909,17 @@ around in a window.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">vy</span> <span class="o">=</span> <span class="mf">0.0</span><span class="o">-</span><span class="p">(</span><span class="n">sci</span><span class="p">::</span><span class="nb">abs</span> <span class="bp">self</span><span class="o">.</span><span class="n">vy</span><span class="p">)</span>
     <span class="n">_self</span> <span class="o">=</span> <span class="bp">self</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="n">Circle</span> <span class="bp">self</span><span class="p">,</span> <span class="n">edit</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Window</span> <span class="n">win</span><span class="p">)</span>
-    <span class="n">white</span>  <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
-    <span class="n">teal</span>   <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>   <span class="mi">200</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
-    <span class="n">shadow</span> <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>   <span class="mi">200</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="n">Circle</span> <span class="bp">self</span><span class="p">,</span> <span class="n">edit</span> <span class="n">g</span><span class="p">::</span><span class="n">Window</span> <span class="n">win</span><span class="p">)</span>
+    <span class="n">white</span>  <span class="o">=</span> <span class="n">g</span><span class="p">::</span><span class="n">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+    <span class="n">teal</span>   <span class="o">=</span> <span class="n">g</span><span class="p">::</span><span class="n">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>   <span class="mi">200</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+    <span class="n">shadow</span> <span class="o">=</span> <span class="n">g</span><span class="p">::</span><span class="n">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>   <span class="mi">200</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
     <span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span><span class="p">)</span>
-    <span class="n">win</span>
-    <span class="o">.</span><span class="n">graphics</span><span class="p">:</span><span class="n">circ</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">+</span> <span class="mf">4.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">+</span> <span class="mf">4.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">shadow</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">graphics</span><span class="p">:</span><span class="n">circ</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">teal</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">graphics</span><span class="p">:</span><span class="n">circ_line</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">nat</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">white</span><span class="p">)</span>
+    <span class="n">g</span><span class="p">::</span><span class="n">circ</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">+</span> <span class="mf">4.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">+</span> <span class="mf">4.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">shadow</span><span class="p">)</span>
+    <span class="n">g</span><span class="p">::</span><span class="n">circ</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">teal</span><span class="p">)</span>
+    <span class="n">g</span><span class="p">::</span><span class="n">circ_line</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">nat</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">white</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">win</span> <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Size</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">)</span><span class="o">.</span><span class="n">graphics</span><span class="p">:</span><span class="n">Window</span> <span class="s2">&quot;Circles&quot;</span>
+    <span class="n">win</span> <span class="o">=</span> <span class="n">g</span><span class="p">::</span><span class="n">Window</span><span class="p">(</span><span class="s2">&quot;Circles&quot;</span><span class="p">,</span> <span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">)</span>
 
     <span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
     <span class="n">circles</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">Circle</span><span class="p">[]</span><span class="o">.</span><span class="n">alloc</span> <span class="n">N</span>
@@ -2884,14 +2928,13 @@ around in a window.</p>
         <span class="n">create_circle</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">(</span><span class="mf">400.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="o">-</span><span class="n">i</span><span class="p">,</span> <span class="mf">160.0</span><span class="o">+</span><span class="n">i</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
 
     <span class="k">while</span> <span class="n">graphics</span><span class="p">:</span><span class="n">is_open</span> <span class="n">win</span>
-        <span class="n">dt</span> <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">dt</span><span class="p">()</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">g</span><span class="p">::</span><span class="n">dt</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">proc_circle</span><span class="o">&amp;</span> <span class="ow">in</span> <span class="n">circles</span> <span class="c1"># mutable pointer</span>
             <span class="n">proc_circle</span><span class="o">.</span><span class="n">process</span> <span class="n">dt</span>
         <span class="n">frame</span> <span class="o">=</span> <span class="n">graphics</span><span class="p">:</span><span class="n">draw</span> <span class="n">win</span>
-        <span class="n">win</span><span class="o">.</span><span class="n">graphics</span><span class="p">:</span><span class="n">clear</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">g</span><span class="p">::</span><span class="n">clear</span> <span class="n">graphics</span><span class="p">:</span><span class="n">Color</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">draw_circle</span> <span class="ow">in</span> <span class="n">circles</span>
             <span class="n">draw_circle</span><span class="o">.</span><span class="n">draw</span> <span class="n">win</span>
-        <span class="k">del</span> <span class="n">frame</span>
 </code></pre>
 </div>
 
@@ -2915,7 +2958,8 @@ which can be caught afterwards to check for successful termination.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">std.io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io.dir</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dir</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">std.io.process</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">process</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">cstr</span><span class="o">|</span><span class="nb">str</span> <span class="n">command</span><span class="p">)</span>
     <span class="n">proc</span> <span class="o">=</span> <span class="n">mut</span> <span class="n">process</span><span class="p">::</span><span class="nb">open</span> <span class="n">command</span>

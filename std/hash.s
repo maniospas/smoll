@@ -44,10 +44,10 @@ def to_hash_base(Number k)
     return bits k
 
 def robinhood_str_entry(str s, nat cost)
-    return (s, cost)
+    return compiler::args()
 
 def robinhood_nat_entry(nat s, nat cost)
-    return (s, cost)
+    return compiler::args()
 
 def robinhood_entry = robinhood_str_entry|robinhood_nat_entry
 

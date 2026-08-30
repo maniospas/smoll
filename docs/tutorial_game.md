@@ -64,6 +64,7 @@ with either transparency or not.
 ```python
 import std.core
 import std.graphics
+import std.io.process::breakpoint
 
 def main()
     WINDOW = edit window(800.0, 600.0, "overlap", "std/ArianaVioleta-dz2K.ttf")

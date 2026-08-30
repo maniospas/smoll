@@ -221,6 +221,21 @@ def mean(vec v)
     doc "mean value"
     return v.reduce(() add)/float len v
 
+def min(vec v)
+    doc "minimum value"
+    min_value = mut v[0]
+    for value in v
+        if min_value>value min_value = value
+    return min_value
+
+def max(vec v)
+    doc "maximum value"
+    max_value = mut v[0]
+    for value in v
+        if max_value<value max_value = value
+    return max_value
+
+
 def var(vec v)
     doc "variance"
     sumsqr = mut 0.0

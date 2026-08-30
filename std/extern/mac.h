@@ -120,6 +120,19 @@ static inline void __smo_close_console(FILE* f) {
     if (f) fclose(f);
 }
 
+static int __smo_fflush(FILE *fp)
+{
+    if (!fp) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (fflush(fp) != 0)
+        return -1;
+
+    return fcntl(fileno(fp), F_FULLFSYNC);
+}
+
 /* ── has display ── */
 static inline int __smo_has_display(void) {
     /* on macOS, GUI is available unless explicitly headless (CI, SSH without X) */

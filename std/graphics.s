@@ -258,6 +258,17 @@ def ellipse(effect edit window WINDOW, position pos, position radius, "line", na
         );
     }
 
+def line(effect edit window WINDOW, position p1, position p2, float thickness, color color)
+    VM "pyray.draw_line_ex(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),$thickness,pyray.Color($color__r,$color__g,$color__b,$color__a))"
+    {
+        DrawLineEx(
+            (Vector2){(float)p1__x, (float)p1__y},
+            (Vector2){(float)p2__x, (float)p2__y},
+            (float)thickness,
+            (Color){color__r,color__g,color__b,color__a}
+        );
+    }
+
 def rect(effect edit window WINDOW, position pos, size size, "solid", color color)
     VM "pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {

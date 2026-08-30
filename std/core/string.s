@@ -380,6 +380,34 @@ def contains(cstr|str _stack, cstr|str _needle)
             return true
     return false
 
+def find(cstr|str _stack, cstr|str _needle, nat|blank _skip, "end_pos"|blank offset)
+    doc "find within a string a needle substring's first ocurence"
+    stack = str _stack
+    needle = str _needle
+    d = needle.dat.length
+    if not try n = stack.dat.length-d
+        fail "not found"
+    if not _skip is blank
+        skip = mut _skip
+    for i in range of n
+        try sliced = stack.slice(i,i+d) # guaranteed to not have issues
+        if sliced==needle
+            if not _skip is blank
+                if skip!=0
+                    skip = skip-1
+                    continue
+            if offset is "end_pos"
+                return i+len needle
+            return i
+    fail "not found"
+
+def slice(cstr|str _s, cstr|str _from, cstr|str _to)
+    doc "slice a string based on a prefix and postfix (those are not included in the found substring)"
+    s = str _s
+    first_pos = s.find(_from end_pos)
+    substr = s.slice(first_pos, len s)
+    return substr.slice(0, substr.find _to)
+
 def nn(str value)
     doc "no new line"
     doc "Given a value, creates a tuple of (value, \"\")."
@@ -485,3 +513,82 @@ def copy(effect edit char_allocator CHARS, nat n)
         v = v/(10 unsafe_assume_nonzero)
     unsafe_valid CHARS
     return str(status surface len digits)
+
+
+# def copy(effect edit char_allocator CHARS, int n)
+#     doc "convert a number to a string"
+
+#     negative = n < int 0
+#     v = mut n
+#     if negative
+#         v = neg v
+#         offset = 1
+
+#     digits = mut 1
+#     temp = mut v
+#     while temp>=int 10
+#         temp = temp/(int 10 unsafe_assume_nonzero)
+#         digits = digits+1
+
+#     surface = edit alloc(CHARS, digits+offset)
+
+#     if negative
+#         surface.buf[surface.pos] = '-'
+
+#     for i in range of digits
+#         dig = v.mod(10 unsafe_assume_nonzero)
+#         {builtins::char digit='0'+dig;}
+#         surface.buf[surface.pos+offset+digits-(i+1)] = digit
+#         v = v/(10 unsafe_assume_nonzero)
+
+#     unsafe_valid CHARS
+#     return str(status surface len digits+offset)
+
+
+def copy(effect edit char_allocator CHARS, float n)
+    doc "convert a number to a string"
+
+    negative = n < 0.0
+    value = mut n
+    if negative
+        value = neg value
+        offset = 1
+
+    whole = nat value
+    fraction = nat ((value-float whole)*1000.0)
+
+    v = mut whole
+    digits = mut 1
+    while v>=10
+        v = v/(10 unsafe_assume_nonzero)
+        digits = digits+1
+
+    surface = edit alloc(CHARS, offset+digits+4)
+
+    if negative
+        surface.buf[surface.pos] = '-'
+
+    v = whole
+    dig = mut 0 # helper
+    for i in range of digits
+        dig = v.mod(10 unsafe_assume_nonzero)
+        {builtins::char digit='0'+dig;}
+        surface.buf[surface.pos+offset+digits-(i+1)] = digit
+        v = v/(10 unsafe_assume_nonzero)
+
+    surface.buf[surface.pos+offset+digits] = '.'
+
+    dig = (fraction/100).mod(10 unsafe_assume_nonzero)
+    {digit='0'+dig;}
+    surface.buf[surface.pos+offset+digits+1] = digit
+
+    dig = (fraction/10).mod(10 unsafe_assume_nonzero)
+    {digit='0'+dig;}
+    surface.buf[surface.pos+offset+digits+2] = digit
+
+    dig = fraction.mod(10 unsafe_assume_nonzero)
+    {digit='0'+dig;}
+    surface.buf[surface.pos+offset+digits+3] = digit
+
+    unsafe_valid CHARS
+    return str(status surface len offset+digits+4)

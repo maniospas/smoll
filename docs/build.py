@@ -295,9 +295,10 @@ def export(path, target):
                 </div>
             </div>
             <div class="dropdown">
-                <a href="#" style="font-weight:{'900' if 'reference' in target or 'std' in target else '500'}">Documentation</a>
+                <a href="#" style="font-weight:{'900' if 'reference' in target or 'std' in target or 'learn' in target else '500'}">Documentation</a>
                 <div class="dropdown-menu">
-                    <a href="reference.html" style="font-weight:{'900' if 'reference' in target else '400'}">Learn</a>
+                    <a href="learn.html" style="font-weight:{'900' if 'learn' in target else '400'}">Learn</a>
+                    <a href="reference.html" style="font-weight:{'900' if 'reference' in target else '400'}">Reference guide</a>
                     <a href="std.html" style="font-weight:{'900' if 'std' in target else '400'}">Standard library</a>
                 </div>
             </div>
@@ -315,7 +316,7 @@ def export(path, target):
 
 export("docs/index.md", "docs/index.html")
 export("docs/install.md", "docs/install.html")
-export("docs/tutorial.md", "docs/tutorial.html")
+export("docs/learn.md", "docs/learn.html")
 export("docs/reference.md", "docs/reference.html")
 export("docs/playground.md", "docs/playground.html")
 export("docs/std.md", "docs/std.html")

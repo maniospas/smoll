@@ -2043,7 +2043,10 @@ class ImplementedType:
         arg_code += ret_code
         doinline = (self.complexity<500 or self.num_calls<=1) and not self.force_not_inline
         if not for_inlining:
-            ret = ("static inline __attribute__((always_inline)) " if doinline else "")+("int " if self.needs_failure_mode else "void ")+self.monomorphic_name+"("+arg_code+") {\n  "
+            ret = ""
+            if perf_mode and self.at:
+                ret += "#line "+str(self.at.row)+" \""+str(self.at.file.path)+"\"\n"
+            ret += ("static inline __attribute__((always_inline)) " if doinline else "")+("int " if self.needs_failure_mode else "void ")+self.monomorphic_name+"("+arg_code+") {\n  "
             ret += ret_body_start
         for var, val in self.vars.items():
             if var in self.args: continue
@@ -5170,6 +5173,19 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         impl.vars[tmp] = var_class
         return await process_statement_operator(file, tokens, impl, pos, [var_class]+[r.private_copy() if r.immutable and r.type.builtin else r for r in ret], current_operator_priority)
 
+    if current == "assigned":
+        if is_lsp and file.is_main_file: print_lsp_decorator(current_token, "**assigned variable**\n\ncaptures the variable of the following assignment")
+        if peek_text(tokens, pos+2)!="=": current_token.error("syntax", "'assigned' must be followed by a variable name and then '='")
+        varname = peek_text(tokens, pos+1)
+        pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
+        pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority)
+        assert not len(ret)
+        varname_prefix = varname+"__"
+        len_varname_prefix = len(varname)+2
+        ret = [v for name, v in impl.vars.items() if name==varname or name[:len_varname_prefix]==varname_prefix]
+        if not ret: current_token.error("syntax", "did not find viariable '"+varname+"'")
+        return pos, ret
+
     if current == "(":
         ret = list()
         while True:
@@ -6760,6 +6776,7 @@ parser = argparse.ArgumentParser(description="Compile a .s file and optionally r
 parser.add_argument("source", metavar="SOURCE", help="Path to the .s source file to compile.",)
 parser.add_argument("--lsp", action="store_true", help="No compilation, and output is meant for the lsp to read.",)
 parser.add_argument("--build", action="store_true", help="Build without running.",)
+parser.add_argument("--perf", action="store_true", help="Add debug symbols and prefer running with 'perf' (grant more permissions like 'sudo sysctl kernel.perf_event_paranoid=1' - they persist until restart).",)
 parser.add_argument("--time", action="store_true", help="Report the time of ending file parses.",)
 parser.add_argument("--docs", action="store_true", help="Export to a markdown file.",)
 parser.add_argument("--cleanup", action="store_true", help="Clean up generated .C files and executables.",)
@@ -6771,6 +6788,7 @@ args, extra_args = parser.parse_known_args()
 debug_mode = args.debug
 cleanup_mode = args.cleanup
 docs_mode = args.docs
+perf_mode = args.perf
 chosen_compiler = args.back or "auto"
 is_time = args.time
 is_lsp = args.lsp
@@ -7116,6 +7134,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     if gcc_cmd is None:
         print("[✗] "+chosen_compiler+" not found")
         errexit()
+    if perf_mode: gcc_cmd = gcc_cmd+["-g", "-fno-omit-frame-pointer"]
     print(f"[{YELLOW}+{RESET}] compile     ", " ".join(gcc_cmd))
     result = subprocess.run(gcc_cmd, capture_output=True, text=True)
     if result.returncode != 0:
@@ -7153,6 +7172,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
 """
         with open(str(exe_path)+".html", "w") as f:
             f.write(generated_html)
+    return discovered_defs
 
 
 def errexit():
@@ -7230,7 +7250,7 @@ async def main():
             for k,v in memory.foreign_objects.items(): 
                 if v[1]: print("non-freed foreign object "+v[1])
         else:
-            write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0].monomorphic_name)
+            func_defs = write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0].monomorphic_name)
             if not args.build and chosen_compiler!="none":
                 if chosen_compiler=="emcc":
                     from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
@@ -7240,15 +7260,52 @@ async def main():
                     print(f"[{YELLOW}+{RESET}] serving at http://localhost:8000/{exe_path.name}.html (ctrl+C to stop the server)")
                     server.serve_forever()
                 else:
+                    runner = []
+                    if perf_mode: runner = ["perf", "record", "-e", "cycles:u", "-g", "-F10000"]
                     extra_args_str = " ".join(extra_args)
                     if extra_args_str: extra_args_str = " "+extra_args_str
                     if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); errexit()
-                    print(f"[{YELLOW}+{RESET}] run          ./{exe_path}{extra_args_str}")
+                    print(f"[{YELLOW}+{RESET}] run          {' '.join(runner)}{' ' if runner else ''}./{exe_path}{extra_args_str}")
                     try: 
-                        result = subprocess.run("./"+str(exe_path)+extra_args_str, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+                        result = subprocess.run(runner+["./"+str(exe_path)]+extra_args, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
                         if cleanup_mode: 
                             os.remove(str(exe_path)+".c")
                             os.remove(str(exe_path))
+                        if perf_mode:
+                            replacements = {}
+                            for func_def in func_defs:
+                                if func_def.at:
+                                    replacements[func_def.monomorphic_name] = (
+                                        YELLOW + func_def.name + RESET +
+                                        " at " + func_def.at.file.path +
+                                        " line " + str(func_def.at.row)
+                                    )
+                            proc = subprocess.Popen(
+                                [
+                                    "perf", "report",
+                                    "--stdio",
+                                    "--no-children",
+                                    "--sort=symbol",
+                                    "--percent-limit", "1",
+                                ],
+                                text=True,
+                                stdout=subprocess.PIPE,
+                                stderr=sys.stderr,
+                                bufsize=1,
+                            )
+
+                            assert proc.stdout is not None
+
+                            for line in proc.stdout:
+                                for old, new in replacements.items():
+                                    if old in line:
+                                        line = line.replace(old, new)
+
+                                sys.stdout.write(line)
+                            proc.wait()
+
+                            if proc.returncode != 0:
+                                print(f"{RED}error{RESET}: perf report failed")
                         if result.returncode != 0: os._exit(result.returncode)
                     except KeyboardInterrupt: 
                         if cleanup_mode: 

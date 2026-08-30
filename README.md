@@ -24,8 +24,6 @@ the compiler stops you from doing unsafe stuff.
 - Can opt in to constness for memory contents
 - C integration
 
-![logo](docs/smol.png)
-
 ## 🔗 Material
 
 [Index](https://maniospas.github.io/smoll/index.html)<br>
@@ -35,15 +33,18 @@ the compiler stops you from doing unsafe stuff.
 
 *Recommended to use vscode with the smoll extension found in the installation guide. Otherwise, Python keyword highlighting works pretty well.*
 
+![logo](docs/smol.png)
+
 ## ⚡ Quickstart
 
-An example that shows several language features follows.
+An example spanning several language features follows.
 
 ```python
 # test.s
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import std.core
-import std.io
+import std.io.web as web
+import std.io.file as file
 
 def CHUNK_SIZE = 4096
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
@@ -51,7 +52,7 @@ def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/
 def main()
     CLI = edit console()               # the CLI effect tells us where to direct the next prints
     mem = edit char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
-    f = file::read web::get README  # save to .tmp with system curl and read it
+    f = file::read web::get README     # save to .tmp with system curl and read it
     size = mut 0
     for line in (mem, f) # iterator defined over a (memory buffer, file) tuple
         size = size+len line

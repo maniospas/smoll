@@ -45,7 +45,7 @@ def arena(edit any[] buf)
     doc "with another allocator)."
     return arena(buf, 0)
 
-def length(arena arn)
+def len(arena arn)
     doc "allocated arena size"
     doc "This is not the total arena size, but rather the number"
     doc "of elements actively in use."

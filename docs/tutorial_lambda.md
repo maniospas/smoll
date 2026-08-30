@@ -71,10 +71,13 @@ keyword. Next is an example.
 
 ```python
 import std.core
+import compiler as cp
 
-def pair(nat,nat)  # no function body assumes that arguments are returned
+def pair(nat,nat)
+    return cp::args()
+
 def next(nat x, pair->nat addition)
-    return addition.compiler::call(x,1)
+    return addition.cp::call(x,1)
 
 def adder(nat x, nat y)
     return x+y
@@ -91,10 +94,13 @@ the `<...>` notation to enclose a valid input signature. Like below.
 
 ```python
 import std.core
+import compiler as cp
 
 def pair(nat,nat)
+    return cp::args()
+
 def next(nat x, pair->nat addition)
-    return addition.compiler::call(x,1)
+    return addition.cp::call(x,1)
 
 def main()
     CLI = edit console()
@@ -116,14 +122,17 @@ zero-cost abstractions and function pointers under the hood. Below is an example
 
 ```python
 import std.core
+import compiler as cp
 
 def next(nat->nat->nat addition_generator)
     return addition_generator.compiler::call 1
 
 def add1(nat x) 
     return x+1
+
 def add2(nat x)
     return x+2
+
 def add(nat y)
     if y==1 return type add1
     if y==2 return type add2
@@ -132,7 +141,7 @@ def add(nat y)
 def main()
     CLI = edit console()
     successor_function = next type add<nat>  # filter out add functions from the standard library
-    print successor_function.compiler::call 5 # prints 6
+    print successor_function.cp::call 5 # prints 6
 ```
 
 This code has a lot of repetition, which would only grow if
@@ -145,49 +154,51 @@ vertical dash `|` shows type alternatives. The builtin
 
 ```python
 import std.core
+import compiler as cp
 
 def next(nat->nat->nat addition_generator)
-    return addition_generator.compiler::call 1
+    return addition_generator.cp::call 1
 
 def add(nat x, 1|2 value) 
-    return x+compiler::value value
+    return x+cp::value value
 
 def add(nat y)
     if y==1 return type add<nat,1>
-    if y==2 return type add<nat,2> # THIS CODE FAILS RIGHT NOW
+    if y==2 return type add<nat,2> # THIS FUNCTION CANNOT COMPILE YET
     fail "unaccepted number" 
 
 def main()
     CLI = edit console()
     successor_function = next type add<nat>
-    print successor_function.compiler::call 5 # prints 6
+    print successor_function.cp::call 5 # prints 6
 ```
 
 The above code makes a lot of sense for us humans, but the compiler
 would complain that `add(nat y)` has mismatching return types. The
-reason is that literal types persist in the type system, even if incur
+reason is that literal types persist in the type system, even if they incur
 no runtime cost. However, you can strip away the literal type information
 from functors using the `compiler::abstract` function.
 
 
 ```python
 import std.core
+import compiler as cp
 
 def next(nat->nat->nat addition_generator)
-    return addition_generator.compiler::call 1
+    return addition_generator.cp::call 1
 
 def add(nat x, 1|2 value) 
-    return x+compiler::value value
+    return x+cp::value value
 
 def add(nat y)
-    if y==1 return compiler::abstract type add<nat,1>
-    if y==2 return compiler::abstract type add<nat,2>
+    if y==1 return cp::abstract type add<nat,1>
+    if y==2 return cp::abstract type add<nat,2>
     fail "unaccepted number" 
 
 def main()
     CLI = edit console()
     successor_function = next type add<nat>
-    print successor_function.compiler::call 5 # prints 6
+    print successor_function.cp::call 5 # prints 6
 ```
 
 We are starting to generalize. As a last feature,
@@ -200,23 +211,26 @@ types instead of functions.
 
 ```python
 import std.core
+import compiler as cp
 
 def next(nat->nat->nat addition_generator)
-    return addition_generator.compiler::call 1
+    return addition_generator.cp::call 1
 
 def increments = 1|2|3|4|5
+
 def add(nat x, increments value) 
-    return x+compiler::value value
+    return x+cp::value value
+
 def add(nat y)
     for increment is increments
-        if y==compiler::value increment
-            return compiler::abstract type add<nat,increment>
+        if y==cp::value increment
+            return cp::abstract type add<nat,increment>
     fail "unaccepted number" 
 
 def main()
     CLI = edit console()
     successor_function = next type add<nat>
-    print successor_function.compiler::call 5 # prints 6
+    print successor_function.cp::call 5 # prints 6
 ```
 
 
@@ -237,9 +251,9 @@ potentially failing expressions. For clarity, you are not allowed to `try`
 on an error-less expression. There are also some accompanying builtin functions 
 that provide more advanced diagnostics, like `compiler::catch` to retrieve
 error codes and descriptions afterwards, but these are not the subject
-of this tutorial. Only note that `try print successor_function.compiler::call 5`
-would print *0* because try forcefully tries to implement every declared function
-call, substituting failures with zero-initialized values.
+of this tutorial. Only note that something like
+`try x = successor_function.compiler::call 5`
+would forcefully continue after zero-initializing `x`.
 
 ```python
 import std.core

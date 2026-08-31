@@ -24,6 +24,7 @@
 local import std.core
 
 local def rotl(nat x, nat k)
+    doc "rotate and shift operation needed for xoshiro sequences"
     {builtins::nat left = x << k;}
     {builtins::nat compk = 64 - k;}
     {builtins::nat right = x >> compk;}
@@ -32,7 +33,7 @@ local def rotl(nat x, nat k)
 
 def splitmix64(mut nat x)
     doc "next random number"
-    doc "Computes the next random number of a splitmix64 sequence using the mutable "
+    doc "Computes the next number of a splitmix64 random sequence using the mutable "
     doc "unsigned int argument as state to be updated. This is NOT cryptographically "
     doc "secure and also has small period of 2^64 so usage is not recommended for "
     doc "long-running sequences. It is, however, faster than computing a next Rand "
@@ -52,7 +53,7 @@ def splitmix64(mut nat x)
     {z = z ^ rot;}
     return mut z
 
-def splitmix64()
+def splitmix64("time")
     doc "time seed"
     doc "Computes the seed of a splitmix64 sequence using the clock"
     doc "as the source of entropy."
@@ -66,10 +67,8 @@ def Rand(nat seed)
     doc "random number generator"
     doc "Xoshiro256plus random numbers from https://prng.di.unimi.it/"
     doc "These and are NOT cryptographically secure."
-    doc "This a structural type for storing the progress of random number generators "
-    doc "on four u64 state fields. The version is seed-initalized. Its period is 2^256-1."
-    if seed is blank
-        seed = splitmix64()
+    doc "This a type for storing the progress of random number generators "
+    doc "on four nat state fields. The version is seed-initalized. Its period is 2^256-1."
     modifying_seed = mut seed
     s0 = mut splitmix64 modifying_seed
     s1 = mut splitmix64 modifying_seed
@@ -82,10 +81,11 @@ def Rand()
     doc "Xoshiro256plus random numbers from https://prng.di.unimi.it/"
     doc "These and are NOT cryptographically secure."
     doc "This a structural type for storing the progress of random number generators "
-    doc "on four u64 state fields. This version defaults to a time-based seed. Its period is 2^256-1."
-    return Rand splitmix64()
+    doc "on four nat state fields. This version defaults to a time-based seed. Its period is 2^256-1."
+    return Rand splitmix64 type "time"
 
 def next(mut Rand self)
+    doc "next random number"
     doc "Computes the next random number of a Rand sequence."
     {builtins::nat result = self__s0 + self__s3;}
     {builtins::nat t = self__s1 << 17;}

@@ -1,11 +1,12 @@
 import markdown2
 import re
+import html as html_module
 
 def export(path, target):
     with open(path) as file:
         text = file.read()
     text = text.replace("[Index](https://maniospas.github.io/smoll/index.html)", "[GitHub](https://github.com/maniospas/smoll)")
-    text = text.replace("https://maniospas.github.io/smoll/", "")
+    text = text.replace("[https://maniospas.github.io/smoll/](https://maniospas.github.io/smoll/)", "")
 
     html = markdown2.markdown(text, extras=['fenced-code-blocks', 'header-ids', 'smarty-pants', 'markdown-in-html', 'cuddled-lists'])
     smoll_highlight_script = """
@@ -46,7 +47,115 @@ def export(path, target):
         )
         return pattern.sub(replacer, html)
 
+    def add_std_filter(html):
+        headings = list(re.finditer(
+            r'<h1\b[^>]*>.*?</h1>',
+            html,
+            re.IGNORECASE | re.DOTALL
+        ))
+
+        files = set()
+        parts = []
+        last = 0
+
+        for i, heading in enumerate(headings):
+            start = heading.start()
+            end = headings[i + 1].start() if i + 1 < len(headings) else len(html)
+            section = html[start:end]
+
+            subsections = list(re.finditer(
+                r'<h3\b[^>]*>.*?</h3>',
+                section,
+                re.IGNORECASE | re.DOTALL
+            ))
+
+            section_parts = []
+            section_last = 0
+
+            for j, subsection in enumerate(subsections):
+                subsection_start = subsection.start()
+                subsection_end = subsections[j + 1].start() if j + 1 < len(subsections) else len(section)
+                subsection_html = section[subsection_start:subsection_end]
+
+                match = re.search(
+                    r'Defined in:\s*(.*?)(?:</em>|</p>|<br\s*/?>|\n)',
+                    subsection_html,
+                    re.IGNORECASE | re.DOTALL
+                )
+
+                if not match:
+                    continue
+
+                defined_in = re.sub(r'<[^>]+>', '', match.group(1))
+                defined_in = html_module.unescape(defined_in).strip()
+
+                source = re.match(r'(.*?\.s)(?:\s|$)', defined_in)
+                if source:
+                    defined_in = source.group(1)
+
+                if not defined_in:
+                    continue
+
+                files.add(defined_in)
+
+                section_parts.append(section[section_last:subsection_start])
+                section_parts.append(
+                    '<div class="std-subsection" data-defined-in="' +
+                    html_module.escape(defined_in, quote=True) +
+                    '">' +
+                    subsection_html +
+                    '</div>'
+                )
+
+                section_last = subsection_end
+
+            if not section_parts:
+                continue
+
+            section_parts.append(section[section_last:])
+            section = ''.join(section_parts)
+
+            parts.append(html[last:start])
+            parts.append(
+                '<div class="std-definition">' +
+                section +
+                '</div>'
+            )
+
+            last = end
+
+        if not files:
+            return html
+
+        parts.append(html[last:])
+        html = ''.join(parts)
+
+        file_list = """
+        <div class="std-files">
+            <select id="std-file">
+                <option value="">Show all</option>
+        """
+
+        for file in sorted(files):
+            file_list += (
+                '<option value="' +
+                html_module.escape(file, quote=True) +
+                '">' +
+                html_module.escape(file) +
+                '</option>'
+            )
+
+        file_list += """
+            </select>
+        </div>
+        """
+
+        return file_list + html
+
     html = convert_notice_boxes(html)
+
+    if "std" in target:
+        html = add_std_filter(html)
 
     run_button_script = "" if "playground" in target or "std" in target else """
     <script>
@@ -62,10 +171,39 @@ def export(path, target):
                 const code = pre.querySelector("code")?.innerText ?? pre.innerText;
                 const encoded = btoa(
                     String.fromCharCode(...new TextEncoder().encode(code))
-                ).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                ).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');
                 window.location.href = "playground.html?contents=" + encoded;
             });
             pre.appendChild(btn);
+        });
+    });
+    </script>
+    """
+
+    std_filter_script = "" if "std" not in target else """
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const select = document.querySelector("#std-file");
+
+        select.addEventListener("change", () => {
+            const file = select.value;
+
+            document.querySelectorAll(".std-definition").forEach(definition => {
+                let visible = false;
+
+                definition.querySelectorAll(".std-subsection").forEach(subsection => {
+                    const show =
+                        file === "" ||
+                        subsection.dataset.definedIn === file;
+
+                    subsection.style.display = show ? "" : "none";
+
+                    if(show)
+                        visible = true;
+                });
+
+                definition.style.display = visible ? "" : "none";
+            });
         });
     });
     </script>
@@ -77,7 +215,7 @@ def export(path, target):
     <head>
         <meta charset="UTF-8">
         <title>smoλ</title>
-        <link rel="stylesheet" href="index.css"> 
+        <link rel="stylesheet" href="index.css">
         <style>
         body {
             max-width:800px;
@@ -173,6 +311,23 @@ def export(path, target):
             height: 100vh;
         }
         .toc i {color: #888}
+        .std-files {
+            margin-top: 80px;
+            margin-bottom: 40px;
+        }
+        .std-files select {
+            font: inherit;
+            color: #444;
+            background: #fff;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            padding: 6px 10px;
+            max-width: 100%;
+        }
+        .std-file.selected {
+            color: #444;
+            font-weight: 700;
+        }
         pre {
             color: #2f2f2f;
         }
@@ -194,6 +349,9 @@ def export(path, target):
                 color:#eeeeee;
                 background:#1f1f1f;
             }
+            .std-file.selected {
+                color:#eeeeee;
+            }
             .dropdown-menu {
                 background: #1f1f1f;
                 border-color: #444;
@@ -201,6 +359,12 @@ def export(path, target):
             .dropdown-menu a { color: #ddd; }
             .dropdown-menu a:hover { background: #2f2f2f; color: #58a6ff; }
             .dropdown-menu hr { border-color: #444; }
+
+            .std-files select {
+                color: #eeeeee;
+                background: #1f1f1f;
+                border-color: #444;
+            }
         }
         @media (max-width: 1380px) {
             body {margin:10px;}
@@ -305,7 +469,7 @@ def export(path, target):
             <a href="playground.html" style="font-weight:{'900' if 'playground' in target else '500'}">Playground</a>
             <a href="https://github.com/maniospas/smoll">GitHub</a>
         </nav>
-    """ + html + run_button_script + smoll_highlight_script + """
+    """ + html + run_button_script + std_filter_script + smoll_highlight_script + """
     </body>
     </html>
     """

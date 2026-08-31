@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <title>smoλ</title>
-        <link rel="stylesheet" href="index.css"> 
+        <link rel="stylesheet" href="index.css">
         <style>
         body {
             max-width:800px;
@@ -100,6 +100,23 @@
             height: 100vh;
         }
         .toc i {color: #888}
+        .std-files {
+            margin-top: 80px;
+            margin-bottom: 40px;
+        }
+        .std-files select {
+            font: inherit;
+            color: #444;
+            background: #fff;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            padding: 6px 10px;
+            max-width: 100%;
+        }
+        .std-file.selected {
+            color: #444;
+            font-weight: 700;
+        }
         pre {
             color: #2f2f2f;
         }
@@ -121,6 +138,9 @@
                 color:#eeeeee;
                 background:#1f1f1f;
             }
+            .std-file.selected {
+                color:#eeeeee;
+            }
             .dropdown-menu {
                 background: #1f1f1f;
                 border-color: #444;
@@ -128,6 +148,12 @@
             .dropdown-menu a { color: #ddd; }
             .dropdown-menu a:hover { background: #2f2f2f; color: #58a6ff; }
             .dropdown-menu hr { border-color: #444; }
+
+            .std-files select {
+                color: #eeeeee;
+                background: #1f1f1f;
+                border-color: #444;
+            }
         }
         @media (max-width: 1380px) {
             body {margin:10px;}

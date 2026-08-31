@@ -10,6 +10,7 @@ local def run(effect edit console CLI, cstr|str command)
     return cstr()
 
 def print_marker(effect edit colors colors, "success"|"failure"|"pending" status)
+    doc "prints a test status marker"
     CLI = edit colors.CLI
     print nn "["
     if status is "success"
@@ -30,6 +31,7 @@ local def restore_stdout(int saved_stdout)
     {close(saved_stdout);}
 
 def stdout_to_err(effect edit console CLI)
+    doc "temporarily redirect stdout to stderr"
     {builtins::int saved_stdout = dup(STDOUT_FILENO);}
     {fflush(stdout);}
     {dup2(STDERR_FILENO, STDOUT_FILENO);}
@@ -39,6 +41,9 @@ def stdout_to_err(effect edit console CLI)
 
 
 def assert(effect edit console CLI, bool condition, cstr text)
+    doc "assert a condition given a corresponding message"
+    doc "This outputs to stderr, so that asserts are printed"
+    doc "even if stout is suppressed during the 'test' function."
     stdout_to_err()
     colors = edit colors CLI
     #print ""
@@ -50,8 +55,9 @@ def assert(effect edit console CLI, bool condition, cstr text)
         print text
         # print nn "\r"
         # print type "flush"
-        fail "assertion failed"
+        fail "assert failed"
     print_marker type "success"
+    print nn "assert: "
     print text
     # print nn "\r"
     # print type "flush"
@@ -59,9 +65,7 @@ def assert(effect edit console CLI, bool condition, cstr text)
 def test(effect edit colors colors, str command, bool|blank should_fail)
     doc "prints and tests a system command"
     doc "Returns whether the command succeeded or not."
-    doc "The command itself is prepended by a waiting symbols,"
-    doc "that is converted to a success or failure one, depending"
-    doc "on the command's exit code."
+    doc "A completion assert is performed at the end."
     CLI = edit colors.CLI
     print command
     error = mut run command

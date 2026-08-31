@@ -7217,28 +7217,36 @@ async def main():
                     else: docs_file.write("\n")
                     if callee.at: docs_file.write("*Defined in: "+callee.at.file.path+" line "+str(callee.at.row)+"*\n")
                     else: docs_file.write("*Defined by the compiler*\n")
-                    if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                     docs_file.write("\n```rust\n"+callee.signature()+"\n```\n")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+                    if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                     spawned_error_codes = callee.spawned_error_codes
-                    docs_file.write("Complexity:\n\n")
-                    docs_file.write("- Level of abstraction: "+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
-                    docs_file.write("- SSA variables: "+str(len(callee.vars))+"\n")
-                    docs_file.write("- Transpiled C size: "+str(len(callee.implementation))+"\n\n")
+                    if len(callee.implementation):
+                        docs_file.write("<details><summary>Complexity</summary>\n\n")
+                        docs_file.write("- Level of abstraction: "+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
+                        docs_file.write("- SSA variables: "+str(len(callee.vars))+"\n")
+                        docs_file.write("- Transpiled C size: "+str(len(callee.implementation))+"\n\n")
+                        docs_file.write("</details>\n\n")
                     # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):                   
                     #     pass
                     #     #docs_file.write("When this function is called, it does not create a memory dependecy.\n\n")
                     # else:
                     #     docs_file.write("When this function is called, it creates at least one memory dependecy.\n\n")
-                    if len(spawned_error_codes): 
-                        if callee.needs_failure_mode: docs_file.write("Potential errors:\n\n")
-                        else: docs_file.write("No failing errors, but can catch these intercepted ones:\n\n")
-                    for code in spawned_error_codes: docs_file.write(str(code)+". "+err_code_list[code][1:-1]+"\n")
+                    if len(spawned_error_codes):
+                        if callee.needs_failure_mode: docs_file.write("<details><summary>Potential errors</summary>\n\n")
+                        # else: docs_file.write("<details><summary>No failing errors, but can catch these intercepted ones:\n\n")
+                    if callee.needs_failure_mode:
+                        for code in spawned_error_codes: docs_file.write(str(code)+". "+err_code_list[code][1:-1]+"\n")
+                        docs_file.write("</details>\n\n")
                     docs_file.write("\n")
-                    if callee.returned_defers: docs_file.write("\nReturned values defer use of the following functions:\n")
-                    for defer in callee.returned_defers: docs_file.write("```rust\n"+code_summary(defer, callee)+"```\n")
+                    if callee.returned_defers: 
+                        docs_file.write("<details><summary>Defered callss</summary>\n\n")
+                        for defer in callee.returned_defers: docs_file.write("```rust\n"+code_summary(defer, callee)+"```\n")
+                        docs_file.write("</details>\n\n")
                     singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
-                    if singletons: docs_file.write("\nThe following singletons are initialized:\n")
-                    for singleton in singletons: docs_file.write("```rust\n"+singleton.signature()+"\n```\n")
+                    if singletons: 
+                        docs_file.write("<details><summary>Consumed singletons</summary>\n\n")
+                        for singleton in singletons: docs_file.write("```rust\n"+singleton.signature()+"\n```\n")
+                        docs_file.write("</details>\n\n")
                     if callee.VM: docs_file.write("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*\n")
     elif not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)

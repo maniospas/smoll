@@ -1,4 +1,5 @@
 import std.core
+import std.test
 
 def swap(mut any ptr x, mut any ptr y)
     z = mut x
@@ -16,4 +17,4 @@ def main()
     swap(p1,p2)
     p1 = v1 # = is overloaded to move data into pointers too
     p2 = v2
-    print arr[0] # 2
+    assert(arr[0]==2, "successfully swapped pointers with inferred types")

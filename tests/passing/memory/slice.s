@@ -1,4 +1,5 @@
 import std.core
+import std.test
 
 def main()
     CLI = edit console()
@@ -16,6 +17,6 @@ def main()
     x3[1] = 7
     x3[2] = 8
 
-    print x1[2]
-    print x2[2]
-    print x3[2]
+    assert(x1[2]==2, "read from the end of first adjacent slice")
+    assert(x2[2]==5, "read from the end of second adjacent slice")
+    assert(x3[2]==8, "read from the end of last adjacent slice")

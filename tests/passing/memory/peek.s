@@ -1,5 +1,6 @@
 import std.core
 import std.ptrpeek
+import std.test
 
 def point(nat x, nat y)
     return class compiler::args()
@@ -10,4 +11,8 @@ def main()
     b = last [point(1,1)]
     debug::print a
     debug::print b
-    print a.x+b.x
+    assert(a.x+b.x==1, "added two pointer contents without deref")
+    assert(b.x-a.x==1, "substracted two pointer contents without deref")
+    assert(b.x-0==1, "substracted number from pointer without deref")
+    assert(b.x*0==0, "multiplied number and pointer without deref")
+    assert(b.x/1==1, "divided pointer by number without deref")

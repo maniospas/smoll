@@ -321,6 +321,7 @@ cstr(cstr cstr, str) -> (cstr)
 
 This function's return is meant to be passed to operating system calls,
 or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -339,6 +340,7 @@ cstr(unsafe_temp) -> (cstr)
 
 This function's return is meant to be passed to operating system calls,
 or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -357,6 +359,7 @@ cstr(unsafe_temp) -> (cstr)
 
 This function's return is meant to be passed to operating system calls,
 or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -380,6 +383,7 @@ string with this function, which can then be compared.
 This comparison is also one numerical comparison, as
 care is taken for all cstr to point to the same memory
 location.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -407,6 +411,7 @@ int(bits) -> (int)
 ```
 
 Converts a bit representation to the corresponding integer.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -424,6 +429,7 @@ int(nat) -> (int)
 ```
 
 Overflows are mapped to negative integers without any numerical safeguards.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -441,6 +447,7 @@ int(int) -> (int)
 ```
 
 Serves as a tautology function for code that parses on multiple number types.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -458,6 +465,7 @@ int(float) -> (int)
 ```
 
 May lose information due to truncating.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -473,6 +481,7 @@ May lose information due to truncating.
 ```rust
 int(console) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -496,6 +505,7 @@ int(console) -> (int)
 ```rust
 int(str) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -520,6 +530,7 @@ int(str) -> (int)
 ```rust
 int(cstr) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -554,6 +565,7 @@ Represents values in the range `0 to 2^64-1`.
 ```rust
 nat(nat32) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -569,6 +581,7 @@ nat(nat32) -> (nat)
 ```rust
 nat(nat16) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -586,6 +599,7 @@ nat(bits) -> (nat)
 ```
 
 Converts a bit representation to the corresponding natural number.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -604,6 +618,7 @@ nat(char) -> (nat)
 
 Converting a character to a natural number considers
 its bit representation interpreted as an unsigned number.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -622,6 +637,7 @@ nat(nat) -> (nat)
 
 Converting to natural numbers loses information.
  Failed on negative input because it typically indicates a later error in buffer indexing.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -640,6 +656,7 @@ nat(int) -> (nat)
 
 Converting to natural numbers loses information.
  Failed on negative input because it typically indicates a later error in buffer indexing.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -663,6 +680,7 @@ nat(float) -> (nat)
 
 Converting to natural numbers loses information.
  Failed on negative input because it typically indicates a later error in buffer indexing.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -683,6 +701,7 @@ Converting to natural numbers loses information.
 ```rust
 nat(console) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -705,6 +724,7 @@ nat(console) -> (nat)
 ```rust
 nat(str) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -728,6 +748,7 @@ nat(str) -> (nat)
 ```rust
 nat(cstr) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -761,6 +782,7 @@ Represents values in the range `0 to 2^32-1`.
 ```rust
 nat32(nat) -> (nat32)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -779,6 +801,7 @@ nat32(nat) -> (nat32)
 
 The conversion checks whether the previous value fits in the new one.
 If it does not, this operation can fail.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -812,6 +835,7 @@ nat16(nat) -> (nat16)
 
 The conversion checks whether the previous value fits in the new one.
 If it does not, this operation can fail.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -845,6 +869,7 @@ nat8(nat) -> (nat8)
 
 The conversion checks whether the previous value fits in the new one.
 If it does not, this operation can fail.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -875,6 +900,7 @@ float(bits) -> (float)
 ```
 
 Converts a bit representation to the corresponding float number.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -892,6 +918,7 @@ float(nat) -> (float)
 ```
 
 May lose information because floats are not exact representation of all integers.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -909,6 +936,7 @@ float(int) -> (float)
 ```
 
 May lose information because floats are not exact representation of all integers.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -926,6 +954,7 @@ float(float) -> (float)
 ```
 
 Serves as a tautology function for code that parses on multiple number types.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -941,6 +970,7 @@ Serves as a tautology function for code that parses on multiple number types.
 ```rust
 float(console) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -964,6 +994,7 @@ float(console) -> (float)
 ```rust
 float(str) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -989,6 +1020,7 @@ float(str) -> (float)
 ```rust
 float(cstr) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1055,6 +1087,7 @@ char(cstr) -> (char)
 
 The first character of a string is extracted,
 for example to write `c = char \"C\"`.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1073,6 +1106,7 @@ char(str) -> (char)
 
 The first character of a string is extracted,
 for example to write `c = char str \"C\"`.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1088,6 +1122,7 @@ for example to write `c = char str \"C\"`.
 ```rust
 char(console) -> (char)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1122,6 +1157,7 @@ eq(any ptr x, any ptr y) -> (bool)
 ```
 
 Compares the address of two pointers.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1141,6 +1177,7 @@ eq(catch x, catch y) -> (bool)
 Compares two error messages. This comparison is
 used only for comparing error messages produced
 by the same running program.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1156,6 +1193,7 @@ by the same running program.
 ```rust
 eq(nat x, nat y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1171,6 +1209,7 @@ eq(nat x, nat y) -> (bool)
 ```rust
 eq(int x, int y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1186,6 +1225,7 @@ eq(int x, int y) -> (bool)
 ```rust
 eq(float x, float y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1201,6 +1241,7 @@ eq(float x, float y) -> (bool)
 ```rust
 eq(bool value, false) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1216,6 +1257,7 @@ eq(bool value, false) -> (bool)
 ```rust
 eq(false, bool value) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1231,6 +1273,7 @@ eq(false, bool value) -> (bool)
 ```rust
 eq(bool value, true) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1246,6 +1289,7 @@ eq(bool value, true) -> (bool)
 ```rust
 eq(true, bool value) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1263,6 +1307,7 @@ eq(false, true) -> (false)
 ```
 
 This is a compile-time operation that does not evoke any runtime booleans.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1280,6 +1325,7 @@ eq(true, false) -> (false)
 ```
 
 This is a compile-time operation that does not evoke any runtime booleans.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1297,6 +1343,7 @@ eq(false, false) -> (true)
 ```
 
 This is a compile-time operation that does not evoke any runtime booleans.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1314,6 +1361,7 @@ eq(true, true) -> (true)
 ```
 
 This is a compile-time operation that does not evoke any runtime booleans.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1329,6 +1377,7 @@ This is a compile-time operation that does not evoke any runtime booleans.
 ```rust
 eq(bool x, bool y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1344,6 +1393,7 @@ eq(bool x, bool y) -> (bool)
 ```rust
 eq(cstr x, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1359,6 +1409,7 @@ eq(cstr x, str) -> (bool)
 ```rust
 eq(str, cstr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1392,6 +1443,7 @@ use 'eq(revalidate x, revalidate y)'
 to re-retrieve the first characters. This is still faster than
 full comparison of large strings, given that most string comparisons
 yield false.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1412,6 +1464,7 @@ Comparing two cstrs is as simple as comparing their addresses,
 so this operation is exceedingly lightweight and a convenient
 means for checking for runtime tags. The compier enforces that
 two same-content cstr will always have the same memory address.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1427,6 +1480,7 @@ two same-content cstr will always have the same memory address.
 ```rust
 eq(char x, char y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1442,6 +1496,7 @@ eq(char x, char y) -> (bool)
 ```rust
 eq(float ptr _x, float _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1462,6 +1517,7 @@ eq(float ptr _x, float _y) -> (bool)
 ```rust
 eq(float ptr _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1482,6 +1538,7 @@ eq(float ptr _x, float ptr _y) -> (bool)
 ```rust
 eq(cstr ptr x, cstr ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1502,6 +1559,7 @@ eq(cstr ptr x, cstr ptr y) -> (bool)
 ```rust
 eq(cstr ptr x, str ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1522,6 +1580,7 @@ eq(cstr ptr x, str ptr y) -> (bool)
 ```rust
 eq(str ptr x, cstr ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1542,6 +1601,7 @@ eq(str ptr x, cstr ptr y) -> (bool)
 ```rust
 eq(str ptr x, str ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1562,6 +1622,7 @@ eq(str ptr x, str ptr y) -> (bool)
 ```rust
 eq(cstr x, cstr ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1582,6 +1643,7 @@ eq(cstr x, cstr ptr y) -> (bool)
 ```rust
 eq(cstr x, str ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1602,6 +1664,7 @@ eq(cstr x, str ptr y) -> (bool)
 ```rust
 eq(str, cstr ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1622,6 +1685,7 @@ eq(str, cstr ptr y) -> (bool)
 ```rust
 eq(str, str ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1642,6 +1706,7 @@ eq(str, str ptr y) -> (bool)
 ```rust
 eq(cstr ptr x, cstr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1662,6 +1727,7 @@ eq(cstr ptr x, cstr y) -> (bool)
 ```rust
 eq(cstr ptr x, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1682,6 +1748,7 @@ eq(cstr ptr x, str) -> (bool)
 ```rust
 eq(str ptr x, cstr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1702,6 +1769,7 @@ eq(str ptr x, cstr y) -> (bool)
 ```rust
 eq(str ptr x, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1722,6 +1790,7 @@ eq(str ptr x, str) -> (bool)
 ```rust
 eq(nat _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1742,6 +1811,7 @@ eq(nat _x, nat ptr _y) -> (bool)
 ```rust
 eq(int _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1762,6 +1832,7 @@ eq(int _x, int ptr _y) -> (bool)
 ```rust
 eq(float _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1782,6 +1853,7 @@ eq(float _x, float ptr _y) -> (bool)
 ```rust
 eq(nat ptr _x, nat _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1802,6 +1874,7 @@ eq(nat ptr _x, nat _y) -> (bool)
 ```rust
 eq(nat ptr _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1822,6 +1895,7 @@ eq(nat ptr _x, nat ptr _y) -> (bool)
 ```rust
 eq(int ptr _x, int _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1842,6 +1916,7 @@ eq(int ptr _x, int _y) -> (bool)
 ```rust
 eq(int ptr _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1867,6 +1942,7 @@ neq(catch x, catch y) -> (bool)
 Compares two error messages. This comparison is
 used only for comparing error messages produced
 by the same running program.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1882,6 +1958,7 @@ by the same running program.
 ```rust
 neq(nat x, nat y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1897,6 +1974,7 @@ neq(nat x, nat y) -> (bool)
 ```rust
 neq(int x, int y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1912,6 +1990,7 @@ neq(int x, int y) -> (bool)
 ```rust
 neq(float x, float y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1927,6 +2006,7 @@ neq(float x, float y) -> (bool)
 ```rust
 neq(bool x, false y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1942,6 +2022,7 @@ neq(bool x, false y) -> (bool)
 ```rust
 neq(bool x, true y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1957,6 +2038,7 @@ neq(bool x, true y) -> (bool)
 ```rust
 neq(false x, bool y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1972,6 +2054,7 @@ neq(false x, bool y) -> (bool)
 ```rust
 neq(true x, bool y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -1987,6 +2070,7 @@ neq(true x, bool y) -> (bool)
 ```rust
 neq(false x, false y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2002,6 +2086,7 @@ neq(false x, false y) -> (false)
 ```rust
 neq(false x, true y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2017,6 +2102,7 @@ neq(false x, true y) -> (true)
 ```rust
 neq(true x, false y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2032,6 +2118,7 @@ neq(true x, false y) -> (true)
 ```rust
 neq(true x, true y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2047,6 +2134,7 @@ neq(true x, true y) -> (false)
 ```rust
 neq(bool x, bool y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2064,6 +2152,7 @@ neq(any ptr x, any ptr y) -> (bool)
 ```
 
 Compares the address of two pointers.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2081,6 +2170,7 @@ neq(cstr x, cstr y) -> (bool)
 ```
 
 Negates the outcome of equality checks between cstr and strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2098,6 +2188,7 @@ neq(cstr x, str) -> (bool)
 ```
 
 Negates the outcome of equality checks between cstr and strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2115,6 +2206,7 @@ neq(str, cstr y) -> (bool)
 ```
 
 Negates the outcome of equality checks between cstr and strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2132,6 +2224,7 @@ neq(str, str) -> (bool)
 ```
 
 Negates the outcome of equality checks between cstr and strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2147,6 +2240,7 @@ Negates the outcome of equality checks between cstr and strings.
 ```rust
 neq(char x, char y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2162,6 +2256,7 @@ neq(char x, char y) -> (bool)
 ```rust
 neq(cstr ptr x, cstr ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2182,6 +2277,7 @@ neq(cstr ptr x, cstr ptr y) -> (bool)
 ```rust
 neq(cstr ptr x, str ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2202,6 +2298,7 @@ neq(cstr ptr x, str ptr y) -> (bool)
 ```rust
 neq(str ptr x, cstr ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2222,6 +2319,7 @@ neq(str ptr x, cstr ptr y) -> (bool)
 ```rust
 neq(str ptr x, str ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2242,6 +2340,7 @@ neq(str ptr x, str ptr y) -> (bool)
 ```rust
 neq(cstr x, cstr ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2262,6 +2361,7 @@ neq(cstr x, cstr ptr y) -> (bool)
 ```rust
 neq(cstr x, str ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2282,6 +2382,7 @@ neq(cstr x, str ptr y) -> (bool)
 ```rust
 neq(str, cstr ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2302,6 +2403,7 @@ neq(str, cstr ptr y) -> (bool)
 ```rust
 neq(str, str ptr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2322,6 +2424,7 @@ neq(str, str ptr y) -> (bool)
 ```rust
 neq(cstr ptr x, cstr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2342,6 +2445,7 @@ neq(cstr ptr x, cstr y) -> (bool)
 ```rust
 neq(cstr ptr x, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2362,6 +2466,7 @@ neq(cstr ptr x, str) -> (bool)
 ```rust
 neq(str ptr x, cstr y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2382,6 +2487,7 @@ neq(str ptr x, cstr y) -> (bool)
 ```rust
 neq(str ptr x, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2402,6 +2508,7 @@ neq(str ptr x, str) -> (bool)
 ```rust
 neq(nat _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2422,6 +2529,7 @@ neq(nat _x, nat ptr _y) -> (bool)
 ```rust
 neq(int _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2442,6 +2550,7 @@ neq(int _x, int ptr _y) -> (bool)
 ```rust
 neq(float _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2462,6 +2571,7 @@ neq(float _x, float ptr _y) -> (bool)
 ```rust
 neq(nat ptr _x, nat _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2482,6 +2592,7 @@ neq(nat ptr _x, nat _y) -> (bool)
 ```rust
 neq(nat ptr _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2502,6 +2613,7 @@ neq(nat ptr _x, nat ptr _y) -> (bool)
 ```rust
 neq(int ptr _x, int _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2522,6 +2634,7 @@ neq(int ptr _x, int _y) -> (bool)
 ```rust
 neq(int ptr _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2542,6 +2655,7 @@ neq(int ptr _x, int ptr _y) -> (bool)
 ```rust
 neq(float ptr _x, float _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2562,6 +2676,7 @@ neq(float ptr _x, float _y) -> (bool)
 ```rust
 neq(float ptr _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2585,6 +2700,7 @@ not(false) -> (true)
 ```
 
 This is a compile-time operation on the compiler::false type rather than a runtime boolean.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2602,6 +2718,7 @@ not(true) -> (false)
 ```
 
 This is a compile-time operation on the compiler::true type rather than a runtime boolean.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2619,6 +2736,7 @@ not(bool) -> (bool)
 ```
 
 This operates on boolean values at runtime.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2661,6 +2779,7 @@ Represents values in the range `2^-63 to 2^63-1`.
 ```rust
 is_different(nat x, nat y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2676,6 +2795,7 @@ is_different(nat x, nat y) -> (false)
 ```rust
 is_different(nat x, int y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2691,6 +2811,7 @@ is_different(nat x, int y) -> (true)
 ```rust
 is_different(nat x, float y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2706,6 +2827,7 @@ is_different(nat x, float y) -> (true)
 ```rust
 is_different(int x, nat y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2721,6 +2843,7 @@ is_different(int x, nat y) -> (true)
 ```rust
 is_different(int x, int y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2736,6 +2859,7 @@ is_different(int x, int y) -> (false)
 ```rust
 is_different(int x, float y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2751,6 +2875,7 @@ is_different(int x, float y) -> (true)
 ```rust
 is_different(float x, nat y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2766,6 +2891,7 @@ is_different(float x, nat y) -> (true)
 ```rust
 is_different(float x, int y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2781,6 +2907,7 @@ is_different(float x, int y) -> (true)
 ```rust
 is_different(float x, float y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2797,6 +2924,7 @@ is_different(float x, float y) -> (false)
 ```rust
 neg(nat) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2812,6 +2940,7 @@ neg(nat) -> (nat)
 ```rust
 neg(int) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2827,6 +2956,7 @@ neg(int) -> (int)
 ```rust
 neg(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2845,6 +2975,7 @@ add(nat x, nat y) -> (nat)
 ```
 
 Adds two numbers of the same type. This is an overload for the + operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2862,6 +2993,7 @@ add(int x, int y) -> (int)
 ```
 
 Adds two numbers of the same type. This is an overload for the + operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2879,6 +3011,7 @@ add(float x, float y) -> (float)
 ```
 
 Adds two numbers of the same type. This is an overload for the + operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2898,6 +3031,7 @@ add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
 Adds a natural number offset to a pointer.
 
 *Warning: Its usage in unsafe and guarded under std/unsafe.s.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2930,6 +3064,7 @@ The snippet fits the result in a contiguous area on the arena's buffer,
 with only one copying operation for each character. This does not
 magically optimize all copying operations, but it does makes most
 convenient optimizatins when allocating and immediately concatenating.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -2972,6 +3107,7 @@ The snippet fits the result in a contiguous area on the arena's buffer,
 with only one copying operation for each character. This does not
 magically optimize all copying operations, but it does makes most
 convenient optimizatins when allocating and immediately concatenating.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3014,6 +3150,7 @@ The snippet fits the result in a contiguous area on the arena's buffer,
 with only one copying operation for each character. This does not
 magically optimize all copying operations, but it does makes most
 convenient optimizatins when allocating and immediately concatenating.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3056,6 +3193,7 @@ The snippet fits the result in a contiguous area on the arena's buffer,
 with only one copying operation for each character. This does not
 magically optimize all copying operations, but it does makes most
 convenient optimizatins when allocating and immediately concatenating.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3089,6 +3227,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3122,6 +3261,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3155,6 +3295,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3188,6 +3329,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3221,6 +3363,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3252,6 +3395,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3283,6 +3427,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3314,6 +3459,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3345,6 +3491,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3359,7 +3506,7 @@ yet safe and fast code.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -3380,6 +3527,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3394,7 +3542,7 @@ yet safe and fast code.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -3415,6 +3563,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3429,7 +3578,7 @@ yet safe and fast code.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -3450,6 +3599,7 @@ an automatically resized list. Since that allocation defers its
 deallocation too, it cannot be returned from nested code blocks.
 Switch to a different character allocator to produce more dynamic
 yet safe and fast code.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3464,7 +3614,7 @@ yet safe and fast code.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -3479,6 +3629,7 @@ add(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3504,6 +3655,7 @@ add(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3529,6 +3681,7 @@ add(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3544,7 +3697,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -3559,6 +3712,7 @@ add(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3584,6 +3738,7 @@ add(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3610,6 +3765,7 @@ add(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3635,6 +3791,7 @@ add(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3661,6 +3818,7 @@ add(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3676,7 +3834,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -3691,6 +3849,7 @@ add(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3707,7 +3866,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -3720,6 +3879,7 @@ free(mut any ptr) -> ()
 ```rust
 add(nat _x, nat ptr _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3740,6 +3900,7 @@ add(nat _x, nat ptr _y) -> (nat)
 ```rust
 add(int _x, int ptr _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3760,6 +3921,7 @@ add(int _x, int ptr _y) -> (int)
 ```rust
 add(float _x, float ptr _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3780,6 +3942,7 @@ add(float _x, float ptr _y) -> (float)
 ```rust
 add(nat ptr _x, nat _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3800,6 +3963,7 @@ add(nat ptr _x, nat _y) -> (nat)
 ```rust
 add(nat ptr _x, nat ptr _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3820,6 +3984,7 @@ add(nat ptr _x, nat ptr _y) -> (nat)
 ```rust
 add(int ptr _x, int _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3840,6 +4005,7 @@ add(int ptr _x, int _y) -> (int)
 ```rust
 add(int ptr _x, int ptr _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3860,6 +4026,7 @@ add(int ptr _x, int ptr _y) -> (int)
 ```rust
 add(float ptr _x, float _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3880,6 +4047,7 @@ add(float ptr _x, float _y) -> (float)
 ```rust
 add(float ptr _x, float ptr _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3903,6 +4071,7 @@ mul(nat x, nat y) -> (nat)
 ```
 
 Multiplies two numbers of the same type. This is an overload for the * operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3920,6 +4089,7 @@ mul(int x, int y) -> (int)
 ```
 
 Multiplies two numbers of the same type. This is an overload for the * operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3937,6 +4107,7 @@ mul(float x, float y) -> (float)
 ```
 
 Multiplies two numbers of the same type. This is an overload for the * operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3954,6 +4125,7 @@ mul(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -3979,6 +4151,7 @@ mul(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4004,6 +4177,7 @@ mul(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4019,7 +4193,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -4034,6 +4208,7 @@ mul(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4059,6 +4234,7 @@ mul(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4085,6 +4261,7 @@ mul(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4110,6 +4287,7 @@ mul(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4136,6 +4314,7 @@ mul(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4151,7 +4330,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -4166,6 +4345,7 @@ mul(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4182,7 +4362,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -4197,6 +4377,7 @@ mul(new FLOATS, mat, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4214,7 +4395,7 @@ Grabs an allocator for the result as an effect.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -4227,6 +4408,7 @@ free(mut any ptr) -> ()
 ```rust
 mul(edit circular, coo, mat) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4253,6 +4435,7 @@ mul(edit circular, coo, mat) -> (mut mat) with effects FLOATS
 ```rust
 mul(edit arena, coo, mat) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4279,6 +4462,7 @@ mul(edit arena, coo, mat) -> (mut mat) with effects FLOATS
 ```rust
 mul(new FLOATS, coo, mat) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4299,7 +4483,7 @@ mul(new FLOATS, coo, mat) -> (mut mat) with effects FLOATS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -4314,6 +4498,7 @@ mul(edit circular, vec, coo) -> (mut vec) with effects FLOATS
 ```
 
 *Warning: the expression `self(v)*m` yields wrong values
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4341,6 +4526,7 @@ mul(edit arena, vec, coo) -> (mut vec) with effects FLOATS
 ```
 
 *Warning: the expression `self(v)*m` yields wrong values
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4368,6 +4554,7 @@ mul(new FLOATS, vec, coo) -> (mut vec) with effects FLOATS
 ```
 
 *Warning: the expression `self(v)*m` yields wrong values
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4385,7 +4572,7 @@ mul(new FLOATS, vec, coo) -> (mut vec) with effects FLOATS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -4398,6 +4585,7 @@ free(mut any ptr) -> ()
 ```rust
 mul(edit circular, coo, vec) -> (mut vec) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4423,6 +4611,7 @@ mul(edit circular, coo, vec) -> (mut vec) with effects FLOATS
 ```rust
 mul(edit arena, coo, vec) -> (mut vec) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4448,6 +4637,7 @@ mul(edit arena, coo, vec) -> (mut vec) with effects FLOATS
 ```rust
 mul(new FLOATS, coo, vec) -> (mut vec) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4465,7 +4655,7 @@ mul(new FLOATS, coo, vec) -> (mut vec) with effects FLOATS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -4480,6 +4670,7 @@ mul(edit circular, mat, mat) -> (mut mat) with effects FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4508,6 +4699,7 @@ mul(edit arena, mat, mat) -> (mut mat) with effects FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4536,6 +4728,7 @@ mul(new FLOATS, mat, mat) -> (mut mat) with effects FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4556,7 +4749,7 @@ Grabs an allocator for the result as an effect.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -4571,6 +4764,7 @@ mul(edit circular, vec, mat) -> (mut vec) with effects FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4598,6 +4792,7 @@ mul(edit arena, vec, mat) -> (mut vec) with effects FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4625,6 +4820,7 @@ mul(new FLOATS, vec, mat) -> (mut vec) with effects FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4642,7 +4838,7 @@ Grabs an allocator for the result as an effect.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -4657,6 +4853,7 @@ mul(edit circular, mat, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4684,6 +4881,7 @@ mul(edit arena, mat, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4709,6 +4907,7 @@ Grabs an allocator for the result as an effect.
 ```rust
 mul(nat _x, nat ptr _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4729,6 +4928,7 @@ mul(nat _x, nat ptr _y) -> (nat)
 ```rust
 mul(int _x, int ptr _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4749,6 +4949,7 @@ mul(int _x, int ptr _y) -> (int)
 ```rust
 mul(float _x, float ptr _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4769,6 +4970,7 @@ mul(float _x, float ptr _y) -> (float)
 ```rust
 mul(nat ptr _x, nat _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4789,6 +4991,7 @@ mul(nat ptr _x, nat _y) -> (nat)
 ```rust
 mul(nat ptr _x, nat ptr _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4809,6 +5012,7 @@ mul(nat ptr _x, nat ptr _y) -> (nat)
 ```rust
 mul(int ptr _x, int _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4829,6 +5033,7 @@ mul(int ptr _x, int _y) -> (int)
 ```rust
 mul(int ptr _x, int ptr _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4849,6 +5054,7 @@ mul(int ptr _x, int ptr _y) -> (int)
 ```rust
 mul(float ptr _x, float _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4869,6 +5075,7 @@ mul(float ptr _x, float _y) -> (float)
 ```rust
 mul(float ptr _x, float ptr _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4893,6 +5100,7 @@ div(nat x, nat y) -> (nat)
 
 Divides two numbers of the same type. This is an overload for the / operator.
 Safeguards against division by zero.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4915,6 +5123,7 @@ div(nat x, nat y, "unsafe_assume_nonzero") -> (nat)
 ```
 
 Divides two numbers of the same type. This is an overload for the / operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4933,6 +5142,7 @@ div(int x, int y) -> (int)
 
 Divides two numbers of the same type. This is an overload for the / operator.
 Safeguards against division by zero.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4955,6 +5165,7 @@ div(int x, int y, "unsafe_assume_nonzero") -> (int)
 ```
 
 Divides two numbers of the same type. This is an overload for the / operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4973,6 +5184,7 @@ div(float x, float y) -> (float)
 
 Divides two numbers of the same type. This is an overload for the / operator.
 Safeguards against division by zero.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -4995,6 +5207,7 @@ div(float x, float y, "unsafe_assume_nonzero") -> (float)
 ```
 
 Divides two numbers of the same type. This is an overload for the / operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5012,6 +5225,7 @@ div(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5038,6 +5252,7 @@ div(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5064,6 +5279,7 @@ div(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5080,7 +5296,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -5095,6 +5311,7 @@ div(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5121,6 +5338,7 @@ div(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5148,6 +5366,7 @@ div(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5174,6 +5393,7 @@ div(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5201,6 +5421,7 @@ div(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5217,7 +5438,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -5232,6 +5453,7 @@ div(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5249,7 +5471,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -5262,6 +5484,7 @@ free(mut any ptr) -> ()
 ```rust
 div(float _x, float ptr _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5283,6 +5506,7 @@ div(float _x, float ptr _y) -> (float)
 ```rust
 div(nat ptr _x, nat _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5304,6 +5528,7 @@ div(nat ptr _x, nat _y) -> (nat)
 ```rust
 div(nat ptr _x, nat ptr _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5325,6 +5550,7 @@ div(nat ptr _x, nat ptr _y) -> (nat)
 ```rust
 div(int ptr _x, int _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5346,6 +5572,7 @@ div(int ptr _x, int _y) -> (int)
 ```rust
 div(int ptr _x, int ptr _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5367,6 +5594,7 @@ div(int ptr _x, int ptr _y) -> (int)
 ```rust
 div(float ptr _x, float _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5388,6 +5616,7 @@ div(float ptr _x, float _y) -> (float)
 ```rust
 div(float ptr _x, float ptr _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5409,6 +5638,7 @@ div(float ptr _x, float ptr _y) -> (float)
 ```rust
 div(nat _x, nat ptr _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5430,6 +5660,7 @@ div(nat _x, nat ptr _y) -> (nat)
 ```rust
 div(int _x, int ptr _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5454,6 +5685,7 @@ mod(nat x, nat y) -> (nat)
 ```
 
 Computes the modulo between two natural numbers. This is an overload for the % operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5476,6 +5708,7 @@ mod(nat x, nat y, "unsafe_assume_nonzero") -> (nat)
 ```
 
 Computes the modulo between two natural numbers. This is an overload for the % operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5494,6 +5727,7 @@ lt(nat x, nat y) -> (bool)
 ```
 
 Compares two numbers of the same type. This is an overload for the < operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5511,6 +5745,7 @@ lt(int x, int y) -> (bool)
 ```
 
 Compares two numbers of the same type. This is an overload for the < operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5528,6 +5763,7 @@ lt(float x, float y) -> (bool)
 ```
 
 Compares two numbers of the same type. This is an overload for the < operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5543,6 +5779,7 @@ Compares two numbers of the same type. This is an overload for the < operator.
 ```rust
 lt(nat _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5563,6 +5800,7 @@ lt(nat _x, nat ptr _y) -> (bool)
 ```rust
 lt(int _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5583,6 +5821,7 @@ lt(int _x, int ptr _y) -> (bool)
 ```rust
 lt(float _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5603,6 +5842,7 @@ lt(float _x, float ptr _y) -> (bool)
 ```rust
 lt(nat ptr _x, nat _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5623,6 +5863,7 @@ lt(nat ptr _x, nat _y) -> (bool)
 ```rust
 lt(nat ptr _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5643,6 +5884,7 @@ lt(nat ptr _x, nat ptr _y) -> (bool)
 ```rust
 lt(int ptr _x, int _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5663,6 +5905,7 @@ lt(int ptr _x, int _y) -> (bool)
 ```rust
 lt(int ptr _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5683,6 +5926,7 @@ lt(int ptr _x, int ptr _y) -> (bool)
 ```rust
 lt(float ptr _x, float _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5703,6 +5947,7 @@ lt(float ptr _x, float _y) -> (bool)
 ```rust
 lt(float ptr _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5726,6 +5971,7 @@ gt(nat x, nat y) -> (bool)
 ```
 
 greater than
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5743,6 +5989,7 @@ gt(int x, int y) -> (bool)
 ```
 
 greater than
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5760,6 +6007,7 @@ gt(float x, float y) -> (bool)
 ```
 
 greater than
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5775,6 +6023,7 @@ greater than
 ```rust
 gt(nat _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5795,6 +6044,7 @@ gt(nat _x, nat ptr _y) -> (bool)
 ```rust
 gt(int _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5815,6 +6065,7 @@ gt(int _x, int ptr _y) -> (bool)
 ```rust
 gt(float _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5835,6 +6086,7 @@ gt(float _x, float ptr _y) -> (bool)
 ```rust
 gt(nat ptr _x, nat _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5855,6 +6107,7 @@ gt(nat ptr _x, nat _y) -> (bool)
 ```rust
 gt(nat ptr _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5875,6 +6128,7 @@ gt(nat ptr _x, nat ptr _y) -> (bool)
 ```rust
 gt(int ptr _x, int _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5895,6 +6149,7 @@ gt(int ptr _x, int _y) -> (bool)
 ```rust
 gt(int ptr _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5915,6 +6170,7 @@ gt(int ptr _x, int ptr _y) -> (bool)
 ```rust
 gt(float ptr _x, float _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5935,6 +6191,7 @@ gt(float ptr _x, float _y) -> (bool)
 ```rust
 gt(float ptr _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5958,6 +6215,7 @@ le(float x, float y) -> (bool)
 ```
 
 Compares two numbers of the same type. This is an overload for the <= operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5975,6 +6233,7 @@ le(nat x, nat y) -> (bool)
 ```
 
 Compares two numbers of the same type. This is an overload for the <= operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -5992,6 +6251,7 @@ le(int x, int y) -> (bool)
 ```
 
 Compares two numbers of the same type. This is an overload for the <= operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6007,6 +6267,7 @@ Compares two numbers of the same type. This is an overload for the <= operator.
 ```rust
 le(nat _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6027,6 +6288,7 @@ le(nat _x, nat ptr _y) -> (bool)
 ```rust
 le(int _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6047,6 +6309,7 @@ le(int _x, int ptr _y) -> (bool)
 ```rust
 le(float _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6067,6 +6330,7 @@ le(float _x, float ptr _y) -> (bool)
 ```rust
 le(nat ptr _x, nat _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6087,6 +6351,7 @@ le(nat ptr _x, nat _y) -> (bool)
 ```rust
 le(nat ptr _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6107,6 +6372,7 @@ le(nat ptr _x, nat ptr _y) -> (bool)
 ```rust
 le(int ptr _x, int _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6127,6 +6393,7 @@ le(int ptr _x, int _y) -> (bool)
 ```rust
 le(int ptr _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6147,6 +6414,7 @@ le(int ptr _x, int ptr _y) -> (bool)
 ```rust
 le(float ptr _x, float _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6167,6 +6435,7 @@ le(float ptr _x, float _y) -> (bool)
 ```rust
 le(float ptr _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6190,6 +6459,7 @@ ge(nat x, nat y) -> (bool)
 ```
 
 Compares two numbers of the same type. This is an overload for the >= operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6207,6 +6477,7 @@ ge(int x, int y) -> (bool)
 ```
 
 Compares two numbers of the same type. This is an overload for the >= operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6224,6 +6495,7 @@ ge(float x, float y) -> (bool)
 ```
 
 Compares two numbers of the same type. This is an overload for the >= operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6239,6 +6511,7 @@ Compares two numbers of the same type. This is an overload for the >= operator.
 ```rust
 ge(nat _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6259,6 +6532,7 @@ ge(nat _x, nat ptr _y) -> (bool)
 ```rust
 ge(int _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6279,6 +6553,7 @@ ge(int _x, int ptr _y) -> (bool)
 ```rust
 ge(float _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6299,6 +6574,7 @@ ge(float _x, float ptr _y) -> (bool)
 ```rust
 ge(nat ptr _x, nat _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6319,6 +6595,7 @@ ge(nat ptr _x, nat _y) -> (bool)
 ```rust
 ge(nat ptr _x, nat ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6339,6 +6616,7 @@ ge(nat ptr _x, nat ptr _y) -> (bool)
 ```rust
 ge(int ptr _x, int _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6359,6 +6637,7 @@ ge(int ptr _x, int _y) -> (bool)
 ```rust
 ge(int ptr _x, int ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6379,6 +6658,7 @@ ge(int ptr _x, int ptr _y) -> (bool)
 ```rust
 ge(float ptr _x, float _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6399,6 +6679,7 @@ ge(float ptr _x, float _y) -> (bool)
 ```rust
 ge(float ptr _x, float ptr _y) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6427,6 +6708,7 @@ the result if it would produce a negative.
 ```rust
 0-(1 assume_smaller)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6445,6 +6727,7 @@ sub(nat x, nat y) -> (nat)
 
 Subtracts two numbers of the same type. This is an overload for the - operator.
 Natural numbers are safeguarded against acquiring negative results, which would overflow.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6467,6 +6750,7 @@ sub(int x, int y) -> (int)
 ```
 
 Subtracts two numbers of the same type. This is an overload for the - operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6484,6 +6768,7 @@ sub(float x, float y) -> (float)
 ```
 
 Subtracts two numbers of the same type. This is an overload for the - operator.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6501,6 +6786,7 @@ sub(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6526,6 +6812,7 @@ sub(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6551,6 +6838,7 @@ sub(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6566,7 +6854,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -6581,6 +6869,7 @@ sub(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6606,6 +6895,7 @@ sub(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6632,6 +6922,7 @@ sub(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6657,6 +6948,7 @@ sub(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6683,6 +6975,7 @@ sub(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6698,7 +6991,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -6713,6 +7006,7 @@ sub(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6729,7 +7023,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -6742,6 +7036,7 @@ free(mut any ptr) -> ()
 ```rust
 sub(nat _x, nat ptr _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6763,6 +7058,7 @@ sub(nat _x, nat ptr _y) -> (nat)
 ```rust
 sub(int _x, int ptr _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6783,6 +7079,7 @@ sub(int _x, int ptr _y) -> (int)
 ```rust
 sub(float _x, float ptr _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6803,6 +7100,7 @@ sub(float _x, float ptr _y) -> (float)
 ```rust
 sub(nat ptr _x, nat _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6824,6 +7122,7 @@ sub(nat ptr _x, nat _y) -> (nat)
 ```rust
 sub(nat ptr _x, nat ptr _y) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6845,6 +7144,7 @@ sub(nat ptr _x, nat ptr _y) -> (nat)
 ```rust
 sub(int ptr _x, int _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6865,6 +7165,7 @@ sub(int ptr _x, int _y) -> (int)
 ```rust
 sub(int ptr _x, int ptr _y) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6885,6 +7186,7 @@ sub(int ptr _x, int ptr _y) -> (int)
 ```rust
 sub(float ptr _x, float _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6905,6 +7207,7 @@ sub(float ptr _x, float _y) -> (float)
 ```rust
 sub(float ptr _x, float ptr _y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6928,6 +7231,7 @@ pow(nat x, nat y) -> (mut nat)
 ```
 
 Exponentiates a natural number by another.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6943,6 +7247,7 @@ Exponentiates a natural number by another.
 ```rust
 pow(float x, float y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6960,6 +7265,7 @@ pow(edit circular, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -6985,6 +7291,7 @@ pow(edit arena, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7010,6 +7317,7 @@ pow(new FLOATS, float v1, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7025,7 +7333,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -7040,6 +7348,7 @@ pow(edit circular, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7065,6 +7374,7 @@ pow(edit circular, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7091,6 +7401,7 @@ pow(edit arena, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7116,6 +7427,7 @@ pow(edit arena, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7142,6 +7454,7 @@ pow(new FLOATS, vec, float v2) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7157,7 +7470,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -7172,6 +7485,7 @@ pow(new FLOATS, vec, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7188,7 +7502,7 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -7212,6 +7526,7 @@ arguments.
 The console is a zero-cost abstraction in that it does not transfer any data
 but relies on singleton safety to synchronize io across threads.
 Quickly print internals for debugging with `unsafe_console()`.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7231,6 +7546,7 @@ unsafe_console() -> (mut console)
 
 This is convenient for print debugging by writing `unsafe_console().print ...`
 without needing to evoke an effect to pass the normally singleton console.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7249,6 +7565,7 @@ print(console CLI, false) -> () with effects CLI
 ```
 
 Automatically ends the line too.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7264,6 +7581,7 @@ Automatically ends the line too.
 ```rust
 print(console CLI, false, cstr endl) -> () with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7281,6 +7599,7 @@ print(console CLI, true) -> () with effects CLI
 ```
 
 Automatically ends the line too.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7296,6 +7615,7 @@ Automatically ends the line too.
 ```rust
 print(console CLI, true, cstr endl) -> () with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7313,6 +7633,7 @@ print(console CLI, bool value) -> () with effects CLI
 ```
 
 Automatically ends the line too.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7328,6 +7649,7 @@ Automatically ends the line too.
 ```rust
 print(console CLI, bool value, cstr endl) -> () with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7345,6 +7667,7 @@ print(console CLI, nat value) -> () with effects CLI
 ```
 
 Automatically ends the line too.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7360,6 +7683,7 @@ Automatically ends the line too.
 ```rust
 print(console CLI, nat value, cstr endl) -> () with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7377,6 +7701,7 @@ print(console CLI, int value) -> () with effects CLI
 ```
 
 Automatically ends the line too.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7392,6 +7717,7 @@ Automatically ends the line too.
 ```rust
 print(console CLI, int value, cstr endl) -> () with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7410,6 +7736,7 @@ print(console CLI, float value) -> () with effects CLI
 
 To pre-specified 6 decimal digits.
 Automatically ends the line too.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7427,6 +7754,7 @@ print(console CLI, float value, cstr endl) -> () with effects CLI
 ```
 
 To pre-specified 6 decimal digits.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7444,6 +7772,7 @@ print(console CLI, cstr value) -> () with effects CLI
 ```
 
 Automatically ends the line too.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7459,6 +7788,7 @@ Automatically ends the line too.
 ```rust
 print(console CLI, cstr value, cstr endl) -> () with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7474,6 +7804,7 @@ print(console CLI, cstr value, cstr endl) -> () with effects CLI
 ```rust
 print(console CLI, "flush") -> () with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7491,6 +7822,7 @@ print(console CLI, char c) -> () with effects CLI
 ```
 
 Ends the line too.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7506,6 +7838,7 @@ Ends the line too.
 ```rust
 print(console CLI, char c, cstr endl) -> () with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7523,6 +7856,7 @@ print(console CLI, str) -> () with effects CLI
 ```
 
 Ends the line too.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7538,6 +7872,7 @@ Ends the line too.
 ```rust
 print(console CLI, str, cstr endl) -> () with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7555,6 +7890,7 @@ print(console CLI, vec) -> () with effects CLI
 ```
 
 Prints as a row, such as [ 1.0  2.0  3.0 ]
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7578,6 +7914,7 @@ print(console CLI, vec, cstr endl) -> () with effects CLI
 ```
 
 Prints as a row, such as [ 1.0  2.0  3.0 ]
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7601,6 +7938,7 @@ print(console CLI, coo) -> () with effects CLI
 ```
 
 Prints it as coordinate as list: (i, j): v
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7618,6 +7956,7 @@ print(console CLI, coo, cstr endl) -> () with effects CLI
 ```
 
 Prints it as coordinate as list: (i, j): v
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7635,6 +7974,7 @@ print(console CLI, mat) -> () with effects CLI
 ```
 
 single-row matrices stay on one line; taller ones get top/mid/bottom brackets
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7658,6 +7998,7 @@ print(console CLI, mat, cstr endl) -> () with effects CLI
 ```
 
 single-row matrices stay on one line; taller ones get top/mid/bottom brackets
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7684,6 +8025,7 @@ nn(nat) -> (nat value, cstr)
 Given a value, creates a tuple of (value, \"\").
 This enables the pattern 'print nn value'
 to print without automatically adding a new line.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7703,6 +8045,7 @@ nn(int) -> (int value, cstr)
 Given a value, creates a tuple of (value, \"\").
 This enables the pattern 'print nn value'
 to print without automatically adding a new line.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7722,6 +8065,7 @@ nn(float) -> (float value, cstr)
 Given a value, creates a tuple of (value, \"\").
 This enables the pattern 'print nn value'
 to print without automatically adding a new line.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7741,6 +8085,7 @@ nn(cstr) -> (cstr value, cstr)
 Given a value, creates a tuple of (value, \"\").
 This enables the pattern 'print nn value'
 to print without automatically adding a new line.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7760,6 +8105,7 @@ nn(str) -> (str, cstr)
 Given a value, creates a tuple of (value, \"\").
 This enables the pattern 'print nn value'
 to print without a new line.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7779,6 +8125,7 @@ nn(vec) -> (vec, cstr)
 Given a value, creates a tuple of (value, \"\").
 This enables the pattern 'print nn value'
 to print without a new line.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7795,6 +8142,7 @@ to print without a new line.
 ```rust
 supports_ansi(console) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7812,6 +8160,7 @@ supports_ansi(console) -> (bool)
 ```rust
 colors(console) -> (colors)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7821,7 +8170,7 @@ colors(console) -> (colors)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 ```
@@ -7834,6 +8183,7 @@ colors(console) -> (colors)
 ```rust
 set(colors, "reset_underline") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7849,6 +8199,7 @@ set(colors, "reset_underline") -> ()
 ```rust
 set(colors, "reset_bold") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7864,6 +8215,7 @@ set(colors, "reset_bold") -> ()
 ```rust
 set(colors, "reset_bg") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7879,6 +8231,7 @@ set(colors, "reset_bg") -> ()
 ```rust
 set(colors, "reset_color") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7894,6 +8247,7 @@ set(colors, "reset_color") -> ()
 ```rust
 set(colors, "reset") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7909,6 +8263,7 @@ set(colors, "reset") -> ()
 ```rust
 set(colors, "strikethrough") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7924,6 +8279,7 @@ set(colors, "strikethrough") -> ()
 ```rust
 set(colors, "reverse") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7939,6 +8295,7 @@ set(colors, "reverse") -> ()
 ```rust
 set(colors, "blink") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7954,6 +8311,7 @@ set(colors, "blink") -> ()
 ```rust
 set(colors, "underline") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7969,6 +8327,7 @@ set(colors, "underline") -> ()
 ```rust
 set(colors, "italic") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7984,6 +8343,7 @@ set(colors, "italic") -> ()
 ```rust
 set(colors, "dim") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -7999,6 +8359,7 @@ set(colors, "dim") -> ()
 ```rust
 set(colors, "bold") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8014,6 +8375,7 @@ set(colors, "bold") -> ()
 ```rust
 set(colors, "bg_black") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8029,6 +8391,7 @@ set(colors, "bg_black") -> ()
 ```rust
 set(colors, "bg_white") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8044,6 +8407,7 @@ set(colors, "bg_white") -> ()
 ```rust
 set(colors, "bg_cyan") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8059,6 +8423,7 @@ set(colors, "bg_cyan") -> ()
 ```rust
 set(colors, "bg_magenta") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8074,6 +8439,7 @@ set(colors, "bg_magenta") -> ()
 ```rust
 set(colors, "bg_blue") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8089,6 +8455,7 @@ set(colors, "bg_blue") -> ()
 ```rust
 set(colors, "bg_yellow") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8104,6 +8471,7 @@ set(colors, "bg_yellow") -> ()
 ```rust
 set(colors, "bg_green") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8119,6 +8487,7 @@ set(colors, "bg_green") -> ()
 ```rust
 set(colors, "bg_red") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8134,6 +8503,7 @@ set(colors, "bg_red") -> ()
 ```rust
 set(colors, "bright_white") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8149,6 +8519,7 @@ set(colors, "bright_white") -> ()
 ```rust
 set(colors, "bright_cyan") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8164,6 +8535,7 @@ set(colors, "bright_cyan") -> ()
 ```rust
 set(colors, "bright_magenta") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8179,6 +8551,7 @@ set(colors, "bright_magenta") -> ()
 ```rust
 set(colors, "bright_blue") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8194,6 +8567,7 @@ set(colors, "bright_blue") -> ()
 ```rust
 set(colors, "bright_yellow") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8209,6 +8583,7 @@ set(colors, "bright_yellow") -> ()
 ```rust
 set(colors, "bright_green") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8224,6 +8599,7 @@ set(colors, "bright_green") -> ()
 ```rust
 set(colors, "bright_red") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8239,6 +8615,7 @@ set(colors, "bright_red") -> ()
 ```rust
 set(colors, "black") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8254,6 +8631,7 @@ set(colors, "black") -> ()
 ```rust
 set(colors, "white") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8269,6 +8647,7 @@ set(colors, "white") -> ()
 ```rust
 set(colors, "cyan") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8284,6 +8663,7 @@ set(colors, "cyan") -> ()
 ```rust
 set(colors, "magenta") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8299,6 +8679,7 @@ set(colors, "magenta") -> ()
 ```rust
 set(colors, "blue") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8314,6 +8695,7 @@ set(colors, "blue") -> ()
 ```rust
 set(colors, "yellow") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8329,6 +8711,7 @@ set(colors, "yellow") -> ()
 ```rust
 set(colors, "green") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8344,6 +8727,7 @@ set(colors, "green") -> ()
 ```rust
 set(colors, "red") -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8360,6 +8744,7 @@ set(colors, "red") -> ()
 ```rust
 exists(any ptr) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8375,6 +8760,7 @@ exists(any ptr) -> (bool)
 ```rust
 exists(cstr) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8390,6 +8776,7 @@ exists(cstr) -> (bool)
 ```rust
 exists(Texture) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8409,6 +8796,7 @@ bits(float) -> (bits)
 
 Retrives the bit representation of a number of shift
 arithmetics and bitwise operations.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8427,6 +8815,7 @@ bits(int) -> (bits)
 
 Retrives the bit representation of a number of shift
 arithmetics and bitwise operations.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8445,6 +8834,7 @@ bits(nat) -> (bits)
 
 Retrives the bit representation of a number of shift
 arithmetics and bitwise operations.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8461,6 +8851,7 @@ arithmetics and bitwise operations.
 ```rust
 lshift(bits, nat y) -> (bits)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8477,6 +8868,7 @@ lshift(bits, nat y) -> (bits)
 ```rust
 rshift(bits, nat y) -> (bits)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8493,6 +8885,7 @@ rshift(bits, nat y) -> (bits)
 ```rust
 xor(bits, bits) -> (bits)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8509,6 +8902,7 @@ xor(bits, bits) -> (bits)
 ```rust
 band(bits, bits) -> (bits)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8525,6 +8919,7 @@ band(bits, bits) -> (bits)
 ```rust
 bor(bits, bits) -> (bits)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8543,6 +8938,7 @@ of(nat from, "len", nat length) -> (nat from, nat)
 ```
 
 Represents the range [from, from+length] where 'from' and 'length' are the arguments.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8560,6 +8956,7 @@ of(nat from, "upto", nat to) -> (nat from, nat)
 ```
 
 Represents the range [from, to] where 'from' and 'to' are the arguments.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8577,6 +8974,7 @@ of(nat from, "to", nat to) -> (nat from, nat to)
 ```
 
 Represents the range [from, to) where 'from' and 'to' are the arguments.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8594,6 +8992,7 @@ of(nat) -> (nat, nat to)
 ```
 
 Represents the range [0, to) where 'to' its  its arguments.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8612,6 +9011,7 @@ range(nat _from, nat to) -> (edit range)
 ```
 
 Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8630,6 +9030,7 @@ next(edit range) -> (nat)
 ```
 
 This increments the r.from position and returns the previous one.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8644,27 +9045,13 @@ This increments the r.from position and returns the previous one.
 </details>
 
 
-### next - Computes the next random number of a Rand sequence.
-*Defined in: std/rand.s line 88*
-
-```rust
-next(mut Rand) -> (float)
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 12
-- Transpiled C size: 79
-
-</details>
-
-
 ### next
 *Defined in: std/map.s line 54*
 
 ```rust
 next(robinhood_nat_entry[], mut nat pos) -> (mut nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8686,6 +9073,7 @@ next(robinhood_nat_entry[], mut nat pos) -> (mut nat)
 ```rust
 next(robinhood_str_entry[], mut nat pos) -> (mut str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8701,6 +9089,22 @@ next(robinhood_str_entry[], mut nat pos) -> (mut str)
 </details>
 
 
+### next - Computes the next random number of a Rand sequence.
+*Defined in: std/rand.s line 88*
+
+```rust
+next(mut Rand) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 79
+
+</details>
+
+
 # get
 ### get - immutable pointer to buffer element
 *Defined in: std/core/array.s line 100*
@@ -8713,6 +9117,7 @@ This uses pointer arithmetics to index the buffer, basically performing the oper
 `i*buffer.unsafe_align+buffer.unsafe_offset`. Fresh buffers have zero offset and alignment
 equal to element size, but more complicated situations arise in situations where sub-buffers
 are retrieved or sliced.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8740,6 +9145,7 @@ equal to element size, but more complicated situations arise in situations where
 are retrieved or sliced.
 
 *Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8758,6 +9164,7 @@ get(range, nat _pos) -> (nat)
 
 The item itself is returned. This lets the range be used as an iterator
 per a pattern like `for i in range 10 ...`.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8778,6 +9185,7 @@ per a pattern like `for i in range 10 ...`.
 ```rust
 get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8798,6 +9206,7 @@ get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```rust
 get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8818,6 +9227,7 @@ get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```rust
 get(circular, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8838,6 +9248,7 @@ get(circular, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 ```rust
 get(arena, nat pos) -> (any ptr {follows any ptr l.buf.unsafe_ptr})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8861,6 +9272,7 @@ get(arena, nat pos, "unsafe_assume_inbounds") -> (any ptr {follows any ptr l.buf
 
 
 *Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8876,6 +9288,7 @@ get(arena, nat pos, "unsafe_assume_inbounds") -> (any ptr {follows any ptr l.buf
 ```rust
 get(str, nat i) -> (char ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -8896,343 +9309,13 @@ get(str, nat i) -> (char ptr)
 ```rust
 get(str, nat i, "unsafe_assume_inbounds") -> (char ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 10
 - Transpiled C size: 23
 
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit circular, edit open, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 46
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit circular, edit terminal, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-48. not open file
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit circular, edit write, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-48. not open file
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit circular, edit write, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-48. not open file
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit circular, edit open, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-48. not open file
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit circular, edit open, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-48. not open file
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit arena, edit open, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 46
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit arena, edit terminal, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-48. not open file
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit arena, edit write, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-48. not open file
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit arena, edit write, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-48. not open file
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit arena, edit open, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-48. not open file
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 26*
-
-```rust
-get(edit arena, edit open, nat) -> (str) with effects CHARS
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-48. not open file
-2. null pointer
-18. can only define strings on contiguous buffers
-19. can only define strings on non-offset buffers
-6. nat subtraction would yield a negative
-39. end of file
-15. out of bounds
-</details>
-
-
-### get
-*Defined in: std/io.s line 23*
-
-```rust
-get(edit open, nat) -> (str)
-```
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 2 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 32
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-54. not open dir
-55. end of dir
 </details>
 
 
@@ -9244,6 +9327,7 @@ get(robinhood_nat_entry[], any[], nat key) -> (any ptr {follows any ptr values.u
 ```
 
 Implemented for string or cstr keys but buffer of any values.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9270,6 +9354,7 @@ get(robinhood_str_entry[], any[], str) -> (any ptr {follows any ptr values.unsaf
 ```
 
 Implemented for string or cstr keys but buffer of any values.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9296,6 +9381,7 @@ get(robinhood_str_entry[], any[], cstr key) -> (any ptr {follows any ptr values.
 ```
 
 Implemented for string or cstr keys but buffer of any values.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9314,12 +9400,357 @@ Implemented for string or cstr keys but buffer of any values.
 </details>
 
 
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit circular, edit open, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 46
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit circular, edit terminal, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+48. not open file
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit circular, edit write, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+48. not open file
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit circular, edit write, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+48. not open file
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit circular, edit open, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+48. not open file
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit circular, edit open, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+48. not open file
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit arena, edit open, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 46
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit arena, edit terminal, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+48. not open file
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit arena, edit write, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+48. not open file
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit arena, edit write, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+48. not open file
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit arena, edit open, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+48. not open file
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 26*
+
+```rust
+get(edit arena, edit open, nat) -> (str) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+48. not open file
+2. null pointer
+18. can only define strings on contiguous buffers
+19. can only define strings on non-offset buffers
+6. nat subtraction would yield a negative
+39. end of file
+15. out of bounds
+</details>
+
+
+### get
+*Defined in: std/io.s line 23*
+
+```rust
+get(edit open, nat) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 2 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 32
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+54. not open dir
+55. end of dir
+</details>
+
+
 ### get - a get request
 *Defined in: std/net/fetch.s line 88*
 
 ```rust
 get(edit circular, cstr url) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9346,6 +9777,7 @@ get(edit circular, cstr url) -> (nat status, str) with effects CHARS
 ```rust
 get(edit circular, str) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9375,6 +9807,7 @@ get(edit circular, str) -> (nat status, str) with effects CHARS
 ```rust
 get(edit arena, cstr url) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9401,6 +9834,7 @@ get(edit arena, cstr url) -> (nat status, str) with effects CHARS
 ```rust
 get(edit arena, str) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9430,6 +9864,7 @@ get(edit arena, str) -> (nat status, str) with effects CHARS
 ```rust
 get(new CHARS, cstr url) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9450,7 +9885,7 @@ get(new CHARS, cstr url) -> (nat status, str) with effects CHARS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 exists(any ptr) -> (bool)
@@ -9464,6 +9899,7 @@ free(mut any ptr) -> ()
 ```rust
 get(new CHARS, str) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9487,7 +9923,7 @@ get(new CHARS, str) -> (nat status, str) with effects CHARS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 exists(any ptr) -> (bool)
@@ -9501,6 +9937,7 @@ free(mut any ptr) -> ()
 ```rust
 get(vec, nat i) -> (float ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9524,6 +9961,7 @@ get(vec, nat i, "unsafe_assume_inbounds") -> (float ptr)
 
 
 *Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9539,6 +9977,7 @@ get(vec, nat i, "unsafe_assume_inbounds") -> (float ptr)
 ```rust
 get(mat, nat i, nat j) -> (float ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9563,6 +10002,7 @@ get(mat, nat i, nat j, "unsafe_assume_inbounds") -> (float ptr)
 
 
 *Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9578,6 +10018,7 @@ get(mat, nat i, nat j, "unsafe_assume_inbounds") -> (float ptr)
 ```rust
 get(coo, nat k) -> (sparse_element ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9601,6 +10042,7 @@ get(coo, nat k, "unsafe_assume_inbounds") -> (sparse_element ptr)
 
 
 *Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9617,6 +10059,7 @@ get(coo, nat k, "unsafe_assume_inbounds") -> (sparse_element ptr)
 ```rust
 KB(nat) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9633,6 +10076,7 @@ KB(nat) -> (nat)
 ```rust
 MB(nat) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9649,6 +10093,7 @@ MB(nat) -> (nat)
 ```rust
 GB(nat) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9665,6 +10110,7 @@ GB(nat) -> (nat)
 ```rust
 alloc(nat) -> (edit char[])
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9681,7 +10127,7 @@ alloc(nat) -> (edit char[])
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -9699,6 +10145,7 @@ Allocates an empty buffer and zero-initializes it. This is stable with regards t
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
 This version allocates a buffer of ONE element.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9715,7 +10162,7 @@ This version allocates a buffer of ONE element.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -9733,6 +10180,7 @@ Allocates an empty buffer and zero-initializes it. This is stable with regards t
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
 This version allocates a buffer of ONE element.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9748,7 +10196,7 @@ This version allocates a buffer of ONE element.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -9766,6 +10214,7 @@ Allocates an empty buffer and zero-initializes it. This is stable with regards t
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
 This version allocates a buffer of ONE element.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9782,7 +10231,7 @@ This version allocates a buffer of ONE element.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -9800,6 +10249,7 @@ Allocates an empty buffer and zero-initializes it. This is stable with regards t
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
 This version allocates a buffer of ONE element.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9815,7 +10265,7 @@ This version allocates a buffer of ONE element.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -9833,6 +10283,7 @@ Allocates an empty buffer and zero-initializes it. This is stable with regards t
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
 This version allocates a buffer of ONE element.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9848,7 +10299,7 @@ This version allocates a buffer of ONE element.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -9866,6 +10317,7 @@ Allocates an empty buffer and zero-initializes it. This is stable with regards t
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
 This version allocates a buffer of ONE element.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9880,7 +10332,7 @@ This version allocates a buffer of ONE element.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -9897,6 +10349,7 @@ alloc(edit any[], nat size) -> (edit any[])
 Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9913,7 +10366,7 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -9930,6 +10383,7 @@ alloc(edit any[], nat size, "unsafe_leaky") -> (edit any[])
 Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9945,7 +10399,7 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -9962,6 +10416,7 @@ alloc(edit any[], nat size, "dirty") -> (edit any[])
 Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -9978,7 +10433,7 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -9995,6 +10450,7 @@ alloc(edit any[], nat size, "dirty", "unsafe_leaky") -> (edit any[])
 Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10010,7 +10466,7 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -10027,6 +10483,7 @@ alloc(edit any[], nat size, "unsafe_first") -> (edit any[])
 Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10042,7 +10499,7 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -10059,6 +10516,7 @@ alloc(edit any[], nat size, "unsafe_first", "unsafe_leaky") -> (edit any[])
 Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
 as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
 allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10073,7 +10531,7 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -10090,6 +10548,7 @@ alloc(nat) -> (mut any ptr)
 Allocates a memory of the provided size in bytes.
 
 *Warning: Its usage in unsafe and guarded under std/unsafe.s.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10110,6 +10569,7 @@ Allocates a memory of the provided size in bytes.
 ```rust
 alloc(new CHARS, nat length) -> (mut allocated) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10124,7 +10584,7 @@ alloc(new CHARS, nat length) -> (mut allocated) with effects CHARS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -10139,6 +10599,7 @@ alloc(edit list) -> (edit allocated)
 ```
 
 Creates room for one element.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10161,6 +10622,7 @@ Creates room for one element.
 ```rust
 alloc(edit list, nat length) -> (edit allocated)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10185,6 +10647,7 @@ alloc(edit list) -> (edit allocated)
 ```
 
 Creates room for one element.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10207,6 +10670,7 @@ Creates room for one element.
 ```rust
 alloc(edit list, nat length) -> (edit allocated)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10231,6 +10695,7 @@ alloc(edit circular) -> (edit allocated)
 ```
 
 Creates room for one element.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10251,6 +10716,7 @@ Creates room for one element.
 ```rust
 alloc(edit circular, nat length) -> (edit allocated)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10273,6 +10739,7 @@ alloc(edit arena) -> (edit allocated)
 ```
 
 Creates room for one element.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10293,6 +10760,7 @@ Creates room for one element.
 ```rust
 alloc(edit arena, nat length) -> (edit allocated)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10313,6 +10781,7 @@ alloc(edit arena, nat length) -> (edit allocated)
 ```rust
 alloc(cstr) -> (mut char[])
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10336,7 +10805,7 @@ alloc(cstr) -> (mut char[])
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -10349,6 +10818,7 @@ free(mut any ptr) -> ()
 ```rust
 alloc(cstr surface, cstr obj) -> (mut char[])
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10373,7 +10843,7 @@ alloc(cstr surface, cstr obj) -> (mut char[])
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -10391,6 +10861,7 @@ resize(edit any[], nat size) -> (edit any[])
 For stability of data structures, this does nothing if the previous size is the same or less.
 If old size was zero, an error is created instead of allocating so that this does not leak
 resources.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10416,6 +10887,7 @@ resize(edit any[], nat size, "unsafe") -> (edit any[])
 For stability of data structures, this does nothing if the previous size is the same or less.
 If old size was zero, an error is created instead of allocating so that this does not leak
 resources.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10437,6 +10909,7 @@ resources.
 ```rust
 last(edit any[]) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10463,6 +10936,7 @@ This uses pointer arithmetics to index the buffer, basically performing the oper
 `i*buffer.unsafe_align+buffer.unsafe_offset`. Fresh buffers have zero offset and alignment
 equal to element size, but more complicated situations arise in situations where sub-buffers
 are retrieved or sliced.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10490,6 +10964,7 @@ equal to element size, but more complicated situations arise in situations where
 are retrieved or sliced.
 
 *Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10505,6 +10980,7 @@ are retrieved or sliced.
 ```rust
 mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10525,6 +11001,7 @@ mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr}
 ```rust
 mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10545,6 +11022,7 @@ mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr}
 ```rust
 mutget(edit circular, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10565,6 +11043,7 @@ mutget(edit circular, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_
 ```rust
 mutget(edit arena, nat pos) -> (mut any ptr {follows any ptr l.buf.unsafe_ptr})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10588,6 +11067,7 @@ mutget(edit arena, nat pos, "unsafe_assume_inbounds") -> (mut any ptr {follows a
 
 
 *Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10605,6 +11085,7 @@ mutget(edit robinhood_nat_entry[], edit any[], nat key) -> (mut any ptr {follows
 ```
 
 Implemented for string or cstr keys but buffer of any values.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10631,6 +11112,7 @@ mutget(edit robinhood_str_entry[], edit any[], str) -> (mut any ptr {follows any
 ```
 
 Implemented for string or cstr keys but buffer of any values.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10657,6 +11139,7 @@ mutget(edit robinhood_str_entry[], edit any[], cstr key) -> (mut any ptr {follow
 ```
 
 Implemented for string or cstr keys but buffer of any values.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10681,6 +11164,7 @@ Implemented for string or cstr keys but buffer of any values.
 ```rust
 mutget(edit vec, nat i) -> (mut float ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10701,6 +11185,7 @@ mutget(edit vec, nat i) -> (mut float ptr)
 ```rust
 mutget(edit vec, nat i, "unsafe_assume_inbounds") -> (mut float ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10716,6 +11201,7 @@ mutget(edit vec, nat i, "unsafe_assume_inbounds") -> (mut float ptr)
 ```rust
 mutget(edit mat, nat i, nat j) -> (mut float ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10737,6 +11223,7 @@ mutget(edit mat, nat i, nat j) -> (mut float ptr)
 ```rust
 mutget(edit coo, nat k) -> (mut sparse_element ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10760,6 +11247,7 @@ mutget(edit coo, nat k, "unsafe_assume_inbounds") -> (mut sparse_element ptr)
 
 
 *Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10776,6 +11264,7 @@ mutget(edit coo, nat k, "unsafe_assume_inbounds") -> (mut sparse_element ptr)
 ```rust
 len(str) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10791,6 +11280,7 @@ len(str) -> (nat)
 ```rust
 len(list) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10806,6 +11296,7 @@ len(list) -> (nat)
 ```rust
 len(list) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10824,6 +11315,7 @@ len(arena) -> (nat)
 
 This is not the total arena size, but rather the number
 of elements actively in use.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10839,6 +11331,7 @@ of elements actively in use.
 ```rust
 len(any[]) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10854,6 +11347,7 @@ len(any[]) -> (nat)
 ```rust
 len(vec) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10870,6 +11364,7 @@ len(vec) -> (nat)
 ```rust
 new() -> (new)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10886,6 +11381,7 @@ new() -> (new)
 ```rust
 arena("char__t9t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10907,6 +11403,7 @@ to track the size of allocated data within the buffer.
 Contrary to circular buffers, arenas are not freed automatically
 and therefore eventually run out of space. However, they come
 with data integrity guarantees.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10930,6 +11427,7 @@ and therefore eventually run out of space. However, they come
 with data integrity guarantees. Attach a garbage
 collector to an arena per `gc arena alloc 4` (or construct it
 with another allocator).
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10945,6 +11443,7 @@ with another allocator).
 ```rust
 arena("float__t661t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10960,6 +11459,7 @@ arena("float__t661t") -> (edit arena)
 ```rust
 arena("float__t619t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10975,6 +11475,7 @@ arena("float__t619t") -> (edit arena)
 ```rust
 arena("float__t615t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -10990,6 +11491,7 @@ arena("float__t615t") -> (edit arena)
 ```rust
 arena("float__t611t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11005,6 +11507,7 @@ arena("float__t611t") -> (edit arena)
 ```rust
 arena("float__t4t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11020,6 +11523,7 @@ arena("float__t4t") -> (edit arena)
 ```rust
 arena("float__t3595t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11035,6 +11539,7 @@ arena("float__t3595t") -> (edit arena)
 ```rust
 arena("float__t3529t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11050,6 +11555,7 @@ arena("float__t3529t") -> (edit arena)
 ```rust
 arena("float__t3250t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11065,6 +11571,7 @@ arena("float__t3250t") -> (edit arena)
 ```rust
 arena(edit vec) -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11081,6 +11588,7 @@ arena(edit vec) -> (edit arena)
 ```rust
 allocated(edit any[], nat pos) -> (edit allocated)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11100,6 +11608,7 @@ status(allocated) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat)
 
 This unpacking is used to pass an arena's state or allocated
 memory data as part of structural input.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11118,6 +11627,7 @@ status(arena) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat)
 
 This unpacking is used to pass an arena's state or allocated
 memory data as part of structural input.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11134,6 +11644,7 @@ memory data as part of structural input.
 ```rust
 circular("char__t9t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11149,6 +11660,7 @@ circular("char__t9t") -> (edit circular)
 ```rust
 circular(edit any[]) -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11164,6 +11676,7 @@ circular(edit any[]) -> (edit circular)
 ```rust
 circular("float__t3595t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11179,6 +11692,7 @@ circular("float__t3595t") -> (edit circular)
 ```rust
 circular("float__t3529t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11194,6 +11708,7 @@ circular("float__t3529t") -> (edit circular)
 ```rust
 circular("float__t3250t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11209,6 +11724,7 @@ circular("float__t3250t") -> (edit circular)
 ```rust
 circular("float__t661t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11224,6 +11740,7 @@ circular("float__t661t") -> (edit circular)
 ```rust
 circular("float__t619t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11239,6 +11756,7 @@ circular("float__t619t") -> (edit circular)
 ```rust
 circular("float__t615t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11254,6 +11772,7 @@ circular("float__t615t") -> (edit circular)
 ```rust
 circular("float__t611t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11269,6 +11788,7 @@ circular("float__t611t") -> (edit circular)
 ```rust
 circular("float__t4t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11285,6 +11805,7 @@ circular("float__t4t") -> (edit circular)
 ```rust
 list("char__t9t") -> (edit list)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11301,7 +11822,7 @@ list("char__t9t") -> (edit list)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -11317,6 +11838,7 @@ list(edit any[], "external") -> (edit list)
 
 List defined over a mutable buf that is automatically managed and resized.
 A capacity is maintained so that resizes are not performed too frequently.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11335,6 +11857,7 @@ list(edit any[]) -> (edit list)
 
 List defined over a mutable buf that is automatically managed and resized.
 A capacity is maintained so that resizes are not performed too frequently.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11351,7 +11874,7 @@ A capacity is maintained so that resizes are not performed too frequently.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -11364,6 +11887,7 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t3595t") -> (edit list)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11380,7 +11904,7 @@ list("float__t3595t") -> (edit list)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -11393,6 +11917,7 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t3529t") -> (edit list)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11409,7 +11934,7 @@ list("float__t3529t") -> (edit list)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -11422,6 +11947,7 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t3250t") -> (edit list)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11438,7 +11964,7 @@ list("float__t3250t") -> (edit list)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -11451,6 +11977,7 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t661t") -> (edit list)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11467,7 +11994,7 @@ list("float__t661t") -> (edit list)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -11480,6 +12007,7 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t619t") -> (edit list)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11496,7 +12024,7 @@ list("float__t619t") -> (edit list)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -11509,6 +12037,7 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t615t") -> (edit list)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11525,7 +12054,7 @@ list("float__t615t") -> (edit list)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -11538,6 +12067,7 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t611t") -> (edit list)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11554,7 +12084,7 @@ list("float__t611t") -> (edit list)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -11567,6 +12097,7 @@ free(mut any ptr) -> ()
 ```rust
 list("float__t4t") -> (edit list)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11583,7 +12114,7 @@ list("float__t4t") -> (edit list)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -11597,6 +12128,7 @@ free(mut any ptr) -> ()
 ```rust
 at(edit allocated) -> (mut any ptr {follows any ptr surface.buf.unsafe_ptr})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11617,6 +12149,7 @@ at(edit allocated) -> (mut any ptr {follows any ptr surface.buf.unsafe_ptr})
 ```rust
 at(edit robinhood_nat_entry[], nat _k) -> (mut nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11641,6 +12174,7 @@ at(edit robinhood_nat_entry[], nat _k) -> (mut nat)
 ```rust
 at(edit robinhood_str_entry[], str) -> (mut nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11665,6 +12199,7 @@ at(edit robinhood_str_entry[], str) -> (mut nat)
 ```rust
 at(edit robinhood_str_entry[], cstr _k) -> (mut nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11689,6 +12224,7 @@ at(edit robinhood_str_entry[], cstr _k) -> (mut nat)
 ```rust
 at(vec, nat i) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 2 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11709,6 +12245,7 @@ at(vec, nat i) -> (float)
 ```rust
 at(float number, nat i) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11730,6 +12267,7 @@ This allocates a region of a given number of elements
 within an arena and returns a buffer interface wrapping
 it. It is an alternative to allocating buffers on the
 heap.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11750,6 +12288,7 @@ heap.
 ```rust
 slice(str, str, str) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11773,6 +12312,7 @@ slice(str, str, str) -> (str)
 ```rust
 slice(str, str, cstr _to) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11796,6 +12336,7 @@ slice(str, str, cstr _to) -> (str)
 ```rust
 slice(str, cstr _from, str) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11819,6 +12360,7 @@ slice(str, cstr _from, str) -> (str)
 ```rust
 slice(str, cstr _from, cstr _to) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11842,6 +12384,7 @@ slice(str, cstr _from, cstr _to) -> (str)
 ```rust
 slice(cstr _s, str, str) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11865,6 +12408,7 @@ slice(cstr _s, str, str) -> (str)
 ```rust
 slice(cstr _s, str, cstr _to) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11888,6 +12432,7 @@ slice(cstr _s, str, cstr _to) -> (str)
 ```rust
 slice(cstr _s, cstr _from, str) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11911,6 +12456,7 @@ slice(cstr _s, cstr _from, str) -> (str)
 ```rust
 slice(cstr _s, cstr _from, cstr _to) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11939,6 +12485,7 @@ This operation does not perform any additional allocations
 or memory moves and is thus convenient for parsing code.
 Explicitly copy the result to move it away from volatile
 memory, such as circular buffers.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11966,6 +12513,7 @@ This operation does not perform any additional allocations
 or memory moves and is thus convenient for parsing code.
 Explicitly copy the result to move it away from volatile
 memory, such as circular buffers.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -11989,6 +12537,7 @@ memory, such as circular buffers.
 ```rust
 list("char__t9t") -> (edit list)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12005,7 +12554,7 @@ list("char__t9t") -> (edit list)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -12018,6 +12567,7 @@ free(mut any ptr) -> ()
 ```rust
 circular("char__t9t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12033,6 +12583,7 @@ circular("char__t9t") -> (edit circular)
 ```rust
 arena("char__t9t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12048,6 +12599,7 @@ arena("char__t9t") -> (edit arena)
 ```rust
 new() -> (new)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12064,6 +12616,7 @@ new() -> (new)
 ```rust
 strdat(nat pos, nat length, char first) -> (nat pos, nat length, char first)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12079,6 +12632,7 @@ strdat(nat pos, nat length, char first) -> (nat pos, nat length, char first)
 ```rust
 strdat(nat _pos, nat _length) -> (nat16 pos, nat16 length)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12103,6 +12657,7 @@ str(cstr) -> (str)
 
 Defines an implicit constant buffer using the cstr's memory data.
 Subsequent comparisons no longer use the underlying pointer value.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12122,6 +12677,7 @@ str(char[], nat endpos, "from", nat pos) -> (str)
 The string automatically detects the first character,
 which is generally tracked for fewer indirections
 on comparisons of unequal strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12150,6 +12706,7 @@ str(char[], nat pos, "to", nat endpos) -> (str)
 The string automatically detects the first character,
 which is generally tracked for fewer indirections
 on comparisons of unequal strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12178,6 +12735,7 @@ str(char[], nat pos, "len", nat length) -> (str)
 The string automatically detects the first character,
 which is generally tracked for fewer indirections
 on comparisons of unequal strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12201,6 +12759,7 @@ on comparisons of unequal strings.
 ```rust
 str(str) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12216,6 +12775,7 @@ str(str) -> (str)
 ```rust
 str(char[]) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12240,6 +12800,7 @@ str(char[]) -> (str)
 ```rust
 str(char[], nat length) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12264,6 +12825,7 @@ str(char[], nat length) -> (str)
 ```rust
 str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12285,6 +12847,7 @@ str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```rust
 str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12300,6 +12863,7 @@ str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```rust
 str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12318,6 +12882,7 @@ str(new CHARS, console console) -> (str) with effects CHARS
 
 The read string is placed onto memory that keeps being reallocated to accommodate its size.
 The resulting memory will consume exactly the required size in bytes.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12343,7 +12908,7 @@ The resulting memory will consume exactly the required size in bytes.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -12358,6 +12923,7 @@ str(edit arena, console console) -> (str) with effects CHARS
 ```
 
 The read string is placed on an arena while consuming only the necessarily minimum size.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12387,6 +12953,7 @@ str(cstr) -> (str)
 
 The created str variation should be used only for storng and
 retrieving data with 'unpack' for memory efficiency.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12410,6 +12977,7 @@ str(str) -> (str)
 
 The created str variation should be used only for storng and
 retrieving data with 'unpack' for memory efficiency.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12430,6 +12998,7 @@ retrieving data with 'unpack' for memory efficiency.
 ```rust
 str(cstr ptr) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12450,6 +13019,7 @@ str(cstr ptr) -> (str)
 ```rust
 str(str ptr) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12480,6 +13050,7 @@ when they are placed on reused arenas or circular buffers. That
 said, that would be a logical bug of insufficient sizing or
 sequencing. Strings remain valid slices of allocated memory regions
 without runtime failures; they always preserve their size.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12513,6 +13084,7 @@ when they are placed on reused arenas or circular buffers. That
 said, that would be a logical bug of insufficient sizing or
 sequencing. Strings remain valid slices of allocated memory regions
 without runtime failures; they always preserve their size.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12546,6 +13118,7 @@ when they are placed on reused arenas or circular buffers. That
 said, that would be a logical bug of insufficient sizing or
 sequencing. Strings remain valid slices of allocated memory regions
 without runtime failures; they always preserve their size.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12577,6 +13150,7 @@ when they are placed on reused arenas or circular buffers. That
 said, that would be a logical bug of insufficient sizing or
 sequencing. Strings remain valid slices of allocated memory regions
 without runtime failures; they always preserve their size.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12608,6 +13182,7 @@ when they are placed on reused arenas or circular buffers. That
 said, that would be a logical bug of insufficient sizing or
 sequencing. Strings remain valid slices of allocated memory regions
 without runtime failures; they always preserve their size.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12639,6 +13214,7 @@ when they are placed on reused arenas or circular buffers. That
 said, that would be a logical bug of insufficient sizing or
 sequencing. Strings remain valid slices of allocated memory regions
 without runtime failures; they always preserve their size.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12670,6 +13246,7 @@ when they are placed on reused arenas or circular buffers. That
 said, that would be a logical bug of insufficient sizing or
 sequencing. Strings remain valid slices of allocated memory regions
 without runtime failures; they always preserve their size.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12686,7 +13263,7 @@ without runtime failures; they always preserve their size.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -12708,6 +13285,7 @@ when they are placed on reused arenas or circular buffers. That
 said, that would be a logical bug of insufficient sizing or
 sequencing. Strings remain valid slices of allocated memory regions
 without runtime failures; they always preserve their size.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12724,7 +13302,7 @@ without runtime failures; they always preserve their size.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -12737,6 +13315,7 @@ free(mut any ptr) -> ()
 ```rust
 copy(edit list, float n) -> (str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12765,6 +13344,7 @@ copy(edit list, float n) -> (str) with effects CHARS
 ```rust
 copy(edit circular, float n) -> (str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12792,6 +13372,7 @@ copy(edit circular, float n) -> (str) with effects CHARS
 ```rust
 copy(edit arena, float n) -> (str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12819,6 +13400,7 @@ copy(edit arena, float n) -> (str) with effects CHARS
 ```rust
 copy(new CHARS, float n) -> (str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12840,7 +13422,7 @@ copy(new CHARS, float n) -> (str) with effects CHARS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -12860,6 +13442,7 @@ Example:
 CHARS = edit list char[]
 s = copy 123
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12894,6 +13477,7 @@ Example:
 CHARS = edit circular alloc 10
 s = copy 123
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12926,6 +13510,7 @@ Example:
 CHARS = edit arena alloc 10
 s = copy 123
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12958,6 +13543,7 @@ Example:
 CHARS = new()
 s = copy 123
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -12977,7 +13563,7 @@ s = copy 123
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -12992,6 +13578,7 @@ copy(edit circular, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13017,6 +13604,7 @@ copy(edit arena, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13042,6 +13630,7 @@ copy(new FLOATS, vec) -> (mut vec) with effects FLOATS
 ```
 
 Grabs a FLOATS for the result as an effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13057,7 +13646,7 @@ Grabs a FLOATS for the result as an effect.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -13075,6 +13664,7 @@ copy_null_terminated(edit arena, cstr _other) -> (str) with effects CHARS
 Constructs the copy on the buffer at a given position and returns it.
 The position is mutated to indicate where the string ends (e.g., to copy more strings).
 This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13101,6 +13691,7 @@ copy_null_terminated(edit arena, str) -> (str) with effects CHARS
 Constructs the copy on the buffer at a given position and returns it.
 The position is mutated to indicate where the string ends (e.g., to copy more strings).
 This operation may fail if the string does not fit the current allocation - prefer copying on a `list mut char[]` instead.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13126,6 +13717,7 @@ copy_null_terminated(new CHARS, str) -> (str) with effects CHARS
 
 Copies a string to a new buffer while ensuring null termination.
 This is mainly useful for supporting 'cstr unsafe_temp'.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13144,7 +13736,7 @@ This is mainly useful for supporting 'cstr unsafe_temp'.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -13160,6 +13752,7 @@ unsafe_temp(cstr) -> (cstr cstr, str)
 ```
 
 This is mainly used as a stt-input counterpart for converting str|cstr to cstr.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13191,6 +13784,7 @@ strings while this is used in code; use it only for its intended purposes.
 passing data to 'compt' or 'macro'.*
 
 *Info: This is safe to run during 'compt' or 'macro' in that the latter will fail gracefully.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13209,7 +13803,7 @@ passing data to 'compt' or 'macro'.*
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -13238,6 +13832,7 @@ strings while this is used in code; use it only for its intended purposes.
 passing data to 'compt' or 'macro'.*
 
 *Info: This is safe to run during 'compt' or 'macro' in that the latter will fail gracefully.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13256,7 +13851,7 @@ passing data to 'compt' or 'macro'.*
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -13273,6 +13868,7 @@ endpos(str) -> (nat)
 
 This position is computed relative to its start in its
 enclosing buffer.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13308,6 +13904,7 @@ print s1           # prints 456
 s2 = revalidate s1
 print s2.dat.first # prints 2
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13324,6 +13921,7 @@ print s2.dat.first # prints 2
 ```rust
 starts_with(str, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13346,6 +13944,7 @@ starts_with(str, str) -> (bool)
 ```rust
 starts_with(str, cstr _needle) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13368,6 +13967,7 @@ starts_with(str, cstr _needle) -> (bool)
 ```rust
 starts_with(cstr _stack, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13390,6 +13990,7 @@ starts_with(cstr _stack, str) -> (bool)
 ```rust
 starts_with(cstr _stack, cstr _needle) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13413,6 +14014,7 @@ starts_with(cstr _stack, cstr _needle) -> (bool)
 ```rust
 ends_with(str, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13435,6 +14037,7 @@ ends_with(str, str) -> (bool)
 ```rust
 ends_with(str, cstr _needle) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13457,6 +14060,7 @@ ends_with(str, cstr _needle) -> (bool)
 ```rust
 ends_with(cstr _stack, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13479,6 +14083,7 @@ ends_with(cstr _stack, str) -> (bool)
 ```rust
 ends_with(cstr _stack, cstr _needle) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13502,6 +14107,7 @@ ends_with(cstr _stack, cstr _needle) -> (bool)
 ```rust
 contains(str, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13517,6 +14123,7 @@ contains(str, str) -> (bool)
 ```rust
 contains(str, cstr _needle) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13532,6 +14139,7 @@ contains(str, cstr _needle) -> (bool)
 ```rust
 contains(cstr _stack, str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13547,6 +14155,7 @@ contains(cstr _stack, str) -> (bool)
 ```rust
 contains(cstr _stack, cstr _needle) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13562,6 +14171,7 @@ contains(cstr _stack, cstr _needle) -> (bool)
 ```rust
 contains(str, char needle) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13583,6 +14193,7 @@ contains(str, char needle) -> (bool)
 ```rust
 contains(cstr _stack, char needle) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13605,6 +14216,7 @@ contains(cstr _stack, char needle) -> (bool)
 ```rust
 find(str, str) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13625,6 +14237,7 @@ find(str, str) -> (nat)
 ```rust
 find(str, str, "end_pos") -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13645,6 +14258,7 @@ find(str, str, "end_pos") -> (nat)
 ```rust
 find(str, str, nat _skip) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13666,6 +14280,7 @@ find(str, str, nat _skip) -> (nat)
 ```rust
 find(str, str, nat _skip, "end_pos") -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13687,6 +14302,7 @@ find(str, str, nat _skip, "end_pos") -> (nat)
 ```rust
 find(str, cstr _needle) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13707,6 +14323,7 @@ find(str, cstr _needle) -> (nat)
 ```rust
 find(str, cstr _needle, "end_pos") -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13727,6 +14344,7 @@ find(str, cstr _needle, "end_pos") -> (nat)
 ```rust
 find(str, cstr _needle, nat _skip) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13748,6 +14366,7 @@ find(str, cstr _needle, nat _skip) -> (nat)
 ```rust
 find(str, cstr _needle, nat _skip, "end_pos") -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13769,6 +14388,7 @@ find(str, cstr _needle, nat _skip, "end_pos") -> (nat)
 ```rust
 find(cstr _stack, str) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13789,6 +14409,7 @@ find(cstr _stack, str) -> (nat)
 ```rust
 find(cstr _stack, str, "end_pos") -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13809,6 +14430,7 @@ find(cstr _stack, str, "end_pos") -> (nat)
 ```rust
 find(cstr _stack, str, nat _skip) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13830,6 +14452,7 @@ find(cstr _stack, str, nat _skip) -> (nat)
 ```rust
 find(cstr _stack, str, nat _skip, "end_pos") -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13851,6 +14474,7 @@ find(cstr _stack, str, nat _skip, "end_pos") -> (nat)
 ```rust
 find(cstr _stack, cstr _needle) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13871,6 +14495,7 @@ find(cstr _stack, cstr _needle) -> (nat)
 ```rust
 find(cstr _stack, cstr _needle, "end_pos") -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13891,6 +14516,7 @@ find(cstr _stack, cstr _needle, "end_pos") -> (nat)
 ```rust
 find(cstr _stack, cstr _needle, nat _skip) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13912,6 +14538,7 @@ find(cstr _stack, cstr _needle, nat _skip) -> (nat)
 ```rust
 find(cstr _stack, cstr _needle, nat _skip, "end_pos") -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13933,6 +14560,7 @@ find(cstr _stack, cstr _needle, nat _skip, "end_pos") -> (nat)
 ```rust
 find(nat[], nat _k) -> (mut nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13957,6 +14585,7 @@ find(nat[], nat _k) -> (mut nat)
 ```rust
 find(str[], str) -> (mut nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13981,6 +14610,7 @@ find(str[], str) -> (mut nat)
 ```rust
 find(str[], cstr _k) -> (mut nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14005,6 +14635,7 @@ find(str[], cstr _k) -> (mut nat)
 ```rust
 find(robinhood_nat_entry[], nat _k) -> (mut nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14029,6 +14660,7 @@ find(robinhood_nat_entry[], nat _k) -> (mut nat)
 ```rust
 find(robinhood_str_entry[], str) -> (mut nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14053,6 +14685,7 @@ find(robinhood_str_entry[], str) -> (mut nat)
 ```rust
 find(robinhood_str_entry[], cstr _k) -> (mut nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14081,6 +14714,7 @@ empty(str) -> (bool)
 
 Prefer this check because its cstr-checking counterpar is faster
 than casting to a string.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14101,6 +14735,7 @@ There are two conditions checked: a) that the cstr is an emptry
 pair of brackets, b) that the cstr is zero-initialized, corresponding
 to a null memory address. This function is faster than '0==len str c',
 as there is no need to actually traverse the character contents.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14117,6 +14752,7 @@ as there is no need to actually traverse the character contents.
 ```rust
 is_number(char) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14133,6 +14769,7 @@ is_number(char) -> (bool)
 ```rust
 rotl(nat x, nat k) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14152,6 +14789,7 @@ splitmix64() -> (nat)
 
 Computes the seed of a splitmix64 sequence using the clock
 as the source of entropy.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14177,6 +14815,7 @@ state with next. If you do not provide a seed, a number obtained from the
 current time is provided. That can only be the start of a sequence, and 
 marked as a leaking resource to prevent time-based randomization (which is 
 not random).
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14198,6 +14837,7 @@ Xoshiro256plus random numbers from https://prng.di.unimi.it/
 These and are NOT cryptographically secure.
 This a structural type for storing the progress of random number generators 
 on four u64 state fields. This version defaults to a time-based seed. Its period is 2^256-1.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14218,6 +14858,7 @@ Xoshiro256plus random numbers from https://prng.di.unimi.it/
 These and are NOT cryptographically secure.
 This a structural type for storing the progress of random number generators 
 on four u64 state fields. The version is seed-initalized. Its period is 2^256-1.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14257,6 +14898,7 @@ cstr() -> (cstr)
 ```rust
 nat(nat32) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14272,6 +14914,7 @@ nat(nat32) -> (nat)
 ```rust
 nat(nat16) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14289,6 +14932,7 @@ float(bits) -> (float)
 ```
 
 Converts a bit representation to the corresponding float number.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14306,6 +14950,7 @@ nat(bits) -> (nat)
 ```
 
 Converts a bit representation to the corresponding natural number.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14324,6 +14969,7 @@ nat(char) -> (nat)
 
 Converting a character to a natural number considers
 its bit representation interpreted as an unsigned number.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14342,6 +14988,7 @@ nat(nat) -> (nat)
 
 Converting to natural numbers loses information.
  Failed on negative input because it typically indicates a later error in buffer indexing.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14360,6 +15007,7 @@ nat(int) -> (nat)
 
 Converting to natural numbers loses information.
  Failed on negative input because it typically indicates a later error in buffer indexing.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14383,6 +15031,7 @@ nat(float) -> (nat)
 
 Converting to natural numbers loses information.
  Failed on negative input because it typically indicates a later error in buffer indexing.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14405,6 +15054,7 @@ float(nat) -> (float)
 ```
 
 May lose information because floats are not exact representation of all integers.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14422,6 +15072,7 @@ float(int) -> (float)
 ```
 
 May lose information because floats are not exact representation of all integers.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14439,6 +15090,7 @@ float(float) -> (float)
 ```
 
 Serves as a tautology function for code that parses on multiple number types.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14457,6 +15109,7 @@ cstr(cstr cstr, str) -> (cstr)
 
 This function's return is meant to be passed to operating system calls,
 or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14475,6 +15128,7 @@ cstr(unsafe_temp) -> (cstr)
 
 This function's return is meant to be passed to operating system calls,
 or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14493,6 +15147,7 @@ cstr(unsafe_temp) -> (cstr)
 
 This function's return is meant to be passed to operating system calls,
 or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14511,6 +15166,7 @@ str(cstr) -> (str)
 
 Defines an implicit constant buffer using the cstr's memory data.
 Subsequent comparisons no longer use the underlying pointer value.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14530,6 +15186,7 @@ str(char[], nat endpos, "from", nat pos) -> (str)
 The string automatically detects the first character,
 which is generally tracked for fewer indirections
 on comparisons of unequal strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14558,6 +15215,7 @@ str(char[], nat pos, "to", nat endpos) -> (str)
 The string automatically detects the first character,
 which is generally tracked for fewer indirections
 on comparisons of unequal strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14586,6 +15244,7 @@ str(char[], nat pos, "len", nat length) -> (str)
 The string automatically detects the first character,
 which is generally tracked for fewer indirections
 on comparisons of unequal strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14609,6 +15268,7 @@ on comparisons of unequal strings.
 ```rust
 str(str) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14624,6 +15284,7 @@ str(str) -> (str)
 ```rust
 str(char[]) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14648,6 +15309,7 @@ str(char[]) -> (str)
 ```rust
 str(char[], nat length) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14672,6 +15334,7 @@ str(char[], nat length) -> (str)
 ```rust
 str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14693,6 +15356,7 @@ str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```rust
 str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14708,6 +15372,7 @@ str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```rust
 str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14724,6 +15389,7 @@ str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```rust
 hash(nat k, nat size) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14744,6 +15410,7 @@ hash(nat k, nat size) -> (nat)
 ```rust
 hash(str, nat size) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14767,6 +15434,7 @@ hash(str, nat size) -> (nat)
 ```rust
 to_hash_base(nat) -> (bits)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14782,6 +15450,7 @@ to_hash_base(nat) -> (bits)
 ```rust
 to_hash_base(int) -> (bits)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14797,6 +15466,7 @@ to_hash_base(int) -> (bits)
 ```rust
 to_hash_base(float) -> (bits)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14812,6 +15482,7 @@ to_hash_base(float) -> (bits)
 ```rust
 to_hash_base(cstr) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14827,6 +15498,7 @@ to_hash_base(cstr) -> (str)
 ```rust
 to_hash_base(str) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14843,6 +15515,7 @@ to_hash_base(str) -> (str)
 ```rust
 robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14859,6 +15532,7 @@ robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```rust
 robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14875,6 +15549,7 @@ robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```rust
 robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14890,6 +15565,7 @@ robinhood_nat_entry(nat s, nat cost) -> (nat s, nat cost)
 ```rust
 robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14906,6 +15582,7 @@ robinhood_str_entry(str, nat cost) -> (str, nat cost)
 ```rust
 raw(cstr) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14921,6 +15598,7 @@ raw(cstr) -> (str)
 ```rust
 raw(nat) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14936,6 +15614,7 @@ raw(nat) -> (nat)
 ```rust
 raw(str) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14951,6 +15630,7 @@ raw(str) -> (str)
 ```rust
 raw(nat s, nat cost) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14966,6 +15646,7 @@ raw(nat s, nat cost) -> (nat)
 ```rust
 raw(str, nat cost) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14982,6 +15663,7 @@ raw(str, nat cost) -> (str)
 ```rust
 is_zero(nat) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14997,6 +15679,7 @@ is_zero(nat) -> (bool)
 ```rust
 is_zero(str) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15016,6 +15699,7 @@ strmap(edit any[]) -> (mut robinhood_str_entry[], edit any[])
 
 Maps string indexes to the buffer provided using a robinhood scheme.
 Map size is static and cannot be adjusted after initialization.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15032,7 +15716,7 @@ Map size is static and cannot be adjusted after initialization.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -15049,6 +15733,7 @@ natmap(edit any[]) -> (mut robinhood_nat_entry[], edit any[])
 
 Maps number indexes to the buffer provided using a robinhood scheme.
 Map size is static and cannot be adjusted after initialization.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15065,7 +15750,7 @@ Map size is static and cannot be adjusted after initialization.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -15079,6 +15764,7 @@ free(mut any ptr) -> ()
 ```rust
 unpack(char[], nat16 dat.pos, nat16 dat.length) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15102,6 +15788,7 @@ unpack(str) -> (str)
 
 The created compact str is unpacked into its 'nat'-using representation
 that is more efficient for computations in 64-bit architectures.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15120,6 +15807,7 @@ post(edit circular, cstr url, cstr _body) -> (nat status, str) with effects CHAR
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15146,6 +15834,7 @@ The default application/json content type is used.
 ```rust
 post(edit circular, cstr url, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15174,6 +15863,7 @@ post(edit circular, cstr url, str) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15203,6 +15893,7 @@ The default application/json content type is used.
 ```rust
 post(edit circular, cstr url, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15234,6 +15925,7 @@ post(edit circular, str, cstr _body) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15263,6 +15955,7 @@ The default application/json content type is used.
 ```rust
 post(edit circular, str, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15294,6 +15987,7 @@ post(edit circular, str, str) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15323,6 +16017,7 @@ The default application/json content type is used.
 ```rust
 post(edit circular, str, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15354,6 +16049,7 @@ post(edit arena, cstr url, cstr _body) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15380,6 +16076,7 @@ The default application/json content type is used.
 ```rust
 post(edit arena, cstr url, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15408,6 +16105,7 @@ post(edit arena, cstr url, str) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15437,6 +16135,7 @@ The default application/json content type is used.
 ```rust
 post(edit arena, cstr url, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15468,6 +16167,7 @@ post(edit arena, str, cstr _body) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15497,6 +16197,7 @@ The default application/json content type is used.
 ```rust
 post(edit arena, str, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15528,6 +16229,7 @@ post(edit arena, str, str) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15557,6 +16259,7 @@ The default application/json content type is used.
 ```rust
 post(edit arena, str, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15588,6 +16291,7 @@ post(new CHARS, cstr url, cstr _body) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15608,7 +16312,7 @@ The default application/json content type is used.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 exists(any ptr) -> (bool)
@@ -15622,6 +16326,7 @@ free(mut any ptr) -> ()
 ```rust
 post(new CHARS, cstr url, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15642,7 +16347,7 @@ post(new CHARS, cstr url, cstr _body, cstr content_type) -> (nat status, str) wi
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 exists(any ptr) -> (bool)
@@ -15658,6 +16363,7 @@ post(new CHARS, cstr url, str) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15681,7 +16387,7 @@ The default application/json content type is used.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 exists(any ptr) -> (bool)
@@ -15695,6 +16401,7 @@ free(mut any ptr) -> ()
 ```rust
 post(new CHARS, cstr url, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15718,7 +16425,7 @@ post(new CHARS, cstr url, str, cstr content_type) -> (nat status, str) with effe
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 exists(any ptr) -> (bool)
@@ -15734,6 +16441,7 @@ post(new CHARS, str, cstr _body) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15757,7 +16465,7 @@ The default application/json content type is used.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 exists(any ptr) -> (bool)
@@ -15771,6 +16479,7 @@ free(mut any ptr) -> ()
 ```rust
 post(new CHARS, str, cstr _body, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15794,7 +16503,7 @@ post(new CHARS, str, cstr _body, cstr content_type) -> (nat status, str) with ef
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 exists(any ptr) -> (bool)
@@ -15810,6 +16519,7 @@ post(new CHARS, str, str) -> (nat status, str) with effects CHARS
 ```
 
 The default application/json content type is used.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15833,7 +16543,7 @@ The default application/json content type is used.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 exists(any ptr) -> (bool)
@@ -15847,6 +16557,7 @@ free(mut any ptr) -> ()
 ```rust
 post(new CHARS, str, str, cstr content_type) -> (nat status, str) with effects CHARS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15870,7 +16581,7 @@ post(new CHARS, str, str, cstr content_type) -> (nat status, str) with effects C
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 exists(any ptr) -> (bool)
@@ -15885,6 +16596,7 @@ free(mut any ptr) -> ()
 ```rust
 abs(int) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15900,6 +16612,7 @@ abs(int) -> (int)
 ```rust
 abs(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15916,6 +16629,7 @@ abs(float) -> (float)
 ```rust
 sqrt(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15932,6 +16646,7 @@ sqrt(float) -> (float)
 ```rust
 sin(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15948,6 +16663,7 @@ sin(float) -> (float)
 ```rust
 cos(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15964,6 +16680,7 @@ cos(float) -> (float)
 ```rust
 log(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15980,6 +16697,7 @@ log(float) -> (float)
 ```rust
 tan(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -15996,6 +16714,7 @@ tan(float) -> (float)
 ```rust
 floor(float) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16012,6 +16731,7 @@ floor(float) -> (int)
 ```rust
 asin(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16028,6 +16748,7 @@ asin(float) -> (float)
 ```rust
 acos(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16044,6 +16765,7 @@ acos(float) -> (float)
 ```rust
 atan(float x, float y) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16059,6 +16781,7 @@ atan(float x, float y) -> (float)
 ```rust
 atan(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16075,6 +16798,7 @@ atan(float) -> (float)
 ```rust
 exp(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16091,6 +16815,7 @@ exp(float) -> (float)
 ```rust
 isnan(float) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16108,6 +16833,7 @@ isnan(float) -> (bool)
 ```rust
 isinf(float) -> (bool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16127,6 +16853,7 @@ vec(float ptr unsafe_ptr, nat pos, nat length) -> (mut vec)
 ```
 
 Warning: directly calling this constructor without safety checks is unsafe.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16142,6 +16869,7 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 vec(edit circular, nat length) -> (mut vec) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16164,6 +16892,7 @@ vec(edit circular, nat length) -> (mut vec) with effects FLOATS
 ```rust
 vec(edit circular, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16186,6 +16915,7 @@ vec(edit circular, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```rust
 vec(edit arena, nat length) -> (mut vec) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16208,6 +16938,7 @@ vec(edit arena, nat length) -> (mut vec) with effects FLOATS
 ```rust
 vec(edit arena, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16230,6 +16961,7 @@ vec(edit arena, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```rust
 vec(edit float[]) -> (mut vec)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16253,6 +16985,7 @@ vec(new FLOATS, nat length) -> (mut vec) with effects FLOATS
 ```
 
 Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16267,7 +17000,7 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -16282,6 +17015,7 @@ vec(new FLOATS, nat length, "dirty") -> (mut vec) with effects FLOATS
 ```
 
 Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16296,7 +17030,7 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -16309,6 +17043,7 @@ free(mut any ptr) -> ()
 ```rust
 vec(mat) -> (mut vec)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16327,6 +17062,7 @@ mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride) -> (mut mat)
 ```
 
 Warning: directly calling this constructor without safety checks is unsafe.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16345,6 +17081,7 @@ mat(vec, "col") -> (mut mat)
 
 A 'type \"row\"' or 'type \"col\"' marker is needed
 to indicate the new matrix's orientation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16363,6 +17100,7 @@ mat(vec, "row") -> (mut mat)
 
 A 'type \"row\"' or 'type \"col\"' marker is needed
 to indicate the new matrix's orientation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16378,6 +17116,7 @@ to indicate the new matrix's orientation.
 ```rust
 mat(edit float[], nat rows) -> (mut mat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16402,6 +17141,7 @@ mat(edit float[], nat rows) -> (mut mat)
 ```rust
 mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16424,6 +17164,7 @@ mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```rust
 mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16446,6 +17187,7 @@ mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```rust
 mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16468,6 +17210,7 @@ mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```rust
 mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16490,6 +17233,7 @@ mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```rust
 mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16506,7 +17250,7 @@ mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -16519,6 +17263,7 @@ free(mut any ptr) -> ()
 ```rust
 mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16535,7 +17280,7 @@ mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -16549,6 +17294,7 @@ free(mut any ptr) -> ()
 ```rust
 sparse_element(nat row, nat col, float value) -> (nat row, nat col, float value)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16567,6 +17313,7 @@ coo(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz) -> (mut coo)
 ```
 
 Warning: directly calling this constructor without safety checks is unsafe.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16582,6 +17329,7 @@ Warning: directly calling this constructor without safety checks is unsafe.
 ```rust
 coo(sparse_element[], nat rows, nat cols) -> (mut coo)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16599,6 +17347,7 @@ coo(nat rows, nat cols, nat nnz) -> (mut coo)
 ```
 
 This creates a new buffer of sparse elements for convenience.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16615,7 +17364,7 @@ This creates a new buffer of sparse elements for convenience.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -16629,6 +17378,7 @@ free(mut any ptr) -> ()
 ```rust
 new() -> (new)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16644,6 +17394,7 @@ new() -> (new)
 ```rust
 arena("float__t661t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16659,6 +17410,7 @@ arena("float__t661t") -> (edit arena)
 ```rust
 arena("float__t619t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16674,6 +17426,7 @@ arena("float__t619t") -> (edit arena)
 ```rust
 arena("float__t615t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16689,6 +17442,7 @@ arena("float__t615t") -> (edit arena)
 ```rust
 arena("float__t611t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16704,6 +17458,7 @@ arena("float__t611t") -> (edit arena)
 ```rust
 arena("float__t4t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16719,6 +17474,7 @@ arena("float__t4t") -> (edit arena)
 ```rust
 circular("float__t3595t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16734,6 +17490,7 @@ circular("float__t3595t") -> (edit circular)
 ```rust
 circular("float__t3529t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16749,6 +17506,7 @@ circular("float__t3529t") -> (edit circular)
 ```rust
 circular("float__t3250t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16764,6 +17522,7 @@ circular("float__t3250t") -> (edit circular)
 ```rust
 circular("float__t661t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16779,6 +17538,7 @@ circular("float__t661t") -> (edit circular)
 ```rust
 circular("float__t619t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16794,6 +17554,7 @@ circular("float__t619t") -> (edit circular)
 ```rust
 circular("float__t615t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16809,6 +17570,7 @@ circular("float__t615t") -> (edit circular)
 ```rust
 circular("float__t611t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16824,6 +17586,7 @@ circular("float__t611t") -> (edit circular)
 ```rust
 circular("float__t4t") -> (edit circular)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16839,6 +17602,7 @@ circular("float__t4t") -> (edit circular)
 ```rust
 arena("float__t3595t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16854,6 +17618,7 @@ arena("float__t3595t") -> (edit arena)
 ```rust
 arena("float__t3529t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16869,6 +17634,7 @@ arena("float__t3529t") -> (edit arena)
 ```rust
 arena("float__t3250t") -> (edit arena)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16885,6 +17651,7 @@ arena("float__t3250t") -> (edit arena)
 ```rust
 constvec(float[]) -> (vec)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16913,6 +17680,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16940,6 +17708,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16967,6 +17736,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -16994,6 +17764,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17021,6 +17792,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17048,6 +17820,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17075,6 +17848,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17096,6 +17870,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17117,6 +17892,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17138,6 +17914,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17159,6 +17936,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17180,6 +17958,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17201,6 +17980,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17222,6 +18002,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17243,6 +18024,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17264,6 +18046,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17285,6 +18068,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17306,6 +18090,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17327,6 +18112,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17348,6 +18134,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17369,6 +18156,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17390,6 +18178,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17411,6 +18200,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17432,6 +18222,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17453,6 +18244,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17474,6 +18266,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17495,6 +18288,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17516,6 +18310,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17537,6 +18332,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17558,6 +18354,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17579,6 +18376,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17607,6 +18405,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17635,6 +18434,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17663,6 +18463,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17691,6 +18492,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17719,6 +18521,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17747,6 +18550,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17775,6 +18579,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17803,6 +18608,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17831,6 +18637,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17859,6 +18666,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17887,6 +18695,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17915,6 +18724,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17942,6 +18752,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17969,6 +18780,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -17996,6 +18808,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18023,6 +18836,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18050,6 +18864,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18077,6 +18892,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18104,6 +18920,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18131,6 +18948,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18158,6 +18976,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18185,6 +19004,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18212,6 +19032,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18239,6 +19060,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18266,6 +19088,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18293,6 +19116,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18320,6 +19144,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18347,6 +19172,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18374,6 +19200,7 @@ as well as some transformation that can be applied.
 A second vector can also be provided to be subtracted or obtain relative value differences
 without allocating any memory for operation results.
 All computations are branchless, as literals are optimized away during compilation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18396,6 +19223,7 @@ All computations are branchless, as literals are optimized away during compilati
 ```rust
 dot(vec, vec) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18418,6 +19246,7 @@ dot(vec, vec) -> (float)
 ```rust
 sum(vec) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18433,6 +19262,7 @@ sum(vec) -> (float)
 ```rust
 sum(coo, "all") -> (mut float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18450,6 +19280,7 @@ sum(edit circular, coo, "col") -> (mut vec) with effects FLOATS
 ```
 
 result[j] = sum of all stored values in column j
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18476,6 +19307,7 @@ sum(edit arena, coo, "col") -> (mut vec) with effects FLOATS
 ```
 
 result[j] = sum of all stored values in column j
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18502,6 +19334,7 @@ sum(new FLOATS, coo, "col") -> (mut vec) with effects FLOATS
 ```
 
 result[j] = sum of all stored values in column j
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18518,7 +19351,7 @@ result[j] = sum of all stored values in column j
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -18533,6 +19366,7 @@ sum(edit circular, coo, "row") -> (mut vec) with effects FLOATS
 ```
 
 result[i] = sum of all stored values in row i
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18559,6 +19393,7 @@ sum(edit arena, coo, "row") -> (mut vec) with effects FLOATS
 ```
 
 result[i] = sum of all stored values in row i
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18585,6 +19420,7 @@ sum(new FLOATS, coo, "row") -> (mut vec) with effects FLOATS
 ```
 
 result[i] = sum of all stored values in row i
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18601,7 +19437,7 @@ result[i] = sum of all stored values in row i
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -18615,6 +19451,7 @@ free(mut any ptr) -> ()
 ```rust
 mean(accumulator) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18635,6 +19472,7 @@ mean(accumulator) -> (float)
 ```rust
 mean(vec) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18656,6 +19494,7 @@ mean(vec) -> (float)
 ```rust
 min(vec) -> (mut float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18678,6 +19517,7 @@ min(vec) -> (mut float)
 ```rust
 max(vec) -> (mut float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18700,6 +19540,7 @@ max(vec) -> (mut float)
 ```rust
 var(vec) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18722,6 +19563,7 @@ var(vec) -> (float)
 ```rust
 std(accumulator) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18742,6 +19584,7 @@ std(accumulator) -> (float)
 ```rust
 std(vec) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18764,6 +19607,7 @@ std(vec) -> (float)
 ```rust
 self(mut vec) -> (edit arena, mut vec)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18780,6 +19624,7 @@ self(mut vec) -> (edit arena, mut vec)
 ```rust
 accumulator() -> (edit accumulator)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18796,6 +19641,7 @@ accumulator() -> (edit accumulator)
 ```rust
 append(edit accumulator, float value) -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18812,6 +19658,7 @@ append(edit accumulator, float value) -> ()
 ```rust
 pearson(vec, vec) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18837,6 +19684,7 @@ pearson(vec, vec) -> (float)
 ```rust
 rows(mat) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18852,6 +19700,7 @@ rows(mat) -> (nat)
 ```rust
 rows(coo) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18868,6 +19717,7 @@ rows(coo) -> (nat)
 ```rust
 cols(mat) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18883,6 +19733,7 @@ cols(mat) -> (nat)
 ```rust
 cols(coo) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18899,6 +19750,7 @@ cols(coo) -> (nat)
 ```rust
 constmat(float[], nat rows) -> (mat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18924,6 +19776,7 @@ constmat(float[], nat rows) -> (mat)
 ```rust
 mutvec(mat) -> (mut vec)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18940,6 +19793,7 @@ mutvec(mat) -> (mut vec)
 ```rust
 row(mat, nat i) -> (mut vec)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18961,6 +19815,7 @@ row(mat, nat i) -> (mut vec)
 ```rust
 nnz(coo) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -18977,6 +19832,7 @@ nnz(coo) -> (nat)
 ```rust
 todense(edit circular, coo) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19002,6 +19858,7 @@ todense(edit circular, coo) -> (mut mat) with effects FLOATS
 ```rust
 todense(edit arena, coo) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19027,6 +19884,7 @@ todense(edit arena, coo) -> (mut mat) with effects FLOATS
 ```rust
 todense(new FLOATS, coo) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19046,7 +19904,7 @@ todense(new FLOATS, coo) -> (mut mat) with effects FLOATS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19062,6 +19920,7 @@ coo(sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz) -> (mut coo)
 ```
 
 Warning: directly calling this constructor without safety checks is unsafe.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19079,6 +19938,7 @@ mat(float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride) -> (mut mat)
 ```
 
 Warning: directly calling this constructor without safety checks is unsafe.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19097,6 +19957,7 @@ mat(vec, "col") -> (mut mat)
 
 A 'type \"row\"' or 'type \"col\"' marker is needed
 to indicate the new matrix's orientation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19115,6 +19976,7 @@ mat(vec, "row") -> (mut mat)
 
 A 'type \"row\"' or 'type \"col\"' marker is needed
 to indicate the new matrix's orientation.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19130,6 +19992,7 @@ to indicate the new matrix's orientation.
 ```rust
 mat(edit float[], nat rows) -> (mut mat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19154,6 +20017,7 @@ mat(edit float[], nat rows) -> (mut mat)
 ```rust
 mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19176,6 +20040,7 @@ mat(edit circular, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```rust
 mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19198,6 +20063,7 @@ mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```rust
 mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19220,6 +20086,7 @@ mat(edit arena, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```rust
 mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19242,6 +20109,7 @@ mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```rust
 mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19258,7 +20126,7 @@ mat(new FLOATS, nat rows, nat cols) -> (mut mat) with effects FLOATS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19271,6 +20139,7 @@ free(mut any ptr) -> ()
 ```rust
 mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19287,7 +20156,7 @@ mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) with effects FLOATS
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19300,6 +20169,7 @@ free(mut any ptr) -> ()
 ```rust
 coo(sparse_element[], nat rows, nat cols) -> (mut coo)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19317,6 +20187,7 @@ coo(nat rows, nat cols, nat nnz) -> (mut coo)
 ```
 
 This creates a new buffer of sparse elements for convenience.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19333,7 +20204,7 @@ This creates a new buffer of sparse elements for convenience.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19350,6 +20221,7 @@ tagged(cstr) -> (tagged)
 
 Ensures that 'tag ptr' has a unique type and allocates at least a cstr's
 (a pointer's) worth of storage so that tag checking is always valid.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19366,6 +20238,7 @@ Ensures that 'tag ptr' has a unique type and allocates at least a cstr's
 ```rust
 unsafe_match(tagged ptr obj, cstr name, any ptr type) -> (mut any ptr {follows any ptr type})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19388,6 +20261,7 @@ unsafe_match(tagged ptr obj, cstr name, any ptr type) -> (mut any ptr {follows a
 ```rust
 unsafe_defer_free(mut tagged ptr) -> (mut tagged ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19397,7 +20271,7 @@ unsafe_defer_free(mut tagged ptr) -> (mut tagged ptr)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19411,6 +20285,7 @@ free(mut any ptr) -> ()
 ```rust
 tagged_alloc(edit arena, nat size) -> (mut char ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19433,6 +20308,7 @@ tagged_alloc(edit arena, nat size) -> (mut char ptr)
 ```rust
 match(cstr obj, cstr type_name) -> (mut char[])
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19452,7 +20328,7 @@ match(cstr obj, cstr type_name) -> (mut char[])
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19465,6 +20341,7 @@ free(mut any ptr) -> ()
 ```rust
 match(cstr obj, cstr type_name) -> (mut char[])
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19484,7 +20361,7 @@ match(cstr obj, cstr type_name) -> (mut char[])
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19502,6 +20379,7 @@ pipe(cstr) -> (pipe)
 Ensures that 'pipe ptr' has a unique type and allocates at least a cstr's
 (a pointer's) + sizeof(mutex_t) worth of storage so that tag checking and
 mutex checking are always valid.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19518,6 +20396,7 @@ mutex checking are always valid.
 ```rust
 mutex_size() -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19534,6 +20413,7 @@ mutex_size() -> (nat)
 ```rust
 unsafe_pipe_lock(pipe ptr) -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19550,6 +20430,7 @@ unsafe_pipe_lock(pipe ptr) -> ()
 ```rust
 unsafe_pipe_unlock(pipe ptr) -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19568,6 +20449,7 @@ with(pipe ptr) -> (with)
 ```
 
 This blocks other threads from accessing its data.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19577,7 +20459,7 @@ This blocks other threads from accessing its data.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 unsafe_pipe_unlock(pipe ptr) -> ()
@@ -19591,6 +20473,7 @@ unsafe_pipe_unlock(pipe ptr) -> ()
 ```rust
 system_thread(any ptr) -> (system_thread)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19607,6 +20490,7 @@ system_thread(any ptr) -> (system_thread)
 ```rust
 unsafe_spawn((pipe ptr) -> () func, pipe ptr input) -> (system_thread)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19623,6 +20507,7 @@ unsafe_spawn((pipe ptr) -> () func, pipe ptr input) -> (system_thread)
 ```rust
 join(system_thread) -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19639,6 +20524,7 @@ join(system_thread) -> ()
 ```rust
 cpu(nat) -> (cpu)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19655,6 +20541,7 @@ cpu(nat) -> (cpu)
 ```rust
 growing_thread_pool(cpu) -> (edit growing_thread_pool)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19672,7 +20559,7 @@ growing_thread_pool(cpu) -> (edit growing_thread_pool)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19695,6 +20582,7 @@ join(system_thread) -> ()
 ```rust
 thread(edit growing_thread_pool, (pipe ptr) -> () func, pipe ptr input) -> (mut system_thread) with effects THREADS
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19718,6 +20606,7 @@ thread(edit growing_thread_pool, (pipe ptr) -> () func, pipe ptr input) -> (mut 
 ```rust
 unsafe_pipe_match(with, cstr name, any ptr type) -> (mut any ptr {follows any ptr type})
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19740,6 +20629,7 @@ unsafe_pipe_match(with, cstr name, any ptr type) -> (mut any ptr {follows any pt
 ```rust
 unsafe_pipe_defer_free(mut pipe ptr) -> (mut pipe ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19749,7 +20639,7 @@ unsafe_pipe_defer_free(mut pipe ptr) -> (mut pipe ptr)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19763,6 +20653,7 @@ free(mut any ptr) -> ()
 ```rust
 unsafe_pipe_mutax_init(mut pipe ptr) -> (mut pipe ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19772,7 +20663,7 @@ unsafe_pipe_mutax_init(mut pipe ptr) -> (mut pipe ptr)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
@@ -19786,6 +20677,7 @@ add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
 ```rust
 pipe_alloc(edit arena, nat size) -> (mut char ptr)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19808,6 +20700,7 @@ pipe_alloc(edit arena, nat size) -> (mut char ptr)
 ```rust
 shared(cstr) -> (mut char[])
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19831,7 +20724,7 @@ shared(cstr) -> (mut char[])
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19844,6 +20737,7 @@ free(mut any ptr) -> ()
 ```rust
 shared(cstr surface, cstr obj) -> (mut char[])
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19868,7 +20762,7 @@ shared(cstr surface, cstr obj) -> (mut char[])
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -19891,6 +20785,7 @@ calling function mutable arguments and calling function outputs,
 as those have the intent of immediate reuse.
 
 *Warning: Its usage in unsafe and guarded under std/unsafe.s.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19916,6 +20811,7 @@ free(mut any ptr) -> ()
 Frees allocated memory.
 
 *Warning: Its usage in unsafe and guarded under std/unsafe.s.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19936,6 +20832,7 @@ zero(any ptr allocated, nat from, nat to) -> ()
 Memsets a memory region to zero.
 
 *Warning: Its usage in unsafe and guarded under std/unsafe.s.*
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19952,6 +20849,7 @@ Memsets a memory region to zero.
 ```rust
 color(nat _r, nat _g, nat _b) -> (nat8 r, nat8 g, nat8 b, nat8 a)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19972,6 +20870,7 @@ color(nat _r, nat _g, nat _b) -> (nat8 r, nat8 g, nat8 b, nat8 a)
 ```rust
 color(nat _r, nat _g, nat _b, nat _a) -> (nat8 r, nat8 g, nat8 b, nat8 a)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -19993,6 +20892,7 @@ color(nat _r, nat _g, nat _b, nat _a) -> (nat8 r, nat8 g, nat8 b, nat8 a)
 ```rust
 position(float x, float y) -> (float x, float y)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20009,6 +20909,7 @@ position(float x, float y) -> (float x, float y)
 ```rust
 size(float width, float height) -> (float width, float height)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20025,6 +20926,7 @@ size(float width, float height) -> (float width, float height)
 ```rust
 unsafe_open_window(float size.width, float size.height, cstr title, cstr font_path) -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20042,6 +20944,7 @@ unsafe_open_window(float size.width, float size.height, cstr title, cstr font_pa
 ```rust
 window(float size.width, float size.height, cstr title, cstr font_path) -> (edit window)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20058,6 +20961,7 @@ window(float size.width, float size.height, cstr title, cstr font_path) -> (edit
 ```rust
 is_open(edit window) -> (bool) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20075,6 +20979,7 @@ is_open(edit window) -> (bool) with effects WINDOW
 ```rust
 unsafe_begin_drawing() -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20092,6 +20997,7 @@ unsafe_begin_drawing() -> ()
 ```rust
 unsafe_end_drawing() -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20109,6 +21015,7 @@ unsafe_end_drawing() -> ()
 ```rust
 draw(edit window) -> (bool) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20123,7 +21030,7 @@ draw(edit window) -> (bool) with effects WINDOW
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 unsafe_end_drawing() -> ()
@@ -20137,6 +21044,7 @@ unsafe_end_drawing() -> ()
 ```rust
 clear(edit window, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20154,6 +21062,7 @@ clear(edit window, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> ()
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20170,6 +21079,7 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20186,6 +21096,7 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20202,6 +21113,7 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 ```rust
 text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20218,6 +21130,7 @@ text(edit window, str, float pos.x, float pos.y, float size, nat8 color.r, nat8 
 ```rust
 text(edit window, cstr txt, float pos.x, float pos.y, float size, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20235,6 +21148,7 @@ text(edit window, cstr txt, float pos.x, float pos.y, float size, nat8 color.r, 
 ```rust
 sleep(nat) -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20252,6 +21166,7 @@ sleep(nat) -> ()
 ```rust
 TextureData(nat id, float size.width, float size.height, nat mipmaps, nat format) -> (nat id, float size.width, float size.height, nat mipmaps, nat format)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20268,6 +21183,7 @@ TextureData(nat id, float size.width, float size.height, nat mipmaps, nat format
 ```rust
 Texture(nat id, float size.width, float size.height, nat mipmaps, nat format) -> (Texture)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20284,7 +21200,7 @@ Texture(nat id, float size.width, float size.height, nat mipmaps, nat format) ->
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -20298,6 +21214,7 @@ free(mut any ptr) -> ()
 ```rust
 open(cstr) -> (Texture)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20314,7 +21231,7 @@ open(cstr) -> (Texture)
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -20328,6 +21245,7 @@ free(mut any ptr) -> ()
 ```rust
 texture(edit window, Texture, float pos.x, float pos.y, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20349,6 +21267,7 @@ texture(edit window, Texture, float pos.x, float pos.y, float size.width, float 
 ```rust
 texture(edit window, Texture, float pos.x, float pos.y, float scale, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20370,6 +21289,7 @@ texture(edit window, Texture, float pos.x, float pos.y, float scale, nat8 color.
 ```rust
 texture(edit window, Texture, float pos.x, float pos.y, float size.width, float size.height, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float rotation) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20392,6 +21312,7 @@ texture(edit window, Texture, float pos.x, float pos.y, float size.width, float 
 ```rust
 texture(edit window, Texture, float pos.x, float pos.y, float scale, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float rotation) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20413,6 +21334,7 @@ texture(edit window, Texture, float pos.x, float pos.y, float scale, nat8 color.
 ```rust
 texture(edit window, Texture, float pos.x, float pos.y, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20435,6 +21357,7 @@ texture(edit window, Texture, float pos.x, float pos.y, nat8 color.r, nat8 color
 ```rust
 circ(edit window, float pos.x, float pos.y, float radius, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20451,6 +21374,7 @@ circ(edit window, float pos.x, float pos.y, float radius, "solid", nat8 color.r,
 ```rust
 circ(edit window, float pos.x, float pos.y, float radius, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20468,6 +21392,7 @@ circ(edit window, float pos.x, float pos.y, float radius, "line", nat thickness,
 ```rust
 ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20483,6 +21408,7 @@ ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, "
 ```rust
 ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20499,6 +21425,7 @@ ellipse(edit window, float pos.x, float pos.y, float radius.x, float radius.y, "
 ```rust
 line(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20516,6 +21443,7 @@ line(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float thicknes
 ```rust
 rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20532,6 +21460,7 @@ rect(edit window, float pos.x, float pos.y, float size.width, float size.height,
 ```rust
 rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20548,6 +21477,7 @@ rect(edit window, float pos.x, float pos.y, float size.width, float size.height,
 ```rust
 rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a, "rotate", float origin.x, float origin.y, float rotation) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20564,6 +21494,7 @@ rect(edit window, float pos.x, float pos.y, float size.width, float size.height,
 ```rust
 tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, float p3.y, "line", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20580,6 +21511,7 @@ tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, flo
 ```rust
 tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, float p3.y, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20597,6 +21529,7 @@ tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, flo
 ```rust
 dt(window) -> (float) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20614,6 +21547,7 @@ dt(window) -> (float) with effects WINDOW
 ```rust
 uptime(window) -> (float) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20631,6 +21565,7 @@ uptime(window) -> (float) with effects WINDOW
 ```rust
 key_down(window, nat key) -> (bool) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20648,6 +21583,7 @@ key_down(window, nat key) -> (bool) with effects WINDOW
 ```rust
 key_pressed(edit window, nat key) -> (bool) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20665,6 +21601,7 @@ key_pressed(edit window, nat key) -> (bool) with effects WINDOW
 ```rust
 key_released(edit window, nat key) -> (bool) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20682,6 +21619,7 @@ key_released(edit window, nat key) -> (bool) with effects WINDOW
 ```rust
 mouse_pos(window) -> (float x, float y) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20699,6 +21637,7 @@ mouse_pos(window) -> (float x, float y) with effects WINDOW
 ```rust
 mouse_down(window, nat button) -> (bool) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20716,6 +21655,7 @@ mouse_down(window, nat button) -> (bool) with effects WINDOW
 ```rust
 mouse_pressed(edit window, nat button) -> (bool) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -20733,6 +21673,7 @@ mouse_pressed(edit window, nat button) -> (bool) with effects WINDOW
 ```rust
 mouse_wheel(window) -> (float) with effects WINDOW
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21677,6 +22618,7 @@ float ptr() -> (mut float ptr)
 ```rust
 to_number(nat) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21692,6 +22634,7 @@ to_number(nat) -> (nat)
 ```rust
 to_number(int) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21707,6 +22650,7 @@ to_number(int) -> (int)
 ```rust
 to_number(float) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21722,6 +22666,7 @@ to_number(float) -> (float)
 ```rust
 to_number(nat ptr) -> (nat)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21742,6 +22687,7 @@ to_number(nat ptr) -> (nat)
 ```rust
 to_number(int ptr) -> (int)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21762,6 +22708,7 @@ to_number(int ptr) -> (int)
 ```rust
 to_number(float ptr) -> (float)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21783,6 +22730,7 @@ to_number(float ptr) -> (float)
 ```rust
 already_defined(nat x, nat y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21798,6 +22746,7 @@ already_defined(nat x, nat y) -> (true)
 ```rust
 already_defined(nat x, int y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21813,6 +22762,7 @@ already_defined(nat x, int y) -> (true)
 ```rust
 already_defined(nat x, float y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21828,6 +22778,7 @@ already_defined(nat x, float y) -> (true)
 ```rust
 already_defined(nat x, nat ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21843,6 +22794,7 @@ already_defined(nat x, nat ptr y) -> (false)
 ```rust
 already_defined(nat x, int ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21858,6 +22810,7 @@ already_defined(nat x, int ptr y) -> (false)
 ```rust
 already_defined(nat x, float ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21873,6 +22826,7 @@ already_defined(nat x, float ptr y) -> (false)
 ```rust
 already_defined(int x, nat y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21888,6 +22842,7 @@ already_defined(int x, nat y) -> (true)
 ```rust
 already_defined(int x, int y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21903,6 +22858,7 @@ already_defined(int x, int y) -> (true)
 ```rust
 already_defined(int x, float y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21918,6 +22874,7 @@ already_defined(int x, float y) -> (true)
 ```rust
 already_defined(int x, nat ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21933,6 +22890,7 @@ already_defined(int x, nat ptr y) -> (false)
 ```rust
 already_defined(int x, int ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21948,6 +22906,7 @@ already_defined(int x, int ptr y) -> (false)
 ```rust
 already_defined(int x, float ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21963,6 +22922,7 @@ already_defined(int x, float ptr y) -> (false)
 ```rust
 already_defined(float x, nat y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21978,6 +22938,7 @@ already_defined(float x, nat y) -> (true)
 ```rust
 already_defined(float x, int y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -21993,6 +22954,7 @@ already_defined(float x, int y) -> (true)
 ```rust
 already_defined(float x, float y) -> (true)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22008,6 +22970,7 @@ already_defined(float x, float y) -> (true)
 ```rust
 already_defined(float x, nat ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22023,6 +22986,7 @@ already_defined(float x, nat ptr y) -> (false)
 ```rust
 already_defined(float x, int ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22038,6 +23002,7 @@ already_defined(float x, int ptr y) -> (false)
 ```rust
 already_defined(float x, float ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22053,6 +23018,7 @@ already_defined(float x, float ptr y) -> (false)
 ```rust
 already_defined(nat ptr x, nat y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22068,6 +23034,7 @@ already_defined(nat ptr x, nat y) -> (false)
 ```rust
 already_defined(nat ptr x, int y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22083,6 +23050,7 @@ already_defined(nat ptr x, int y) -> (false)
 ```rust
 already_defined(nat ptr x, float y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22098,6 +23066,7 @@ already_defined(nat ptr x, float y) -> (false)
 ```rust
 already_defined(nat ptr x, nat ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22113,6 +23082,7 @@ already_defined(nat ptr x, nat ptr y) -> (false)
 ```rust
 already_defined(nat ptr x, int ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22128,6 +23098,7 @@ already_defined(nat ptr x, int ptr y) -> (false)
 ```rust
 already_defined(nat ptr x, float ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22143,6 +23114,7 @@ already_defined(nat ptr x, float ptr y) -> (false)
 ```rust
 already_defined(int ptr x, nat y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22158,6 +23130,7 @@ already_defined(int ptr x, nat y) -> (false)
 ```rust
 already_defined(int ptr x, int y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22173,6 +23146,7 @@ already_defined(int ptr x, int y) -> (false)
 ```rust
 already_defined(int ptr x, float y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22188,6 +23162,7 @@ already_defined(int ptr x, float y) -> (false)
 ```rust
 already_defined(int ptr x, nat ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22203,6 +23178,7 @@ already_defined(int ptr x, nat ptr y) -> (false)
 ```rust
 already_defined(int ptr x, int ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22218,6 +23194,7 @@ already_defined(int ptr x, int ptr y) -> (false)
 ```rust
 already_defined(int ptr x, float ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22233,6 +23210,7 @@ already_defined(int ptr x, float ptr y) -> (false)
 ```rust
 already_defined(float ptr x, nat y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22248,6 +23226,7 @@ already_defined(float ptr x, nat y) -> (false)
 ```rust
 already_defined(float ptr x, int y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22263,6 +23242,7 @@ already_defined(float ptr x, int y) -> (false)
 ```rust
 already_defined(float ptr x, float y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22278,6 +23258,7 @@ already_defined(float ptr x, float y) -> (false)
 ```rust
 already_defined(float ptr x, nat ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22293,6 +23274,7 @@ already_defined(float ptr x, nat ptr y) -> (false)
 ```rust
 already_defined(float ptr x, int ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22308,6 +23290,7 @@ already_defined(float ptr x, int ptr y) -> (false)
 ```rust
 already_defined(float ptr x, float ptr y) -> (false)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22334,6 +23317,7 @@ cstr(cstr cstr, str) -> (cstr)
 
 This function's return is meant to be passed to operating system calls,
 or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22352,6 +23336,7 @@ cstr(unsafe_temp) -> (cstr)
 
 This function's return is meant to be passed to operating system calls,
 or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22370,6 +23355,7 @@ cstr(unsafe_temp) -> (cstr)
 
 This function's return is meant to be passed to operating system calls,
 or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22388,6 +23374,7 @@ str(cstr) -> (str)
 
 Defines an implicit constant buffer using the cstr's memory data.
 Subsequent comparisons no longer use the underlying pointer value.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22407,6 +23394,7 @@ str(char[], nat endpos, "from", nat pos) -> (str)
 The string automatically detects the first character,
 which is generally tracked for fewer indirections
 on comparisons of unequal strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22435,6 +23423,7 @@ str(char[], nat pos, "to", nat endpos) -> (str)
 The string automatically detects the first character,
 which is generally tracked for fewer indirections
 on comparisons of unequal strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22463,6 +23452,7 @@ str(char[], nat pos, "len", nat length) -> (str)
 The string automatically detects the first character,
 which is generally tracked for fewer indirections
 on comparisons of unequal strings.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22486,6 +23476,7 @@ on comparisons of unequal strings.
 ```rust
 str(str) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22501,6 +23492,7 @@ str(str) -> (str)
 ```rust
 str(char[]) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22525,6 +23517,7 @@ str(char[]) -> (str)
 ```rust
 str(char[], nat length) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22549,6 +23542,7 @@ str(char[], nat length) -> (str)
 ```rust
 str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22570,6 +23564,7 @@ str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```rust
 str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22585,6 +23580,7 @@ str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
 ```rust
 str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str)
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22603,6 +23599,7 @@ str(new CHARS, console console) -> (str) with effects CHARS
 
 The read string is placed onto memory that keeps being reallocated to accommodate its size.
 The resulting memory will consume exactly the required size in bytes.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22628,7 +23625,7 @@ The resulting memory will consume exactly the required size in bytes.
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 free(mut any ptr) -> ()
@@ -22649,6 +23646,7 @@ string with this function, which can then be compared.
 This comparison is also one numerical comparison, as
 care is taken for all cstr to point to the same memory
 location.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22666,6 +23664,7 @@ str(edit arena, console console) -> (str) with effects CHARS
 ```
 
 The read string is placed on an arena while consuming only the necessarily minimum size.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22693,6 +23692,7 @@ The read string is placed on an arena while consuming only the necessarily minim
 ```rust
 run(console CLI, str) -> (cstr) with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22719,6 +23719,7 @@ run(console CLI, str) -> (cstr) with effects CLI
 ```rust
 run(console CLI, cstr command) -> (cstr) with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22741,6 +23742,7 @@ run(console CLI, cstr command) -> (cstr) with effects CLI
 ```rust
 print_marker(colors, "pending") -> () with effects colors
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22756,6 +23758,7 @@ print_marker(colors, "pending") -> () with effects colors
 ```rust
 print_marker(colors, "failure") -> () with effects colors
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22771,6 +23774,7 @@ print_marker(colors, "failure") -> () with effects colors
 ```rust
 print_marker(colors, "success") -> () with effects colors
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22787,6 +23791,7 @@ print_marker(colors, "success") -> () with effects colors
 ```rust
 restore_stdout(int) -> ()
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22803,6 +23808,7 @@ restore_stdout(int) -> ()
 ```rust
 stdout_to_err(console) -> (int) with effects CLI
 ```
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22812,7 +23818,7 @@ stdout_to_err(console) -> (int) with effects CLI
 </details>
 
 
-<details><summary>Defered callss</summary>
+<details><summary>Defered calls</summary>
 
 ```rust
 restore_stdout(int) -> ()
@@ -22829,6 +23835,7 @@ assert(console CLI, bool condition, cstr text) -> () with effects CLI
 
 This outputs to stderr, so that asserts are printed
 even if stout is suppressed during the 'test' function.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22853,6 +23860,7 @@ test(colors, str) -> (bool) with effects colors
 
 Returns whether the command succeeded or not.
 A completion assert is performed at the end.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -22882,6 +23890,7 @@ test(colors, str, bool should_fail) -> (bool) with effects colors
 
 Returns whether the command succeeded or not.
 A completion assert is performed at the end.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)

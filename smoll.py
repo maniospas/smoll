@@ -7221,7 +7221,7 @@ async def main():
                     if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
                     spawned_error_codes = callee.spawned_error_codes
                     if len(callee.implementation):
-                        docs_file.write("<details><summary>Complexity</summary>\n\n")
+                        docs_file.write("\n<details><summary>Complexity</summary>\n\n")
                         docs_file.write("- Level of abstraction: "+str(max(0,callee.min_abstraction_level))+" to "+str(callee.max_abstraction_level)+" (0 are builtins or raw C code, 1 calls those, etc.)\n")
                         docs_file.write("- SSA variables: "+str(len(callee.vars))+"\n")
                         docs_file.write("- Transpiled C size: "+str(len(callee.implementation))+"\n\n")
@@ -7239,7 +7239,7 @@ async def main():
                         docs_file.write("</details>\n\n")
                     docs_file.write("\n")
                     if callee.returned_defers: 
-                        docs_file.write("<details><summary>Defered callss</summary>\n\n")
+                        docs_file.write("<details><summary>Defered calls</summary>\n\n")
                         for defer in callee.returned_defers: docs_file.write("```rust\n"+code_summary(defer, callee)+"```\n")
                         docs_file.write("</details>\n\n")
                     singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]

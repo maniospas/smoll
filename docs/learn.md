@@ -1,8 +1,8 @@
-# Learn
+# Learn smo<span>λ</span>
 
-We will cover the basics of *smoλ* here. This covers the few features that are responsible
-for most code written in the language. Find a complete list of 
-concepts in the <a href="reference.html">reference guide</a>.
+We will cover the basics of *smoλ* here. Try examples in your browser or 
+install the language by following the instructions <a href="install.html">here</a>. 
+Find a complete list of concepts in the <a href="reference.html">reference guide</a>.
 
 <div class="toc" markdown="1">
 
@@ -20,7 +20,7 @@ _9._ [what next?](#what-next) <br>
 
 ## hello world!
 
-Our first program consists -traditionally- of printing a greeting statement.
+In accordance to tradition, our first program below greets everyone!
 We use the `repo` instruction to tell the language that it should automatically download
 code under *std/* from a corresponding web URL (download code is stored in a *.cache* folder).
 Following examples will not have this command for brevity.
@@ -269,7 +269,7 @@ def main()
     else
         message = greeting()
         print 0
-    print message  # ERROR MESSAGE: the variable message.unsafe_ptr could have been invalidated due to line 9
+    print message  # CREATES AN ERROR
 ```
 
 The error message lets us know that the *message* resource was created within a condition or loop

@@ -31,7 +31,7 @@ def alloc(nat bytes)
     if not exists allocated fail "allocation failed"
     return unsafe_mut allocated
 
-def realloc(any ptr allocated, nat bytes)
+def realloc(any ptr allocated, nat bytes, "super_unsafe"|blank unsafe_invalidation_policy)
     doc "reallocate memory"
     doc "Reallocates an allocated memory pointer, potentially invalidating"
     doc "the original one without any safety. As a stopgap measure against"
@@ -45,7 +45,8 @@ def realloc(any ptr allocated, nat bytes)
     {else{new_allocated=malloc(bytes);}}
     if not exists new_allocated fail "reallocation failed"
     {allocated=new_allocated;}
-    INVALIDATE compiler::ptr
+    if unsafe_invalidation_policy is blank
+        INVALIDATE compiler::ptr
     return new_allocated.compiler::unsafe_attach_type(allocated)
 
 def free(mut any ptr allocated)
@@ -70,3 +71,21 @@ def add(any ptr allocated, nat offset)
     {builtins::compiler::ptr element = allocated + offset;}
     return element.compiler::unsafe_attach_type(allocated)
 
+def dereference_ptr(any ptr allocated)
+    doc "dereference a pointer pointing to a pointer"
+    doc "Pointers directly pointing to pointers induce both indirection"
+    doc "and unsafety to the degree that idiomatic code just cannot do"
+    doc "without massive safety violations that the unsafety-inducing"
+    doc "model is not equipped to bypass without invalidating the"
+    doc "type system or derefencing mechanisms. This function performs"
+    doc "a well-controlled indirection instead that does not leave"
+    doc "any safety tracking residues AT ALL when called."
+    doc "To make absolutely sure that using this is properly understood"
+    doc "the result is an immutable pointer, which often needs to be pass"
+    doc "through `unsafe_mut`, for example to be freed."
+    doc ""
+    doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
+    {builtins::compiler::ptr ret = 0;}
+    ptr_size = compiler::size compiler::ptr()
+    {memcpy(&ret, allocated, ptr_size);}
+    return ret

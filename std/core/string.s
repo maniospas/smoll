@@ -27,7 +27,7 @@ local def alloc(effect edit new CHARS, nat length)
     if not try ret = mut allocated(char[].alloc length, 0)
         fail "allocation failed"
     return ret
-def char_allocator = new|arena<char::tag>|circular<char::tag>|list<char::tag>
+def char_allocator = new|bucket|arena<char::tag>|circular<char::tag>|list<char::tag>
 
 def exists(cstr c)
     doc "checks whether a cstr is not zero-initialized"
@@ -129,6 +129,9 @@ def neq(char x, char y)
     {builtins::bool z = (x!=y);}
     return z
 
+local def alloc(edit bucket CHARS, nat length)
+    return allocated(char[].alloc(CHARS, length), 0)
+
 def copy(effect edit char_allocator CHARS, str|cstr _other)
     doc "copy a string"
     doc "The result is a fresh string in a new memory surface effect CHARS."
@@ -140,9 +143,10 @@ def copy(effect edit char_allocator CHARS, str|cstr _other)
     doc "sequencing. Strings remain valid slices of allocated memory regions"
     doc "without runtime failures; they always preserve their size."
     other = str _other
-    surface = alloc(CHARS, len other)
+    surface = alloc(CHARS, other.dat.length)
     {memcpy(surface__buf__unsafe_ptr+surface__pos+surface__buf__unsafe_offset, other__unsafe_ptr+other__dat__pos, other__dat__length);}
-    compiler::unsafe_declare_deep_copy_only()
+    if CHARS is char_allocator\bucket
+        compiler::unsafe_declare_deep_copy_only()
     unsafe_valid CHARS
     return str(surface.buf, surface.pos, other.dat.length, other.dat.first)
 
@@ -154,7 +158,8 @@ def copy_null_terminated(effect new CHARS, str other)
     {memcpy(buf__unsafe_ptr, other__unsafe_ptr+other__dat__pos, other__dat__length);}
     {builtins::compiler::ptr endpos = buf__unsafe_ptr+other__dat__length;}
     {*endpos = 0;}
-    compiler::unsafe_declare_deep_copy_only()
+    if CHARS is char_allocator\bucket
+        compiler::unsafe_declare_deep_copy_only()
     return str(buf, 0, other.dat.length, other.dat.first)
 
 def unsafe_temp(str|blank prefix, str other)
@@ -195,8 +200,6 @@ def unsafe_temp(str|blank prefix, str other)
         _ret = str.unsafe_ptr.unsafe::add str.dat.pos
         {builtins::cstr cstr = _ret;}
         return class(cstr, str)
-
-
 
 def unsafe_temp(cstr cstr)
     doc "tautology function for cstr"

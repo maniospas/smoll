@@ -17,11 +17,49 @@
 local import std.core.builtinsext
 local import std.core.array
 local import std.unsafe as unsafe
+local import compiler as cp
 
 def new()
-    doc "allocations on new bufs"
+    doc "allocations on new memory"
     return class()
 
+local def bucket_contents()
+    return class (
+        assigned elements = mut unsafe::alloc cp::size cp::ptr(),
+        assigned size = mut 0,
+        assigned allocated = mut 0
+    )
+
+def bucket()
+    doc "grouped allocations on new memory"
+    doc "This is similar to 'new' but moves all allocated memory together,"
+    doc "releasing it only when there is no further use for any of its contents."
+    doc "Do note that this operation is typically the lazy-person's way out,"
+    doc "as it acquires and releases memory using one extra layer of indirection"
+    doc "compared to structures like arenas. On the other hand, it's pretty versatile"
+    doc "for holding conditional results. Example:"
+    doc "```python"
+    doc "import std.core"
+    doc "def conditional(bool case)"
+    doc "    CHARS = edit bucket()"
+    doc "    if case  s = copy 123"
+    doc "    else     s = copy 345"
+    doc "    return (s, CHARS) # this would not be possible with 'CHARS = new()'"
+    doc "def main()"
+    doc "    CLI = edit console()"
+    doc "    print conditional true"
+    doc "    print conditional false"
+    doc "```"
+    unsafe_ptr = mut bucket_contents[].alloc(1 unsafe_leaky).unsafe_ptr
+    defer
+        contents = mut cp::deref unsafe_ptr
+        for i in range of contents.size
+            position = contents.elements.unsafe::add(i*cp::size cp::ptr())
+            unsafe::free unsafe_mut unsafe::dereference_ptr position
+        unsafe::free contents.elements
+        unsafe::free unsafe_ptr
+    return class(unsafe_ptr)
+    
 def arena(edit any[] buf, nat _pos)
     doc "a buffer and mutable position pair"
     doc "This structure is often used to track the size of allocated"
@@ -118,6 +156,51 @@ def alloc(edit arena allocator, nat|blank length)
     pos = allocator.pos+0
     allocator.pos = next_pos
     return allocated(allocator.buf, pos)
+
+local def unsafe_alloc(edit bucket allocator, nat|blank bytes)
+    doc "bucket allocation"
+    if bytes is blank
+        bytes = 1
+        doc "Creates room for one element."
+    contents = mut cp::deref allocator.unsafe_ptr
+    prev_size = contents.size+0
+    contents.size = contents.size+1
+    if contents.size>=contents.allocated
+        contents.allocated = (contents.allocated*2)+1
+        new_elements = unsafe_mut contents.elements.unsafe::realloc (contents.allocated*cp::size cp::ptr() super_unsafe)
+        contents.elements = new_elements&
+    position_ptr = contents.elements.unsafe::add(prev_size*cp::size cp::ptr())
+    new_allocation = unsafe_mut unsafe::alloc bytes
+    ptr_size = cp::size cp::ptr()
+    {memcpy(position_ptr, &new_allocation, ptr_size);}
+    allocator.unsafe_ptr = contents
+    return new_allocation
+
+def alloc(edit any[] buffer, edit bucket BUCKET, nat|blank size, "unsafe_first"|"dirty"|blank clear_policy)
+    doc "allocates a buffer"
+    doc "Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,"
+    doc "as it never reallocates an allocation. The allocated memory is tracked alongside others on"
+    doc "an allocation bucket, so that they are released all together. This strategy entangles the"
+    doc "return with the bucket, but at least ensures that only one easy-to-track bucket should be"
+    doc "moved across functions."
+    if size is blank
+        doc "This version allocates a buffer of ONE element."
+        size = 1
+    if buffer.unsafe_size==size and size!=0 
+        buffer.unsafe_ptr.unsafe::zero(0, buffer.unsafe_align.nat()*size)
+        return buffer
+    if clear_policy is blank|"dirty"
+        if buffer.unsafe_size!=0 
+            fail "cannot resize buffers with alloc; it promises no data reallocation"
+    bytes = buffer.unsafe_align.nat()*size
+    if leak_policy is blank
+        if bytes==0
+            fail "cannot allocate a buffer of unsized type"
+    buffer.unsafe_size = size
+    buffer.unsafe_ptr = ref BUCKET.unsafe_alloc(bytes)&
+    if clear_policy is blank
+        buffer.unsafe_ptr.unsafe::zero(0, bytes)
+    unsafe_return buffer
 
 def alloc(edit circular allocator, nat|blank length)
     doc "circular arena allocation"

@@ -33,11 +33,12 @@ def alloc(edit any[] buffer, nat|blank size, "unsafe_first"|"dirty"|blank clear_
     if size is blank
         doc "This version allocates a buffer of ONE element."
         size = 1
-    defer
-        # unsafe_console().print "free"
-        # if not exists buffer.unsafe_ptr
-        #     unsafe_console().print "sjip"
-        buffer.unsafe_ptr.unsafe::free()
+    if leak_policy is blank
+        defer
+            # unsafe_console().print "free"
+            # if not exists buffer.unsafe_ptr
+            #     unsafe_console().print "sjip"
+            buffer.unsafe_ptr.unsafe::free()
     #unsafe_console().print "alloc"
     if buffer.unsafe_size==size and size!=0 
         buffer.unsafe_ptr.unsafe::zero(0, buffer.unsafe_align.nat()*size)

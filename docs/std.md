@@ -11594,7 +11594,7 @@ bucket() -> (edit bucket)
 
 This is similar to 'new' but moves all allocated memory together,
 releasing it only when there is no further use for any of its contents.
-Do note that this operation is typically the lazy-person's way out,
+Do note that this operation is typically the lazy way out,
 as it acquires and releases memory using one extra layer of indirection
 compared to structures like arenas. On the other hand, it's pretty versatile
 for holding conditional results. Example:
@@ -11621,9 +11621,9 @@ def main()
 
 <details><summary>Potential errors</summary>
 
-10. allocation failed
+1.  allocation failed
 2. null pointer
-13. cannot resize buffers with alloc; it promises no data reallocation
+3.  cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 

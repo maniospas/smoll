@@ -34,7 +34,7 @@ def bucket()
     doc "grouped allocations on new memory"
     doc "This is similar to 'new' but moves all allocated memory together,"
     doc "releasing it only when there is no further use for any of its contents."
-    doc "Do note that this operation is typically the lazy-person's way out,"
+    doc "Do note that this operation is typically the lazy way out,"
     doc "as it acquires and releases memory using one extra layer of indirection"
     doc "compared to structures like arenas. On the other hand, it's pretty versatile"
     doc "for holding conditional results. Example:"

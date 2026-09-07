@@ -5480,11 +5480,16 @@ def release_defers(impl: ImplementedType, at: Token):
     for should_invalid in rets:
         if impl.invalidated.get(should_invalid) is not None and (impl.vars[should_invalid].immutable or impl.vars[should_invalid].type==POINTER_TYPE) and impl.invalidated.get(should_invalid).text!="del":
             impl.accumulating_defers[-1][should_invalid].error("safety", "an automatic defer is overruled later by another defer for immutable variable '"+pretty_name(should_invalid)+"'", reason=impl.invalidated.get(should_invalid), raason_message="due to being released in the loop", suggestions=["create a (temporary) copy", "use 'unsafe_valid' if you are sure about pointer and immutable field validity", "initialize the resource before the loop"])
+    accompany_names = set()
+    for v in rets:
+        for accompany in impl.get_required_accompany(impl.vars[v]):
+            accompany_names.add(accompany.name)
+    
     if rets:
         invalidated = set()
         for val in impl.vars.values():
             varname = val.stabilized_name()
-            if impl.get_assignment(varname, rets):
+            if impl.get_assignment(varname, rets) or varname in accompany_names or any(accompany.name in rets for accompany in impl.get_required_accompany(impl.vars[varname])):
                 invalidated.add(val)
                 impl.invalidated[varname] = name
         for invalid_type in impl.invalidate_types_on_defer: # TODO: track defers for each variable to be deleted
@@ -5886,7 +5891,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
         if name.text=="if":
             if_pos = pos-1
             pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
-            if len(ret)!=1: 
+            if len(ret)!=1:
                 if is_lsp and file.is_main_file: print_lsp_keyword(name, "**if**\n\nStart a conditional statement and run a code block if it is true.")
                 name.error("type", "conditions can only evaluate to 'bool' but found '"+signature_like(ret)+"'")
             if ret[0].type==TRUE_TYPE:
@@ -5944,6 +5949,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             impl.accumulating_defers.pop()
             impl.implementation.append(CODEWORD_RBRACKET)
             if peek_text(tokens, pos)=="else":
+                prev_invalidated = {k: v for k, v in impl.invalidated.items()}
                 if is_lsp and file.is_main_file: print_lsp_keyword(get(tokens,pos), "**else**\n\nAlternative to conditional statement.")
                 diff_vars_if = {k: v for k, v in impl.vars.items() if k not in previous_vars}
                 impl.vars = previous_vars
@@ -5967,6 +5973,10 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                         tokens[if_pos].error("safety", "the conditional blocks starting here declares a variable but assume differently whether it is packed in a class '"+pretty_name(k)+"' - perhaps try to 'const' it first")
                     # if var.immutable!=v.immutable:
                     #     tokens[if_pos].error("safety", "the conditional blocks starting here declare a variable but assume differently whether it is immutable '"+k+"'") 
+                for k, v in prev_invalidated.items():
+                    new_invalid = impl.invalidated.get(k, None)
+                    if new_invalid is None:
+                        impl.invalidated[k] = v
                 for k, v in diff_vars_if.items():
                     var = impl.vars.get(k, None)
                     if var is None:

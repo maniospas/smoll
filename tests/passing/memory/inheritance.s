@@ -1,4 +1,5 @@
 import std.core
+import std.test
 
 def Point2D(float x, float y)
     return (x,y)
@@ -23,5 +24,5 @@ def main()
     points[0] = Point3D(1.0,2.0,3.0)
     points[1] = Point3D(1.0,2.0,3.0)
     sums = sum points.plane
-    print sums.x
-    print sums.y
+    assert(sums.x==2.0, "properly summed non-offset subpointer")
+    assert(sums.y==4.0, "properly summed offseted subpointer")

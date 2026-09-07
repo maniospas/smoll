@@ -12,7 +12,8 @@ def safe_main(effect edit console CLI)
     it = edit range of 5
     v = mut vec 10
     while try i=next it
-        v = 2.0*(v1+v2+v)
+        #v = 2.0*(v1+v2+v)  # THIS IS THE CORRECT VERSION
+        v = allocator2.mul(2.0, v1+v2+v) # THIS SHOULD CREATE AN ERROR
     print v[0]
     
 def main()

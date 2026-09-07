@@ -779,35 +779,6 @@ location.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/convertstr.s"><h3 id="int-reads-an-integer-from-the-console">int - reads an integer from the console</h3>
-
-<p><em>Defined in: std/core/convertstr.s line 36</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">int</span><span class="p">(</span><span class="n">console</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 50</li>
-<li>Transpiled C size: 527</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>unexpected end of console read</li>
-<li>user input was not a float</li>
-<li>out of bounds
-</details></li>
-</ol>
-
 </div><div class="std-subsection" data-defined-in="std/core/convertstr.s"><h3 id="int-converts-a-string-to-an-integer">int - converts a string to an integer</h3>
 
 <p><em>Defined in: std/core/convertstr.s line 149</em></p>
@@ -864,6 +835,35 @@ location.</p>
 <li>invalid int conversion from empty string</li>
 <li>invalid int conversion from string with only a sign</li>
 <li>invalid integer int from non-number string</li>
+<li>out of bounds
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/core/convertstr.s"><h3 id="int-reads-an-integer-from-the-console">int - reads an integer from the console</h3>
+
+<p><em>Defined in: std/core/convertstr.s line 36</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">int</span><span class="p">(</span><span class="n">console</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 50</li>
+<li>Transpiled C size: 527</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>unexpected end of console read</li>
+<li>user input was not a float</li>
 <li>out of bounds
 </details></li>
 </ol>
@@ -1042,34 +1042,6 @@ its bit representation interpreted as an unsigned number.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/core/convertstr.s"><h3 id="nat-reads-an-unsigned-integer-from-the-console">nat - reads an unsigned integer from the console</h3>
-
-<p><em>Defined in: std/core/convertstr.s line 60</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">nat</span><span class="p">(</span><span class="n">console</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 36</li>
-<li>Transpiled C size: 390</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="25">
-<li>user input was not a float</li>
-<li>null pointer</li>
-<li>out of bounds
-</details></li>
-</ol>
-
 </div><div class="std-subsection" data-defined-in="std/core/convertstr.s"><h3 id="nat-converts-a-string-to-an-unsigned-integer">nat - converts a string to an unsigned integer</h3>
 
 <p><em>Defined in: std/core/convertstr.s line 172</em></p>
@@ -1124,6 +1096,34 @@ its bit representation interpreted as an unsigned number.</p>
 <li>null pointer</li>
 <li>invalid nat conversion from non-number string</li>
 <li>invalid nat conversion from empty string</li>
+<li>out of bounds
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/core/convertstr.s"><h3 id="nat-reads-an-unsigned-integer-from-the-console">nat - reads an unsigned integer from the console</h3>
+
+<p><em>Defined in: std/core/convertstr.s line 60</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">nat</span><span class="p">(</span><span class="n">console</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 36</li>
+<li>Transpiled C size: 390</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="25">
+<li>user input was not a float</li>
+<li>null pointer</li>
 <li>out of bounds
 </details></li>
 </ol>
@@ -1368,35 +1368,6 @@ If it does not, this operation can fail.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/convertstr.s"><h3 id="float-reads-a-float-from-the-console">float - reads a float from the console</h3>
-
-<p><em>Defined in: std/core/convertstr.s line 80</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">console</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 67</li>
-<li>Transpiled C size: 722</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>unexpected end of console read</li>
-<li>user input was not a float</li>
-<li>out of bounds
-</details></li>
-</ol>
-
 </div><div class="std-subsection" data-defined-in="std/core/convertstr.s"><h3 id="float-converts-a-string-to-a-float">float - converts a string to a float</h3>
 
 <p><em>Defined in: std/core/convertstr.s line 184</em></p>
@@ -1455,6 +1426,35 @@ If it does not, this operation can fail.</p>
 <li>null pointer</li>
 <li>invalid float conversion from non-number string</li>
 <li>invalid float conversion from string without a value after the dot</li>
+<li>out of bounds
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/core/convertstr.s"><h3 id="float-reads-a-float-from-the-console">float - reads a float from the console</h3>
+
+<p><em>Defined in: std/core/convertstr.s line 80</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">float</span><span class="p">(</span><span class="n">console</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 67</li>
+<li>Transpiled C size: 722</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>unexpected end of console read</li>
+<li>user input was not a float</li>
 <li>out of bounds
 </details></li>
 </ol>
@@ -1996,344 +1996,6 @@ two same-content cstr will always have the same memory address.</p>
 
 </div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data">eq - overloads an operator while dereferencing pointer data</h3>
 
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-2">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-3">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-4">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-5">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-6">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-7">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-8">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-9">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-10">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 43</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 5</li>
-<li>Transpiled C size: 61</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-11">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 43</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 103</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-12">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 43</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kt">str</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 103</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-13">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 43</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kt">str</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 13</li>
-<li>Transpiled C size: 145</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-14">eq - overloads an operator while dereferencing pointer data</h3>
-
 <p><em>Defined in: std/ptrpeek.s line 39</em></p>
 
 <div class="codehilite">
@@ -2358,7 +2020,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-15">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-2">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 39</em></p>
 
@@ -2384,7 +2046,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-16">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-3">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 39</em></p>
 
@@ -2410,7 +2072,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-17">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-4">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 39</em></p>
 
@@ -2436,7 +2098,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-18">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-5">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 35</em></p>
 
@@ -2462,7 +2124,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-19">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-6">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 35</em></p>
 
@@ -2488,7 +2150,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-20">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-7">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 35</em></p>
 
@@ -2514,7 +2176,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-21">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-8">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 35</em></p>
 
@@ -2529,6 +2191,344 @@ two same-content cstr will always have the same memory address.</p>
 <li>Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 12</li>
 <li>Transpiled C size: 85</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-9">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-10">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-11">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-12">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-13">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-14">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-15">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-16">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-17">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-18">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 43</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 5</li>
+<li>Transpiled C size: 61</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-19">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 43</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 103</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-20">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 43</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kt">str</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 103</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-21">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 43</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kt">str</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 13</li>
+<li>Transpiled C size: 145</li>
 </ul>
 
 <p></details></p>
@@ -5568,6 +5568,299 @@ yet safe and fast code.</p>
 </details></li>
 </ol>
 
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication">mul - sparse*dense matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 79</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 62</li>
+<li>Transpiled C size: 520</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>can only place matrices on contiguous buffers</li>
+<li>cannot place matrices on buffer offsets</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>inner dimensions must agree</li>
+<li>does not fit in circular arena
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication-2">mul - sparse*dense matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 79</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 62</li>
+<li>Transpiled C size: 520</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>can only place matrices on contiguous buffers</li>
+<li>cannot place matrices on buffer offsets</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>inner dimensions must agree</li>
+<li>arena is out of space
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication-3">mul - sparse*dense matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 79</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 56</li>
+<li>Transpiled C size: 505</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>allocation failed</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>inner dimensions must agree
+</details></li>
+</ol>
+
+<p><details><summary>Defered calls</summary></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication">mul - vector*sparse matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 69</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 46</li>
+<li>Transpiled C size: 388</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="64">
+<li>cannot place vectors on buffer offsets</li>
+<li>does not fit in circular arena</li>
+<li>null pointer</li>
+<li>vector length must match matrix rows</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication-2">mul - vector*sparse matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 69</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 46</li>
+<li>Transpiled C size: 388</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="64">
+<li>cannot place vectors on buffer offsets</li>
+<li>arena is out of space</li>
+<li>null pointer</li>
+<li>vector length must match matrix rows</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication-3">mul - vector*sparse matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 69</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 40</li>
+<li>Transpiled C size: 373</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>allocation failed</li>
+<li>vector length must match matrix rows</li>
+<li>out of bounds
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication">mul - sparse matrix*vector multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 61</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 45</li>
+<li>Transpiled C size: 388</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="64">
+<li>cannot place vectors on buffer offsets</li>
+<li>does not fit in circular arena</li>
+<li>null pointer</li>
+<li>matrix columns must match vector length</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication-2">mul - sparse matrix*vector multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 61</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 45</li>
+<li>Transpiled C size: 388</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="64">
+<li>cannot place vectors on buffer offsets</li>
+<li>arena is out of space</li>
+<li>null pointer</li>
+<li>matrix columns must match vector length</li>
+<li>out of bounds</li>
+<li>can only place vectors on contiguous buffers
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication-3">mul - sparse matrix*vector multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 61</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 39</li>
+<li>Transpiled C size: 373</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>matrix columns must match vector length</li>
+<li>allocation failed</li>
+<li>out of bounds
+</details></li>
+</ol>
+
 </div><div class="std-subsection" data-defined-in="std/sci/mat.s"><h3 id="mul-matrix-matrix-multiplication">mul - matrix-matrix multiplication</h3>
 
 <p><em>Defined in: std/sci/mat.s line 123</em></p>
@@ -5859,299 +6152,6 @@ yet safe and fast code.</p>
 <li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 54</li>
 <li>Transpiled C size: 423</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>matrix columns must match vector length</li>
-<li>allocation failed</li>
-<li>out of bounds
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication">mul - sparse*dense matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 79</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 62</li>
-<li>Transpiled C size: 520</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>can only place matrices on contiguous buffers</li>
-<li>cannot place matrices on buffer offsets</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>inner dimensions must agree</li>
-<li>does not fit in circular arena
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication-2">mul - sparse*dense matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 79</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 62</li>
-<li>Transpiled C size: 520</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>can only place matrices on contiguous buffers</li>
-<li>cannot place matrices on buffer offsets</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>inner dimensions must agree</li>
-<li>arena is out of space
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication-3">mul - sparse*dense matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 79</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 56</li>
-<li>Transpiled C size: 505</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>allocation failed</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>inner dimensions must agree
-</details></li>
-</ol>
-
-<p><details><summary>Defered calls</summary></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication">mul - vector*sparse matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 69</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 46</li>
-<li>Transpiled C size: 388</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="64">
-<li>cannot place vectors on buffer offsets</li>
-<li>does not fit in circular arena</li>
-<li>null pointer</li>
-<li>vector length must match matrix rows</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication-2">mul - vector*sparse matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 69</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 46</li>
-<li>Transpiled C size: 388</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="64">
-<li>cannot place vectors on buffer offsets</li>
-<li>arena is out of space</li>
-<li>null pointer</li>
-<li>vector length must match matrix rows</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication-3">mul - vector*sparse matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 69</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 40</li>
-<li>Transpiled C size: 373</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>allocation failed</li>
-<li>vector length must match matrix rows</li>
-<li>out of bounds
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication">mul - sparse matrix*vector multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 61</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 45</li>
-<li>Transpiled C size: 388</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="64">
-<li>cannot place vectors on buffer offsets</li>
-<li>does not fit in circular arena</li>
-<li>null pointer</li>
-<li>matrix columns must match vector length</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication-2">mul - sparse matrix*vector multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 61</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 45</li>
-<li>Transpiled C size: 388</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="64">
-<li>cannot place vectors on buffer offsets</li>
-<li>arena is out of space</li>
-<li>null pointer</li>
-<li>matrix columns must match vector length</li>
-<li>out of bounds</li>
-<li>can only place vectors on contiguous buffers
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication-3">mul - sparse matrix*vector multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 61</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 39</li>
-<li>Transpiled C size: 373</li>
 </ul>
 
 <p></details></p>
@@ -7500,7 +7500,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 133</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -7526,110 +7526,6 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 133</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-3">gt - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 133</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-4">gt - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 133</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-5">gt - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 133</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-6">gt - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 133</em></p>
-
-<div class="codehilite">
 <pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -7651,7 +7547,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-7">gt - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-3">gt - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 133</em></p>
 
@@ -7677,7 +7573,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-8">gt - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-4">gt - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 133</em></p>
 
@@ -7703,12 +7599,116 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-9">gt - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-5">gt - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 133</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-6">gt - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 133</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-7">gt - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 133</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-8">gt - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 133</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-9">gt - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 133</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -7736,7 +7736,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/core/numbers.s line 122</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -7757,7 +7757,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/core/numbers.s line 122</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -7778,7 +7778,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/core/numbers.s line 122</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -7795,32 +7795,6 @@ Safeguards against division by zero.</p>
 <p></details></p>
 
 </div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data">le - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 143</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-2">le - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 143</em></p>
 
@@ -7846,7 +7820,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-3">le - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-2">le - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 143</em></p>
 
@@ -7872,7 +7846,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-4">le - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-3">le - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 143</em></p>
 
@@ -7898,7 +7872,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-5">le - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-4">le - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 143</em></p>
 
@@ -7924,7 +7898,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-6">le - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-5">le - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 143</em></p>
 
@@ -7950,7 +7924,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-7">le - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-6">le - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 143</em></p>
 
@@ -7976,7 +7950,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-8">le - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-7">le - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 143</em></p>
 
@@ -8002,7 +7976,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-9">le - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-8">le - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 143</em></p>
 
@@ -8017,6 +7991,32 @@ Safeguards against division by zero.</p>
 <li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 9</li>
 <li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="le-overloads-an-operator-while-dereferencing-pointer-data-9">le - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 143</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">le</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
 </ul>
 
 <p></details></p>
@@ -8709,6 +8709,110 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 <p><em>Defined in: std/ptrpeek.s line 93</em></p>
 
 <div class="codehilite">
+<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-2">sub - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 93</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-3">sub - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 93</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-4">sub - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 93</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-5">sub - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 93</em></p>
+
+<div class="codehilite">
 <pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -8731,7 +8835,7 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-2">sub - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-6">sub - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 93</em></p>
 
@@ -8757,7 +8861,7 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-3">sub - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-7">sub - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 93</em></p>
 
@@ -8783,7 +8887,7 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-4">sub - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-8">sub - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 93</em></p>
 
@@ -8810,7 +8914,7 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-5">sub - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-9">sub - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 93</em></p>
 
@@ -8834,110 +8938,6 @@ Natural numbers are safeguarded against acquiring negative results, which would 
 <ol start="2">
 <li>null pointer</li>
 <li>nat subtraction would yield a negative
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-6">sub - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 93</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-7">sub - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 93</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-8">sub - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 93</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="sub-overloads-an-operator-while-dereferencing-pointer-data-9">sub - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 93</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">sub</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
 </details></li>
 </ol>
 
@@ -9756,6 +9756,48 @@ Automatically ends the line too.</p>
 </details></li>
 </ol>
 
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="print-print-sparse-matrix">print - print sparse matrix</h3>
+
+<p><em>Defined in: std/sci/coo.s line 95</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
+</code></pre>
+</div>
+
+<p>Prints it as coordinate as list: (i, j): v</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 22</li>
+<li>Transpiled C size: 182</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="print-print-sparse-matrix-2">print - print sparse matrix</h3>
+
+<p><em>Defined in: std/sci/coo.s line 95</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
+</code></pre>
+</div>
+
+<p>Prints it as coordinate as list: (i, j): v</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 21</li>
+<li>Transpiled C size: 178</li>
+</ul>
+
+<p></details></p>
+
 </div><div class="std-subsection" data-defined-in="std/sci/mat.s"><h3 id="print-print-a-matrix-with-aligned-brackets">print - print a matrix with aligned brackets</h3>
 
 <p><em>Defined in: std/sci/mat.s line 137</em></p>
@@ -9813,48 +9855,6 @@ Automatically ends the line too.</p>
 <li>nat subtraction would yield a negative
 </details></li>
 </ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="print-print-sparse-matrix">print - print sparse matrix</h3>
-
-<p><em>Defined in: std/sci/coo.s line 95</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
-</code></pre>
-</div>
-
-<p>Prints it as coordinate as list: (i, j): v</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 22</li>
-<li>Transpiled C size: 182</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="print-print-sparse-matrix-2">print - print sparse matrix</h3>
-
-<p><em>Defined in: std/sci/coo.s line 95</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
-</code></pre>
-</div>
-
-<p>Prints it as coordinate as list: (i, j): v</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 21</li>
-<li>Transpiled C size: 178</li>
-</ul>
-
-<p></details></p>
 
 </div></div><div class="std-definition"><h1 id="nn">nn</h1>
 
@@ -10053,424 +10053,6 @@ to print without a new line.</p>
 
 <div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-2">set</h3>
 
-<p><em>Defined in: std/core/print.s line 156</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_white&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-3">set</h3>
-
-<p><em>Defined in: std/core/print.s line 154</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_cyan&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-4">set</h3>
-
-<p><em>Defined in: std/core/print.s line 152</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_magenta&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-5">set</h3>
-
-<p><em>Defined in: std/core/print.s line 150</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_blue&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-6">set</h3>
-
-<p><em>Defined in: std/core/print.s line 148</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_yellow&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-7">set</h3>
-
-<p><em>Defined in: std/core/print.s line 146</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_green&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-8">set</h3>
-
-<p><em>Defined in: std/core/print.s line 144</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_red&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-9">set</h3>
-
-<p><em>Defined in: std/core/print.s line 142</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_white&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-10">set</h3>
-
-<p><em>Defined in: std/core/print.s line 140</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_cyan&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-11">set</h3>
-
-<p><em>Defined in: std/core/print.s line 138</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_magenta&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-12">set</h3>
-
-<p><em>Defined in: std/core/print.s line 136</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_blue&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-13">set</h3>
-
-<p><em>Defined in: std/core/print.s line 134</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_yellow&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-14">set</h3>
-
-<p><em>Defined in: std/core/print.s line 132</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_green&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-15">set</h3>
-
-<p><em>Defined in: std/core/print.s line 130</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_red&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-16">set</h3>
-
-<p><em>Defined in: std/core/print.s line 128</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;black&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-17">set</h3>
-
-<p><em>Defined in: std/core/print.s line 126</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;white&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-18">set</h3>
-
-<p><em>Defined in: std/core/print.s line 124</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;cyan&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-19">set</h3>
-
-<p><em>Defined in: std/core/print.s line 122</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;magenta&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-20">set</h3>
-
-<p><em>Defined in: std/core/print.s line 120</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;blue&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-21">set</h3>
-
-<p><em>Defined in: std/core/print.s line 118</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;yellow&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-22">set</h3>
-
-<p><em>Defined in: std/core/print.s line 116</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;green&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-23">set</h3>
-
-<p><em>Defined in: std/core/print.s line 114</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;red&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 4</li>
-<li>Transpiled C size: 11</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-24">set</h3>
-
 <p><em>Defined in: std/core/print.s line 182</em></p>
 
 <div class="codehilite">
@@ -10488,7 +10070,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-25">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-3">set</h3>
 
 <p><em>Defined in: std/core/print.s line 180</em></p>
 
@@ -10507,7 +10089,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-26">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-4">set</h3>
 
 <p><em>Defined in: std/core/print.s line 178</em></p>
 
@@ -10526,7 +10108,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-27">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-5">set</h3>
 
 <p><em>Defined in: std/core/print.s line 176</em></p>
 
@@ -10545,7 +10127,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-28">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-6">set</h3>
 
 <p><em>Defined in: std/core/print.s line 174</em></p>
 
@@ -10564,7 +10146,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-29">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-7">set</h3>
 
 <p><em>Defined in: std/core/print.s line 172</em></p>
 
@@ -10583,7 +10165,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-30">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-8">set</h3>
 
 <p><em>Defined in: std/core/print.s line 170</em></p>
 
@@ -10602,7 +10184,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-31">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-9">set</h3>
 
 <p><em>Defined in: std/core/print.s line 168</em></p>
 
@@ -10621,7 +10203,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-32">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-10">set</h3>
 
 <p><em>Defined in: std/core/print.s line 166</em></p>
 
@@ -10640,7 +10222,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-33">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-11">set</h3>
 
 <p><em>Defined in: std/core/print.s line 164</em></p>
 
@@ -10659,7 +10241,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-34">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-12">set</h3>
 
 <p><em>Defined in: std/core/print.s line 162</em></p>
 
@@ -10678,7 +10260,7 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-35">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-13">set</h3>
 
 <p><em>Defined in: std/core/print.s line 160</em></p>
 
@@ -10697,12 +10279,430 @@ to print without a new line.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-36">set</h3>
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-14">set</h3>
 
 <p><em>Defined in: std/core/print.s line 158</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_black&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-15">set</h3>
+
+<p><em>Defined in: std/core/print.s line 156</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_white&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-16">set</h3>
+
+<p><em>Defined in: std/core/print.s line 154</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_cyan&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-17">set</h3>
+
+<p><em>Defined in: std/core/print.s line 152</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_magenta&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-18">set</h3>
+
+<p><em>Defined in: std/core/print.s line 150</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_blue&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-19">set</h3>
+
+<p><em>Defined in: std/core/print.s line 148</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_yellow&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-20">set</h3>
+
+<p><em>Defined in: std/core/print.s line 146</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_green&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-21">set</h3>
+
+<p><em>Defined in: std/core/print.s line 144</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bg_red&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-22">set</h3>
+
+<p><em>Defined in: std/core/print.s line 142</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_white&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-23">set</h3>
+
+<p><em>Defined in: std/core/print.s line 140</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_cyan&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-24">set</h3>
+
+<p><em>Defined in: std/core/print.s line 138</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_magenta&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-25">set</h3>
+
+<p><em>Defined in: std/core/print.s line 136</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_blue&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-26">set</h3>
+
+<p><em>Defined in: std/core/print.s line 134</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_yellow&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-27">set</h3>
+
+<p><em>Defined in: std/core/print.s line 132</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_green&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-28">set</h3>
+
+<p><em>Defined in: std/core/print.s line 130</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bright_red&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-29">set</h3>
+
+<p><em>Defined in: std/core/print.s line 128</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;black&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-30">set</h3>
+
+<p><em>Defined in: std/core/print.s line 126</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;white&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-31">set</h3>
+
+<p><em>Defined in: std/core/print.s line 124</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;cyan&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-32">set</h3>
+
+<p><em>Defined in: std/core/print.s line 122</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;magenta&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-33">set</h3>
+
+<p><em>Defined in: std/core/print.s line 120</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;blue&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-34">set</h3>
+
+<p><em>Defined in: std/core/print.s line 118</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;yellow&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-35">set</h3>
+
+<p><em>Defined in: std/core/print.s line 116</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;green&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 4</li>
+<li>Transpiled C size: 11</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/print.s"><h3 id="set-36">set</h3>
+
+<p><em>Defined in: std/core/print.s line 114</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">set</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;red&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
 </code></pre>
 </div>
 
@@ -11164,33 +11164,7 @@ arithmetics and bitwise operations.</p>
 
 </div></div><div class="std-definition"><h1 id="get">get</h1>
 
-<div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="get-immutable-pointer-to-buffer-element">get - immutable pointer to buffer element</h3>
-
-<p><em>Defined in: std/core/array.s line 101</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unsafe_assume_inbounds&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
-</code></pre>
-</div>
-
-<p>This uses pointer arithmetics to index the buffer, basically performing the operation
-<code>i*buffer.unsafe_align+buffer.unsafe_offset</code>. Fresh buffers have zero offset and alignment
-equal to element size, but more complicated situations arise in situations where sub-buffers
-are retrieved or sliced.</p>
-
-<div class="notice-box box-warning"><strong>Warning:</strong> This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 13</li>
-<li>Transpiled C size: 49</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/range.s"><h3 id="get-assert-that-a-number-plus-range-start-lies-in-the-range">get - assert that a number plus range start lies in the range</h3>
+<div class="std-subsection" data-defined-in="std/core/range.s"><h3 id="get-assert-that-a-number-plus-range-start-lies-in-the-range">get - assert that a number plus range start lies in the range</h3>
 
 <p><em>Defined in: std/core/range.s line 54</em></p>
 
@@ -11344,7 +11318,7 @@ per a pattern like <code>for i in range 10 ...</code>.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="get-immutable-pointer-to-buffer-element-2">get - immutable pointer to buffer element</h3>
+</div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="get-immutable-pointer-to-buffer-element">get - immutable pointer to buffer element</h3>
 
 <p><em>Defined in: std/core/array.s line 101</em></p>
 
@@ -11374,6 +11348,32 @@ are retrieved or sliced.</p>
 <li>out of bounds
 </details></li>
 </ol>
+
+</div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="get-immutable-pointer-to-buffer-element-2">get - immutable pointer to buffer element</h3>
+
+<p><em>Defined in: std/core/array.s line 101</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unsafe_assume_inbounds&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p>This uses pointer arithmetics to index the buffer, basically performing the operation
+<code>i*buffer.unsafe_align+buffer.unsafe_offset</code>. Fresh buffers have zero offset and alignment
+equal to element size, but more complicated situations arise in situations where sub-buffers
+are retrieved or sliced.</p>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 13</li>
+<li>Transpiled C size: 49</li>
+</ul>
+
+<p></details></p>
 
 </div><div class="std-subsection" data-defined-in="std/core/string.s"><h3 id="get-a-character-in-a-string">get - a character in a string</h3>
 
@@ -12198,6 +12198,32 @@ are retrieved or sliced.</p>
 <p><em>Defined in: std/sci/coo.s line 43</em></p>
 
 <div class="codehilite">
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 11</li>
+<li>Transpiled C size: 50</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="15">
+<li>out of bounds
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="get-get-a-sparse-element-2">get - get a sparse element</h3>
+
+<p><em>Defined in: std/sci/coo.s line 43</em></p>
+
+<div class="codehilite">
 <pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unsafe_assume_inbounds&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -12261,32 +12287,6 @@ are retrieved or sliced.</p>
 </ul>
 
 <p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="get-get-a-sparse-element-2">get - get a sparse element</h3>
-
-<p><em>Defined in: std/sci/coo.s line 43</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 11</li>
-<li>Transpiled C size: 50</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="15">
-<li>out of bounds
-</details></li>
-</ol>
 
 </div></div><div class="std-definition"><h1 id="kb">KB</h1>
 
@@ -13365,6 +13365,50 @@ moved across functions.</p>
 <p><em>Defined in: std/tag.s line 40</em></p>
 
 <div class="codehilite">
+<pre><span></span><code><span class="n">alloc</span><span class="p">(</span><span class="n">cstr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">char</span><span class="p">[])</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 98</li>
+<li>Transpiled C size: 627</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>allocation failed</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation</li>
+<li>out of bounds</li>
+<li>arena is out of space</li>
+<li>empty input name</li>
+<li>cannot tag a structural type</li>
+<li>can only define strings on contiguous buffers</li>
+<li>can only define strings on non-offset buffers
+</details></li>
+</ol>
+
+<p><details><summary>Defered calls</summary></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/tag.s"><h3 id="alloc-5">alloc</h3>
+
+<p><em>Defined in: std/tag.s line 40</em></p>
+
+<div class="codehilite">
 <pre><span></span><code><span class="n">alloc</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">surface</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">char</span><span class="p">[])</span>
 </code></pre>
 </div>
@@ -13391,50 +13435,6 @@ moved across functions.</p>
 <li>empty input name</li>
 <li>cannot tag a structural type</li>
 <li>tag surface cannot be structural type</li>
-<li>can only define strings on contiguous buffers</li>
-<li>can only define strings on non-offset buffers
-</details></li>
-</ol>
-
-<p><details><summary>Defered calls</summary></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/tag.s"><h3 id="alloc-5">alloc</h3>
-
-<p><em>Defined in: std/tag.s line 40</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">alloc</span><span class="p">(</span><span class="n">cstr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">char</span><span class="p">[])</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 98</li>
-<li>Transpiled C size: 627</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>allocation failed</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
-<li>out of bounds</li>
-<li>arena is out of space</li>
-<li>empty input name</li>
-<li>cannot tag a structural type</li>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers
 </details></li>
@@ -13543,37 +13543,6 @@ resources.</p>
 </div></div><div class="std-definition"><h1 id="mutget">mutget</h1>
 
 <div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="mutget-mutable-pointer-to-buffer-element">mutget - mutable pointer to buffer element</h3>
-
-<p><em>Defined in: std/core/array.s line 88</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
-</code></pre>
-</div>
-
-<p>This uses pointer arithmetics to index the buffer, basically performing the operation
-<code>i*buffer.unsafe_align+buffer.unsafe_offset</code>. Fresh buffers have zero offset and alignment
-equal to element size, but more complicated situations arise in situations where sub-buffers
-are retrieved or sliced.</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 13</li>
-<li>Transpiled C size: 72</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="15">
-<li>out of bounds
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="mutget-mutable-pointer-to-buffer-element-2">mutget - mutable pointer to buffer element</h3>
 
 <p><em>Defined in: std/core/array.s line 88</em></p>
 
@@ -13724,6 +13693,37 @@ are retrieved or sliced.</p>
 
 <p></details></p>
 
+</div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="mutget-mutable-pointer-to-buffer-element-2">mutget - mutable pointer to buffer element</h3>
+
+<p><em>Defined in: std/core/array.s line 88</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p>This uses pointer arithmetics to index the buffer, basically performing the operation
+<code>i*buffer.unsafe_align+buffer.unsafe_offset</code>. Fresh buffers have zero offset and alignment
+equal to element size, but more complicated situations arise in situations where sub-buffers
+are retrieved or sliced.</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 13</li>
+<li>Transpiled C size: 72</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="15">
+<li>out of bounds
+</details></li>
+</ol>
+
 </div><div class="std-subsection" data-defined-in="std/map.s"><h3 id="mutget-get-a-mutable-hash-map-entry">mutget - get a mutable hash map entry</h3>
 
 <p><em>Defined in: std/map.s line 49</em></p>
@@ -13865,33 +13865,6 @@ are retrieved or sliced.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/sci/mat.s"><h3 id="mutget-mutable-reference-to-matrix-element-ij">mutget - mutable reference to matrix element (i,j)</h3>
-
-<p><em>Defined in: std/sci/mat.s line 59</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 16</li>
-<li>Transpiled C size: 103</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="72">
-<li>row out of bounds</li>
-<li>column out of bounds
-</details></li>
-</ol>
-
 </div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mutget-mutable-reference-to-a-sparse-element">mutget - mutable reference to a sparse element</h3>
 
 <p><em>Defined in: std/sci/coo.s line 52</em></p>
@@ -13938,6 +13911,33 @@ are retrieved or sliced.</p>
 </ul>
 
 <p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/sci/mat.s"><h3 id="mutget-mutable-reference-to-matrix-element-ij">mutget - mutable reference to matrix element (i,j)</h3>
+
+<p><em>Defined in: std/sci/mat.s line 59</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 16</li>
+<li>Transpiled C size: 103</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="72">
+<li>row out of bounds</li>
+<li>column out of bounds
+</details></li>
+</ol>
 
 </div></div><div class="std-definition"><h1 id="len">len</h1>
 
@@ -18449,29 +18449,7 @@ print s2.dat.first # prints 2
 
 </div></div><div class="std-definition"><h1 id="empty">empty</h1>
 
-<div class="std-subsection" data-defined-in="std/core/string.s"><h3 id="empty-checks-that-a-string-does-not-have-any-character">empty - checks that a string does not have any character</h3>
-
-<p><em>Defined in: std/core/string.s line 493</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">empty</span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Prefer this check because its cstr-checking counterpar is faster
-than casting to a string.</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 8</li>
-<li>Transpiled C size: 31</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/string.s"><h3 id="empty-checks-that-a-cstr-does-not-have-any-characters">empty - checks that a cstr does not have any characters</h3>
+<div class="std-subsection" data-defined-in="std/core/string.s"><h3 id="empty-checks-that-a-cstr-does-not-have-any-characters">empty - checks that a cstr does not have any characters</h3>
 
 <p><em>Defined in: std/core/string.s line 485</em></p>
 
@@ -18491,6 +18469,28 @@ as there is no need to actually traverse the character contents.</p>
 <li>Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 7</li>
 <li>Transpiled C size: 59</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/string.s"><h3 id="empty-checks-that-a-string-does-not-have-any-character">empty - checks that a string does not have any character</h3>
+
+<p><em>Defined in: std/core/string.s line 493</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">empty</span><span class="p">(</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Prefer this check because its cstr-checking counterpar is faster
+than casting to a string.</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 8</li>
+<li>Transpiled C size: 31</li>
 </ul>
 
 <p></details></p>
@@ -25087,9 +25087,9 @@ to indicate the new matrix&#8217;s orientation.</p>
 
 </div></div><div class="std-definition"><h1 id="match">match</h1>
 
-<div class="std-subsection" data-defined-in="std/pipe.s"><h3 id="match-2">match</h3>
+<div class="std-subsection" data-defined-in="std/tag.s"><h3 id="match-2">match</h3>
 
-<p><em>Defined in: std/pipe.s line 123</em></p>
+<p><em>Defined in: std/tag.s line 63</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="k">match</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">type_name</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">char</span><span class="p">[])</span>
@@ -25127,9 +25127,9 @@ to indicate the new matrix&#8217;s orientation.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/tag.s"><h3 id="match-3">match</h3>
+</div><div class="std-subsection" data-defined-in="std/pipe.s"><h3 id="match-3">match</h3>
 
-<p><em>Defined in: std/tag.s line 63</em></p>
+<p><em>Defined in: std/pipe.s line 123</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="k">match</span><span class="p">(</span><span class="n">cstr</span><span class="w"> </span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">type_name</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">char</span><span class="p">[])</span>
@@ -27931,7 +27931,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 <p><em>Defined in: std/ptrpeek.s line 21</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">int</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -27950,7 +27950,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 <p><em>Defined in: std/ptrpeek.s line 21</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">float</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">int</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -27965,6 +27965,25 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 <p></details></p>
 
 </div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-4">to_number</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 21</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">float</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 2</li>
+<li>Transpiled C size: 3</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-5">to_number</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 21</em></p>
 
@@ -27990,7 +28009,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-5">to_number</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-6">to_number</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 21</em></p>
 
@@ -28016,7 +28035,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-6">to_number</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-7">to_number</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 21</em></p>
 
@@ -28041,25 +28060,6 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 <li>null pointer
 </details></li>
 </ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-7">to_number</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 21</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 2</li>
-<li>Transpiled C size: 3</li>
-</ul>
-
-<p></details></p>
 
 </div></div><div class="std-definition"><h1 id="already_defined">already_defined</h1>
 
@@ -29091,6 +29091,33 @@ on comparisons of unequal strings.</p>
 
 <p></details></p>
 
+</div><div class="std-subsection" data-defined-in="std/core/error.s"><h3 id="cstr-a-cstr-description-of-an-error-code-2">cstr - a cstr description of an error code</h3>
+
+<p><em>Defined in: std/core/error.s line 19</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">cstr</span><span class="p">(</span><span class="n">catch</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Error codes should <em>not</em> be compared numerically against
+given numbers, as their numbering changes for different
+programs. Instead, they should be converted to a cstr
+string with this function, which can then be compared.
+This comparison is also one numerical comparison, as
+care is taken for all cstr to point to the same memory
+location.</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 2</li>
+<li>Transpiled C size: 10</li>
+</ul>
+
+<p></details></p>
+
 </div><div class="std-subsection" data-defined-in="std/core/convertstr.s"><h3 id="str-reads-a-string-from-the-console-3">str - reads a string from the console</h3>
 
 <p><em>Defined in: std/core/convertstr.s line 114</em></p>
@@ -29171,33 +29198,6 @@ The resulting memory will consume exactly the required size in bytes.</p>
 <pre><span></span><code><span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
 </code></pre>
 </div>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/error.s"><h3 id="cstr-a-cstr-description-of-an-error-code-2">cstr - a cstr description of an error code</h3>
-
-<p><em>Defined in: std/core/error.s line 19</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">cstr</span><span class="p">(</span><span class="n">catch</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>Error codes should <em>not</em> be compared numerically against
-given numbers, as their numbering changes for different
-programs. Instead, they should be converted to a cstr
-string with this function, which can then be compared.
-This comparison is also one numerical comparison, as
-care is taken for all cstr to point to the same memory
-location.</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 2</li>
-<li>Transpiled C size: 10</li>
-</ul>
 
 <p></details></p>
 

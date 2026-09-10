@@ -320,7 +320,7 @@ def main()
 ```
 
 Above, there was some redundancy when declaring initialized variables that
-are subsquently returned in `std_data`. You can use the helper `assigned var = expression`
+are subsequently returned in `std_data`. You can use the helper `assigned var = expression`
 pattern to perform an assignment that also returns value `var`, like below.
 
 ```python
@@ -1605,9 +1605,10 @@ def main()
 
 However, iterators do not apply arbitary functions
 but instead employ the `get(data, nat index)` function 
-that overloads the `data[index]` operator for indexes
-that are natural numbers. In truth, the range ieration
-examples is equivalent to the next one.
+(the same used for `data[index]` operator) for indexes
+that are natural numbers, starting from zero.
+In other words, the range iteration example is equivalent 
+to the next one.
 
 ```python
 import std.core
@@ -1664,6 +1665,22 @@ def main()
         print nn "difference "
         print diff
     print sol.x
+```
+
+There is also the option to iterate across types by creating
+zero-initialized variables. This pattern
+directly unwraps into sequential code, but is useful for 
+avoiding short temporary allocations:
+
+
+```python
+import std.core
+import compiler as cp
+
+def main()
+    CLI = edit console()
+    for i is 1|2|3
+        print cp::value i # gets the value of the value type 'i'
 ```
 
 ## defer
@@ -1803,18 +1820,17 @@ for each function call compared to direct-to-the-metal code.
 That said, such overheads can often be ignored compare to the
 actual complexity of practical code.
 
-The means of creating placeholder arguments that allow for dynamically
-provided functions is by changing its type to a functor, that is,
-an expression of the form `input_type->output_type`,
-as demonstrated in the example below. This lets the implementation prepare
-for functions of the required input and output characteristics that may be 
-only encountered later. The shape of such functions will always be the required
-one. It is assumed that any such functions could fail when called, and their effects
-will *not* be automatically gathered. Furthermore all their arguments are immutable.
+The means of creating placeholder arguments that accept dynamically
+provided functions is by declaring functors of type `input_type->output_type`. 
+The shape inputs and outputs of functors will always be the required
+one. It is assumed that they could fail when called, and their effects
+will *not* be automatically gathered (the type system will warn you
+about leaking resources). Furthermore all functor arguments are immutable.
 
 The example below also uses `type inc` to retrieve the functor type
-of the function `inc`, as well as the `compiler::call` builtin function 
-to call a functor with given arguments. The retrieval into a factor should be unique.
+of the function `inc`, as well as the `compiler::call(functor, args)` builtin function 
+to call a functor with given arguments. The retrieval into a factor should be unique,
+otherwise the compiler will complain if unable to disambiguate.
 
 ```python
 import std.core
@@ -1857,7 +1873,7 @@ def main()
 ```
 
 A final type resolution feature is that you can specialize on
-argument types as you would by providing comma-separated arguments vias
+argument types as you would by providing comma-separated arguments via
 the `<...>` notation. This is demonstrated below, where different verions
 of the `add` function are retrieved in different situations to extract
 functors based on arguments.
@@ -1884,12 +1900,15 @@ def main()
 ```
 
 
+*Info: several features of the standard library, such as tagged unions, parallel processes, and blob data, rely on functors to dynamically insert your own implementation (e.g., your own threaded code).*
+
+
 ## debugging tools
 
 *Warning: This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.*
 
 So far we encountered `compiler::args()`, `compiler::skip()`, 
-`compiler::catch()`, `compiler::value(expression)` and `debug::nocatch()`
+`compiler::catch()`, `compiler::value(literal_value)` and `debug::nocatch()`
 that let code interface with the compiler to an extend.
 
 There are some more mechanisms that help inspect
@@ -1912,7 +1931,7 @@ def main()
     CLI = edit console()
     s1 = str "s1"
     s2 = str "s2"
-    debug::print type "--- main ---" # prints '"--- main ---"' at compile time
+    debug::print type "--- main ---" # prints the '"--- main ---"' literal type at compile time
     s = debug::print (s1,s2)         # prints 'str, str' at compile time
     print s # ERROR due to undefined print, but the above still prints
 ```

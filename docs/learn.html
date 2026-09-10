@@ -376,8 +376,8 @@ executed based on a condition. Conditions evaluate to a <code>bool</code> type.<
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mi">0</span>
-        <span class="nb">print</span> <span class="s2">&quot;x is negative</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="nb">print</span> <span class="s2">&quot;done</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="nb">print</span> <span class="s2">&quot;x is negative&quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;done&quot;</span>
 </code></pre>
 </div>
 
@@ -472,8 +472,8 @@ are probably most curious about: concatenation. This requires that we (actually,
 compiler) allocate some memory where the result should be placed. The schema
 for memory management is defined via <em>allocators</em>. The simplest allocator for
 character data is <code>new()</code>: it just creates new memory as needed, like below.
-Do note that allocators are also effects so that you don&#8217;t need to keep passing
-them as arguments.</p>
+Do note that allocators are also typically declared as effects in the standard
+library, so that you don&#8217;t need to keep passing them as arguments.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
@@ -552,22 +552,6 @@ allocator. This brings us to arenas and circular buffers. Arenas are memory regi
 that are gradually used until full. Circular buffers are arenas that overwrite previous values from
 the start once full. Here is the above snippet using an arena. </p>
 
-<p>In the snippet below, the <code>arena</code> type may not refer only to character regions in memory;
-in normal code such abstractions are disambiguated, but the <em>greeting</em> function would try -and fail-
-to erroneously use any arena as an allocator, even those that are defined for non-character data types.
-Thus the syntax <code>char_allocator^arena</code> is used to select character allocators that are also arenas.
-In general, <em>smoll</em> has an algebraic type system; this is the operation for getting common type elements, 
-but you can also write <code>float|int|nat</code> to indicate type alternatives and <code>char_allocator\new</code> to get character
-allocators other than <em>new</em>. Find more about types in the <a href="reference.html">reference guide</a>.</p>
-
-<p>In the most general case,
-one could also define <code>def greeting(effect edit char_allocator CHARS)</code> to create generic code that
-accepts any character allocator. Having same-named functions with different behavior based on
-their arguments is also known as <em>polymorphism</em>.</p>
-
-<p>Also note the <code>effect</code> keyword that tells the greeting function to look for <code>CHARS</code> in the calling context without
-necessarily expecting that as an argument. Effects can only be placed before other arguments.</p>
-
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
@@ -588,6 +572,23 @@ necessarily expecting that as an argument. Effects can only be placed before oth
     <span class="nb">print</span> <span class="n">message</span>
 </code></pre>
 </div>
+
+<p>In the snippet above, the <code>arena</code> type may not refer only to character regions in memory;
+in normal code such abstractions are disambiguated, but the <em>greeting</em> function would try -and fail-
+to erroneously use any arena type as an allocator, even those that are defined for non-character data types.
+Thus the syntax <code>char_allocator^arena</code> is used to select character allocators that are also arenas.
+In general, <em>smoll</em> has an algebraic type system; this is the operation for getting common type elements, 
+but you can also write <code>float|int|nat</code> to indicate type alternatives and <code>char_allocator\new</code> to get character
+allocators other than <em>new</em>. Find more about types in the <a href="reference.html">reference guide</a>.</p>
+
+<p>In the most general case,
+one could also define <code>def greeting(effect edit char_allocator CHARS)</code> to create generic code that
+accepts any character allocator. Having same-named functions with different behavior based on
+their arguments is also known as <em>polymorphism</em>.</p>
+
+<p>Finally note the <code>effect</code> keyword that tells the greeting function to look for <code>CHARS</code> in the calling context without
+necessarily expecting that as an argument. Effect variables can only be placed before other arguments. 
+Since effects could be hard to spot for the sake of concise code, you could follow the naming convention of capitalizing them.</p>
 
 <h2 id="recursion">recursion</h2>
 
@@ -645,8 +646,10 @@ notation.</p>
 </div>
 
 <p>Tuples are automatically unpacked into raw data. That is, <em>smoλ</em>
-defaults to <em>structural typing</em> function outputs. However, one
-can actually create nominal types, which can NOT structurally
+defaults to <em>structural typing</em> function outputs, which makes for
+more dynamic code in which function results can readily be used as
+inputs expecting the same data structure. However, one
+can actually create nominal types, which can NOT be structurally
 matched to data of the same shape, by declaring a tuple as a class.</p>
 
 <div class="codehilite">
@@ -665,11 +668,12 @@ matched to data of the same shape, by declaring a tuple as a class.</p>
 
 <p>All data encountered until now have been immutable in that
 variable values cannot be modified. There 
-are two mechanisms for elevated permissions, <code>edit</code> that we 
+are two mechanisms for elevated permissions: <code>edit</code> that we 
 have partly encountered already and <code>mut</code>. Of the two, <code>edit</code>
-allows modifying data structure values only, whereas <code>mut</code>
+allows modifying data structure values only (given that they,
+in turn have modification permissions), whereas <code>mut</code>
 allows replacing the whole structure. These qualifiers can
-only be placed in function declarations or after the <code>=</code> symbol.</p>
+only be placed in function signatures, or after the <code>=</code> symbol.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
@@ -793,12 +797,12 @@ def call(nat->nat inc)
         }
         function highlightSmoll(raw){
           return escapeHtml(raw).replace(
-            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|return|try|type|fail|mut|edit|unsafe_mut)\b|\b(?:def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
+            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|return|try|type|effect|fail|mut|edit|unsafe_mut)\b|\b(?:rec|def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
             function(m){
               if(m[0]==='#') return '<span style="color:#777777">'+m+'</span>';
               if(m[0]==='"') return '<span style="color:#2c5b19">'+m+'</span>';
-              if(/^(if|while|for|return|in|else|try|type|fail|mut|edit|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
-              if(/^(def|local|import|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
+              if(/^(if|while|for|return|in|else|try|type|fail|mut|edit|effect|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
+              if(/^(rec|def|local|import|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
               return '<span style="color:#2e766b">'+m+'</span>';
             }
           );

@@ -583,7 +583,7 @@ triple should be allowed.</p>
 </div>
 
 <p>Above, there was some redundancy when declaring initialized variables that
-are subsquently returned in <code>std_data</code>. You can use the helper <code>assigned var = expression</code>
+are subsequently returned in <code>std_data</code>. You can use the helper <code>assigned var = expression</code>
 pattern to perform an assignment that also returns value <code>var</code>, like below.</p>
 
 <div class="codehilite">
@@ -1910,9 +1910,10 @@ is converted into a <code>while try</code>.</p>
 
 <p>However, iterators do not apply arbitary functions
 but instead employ the <code>get(data, nat index)</code> function 
-that overloads the <code>data[index]</code> operator for indexes
-that are natural numbers. In truth, the range ieration
-examples is equivalent to the next one.</p>
+(the same used for <code>data[index]</code> operator) for indexes
+that are natural numbers, starting from zero.
+In other words, the range iteration example is equivalent 
+to the next one.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
@@ -1971,6 +1972,22 @@ returns.</p>
         <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;difference &quot;</span>
         <span class="nb">print</span> <span class="n">diff</span>
     <span class="nb">print</span> <span class="n">sol</span><span class="o">.</span><span class="n">x</span>
+</code></pre>
+</div>
+
+<p>There is also the option to iterate across types by creating
+zero-initialized variables. This pattern
+directly unwraps into sequential code, but is useful for 
+avoiding short temporary allocations:</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">compiler</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">is</span> <span class="mi">1</span><span class="o">|</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span>
+        <span class="nb">print</span> <span class="n">cp</span><span class="p">::</span><span class="n">value</span> <span class="n">i</span> <span class="c1"># gets the value of the value type &#39;i&#39;</span>
 </code></pre>
 </div>
 
@@ -2113,18 +2130,17 @@ for each function call compared to direct-to-the-metal code.
 That said, such overheads can often be ignored compare to the
 actual complexity of practical code.</p>
 
-<p>The means of creating placeholder arguments that allow for dynamically
-provided functions is by changing its type to a functor, that is,
-an expression of the form <code>input_type-&gt;output_type</code>,
-as demonstrated in the example below. This lets the implementation prepare
-for functions of the required input and output characteristics that may be 
-only encountered later. The shape of such functions will always be the required
-one. It is assumed that any such functions could fail when called, and their effects
-will <em>not</em> be automatically gathered. Furthermore all their arguments are immutable.</p>
+<p>The means of creating placeholder arguments that accept dynamically
+provided functions is by declaring functors of type <code>input_type-&gt;output_type</code>. 
+The shape inputs and outputs of functors will always be the required
+one. It is assumed that they could fail when called, and their effects
+will <em>not</em> be automatically gathered (the type system will warn you
+about leaking resources). Furthermore all functor arguments are immutable.</p>
 
 <p>The example below also uses <code>type inc</code> to retrieve the functor type
-of the function <code>inc</code>, as well as the <code>compiler::call</code> builtin function 
-to call a functor with given arguments. The retrieval into a factor should be unique.</p>
+of the function <code>inc</code>, as well as the <code>compiler::call(functor, args)</code> builtin function 
+to call a functor with given arguments. The retrieval into a factor should be unique,
+otherwise the compiler will complain if unable to disambiguate.</p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
@@ -2169,7 +2185,7 @@ to call a functor with given arguments. The retrieval into a factor should be un
 </div>
 
 <p>A final type resolution feature is that you can specialize on
-argument types as you would by providing comma-separated arguments vias
+argument types as you would by providing comma-separated arguments via
 the <code>&lt;...&gt;</code> notation. This is demonstrated below, where different verions
 of the <code>add</code> function are retrieved in different situations to extract
 functors based on arguments.</p>
@@ -2196,12 +2212,14 @@ functors based on arguments.</p>
 </code></pre>
 </div>
 
+<div class="notice-box box-info"><strong>Info:</strong> several features of the standard library, such as tagged unions, parallel processes, and blob data, rely on functors to dynamically insert your own implementation (e.g., your own threaded code).</div>
+
 <h2 id="debugging-tools">debugging tools</h2>
 
 <div class="notice-box box-warning"><strong>Warning:</strong> This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.</div>
 
 <p>So far we encountered <code>compiler::args()</code>, <code>compiler::skip()</code>, 
-<code>compiler::catch()</code>, <code>compiler::value(expression)</code> and <code>debug::nocatch()</code>
+<code>compiler::catch()</code>, <code>compiler::value(literal_value)</code> and <code>debug::nocatch()</code>
 that let code interface with the compiler to an extend.</p>
 
 <p>There are some more mechanisms that help inspect
@@ -2224,7 +2242,7 @@ For example, one pattern usable for debuggining is the following.</p>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">s1</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s1&quot;</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="nb">str</span> <span class="s2">&quot;s2&quot;</span>
-    <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;--- main ---&quot;</span> <span class="c1"># prints &#39;&quot;--- main ---&quot;&#39; at compile time</span>
+    <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="nb">type</span> <span class="s2">&quot;--- main ---&quot;</span> <span class="c1"># prints the &#39;&quot;--- main ---&quot;&#39; literal type at compile time</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">debug</span><span class="p">::</span><span class="nb">print</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">)</span>         <span class="c1"># prints &#39;str, str&#39; at compile time</span>
     <span class="nb">print</span> <span class="n">s</span> <span class="c1"># ERROR due to undefined print, but the above still prints</span>
 </code></pre>
@@ -3071,12 +3089,12 @@ arguments to the iterator. This is useful when interweaving other kinds of strin
         }
         function highlightSmoll(raw){
           return escapeHtml(raw).replace(
-            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|return|try|type|fail|mut|edit|unsafe_mut)\b|\b(?:def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
+            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|return|try|type|effect|fail|mut|edit|unsafe_mut)\b|\b(?:rec|def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
             function(m){
               if(m[0]==='#') return '<span style="color:#777777">'+m+'</span>';
               if(m[0]==='"') return '<span style="color:#2c5b19">'+m+'</span>';
-              if(/^(if|while|for|return|in|else|try|type|fail|mut|edit|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
-              if(/^(def|local|import|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
+              if(/^(if|while|for|return|in|else|try|type|fail|mut|edit|effect|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
+              if(/^(rec|def|local|import|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
               return '<span style="color:#2e766b">'+m+'</span>';
             }
           );

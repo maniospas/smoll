@@ -20,11 +20,6 @@ local import std.unsafe as unsafe
 # a convention to make pointer operations safe outside the unsafe:: namespace
 # is that we GUARANTEE that non-zero pointers to a memory region contain
 # at least one element of the attached type (automatically inferred for any)
-
-def nat(nat16|nat32 x)
-    {builtins::nat value = x;}
-    return value
-
 def alloc(edit any[] buffer, nat|blank size, "unsafe_first"|"dirty"|blank clear_policy, "unsafe_leaky"|blank leak_policy)
     doc "allocates a buffer"
     doc "Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,"

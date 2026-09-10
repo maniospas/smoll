@@ -22,7 +22,7 @@ _9._ [what next?](#what-next) <br>
 
 In accordance to tradition, our first program below greets everyone!
 We use the `repo` instruction to tell the language that it should automatically download
-code under *std/* from a corresponding web URL (download code is stored in a *.cache* folder).
+code under *std/* from a corresponding web URL (downloaded code is stored in a *.cache* folder).
 Following examples will not have this command for brevity.
 
 Then, the program imports the standard library's collections of basic yet useful functions, 
@@ -116,8 +116,8 @@ def main()
     CLI = edit console()
     x = 1.0-2.0
     if x<0
-        print "x is negative\n"
-    print "done\n"
+        print "x is negative"
+    print "done"
 ```
 
 Loops either have the form `while condition body`, which looks
@@ -208,8 +208,8 @@ are probably most curious about: concatenation. This requires that we (actually,
 compiler) allocate some memory where the result should be placed. The schema
 for memory management is defined via *allocators*. The simplest allocator for
 character data is `new()`: it just creates new memory as needed, like below.
-Do note that allocators are also effects so that you don't need to keep passing
-them as arguments.
+Do note that allocators are also typically declared as effects in the standard
+library, so that you don't need to keep passing them as arguments.
 
 ```python
 import std.core
@@ -285,22 +285,6 @@ allocator. This brings us to arenas and circular buffers. Arenas are memory regi
 that are gradually used until full. Circular buffers are arenas that overwrite previous values from
 the start once full. Here is the above snippet using an arena. 
 
-In the snippet below, the `arena` type may not refer only to character regions in memory;
-in normal code such abstractions are disambiguated, but the *greeting* function would try -and fail-
-to erroneously use any arena as an allocator, even those that are defined for non-character data types.
-Thus the syntax `char_allocator^arena` is used to select character allocators that are also arenas.
-In general, *smoll* has an algebraic type system; this is the operation for getting common type elements, 
-but you can also write `float|int|nat` to indicate type alternatives and `char_allocator\new` to get character
-allocators other than *new*. Find more about types in the <a href="reference.html">reference guide</a>.
-
-In the most general case,
-one could also define `def greeting(effect edit char_allocator CHARS)` to create generic code that
-accepts any character allocator. Having same-named functions with different behavior based on
-their arguments is also known as *polymorphism*.
-
-Also note the `effect` keyword that tells the greeting function to look for `CHARS` in the calling context without
-necessarily expecting that as an argument. Effects can only be placed before other arguments.
-
 ```python
 import std.core
 
@@ -320,6 +304,24 @@ def main()
         print 0
     print message
 ```
+
+In the snippet above, the `arena` type may not refer only to character regions in memory;
+in normal code such abstractions are disambiguated, but the *greeting* function would try -and fail-
+to erroneously use any arena type as an allocator, even those that are defined for non-character data types.
+Thus the syntax `char_allocator^arena` is used to select character allocators that are also arenas.
+In general, *smoll* has an algebraic type system; this is the operation for getting common type elements, 
+but you can also write `float|int|nat` to indicate type alternatives and `char_allocator\new` to get character
+allocators other than *new*. Find more about types in the <a href="reference.html">reference guide</a>.
+
+In the most general case,
+one could also define `def greeting(effect edit char_allocator CHARS)` to create generic code that
+accepts any character allocator. Having same-named functions with different behavior based on
+their arguments is also known as *polymorphism*.
+
+Finally note the `effect` keyword that tells the greeting function to look for `CHARS` in the calling context without
+necessarily expecting that as an argument. Effect variables can only be placed before other arguments. 
+Since effects could be hard to spot for the sake of concise code, you could follow the naming convention of capitalizing them.
+
 
 ## recursion
 
@@ -376,8 +378,10 @@ def main()
 ```
 
 Tuples are automatically unpacked into raw data. That is, *smoλ*
-defaults to *structural typing* function outputs. However, one
-can actually create nominal types, which can NOT structurally
+defaults to *structural typing* function outputs, which makes for
+more dynamic code in which function results can readily be used as
+inputs expecting the same data structure. However, one
+can actually create nominal types, which can NOT be structurally
 matched to data of the same shape, by declaring a tuple as a class.
 
 ```python
@@ -396,11 +400,12 @@ def main()
 
 All data encountered until now have been immutable in that
 variable values cannot be modified. There 
-are two mechanisms for elevated permissions, `edit` that we 
+are two mechanisms for elevated permissions: `edit` that we 
 have partly encountered already and `mut`. Of the two, `edit`
-allows modifying data structure values only, whereas `mut`
+allows modifying data structure values only (given that they,
+in turn have modification permissions), whereas `mut`
 allows replacing the whole structure. These qualifiers can
-only be placed in function declarations or after the `=` symbol.
+only be placed in function signatures, or after the `=` symbol.
 
 ```python
 import std.core

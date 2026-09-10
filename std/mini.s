@@ -19,41 +19,6 @@ local import std.core.numbers
 local import std.core.array
 local import std.core.string as string
 
-def nat8(nat x)
-    doc "convert unsigned number to 8 bits"
-    doc "The conversion checks whether the previous value fits in the new one."
-    doc "If it does not, this operation can fail."
-    if x>255 fail "nat value too large to pack in nat8"
-    {builtins::nat8 value = x;}
-    return value
-
-def nat16(nat x)
-    doc "convert unsigned number to 16 bits"
-    doc "The conversion checks whether the previous value fits in the new one."
-    doc "If it does not, this operation can fail."
-    if x>65535 fail "nat value too large to pack in nat16"
-    {builtins::nat16 value = x;}
-    return value
-
-def nat32(nat x)
-    doc "convert unsigned number to 32 bits"
-    doc "The conversion checks whether the previous value fits in the new one."
-    doc "If it does not, this operation can fail."
-    if x>4294967295 fail "nat value too large to pack in nat32"
-    {builtins::nat32 value = x;}
-    return value
-    
-# def nat(nat32 x)
-#     doc "retrieved unsigned number from 32 bits"
-#     {builtins::nat value = x;}
-#     return value
-
-# imported from array
-# def nat(nat16 x)
-#     doc "retrieved unsigned number from 16 bits"
-#     {builtins::nat value = x;}
-#     return value
-
 local def strdat(nat _pos, nat _length)
     pos = nat16 _pos
     length = nat16 _length

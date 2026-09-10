@@ -751,6 +751,7 @@ def signature_like(vars: list[Variable], impl=None, monomorphic=False):
     def toname(checked: ImplementedType):
         if monomorphic: return checked.monomorphic_name
         return checked.name
+    close_brackets = 0
     while i<len(vars):
         if ret: ret += ", "
         type = vars[i].type
@@ -798,9 +799,16 @@ def signature_like(vars: list[Variable], impl=None, monomorphic=False):
             elif all(vars[k].immutable or vars[k].isprivate for k in range(i, min(len(vars),i+len(type.rets)))): pass#ret += "const "
             elif any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "edit "
             ret += toname(type)+arg_name
-            i += len(type.rets)
+            if len(type.rets)==len(vars):
+                ret += " {tag"
+                i = i+1
+                close_brackets = close_brackets+1
+            else:
+                i += len(type.rets)
         if not len(type.rets): i += 1
         #assert len(type.rets)
+    for i in range(close_brackets):
+        ret += "}"
     return ret
 
 def code_summary(tokens: list[CodeSegment], impl: "ImplementedType") -> str:
@@ -828,7 +836,7 @@ def rename(seq: list, substitute: dict[str, Variable], others: dict[str, CodeWor
 class ImplementedType:
     def __init__(self, name: str, builtin:str|None=None, at:Optional["Token"]=None, memory_size=0):
         self.name = name
-        self.count_checkable_copies: int = 0
+        self.count_checkable_copies: int = 1
         self.invalidated_by = self # which type's invalidation cause invalidation of this - right now helps invalidate pointer buffers
         self.is_literal_of: Optional["ImplementedType"] = None
         self.monomorphic_name = name.replace(",","__").replace(" ","_").replace(".","_").replace("[","_").replace("]","_").replace("{","_").replace("}","_").replace("(","_").replace(")","_").replace("->","__")+create_temp()
@@ -2603,15 +2611,16 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         total_size = 0
         for var in vars:
             if var.type.builtin: total_size += var.type.memory_size()
+        literal_type = create_literal_type(Token(str(total_size), error_token.file, error_token.row, error_token.col), UINT_TYPE)
         tmp = create_temp()
-        var = Variable(tmp, UINT_TYPE, token=error_token)
+        var = Variable(tmp, literal_type.variations[0], token=error_token)
         impl.vars[tmp] = var
-        impl.implementation.extend([
-            var,
-            CODEWORD_EQUALS,
-            create_code_word_cached(str(total_size)),
-            CODEWORD_SEMICOLON
-        ])
+        # impl.implementation.extend([
+        #     var,
+        #     CODEWORD_EQUALS,
+        #     create_code_word_cached(str(total_size)),
+        #     CODEWORD_SEMICOLON
+        # ])
         return [var]
     if _callee is not None: callee = _callee
     else: callee = _select_call(file, impl, method, vars, error_token, out_format)
@@ -2884,8 +2893,6 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                 for accompany in impl.get_required_accompany(a):
                     impl.add_required_accompany(r, accompany)
                 impl.add_required_accompany(r, a)
-
-                #print(impl.signature(), callee.signature())
 
     for var in add_to_invalidators:
         if not val.immutable:
@@ -4495,10 +4502,10 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             pos += 1
             reflection_token_text = reflection_token.text
             if len(rets)!=1:
-                get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or variable descriptors but got: '"+signature_like(rets, impl)+"'")
+                get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or variable descriptors obtained via 'type(varname)' but got: '"+signature_like(rets, impl)+"'")
             reflection_var = rets[0]
             if reflection_var.type.is_functor_of is None and reflection_var.type.is_literal_of!=ANY_TYPE:
-                get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or variable descriptors but got: '"+signature_like(rets, impl)+"'")
+                get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or variable descriptors obtained via 'type(varname)' but got: '"+signature_like(rets, impl)+"'")
             
             variation = reflection_var.type
             variations = list()
@@ -4961,8 +4968,10 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         pos += 1
         pos, ret = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
         pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
+        original_input_args = [r for r in ret]
         for i, arg in enumerate(ret):
-            if arg.type.is_literal_of==CSTR_TYPE:
+            if arg.type is CSTR_TYPE: pass
+            elif arg.type.is_literal_of is CSTR_TYPE:
                 current = arg.type.at.text
                 tmp: str|None = global_cstr2var.get(current, None)
                 ptr_type = arg.type.is_forced_pointer_type_of
@@ -4971,17 +4980,25 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     global_cstr2var[current] = variable.name
                     global_var2cstr[variable.name] = current
                 ret[i] = variable
-
+            elif arg.type.is_literal_of is UINT_TYPE:
+                current = arg.type.at.text
+                ret[i] = Variable(create_temp(), UINT_TYPE, token=current_token)
+            else:
+                literal_tok.error("type", "macros can only have known cstr or nat inputs, passed via corresponding literals but found "+signature_like([ret[i]], impl), suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
+            
         temporary_implementation = _select_call(file, impl, method, ret, literal_tok, out_format=None)
         input_args = ret
         ret = input_args+[temporary_implementation.vars[r] for r in temporary_implementation.rets]
         memory = MemoryEmulator(1024*vm_memory_kb)
         returned_values = [0 for r in ret if r.type.builtin]
         for i, arg in enumerate(input_args):
+            if arg.type==UINT_TYPE:
+                returned_values[i] = int(original_input_args[i].type.at.text)
+                continue
             if arg.type!=CSTR_TYPE: 
-                literal_tok.error("type", "macros can only have known cstr inputs", suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
+                literal_tok.error("type", "macros can only have known cstr or nat inputs, passed via corresponding literals", suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
             if arg.name not in global_var2cstr: 
-                literal_tok.error("type", "macros can only have known cstr inputs", suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
+                literal_tok.error("type", "macros can only have known cstr or nat inputs, passed via corresponding literals", suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
             returned_values[i] = memory.write_cstr(global_var2cstr[arg.name][1:-1])
         temporary_implementation.defers.clear()
         returned_error = await temporary_implementation.interpret(returned_values, memory, recursion_budget=vm_recursion_budget)
@@ -6921,7 +6938,7 @@ DEBUG_TYPE.doc.append("prints a type during compilation")
 DEBUG_TYPE.doc.append("This runs even if subsequent code fails.")
 SIZEOF_TYPE = ImplementedType("size")
 SIZEOF_TYPE.doc.append("memory size")
-SIZEOF_TYPE.doc.append("Retrieves the natural number storage size of given values.")
+SIZEOF_TYPE.doc.append("Retrieves the natural number storage size of given values. The return is in the form of 'nat' literal")
 SIZEOF_TYPE.vars["size"] = Variable("size", UINT_TYPE)
 SIZEOF_TYPE.rets.append("size")
 CAUGHT_TYPE = ImplementedType("catch", "int64_t", memory_size=8)
@@ -6968,6 +6985,12 @@ VARNAME_TYPE = ImplementedType("varname", at=compiler_token)
 VARNAME_TYPE.doc.append("tuple to cstr literal")
 VARNAME_TYPE.doc.append("Converts a tuple to a cstr literal capturing the name of local variables,")
 VARNAME_TYPE.doc.append("for example so that macros can consume the result.")
+
+LITNAME_TYPE = ImplementedType("litname", at=compiler_token)
+LITNAME_TYPE.doc.append("literal type to cstr literal")
+LITNAME_TYPE.doc.append("Converts a literal type's variable to a cstr literal capturing the value,")
+LITNAME_TYPE.doc.append("encapsulated by the type.")
+
 
 
 NODEPENDENCY_TYPE = ImplementedType("unsafe_declare_deep_copy_only", at=compiler_token)

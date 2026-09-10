@@ -25,7 +25,7 @@ def new()
 
 local def bucket_contents()
     return class (
-        assigned elements = mut unsafe::alloc cp::size cp::ptr(),
+        assigned elements = mut unsafe::alloc cp::value cp::size cp::ptr(),
         assigned size = mut 0,
         assigned allocated = mut 0
     )
@@ -54,7 +54,7 @@ def bucket()
     defer
         contents = mut cp::deref unsafe_ptr
         for i in range of contents.size
-            position = contents.elements.unsafe::add(i*cp::size cp::ptr())
+            position = contents.elements.unsafe::add(i*cp::value cp::size cp::ptr())
             unsafe::free unsafe_mut unsafe::dereference_ptr position
         unsafe::free contents.elements
         unsafe::free unsafe_ptr
@@ -167,9 +167,9 @@ local def unsafe_alloc(edit bucket allocator, nat|blank bytes)
     contents.size = contents.size+1
     if contents.size>=contents.allocated
         contents.allocated = (contents.allocated*2)+1
-        new_elements = unsafe_mut contents.elements.unsafe::realloc (contents.allocated*cp::size cp::ptr() super_unsafe)
+        new_elements = unsafe_mut contents.elements.unsafe::realloc (contents.allocated*cp::value cp::size cp::ptr() super_unsafe)
         contents.elements = new_elements&
-    position_ptr = contents.elements.unsafe::add(prev_size*cp::size cp::ptr())
+    position_ptr = contents.elements.unsafe::add(prev_size*cp::value cp::size cp::ptr())
     new_allocation = unsafe_mut unsafe::alloc bytes
     ptr_size = cp::size cp::ptr()
     {memcpy(position_ptr, &new_allocation, ptr_size);}
@@ -231,10 +231,6 @@ def alloc(edit list allocator, nat|blank length)
 def at(edit allocated surface)
     doc "get a mutable pointer to the last buffer element"
     return surface.buf[surface.pos]&
-
-local def nat32(nat x) # declare here to not import from anywhere
-    {builtins::nat32 value = x;}
-    return value
 
 def slice(edit arena surface, nat length)
     doc "a buffer subregion of an arena"

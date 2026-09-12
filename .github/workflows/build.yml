@@ -51,7 +51,7 @@ jobs:
       - name: Language tests
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            smoll${{ matrix.exe_ext }} tests/all.s --back clang
+            .\\smoll${{ matrix.exe_ext }} tests\\all.s --back clang
           else
             ./smoll${{ matrix.exe_ext }} tests/all.s
           fi

@@ -153,7 +153,7 @@ const END_MARKER = '===END===';
 
 function ensureCompilerRunning(firstTmpPath: string) {
   if (compilerProc) return;
-  const BINARY = platform() === 'win32' ? 'smoll.exe' : './smoll';
+  const BINARY = platform() === 'win32' ? '.\\smoll.exe' : './smoll';
   compilerProc = spawn(BINARY, [firstTmpPath, '--lsp'], {});
   compilerProc.stdout.setEncoding('utf8');
   compilerProc.stdout.on('data', (chunk: string) => {

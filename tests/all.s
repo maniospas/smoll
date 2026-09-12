@@ -31,6 +31,7 @@ def main()
                 failures = failures+1
 
     # final report
+    stdout_to_err()
     if failures==0
         set(colors green) print nn "PASSING "
         set(colors reset) print nn "no errors across "

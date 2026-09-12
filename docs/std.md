@@ -377,7 +377,7 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 *Defined in: std/core/error.s line 19*
 
 ```rust
-cstr(catch) -> (cstr)
+cstr(last_error) -> (cstr)
 ```
 
 Error codes should *not* be compared numerically against
@@ -1311,7 +1311,7 @@ Compares the address of two pointers.
 *Defined in: std/core/numbers.s line 40*
 
 ```rust
-eq(catch x, catch y) -> (bool)
+eq(last_error x, last_error y) -> (bool)
 ```
 
 Compares two error messages. This comparison is
@@ -1476,48 +1476,6 @@ two same-content cstr will always have the same memory address.
 - SSA variables: 3
 - Transpiled C size: 11
 
-</details>
-
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(nat _x, nat ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 63*
-
-```rust
-eq(int _x, int ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
 </details>
 
 
@@ -1920,6 +1878,48 @@ eq(str ptr x, str) -> (bool)
 </details>
 
 
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(nat _x, nat ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 63*
+
+```rust
+eq(int _x, int ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
 # neq
 ### neq - not equal
 *Defined in: std/core/bool.s line 66*
@@ -2005,7 +2005,7 @@ neq(bool x, bool y) -> (bool)
 *Defined in: std/core/numbers.s line 48*
 
 ```rust
-neq(catch x, catch y) -> (bool)
+neq(last_error x, last_error y) -> (bool)
 ```
 
 Compares two error messages. This comparison is
@@ -2236,195 +2236,6 @@ Negates the outcome of equality checks between cstr and strings.
 - SSA variables: 12
 - Transpiled C size: 33
 
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(nat _x, nat ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(int _x, int ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(float _x, float ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(nat ptr _x, nat _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(nat ptr _x, nat ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(int ptr _x, int _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(int ptr _x, int ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(float ptr _x, float _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(float ptr _x, float ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
 </details>
 
 
@@ -2671,6 +2482,195 @@ neq(str ptr x, str) -> (bool)
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 12
 - Transpiled C size: 85
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(nat _x, nat ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(int _x, int ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(float _x, float ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(nat ptr _x, nat _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(nat ptr _x, nat ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(int ptr _x, int _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(int ptr _x, int ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(float ptr _x, float _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(float ptr _x, float ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 </details>
 
@@ -4460,252 +4460,6 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-### mul - sparse*dense matrix multiplication
-*Defined in: std/sci/coo.s line 79*
-
-```rust
-mul(edit circular, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 62
-- Transpiled C size: 520
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-72. row out of bounds
-73. column out of bounds
-76. inner dimensions must agree
-20. does not fit in circular arena
-</details>
-
-
-### mul - sparse*dense matrix multiplication
-*Defined in: std/sci/coo.s line 79*
-
-```rust
-mul(edit arena, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 62
-- Transpiled C size: 520
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-72. row out of bounds
-73. column out of bounds
-76. inner dimensions must agree
-19. arena is out of space
-</details>
-
-
-### mul - sparse*dense matrix multiplication
-*Defined in: std/sci/coo.s line 79*
-
-```rust
-mul(new FLOATS, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 56
-- Transpiled C size: 505
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-72. row out of bounds
-73. column out of bounds
-76. inner dimensions must agree
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-</details>
-
-
-<details><summary>Defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
-
-### mul - vector*sparse matrix multiplication
-*Defined in: std/sci/coo.s line 69*
-
-```rust
-mul(edit circular, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-*Warning: the expression `self(v)*m` yields wrong values
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 46
-- Transpiled C size: 388
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. cannot place vectors on buffer offsets
-2. null pointer
-18. out of bounds
-20. does not fit in circular arena
-75. vector length must match matrix rows
-63. can only place vectors on contiguous buffers
-</details>
-
-
-### mul - vector*sparse matrix multiplication
-*Defined in: std/sci/coo.s line 69*
-
-```rust
-mul(edit arena, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-*Warning: the expression `self(v)*m` yields wrong values
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 46
-- Transpiled C size: 388
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. cannot place vectors on buffer offsets
-2. null pointer
-19. arena is out of space
-18. out of bounds
-75. vector length must match matrix rows
-63. can only place vectors on contiguous buffers
-</details>
-
-
-### mul - vector*sparse matrix multiplication
-*Defined in: std/sci/coo.s line 69*
-
-```rust
-mul(new FLOATS, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-*Warning: the expression `self(v)*m` yields wrong values
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 40
-- Transpiled C size: 373
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-2. null pointer
-75. vector length must match matrix rows
-13. allocation failed
-</details>
-
-
-### mul - sparse matrix*vector multiplication
-*Defined in: std/sci/coo.s line 61*
-
-```rust
-mul(edit circular, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 45
-- Transpiled C size: 388
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. cannot place vectors on buffer offsets
-2. null pointer
-18. out of bounds
-20. does not fit in circular arena
-74. matrix columns must match vector length
-63. can only place vectors on contiguous buffers
-</details>
-
-
-### mul - sparse matrix*vector multiplication
-*Defined in: std/sci/coo.s line 61*
-
-```rust
-mul(edit arena, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 45
-- Transpiled C size: 388
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. cannot place vectors on buffer offsets
-2. null pointer
-19. arena is out of space
-18. out of bounds
-74. matrix columns must match vector length
-63. can only place vectors on contiguous buffers
-</details>
-
-
-### mul - sparse matrix*vector multiplication
-*Defined in: std/sci/coo.s line 61*
-
-```rust
-mul(new FLOATS, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 39
-- Transpiled C size: 373
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-2. null pointer
-74. matrix columns must match vector length
-13. allocation failed
-</details>
-
-
 ### mul - matrix-matrix multiplication
 *Defined in: std/sci/mat.s line 123*
 
@@ -4960,6 +4714,252 @@ Grabs an allocator for the result as an effect.
 18. out of bounds
 74. matrix columns must match vector length
 2. null pointer
+13. allocation failed
+</details>
+
+
+### mul - sparse*dense matrix multiplication
+*Defined in: std/sci/coo.s line 79*
+
+```rust
+mul(edit circular, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 62
+- Transpiled C size: 520
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+72. row out of bounds
+73. column out of bounds
+76. inner dimensions must agree
+20. does not fit in circular arena
+</details>
+
+
+### mul - sparse*dense matrix multiplication
+*Defined in: std/sci/coo.s line 79*
+
+```rust
+mul(edit arena, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 62
+- Transpiled C size: 520
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+72. row out of bounds
+73. column out of bounds
+76. inner dimensions must agree
+19. arena is out of space
+</details>
+
+
+### mul - sparse*dense matrix multiplication
+*Defined in: std/sci/coo.s line 79*
+
+```rust
+mul(new FLOATS, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 56
+- Transpiled C size: 505
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+72. row out of bounds
+73. column out of bounds
+76. inner dimensions must agree
+13. allocation failed
+15. cannot allocate a buffer of unsized type
+16. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+<details><summary>Defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
+### mul - vector*sparse matrix multiplication
+*Defined in: std/sci/coo.s line 69*
+
+```rust
+mul(edit circular, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+*Warning: the expression `self(v)*m` yields wrong values
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 46
+- Transpiled C size: 388
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. cannot place vectors on buffer offsets
+2. null pointer
+18. out of bounds
+20. does not fit in circular arena
+75. vector length must match matrix rows
+63. can only place vectors on contiguous buffers
+</details>
+
+
+### mul - vector*sparse matrix multiplication
+*Defined in: std/sci/coo.s line 69*
+
+```rust
+mul(edit arena, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+*Warning: the expression `self(v)*m` yields wrong values
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 46
+- Transpiled C size: 388
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. cannot place vectors on buffer offsets
+2. null pointer
+19. arena is out of space
+18. out of bounds
+75. vector length must match matrix rows
+63. can only place vectors on contiguous buffers
+</details>
+
+
+### mul - vector*sparse matrix multiplication
+*Defined in: std/sci/coo.s line 69*
+
+```rust
+mul(new FLOATS, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+*Warning: the expression `self(v)*m` yields wrong values
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 373
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+18. out of bounds
+2. null pointer
+75. vector length must match matrix rows
+13. allocation failed
+</details>
+
+
+### mul - sparse matrix*vector multiplication
+*Defined in: std/sci/coo.s line 61*
+
+```rust
+mul(edit circular, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 388
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. cannot place vectors on buffer offsets
+2. null pointer
+18. out of bounds
+20. does not fit in circular arena
+74. matrix columns must match vector length
+63. can only place vectors on contiguous buffers
+</details>
+
+
+### mul - sparse matrix*vector multiplication
+*Defined in: std/sci/coo.s line 61*
+
+```rust
+mul(edit arena, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 388
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. cannot place vectors on buffer offsets
+2. null pointer
+19. arena is out of space
+18. out of bounds
+74. matrix columns must match vector length
+63. can only place vectors on contiguous buffers
+</details>
+
+
+### mul - sparse matrix*vector multiplication
+*Defined in: std/sci/coo.s line 61*
+
+```rust
+mul(new FLOATS, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 373
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+18. out of bounds
+2. null pointer
+74. matrix columns must match vector length
 13. allocation failed
 </details>
 
@@ -6063,90 +6063,6 @@ greater than
 *Defined in: std/ptrpeek.s line 133*
 
 ```rust
-gt(int ptr _x, int _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
-gt(int ptr _x, int ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
-gt(float ptr _x, float _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
-gt(float ptr _x, float ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
 gt(nat _x, nat ptr _y) -> (bool)
 ```
 
@@ -6232,6 +6148,90 @@ gt(nat ptr _x, nat _y) -> (bool)
 
 ```rust
 gt(nat ptr _x, nat ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
+gt(int ptr _x, int _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
+gt(int ptr _x, int ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
+gt(float ptr _x, float _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
+gt(float ptr _x, float ptr _y) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -7930,42 +7930,6 @@ Prints as a row, such as [ 1.0  2.0  3.0 ]
 </details>
 
 
-### print - print sparse matrix
-*Defined in: std/sci/coo.s line 95*
-
-```rust
-print(console CLI, coo) -> () with effects CLI
-```
-
-Prints it as coordinate as list: (i, j): v
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 22
-- Transpiled C size: 182
-
-</details>
-
-
-### print - print sparse matrix
-*Defined in: std/sci/coo.s line 95*
-
-```rust
-print(console CLI, coo, cstr endl) -> () with effects CLI
-```
-
-Prints it as coordinate as list: (i, j): v
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 21
-- Transpiled C size: 178
-
-</details>
-
-
 ### print - print a matrix with aligned brackets
 *Defined in: std/sci/mat.s line 137*
 
@@ -8011,6 +7975,42 @@ single-row matrices stay on one line; taller ones get top/mid/bottom brackets
 
 2. null pointer
 6. nat subtraction would yield a negative
+</details>
+
+
+### print - print sparse matrix
+*Defined in: std/sci/coo.s line 95*
+
+```rust
+print(console CLI, coo) -> () with effects CLI
+```
+
+Prints it as coordinate as list: (i, j): v
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 182
+
+</details>
+
+
+### print - print sparse matrix
+*Defined in: std/sci/coo.s line 95*
+
+```rust
+print(console CLI, coo, cstr endl) -> () with effects CLI
+```
+
+Prints it as coordinate as list: (i, j): v
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 178
+
 </details>
 
 
@@ -9973,46 +9973,6 @@ get(vec, nat i, "unsafe_assume_inbounds") -> (float ptr)
 </details>
 
 
-### get - get a sparse element
-*Defined in: std/sci/coo.s line 43*
-
-```rust
-get(coo, nat k) -> (sparse_element ptr)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 11
-- Transpiled C size: 50
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-</details>
-
-
-### get - get a sparse element
-*Defined in: std/sci/coo.s line 43*
-
-```rust
-get(coo, nat k, "unsafe_assume_inbounds") -> (sparse_element ptr)
-```
-
-
-*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 11
-- Transpiled C size: 27
-
-</details>
-
-
 ### get - reference to matrix element (i,j)
 *Defined in: std/sci/mat.s line 65*
 
@@ -10050,6 +10010,46 @@ get(mat, nat i, nat j, "unsafe_assume_inbounds") -> (float ptr)
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 16
 - Transpiled C size: 57
+
+</details>
+
+
+### get - get a sparse element
+*Defined in: std/sci/coo.s line 43*
+
+```rust
+get(coo, nat k) -> (sparse_element ptr)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 50
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+18. out of bounds
+</details>
+
+
+### get - get a sparse element
+*Defined in: std/sci/coo.s line 43*
+
+```rust
+get(coo, nat k, "unsafe_assume_inbounds") -> (sparse_element ptr)
+```
+
+
+*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 27
 
 </details>
 
@@ -11367,6 +11367,28 @@ mutget(edit vec, nat i, "unsafe_assume_inbounds") -> (mut float ptr)
 </details>
 
 
+### mutget - mutable reference to matrix element (i,j)
+*Defined in: std/sci/mat.s line 59*
+
+```rust
+mutget(edit mat, nat i, nat j) -> (mut float ptr)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 103
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+72. row out of bounds
+73. column out of bounds
+</details>
+
+
 ### mutget - mutable reference to a sparse element
 *Defined in: std/sci/coo.s line 52*
 
@@ -11404,28 +11426,6 @@ mutget(edit coo, nat k, "unsafe_assume_inbounds") -> (mut sparse_element ptr)
 - SSA variables: 11
 - Transpiled C size: 27
 
-</details>
-
-
-### mutget - mutable reference to matrix element (i,j)
-*Defined in: std/sci/mat.s line 59*
-
-```rust
-mutget(edit mat, nat i, nat j) -> (mut float ptr)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 16
-- Transpiled C size: 103
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-72. row out of bounds
-73. column out of bounds
 </details>
 
 
@@ -17801,22 +17801,6 @@ Warning: directly calling this constructor without safety checks is unsafe.
 </details>
 
 
-### coo
-*Defined in: std/sci/coo.s line 40*
-
-```rust
-coo(sparse_element[], nat rows, nat cols) -> (mut coo {tag, mut sparse_element ptr unsafe_ptr, mut nat rows, mut nat cols, mut nat nnz})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 40
-
-</details>
-
-
 ### coo - allocate a sparse matrix
 *Defined in: std/sci/coo.s line 34*
 
@@ -17848,6 +17832,22 @@ This creates a new buffer of sparse elements for convenience.
 free(mut any ptr) -> ()
 ```
 </details>
+
+### coo
+*Defined in: std/sci/coo.s line 40*
+
+```rust
+coo(sparse_element[], nat rows, nat cols) -> (mut coo {tag, mut sparse_element ptr unsafe_ptr, mut nat rows, mut nat cols, mut nat nnz})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 40
+
+</details>
+
 
 # float\_allocator
 ### new - allocations on new memory
@@ -20412,22 +20412,6 @@ Warning: directly calling this constructor without safety checks is unsafe.
 </details>
 
 
-### coo
-*Defined in: std/sci/coo.s line 40*
-
-```rust
-coo(sparse_element[], nat rows, nat cols) -> (mut coo {tag, mut sparse_element ptr unsafe_ptr, mut nat rows, mut nat cols, mut nat nnz})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 40
-
-</details>
-
-
 ### coo - allocate a sparse matrix
 *Defined in: std/sci/coo.s line 34*
 
@@ -20674,6 +20658,22 @@ mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr uns
 free(mut any ptr) -> ()
 ```
 </details>
+
+### coo
+*Defined in: std/sci/coo.s line 40*
+
+```rust
+coo(sparse_element[], nat rows, nat cols) -> (mut coo {tag, mut sparse_element ptr unsafe_ptr, mut nat rows, mut nat cols, mut nat nnz})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 40
+
+</details>
+
 
 # tagged
 ### tagged - blank tag structure
@@ -23140,38 +23140,6 @@ float ptr() -> (mut float ptr)
 *Defined in: std/ptrpeek.s line 21*
 
 ```rust
-to_number(nat) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 3
-
-</details>
-
-
-### to\_number
-*Defined in: std/ptrpeek.s line 21*
-
-```rust
-to_number(int) -> (int)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 3
-
-</details>
-
-
-### to\_number
-*Defined in: std/ptrpeek.s line 21*
-
-```rust
 to_number(float) -> (float)
 ```
 
@@ -23244,6 +23212,38 @@ to_number(float ptr) -> (float)
 <details><summary>Potential errors</summary>
 
 2. null pointer
+</details>
+
+
+### to\_number
+*Defined in: std/ptrpeek.s line 21*
+
+```rust
+to_number(nat) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
+</details>
+
+
+### to\_number
+*Defined in: std/ptrpeek.s line 21*
+
+```rust
+to_number(int) -> (int)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
 </details>
 
 
@@ -24189,7 +24189,7 @@ free(mut any ptr) -> ()
 *Defined in: std/core/error.s line 19*
 
 ```rust
-cstr(catch) -> (cstr)
+cstr(last_error) -> (cstr)
 ```
 
 Error codes should *not* be compared numerically against
@@ -24388,8 +24388,8 @@ A completion assert is performed at the end.
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 24
-- Transpiled C size: 122
+- SSA variables: 25
+- Transpiled C size: 128
 
 </details>
 
@@ -24418,8 +24418,8 @@ A completion assert is performed at the end.
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 28
-- Transpiled C size: 159
+- SSA variables: 29
+- Transpiled C size: 165
 
 </details>
 

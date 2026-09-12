@@ -660,7 +660,7 @@ or to comptime returns with the pattern &#8216;cstr unsafe<em>temp string</em>va
 <p><em>Defined in: std/core/error.s line 19</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">cstr</span><span class="p">(</span><span class="n">catch</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="p">)</span>
+<pre><span></span><code><span class="n">cstr</span><span class="p">(</span><span class="n">last_error</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1781,7 +1781,7 @@ This type ordains special treatment by the compiler.</p>
 <p><em>Defined in: std/core/numbers.s line 40</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">catch</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">catch</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">last_error</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">last_error</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -1980,7 +1980,7 @@ two same-content cstr will always have the same memory address.</p>
 <p><em>Defined in: std/ptrpeek.s line 63</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2006,7 +2006,7 @@ two same-content cstr will always have the same memory address.</p>
 <p><em>Defined in: std/ptrpeek.s line 63</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2032,58 +2032,6 @@ two same-content cstr will always have the same memory address.</p>
 <p><em>Defined in: std/ptrpeek.s line 63</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-4">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-5">eq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 63</em></p>
-
-<div class="codehilite">
 <pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -2105,7 +2053,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-6">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-4">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 63</em></p>
 
@@ -2131,7 +2079,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-7">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-5">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 63</em></p>
 
@@ -2157,7 +2105,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-8">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-6">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 63</em></p>
 
@@ -2183,7 +2131,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-9">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-7">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 63</em></p>
 
@@ -2209,7 +2157,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-10">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-8">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 43</em></p>
 
@@ -2235,7 +2183,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-11">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-9">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 43</em></p>
 
@@ -2261,7 +2209,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-12">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-10">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 43</em></p>
 
@@ -2287,7 +2235,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-13">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-11">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 43</em></p>
 
@@ -2313,7 +2261,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-14">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-12">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 39</em></p>
 
@@ -2339,7 +2287,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-15">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-13">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 39</em></p>
 
@@ -2365,7 +2313,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-16">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-14">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 39</em></p>
 
@@ -2391,7 +2339,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-17">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-15">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 39</em></p>
 
@@ -2417,7 +2365,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-18">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-16">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 35</em></p>
 
@@ -2443,7 +2391,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-19">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-17">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 35</em></p>
 
@@ -2469,7 +2417,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-20">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-18">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 35</em></p>
 
@@ -2495,7 +2443,7 @@ two same-content cstr will always have the same memory address.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-21">eq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-19">eq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 35</em></p>
 
@@ -2510,6 +2458,58 @@ two same-content cstr will always have the same memory address.</p>
 <li>Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 12</li>
 <li>Transpiled C size: 85</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-20">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="eq-overloads-an-operator-while-dereferencing-pointer-data-21">eq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 63</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
 </ul>
 
 <p></details></p>
@@ -2623,7 +2623,7 @@ two same-content cstr will always have the same memory address.</p>
 <p><em>Defined in: std/core/numbers.s line 48</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">catch</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">catch</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">last_error</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">last_error</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -2900,240 +2900,6 @@ by the same running program.</p>
 
 </div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data">neq - overloads an operator while dereferencing pointer data</h3>
 
-<p><em>Defined in: std/ptrpeek.s line 73</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-2">neq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 73</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-3">neq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 73</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-4">neq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 73</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-5">neq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 73</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-6">neq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 73</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-7">neq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 73</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-8">neq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 73</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-9">neq - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 73</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-10">neq - overloads an operator while dereferencing pointer data</h3>
-
 <p><em>Defined in: std/ptrpeek.s line 55</em></p>
 
 <div class="codehilite">
@@ -3158,7 +2924,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-11">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-2">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 55</em></p>
 
@@ -3184,7 +2950,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-12">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-3">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 55</em></p>
 
@@ -3210,7 +2976,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-13">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-4">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 55</em></p>
 
@@ -3236,7 +3002,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-14">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-5">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 51</em></p>
 
@@ -3262,7 +3028,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-15">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-6">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 51</em></p>
 
@@ -3288,7 +3054,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-16">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-7">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 51</em></p>
 
@@ -3314,7 +3080,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-17">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-8">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 51</em></p>
 
@@ -3340,7 +3106,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-18">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-9">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 47</em></p>
 
@@ -3366,7 +3132,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-19">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-10">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 47</em></p>
 
@@ -3392,7 +3158,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-20">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-11">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 47</em></p>
 
@@ -3418,7 +3184,7 @@ by the same running program.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-21">neq - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-12">neq - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 47</em></p>
 
@@ -3433,6 +3199,240 @@ by the same running program.</p>
 <li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 12</li>
 <li>Transpiled C size: 85</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-13">neq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 73</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-14">neq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 73</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-15">neq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 73</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-16">neq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 73</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-17">neq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 73</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-18">neq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 73</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-19">neq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 73</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-20">neq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 73</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="neq-overloads-an-operator-while-dereferencing-pointer-data-21">neq - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 73</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
 </ul>
 
 <p></details></p>
@@ -5549,299 +5549,6 @@ convenient optimizatins when allocating and immediately concatenating.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication">mul - sparse*dense matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 79</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">stride</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 62</li>
-<li>Transpiled C size: 520</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>can only place matrices on contiguous buffers</li>
-<li>cannot place matrices on buffer offsets</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>inner dimensions must agree</li>
-<li>does not fit in circular arena
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication-2">mul - sparse*dense matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 79</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">stride</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 62</li>
-<li>Transpiled C size: 520</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>can only place matrices on contiguous buffers</li>
-<li>cannot place matrices on buffer offsets</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>inner dimensions must agree</li>
-<li>arena is out of space
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication-3">mul - sparse*dense matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 79</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">stride</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 56</li>
-<li>Transpiled C size: 505</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer</li>
-<li>row out of bounds</li>
-<li>column out of bounds</li>
-<li>inner dimensions must agree</li>
-<li>allocation failed</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation
-</details></li>
-</ol>
-
-<p><details><summary>Defered calls</summary></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
-</code></pre>
-</div>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication">mul - vector*sparse matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 69</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 46</li>
-<li>Transpiled C size: 388</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="64">
-<li>cannot place vectors on buffer offsets</li>
-<li>null pointer</li>
-<li>out of bounds</li>
-<li>does not fit in circular arena</li>
-<li>vector length must match matrix rows</li>
-<li>can only place vectors on contiguous buffers
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication-2">mul - vector*sparse matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 69</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 46</li>
-<li>Transpiled C size: 388</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="64">
-<li>cannot place vectors on buffer offsets</li>
-<li>null pointer</li>
-<li>arena is out of space</li>
-<li>out of bounds</li>
-<li>vector length must match matrix rows</li>
-<li>can only place vectors on contiguous buffers
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication-3">mul - vector*sparse matrix multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 69</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 40</li>
-<li>Transpiled C size: 373</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="18">
-<li>out of bounds</li>
-<li>null pointer</li>
-<li>vector length must match matrix rows</li>
-<li>allocation failed
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication">mul - sparse matrix*vector multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 61</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 45</li>
-<li>Transpiled C size: 388</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="64">
-<li>cannot place vectors on buffer offsets</li>
-<li>null pointer</li>
-<li>out of bounds</li>
-<li>does not fit in circular arena</li>
-<li>matrix columns must match vector length</li>
-<li>can only place vectors on contiguous buffers
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication-2">mul - sparse matrix*vector multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 61</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 45</li>
-<li>Transpiled C size: 388</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="64">
-<li>cannot place vectors on buffer offsets</li>
-<li>null pointer</li>
-<li>arena is out of space</li>
-<li>out of bounds</li>
-<li>matrix columns must match vector length</li>
-<li>can only place vectors on contiguous buffers
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication-3">mul - sparse matrix*vector multiplication</h3>
-
-<p><em>Defined in: std/sci/coo.s line 61</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 39</li>
-<li>Transpiled C size: 373</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="18">
-<li>out of bounds</li>
-<li>null pointer</li>
-<li>matrix columns must match vector length</li>
-<li>allocation failed
-</details></li>
-</ol>
-
 </div><div class="std-subsection" data-defined-in="std/sci/mat.s"><h3 id="mul-matrix-matrix-multiplication">mul - matrix-matrix multiplication</h3>
 
 <p><em>Defined in: std/sci/mat.s line 123</em></p>
@@ -6143,6 +5850,299 @@ convenient optimizatins when allocating and immediately concatenating.</p>
 <li>out of bounds</li>
 <li>matrix columns must match vector length</li>
 <li>null pointer</li>
+<li>allocation failed
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication">mul - sparse*dense matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 79</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">stride</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 62</li>
+<li>Transpiled C size: 520</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>can only place matrices on contiguous buffers</li>
+<li>cannot place matrices on buffer offsets</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>inner dimensions must agree</li>
+<li>does not fit in circular arena
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication-2">mul - sparse*dense matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 79</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">stride</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 62</li>
+<li>Transpiled C size: 520</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>can only place matrices on contiguous buffers</li>
+<li>cannot place matrices on buffer offsets</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>inner dimensions must agree</li>
+<li>arena is out of space
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparsedense-matrix-multiplication-3">mul - sparse*dense matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 79</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">mat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">mat</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">stride</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 56</li>
+<li>Transpiled C size: 505</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer</li>
+<li>row out of bounds</li>
+<li>column out of bounds</li>
+<li>inner dimensions must agree</li>
+<li>allocation failed</li>
+<li>cannot allocate a buffer of unsized type</li>
+<li>cannot resize buffers with alloc; it promises no data reallocation
+</details></li>
+</ol>
+
+<p><details><summary>Defered calls</summary></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication">mul - vector*sparse matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 69</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 46</li>
+<li>Transpiled C size: 388</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="64">
+<li>cannot place vectors on buffer offsets</li>
+<li>null pointer</li>
+<li>out of bounds</li>
+<li>does not fit in circular arena</li>
+<li>vector length must match matrix rows</li>
+<li>can only place vectors on contiguous buffers
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication-2">mul - vector*sparse matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 69</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 46</li>
+<li>Transpiled C size: 388</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="64">
+<li>cannot place vectors on buffer offsets</li>
+<li>null pointer</li>
+<li>arena is out of space</li>
+<li>out of bounds</li>
+<li>vector length must match matrix rows</li>
+<li>can only place vectors on contiguous buffers
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-vectorsparse-matrix-multiplication-3">mul - vector*sparse matrix multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 69</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p>*Warning: the expression <code>self(v)*m</code> yields wrong values</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 40</li>
+<li>Transpiled C size: 373</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="18">
+<li>out of bounds</li>
+<li>null pointer</li>
+<li>vector length must match matrix rows</li>
+<li>allocation failed
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication">mul - sparse matrix*vector multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 61</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 45</li>
+<li>Transpiled C size: 388</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="64">
+<li>cannot place vectors on buffer offsets</li>
+<li>null pointer</li>
+<li>out of bounds</li>
+<li>does not fit in circular arena</li>
+<li>matrix columns must match vector length</li>
+<li>can only place vectors on contiguous buffers
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication-2">mul - sparse matrix*vector multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 61</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 45</li>
+<li>Transpiled C size: 388</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="64">
+<li>cannot place vectors on buffer offsets</li>
+<li>null pointer</li>
+<li>arena is out of space</li>
+<li>out of bounds</li>
+<li>matrix columns must match vector length</li>
+<li>can only place vectors on contiguous buffers
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mul-sparse-matrixvector-multiplication-3">mul - sparse matrix*vector multiplication</h3>
+
+<p><em>Defined in: std/sci/coo.s line 61</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mul</span><span class="p">(</span><span class="n">new</span><span class="w"> </span><span class="n">FLOATS</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">FLOATS</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 39</li>
+<li>Transpiled C size: 373</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="18">
+<li>out of bounds</li>
+<li>null pointer</li>
+<li>matrix columns must match vector length</li>
 <li>allocation failed
 </details></li>
 </ol>
@@ -7481,7 +7481,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 133</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -7507,110 +7507,6 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 133</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-3">gt - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 133</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-4">gt - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 133</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-5">gt - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 133</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="2">
-<li>null pointer
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-6">gt - overloads an operator while dereferencing pointer data</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 133</em></p>
-
-<div class="codehilite">
 <pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -7632,7 +7528,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-7">gt - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-3">gt - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 133</em></p>
 
@@ -7658,7 +7554,7 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-8">gt - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-4">gt - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 133</em></p>
 
@@ -7684,12 +7580,116 @@ Safeguards against division by zero.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-9">gt - overloads an operator while dereferencing pointer data</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-5">gt - overloads an operator while dereferencing pointer data</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 133</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-6">gt - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 133</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-7">gt - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 133</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 79</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-8">gt - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 133</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 9</li>
+<li>Transpiled C size: 68</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="2">
+<li>null pointer
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="gt-overloads-an-operator-while-dereferencing-pointer-data-9">gt - overloads an operator while dereferencing pointer data</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 133</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">gt</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -9737,48 +9737,6 @@ Automatically ends the line too.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="print-print-sparse-matrix">print - print sparse matrix</h3>
-
-<p><em>Defined in: std/sci/coo.s line 95</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
-</code></pre>
-</div>
-
-<p>Prints it as coordinate as list: (i, j): v</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 22</li>
-<li>Transpiled C size: 182</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="print-print-sparse-matrix-2">print - print sparse matrix</h3>
-
-<p><em>Defined in: std/sci/coo.s line 95</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
-</code></pre>
-</div>
-
-<p>Prints it as coordinate as list: (i, j): v</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 21</li>
-<li>Transpiled C size: 178</li>
-</ul>
-
-<p></details></p>
-
 </div><div class="std-subsection" data-defined-in="std/sci/mat.s"><h3 id="print-print-a-matrix-with-aligned-brackets">print - print a matrix with aligned brackets</h3>
 
 <p><em>Defined in: std/sci/mat.s line 137</em></p>
@@ -9836,6 +9794,48 @@ Automatically ends the line too.</p>
 <li>nat subtraction would yield a negative
 </details></li>
 </ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="print-print-sparse-matrix">print - print sparse matrix</h3>
+
+<p><em>Defined in: std/sci/coo.s line 95</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
+</code></pre>
+</div>
+
+<p>Prints it as coordinate as list: (i, j): v</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 22</li>
+<li>Transpiled C size: 182</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="print-print-sparse-matrix-2">print - print sparse matrix</h3>
+
+<p><em>Defined in: std/sci/coo.s line 95</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">print</span><span class="p">(</span><span class="n">console</span><span class="w"> </span><span class="n">CLI</span><span class="p">,</span><span class="w"> </span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">endl</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">CLI</span>
+</code></pre>
+</div>
+
+<p>Prints it as coordinate as list: (i, j): v</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 21</li>
+<li>Transpiled C size: 178</li>
+</ul>
+
+<p></details></p>
 
 </div></div><div class="std-definition"><h1 id="nn">nn</h1>
 
@@ -12174,53 +12174,6 @@ are retrieved or sliced.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="get-get-a-sparse-element">get - get a sparse element</h3>
-
-<p><em>Defined in: std/sci/coo.s line 43</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 11</li>
-<li>Transpiled C size: 50</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="18">
-<li>out of bounds
-</details></li>
-</ol>
-
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="get-get-a-sparse-element-2">get - get a sparse element</h3>
-
-<p><em>Defined in: std/sci/coo.s line 43</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unsafe_assume_inbounds&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<div class="notice-box box-warning"><strong>Warning:</strong> This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 11</li>
-<li>Transpiled C size: 27</li>
-</ul>
-
-<p></details></p>
-
 </div><div class="std-subsection" data-defined-in="std/sci/mat.s"><h3 id="get-reference-to-matrix-element-ij">get - reference to matrix element (i,j)</h3>
 
 <p><em>Defined in: std/sci/mat.s line 65</em></p>
@@ -12265,6 +12218,53 @@ are retrieved or sliced.</p>
 <li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 16</li>
 <li>Transpiled C size: 57</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="get-get-a-sparse-element">get - get a sparse element</h3>
+
+<p><em>Defined in: std/sci/coo.s line 43</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 11</li>
+<li>Transpiled C size: 50</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="18">
+<li>out of bounds
+</details></li>
+</ol>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="get-get-a-sparse-element-2">get - get a sparse element</h3>
+
+<p><em>Defined in: std/sci/coo.s line 43</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">coo</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unsafe_assume_inbounds&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="notice-box box-warning"><strong>Warning:</strong> This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 11</li>
+<li>Transpiled C size: 27</li>
 </ul>
 
 <p></details></p>
@@ -13846,6 +13846,33 @@ are retrieved or sliced.</p>
 
 <p></details></p>
 
+</div><div class="std-subsection" data-defined-in="std/sci/mat.s"><h3 id="mutget-mutable-reference-to-matrix-element-ij">mutget - mutable reference to matrix element (i,j)</h3>
+
+<p><em>Defined in: std/sci/mat.s line 59</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 16</li>
+<li>Transpiled C size: 103</li>
+</ul>
+
+<p></details></p>
+
+<p><details><summary>Potential errors</summary></p>
+
+<ol start="72">
+<li>row out of bounds</li>
+<li>column out of bounds
+</details></li>
+</ol>
+
 </div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="mutget-mutable-reference-to-a-sparse-element">mutget - mutable reference to a sparse element</h3>
 
 <p><em>Defined in: std/sci/coo.s line 52</em></p>
@@ -13892,33 +13919,6 @@ are retrieved or sliced.</p>
 </ul>
 
 <p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/sci/mat.s"><h3 id="mutget-mutable-reference-to-matrix-element-ij">mutget - mutable reference to matrix element (i,j)</h3>
-
-<p><em>Defined in: std/sci/mat.s line 59</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">mat</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 16</li>
-<li>Transpiled C size: 103</li>
-</ul>
-
-<p></details></p>
-
-<p><details><summary>Potential errors</summary></p>
-
-<ol start="72">
-<li>row out of bounds</li>
-<li>column out of bounds
-</details></li>
-</ol>
 
 </div></div><div class="std-definition"><h1 id="len">len</h1>
 
@@ -21545,25 +21545,6 @@ to indicate the new matrix&#8217;s orientation.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="coo-2">coo</h3>
-
-<p><em>Defined in: std/sci/coo.s line 40</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">coo</span><span class="p">(</span><span class="n">sparse_element</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">coo</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">nnz</span><span class="p">})</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 13</li>
-<li>Transpiled C size: 40</li>
-</ul>
-
-<p></details></p>
-
 </div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="coo-allocate-a-sparse-matrix">coo - allocate a sparse matrix</h3>
 
 <p><em>Defined in: std/sci/coo.s line 34</em></p>
@@ -21600,6 +21581,25 @@ to indicate the new matrix&#8217;s orientation.</p>
 <pre><span></span><code><span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
 </code></pre>
 </div>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="coo-2">coo</h3>
+
+<p><em>Defined in: std/sci/coo.s line 40</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">coo</span><span class="p">(</span><span class="n">sparse_element</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">coo</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">nnz</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 13</li>
+<li>Transpiled C size: 40</li>
+</ul>
 
 <p></details></p>
 
@@ -24637,25 +24637,6 @@ All computations are branchless, as literals are optimized away during compilati
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="coo-3">coo</h3>
-
-<p><em>Defined in: std/sci/coo.s line 40</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">coo</span><span class="p">(</span><span class="n">sparse_element</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">coo</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">nnz</span><span class="p">})</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 13</li>
-<li>Transpiled C size: 40</li>
-</ul>
-
-<p></details></p>
-
 </div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="coo-allocate-a-sparse-matrix-2">coo - allocate a sparse matrix</h3>
 
 <p><em>Defined in: std/sci/coo.s line 34</em></p>
@@ -24952,6 +24933,25 @@ to indicate the new matrix&#8217;s orientation.</p>
 <pre><span></span><code><span class="n">free</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">()</span>
 </code></pre>
 </div>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/sci/coo.s"><h3 id="coo-3">coo</h3>
+
+<p><em>Defined in: std/sci/coo.s line 40</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">coo</span><span class="p">(</span><span class="n">sparse_element</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">coo</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">sparse_element</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">unsafe_ptr</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">nnz</span><span class="p">})</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 13</li>
+<li>Transpiled C size: 40</li>
+</ul>
 
 <p></details></p>
 
@@ -27913,44 +27913,6 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 <p><em>Defined in: std/ptrpeek.s line 21</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 2</li>
-<li>Transpiled C size: 3</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-3">to_number</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 21</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">int</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 2</li>
-<li>Transpiled C size: 3</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-4">to_number</h3>
-
-<p><em>Defined in: std/ptrpeek.s line 21</em></p>
-
-<div class="codehilite">
 <pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">float</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -27965,7 +27927,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-5">to_number</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-3">to_number</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 21</em></p>
 
@@ -27991,7 +27953,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-6">to_number</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-4">to_number</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 21</em></p>
 
@@ -28017,7 +27979,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 </details></li>
 </ol>
 
-</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-7">to_number</h3>
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-5">to_number</h3>
 
 <p><em>Defined in: std/ptrpeek.s line 21</em></p>
 
@@ -28042,6 +28004,44 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 <li>null pointer
 </details></li>
 </ol>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-6">to_number</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 21</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 2</li>
+<li>Transpiled C size: 3</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/ptrpeek.s"><h3 id="to_number-7">to_number</h3>
+
+<p><em>Defined in: std/ptrpeek.s line 21</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">to_number</span><span class="p">(</span><span class="n">int</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 2</li>
+<li>Transpiled C size: 3</li>
+</ul>
+
+<p></details></p>
 
 </div></div><div class="std-definition"><h1 id="already_defined">already_defined</h1>
 
@@ -29161,7 +29161,7 @@ The resulting memory will consume exactly the required size in bytes.</p>
 <p><em>Defined in: std/core/error.s line 19</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">cstr</span><span class="p">(</span><span class="n">catch</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="p">)</span>
+<pre><span></span><code><span class="n">cstr</span><span class="p">(</span><span class="n">last_error</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cstr</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -29403,8 +29403,8 @@ A completion assert is performed at the end.</p>
 
 <ul>
 <li>Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 24</li>
-<li>Transpiled C size: 122</li>
+<li>SSA variables: 25</li>
+<li>Transpiled C size: 128</li>
 </ul>
 
 <p></details></p>
@@ -29438,8 +29438,8 @@ A completion assert is performed at the end.</p>
 
 <ul>
 <li>Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 28</li>
-<li>Transpiled C size: 159</li>
+<li>SSA variables: 29</li>
+<li>Transpiled C size: 165</li>
 </ul>
 
 <p></details></p>

@@ -7091,9 +7091,13 @@ UNSAFE_SIZE_VARIABLE = Variable("unsafe_size", UINT_TYPE, immutable=False, ispri
 UNSAFE_OFFSET_VARIABLE = Variable("unsafe_offset", UINT32_TYPE, immutable=False, isprivate=False)
 UNSAFE_ALIGN_VARIABLE = Variable("unsafe_align", UINT32_TYPE, immutable=False, isprivate=False)
 
+def platform_exe_path(output_name: str):
+    if sys.platform == "win32" and chosen_compiler not in ("none", "emcc"): return str(output_name)+".exe"
+    return str(output_name)
+
 def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_point: str|None) -> None:
     src_path = Path(f"{output_name}.c")
-    exe_path = Path(output_name)
+    exe_path = Path(platform_exe_path(output_name))
     header = "\n".join("#include \""+k.path+"\"" for k in externals)+"\n"
 
     discovered_defs: list[ImplementedType] = list()
@@ -7302,6 +7306,7 @@ async def main():
                 if v[1]: print("non-freed foreign object "+v[1])
         else:
             func_defs = write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0].monomorphic_name)
+            original_exe_path = exe_path
             if not args.build and chosen_compiler!="none":
                 if chosen_compiler=="emcc":
                     from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
@@ -7315,12 +7320,13 @@ async def main():
                     if perf_mode: runner = ["perf", "record", "-e", "cycles:u", "-g", "-F10000"]
                     extra_args_str = " ".join(extra_args)
                     if extra_args_str: extra_args_str = " "+extra_args_str
+                    exe_path = Path(platform_exe_path(str(exe_path)))
                     if not exe_path.is_file(): print(f"{RED}error{RESET}: executable {exe_path} not found"); errexit()
                     print(f"[{YELLOW}+{RESET}] run          {' '.join(runner)}{' ' if runner else ''}./{exe_path}{extra_args_str}")
                     try: 
                         result = subprocess.run(runner+["./"+str(exe_path)]+extra_args, text=True, check=False, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
                         if cleanup_mode: 
-                            os.remove(str(exe_path)+".c")
+                            os.remove(str(original_exe_path)+".c")
                             os.remove(str(exe_path))
                         if perf_mode:
                             replacements = {}
@@ -7360,7 +7366,7 @@ async def main():
                         if result.returncode != 0: os._exit(result.returncode)
                     except KeyboardInterrupt: 
                         if cleanup_mode: 
-                            os.remove(str(exe_path)+".c")
+                            os.remove(str(original_exe_path)+".c")
                             os.remove(str(exe_path))
                         os._exit(1)
             os._exit(0) # not in lsp or pyodide case, as it inteferes with the stdout pipe

@@ -6814,7 +6814,7 @@ parser.add_argument("--perf", action="store_true", help="Add debug symbols and p
 parser.add_argument("--time", action="store_true", help="Report the time of ending file parses.",)
 parser.add_argument("--docs", action="store_true", help="Export to a markdown file.",)
 parser.add_argument("--cleanup", action="store_true", help="Clean up generated .C files and executables.",)
-parser.add_argument("--debug", action="store_true", help="Enable debug messages for all failure.",)
+parser.add_argument("--debug", action="store_true", help="Show debug messages for all failures.",)
 parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang, none (the last option only creates a C file).",)
 parser.add_argument("--vmkb", action="store", type=int, default=256, help="VM memory in kilobytes.",)
 parser.add_argument("--vmrec", action="store", type=int, default=16, help="VM recursion budget.",)

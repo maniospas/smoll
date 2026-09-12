@@ -177,6 +177,18 @@ function ensureCompilerRunning(firstTmpPath: string) {
     if (stalled) stalled('');
     dequeueNext();
   });
+  compilerProc.on('error', (err) => {
+    connection.console.log(`[smoll] ${err.message}`);
+    compilerProc = null;
+    outputBuffer = '';
+    busy = false;
+
+    const stalled = pendingResolve;
+    pendingResolve = null;
+
+    if (stalled) stalled('');
+    dequeueNext();
+  });
 }
 
 

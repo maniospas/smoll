@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <errno.h>
 
 const char* const __temp_osname = "windows";
 
@@ -21,7 +22,9 @@ const char* const __temp_osname = "windows";
 /* ── memory-mapped file (fallback: tmpfile) ── */
 static inline FILE* fmemopen(void* buf, size_t size, const char* mode) {
     (void)buf; (void)size; (void)mode;
-    return tmpfile();
+    FILE* fp = NULL;
+    if(tmpfile_s(&fp) != 0) return NULL;
+    return fp;
 }
 
 /* ── sleep ── */
@@ -44,8 +47,7 @@ static inline double __smo_time_eta(void) {
     }
     LARGE_INTEGER now;
     QueryPerformanceCounter(&now);
-    return (double)(now.QuadPart - __smo_time_start_w.QuadPart) /
-           (double)__smo_time_freq_w.QuadPart;
+    return (double)(now.QuadPart - __smo_time_start_w.QuadPart) / (double)__smo_time_freq_w.QuadPart;
 }
 
 /* ── file size ── */
@@ -59,35 +61,22 @@ static inline uint64_t __smo_file_size(FILE* fp) {
 
 /* ── filesystem ── */
 static inline int __smo_is_file(const char* path) {
-    struct stat st;
-    if (_stat(path, &st) != 0) return 0;
-    return S_ISREG(st.st_mode);
+    struct _stat st;
+    if(_stat(path, &st) != 0) return 0;
+    return (st.st_mode & _S_IFMT) == _S_IFREG;
 }
 
 static inline int __smo_is_dir(const char* path) {
     struct _stat st;
-    if (_stat(path, &st) != 0) return 0;
+    if(_stat(path, &st) != 0) return 0;
     return (st.st_mode & _S_IFMT) == _S_IFDIR;
 }
 
-static inline int __smo_create_dir(const char* path) {
-    return _mkdir(path) == 0;
-}
-
-static inline int __smo_remove_file(const char* path) {
-    return remove(path) == 0;
-}
-
-static int __smo_fflush(FILE *fp)
-{
-    if (!fp) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    if (fflush(fp) != 0)
-        return -1;
-
+static inline int __smo_create_dir(const char* path) { return _mkdir(path) == 0; }
+static inline int __smo_remove_file(const char* path) { return remove(path) == 0; }
+static inline int __smo_fflush(FILE *fp) {
+    if (!fp) { errno = EINVAL; return -1; }
+    if (fflush(fp) != 0) return -1;
     return _commit(_fileno(fp));
 }
 
@@ -105,32 +94,25 @@ static inline FILE* __smo_open_console(void) {
     if (f) setvbuf(f, NULL, _IONBF, 0);
     return f;
 }
-
-static inline void __smo_close_console(FILE* f) {
-    if (f) fclose(f);
-    FreeConsole();
-}
+static inline void __smo_close_console(FILE* f) { if (f) fclose(f); FreeConsole();}
 
 /* ── key press ── */
 static inline int64_t __smo_next_key_press(void) {
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+    if(hIn == NULL || hIn == INVALID_HANDLE_VALUE) return -1;
     INPUT_RECORD record;
     DWORD readCount;
     int64_t code = -1;
-
     DWORD mode;
-    GetConsoleMode(hIn, &mode);
-    SetConsoleMode(hIn, mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT));
-
-    while (1) {
+    if(!GetConsoleMode(hIn, &mode)) return -1;
+    if(!SetConsoleMode(hIn, mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT))) return -1;
+    while(1) {
         if (!ReadConsoleInputW(hIn, &record, 1, &readCount)) break;
         if (record.EventType == KEY_EVENT && record.Event.KeyEvent.bKeyDown) {
-            code = ((int64_t)record.Event.KeyEvent.wVirtualKeyCode << 16)
-                 |  (int64_t)record.Event.KeyEvent.wVirtualScanCode;
+            code = ((int64_t)record.Event.KeyEvent.wVirtualKeyCode << 16) |  (int64_t)record.Event.KeyEvent.wVirtualScanCode;
             break;
         }
     }
-
     SetConsoleMode(hIn, mode);
     return code;
 }

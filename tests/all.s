@@ -11,7 +11,11 @@ def main()
     CLI = edit console()
     colors = colors CLI
     CHARS = edit arena alloc 128
-    command_base = copy "./smoll --cleanup " # suffices to make clever string building additions
+    # this one copy suffices to make clever string building additions
+    if compiler::os type "win"
+        command_base = copy "./smoll.exe --cleanup "
+    else
+        command_base = copy "./smoll --cleanup "
     counter  = mut 0
     failures = mut 0
     for path in open test_root

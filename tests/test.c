@@ -49,6 +49,7 @@ static const char* __t_all_errcodes[40] = {"noerr",
 "cannot cast a blob onto an already allocated array"
 };
 
+#line 20 "std/core/print.s"
 static inline __attribute__((always_inline)) void console__t419t() {
   goto __t_return;
   __t_return:
@@ -66,6 +67,7 @@ static inline __attribute__((always_inline)) void nat__nat____buffer__t4347t(cha
   *__t4380t=unsafe_align;
 }
 
+#line 52 "std/unsafe.s"
 static inline __attribute__((always_inline)) void free__t743t(char** __t4381t) {
   char* allocated=*__t4381t;
   if(allocated){
@@ -80,6 +82,7 @@ static inline __attribute__((always_inline)) void false__t14t(int* __t4382t) {
   *__t4382t=value;
 }
 
+#line 56 "std/core/bool.s"
 static inline __attribute__((always_inline)) void not__t51t(int __t_anon0, int* __t4383t) {
   int __t52t__=0;
   false__t14t(&__t52t__);
@@ -88,6 +91,7 @@ static inline __attribute__((always_inline)) void not__t51t(int __t_anon0, int* 
   *__t4383t=__t52t__;
 }
 
+#line 23 "std/core/numbers.s"
 static inline __attribute__((always_inline)) void is_different__t109t(uint64_t x, uint64_t y, int* __t4384t) {
   int __t110t=0;
   int __t111t__=0;
@@ -97,6 +101,7 @@ static inline __attribute__((always_inline)) void is_different__t109t(uint64_t x
   *__t4384t=__t111t__;
 }
 
+#line 26 "std/core/numbers.s"
 static inline __attribute__((always_inline)) void eq__t134t(uint64_t x, uint64_t y, char* __t4385t) {
   int __t135t__=0;
   char z=0;
@@ -107,6 +112,7 @@ static inline __attribute__((always_inline)) void eq__t134t(uint64_t x, uint64_t
   *__t4385t=z;
 }
 
+#line 33 "std/core/numbers.s"
 static inline __attribute__((always_inline)) void neq__t158t(uint64_t x, uint64_t y, char* __t4386t) {
   int __t159t__=0;
   char z=0;
@@ -117,6 +123,7 @@ static inline __attribute__((always_inline)) void neq__t158t(uint64_t x, uint64_
   *__t4386t=z;
 }
 
+#line 151 "std/core/convert.s"
 static inline __attribute__((always_inline)) void nat__t682t(uint32_t x, uint64_t* __t4387t) {
   uint64_t value=0;
   value=x;
@@ -125,6 +132,7 @@ static inline __attribute__((always_inline)) void nat__t682t(uint32_t x, uint64_
   *__t4387t=value;
 }
 
+#line 75 "std/core/numbers.s"
 static inline __attribute__((always_inline)) void mul__t212t(uint64_t x, uint64_t y, uint64_t* __t4388t) {
   int __t213t__=0;
   uint64_t z=0;
@@ -135,10 +143,12 @@ static inline __attribute__((always_inline)) void mul__t212t(uint64_t x, uint64_
   *__t4388t=z;
 }
 
+#line 59 "std/unsafe.s"
 static inline __attribute__((always_inline)) void zero__t744t(char* allocated, uint64_t from, uint64_t to) {
   ptr_memzero(allocated,from,to);
 }
 
+#line 58 "std/core/convert.s"
 static inline __attribute__((always_inline)) void exists__t652t(char* x, char* __t4389t) {
   char z=0;
   z=x!=0;
@@ -147,6 +157,7 @@ static inline __attribute__((always_inline)) void exists__t652t(char* x, char* _
   *__t4389t=z;
 }
 
+#line 30 "std/core/bool.s"
 static inline __attribute__((always_inline)) void not__t42t(char value, char* __t4390t) {
   char z=0;
   if(!value){
@@ -157,6 +168,7 @@ static inline __attribute__((always_inline)) void not__t42t(char value, char* __
   *__t4390t=z;
 }
 
+#line 25 "std/unsafe.s"
 static inline __attribute__((always_inline)) int alloc__t727t(uint64_t bytes, char** __t4391t) {
   char* allocated=0;
   char __t728t__=0;
@@ -180,6 +192,7 @@ static inline __attribute__((always_inline)) int alloc__t727t(uint64_t bytes, ch
   return __t_errcode;
 }
 
+#line 23 "std/core/array.s"
 static inline __attribute__((always_inline)) int alloc__t866t(char** __t4392t, uint64_t* __t4393t, uint32_t* __t4394t, uint32_t* __t4395t, uint64_t size, char** __t4396t, uint64_t* __t4397t, uint32_t* __t4398t, uint32_t* __t4399t) {
   char* buffer__unsafe_ptr=*__t4392t;
   uint64_t buffer__unsafe_size=*__t4393t;
@@ -266,6 +279,7 @@ static inline __attribute__((always_inline)) int alloc__t866t(char** __t4392t, u
   return __t_errcode;
 }
 
+#line 130 "std/core/numbers.s"
 static inline __attribute__((always_inline)) void ge__t373t(uint64_t x, uint64_t y, char* __t4400t) {
   int __t374t__=0;
   char z=0;
@@ -276,6 +290,7 @@ static inline __attribute__((always_inline)) void ge__t373t(uint64_t x, uint64_t
   *__t4400t=z;
 }
 
+#line 67 "std/core/numbers.s"
 static inline __attribute__((always_inline)) void add__t188t(uint64_t x, uint64_t y, uint64_t* __t4401t) {
   int __t189t__=0;
   uint64_t z=0;
@@ -290,6 +305,7 @@ static inline __attribute__((always_inline)) void unsafe_attach_type__t28t(char*
   *__t4402t=to;
 }
 
+#line 66 "std/unsafe.s"
 static inline __attribute__((always_inline)) void add__t745t(char* allocated, uint64_t offset, char** __t4403t) {
   char* element=0;
   char* __t746t__=0;
@@ -300,6 +316,7 @@ static inline __attribute__((always_inline)) void add__t745t(char* allocated, ui
   *__t4403t=__t746t__;
 }
 
+#line 96 "std/core/array.s"
 static inline __attribute__((always_inline)) int get__t1086t(char* buffer__unsafe_ptr, uint64_t buffer__unsafe_size, uint32_t buffer__unsafe_offset, uint32_t buffer__unsafe_align, uint64_t i, char** __t4404t) {
   int __t1087t=0;
   char __t1088t__=0;
@@ -330,12 +347,14 @@ static inline __attribute__((always_inline)) int get__t1086t(char* buffer__unsaf
   return __t_errcode;
 }
 
+#line 3 "std/blob.s"
 static inline __attribute__((always_inline)) void unsafe_blob__t4170t(char* unsafe_ptr, char** __t4405t) {
   goto __t_return;
   __t_return:
   *__t4405t=unsafe_ptr;
 }
 
+#line 1 "compiler"
 static inline __attribute__((always_inline)) int assert_eq__t38t(char* to, char* from) {
   int __t_errcode=0;
   int __t_complain=0;
@@ -350,6 +369,7 @@ static inline __attribute__((always_inline)) int assert_eq__t38t(char* to, char*
   return __t_errcode;
 }
 
+#line 5 "tests/test.s"
 static inline __attribute__((always_inline)) int create_blob__t4342t(char** __t4406t) {
   uint64_t __t4343t=0;
   uint64_t __t4344t=0;
@@ -417,6 +437,7 @@ static inline __attribute__((always_inline)) int create_blob__t4342t(char** __t4
   return __t_errcode;
 }
 
+#line 1 "builtins"
 static inline __attribute__((always_inline)) void char____t_buffer____buffer__t4366t(char** __t4407t, uint64_t* __t4408t, uint32_t* __t4409t, uint32_t* __t4410t) {
   char* unsafe_ptr=0;
   uint64_t unsafe_size=0;
@@ -429,6 +450,7 @@ static inline __attribute__((always_inline)) void char____t_buffer____buffer__t4
   *__t4410t=unsafe_align;
 }
 
+#line 114 "std/core/numbers.s"
 static inline __attribute__((always_inline)) void gt__t325t(uint64_t x, uint64_t y, char* __t4411t) {
   int __t326t__=0;
   char z=0;
@@ -439,6 +461,7 @@ static inline __attribute__((always_inline)) void gt__t325t(uint64_t x, uint64_t
   *__t4411t=z;
 }
 
+#line 143 "std/core/convert.s"
 static inline __attribute__((always_inline)) int nat32__t679t(uint64_t x, uint32_t* __t4412t) {
   uint64_t __t680t=0;
   char __t681t__=0;
@@ -462,6 +485,7 @@ static inline __attribute__((always_inline)) int nat32__t679t(uint64_t x, uint32
   return __t_errcode;
 }
 
+#line 10 "std/blob.s"
 static inline __attribute__((always_inline)) int as__t4251t(char* b__unsafe_ptr, char* _ret__unsafe_ptr, uint64_t _ret__unsafe_size, uint32_t _ret__unsafe_offset, uint32_t _ret__unsafe_align, char** __t4413t, uint64_t* __t4414t, uint32_t* __t4415t, uint32_t* __t4416t) {
   char* ret__unsafe_ptr=0;
   uint64_t ret__unsafe_size=0;
@@ -528,6 +552,7 @@ static inline __attribute__((always_inline)) int as__t4251t(char* b__unsafe_ptr,
   return __t_errcode;
 }
 
+#line 109 "std/core/array.s"
 static inline __attribute__((always_inline)) void len__t1094t(char* buffer__unsafe_ptr, uint64_t buffer__unsafe_size, uint32_t buffer__unsafe_offset, uint32_t buffer__unsafe_align, uint64_t* __t4417t) {
   goto __t_return;
   __t_return:
@@ -539,6 +564,7 @@ static inline __attribute__((always_inline)) void true__t15t(int* __t4418t) {
   *__t4418t=value;
 }
 
+#line 61 "std/core/bool.s"
 static inline __attribute__((always_inline)) void not__t53t(int __t_anon0, int* __t4419t) {
   int __t54t__=0;
   true__t15t(&__t54t__);
@@ -547,6 +573,7 @@ static inline __attribute__((always_inline)) void not__t53t(int __t_anon0, int* 
   *__t4419t=__t54t__;
 }
 
+#line 41 "std/core/string.s"
 static inline __attribute__((always_inline)) void str__t1544t(char* unsafe_ptr, uint64_t dat__pos, uint64_t dat__length, char dat__first, char** __t4420t, uint64_t* __t4421t, uint64_t* __t4422t, char* __t4423t) {
   goto __t_return;
   __t_return:
@@ -556,6 +583,7 @@ static inline __attribute__((always_inline)) void str__t1544t(char* unsafe_ptr, 
   *__t4423t=dat__first;
 }
 
+#line 50 "std/core/string.s"
 static inline __attribute__((always_inline)) int str__t1548t(char* buf__unsafe_ptr, uint64_t buf__unsafe_size, uint32_t buf__unsafe_offset, uint32_t buf__unsafe_align, uint64_t dat__pos, uint64_t dat__length, char dat__first, char** __t4424t, uint64_t* __t4425t, uint64_t* __t4426t, char* __t4427t) {
   char* unsafe_ptr=0;
   uint64_t __t1549t__=0;
@@ -599,6 +627,7 @@ static inline __attribute__((always_inline)) int str__t1548t(char* buf__unsafe_p
   return __t_errcode;
 }
 
+#line 57 "std/core/string.s"
 static inline __attribute__((always_inline)) int str__t1568t(char* buf__unsafe_ptr, uint64_t buf__unsafe_size, uint32_t buf__unsafe_offset, uint32_t buf__unsafe_align, char** __t4428t, uint64_t* __t4429t, uint64_t* __t4430t, char* __t4431t) {
   int __t1569t=0;
   uint64_t __t1570t__=0;
@@ -654,6 +683,7 @@ static inline __attribute__((always_inline)) int str__t1568t(char* buf__unsafe_p
   return __t_errcode;
 }
 
+#line 13 "tests/test.s"
 static inline __attribute__((always_inline)) int create_str_from_blob__t4363t(char** __t4432t, uint64_t* __t4433t, uint64_t* __t4434t, char* __t4435t) {
   char* __t4364t__unsafe_ptr=0;
   char* blobbed__unsafe_ptr=0;
@@ -699,6 +729,7 @@ static inline __attribute__((always_inline)) int create_str_from_blob__t4363t(ch
   return __t_errcode;
 }
 
+#line 315 "std/core/string.s"
 static inline __attribute__((always_inline)) void print__t1783t(char* s__unsafe_ptr, uint64_t s__dat__pos, uint64_t s__dat__length, char s__dat__first) {
   int __t1784t=0;
   const char* endl=0;
@@ -706,6 +737,7 @@ static inline __attribute__((always_inline)) void print__t1783t(char* s__unsafe_
   printf("%.*s%s",s__dat__length,s__dat__pos+s__unsafe_ptr,endl);
 }
 
+#line 17 "tests/test.s"
 static inline __attribute__((always_inline)) int main__t4371t() {
   char* __t4374t__unsafe_ptr=0;
   uint64_t __t4374t__dat__pos=0;

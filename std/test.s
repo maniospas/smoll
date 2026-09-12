@@ -5,7 +5,7 @@ local import std.io
 local def run(effect edit console CLI, cstr|str command)
     proc = process::open command
     del proc
-    if try error = compiler::catch()
+    if try error = compiler::last_error()
         return cstr error
     return cstr()
 

@@ -99,7 +99,7 @@ and handled. Preface error-prone expressions with a `try` keyword. This actually
 evaluates to true/false depending on whether execution was successful or an error
 occurred. Use it like below.
 
-At the very end of our function, the `debug::nocatch()`
+At the very end of our function, the `debug::no_unhandled_error()`
 function is called to ensure that we have enclosed all potential errors in a `try`
 statement. This is recognized during compilation, with the language helping us 
 identify missed errors up to that point. In general, there are several helper functions
@@ -120,7 +120,7 @@ def main()
         print x*x
     else
         print "failed to read number"
-    debug::nocatch() # fails compilation if we leave unhandled errors
+    debug::no_unhandled_error() # fails compilation if we leave unhandled errors
 ```
 
 The above can also be converted into a safe loop that waits for successful user
@@ -139,7 +139,7 @@ def main()
         print "invalid format"
     print nn "its square is: "
     print x*x
-    debug::nocatch() # fails compilation if we leave unhandled errors
+    debug::no_unhandled_error() # fails compilation if we leave unhandled errors
 ```
 
 ## more on types

@@ -37,7 +37,7 @@ def neq(Number x, Number y)
     {builtins::bool z = x!=y;}
     return z
 
-def eq(compiler::catch x, compiler::catch y)
+def eq(compiler::last_error x, compiler::last_error y)
     doc "equals"
     doc "Compares two error messages. This comparison is"
     doc "used only for comparing error messages produced"
@@ -45,7 +45,7 @@ def eq(compiler::catch x, compiler::catch y)
     {builtins::bool z=(x==y);}
     return z
 
-def neq(compiler::catch x, compiler::catch y)
+def neq(compiler::last_error x, compiler::last_error y)
     doc "not equal"
     doc "Compares two error messages. This comparison is"
     doc "used only for comparing error messages produced"

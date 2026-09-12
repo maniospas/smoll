@@ -1527,7 +1527,7 @@ Propagating failures is done in the spirit of writing concise but well-controlle
 **Don't care about failures. Unless you must.** That is, assume correct execution,
 as if you were scripting, and only handle failures at places where they can be handled
 safely or where they would be critical. If it is important to ensure that 
-a function does not fail up to a certain point, place the `debug::nocatch()` 
+a function does not fail up to a certain point, place the `debug::no_unhandled_error()` 
 assertion. There are various other compiler assertions too, which are covered later.
 
 ```python
@@ -1539,7 +1539,7 @@ def main()
     try x[0] = char "a" # still needs a try for buffer elements - though checks can be optimized away
     try print x[0]
     print "this must run at all costs"
-    debug::nocatch()    # error if without 'try' on all PREVIOUS calls that could fail
+    debug::no_unhandled_error()    # error if without 'try' on all PREVIOUS calls that could fail
     print x[10000]      # allowed to fail now
     print "this will never run due to out of bounds error"
 ```
@@ -1731,7 +1731,7 @@ def main()
 
 ## catching errors
 
-The `compiler::catch()` function provides the means of retrieving
+The `compiler::last_error()` function provides the means of retrieving
 an error code intercepted by `try` statements. This function creates
 an error itself if it *fails* to find an error. To avoid confusion, the
 compiler just mandates that you should wrap the catch function inside a `try` 
@@ -1746,7 +1746,7 @@ import compiler as cp
 def main()
     CLI = edit console()
     try print 2*3-20 # nat cannot become negative
-    if try error = cp::catch()
+    if try error = cp::last_error()
         print "cannot substract two nat numbers and obtain a negative result"
 ```
 
@@ -1774,7 +1774,7 @@ def main()
     try bye_error()
     del proc
 
-    if try error = cp::catch()
+    if try error = cp::last_error()
         print cstr error # prints 'bye!' if no process error
         fail error       # can fail with error codes too
 ```
@@ -1908,7 +1908,7 @@ def main()
 *Warning: This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.*
 
 So far we encountered `compiler::args()`, `compiler::skip()`, 
-`compiler::catch()`, `compiler::value(literal_value)` and `debug::nocatch()`
+`compiler::last_error()`, `compiler::value(literal_value)` and `debug::no_unhandled_error()`
 that let code interface with the compiler to an extend.
 
 There are some more mechanisms that help inspect
@@ -1998,7 +1998,7 @@ def main()
     CLI = edit console()
     SAFETY = range of 14 # recursive depth limit in playground
     try wooo 0
-    if try error = cp::catch()
+    if try error = cp::last_error()
         print cstr error # prints 'iteration end'
 ```
 
@@ -2247,11 +2247,11 @@ store lines.
 
 ```python
 import std.core
-import std.io
+import std.io.file as file
 
 def main()
     CLI = edit console()
-    f = file::read "README.md"
+    f = file::open "README.md"
     mem = char[].alloc KB 4 # max 4 KB chunk size, on char[] by default
     for line in (mem, f)
         print nn "|"
@@ -2264,7 +2264,7 @@ or even defer its deletion to when the file is no longer in use.
 
 ```python
 import std.core
-import std.io
+import std.io.file as file
 
 def main()
     CLI = edit console()
@@ -2282,7 +2282,7 @@ safe.
 
 ```python
 import std.core
-import std.io
+import std.io.file as file
 
 def main()
     CLI = edit console()
@@ -2325,7 +2325,7 @@ def main()
 
 Equivalently, manually release the process to wait for its conclusion.
 As resource release code intercepts erroneous termination with `try`,
-check on this with `compiler::catch()`.  To propagate or otherwise
+check on this with `compiler::last_error()`.  To propagate or otherwise
 handle the intercepted errors, use a pattern like below.
 
 ```python
@@ -2487,7 +2487,7 @@ def safe_main()
 def main()
     CLI = edit console()
     try safe_main()
-    if try error=cp::catch()
+    if try error=cp::last_error()
         print cstr error
 ```
 
@@ -2673,7 +2673,7 @@ import std.io.process as process
 def run(cstr|str command)
     proc = mut process::open command
     del proc # force resource deallocation = end the process
-    if try error = compiler::catch()
+    if try error = compiler::last_error()
         print cstr error
 
 def main()

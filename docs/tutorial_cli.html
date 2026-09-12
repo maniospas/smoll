@@ -361,7 +361,7 @@ and handled. Preface error-prone expressions with a <code>try</code> keyword. Th
 evaluates to true/false depending on whether execution was successful or an error
 occurred. Use it like below.</p>
 
-<p>At the very end of our function, the <code>debug::nocatch()</code>
+<p>At the very end of our function, the <code>debug::no_unhandled_error()</code>
 function is called to ensure that we have enclosed all potential errors in a <code>try</code>
 statement. This is recognized during compilation, with the language helping us 
 identify missed errors up to that point. In general, there are several helper functions
@@ -382,7 +382,7 @@ for debugging and more dynamic programs.</p>
         <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
     <span class="k">else</span>
         <span class="nb">print</span> <span class="s2">&quot;failed to read number&quot;</span>
-    <span class="n">debug</span><span class="p">::</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
+    <span class="n">debug</span><span class="p">::</span><span class="n">no_unhandled_error</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
 </code></pre>
 </div>
 
@@ -402,7 +402,7 @@ input by substituting the <code>if</code> with a <code>while</code> loop, like b
         <span class="nb">print</span> <span class="s2">&quot;invalid format&quot;</span>
     <span class="nb">print</span> <span class="n">nn</span> <span class="s2">&quot;its square is: &quot;</span>
     <span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
-    <span class="n">debug</span><span class="p">::</span><span class="n">nocatch</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
+    <span class="n">debug</span><span class="p">::</span><span class="n">no_unhandled_error</span><span class="p">()</span> <span class="c1"># fails compilation if we leave unhandled errors</span>
 </code></pre>
 </div>
 

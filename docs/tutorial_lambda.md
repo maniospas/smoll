@@ -249,7 +249,7 @@ One can actually test for errors in *smoλ* at any point, as they cascade
 upwards in the call stack. Below is an example, where `try` encloses
 potentially failing expressions. For clarity, you are not allowed to `try` 
 on an error-less expression. There are also some accompanying builtin functions 
-that provide more advanced diagnostics, like `compiler::catch` to retrieve
+that provide more advanced diagnostics, like `compiler::last_error` to retrieve
 error codes and descriptions afterwards, but these are not the subject
 of this tutorial. Only note that something like
 `try x = successor_function.compiler::call 5`

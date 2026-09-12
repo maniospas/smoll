@@ -6,28 +6,28 @@
 typedef void (*__smoll_func_ptr_type)(void);
 int __t_argc;
 char** __t_argv;
-const char* const __t5218t=" out of ";
-const char* const __t5096t="no errors found, but the run should be failing (contains _fail_ in its name)";
-const char* const __t5037t="X";
-const char* const __t5024t="] ";
-const char* const __t5034t="failure";
-const char* const __t5009t="[";
-const char* const __t5213t="FAILED ";
-const char* const __t5222t=" tests";
-const char* const __t5071t=" |- ";
-const char* const __t5177t="/";
-const char* const __t5208t="no errors across ";
-const char* const __t5203t="PASSING ";
-const char* const __t5168t="..";
-const char* const __t5146t="./tests/passing/";
-const char* const __t5106t="completed";
-const char* const __t5014t="success";
-const char* const __t5017t="V";
-const char* const __t443t="\n";
-const char* const __t5157t="./smoll --cleanup ";
 const char* const __t431t="";
+const char* const __t5037t="X";
+const char* const __t5222t=" tests";
+const char* const __t5208t="no errors across ";
+const char* const __t5009t="[";
+const char* const __t5014t="success";
+const char* const __t5096t="no errors found, but the run should be failing (contains _fail_ in its name)";
+const char* const __t5024t="] ";
+const char* const __t5177t="/";
+const char* const __t5213t="FAILED ";
 const char* const __t5184t=".s";
+const char* const __t5146t="./tests/passing/";
+const char* const __t5203t="PASSING ";
+const char* const __t443t="\n";
+const char* const __t5218t=" out of ";
+const char* const __t5168t="..";
+const char* const __t5157t="./smoll --cleanup ";
+const char* const __t5071t=" |- ";
+const char* const __t5017t="V";
 const char* const __t5191t="_fail_";
+const char* const __t5034t="failure";
+const char* const __t5106t="completed";
 static const char* __t_all_errcodes[60] = {"noerr",
 "error",
 "null pointer",

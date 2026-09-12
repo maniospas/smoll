@@ -1828,7 +1828,7 @@ You can manually <code>fail</code> like so:</p>
 <strong>Don&#8217;t care about failures. Unless you must.</strong> That is, assume correct execution,
 as if you were scripting, and only handle failures at places where they can be handled
 safely or where they would be critical. If it is important to ensure that 
-a function does not fail up to a certain point, place the <code>debug::nocatch()</code> 
+a function does not fail up to a certain point, place the <code>debug::no_unhandled_error()</code> 
 assertion. There are various other compiler assertions too, which are covered later.</p>
 
 <div class="codehilite">
@@ -1840,7 +1840,7 @@ assertion. There are various other compiler assertions too, which are covered la
     <span class="k">try</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">char</span> <span class="s2">&quot;a&quot;</span> <span class="c1"># still needs a try for buffer elements - though checks can be optimized away</span>
     <span class="k">try</span> <span class="nb">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="nb">print</span> <span class="s2">&quot;this must run at all costs&quot;</span>
-    <span class="n">debug</span><span class="p">::</span><span class="n">nocatch</span><span class="p">()</span>    <span class="c1"># error if without &#39;try&#39; on all PREVIOUS calls that could fail</span>
+    <span class="n">debug</span><span class="p">::</span><span class="n">no_unhandled_error</span><span class="p">()</span>    <span class="c1"># error if without &#39;try&#39; on all PREVIOUS calls that could fail</span>
     <span class="nb">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">10000</span><span class="p">]</span>      <span class="c1"># allowed to fail now</span>
     <span class="nb">print</span> <span class="s2">&quot;this will never run due to out of bounds error&quot;</span>
 </code></pre>
@@ -2040,7 +2040,7 @@ open files and processes.</p>
 
 <h2 id="catching-errors">catching errors</h2>
 
-<p>The <code>compiler::catch()</code> function provides the means of retrieving
+<p>The <code>compiler::last_error()</code> function provides the means of retrieving
 an error code intercepted by <code>try</code> statements. This function creates
 an error itself if it <em>fails</em> to find an error. To avoid confusion, the
 compiler just mandates that you should wrap the catch function inside a <code>try</code> 
@@ -2219,7 +2219,7 @@ functors based on arguments.</p>
 <div class="notice-box box-warning"><strong>Warning:</strong> This subsection covers debugging tricks and is better suited for advanced readers. You can skip it when working in small projects.</div>
 
 <p>So far we encountered <code>compiler::args()</code>, <code>compiler::skip()</code>, 
-<code>compiler::catch()</code>, <code>compiler::value(literal_value)</code> and <code>debug::nocatch()</code>
+<code>compiler::last_error()</code>, <code>compiler::value(literal_value)</code> and <code>debug::no_unhandled_error()</code>
 that let code interface with the compiler to an extend.</p>
 
 <p>There are some more mechanisms that help inspect
@@ -2651,7 +2651,7 @@ similarly to files.</p>
 
 <p>Equivalently, manually release the process to wait for its conclusion.
 As resource release code intercepts erroneous termination with <code>try</code>,
-check on this with <code>compiler::catch()</code>.  To propagate or otherwise
+check on this with <code>compiler::last_error()</code>.  To propagate or otherwise
 handle the intercepted errors, use a pattern like below.</p>
 
 <div class="codehilite">

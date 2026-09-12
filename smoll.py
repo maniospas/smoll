@@ -2659,7 +2659,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         if not impl.used_error_codes: error_token.error("safety", "there is nothing to catch up to here")
         impl.has_caught_used_error_codes = True
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
-        if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if try error=compiler::catch() print cstr error`")
+        if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if try error=compiler::last_error() print cstr error`")
         else: impl.count_handled_tries[-1] += 1
         impl.has_any_complaint = True
         impl.implementation.extend([
@@ -6930,7 +6930,7 @@ DEREF_TYPE.args.append("ptr")
 ABSTRACT_TYPE = ImplementedType("abstract")
 ABSTRACT_TYPE.doc.append("Abstracts a functor by removing all literal type references.")
 
-NOCATCH_TYPE = ImplementedType("nocatch")
+NOCATCH_TYPE = ImplementedType("no_unhandled_error")
 NOCATCH_TYPE.doc.append("verify no errors up to now")
 NOCATCH_TYPE.doc.append("Creates a compiler error if it is possible to have seen an error outside a 'try' statement that would have terminate this function before this point.")
 DEBUG_TYPE = ImplementedType("print")
@@ -6941,7 +6941,7 @@ SIZEOF_TYPE.doc.append("memory size")
 SIZEOF_TYPE.doc.append("Retrieves the natural number storage size of given values. The return is in the form of 'nat' literal")
 SIZEOF_TYPE.vars["size"] = Variable("size", UINT_TYPE)
 SIZEOF_TYPE.rets.append("size")
-CAUGHT_TYPE = ImplementedType("catch", "int64_t", memory_size=8)
+CAUGHT_TYPE = ImplementedType("last_error", "int64_t", memory_size=8)
 CAUGHT_TYPE.doc.append("catch the error code intercepted by 'try'")
 CAUGHT_TYPE.doc.append("Also catches the error codes produced by defers triggered by 'del'.")
 CAUGHT_TYPE.doc.append("Fails if there is no error code, otherwise returns and cleans the last error code.")
@@ -7057,7 +7057,7 @@ fixed_namespace.types["true"] = UnionType("true", at=compiler_token).append(TRUE
 fixed_namespace.types["false"] = UnionType("false", at=compiler_token).append(FALSE_TYPE)
 fixed_namespace.types["ptr"] = UnionType("ptr", at=compiler_token).append(POINTER_TYPE)
 fixed_namespace.types["unsafe_attach_type"] = UnionType("unsafe_attach_type", at=compiler_token).append(SAME_CONTENTS_TYPE).append(SAME_CONTENTS_TYPE_CSTR)
-fixed_namespace.types["catch"] = UnionType("catch", at=compiler_token).append(CAUGHT_TYPE)
+fixed_namespace.types["last_error"] = UnionType("last_error", at=compiler_token).append(CAUGHT_TYPE)
 fixed_namespace.types["for_counter"] = UnionType("for_counter", at=compiler_token).append(FOR_COUNTER_TYPE)
 fixed_namespace.types["size"] = UnionType("size", at=compiler_token).append(SIZEOF_TYPE)
 fixed_namespace.types["value"] = UnionType("value", at=compiler_token).append(RESOLVE_LITERAL_TYPE)
@@ -7077,7 +7077,7 @@ smol_namespace.namespaces["compiler"] = fixed_namespace
 
 debug_namespace = File("debug")
 debug_token = Token("debug", debug_namespace, 1, 1)
-debug_namespace.types["nocatch"] = UnionType("nocatch", at=compiler_token).append(NOCATCH_TYPE)
+debug_namespace.types["no_unhandled_error"] = UnionType("no_unhandled_error", at=compiler_token).append(NOCATCH_TYPE)
 debug_namespace.types["print"] = UnionType("print", at=compiler_token).append(DEBUG_TYPE)
 debug_namespace.types["branchless"] = UnionType("branchless", at=compiler_token).append(SUCCESS_TYPE)
 debug_namespace.types["unsafe_singletons"] = UnionType("unsafe_singletons", at=compiler_token).append(UNSAFE_EFFECTS_TYPE)
@@ -7169,11 +7169,12 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
     if chosen_compiler=="none": return
     gcc_cmd = {
         "gcc": [ "gcc", "-O3", str(src_path), "-o", str(exe_path), "-I."]+linker,
+        "clang": [ "clang", "-O2", str(src_path), "-o", str(exe_path), "-I."]+linker,
         "antcc": [ "./antcc", "-O2", str(src_path), "-o", str(exe_path), "-I."]+linker,
         "emcc": [ "emcc", "-O3", str(src_path), "-o", str(exe_path)+".js", "-I."]+linker
     }.get(chosen_compiler, None)
     if gcc_cmd is None:
-        print("[✗] "+chosen_compiler+" not found")
+        print("[✗] "+chosen_compiler+" is not a supported backend")
         errexit()
     if perf_mode: gcc_cmd = gcc_cmd+["-g", "-fno-omit-frame-pointer"]
     print(f"[{YELLOW}+{RESET}] compile     ", " ".join(gcc_cmd))

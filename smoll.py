@@ -6529,7 +6529,7 @@ async def resolve_name(path: str, at_token: Token|None) -> str:
             await download_with_progress(path, symbol, "download     "+os.path.basename(symbol).ljust(40))
         except Exception as e: 
             if at_token: at_token.error("download", str(e))
-            print("[✗] failed:")
+            print(f"[{RED}X{RESET}] failed:")
             print(str(e))
             errexit()
     else: symbol = path
@@ -6656,7 +6656,7 @@ def _load(file: File, is_main_file: bool=False, err_token:Token|None=None) -> tu
                 # message (may span multiple lines))
                 printid(str(err))
             raise FatalException
-        print(f"[{RED}✗{RESET}] {PURPLE}file read error{RESET} {err}")
+        print(f"[{RED}X{RESET}] {PURPLE}file read error{RESET} {err}")
         location = f"{file.path} line {row+1}"
         print(f"{RED}at{RESET} {location}")
         errexit()
@@ -7175,13 +7175,13 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         "emcc": [ "emcc", "-O3", str(src_path), "-o", str(exe_path)+".js", "-I."]+linker
     }.get(chosen_compiler, None)
     if gcc_cmd is None:
-        print("[✗] "+chosen_compiler+" is not a supported backend")
+        print(f"[{RED}X{RESET}] "+chosen_compiler+" is not a supported backend")
         errexit()
     if perf_mode: gcc_cmd = gcc_cmd+["-g", "-fno-omit-frame-pointer"]
     print(f"[{YELLOW}+{RESET}] compile     ", " ".join(gcc_cmd))
     result = subprocess.run(gcc_cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        print("[✗] "+chosen_compiler+" failed:")
+        print(f"[{RED}X{RESET}] "+chosen_compiler+" failed:")
         print(result.stderr)
         errexit()
     if chosen_compiler=="emcc":

@@ -1,4 +1,4 @@
-name: Build Nuitka Binaries
+name: Build Binaries
 
 on:
   push:
@@ -29,6 +29,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y patchelf
+      - name: Install Clang on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install llvm -y
+          echo "/c/Program Files/LLVM/bin" >> "$GITHUB_PATH"
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

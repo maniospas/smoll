@@ -67,6 +67,7 @@ def test(effect edit colors colors, str command, bool|blank should_fail)
     doc "Returns whether the command succeeded or not."
     doc "A completion assert is performed at the end."
     CLI = edit colors.CLI
+    stdout_to_err()
     print command
     error = mut run command
     if not should_fail is blank

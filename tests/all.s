@@ -13,7 +13,7 @@ def main()
     CHARS = edit arena alloc 128
     # this one copy suffices to make clever string building additions
     if compiler::os type "win"
-        command_base = copy "./smoll.exe --cleanup "
+        command_base = copy "./smoll.exe --back clang --cleanup "
     else
         command_base = copy "./smoll --cleanup "
     counter  = mut 0

@@ -2281,90 +2281,6 @@ Negates the outcome of equality checks between cstr and strings.
 
 
 ### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 47*
-
-```rust
-neq(cstr ptr x, cstr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 37
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 47*
-
-```rust
-neq(cstr ptr x, str) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 43
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 47*
-
-```rust
-neq(str ptr x, cstr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 47*
-
-```rust
-neq(str ptr x, str) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 12
-- Transpiled C size: 85
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
 *Defined in: std/ptrpeek.s line 73*
 
 ```rust
@@ -2705,6 +2621,90 @@ neq(str, cstr ptr y) -> (bool)
 
 ```rust
 neq(str, str ptr y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 85
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 47*
+
+```rust
+neq(cstr ptr x, cstr y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 37
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 47*
+
+```rust
+neq(cstr ptr x, str) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 43
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 47*
+
+```rust
+neq(str ptr x, cstr y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 47*
+
+```rust
+neq(str ptr x, str) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -3814,10 +3814,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -3840,10 +3840,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -3890,10 +3890,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -3916,11 +3916,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-66. different vector sizes
+64. cannot place vectors on buffer offsets
+65. different vector sizes
 2. null pointer
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -3943,10 +3943,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -3969,11 +3969,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-66. different vector sizes
+64. cannot place vectors on buffer offsets
+65. different vector sizes
 2. null pointer
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4020,7 +4020,7 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-66. different vector sizes
+65. different vector sizes
 2. null pointer
 13. allocation failed
 </details>
@@ -4289,10 +4289,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4315,10 +4315,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4365,10 +4365,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4391,11 +4391,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-66. different vector sizes
+64. cannot place vectors on buffer offsets
+65. different vector sizes
 2. null pointer
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4418,10 +4418,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4444,11 +4444,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-66. different vector sizes
+64. cannot place vectors on buffer offsets
+65. different vector sizes
 2. null pointer
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4495,7 +4495,7 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-66. different vector sizes
+65. different vector sizes
 2. null pointer
 13. allocation failed
 </details>
@@ -4519,11 +4519,11 @@ mul(edit circular, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat
 <details><summary>Potential errors</summary>
 
 2. null pointer
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
-73. row out of bounds
-74. column out of bounds
-77. inner dimensions must agree
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+72. row out of bounds
+73. column out of bounds
+76. inner dimensions must agree
 20. does not fit in circular arena
 </details>
 
@@ -4546,11 +4546,11 @@ mul(edit arena, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat po
 <details><summary>Potential errors</summary>
 
 2. null pointer
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
-73. row out of bounds
-74. column out of bounds
-77. inner dimensions must agree
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+72. row out of bounds
+73. column out of bounds
+76. inner dimensions must agree
 19. arena is out of space
 </details>
 
@@ -4573,10 +4573,10 @@ mul(new FLOATS, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat po
 <details><summary>Potential errors</summary>
 
 2. null pointer
-73. row out of bounds
-74. column out of bounds
+72. row out of bounds
+73. column out of bounds
+76. inner dimensions must agree
 13. allocation failed
-77. inner dimensions must agree
 15. cannot allocate a buffer of unsized type
 16. cannot resize buffers with alloc; it promises no data reallocation
 </details>
@@ -4608,12 +4608,12 @@ mul(edit circular, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 18. out of bounds
 20. does not fit in circular arena
-76. vector length must match matrix rows
+75. vector length must match matrix rows
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4636,12 +4636,12 @@ mul(edit arena, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
 18. out of bounds
-76. vector length must match matrix rows
+75. vector length must match matrix rows
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4664,9 +4664,9 @@ mul(new FLOATS, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 
 <details><summary>Potential errors</summary>
 
-2. null pointer
 18. out of bounds
-76. vector length must match matrix rows
+2. null pointer
+75. vector length must match matrix rows
 13. allocation failed
 </details>
 
@@ -4688,12 +4688,12 @@ mul(edit circular, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 18. out of bounds
 20. does not fit in circular arena
-75. matrix columns must match vector length
+74. matrix columns must match vector length
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4714,12 +4714,12 @@ mul(edit arena, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
 18. out of bounds
-75. matrix columns must match vector length
+74. matrix columns must match vector length
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4742,7 +4742,7 @@ mul(new FLOATS, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 
 18. out of bounds
 2. null pointer
-75. matrix columns must match vector length
+74. matrix columns must match vector length
 13. allocation failed
 </details>
 
@@ -4768,11 +4768,11 @@ Grabs an allocator for the result as an effect.
 
 2. null pointer
 20. does not fit in circular arena
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
-73. row out of bounds
-74. column out of bounds
-77. inner dimensions must agree
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+72. row out of bounds
+73. column out of bounds
+76. inner dimensions must agree
 </details>
 
 
@@ -4797,11 +4797,11 @@ Grabs an allocator for the result as an effect.
 
 2. null pointer
 19. arena is out of space
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
-73. row out of bounds
-74. column out of bounds
-77. inner dimensions must agree
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+72. row out of bounds
+73. column out of bounds
+76. inner dimensions must agree
 </details>
 
 
@@ -4826,9 +4826,9 @@ Grabs an allocator for the result as an effect.
 
 16. cannot resize buffers with alloc; it promises no data reallocation
 2. null pointer
-77. inner dimensions must agree
-73. row out of bounds
-74. column out of bounds
+72. row out of bounds
+73. column out of bounds
+76. inner dimensions must agree
 13. allocation failed
 15. cannot allocate a buffer of unsized type
 </details>
@@ -4860,12 +4860,12 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 18. out of bounds
 20. does not fit in circular arena
-76. vector length must match matrix rows
+75. vector length must match matrix rows
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4888,12 +4888,12 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
 18. out of bounds
-76. vector length must match matrix rows
+75. vector length must match matrix rows
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4916,9 +4916,9 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-2. null pointer
 18. out of bounds
-76. vector length must match matrix rows
+2. null pointer
+75. vector length must match matrix rows
 13. allocation failed
 </details>
 
@@ -4942,12 +4942,12 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 18. out of bounds
 20. does not fit in circular arena
-75. matrix columns must match vector length
+74. matrix columns must match vector length
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4970,12 +4970,12 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
 18. out of bounds
-75. matrix columns must match vector length
+74. matrix columns must match vector length
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -4999,9 +4999,72 @@ Grabs an allocator for the result as an effect.
 <details><summary>Potential errors</summary>
 
 18. out of bounds
+74. matrix columns must match vector length
 2. null pointer
-75. matrix columns must match vector length
 13. allocation failed
+</details>
+
+
+### mul - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 103*
+
+```rust
+mul(int ptr _x, int ptr _y) -> (int)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### mul - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 103*
+
+```rust
+mul(float ptr _x, float _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### mul - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 103*
+
+```rust
+mul(float ptr _x, float ptr _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
 </details>
 
 
@@ -5122,69 +5185,6 @@ mul(int ptr _x, int _y) -> (int)
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 9
 - Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### mul - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 103*
-
-```rust
-mul(int ptr _x, int ptr _y) -> (int)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### mul - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 103*
-
-```rust
-mul(float ptr _x, float _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### mul - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 103*
-
-```rust
-mul(float ptr _x, float ptr _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
 
 </details>
 
@@ -5340,11 +5340,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 20. does not fit in circular arena
 4. division by zero
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -5367,11 +5367,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
 4. division by zero
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -5419,11 +5419,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 20. does not fit in circular arena
 4. division by zero
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -5446,12 +5446,12 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-66. different vector sizes
+64. cannot place vectors on buffer offsets
+65. different vector sizes
 2. null pointer
 20. does not fit in circular arena
 4. division by zero
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -5474,11 +5474,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
 4. division by zero
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -5501,12 +5501,12 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-66. different vector sizes
+64. cannot place vectors on buffer offsets
+65. different vector sizes
 2. null pointer
 19. arena is out of space
 4. division by zero
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -5554,7 +5554,7 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-66. different vector sizes
+65. different vector sizes
 2. null pointer
 4. division by zero
 13. allocation failed
@@ -6348,6 +6348,90 @@ Compares two numbers of the same type. This is an overload for the <= operator.
 *Defined in: std/ptrpeek.s line 143*
 
 ```rust
+le(int ptr _x, int ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### le - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 143*
+
+```rust
+le(float ptr _x, float _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### le - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 143*
+
+```rust
+le(float ptr _x, float ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### le - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 143*
+
+```rust
+le(nat _x, nat ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### le - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 143*
+
+```rust
 le(int _x, int ptr _y) -> (bool)
 ```
 
@@ -6433,90 +6517,6 @@ le(nat ptr _x, nat ptr _y) -> (bool)
 
 ```rust
 le(int ptr _x, int _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### le - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 143*
-
-```rust
-le(int ptr _x, int ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### le - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 143*
-
-```rust
-le(float ptr _x, float _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### le - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 143*
-
-```rust
-le(float ptr _x, float ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### le - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 143*
-
-```rust
-le(nat _x, nat ptr _y) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -6880,10 +6880,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -6906,10 +6906,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -6956,10 +6956,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -6982,11 +6982,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-66. different vector sizes
+64. cannot place vectors on buffer offsets
+65. different vector sizes
 2. null pointer
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -7009,10 +7009,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -7035,11 +7035,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-66. different vector sizes
+64. cannot place vectors on buffer offsets
+65. different vector sizes
 2. null pointer
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -7086,9 +7086,95 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-66. different vector sizes
+65. different vector sizes
 2. null pointer
 13. allocation failed
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(nat _x, nat ptr _y) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(int _x, int ptr _y) -> (int)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(float _x, float ptr _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(nat ptr _x, nat _y) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
 </details>
 
 
@@ -7198,92 +7284,6 @@ sub(float ptr _x, float ptr _y) -> (float)
 </details>
 
 
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(nat _x, nat ptr _y) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-</details>
-
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(int _x, int ptr _y) -> (int)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(float _x, float ptr _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(nat ptr _x, nat _y) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-</details>
-
-
 # pow
 ### pow - exponentiate by
 *Defined in: std/core/numbers.s line 161*
@@ -7316,188 +7316,6 @@ pow(float x, float y) -> (float)
 - SSA variables: 3
 - Transpiled C size: 12
 
-</details>
-
-
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 146*
-
-```rust
-pow(edit circular, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 215
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-2. null pointer
-20. does not fit in circular arena
-</details>
-
-
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 146*
-
-```rust
-pow(edit arena, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 215
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-2. null pointer
-19. arena is out of space
-</details>
-
-
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 146*
-
-```rust
-pow(new FLOATS, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 28
-- Transpiled C size: 200
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-13. allocation failed
-</details>
-
-
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 135*
-
-```rust
-pow(edit circular, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 36
-- Transpiled C size: 225
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-2. null pointer
-20. does not fit in circular arena
-</details>
-
-
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 135*
-
-```rust
-pow(edit circular, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 40
-- Transpiled C size: 263
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-66. different vector sizes
-2. null pointer
-20. does not fit in circular arena
-</details>
-
-
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 135*
-
-```rust
-pow(edit arena, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 36
-- Transpiled C size: 225
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-2. null pointer
-19. arena is out of space
-</details>
-
-
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 135*
-
-```rust
-pow(edit arena, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 40
-- Transpiled C size: 263
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
-66. different vector sizes
-2. null pointer
-19. arena is out of space
 </details>
 
 
@@ -7544,9 +7362,191 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-66. different vector sizes
+65. different vector sizes
 2. null pointer
 13. allocation failed
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 146*
+
+```rust
+pow(edit circular, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 215
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. cannot place vectors on buffer offsets
+2. null pointer
+20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 146*
+
+```rust
+pow(edit arena, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 215
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. cannot place vectors on buffer offsets
+2. null pointer
+19. arena is out of space
+63. can only place vectors on contiguous buffers
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 146*
+
+```rust
+pow(new FLOATS, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 200
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+13. allocation failed
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 135*
+
+```rust
+pow(edit circular, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 225
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. cannot place vectors on buffer offsets
+2. null pointer
+20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 135*
+
+```rust
+pow(edit circular, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 263
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. cannot place vectors on buffer offsets
+65. different vector sizes
+2. null pointer
+20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 135*
+
+```rust
+pow(edit arena, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 225
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. cannot place vectors on buffer offsets
+2. null pointer
+19. arena is out of space
+63. can only place vectors on contiguous buffers
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 135*
+
+```rust
+pow(edit arena, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 263
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. cannot place vectors on buffer offsets
+65. different vector sizes
+2. null pointer
+19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -7923,42 +7923,6 @@ print(console CLI, str, cstr endl) -> () with effects CLI
 </details>
 
 
-### print - print sparse matrix
-*Defined in: std/sci/coo.s line 95*
-
-```rust
-print(console CLI, coo) -> () with effects CLI
-```
-
-Prints it as coordinate as list: (i, j): v
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 22
-- Transpiled C size: 182
-
-</details>
-
-
-### print - print sparse matrix
-*Defined in: std/sci/coo.s line 95*
-
-```rust
-print(console CLI, coo, cstr endl) -> () with effects CLI
-```
-
-Prints it as coordinate as list: (i, j): v
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 21
-- Transpiled C size: 178
-
-</details>
-
-
 ### print - print a matrix with aligned brackets
 *Defined in: std/sci/mat.s line 137*
 
@@ -8052,6 +8016,42 @@ Prints as a row, such as [ 1.0  2.0  3.0 ]
 
 2. null pointer
 6. nat subtraction would yield a negative
+</details>
+
+
+### print - print sparse matrix
+*Defined in: std/sci/coo.s line 95*
+
+```rust
+print(console CLI, coo) -> () with effects CLI
+```
+
+Prints it as coordinate as list: (i, j): v
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 182
+
+</details>
+
+
+### print - print sparse matrix
+*Defined in: std/sci/coo.s line 95*
+
+```rust
+print(console CLI, coo, cstr endl) -> () with effects CLI
+```
+
+Prints it as coordinate as list: (i, j): v
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 178
+
 </details>
 
 
@@ -9343,60 +9343,6 @@ are retrieved or sliced.
 
 
 ### mutget - get a mutable hash map entry
-*Defined in: std/map.s line 49*
-
-```rust
-mutget(edit robinhood_nat_entry[], edit any[], nat key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
-```
-
-Implemented for string or cstr keys but buffer of any values.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 65
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-2. null pointer
-5. modulo by zero
-6. nat subtraction would yield a negative
-61. string buffer is full
-</details>
-
-
-### mutget - get a mutable hash map entry
-*Defined in: std/map.s line 39*
-
-```rust
-mutget(edit robinhood_str_entry[], edit any[], str) -> (mut any ptr {follows any ptr values.unsafe_ptr})
-```
-
-Implemented for string or cstr keys but buffer of any values.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 22
-- Transpiled C size: 94
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-2. null pointer
-5. modulo by zero
-6. nat subtraction would yield a negative
-61. string buffer is full
-</details>
-
-
-### mutget - get a mutable hash map entry
 *Defined in: std/map.s line 39*
 
 ```rust
@@ -9419,7 +9365,7 @@ Implemented for string or cstr keys but buffer of any values.
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-61. string buffer is full
+60. string buffer is full
 </details>
 
 
@@ -9468,7 +9414,7 @@ mutget(edit circular, edit terminal, nat) -> (str {tag, char ptr unsafe_ptr, nat
 
 2. null pointer
 18. out of bounds
-52. not open file
+51. not open file
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
@@ -9495,7 +9441,7 @@ mutget(edit circular, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat da
 
 2. null pointer
 18. out of bounds
-52. not open file
+51. not open file
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
@@ -9522,7 +9468,7 @@ mutget(edit circular, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat da
 
 2. null pointer
 18. out of bounds
-52. not open file
+51. not open file
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
@@ -9549,7 +9495,7 @@ mutget(edit circular, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat
 
 2. null pointer
 18. out of bounds
-52. not open file
+51. not open file
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
@@ -9576,7 +9522,7 @@ mutget(edit circular, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat
 
 2. null pointer
 18. out of bounds
-52. not open file
+51. not open file
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
@@ -9629,7 +9575,7 @@ mutget(edit arena, edit terminal, nat) -> (str {tag, char ptr unsafe_ptr, nat da
 
 2. null pointer
 18. out of bounds
-52. not open file
+51. not open file
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
@@ -9656,7 +9602,7 @@ mutget(edit arena, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.p
 
 2. null pointer
 18. out of bounds
-52. not open file
+51. not open file
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
@@ -9683,7 +9629,7 @@ mutget(edit arena, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.p
 
 2. null pointer
 18. out of bounds
-52. not open file
+51. not open file
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
@@ -9710,7 +9656,7 @@ mutget(edit arena, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.po
 
 2. null pointer
 18. out of bounds
-52. not open file
+51. not open file
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
@@ -9737,7 +9683,7 @@ mutget(edit arena, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.po
 
 2. null pointer
 18. out of bounds
-52. not open file
+51. not open file
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
@@ -9762,8 +9708,62 @@ mutget(edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.l
 
 <details><summary>Potential errors</summary>
 
-58. not open dir
-59. end of dir
+57. not open dir
+58. end of dir
+</details>
+
+
+### mutget - get a mutable hash map entry
+*Defined in: std/map.s line 49*
+
+```rust
+mutget(edit robinhood_nat_entry[], edit any[], nat key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+```
+
+Implemented for string or cstr keys but buffer of any values.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 65
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+18. out of bounds
+2. null pointer
+5. modulo by zero
+6. nat subtraction would yield a negative
+60. string buffer is full
+</details>
+
+
+### mutget - get a mutable hash map entry
+*Defined in: std/map.s line 39*
+
+```rust
+mutget(edit robinhood_str_entry[], edit any[], str) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+```
+
+Implemented for string or cstr keys but buffer of any values.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 94
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+18. out of bounds
+2. null pointer
+5. modulo by zero
+6. nat subtraction would yield a negative
+60. string buffer is full
 </details>
 
 
@@ -9861,8 +9861,8 @@ mutget(edit mat, nat i, nat j) -> (mut float ptr)
 
 <details><summary>Potential errors</summary>
 
-73. row out of bounds
-74. column out of bounds
+72. row out of bounds
+73. column out of bounds
 </details>
 
 
@@ -10081,33 +10081,6 @@ get(str, nat i, "unsafe_assume_inbounds") -> (char ptr)
 
 
 ### get - get a hash map entry
-*Defined in: std/map.s line 44*
-
-```rust
-get(robinhood_nat_entry[], any[], nat key) -> (any ptr {follows any ptr values.unsafe_ptr})
-```
-
-Implemented for string or cstr keys but buffer of any values.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 57
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-2. null pointer
-5. modulo by zero
-6. nat subtraction would yield a negative
-60. index not found
-</details>
-
-
-### get - get a hash map entry
 *Defined in: std/map.s line 34*
 
 ```rust
@@ -10130,7 +10103,7 @@ Implemented for string or cstr keys but buffer of any values.
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-60. index not found
+59. index not found
 </details>
 
 
@@ -10157,7 +10130,34 @@ Implemented for string or cstr keys but buffer of any values.
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-60. index not found
+59. index not found
+</details>
+
+
+### get - get a hash map entry
+*Defined in: std/map.s line 44*
+
+```rust
+get(robinhood_nat_entry[], any[], nat key) -> (any ptr {follows any ptr values.unsafe_ptr})
+```
+
+Implemented for string or cstr keys but buffer of any values.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 57
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+18. out of bounds
+2. null pointer
+5. modulo by zero
+6. nat subtraction would yield a negative
+59. index not found
 </details>
 
 
@@ -10183,8 +10183,8 @@ get(edit circular, cstr url) -> (nat status, str) with effects CHARS
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -10213,8 +10213,8 @@ get(edit circular, str) -> (nat status, str) with effects CHARS
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -10240,8 +10240,8 @@ get(edit arena, cstr url) -> (nat status, str) with effects CHARS
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -10270,8 +10270,8 @@ get(edit arena, str) -> (nat status, str) with effects CHARS
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -10297,8 +10297,8 @@ get(new CHARS, cstr url) -> (nat status, str) with effects CHARS
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -10335,8 +10335,8 @@ get(new CHARS, str) -> (nat status, str) with effects CHARS
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -10445,8 +10445,8 @@ get(mat, nat i, nat j) -> (float ptr)
 
 <details><summary>Potential errors</summary>
 
-73. row out of bounds
-74. column out of bounds
+72. row out of bounds
+73. column out of bounds
 </details>
 
 
@@ -11383,9 +11383,9 @@ alloc(cstr) -> (mut char[])
 13. allocation failed
 15. cannot allocate a buffer of unsized type
 16. cannot resize buffers with alloc; it promises no data reallocation
-82. empty input name
-83. cannot tag a structural type
+81. empty input name
 18. out of bounds
+82. cannot tag a structural type
 19. arena is out of space
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
@@ -11420,10 +11420,10 @@ alloc(cstr surface, cstr obj) -> (mut char[])
 13. allocation failed
 15. cannot allocate a buffer of unsized type
 16. cannot resize buffers with alloc; it promises no data reallocation
-82. empty input name
-83. cannot tag a structural type
+81. empty input name
 18. out of bounds
-84. tag surface cannot be structural type
+82. cannot tag a structural type
+83. tag surface cannot be structural type
 19. arena is out of space
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
@@ -11776,6 +11776,38 @@ with another allocator).
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
+arena("float__t4097t") -> (edit arena {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t4031t") -> (edit arena {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
 arena("float__t3744t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
@@ -11857,38 +11889,6 @@ arena("float__t612t") -> (edit arena {tag, edit float[], mut nat pos})
 
 ```rust
 arena("float__t4t") -> (edit arena {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### arena
-*Defined in: std/sci/vec.s line 23*
-
-```rust
-arena("float__t4097t") -> (edit arena {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### arena
-*Defined in: std/sci/vec.s line 23*
-
-```rust
-arena("float__t4031t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12548,7 +12548,7 @@ at(edit robinhood_nat_entry[], nat _k) -> (mut nat)
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-61. string buffer is full
+60. string buffer is full
 </details>
 
 
@@ -12573,7 +12573,7 @@ at(edit robinhood_str_entry[], str) -> (mut nat)
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-61. string buffer is full
+60. string buffer is full
 </details>
 
 
@@ -12598,7 +12598,7 @@ at(edit robinhood_str_entry[], cstr _k) -> (mut nat)
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-61. string buffer is full
+60. string buffer is full
 </details>
 
 
@@ -14170,10 +14170,10 @@ Grabs a FLOATS for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -14196,10 +14196,10 @@ Grabs a FLOATS for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -15149,7 +15149,7 @@ find(nat[], nat _k) -> (mut nat)
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-60. index not found
+59. index not found
 </details>
 
 
@@ -15174,7 +15174,7 @@ find(str[], str) -> (mut nat)
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-60. index not found
+59. index not found
 </details>
 
 
@@ -15199,7 +15199,7 @@ find(str[], cstr _k) -> (mut nat)
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-60. index not found
+59. index not found
 </details>
 
 
@@ -15224,7 +15224,7 @@ find(robinhood_nat_entry[], nat _k) -> (mut nat)
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-60. index not found
+59. index not found
 </details>
 
 
@@ -15249,7 +15249,7 @@ find(robinhood_str_entry[], str) -> (mut nat)
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-60. index not found
+59. index not found
 </details>
 
 
@@ -15274,7 +15274,7 @@ find(robinhood_str_entry[], cstr _k) -> (mut nat)
 2. null pointer
 5. modulo by zero
 6. nat subtraction would yield a negative
-60. index not found
+59. index not found
 </details>
 
 
@@ -15460,6 +15460,24 @@ on four nat state fields. The version is seed-initalized. Its period is 2^256-1.
 
 
 # next
+### next - next random number
+*Defined in: std/rand.s line 87*
+
+```rust
+next(mut Rand {tag, mut nat s0, mut nat s1, mut nat s2, mut nat s3}) -> (float)
+```
+
+Computes the next random number of a Rand sequence.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 79
+
+</details>
+
+
 ### next
 *Defined in: std/map.s line 54*
 
@@ -15501,24 +15519,6 @@ next(robinhood_str_entry[], mut nat pos) -> (mut str {tag, mut char ptr unsafe_p
 
 18. out of bounds
 2. null pointer
-</details>
-
-
-### next - next random number
-*Defined in: std/rand.s line 87*
-
-```rust
-next(mut Rand {tag, mut nat s0, mut nat s1, mut nat s2, mut nat s3}) -> (float)
-```
-
-Computes the next random number of a Rand sequence.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 12
-- Transpiled C size: 79
-
 </details>
 
 
@@ -16493,8 +16493,8 @@ The default application/json content type is used.
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16520,8 +16520,8 @@ post(edit circular, cstr url, cstr _body, cstr content_type) -> (nat status, str
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16552,8 +16552,8 @@ The default application/json content type is used.
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16582,8 +16582,8 @@ post(edit circular, cstr url, str, cstr content_type) -> (nat status, str) with 
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16614,8 +16614,8 @@ The default application/json content type is used.
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16644,8 +16644,8 @@ post(edit circular, str, cstr _body, cstr content_type) -> (nat status, str) wit
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16676,8 +16676,8 @@ The default application/json content type is used.
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16706,8 +16706,8 @@ post(edit circular, str, str, cstr content_type) -> (nat status, str) with effec
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16735,8 +16735,8 @@ The default application/json content type is used.
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16762,8 +16762,8 @@ post(edit arena, cstr url, cstr _body, cstr content_type) -> (nat status, str) w
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16794,8 +16794,8 @@ The default application/json content type is used.
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16824,8 +16824,8 @@ post(edit arena, cstr url, str, cstr content_type) -> (nat status, str) with eff
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16856,8 +16856,8 @@ The default application/json content type is used.
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16886,8 +16886,8 @@ post(edit arena, str, cstr _body, cstr content_type) -> (nat status, str) with e
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16918,8 +16918,8 @@ The default application/json content type is used.
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16948,8 +16948,8 @@ post(edit arena, str, str, cstr content_type) -> (nat status, str) with effects 
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -16977,8 +16977,8 @@ The default application/json content type is used.
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -17012,8 +17012,8 @@ post(new CHARS, cstr url, cstr _body, cstr content_type) -> (nat status, str) wi
 21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -17052,8 +17052,8 @@ The default application/json content type is used.
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -17090,8 +17090,8 @@ post(new CHARS, cstr url, str, cstr content_type) -> (nat status, str) with effe
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -17130,8 +17130,8 @@ The default application/json content type is used.
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -17168,8 +17168,8 @@ post(new CHARS, str, cstr _body, cstr content_type) -> (nat status, str) with ef
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -17208,8 +17208,8 @@ The default application/json content type is used.
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -17246,8 +17246,8 @@ post(new CHARS, str, str, cstr content_type) -> (nat status, str) with effects C
 18. out of bounds
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
-62. curl initialization failed
-63. out of memory while reading response
+61. curl initialization failed
+62. out of memory while reading response
 </details>
 
 
@@ -17550,9 +17550,9 @@ vec(edit circular, nat length) -> (mut vec {tag, mut float ptr unsafe_ptr, mut n
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -17573,9 +17573,9 @@ vec(edit circular, nat length, "dirty") -> (mut vec {tag, mut float ptr unsafe_p
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -17596,9 +17596,9 @@ vec(edit arena, nat length) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat 
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -17619,9 +17619,9 @@ vec(edit arena, nat length, "dirty") -> (mut vec {tag, mut float ptr unsafe_ptr,
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 19. arena is out of space
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -17642,8 +17642,8 @@ vec(edit float[]) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut n
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -17785,9 +17785,9 @@ mat(edit float[], nat rows) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat 
 
 19. arena is out of space
 4. division by zero
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
-72. buffer size not divisible by vector rows
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+71. buffer size not divisible by vector rows
 </details>
 
 
@@ -17809,8 +17809,8 @@ mat(edit circular, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_pt
 <details><summary>Potential errors</summary>
 
 20. does not fit in circular arena
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
 </details>
 
 
@@ -17832,8 +17832,8 @@ mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr 
 <details><summary>Potential errors</summary>
 
 20. does not fit in circular arena
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
 </details>
 
 
@@ -17855,8 +17855,8 @@ mat(edit arena, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, 
 <details><summary>Potential errors</summary>
 
 19. arena is out of space
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
 </details>
 
 
@@ -17878,8 +17878,8 @@ mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr uns
 <details><summary>Potential errors</summary>
 
 19. arena is out of space
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
 </details>
 
 
@@ -18044,102 +18044,6 @@ new() -> (new {tag})
 </details>
 
 
-### arena
-*Defined in: std/sci/vec.s line 23*
-
-```rust
-arena("float__t3744t") -> (edit arena {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### arena
-*Defined in: std/sci/vec.s line 23*
-
-```rust
-arena("float__t662t") -> (edit arena {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### arena
-*Defined in: std/sci/vec.s line 23*
-
-```rust
-arena("float__t620t") -> (edit arena {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### arena
-*Defined in: std/sci/vec.s line 23*
-
-```rust
-arena("float__t616t") -> (edit arena {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### arena
-*Defined in: std/sci/vec.s line 23*
-
-```rust
-arena("float__t612t") -> (edit arena {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### arena
-*Defined in: std/sci/vec.s line 23*
-
-```rust
-arena("float__t4t") -> (edit arena {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
 ### circular
 *Defined in: std/sci/vec.s line 24*
 
@@ -18300,6 +18204,102 @@ arena("float__t4031t") -> (edit arena {tag, edit float[], mut nat pos})
 </details>
 
 
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t3744t") -> (edit arena {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t662t") -> (edit arena {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t620t") -> (edit arena {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t616t") -> (edit arena {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t612t") -> (edit arena {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t4t") -> (edit arena {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
 # constvec
 ### constvec - treat an immutable float buffer as an immutable vector
 *Defined in: std/sci/vec.s line 42*
@@ -18318,215 +18318,12 @@ constvec(float[]) -> (vec {tag, float ptr unsafe_ptr, nat pos, nat length})
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
+63. can only place vectors on contiguous buffers
 </details>
 
 
 # reduce
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-```rust
-reduce(vec, "rel", vec, "add", "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 53
-- Transpiled C size: 451
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-4. division by zero
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-```rust
-reduce(vec, "rel", vec, "add", "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 53
-- Transpiled C size: 449
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-4. division by zero
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-```rust
-reduce(vec, "rel", vec, "add") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 49
-- Transpiled C size: 405
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-4. division by zero
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-```rust
-reduce(vec, "rel", vec, "l2") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 52
-- Transpiled C size: 437
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-4. division by zero
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-```rust
-reduce(vec, "rel", vec, "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 49
-- Transpiled C size: 387
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-4. division by zero
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-```rust
-reduce(vec, "rel", vec, "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 49
-- Transpiled C size: 385
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-4. division by zero
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-```rust
-reduce(vec, "rel", vec) -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 45
-- Transpiled C size: 341
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-4. division by zero
-</details>
-
-
 ### reduce - reduce a vector to one value
 *Defined in: std/sci/vec.s line 176*
 
@@ -19872,6 +19669,209 @@ All computations are branchless, as literals are optimized away during compilati
 </details>
 
 
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+```rust
+reduce(vec, "rel", vec, "add", "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 451
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+18. out of bounds
+4. division by zero
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+```rust
+reduce(vec, "rel", vec, "add", "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 449
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+18. out of bounds
+4. division by zero
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+```rust
+reduce(vec, "rel", vec, "add") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 49
+- Transpiled C size: 405
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+18. out of bounds
+4. division by zero
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+```rust
+reduce(vec, "rel", vec, "l2") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 52
+- Transpiled C size: 437
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+18. out of bounds
+4. division by zero
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+```rust
+reduce(vec, "rel", vec, "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 49
+- Transpiled C size: 387
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+18. out of bounds
+4. division by zero
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+```rust
+reduce(vec, "rel", vec, "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 49
+- Transpiled C size: 385
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+18. out of bounds
+4. division by zero
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+```rust
+reduce(vec, "rel", vec) -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 341
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+18. out of bounds
+4. division by zero
+</details>
+
+
 # dot
 ### dot - dot product
 *Defined in: std/sci/vec.s line 212*
@@ -19896,6 +19896,22 @@ dot(vec, vec) -> (float)
 
 
 # sum
+### sum - sum
+*Defined in: std/sci/vec.s line 216*
+
+```rust
+sum(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 15
+
+</details>
+
+
 ### sum - sum of all elements
 *Defined in: std/sci/coo.s line 125*
 
@@ -19931,11 +19947,11 @@ result[j] = sum of all stored values in column j
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 18. out of bounds
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -19958,11 +19974,11 @@ result[j] = sum of all stored values in column j
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
 18. out of bounds
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -20010,11 +20026,11 @@ result[i] = sum of all stored values in row i
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 18. out of bounds
 20. does not fit in circular arena
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -20037,11 +20053,11 @@ result[i] = sum of all stored values in row i
 
 <details><summary>Potential errors</summary>
 
-64. can only place vectors on contiguous buffers
-65. cannot place vectors on buffer offsets
+64. cannot place vectors on buffer offsets
 2. null pointer
 19. arena is out of space
 18. out of bounds
+63. can only place vectors on contiguous buffers
 </details>
 
 
@@ -20067,22 +20083,6 @@ result[i] = sum of all stored values in row i
 2. null pointer
 18. out of bounds
 13. allocation failed
-</details>
-
-
-### sum - sum
-*Defined in: std/sci/vec.s line 216*
-
-```rust
-sum(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 2 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 6
-- Transpiled C size: 15
-
 </details>
 
 
@@ -20312,9 +20312,9 @@ pearson(vec, vec) -> (float)
 <details><summary>Potential errors</summary>
 
 2. null pointer
-67. vectors must have the same length
-68. at least two values required
-69. undefined for constant vectors
+66. vectors must have the same length
+67. at least two values required
+68. undefined for constant vectors
 4. division by zero
 </details>
 
@@ -20405,9 +20405,9 @@ constmat(float[], nat rows) -> (mat {tag, float ptr unsafe_ptr, nat pos, nat row
 
 19. arena is out of space
 4. division by zero
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
-72. buffer size not divisible by vector rows
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+71. buffer size not divisible by vector rows
 </details>
 
 
@@ -20446,7 +20446,7 @@ row(mat, nat i) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat
 
 <details><summary>Potential errors</summary>
 
-73. row out of bounds
+72. row out of bounds
 </details>
 
 
@@ -20487,10 +20487,10 @@ todense(edit circular, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat 
 
 2. null pointer
 20. does not fit in circular arena
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
-73. row out of bounds
-74. column out of bounds
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+72. row out of bounds
+73. column out of bounds
 </details>
 
 
@@ -20513,10 +20513,10 @@ todense(edit arena, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos
 
 2. null pointer
 19. arena is out of space
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
-73. row out of bounds
-74. column out of bounds
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+72. row out of bounds
+73. column out of bounds
 </details>
 
 
@@ -20539,8 +20539,8 @@ todense(new FLOATS, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos
 
 16. cannot resize buffers with alloc; it promises no data reallocation
 2. null pointer
-73. row out of bounds
-74. column out of bounds
+72. row out of bounds
+73. column out of bounds
 13. allocation failed
 15. cannot allocate a buffer of unsized type
 </details>
@@ -20695,9 +20695,9 @@ mat(edit float[], nat rows) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat 
 
 19. arena is out of space
 4. division by zero
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
-72. buffer size not divisible by vector rows
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
+71. buffer size not divisible by vector rows
 </details>
 
 
@@ -20719,8 +20719,8 @@ mat(edit circular, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_pt
 <details><summary>Potential errors</summary>
 
 20. does not fit in circular arena
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
 </details>
 
 
@@ -20742,8 +20742,8 @@ mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr 
 <details><summary>Potential errors</summary>
 
 20. does not fit in circular arena
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
 </details>
 
 
@@ -20765,8 +20765,8 @@ mat(edit arena, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, 
 <details><summary>Potential errors</summary>
 
 19. arena is out of space
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
 </details>
 
 
@@ -20788,8 +20788,8 @@ mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr uns
 <details><summary>Potential errors</summary>
 
 19. arena is out of space
-70. can only place matrices on contiguous buffers
-71. cannot place matrices on buffer offsets
+69. can only place matrices on contiguous buffers
+70. cannot place matrices on buffer offsets
 </details>
 
 
@@ -20891,7 +20891,7 @@ unsafe_match(tagged ptr obj, cstr name, any ptr type) -> (mut any ptr {follows a
 
 <details><summary>Potential errors</summary>
 
-81. does not match
+80. does not match
 2. null pointer
 </details>
 
@@ -21259,7 +21259,7 @@ unsafe_pipe_match(with, cstr name, any ptr type) -> (mut any ptr {follows any pt
 
 <details><summary>Potential errors</summary>
 
-81. does not match
+80. does not match
 2. null pointer
 </details>
 
@@ -21357,9 +21357,9 @@ shared(cstr) -> (mut char[])
 13. allocation failed
 15. cannot allocate a buffer of unsized type
 16. cannot resize buffers with alloc; it promises no data reallocation
-82. empty input name
-83. cannot tag a structural type
+81. empty input name
 18. out of bounds
+82. cannot tag a structural type
 19. arena is out of space
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
@@ -21394,10 +21394,10 @@ shared(cstr surface, cstr obj) -> (mut char[])
 13. allocation failed
 15. cannot allocate a buffer of unsized type
 16. cannot resize buffers with alloc; it promises no data reallocation
-82. empty input name
-83. cannot tag a structural type
+81. empty input name
 18. out of bounds
-84. tag surface cannot be structural type
+82. cannot tag a structural type
+83. tag surface cannot be structural type
 19. arena is out of space
 21. can only define strings on contiguous buffers
 22. can only define strings on non-offset buffers
@@ -21689,7 +21689,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-85. cannot cast a blob onto an already allocated array
+84. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21711,7 +21711,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-85. cannot cast a blob onto an already allocated array
+84. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21733,7 +21733,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-85. cannot cast a blob onto an already allocated array
+84. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21755,7 +21755,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-85. cannot cast a blob onto an already allocated array
+84. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21777,7 +21777,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-85. cannot cast a blob onto an already allocated array
+84. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21799,7 +21799,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-85. cannot cast a blob onto an already allocated array
+84. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21821,7 +21821,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-85. cannot cast a blob onto an already allocated array
+84. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -22179,7 +22179,7 @@ draw(edit window {tag, float size.width, float size.height, cstr title, mut bool
 
 <details><summary>Potential errors</summary>
 
-79. alopeny drawing on window
+78. alopeny drawing on window
 </details>
 
 
@@ -22505,23 +22505,6 @@ texture(edit window, Texture, float pos.x, float pos.y, nat8 color.r, nat8 color
 
 # circ
 ### circ
-*Defined in: std/graphics.s line 231*
-
-```rust
-circ(edit window, float pos.x, float pos.y, float radius, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 36
-
-</details>
-
-
-*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_circle_v(pyray.Vector2($pos__x,$pos__y),$radius,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
-### circ
 *Defined in: std/graphics.s line 318*
 
 ```rust
@@ -22538,6 +22521,23 @@ circ(edit window, float pos.x, float pos.y, float radius, "line", nat thickness,
 
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
+### circ
+*Defined in: std/graphics.s line 231*
+
+```rust
+circ(edit window, float pos.x, float pos.y, float radius, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 36
+
+</details>
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_circle_v(pyray.Vector2($pos__x,$pos__y),$radius,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # ellipse
 ### ellipse
 *Defined in: std/graphics.s line 251*
@@ -22591,23 +22591,6 @@ line(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float thicknes
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_line_ex(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),$thickness,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # rect
 ### rect
-*Defined in: std/graphics.s line 272*
-
-```rust
-rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 14
-- Transpiled C size: 24
-
-</details>
-
-
-*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))`*
-### rect
 *Defined in: std/graphics.s line 286*
 
 ```rust
@@ -22640,6 +22623,23 @@ rect(edit window, float pos.x, float pos.y, float size.width, float size.height,
 
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_rectangle_lines_ex(pyray.Rectangle($pos__x,$pos__y,$size__width,$size__height),$thickness,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
+### rect
+*Defined in: std/graphics.s line 272*
+
+```rust
+rect(edit window, float pos.x, float pos.y, float size.width, float size.height, "solid", nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 14
+- Transpiled C size: 24
+
+</details>
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # tri
 ### tri
 *Defined in: std/graphics.s line 307*
@@ -24999,7 +24999,7 @@ even if stout is suppressed during the 'test' function.
 
 <details><summary>Potential errors</summary>
 
-86. assert failed
+85. assert failed
 </details>
 
 

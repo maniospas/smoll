@@ -69,12 +69,23 @@ def to_end(edit File f)
     doc "move to file end"
     doc "Moves the file opening position to the end of the file"
     doc "but does not close it."
-    if not exists f.unsafe_ptr: fail "failed to move to end of closed file"
+    if not exists f.unsafe_ptr: fail "file is closed"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_END);}
 
-def seek(edit File f, nat idx)
-    if not exists f.unsafe_ptr: fail "failed to move to a position to closed file"
+def seek(edit File f, nat idx, "set"|blank)
+    doc "move to a specific position to a file"
+    if not exists f.unsafe_ptr: fail "file is closed"
     {fseek((FILE*)f__unsafe_ptr, idx, SEEK_SET);}
+
+def seek(edit File f, nat idx, "forward")
+    doc "move forward in the file"
+    if not exists f.unsafe_ptr: fail "file is closed"
+    {fseek((FILE*)f__unsafe_ptr, idx, SEEK_CUR);}
+
+def seek(edit File f, nat idx, "backward")
+    doc "move backeward in the file"
+    if not exists f.unsafe_ptr: fail "file is closed"
+    {fseek((FILE*)f__unsafe_ptr, 0-idx, SEEK_CUR);}
 
 def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     doc "next line"

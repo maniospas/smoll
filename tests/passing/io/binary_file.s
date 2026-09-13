@@ -13,11 +13,11 @@ def main()
     assert(1==file::position f, "moved backward in file")
 
     if try file::chunk(chunk_buffer, f)
-        first_byte = bits nat chunk_buffer[0] # bits are always 64 bits and can be converted to and from char
+        first_byte = bits nat nat8 chunk_buffer[0] # bits are always 64 bits and can be converted to and from char
         print chunk_buffer[0]      # char 
-        print nat chunk_buffer[0]  # nat id
+        print nat nat8 chunk_buffer[0]  # nat id
         print nat first_byte       # back to nat (is the same)
-        assert(nat(first_byte)==nat(chunk_buffer[0]), "correct conversion to bits")
+        assert(nat(first_byte)==nat(nat8 chunk_buffer[0]), "correct conversion to bits")
         print tochar nat8 nat first_byte
         assert((tochar nat8 nat first_byte)==(chunk_buffer[0]), "correct round-conversion to bits")
-        print nat((bits chunk_buffer[0]).lshift 8) + nat(chunk_buffer[1])
+        print nat((bits chunk_buffer[0]).lshift 8) + nat(nat8 chunk_buffer[1])

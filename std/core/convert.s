@@ -19,39 +19,25 @@ local import std.core.numbers
 
 def float(Number x)
     doc "cast to float"
-    if not x is float
-        doc "May lose information because floats are not exact representation of all integers."
-    if x is float
-        doc "Serves as a tautology function for code that parses on multiple number types."
+    if x is float: doc "Serves as a tautology function for code that parses on multiple number types."
+    else: doc "May lose information because floats are not exact representation of all integers."
     {builtins::float z=x;}
     return z
 
 def int(Number x)
     doc "cast to int"
-    if x is float
-        doc "May lose information due to truncating."
-    if x is nat
-        doc "Overflows are mapped to negative integers without any numerical safeguards."
-    if x is int
-        doc "Serves as a tautology function for code that parses on multiple number types."
+    if x is float: doc "May lose information due to truncating."
+    if x is nat:   doc "Overflows are mapped to negative integers without any numerical safeguards."
+    if x is int:   doc "Serves as a tautology function for code that parses on multiple number types."
     {builtins::int z=x;}
     return z
 
 def nat(Number x)
     doc "cast to nat"
     doc "Converting to natural numbers loses information."
-    doc" Failed on negative input because it typically indicates a later error in buffer indexing."
-    if x is int and x<int(0)
-        fail "cannot convert negative int to nat"
-    if x is float and x<float(0)
-        fail "cannot convert negative float to nat"
-    {builtins::nat value=x;}
-    return value
-
-def nat(char x)
-    doc "cast to nat"
-    doc "Converting a character to a natural number considers"
-    doc "its bit representation interpreted as an unsigned number."
+    doc" Fails on negative inputs to guard against assumption errors."
+    if x is int   and x<int(0): fail "cannot convert negative int to nat"
+    if x is float and x<float(0): fail "cannot convert negative float to nat"
     {builtins::nat value=x;}
     return value
 
@@ -101,6 +87,8 @@ def float(bits x)
     
 def lshift(bits x, nat y) 
     doc "left shift"
+    doc "Reminder that bits store 64 bits and thus this shift should"
+    doc "be casted to lower-bit numbers (e.g., nat16) to truncate leading ones."
     {builtins::nat z = (x__value<<y);}
     return bits z
 
@@ -153,11 +141,10 @@ def nat16(nat x)
 
 def nat16(nat x, "truncate")
     doc "convert unsigned number to 16-bit unsigned number"
-    doc "The conversion truncates the given input, if it would not fit."
-    doc "For example, 65536 would become 1."
+    doc "This conversion truncates the given input, if it would not fit."
+    doc "For example, 65536 becomes 1."
     {builtins::nat16 value = x;}
     return value
-
 
 def nat32(nat x)
     doc "convert unsigned number to 32-bit unsigned number"
@@ -166,21 +153,34 @@ def nat32(nat x)
     if x>4294967295: fail "nat value too large to pack in nat32"
     {builtins::nat32 value = x;}
     return value
+
+def nat32(nat x, "truncate")
+    doc "convert unsigned number to 32-bit unsigned number"
+    doc "The conversion truncates the given input, if it would not fit."
+    doc "For example, 4294967295 becomes 1."
+    VM "[x%4294967295]"
+    {builtins::nat32 value = x;}
+    return value
     
-def nat(nat32 x)
-    doc "retrieved unsigned number from 32-bit unsigned number"
+def nat(nat8|nat16|nat32 x)
+    doc "retrieved unsigned number from lesser-bit unsigned number"
     {builtins::nat value = x;}
     return value
 
-def nat(nat16 x)
-    doc "retrieved unsigned number from 16-bit unsigned number"
-    {builtins::nat value = x;}
+def nat32(nat8|nat16 x)
+    doc "retrieved 32-bit unsigned number from lesser-bit unsigned number"
+    {builtins::nat32 value = x;}
+    return value
+    
+def nat16(nat8 x)
+    doc "retrieved 16-bit unsigned number from lesser-bit unsigned number"
+    {builtins::nat16 value = x;}
     return value
 
-def nat(nat8 x)
-    doc "retrieved unsigned number from 8-bit unsigned number"
-    {builtins::nat value = x;}
-    return value
-
-def bits(char|nat8|nat16|nat32 value)
+def bits(nat8|nat16|nat32 value)
+    doc "converts unsigned numbers to bits"
     return bits nat value
+
+def bits(char value)
+    doc "converts a character to its bit representation"
+    return bits nat8 value

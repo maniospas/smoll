@@ -23,7 +23,7 @@ def Hashable = nat|float|cstr|str
 def hash(str k, nat size)
     h = mut 5381
     for i in range of len k
-        h = h.bits().lshift(5).nat().add(h) + nat k[i]
+        h = h.bits().lshift(5).nat().add(h) + nat nat8 k[i]
     return h.mod size
 
 def hash(nat k, nat size)

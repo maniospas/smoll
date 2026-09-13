@@ -37,6 +37,7 @@ static void __t_handle_sigint(int sig) {
 }
 
 #ifdef __EMSCRIPTEN__
+#include <dirent.h>
 #define DECLARE_HANDLERS struct sigaction __t_sa = { .sa_handler = __t_handle_sigint };\
     sigemptyset(&__t_sa.sa_mask);\
     __t_sa.sa_flags = 0;\

@@ -26,4 +26,3 @@ def mutget(edit dir::open data, nat)
 def mutget(effect edit arena<char::tag>|circular<char::tag> CHARS, edit file::File|process::open f, nat)
     return file::line|process::line(CHARS, f)
 
-

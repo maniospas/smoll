@@ -11,9 +11,9 @@ def addnat(nat x)
     # compiler::abstract(...) abstracts away the literals,
     # which is safe as literals are eliminated at compile 
     # time. So we return a `nat->nat` functor.
-    if x==0 return compiler::abstract(type add<nat,0>)
-    if x==1 return compiler::abstract(type add<nat,1>)
-    if x==2 return compiler::abstract(type add<nat,2>)
+    if x==0: return compiler::abstract(type add<nat,0>)
+    if x==1: return compiler::abstract(type add<nat,1>)
+    if x==2: return compiler::abstract(type add<nat,2>)
     # zero initialization otherwise creates a null pointer error 
     # when trying to call the return
 

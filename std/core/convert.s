@@ -62,20 +62,20 @@ def exists(const any ptr x)
 
 def bits(nat value)
     doc "bit representation"
-    doc "Retrives the bit representation of a number of shift"
+    doc "Retrieves the bit representation of a number of shift"
     doc "arithmetics and bitwise operations."
     return class value
 
 def bits(int x)
     doc "bit representation"
-    doc "Retrives the bit representation of a number of shift"
+    doc "Retrieves the bit representation of a number of shift"
     doc "arithmetics and bitwise operations."
     {builtins::nat z=x;}
     return bits z
 
 def bits(float x)
     doc "bit representation"
-    doc "Retrives the bit representation of a number of shift"
+    doc "Retrieves the bit representation of a number of shift"
     doc "arithmetics and bitwise operations."
     {builtins::nat z=0;}
     {memcpy(&z, &x, 8);}
@@ -125,35 +125,54 @@ def bor(bits x, bits y)
     return bits z
 
 def nat8(nat x)
-    doc "convert unsigned number to 8 bits"
+    doc "convert unsigned number to 8-bit unsigned number"
     doc "The conversion checks whether the previous value fits in the new one."
     doc "If it does not, this operation can fail."
-    if x>255 fail "nat value too large to pack in nat8"
+    if x>255: fail "nat value too large to pack in nat8"
+    {builtins::nat8 value = x;}
+    return value
+
+def tochar(nat8 x)
+    {builtins::char value = x;}
+    return value
+
+def nat8(char x)
+    doc "convert a character to 8-bit unsigned number"
+    doc "The conversion checks whether the previous value fits in the new one."
+    doc "If it does not, this operation can fail."
     {builtins::nat8 value = x;}
     return value
 
 def nat16(nat x)
-    doc "convert unsigned number to 16 bits"
+    doc "convert unsigned number to 16-bit unsigned number"
     doc "The conversion checks whether the previous value fits in the new one."
     doc "If it does not, this operation can fail."
-    if x>65535 fail "nat value too large to pack in nat16"
+    if x>65535: fail "nat value too large to pack in nat16"
     {builtins::nat16 value = x;}
     return value
 
 def nat32(nat x)
-    doc "convert unsigned number to 32 bits"
+    doc "convert unsigned number to 32-bit unsigned number"
     doc "The conversion checks whether the previous value fits in the new one."
     doc "If it does not, this operation can fail."
-    if x>4294967295 fail "nat value too large to pack in nat32"
+    if x>4294967295: fail "nat value too large to pack in nat32"
     {builtins::nat32 value = x;}
     return value
     
 def nat(nat32 x)
-    doc "retrieved unsigned number from 32 bits"
+    doc "retrieved unsigned number from 32-bit unsigned number"
     {builtins::nat value = x;}
     return value
 
 def nat(nat16 x)
-    doc "retrieved unsigned number from 16 bits"
+    doc "retrieved unsigned number from 16-bit unsigned number"
     {builtins::nat value = x;}
     return value
+
+def nat(nat8 x)
+    doc "retrieved unsigned number from 8-bit unsigned number"
+    {builtins::nat value = x;}
+    return value
+
+def bits(char|nat8|nat16|nat32 value)
+    return bits nat value

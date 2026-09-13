@@ -28,7 +28,7 @@ def cstr(compiler::last_error value)
     {builtins::cstr ret = __t_all_errcodes[value];}
     return ret
 
-# def exists(compiler::last_error value)
-#     doc "checks that an error code is an error"
-#     {builtins::bool ret = (value!=0);}
-#     return ret
+def ok(compiler::last_error value)
+    doc "checks that an error code is an error"
+    {builtins::bool ret = (value==0);}
+    return ret

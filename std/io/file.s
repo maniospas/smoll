@@ -49,7 +49,7 @@ def write(str|cstr _path)
 def terminal()
     doc "opens a new system writable interactive terminal, fails if no display is available"
     {builtins::bool has_gui = __smo_has_display();}
-    if not has_gui fail "cannot open a new terminal in the current environment"
+    if not has_gui: fail "cannot open a new terminal in the current environment"
     {builtins::compiler::ptr unsafe_ptr = __smo_open_console();}
     defer
         {__smo_close_console((FILE*)unsafe_ptr); unsafe_ptr=0;}
@@ -62,30 +62,39 @@ def File = open|write|terminal
 def to_start(edit File f)
     doc "move to file start"
     doc "Moves the file opening position to the start of the file."
-    if not exists f.unsafe_ptr fail "failed to move to start of closed file"
+    if not exists f.unsafe_ptr: fail "failed to move to start of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_SET);}
 
 def to_end(edit File f)
     doc "move to file end"
     doc "Moves the file opening position to the end of the file"
     doc "but does not close it."
-    if not exists f.unsafe_ptr fail "failed to move to end of closed file"
+    if not exists f.unsafe_ptr: fail "failed to move to end of closed file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_END);}
+
+def seek(edit File f, nat idx)
+    if not exists f.unsafe_ptr: fail "failed to move to a position to closed file"
+    {fseek((FILE*)f__unsafe_ptr, idx, SEEK_SET);}
 
 def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     doc "next line"
     doc "Retrieves the next chunk of data from a file,"
     doc "and stores it on a char[] buffer at a given position."
-    doc "A string representation of the stored data are returned."
-    doc "An error is created if the buffer's"
-    doc "size is exceeded."
+    doc "A string representation of the stored data is returned,"
+    doc "but do note that this may interweave null character data"
+    doc "because strings are defined over char[] buffers."
+    doc "The read chunk will have size up to the remainder size of"
+    doc "the buffer, so it is better (safer) to access character data"
+    doc "from the result."
+    doc "An error is created if the buffer's size is exceeded."
     if pos is blank
         pos = mut 0
-    if not exists buf.unsafe_ptr fail "not open file"
+    if not exists buf.unsafe_ptr: fail "not open file"
     contents = unsafe::add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos
-    {builtins::nat bytes_open = f__unsafe_ptr?fread((char*)contents, 1, size, (FILE*)f__unsafe_ptr):0;}
-    if bytes_open==0 fail "end of file"
+    bytes_open = 0
+    if exists f.unsafe_ptr: {bytes_open = fread((char*)contents, 1, size, (FILE*)f__unsafe_ptr);}
+    if bytes_open==0: fail "end of file"
     prev_pos = const pos
     pos = pos+bytes_open
     return str(buf, prev_pos len bytes_open)
@@ -117,11 +126,11 @@ def line(effect edit arena<char::tag>|circular<char::tag> CHARS, edit File f)
 
 local def _print(edit terminal|write f, str text)
     doc "writes a string to a write file"
-    if not exists f.unsafe_ptr fail "failed to write to closed file"
+    if not exists f.unsafe_ptr: fail "failed to write to closed file"
     if 0!=text.dat.length
         {builtins::compiler::ptr first_pos = text__unsafe_ptr+text__dat__pos;}
         {builtins::nat bytes_written = fwrite(first_pos, 1, text__dat__length, (FILE*)f__unsafe_ptr);}
-        if bytes_written!=len text fail "failed to write to file"
+        if bytes_written!=len text: fail "failed to write to file"
 
 def print(edit terminal|write f, str|cstr text, cstr|blank endl)
     if endl is blank

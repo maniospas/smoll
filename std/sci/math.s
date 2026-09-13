@@ -18,14 +18,14 @@ local import "std/extern/math.h"
 local import std.core
 
 def abs(float x)
-    if x<0.0 return neg x
+    if x<0.0: return neg x
     return x
     # VM "[abs($x)]"
     # {builtins::int c = 0x7FFFFFFFFFFFFFFF;}
     # return float bits(x).band(bits c)
 
 def abs(int x)
-    if x<int 0 return neg x
+    if x<int 0: return neg x
     return x
     # VM "[abs($x)]"
     # mask = rshift(bits x, 63)

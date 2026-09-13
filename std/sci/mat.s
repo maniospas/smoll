@@ -36,8 +36,8 @@ def mat(effect edit new FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
 
 def mat(effect edit float_allocator\new FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
     doc "matrix on an existing vecpos"
-    if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place matrices on contiguous buffers"
-    if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place matrices on buffer offsets"
+    if FLOATS.buf.unsafe_align.nat()!=8: fail "can only place matrices on contiguous buffers"
+    if FLOATS.buf.unsafe_offset.nat()!=0: fail "cannot place matrices on buffer offsets"
     size = rows*cols
     surface = FLOATS.alloc size
     if clear_policy is blank
@@ -47,26 +47,26 @@ def mat(effect edit float_allocator\new FLOATS, nat rows, nat cols, "dirty"|blan
 def constmat(float[] buf, nat rows)
     doc "immutable matrix on an immutable float[] buffer"
     cols = len(buf)/rows
-    if cols*rows!=len buf fail "buffer size not divisible by vector rows"
+    if cols*rows!=len buf: fail "buffer size not divisible by vector rows"
     return const mat(arena unsafe_mut buf, rows, cols dirty)
 
 def mat(edit float[] buf, nat rows)
     doc "matrix on an existing float[] buffer"
     cols = len(buf)/rows
-    if cols*rows!=len buf fail "buffer size not divisible by vector rows"
+    if cols*rows!=len buf: fail "buffer size not divisible by vector rows"
     return mat(arena unsafe_mut buf, rows, cols dirty)
 
 def mutget(edit mat m, nat i, nat j)
     doc "mutable reference to matrix element (i,j)"
-    if i>=m.rows fail "row out of bounds"
-    if j>=m.cols fail "column out of bounds"
+    if i>=m.rows: fail "row out of bounds"
+    if j>=m.cols: fail "column out of bounds"
     return unsafe_mut m.unsafe_ptr+8*(m.pos+i*m.stride+j)
 
 def get(mat m, nat i, nat j, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "reference to matrix element (i,j)"
     if inbounds_guarantee is blank
-        if i>=m.rows fail "row out of bounds"
-        if j>=m.cols fail "column out of bounds"
+        if i>=m.rows: fail "row out of bounds"
+        if j>=m.cols: fail "column out of bounds"
     else
         doc ""
         doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
@@ -93,13 +93,13 @@ def mutvec(mat m)
 
 def row(mat m, nat i)
     doc "view matrix row as a vector"
-    if i>=m.rows fail "row out of bounds"
+    if i>=m.rows: fail "row out of bounds"
     return vec(m.unsafe_ptr, m.pos+i*m.stride, m.cols)
 
 def mul(effect edit float_allocator FLOATS, mat m, vec v)
     doc "matrix-vector multiplication"
     doc "Grabs an allocator for the result as an effect."
-    if m.cols!=v.length fail "matrix columns must match vector length"
+    if m.cols!=v.length: fail "matrix columns must match vector length"
     result = edit vec m.rows
     for i in range of m.rows
         acc = mut 0.0
@@ -111,7 +111,7 @@ def mul(effect edit float_allocator FLOATS, mat m, vec v)
 def mul(effect edit float_allocator FLOATS, vec v, mat m)
     doc "vector-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
-    if v.length!=m.rows fail "vector length must match matrix rows"
+    if v.length!=m.rows: fail "vector length must match matrix rows"
     result = edit vec m.cols
     for j in range of m.cols
         acc = mut 0.0
@@ -123,7 +123,7 @@ def mul(effect edit float_allocator FLOATS, vec v, mat m)
 def mul(effect edit float_allocator FLOATS, mat m1, mat m2)
     doc "matrix-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
-    if m1.cols!=m2.rows fail "inner dimensions must agree"
+    if m1.cols!=m2.rows: fail "inner dimensions must agree"
     result = edit mat(m1.rows, m2.cols)
     for i in range of m1.rows
         for j in range of m2.cols
@@ -140,15 +140,15 @@ def print(effect edit console CLI, mat m, cstr|blank endl)
     if endl is blank
         endl = "\n"
     for i in range of m.rows
-        if m.rows==1  print ("[ ", "")
-        if m.rows>1 and i==0 print ("⎡ ", "")
-        if m.rows>1 and i>0 and i<m.rows-1 print ("⎢ ", "")
-        if m.rows>1 and i==m.rows-1 print ("⎣ ", "")
+        if m.rows==1: print ("[ ", "")
+        if m.rows>1 and i==0: print ("⎡ ", "")
+        if m.rows>1 and i>0 and i<m.rows-1: print ("⎢ ", "")
+        if m.rows>1 and i==m.rows-1: print ("⎣ ", "")
         for j in range of m.cols
             print (m[i,j unsafe_assume_inbounds], "")
-            if j<m.cols-1 print ("  ", "")
-        if m.rows==1 print (" ]", "")
-        if m.rows>1 and i==0 print (" ⎤", "")
-        if m.rows>1 and i>0 and i<m.rows-1 print (" ⎥", "")
-        if m.rows>1 and i==m.rows-1 print (" ⎦", "")
+            if j<m.cols-1: print ("  ", "")
+        if m.rows==1: print (" ]", "")
+        if m.rows>1 and i==0: print (" ⎤", "")
+        if m.rows>1 and i>0 and i<m.rows-1: print (" ⎥", "")
+        if m.rows>1 and i==m.rows-1: print (" ⎦", "")
         print ("", endl)

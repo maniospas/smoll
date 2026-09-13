@@ -62,9 +62,8 @@ def resize(edit any[] buffer, nat size, "unsafe"|blank prunning)
     doc "If old size was zero, an error is created instead of allocating so that this does not leak"
     doc "resources."
     if prunning is blank
-        if buffer.unsafe_size>=size 
-            return buffer
-        if buffer.unsafe_size==0 fail "cannot resize an unallocated or freed buffer"
+        if buffer.unsafe_size>=size: return buffer
+        if buffer.unsafe_size==0: fail "cannot resize an unallocated or freed buffer"
     #if buffer.unsafe_offset.nat()!=0 fail "cannot resize a buffer with offset"
     prev_bytes = buffer.unsafe_size*buffer.unsafe_align.nat()
     buffer.unsafe_size = size
@@ -87,7 +86,7 @@ def mutget(edit any[] buffer, nat i, "unsafe_assume_inbounds"|blank inbounds_gua
     doc "equal to element size, but more complicated situations arise in situations where sub-buffers"
     doc "are retrieved or sliced."
     if inbounds_guarantee is blank
-        if i>=buffer.unsafe_size fail "out of bounds"
+        if i>=buffer.unsafe_size: fail "out of bounds"
     else
         doc ""
         doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
@@ -100,7 +99,7 @@ def get(any[] buffer, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "equal to element size, but more complicated situations arise in situations where sub-buffers"
     doc "are retrieved or sliced."
     if inbounds_guarantee is blank
-        if i>=buffer.unsafe_size fail "out of bounds"
+        if i>=buffer.unsafe_size: fail "out of bounds"
     else
         doc ""
         doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"

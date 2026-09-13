@@ -1,8 +1,8 @@
 # Learn smo<span>λ</span>
 
 We will cover the basics of *smoλ* here. Try examples in your browser or 
-install the language by following the instructions <a href="install.html">here</a>. 
-Find a complete list of concepts in the <a href="reference.html">reference guide</a>.
+<a href="install.html">install the language</a>.
+Find all available functionalities in the <a href="reference.html">reference guide</a>.
 
 <div class="toc" markdown="1">
 
@@ -21,11 +21,11 @@ _9._ [what next?](#what-next) <br>
 ## hello world!
 
 In accordance to tradition, our first program below greets everyone!
-We use the `repo` instruction to tell the language that it should automatically download
+We use `repo` to tell the language that it should automatically download
 code under *std/* from a corresponding web URL (downloaded code is stored in a *.cache* folder).
 Following examples will not have this command for brevity.
 
-Then, the program imports the standard library's collections of basic yet useful functions, 
+The program imports the standard library's collections of basic yet useful functions, 
 and defines a `main` function to serve as the
 entry point of our program. The function's body is indented, which is how
 the language tracks code blocks.
@@ -145,6 +145,22 @@ keywords for your own functions.)
 -  `range of (1 to 10)` becomes `range(1,10)` 
 -  `range of (1 upto 10)` becomes `range(1,11)` 
 -  `range of (2 len 10)` becomes `range(2,12)`
+
+If there is only one expression within a condition or loop, you can 
+place it in the same line after `:`. Do note that -again very sneakily-
+the example showcases the special case of also using `else if` as a shorthand
+to nesting a new condition within an `else`.
+
+```python
+import std.core
+
+def main()
+    CLI = edit console()
+    x = 1.0-2.0
+    if x<0: print "x is negative"
+    else if x==0: print "x is negative"
+    else: print "x is positive"
+```
 
 
 ## errors
@@ -336,7 +352,7 @@ keyword and are able to call all subsequent functions
 in the same file, including themselves. Importantly,
 they can do so *only after their first return*, which
 helps determine their type. In a pinch, write 
-`if false return ...` to create a "ghost" return that is 
+`if false: return ...` to create a "ghost" return that is 
 never called, but do prefer having a first return as an
 escape hatch.
 
@@ -347,8 +363,7 @@ Fibonacci function, and we do so below.
 import std.core
 
 rec fib(nat n)
-    if n<=1
-        return 1
+    if n<=1: return 1
     return fib(n-1)+fib(n-2)
 
 def main()
@@ -480,8 +495,7 @@ def main()
     ]   
         print s+"!"
         lengths[compiler::for_counter()] = len s+"!"
-    for l in lengths
-        print l
+    for l in lengths: print l
 ```
 
 

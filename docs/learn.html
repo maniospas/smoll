@@ -261,8 +261,8 @@
     <h1 id="learn-smospanλspan">Learn smo<span>λ</span></h1>
 
 <p>We will cover the basics of <em>smoλ</em> here. Try examples in your browser or 
-install the language by following the instructions <a href="install.html">here</a>. 
-Find a complete list of concepts in the <a href="reference.html">reference guide</a>.</p>
+<a href="install.html">install the language</a>.
+Find all available functionalities in the <a href="reference.html">reference guide</a>.</p>
 
 <div class="toc">
 
@@ -281,11 +281,11 @@ Find a complete list of concepts in the <a href="reference.html">reference guide
 <h2 id="hello-world">hello world!</h2>
 
 <p>In accordance to tradition, our first program below greets everyone!
-We use the <code>repo</code> instruction to tell the language that it should automatically download
+We use <code>repo</code> to tell the language that it should automatically download
 code under <em>std/</em> from a corresponding web URL (downloaded code is stored in a <em>.cache</em> folder).
 Following examples will not have this command for brevity.</p>
 
-<p>Then, the program imports the standard library&#8217;s collections of basic yet useful functions, 
+<p>The program imports the standard library&#8217;s collections of basic yet useful functions, 
 and defines a <code>main</code> function to serve as the
 entry point of our program. The function&#8217;s body is indented, which is how
 the language tracks code blocks.</p>
@@ -409,6 +409,23 @@ keywords for your own functions.)</p>
 <li><code>range of (1 upto 10)</code> becomes <code>range(1,11)</code> </li>
 <li><code>range of (2 len 10)</code> becomes <code>range(2,12)</code></li>
 </ul>
+
+<p>If there is only one expression within a condition or loop, you can 
+place it in the same line after <code>:</code>. Do note that -again very sneakily-
+the example showcases the special case of also using <code>else if</code> as a shorthand
+to nesting a new condition within an <code>else</code>.</p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span> <span class="nb">print</span> <span class="s2">&quot;x is negative&quot;</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="nb">print</span> <span class="s2">&quot;x is negative&quot;</span>
+    <span class="k">else</span><span class="p">:</span> <span class="nb">print</span> <span class="s2">&quot;x is positive&quot;</span>
+</code></pre>
+</div>
 
 <h2 id="errors">errors</h2>
 
@@ -603,7 +620,7 @@ keyword and are able to call all subsequent functions
 in the same file, including themselves. Importantly,
 they can do so <em>only after their first return</em>, which
 helps determine their type. In a pinch, write 
-<code>if false return ...</code> to create a &#8220;ghost&#8221; return that is 
+<code>if false: return ...</code> to create a &#8220;ghost&#8221; return that is 
 never called, but do prefer having a first return as an
 escape hatch.</p>
 
@@ -614,8 +631,7 @@ Fibonacci function, and we do so below.</p>
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
 <span class="n">rec</span> <span class="n">fib</span><span class="p">(</span><span class="n">nat</span> <span class="n">n</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span><span class="mi">1</span>
-        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span><span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
@@ -749,8 +765,7 @@ lengths on another buffer.</p>
     <span class="p">]</span>   
         <span class="nb">print</span> <span class="n">s</span><span class="o">+</span><span class="s2">&quot;!&quot;</span>
         <span class="n">lengths</span><span class="p">[</span><span class="n">compiler</span><span class="p">::</span><span class="n">for_counter</span><span class="p">()]</span> <span class="o">=</span> <span class="nb">len</span> <span class="n">s</span><span class="o">+</span><span class="s2">&quot;!&quot;</span>
-    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lengths</span>
-        <span class="nb">print</span> <span class="n">l</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lengths</span><span class="p">:</span> <span class="nb">print</span> <span class="n">l</span>
 </code></pre>
 </div>
 

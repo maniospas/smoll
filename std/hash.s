@@ -77,12 +77,11 @@ def find(robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
     pos = hash(k, n)
     for i in range of n
         idx = mut (pos+i)
-        if idx>=n idx = idx-n
-        if idx==0 continue
+        if idx>=n: idx = idx-n
+        if idx==0: continue
         entry = data[idx]
-        if is_zero raw entry continue
-        if k==raw entry 
-            return idx
+        if is_zero raw entry: continue
+        if k==raw entry: return idx
     fail "index not found"
 
 def at(edit robinhood_entry[] data, cstr|str|nat _k)
@@ -96,14 +95,13 @@ def at(edit robinhood_entry[] data, cstr|str|nat _k)
     pos = hash(k, n)
     for i in range of n
         idx = mut (pos+i)
-        if idx>=n idx = idx-n
-        if idx==0 continue
+        if idx>=n: idx = idx-n
+        if idx==0:  continue
         entry = data[idx]
         if is_zero raw entry 
             data[idx] = (k,i)
             return idx
-        if k==raw entry 
-            return idx
+        if k==raw entry: return idx
         if i>entry.cost
             tmp = k
             k = unsafe_mut raw data[idx]

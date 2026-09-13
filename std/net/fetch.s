@@ -38,13 +38,13 @@ def HttpOptions(HttpMethod method, cstr|blank body, cstr|blank content_type)
 def request(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr _url, HttpOptions opts)
     {"-lcurl"}
     {builtins::compiler::ptr curl = curl_easy_init();}
-    if not exists curl fail "curl initialization failed"
+    if not exists curl: fail "curl initialization failed"
     url = cstr unsafe_temp _url
     if CHARS is new
         buf = edit char[]
         pos = 0
         defer
-            if exists buf.unsafe_ptr buf.unsafe_ptr.unsafe::free()
+            if exists buf.unsafe_ptr: buf.unsafe_ptr.unsafe::free()
     if CHARS is arena<char::tag>
         buf = CHARS.buf
         pos = CHARS.pos
@@ -52,8 +52,8 @@ def request(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr
         buf = CHARS.buf
         pos = 0
     if CHARS is arena<char::tag>|circular<char::tag>
-        if buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
-        if buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
+        if buf.unsafe_align.nat()!=1: fail "can only define strings on contiguous buffers"
+        if buf.unsafe_offset.nat()!=0: fail "can only define strings on non-offset buffers"
     {
         __smoll_buf_for_callback __buf = {buf__unsafe_ptr, pos, buf__unsafe_size};
         struct curl_slist *__headers = NULL;
@@ -65,13 +65,13 @@ def request(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr
         curl_easy_setopt((CURL*)curl, CURLOPT_WRITEDATA,      &__buf);
     }
     if exists opts.body
-    {
-        curl_easy_setopt((CURL*)curl, CURLOPT_POSTFIELDS, opts__body);
-        char __ct[15 + strlen(opts__content_type) + 1];
-        snprintf(__ct, sizeof(__ct), "Content-Type: %s", opts__content_type);
-        __headers = curl_slist_append(__headers, __ct);
-        curl_easy_setopt((CURL*)curl, CURLOPT_HTTPHEADER, __headers);
-    }
+        {
+            curl_easy_setopt((CURL*)curl, CURLOPT_POSTFIELDS, opts__body);
+            char __ct[15 + strlen(opts__content_type) + 1];
+            snprintf(__ct, sizeof(__ct), "Content-Type: %s", opts__content_type);
+            __headers = curl_slist_append(__headers, __ct);
+            curl_easy_setopt((CURL*)curl, CURLOPT_HTTPHEADER, __headers);
+        }
     {
         builtins::nat status = 0;
         if (curl_easy_perform((CURL*)curl) == CURLE_OK)
@@ -80,7 +80,7 @@ def request(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr
         if (__headers) curl_slist_free_all(__headers);
     }
     { builtins::bool has_read = __buf.data!=0; }
-    if not has_read fail "out of memory while reading response"
+    if not has_read: fail "out of memory while reading response"
     {buf__unsafe_size = __buf.size;}
     {buf__unsafe_ptr = __buf.data;}
     return response(status, str(buf, pos to buf.unsafe_size))

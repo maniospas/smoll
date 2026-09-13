@@ -39,7 +39,7 @@ def breakpoint(effect edit console CLI)
     if compiler::back type "emcc"
         { emscripten_sleep(0); }
     {builtins::bool has_failed = __t_interrupted;}
-    if not has_failed return ()
+    if not has_failed: return ()
     color = colors CLI
     set(color red)
     print nn "SIGINT: "
@@ -47,7 +47,7 @@ def breakpoint(effect edit console CLI)
     print nn "Create a safe failure (F), or unsafely crash (C)?\n"
     del color
     {while(true){builtins::char c = getchar(); if(c=='F'){has_failed=0;break;}if(c=='f'){has_failed=0;break;}if(c=='C'){break;}if(c=='c'){break;}}}
-    if has_failed {_exit(1);}
+    if has_failed: {_exit(1);}
     fail "interrupted by user"
 
 local def pclose(any ptr unsafe_ptr)
@@ -64,7 +64,7 @@ local def popen(cstr cmd)
 def open(cstr cmd)
     doc "create a system process"
     unsafe_ptr = unsafe_mut popen cmd
-    if not exists unsafe_ptr fail "failed to start process"
+    if not exists unsafe_ptr: fail "failed to start process"
     defer
         if exists unsafe_ptr
             status = pclose unsafe_ptr
@@ -89,8 +89,9 @@ def chunk(char[] buf, mut nat|blank pos, open f)
         pos = mut 0
     unsafe_ptr = unsafe::add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos
-    {builtins::nat bytes_open = f__unsafe_ptr?fread(unsafe_ptr, 1, size, (FILE*)f__unsafe_ptr):0;}
-    if bytes_open==0 fail "end of file"
+    bytes_open = 0
+    if exists f.unsafe_ptr: {bytes_open = fread(unsafe_ptr, 1, size, (FILE*)f__unsafe_ptr);}
+    if bytes_open==0: fail "end of file"
     prev_pos = const pos
     pos = pos+bytes_open
     return str(buf, prev_pos len bytes_open)
@@ -129,7 +130,7 @@ def safe(cstr cmd)
     doc "Otherwise, the command is just returned."
     {builtins::bool unsafe_chars = 0;}
     #{while(*p && !unsafe_chars) { char c=*p++; if(c==';'||c=='|'||c=='&'||c=='`'||c=='$'||c=='('||c==')'||c=='<'||c=='>'||c=='\n'||c=='\r'||c=='\\') unsafe_chars=1; }}
-    if unsafe_chars fail "unsanitized command: shell metacharacter detected"
+    if unsafe_chars: fail "unsanitized command: shell metacharacter detected"
     return cmd
 
 def system(effect edit console CLI, cstr|str _cmd)

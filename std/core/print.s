@@ -109,75 +109,75 @@ def supports_ansi(console CLI)
 def colors(edit console CLI)
     initialized = supports_ansi CLI
     defer
-        if initialized {printf("\033[0m");}
+        if initialized: {printf("\033[0m");}
     return class(CLI, initialized)
 def set(edit colors colors, "red")
-    if colors.initialized {printf("\033[31m");}
+    if colors.initialized: {printf("\033[31m");}
 def set(edit colors colors, "green")      
-    if colors.initialized {printf("\033[32m");}
+    if colors.initialized: {printf("\033[32m");}
 def set(edit colors colors, "yellow")     
-    if colors.initialized {printf("\033[33m");}
+    if colors.initialized: {printf("\033[33m");}
 def set(edit colors colors, "blue")       
-    if colors.initialized {printf("\033[34m");}
+    if colors.initialized: {printf("\033[34m");}
 def set(edit colors colors, "magenta")    
-    if colors.initialized {printf("\033[35m");}
+    if colors.initialized: {printf("\033[35m");}
 def set(edit colors colors, "cyan")       
-    if colors.initialized {printf("\033[36m");}
+    if colors.initialized: {printf("\033[36m");}
 def set(edit colors colors, "white")      
-    if colors.initialized {printf("\033[37m");}
+    if colors.initialized: {printf("\033[37m");}
 def set(edit colors colors, "black")      
-    if colors.initialized {printf("\033[30m");}
+    if colors.initialized: {printf("\033[30m");}
 def set(edit colors colors, "bright_red")    
-    if colors.initialized {printf("\033[91m");}
+    if colors.initialized: {printf("\033[91m");}
 def set(edit colors colors, "bright_green")  
-    if colors.initialized {printf("\033[92m");}
+    if colors.initialized: {printf("\033[92m");}
 def set(edit colors colors, "bright_yellow") 
-    if colors.initialized {printf("\033[93m");}
+    if colors.initialized: {printf("\033[93m");}
 def set(edit colors colors, "bright_blue")   
-    if colors.initialized {printf("\033[94m");}
+    if colors.initialized: {printf("\033[94m");}
 def set(edit colors colors, "bright_magenta")
-    if colors.initialized {printf("\033[95m");}
+    if colors.initialized: {printf("\033[95m");}
 def set(edit colors colors, "bright_cyan")   
-    if colors.initialized {printf("\033[96m");}
+    if colors.initialized: {printf("\033[96m");}
 def set(edit colors colors, "bright_white")  
-    if colors.initialized {printf("\033[97m");}
+    if colors.initialized: {printf("\033[97m");}
 def set(edit colors colors, "bg_red")    
-    if colors.initialized {printf("\033[41m");}
+    if colors.initialized: {printf("\033[41m");}
 def set(edit colors colors, "bg_green")  
-    if colors.initialized {printf("\033[42m");}
+    if colors.initialized: {printf("\033[42m");}
 def set(edit colors colors, "bg_yellow") 
-    if colors.initialized {printf("\033[43m");}
+    if colors.initialized: {printf("\033[43m");}
 def set(edit colors colors, "bg_blue")   
-    if colors.initialized {printf("\033[44m");}
+    if colors.initialized: {printf("\033[44m");}
 def set(edit colors colors, "bg_magenta")
-    if colors.initialized {printf("\033[45m");}
+    if colors.initialized: {printf("\033[45m");}
 def set(edit colors colors, "bg_cyan")   
-    if colors.initialized {printf("\033[46m");}
+    if colors.initialized: {printf("\033[46m");}
 def set(edit colors colors, "bg_white")  
-    if colors.initialized {printf("\033[47m");}
+    if colors.initialized: {printf("\033[47m");}
 def set(edit colors colors, "bg_black")  
-    if colors.initialized {printf("\033[40m");}
+    if colors.initialized: {printf("\033[40m");}
 def set(edit colors colors, "bold")         
-    if colors.initialized {printf("\033[1m");}
+    if colors.initialized: {printf("\033[1m");}
 def set(edit colors colors, "dim")          
-    if colors.initialized {printf("\033[2m");}
+    if colors.initialized: {printf("\033[2m");}
 def set(edit colors colors, "italic")       
-    if colors.initialized {printf("\033[3m");}
+    if colors.initialized: {printf("\033[3m");}
 def set(edit colors colors, "underline")    
-    if colors.initialized {printf("\033[4m");}
+    if colors.initialized: {printf("\033[4m");}
 def set(edit colors colors, "blink")        
-    if colors.initialized {printf("\033[5m");}
+    if colors.initialized: {printf("\033[5m");}
 def set(edit colors colors, "reverse")      
-    if colors.initialized {printf("\033[7m");}
+    if colors.initialized: {printf("\033[7m");}
 def set(edit colors colors, "strikethrough")
-    if colors.initialized {printf("\033[9m");}
+    if colors.initialized: {printf("\033[9m");}
 def set(edit colors colors, "reset")          
-    if colors.initialized {printf("\033[0m");}
+    if colors.initialized: {printf("\033[0m");}
 def set(edit colors colors, "reset_color") 
-    if colors.initialized {printf("\033[39m");}
+    if colors.initialized: {printf("\033[39m");}
 def set(edit colors colors, "reset_bg")       
-    if colors.initialized {printf("\033[49m");}
+    if colors.initialized: {printf("\033[49m");}
 def set(edit colors colors, "reset_bold")     
-    if colors.initialized {printf("\033[22m");}
+    if colors.initialized: {printf("\033[22m");}
 def set(edit colors colors, "reset_underline")
-    if colors.initialized {printf("\033[24m");}
+    if colors.initialized: {printf("\033[24m");}

@@ -18,11 +18,11 @@ def _main(effect edit console CLI)
     counter  = mut 0
     failures = mut 0
     for path in open test_root
-        if path==".." or not is_dir(test_root, path) continue
+        if path==".." or not is_dir(test_root, path): continue
         reuse CHARS # start from the same position at each iteration (defers a reset)
         dir_path = test_root+path+"/"
         for entry in open dir_path
-            if not ends_with(entry, ".s") continue
+            if not ends_with(entry, ".s"): continue
             reuse CHARS
             counter = counter+1
             should_fail = entry.contains "_fail_"
@@ -42,7 +42,6 @@ def _main(effect edit console CLI)
 
 def main()
     CLI = edit console()
-    try _main()
-    if try err_code=compiler::last_error()
-        print cstr err_code
+    if not try _main()
+        print cstr compiler::last_error()
         fail "tests failed"

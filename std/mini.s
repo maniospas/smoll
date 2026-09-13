@@ -47,5 +47,5 @@ def unpack(str m)
 def unpack(const char[] buf, strdat dat)
     pos = nat dat.pos
     length = nat dat.length
-    if pos+length>len buf fail "string does not fit on buffer" 
+    if pos+length>len buf: fail "string does not fit on buffer" 
     return string::str(buf.unsafe_ptr, pos, length)

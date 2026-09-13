@@ -43,7 +43,7 @@ def coo(sparse_element[] elements, nat rows, nat cols)
 def get(coo m, nat k, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "get a sparse element"
     if inbounds_guarantee is blank
-        if k>=m.nnz fail "out of bounds"
+        if k>=m.nnz: fail "out of bounds"
     else
         doc ""
         doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
@@ -52,7 +52,7 @@ def get(coo m, nat k, "unsafe_assume_inbounds"|blank inbounds_guarantee)
 def mutget(edit coo m, nat k, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "mutable reference to a sparse element"
     if inbounds_guarantee is blank
-        if k>=m.nnz fail "out of bounds"
+        if k>=m.nnz: fail "out of bounds"
     else
         doc ""
         doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
@@ -60,7 +60,7 @@ def mutget(edit coo m, nat k, "unsafe_assume_inbounds"|blank inbounds_guarantee)
 
 def mul(effect edit float_allocator FLOATS, coo m, vec v)
     doc "sparse matrix*vector multiplication"
-    if m.cols!=v.length fail "matrix columns must match vector length"
+    if m.cols!=v.length: fail "matrix columns must match vector length"
     result = edit vec m.rows
     for entry in m
         result[entry.row] = result[entry.row]+entry.value*v[entry.col]
@@ -70,7 +70,7 @@ def mul(effect edit float_allocator FLOATS, vec v, coo m)
     doc "vector*sparse matrix multiplication"
     doc "*Warning: the expression `self(v)*m` yields wrong values"
     "because the vector is not modified element-by-element."
-    if v.length!=m.rows fail "vector length must match matrix rows"
+    if v.length!=m.rows: fail "vector length must match matrix rows"
     result = edit vec m.cols
     for entry in m
         result[entry.col] = result[entry.col]+v[entry.row]*entry.value
@@ -78,7 +78,7 @@ def mul(effect edit float_allocator FLOATS, vec v, coo m)
 
 def mul(effect edit float_allocator FLOATS, coo m1, mat m2)
     doc "sparse*dense matrix multiplication"
-    if m1.cols!=m2.rows fail "inner dimensions must agree"
+    if m1.cols!=m2.rows: fail "inner dimensions must agree"
     result = edit mat(m1.rows, m2.cols)
     for entry in m1
         for j in range of m2.cols

@@ -86,7 +86,7 @@ local def unsafe_end_drawing()
         { emscripten_sleep(0); }
     
 def draw(effect edit window WINDOW)
-    if WINDOW.openy fail "alopeny drawing on window"
+    if WINDOW.openy: fail "alopeny drawing on window"
     is_drawing = true
     unsafe_begin_drawing()
     defer

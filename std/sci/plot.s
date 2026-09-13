@@ -17,12 +17,12 @@ def area(effect edit window WINDOW, position pos, size size)
     )
 
 def fit(effect mut area AREA, float x, "horizontal")
-    if AREA.x_range.min>x AREA.x_range.min = x
-    if AREA.x_range.max<x AREA.x_range.max = x
+    if AREA.x_range.min>x: AREA.x_range.min = x
+    if AREA.x_range.max<x: AREA.x_range.max = x
 
 def fit(effect mut area AREA, float y, "vertical")
-    if AREA.y_range.min>y AREA.y_range.min = y
-    if AREA.y_range.max<y AREA.y_range.max = y
+    if AREA.y_range.min>y: AREA.y_range.min = y
+    if AREA.y_range.max<y: AREA.y_range.max = y
 
 def fit(effect mut area AREA, vec v, "horizontal"|"vertical" dim)
     fit(min v, dim)
@@ -65,18 +65,18 @@ def plot(effect area AREA, vec x, vec y, plot_config config)
 
     dx = mut xmax - xmin
     dy = mut ymax - ymin
-    if dx == 0.0 dx = 1.0
-    if dy == 0.0 dy = 1.0
+    if dx == 0.0: dx = 1.0
+    if dy == 0.0: dy = 1.0
 
     # axes
 
-    if xmin <= 0.0 and xmax >= 0.0 axis_x = AREA.pos.x + (((0.0-xmin)/dx)*AREA.size.width)
-    else if xmin > 0.0 axis_x = AREA.pos.x
-    else axis_x = AREA.pos.x + AREA.size.width
+    if xmin <= 0.0 and xmax >= 0.0: axis_x = AREA.pos.x + (((0.0-xmin)/dx)*AREA.size.width)
+    else if xmin > 0.0: axis_x = AREA.pos.x
+    else: axis_x = AREA.pos.x + AREA.size.width
 
-    if ymin <= 0.0 and ymax >= 0.0 axis_y = AREA.pos.y + AREA.size.height - (((0.0-ymin)/dy)*AREA.size.height)
-    else if ymin > 0.0 axis_y = AREA.pos.y + AREA.size.height
-    else axis_y = AREA.pos.y
+    if ymin <= 0.0 and ymax >= 0.0: axis_y = AREA.pos.y + AREA.size.height - (((0.0-ymin)/dy)*AREA.size.height)
+    else if ymin > 0.0: axis_y = AREA.pos.y + AREA.size.height
+    else: axis_y = AREA.pos.y
 
     line(axis_x, AREA.pos.y, axis_x, AREA.pos.y + AREA.size.height, config.axes_thickness, config.axes_color)
     line(AREA.pos.x, axis_y, AREA.pos.x + AREA.size.width, axis_y, config.axes_thickness*2.0, config.axes_color)
@@ -86,19 +86,20 @@ def plot(effect area AREA, vec x, vec y, plot_config config)
     tic_size = config.point_radius
     tic_text_size = config.font_size
     tics = config.grid_tics
-    if tics!=0 for j in range(0, tics+1)
-        t = float(j)/float(tics)
-        px = AREA.pos.x + t*AREA.size.width
-        py = AREA.pos.y + t*AREA.size.height
-        xnumber = xmin + t*dx
-        ynumber = ymax - t*dy
-        line(px, AREA.pos.y, px, AREA.pos.y + AREA.size.height, 1.0, config.grid_color)
-        line(AREA.pos.x, py, AREA.pos.x + AREA.size.width, py, 1.0, config.grid_color)
-        line(px, axis_y-tic_size, px, axis_y+tic_size, 1.0, config.axes_color)
-        line(axis_x-tic_size, py, axis_x+tic_size, py, 1.0, config.axes_color)
-        text(WINDOW, copy(xnumber), position(px, axis_y+tic_size+2.0), tic_text_size, config.axes_color)
-        y_text = copy(ynumber)
-        text(WINDOW, y_text, position(axis_x+tic_size+2.0-(0.8*tic_text_size*float len y_text), py), tic_text_size, config.axes_color)
+    if tics!=0
+        for j in range(0, tics+1)
+            t = float(j)/float(tics)
+            px = AREA.pos.x + t*AREA.size.width
+            py = AREA.pos.y + t*AREA.size.height
+            xnumber = xmin + t*dx
+            ynumber = ymax - t*dy
+            line(px, AREA.pos.y, px, AREA.pos.y + AREA.size.height, 1.0, config.grid_color)
+            line(AREA.pos.x, py, AREA.pos.x + AREA.size.width, py, 1.0, config.grid_color)
+            line(px, axis_y-tic_size, px, axis_y+tic_size, 1.0, config.axes_color)
+            line(axis_x-tic_size, py, axis_x+tic_size, py, 1.0, config.axes_color)
+            text(WINDOW, copy(xnumber), position(px, axis_y+tic_size+2.0), tic_text_size, config.axes_color)
+            y_text = copy(ynumber)
+            text(WINDOW, y_text, position(axis_x+tic_size+2.0-(0.8*tic_text_size*float len y_text), py), tic_text_size, config.axes_color)
 
     if config.method=="line"
         for i in range(1, len x)

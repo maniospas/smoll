@@ -43,18 +43,18 @@ An example spanning several language features follows.
 # test.s
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import std.core
-import std.io.web as web
-import std.io.file as file
+import std.io
 
-def CHUNK_SIZE = 4096
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
-
 def main()
-    CLI = edit console()               # the CLI effect tells us where to direct the next prints
-    mem = edit char[].alloc CHUNK_SIZE # pipe argument with dot, parentheses optional for one argument
-    f = file::open web::get README     # save to .tmp with system curl and read it
+    # EFFECTS to automatically pass around (some functions grab these by name).
+    CLI = edit console()
+    CHARS = edit circular alloc 4096
+
+    # Easy function synthesis because parentheses are optional for one argument.
+    f = edit file::open web::get README
     size = mut 0
-    for line in (mem, f) # iterator defined over a (memory buffer, file) tuple
+    for line in f
         size = size+len line
     print(size, " bytes downloaded\n")
 ```

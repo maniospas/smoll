@@ -97,7 +97,7 @@ below and is more verbose, bue helps avoid confusion of where function come from
 import std.core as core
 
 def main()
-    CLI = edit console() 
+    CLI = edit core::console() 
     core::print "hello world!"
 ```
 
@@ -112,6 +112,7 @@ is introduced in each file, as opposed to files that aggregate
 available programming interfaces in one place.
 
 ```python
+local import std.core::console
 local import std.core::print
 
 def main()
@@ -472,13 +473,10 @@ def main()
 ```
 
 You can have one-liners for conditions and loops,
-like in the following version. These one-liners parse
-exactly one statement (one expression, or one condition, etc).
-In the examples, notice that sometimes immutable variables like
-`sgn` are allowed to assume different values, depending on the
-code branch being executed; the compiler allows this as there
-will be only one value set to those variables. If no value is
-set, the variable is zero-initialized.
+using the `:` separator like in the following version. These one-liners parse
+exactly one statement (one expression, or one condition, etc) and that
+should fit into the same line entirely. As a special case, use `else if`
+to nest a new condition within an `else` branch.
 
 ```python
 import std.core
@@ -486,9 +484,9 @@ import std.core
 def main()
     CLI = edit console()
     x = 1.0-2.0
-    if x<0.0 print "x is negative"
-    else if x==0.0 print "x is zero"
-    else print "x is positive"
+    if x<0.0: print "x is negative"
+    else if x==0.0: print "x is zero"
+    else: print "x is positive"
 ```
 
 ```python
@@ -503,6 +501,12 @@ def main()
     print sgn
 ```
 
+In the above examples, notice that sometimes immutable variables like
+`sgn` are allowed to assume different values, depending on the
+code branch being executed; the compiler allows this as there
+will be only one value set to those variables. If no value is
+set, the variable is zero-initialized.
+
 Loops are similar to conditions, but execute multiple
 times until they check to false. You can use `continue` 
 to skip the rest of the current loop and `break` to halt it. 
@@ -516,8 +520,7 @@ def main()
     CLI = edit console() 
     i = mut 0
     while true # overengineered
-        if i==5 
-            break # stop this way
+        if i==5: break # stop this way
         if i==3
             i = i+1 # skip printing 3 
             continue 
@@ -664,8 +667,7 @@ as recursive.
 import std.core
 
 rec fib(nat n)
-    if n<=1
-        return 1
+    if n<=1: return 1
     return call_fib(n-1)+call_fib(n-2)
 
 def call_fib(nat n)
@@ -688,7 +690,7 @@ mean never.
 import std.core
 
 rec wooo(edit console CLI) # not the ideal way to pass the console - see next section
-    if false return blank()
+    if false: return blank()
     CLI.print "wooo"
     wooo CLI
 
@@ -1032,8 +1034,7 @@ either an increment value of one, or a value provided as second argument.
 import std.core
 
 def inc(nat x, nat|blank value)
-    if value is blank
-        value = 1
+    if value is blank: value = 1
     return x+value
 
 def main()
@@ -1732,32 +1733,44 @@ def main()
 ## catching errors
 
 The `compiler::last_error()` function provides the means of retrieving
-an error code intercepted by `try` statements. This function creates
-an error itself if it *fails* to find an error. To avoid confusion, the
-compiler just mandates that you should wrap the catch function inside a `try` 
-of its own. This way, you can obtain the error and check that it exists
-simultaneously.
+the last error code intercepted by `try` statements (see a couole of
+sections before). Below is a typical pattern for handling error codes.
+Error codes can be compared for equality, or converted to `cstr` strings
+by applying a namesake function.
 
 ```python
 import std.core
-import std.io as io
+import compiler as cp
+
+def _main(effect edit console CLI)
+    print 2*3-20 # cannot substract two nat numbers and obtain a negative result
+
+def main()
+    CLI = edit console()
+    # nat cannot become negative
+    if not try _main()
+        print cstr cp::last_error()
+```
+
+A more transparent pattern can look like this.
+
+```python
+import std.core
 import compiler as cp
 
 def main()
     CLI = edit console()
-    try print 2*3-20 # nat cannot become negative
-    if try error = cp::last_error()
-        print "cannot substract two nat numbers and obtain a negative result"
+    try print 2*3-20 
+    error = cp::last_error()
+    if not ok error
+        print cstr error
 ```
 
-
-The same function also clears the intercepted error code so that the next call 
-captures only subsequent messages. Caught errors can be compared for equality and
-converted to strings per `cstr error`.
-
-Errors are not retrieved when intercepted within called functions.
+Errors are not retrieved when intercepted with `try` within called functions.
 But, importantly, they *are* obtained from deferred statements triggered by 
 `del`. The next snippet demonstrates how to clear errors and check on them.
+Recall that `assigned` yields back the variable that the next expression assigns
+to.
 
 
 ```python
@@ -1774,7 +1787,7 @@ def main()
     try bye_error()
     del proc
 
-    if try error = cp::last_error()
+    if not ok assigned error = cp::last_error()
         print cstr error # prints 'bye!' if no process error
         fail error       # can fail with error codes too
 ```
@@ -1860,11 +1873,11 @@ def pair(nat, nat)
 def least(nat[] numbers, pair->bool order)
     ret = mut numbers[0]
     for number in numbers
-        if order.cp::call(number,ret) ret = number
+        if order.cp::call(number,ret): ret = number
     return ret
 
 def min(nat x, nat y)
-    if x<y return true
+    if x<y: return true
     return false
 
 def main()
@@ -1889,9 +1902,9 @@ def add(nat x, 0|1|2 y)
     return x+cp::value y
     
 def add(nat x) 
-    if x==0 return cp::abstract type add<nat,0>
-    if x==1 return cp::abstract type add<nat,1>
-    if x==2 return cp::abstract type add<nat,2>
+    if x==0: return cp::abstract type add<nat,0>
+    if x==1: return cp::abstract type add<nat,1>
+    if x==2: return cp::abstract type add<nat,2>
 
 def main()
     CLI = console()
@@ -1998,7 +2011,7 @@ def main()
     CLI = edit console()
     SAFETY = range of 14 # recursive depth limit in playground
     try wooo 0
-    if try error = cp::last_error()
+    if not ok assigned error = cp::last_error()
         print cstr error # prints 'iteration end'
 ```
 
@@ -2337,8 +2350,8 @@ def main()
     CLI = edit console()
     process = proc:process "ls"
     del process
-    if try error = cp.catch()
-        fail error # can fail on error codes too
+    if not ok assigned error = cp.catch()
+        fail error  # refail
 ```
 
 ## random
@@ -2673,7 +2686,7 @@ import std.io.process as process
 def run(cstr|str command)
     proc = mut process::open command
     del proc # force resource deallocation = end the process
-    if try error = compiler::last_error()
+    if not ok assigned error = compiler::last_error()
         print cstr error
 
 def main()
@@ -2684,7 +2697,7 @@ def main()
     copy path
     test_dir = dir::open path
     for entry in test_dir # do not move the position
-        if not entry.ends_with ".s" continue
+        if not entry.ends_with ".s": continue
         command = CHARS.buf.str endpos copy_null_terminated(local CHARS, str entry)
         print command
         run command

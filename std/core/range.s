@@ -39,14 +39,13 @@ def of(nat from, "len", nat length)
 def range(nat _from, nat to)
     doc "constructs a range"
     doc "Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration."
-    from = mut _from
+    from = mut 0+_from
     return class(from, to)
 
-def next(edit range r)
+def mutget(edit range r, nat|blank skipped)
     doc "next range number"
     doc "This increments the r.from position and returns the previous one."
-    if r.from>=r.to
-        fail "iteration end"
+    if r.from>=r.to: fail "iteration end"
     ret = const r.from
     r.from = ret+1
     return ret
@@ -56,7 +55,6 @@ def get(range r, nat _pos)
     doc "The item itself is returned. This lets the range be used as an iterator"
     doc "per a pattern like `for i in range 10 ...`."
     pos = _pos+r.from
-    if pos>=r.to
-        fail "iteration end"
+    if pos>=r.to: fail "iteration end"
     return pos
     

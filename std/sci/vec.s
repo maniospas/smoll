@@ -35,20 +35,20 @@ def vec(effect new FLOATS, nat length, "dirty"|blank clear_policy)
 
 def vec(edit float[] buf)
     doc "treat a float buffer as a vector"
-    if buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
-    if buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
+    if buf.unsafe_align.nat()!=8: fail "can only place vectors on contiguous buffers"
+    if buf.unsafe_offset.nat()!=0: fail "cannot place vectors on buffer offsets"
     return vec(buf.unsafe_ptr, 0, len buf)
 
 def constvec(float[] buf)
     doc "treat an immutable float buffer as an immutable vector"
-    if buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
-    if buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
+    if buf.unsafe_align.nat()!=8: fail "can only place vectors on contiguous buffers"
+    if buf.unsafe_offset.nat()!=0: fail "cannot place vectors on buffer offsets"
     return const vec(unsafe_mut buf.unsafe_ptr, 0, len buf)
 
 def vec(effect edit float_allocator\new FLOATS, nat length, "dirty"|blank clear_policy)
     doc "vector allocation"
-    if FLOATS.buf.unsafe_align.nat()!=8 fail "can only place vectors on contiguous buffers"
-    if FLOATS.buf.unsafe_offset.nat()!=0 fail "cannot place vectors on buffer offsets"
+    if FLOATS.buf.unsafe_align.nat()!=8: fail "can only place vectors on contiguous buffers"
+    if FLOATS.buf.unsafe_offset.nat()!=0: fail "cannot place vectors on buffer offsets"
     surface = FLOATS.alloc length
     if clear_policy is blank
         FLOATS.buf.unsafe_ptr.unsafe::zero(8*surface.pos, 8*(surface.pos+length))
@@ -61,13 +61,13 @@ def len(vec v)
 def mutget(edit vec v, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "modify a vector element at given position"
     if inbounds_guarantee is blank
-        if i>=v.length fail "out of bounds"
+        if i>=v.length: fail "out of bounds"
     return unsafe_mut v.unsafe_ptr+8*(i+v.pos)
 
 def get(vec v, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "get a vector element at given position"
     if inbounds_guarantee is blank
-        if i>=v.length fail "out of bounds"
+        if i>=v.length: fail "out of bounds"
     else
         doc ""
         doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
@@ -225,14 +225,14 @@ def min(vec v)
     doc "minimum value"
     min_value = mut v[0]
     for value in v
-        if min_value>value min_value = value
+        if min_value>value: min_value = value
     return min_value
 
 def max(vec v)
     doc "maximum value"
     max_value = mut v[0]
     for value in v
-        if max_value<value max_value = value
+        if max_value<value: max_value = value
     return max_value
 
 
@@ -266,7 +266,7 @@ def print(effect edit console CLI, vec v, cstr|blank endl)
     print nn "[ "
     for i in range of v.length
         print nn v[i unsafe_assume_inbounds]
-        if i<v.length-1 print nn "  "
+        if i<v.length-1: print nn "  "
     print (" ]", endl)
 
 def copy(effect edit float_allocator FLOATS, vec v)

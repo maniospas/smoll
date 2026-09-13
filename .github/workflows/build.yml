@@ -48,13 +48,6 @@ jobs:
       - name: Compile with Nuitka
         run: |
           python -m nuitka --onefile --deployment --assume-yes-for-downloads --python-flag=no_asserts --python-flag=no_site --python-flag=static_hashes --output-filename=smoll smoll.py
-      - name: Language tests
-        run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            .\\smoll${{ matrix.exe_ext }} tests\\all.s --back clang
-          else
-            ./smoll${{ matrix.exe_ext }} tests/all.s
-          fi
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:

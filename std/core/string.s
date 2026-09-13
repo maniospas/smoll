@@ -50,8 +50,8 @@ def str(char ptr unsafe_ptr, nat pos, nat length)
 def str(char[] buf, strdat dat)
     doc "a string residing on a buffer"
     unsafe_ptr = buf.unsafe_ptr
-    if buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
-    if buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
+    if buf.unsafe_align.nat()!=1: fail "can only define strings on contiguous buffers"
+    if buf.unsafe_offset.nat()!=0: fail "can only define strings on non-offset buffers"
     return str(unsafe_ptr, dat)
 
 def str(char[] buf, nat|blank length)
@@ -59,7 +59,7 @@ def str(char[] buf, nat|blank length)
     if length is blank
         length = len buf
     if not length is blank
-        if length>len buf fail "string does not fit on buffer"
+        if length>len buf: fail "string does not fit on buffer"
     return str(buf, 0, length, buf[0])
 
 def str(str other)
@@ -71,7 +71,7 @@ def str(char[] buf, nat pos, "len", nat length)
     doc "The string automatically detects the first character,"
     doc "which is generally tracked for fewer indirections"
     doc "on comparisons of unequal strings."
-    if length!=0 first = buf[pos]  # properly zero-initialized otherwise
+    if length!=0: first = buf[pos]  # properly zero-initialized otherwise
     return str(buf, pos, length, first)
 
 def str(char[] buf, nat pos, "to", nat endpos)
@@ -80,7 +80,7 @@ def str(char[] buf, nat pos, "to", nat endpos)
     doc "which is generally tracked for fewer indirections"
     doc "on comparisons of unequal strings."
     length = endpos-pos
-    if length!=0 first = buf[pos]  # properly zero-initialized otherwise
+    if length!=0: first = buf[pos]  # properly zero-initialized otherwise
     return str(buf, pos, length, first)
 
 def str(char[] buf, nat endpos, "from", nat pos)
@@ -340,19 +340,19 @@ def slice(cstr|str _s, nat from, nat to)
     doc "Explicitly copy the result to move it away from volatile"
     doc "memory, such as circular buffers."
     s = str _s
-    if from==to return str ""
-    if from>to or to>s.dat.length fail "slice out of string bounds"
+    if from==to: return str ""
+    if from>to or to>s.dat.length: fail "slice out of string bounds"
     new_length = to-(from assume_smaller)
-    if from!=0 new_first = const s[from]
-    else new_first = const s.dat.first
+    if from!=0: new_first = const s[from]
+    else: new_first = const s.dat.first
     return str(s.unsafe_ptr, s.dat.pos+from, new_length, new_first)
 
 def starts_with(cstr|str _stack, cstr|str _needle)
     doc "check whether a string starts with a particular substring sequence"
     stack = str _stack
     needle = str _needle
-    if stack.dat.first!=needle.dat.first return false
-    if stack.dat.length<needle.dat.length return false
+    if stack.dat.first!=needle.dat.first: return false
+    if stack.dat.length<needle.dat.length: return false
     return stack.slice(0,len needle)==needle
 
 def ends_with(cstr|str _stack, cstr|str _needle)
@@ -368,9 +368,9 @@ def ends_with(cstr|str _stack, cstr|str _needle)
 def contains(cstr|str _stack, char needle)
     doc "check whether a string contains a needle character"
     stack = str _stack
-    if stack.dat.first==needle return true
+    if stack.dat.first==needle: return true
     for i in range of len stack
-        if stack[i]==needle return true
+        if stack[i]==needle: return true
     return false
 
 def contains(cstr|str _stack, cstr|str _needle)

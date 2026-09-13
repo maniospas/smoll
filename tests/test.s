@@ -1,20 +1,16 @@
 import std.core
-import std.blob
-import compiler::varname as @
-
-def create_blob()
-    temp = [(72,73)]
-    blobbed = macro<blob> @temp[0]& # convert a typed pointer into an abstract data blob
-    debug::print blobbed
-    # next line needed to not return 'temp'; it safely fails the function if the pointers are not equal
-    compiler::assert_eq(blobbed.unsafe_ptr, temp.unsafe_ptr)
-    return blobbed
-
-def create_str_from_blob()
-    blobbed = create_blob()
-    return str blobbed.as char[]
+import std.io
 
 def main()
     CLI = edit console()
-    print create_str_from_blob()
-    
+    chunk_buffer = edit alloc 2 # chunk size
+    f = edit file::open "README.md"
+    f.file::seek 1
+    if try file::chunk(chunk_buffer, f)
+        first_byte = bits nat chunk_buffer[0] # bits are always 64 bits and can be converted to and from char
+        print chunk_buffer[0]      # char 
+        print nat chunk_buffer[0]  # nat id
+        print nat first_byte       # back to nat (is the same)
+        print tochar nat8 nat first_byte
+
+        print nat((bits chunk_buffer[0]).lshift 8) + nat(chunk_buffer[1])

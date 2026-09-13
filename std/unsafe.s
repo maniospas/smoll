@@ -28,7 +28,7 @@ def alloc(nat bytes)
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
     {builtins::compiler::ptr allocated = malloc(bytes);}
-    if not exists allocated fail "allocation failed"
+    if not exists allocated: fail "allocation failed"
     return unsafe_mut allocated
 
 def realloc(any ptr allocated, nat bytes, "super_unsafe"|blank unsafe_invalidation_policy)
@@ -43,7 +43,7 @@ def realloc(any ptr allocated, nat bytes, "super_unsafe"|blank unsafe_invalidati
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
     {if(allocated){builtins::compiler::ptr new_allocated = realloc(allocated, bytes);}}
     {else{new_allocated=malloc(bytes);}}
-    if not exists new_allocated fail "reallocation failed"
+    if not exists new_allocated: fail "reallocation failed"
     {allocated=new_allocated;}
     if unsafe_invalidation_policy is blank
         INVALIDATE compiler::ptr

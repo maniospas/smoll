@@ -24,7 +24,7 @@ local import std.unsafe as unsafe
 def char(console)
     {builtins::int _c=getchar();}
     {builtins::bool iseof = (_c==EOF);}
-    if iseof fail "unexpected end of console read"
+    if iseof: fail "unexpected end of console read"
     {builtins::char c = _c;}
     return c
 
@@ -36,7 +36,7 @@ def is_number(char c)
 def int(console console)
     doc "reads an integer from the console"
     while try c=mut char console 
-        if not "\t ".contains c break
+        if not "\t ".contains c: break
     neg = c==char"-"
     if neg or c==char "+" 
         c = char console
@@ -48,11 +48,11 @@ def int(console console)
         number = number*int(10)+digit
         digits = digits + 1
         eof = not try c = char console
-        if eof break
-    if neg number = int(0)-number
+        if eof: break
+    if neg: number = int(0)-number
     if digits==0
         while not eof
-            if "\n\r".contains c break
+            if "\n\r".contains c: break
             eof = not try c=char console
         fail "user input was not a float"
     return const number
@@ -60,7 +60,7 @@ def int(console console)
 def nat(console console)
     doc "reads an unsigned integer from the console"
     while try c=mut char console 
-        if not "\t ".contains c break
+        if not "\t ".contains c: break
     number = mut nat 0
     digits = mut 0
     eof = mut false
@@ -69,10 +69,10 @@ def nat(console console)
         number = number*10+digit
         digits = digits + 1
         eof = not try c = char console
-        if eof break
+        if eof: break
     if digits==0
         while not eof
-            if "\n\r".contains c break
+            if "\n\r".contains c: break
             eof = not try c=char console
         fail "user input was not a float"
     return const number
@@ -80,10 +80,9 @@ def nat(console console)
 def float(console console)
     doc "reads a float from the console"
     while try c=mut char console 
-        if not "\t ".contains c break
+        if not "\t ".contains c: break
     neg = c==char"-"
-    if neg or c==char "+" 
-        c = char console
+    if neg or c==char "+": c = char console
     number = mut 0.0
     digits = mut 0
     eof = mut false
@@ -92,7 +91,7 @@ def float(console console)
         number = number*10.0+digit
         digits = digits + 1
         eof = not try c = char console
-        if eof break
+        if eof: break
     if c==char "." and not eof
         c = char console
         base = mut 0.1
@@ -102,11 +101,11 @@ def float(console console)
             base = base*0.1
             digits = digits + 1
             eof = not try c = char console 
-            if eof break
-    if neg number = 0.0-number
+            if eof: break
+    if neg: number = 0.0-number
     if digits==0
         while not eof
-            if "\n\r".contains c break
+            if "\n\r".contains c: break
             eof = not try c=char console
         fail "user input was not a float"
     return const number
@@ -123,8 +122,8 @@ def str(effect edit char_allocator CHARS, edit console console)
             ch = edit arena ref char[].alloc 8
         else
             compiler::skip()
-    if ch.buf.unsafe_align.nat()!=1 fail "can only define strings on contiguous buffers"
-    if ch.buf.unsafe_offset.nat()!=0 fail "can only define strings on non-offset buffers"
+    if ch.buf.unsafe_align.nat()!=1: fail "can only define strings on contiguous buffers"
+    if ch.buf.unsafe_offset.nat()!=0: fail "can only define strings on non-offset buffers"
     start = const ch.pos
     while true
         _c = char console
@@ -149,20 +148,20 @@ def str(effect edit char_allocator CHARS, edit console console)
 def int(cstr|str _s)
     doc "converts a string to an integer"
     s = str _s
-    if 0==len s fail "invalid int conversion from empty string"
+    if 0==len s: fail "invalid int conversion from empty string"
     number = mut int 0
     i = mut 0
     negative = s[0]==char "-"
     if negative
         i = i+1
-        if i==len s fail "invalid int conversion from string with only a sign"
+        if i==len s: fail "invalid int conversion from string with only a sign"
     else if s[i]==char "+"
         i = i+1
-        if i==len s fail "invalid int conversion from string with only a sign"
+        if i==len s: fail "invalid int conversion from string with only a sign"
     while i<len s
         c = s[i]
         {builtins::bool is_digit=c>='0' && c<='9'; builtins::int digit=c-'0';}
-        if not is_digit fail "invalid integer int from non-number string"
+        if not is_digit: fail "invalid integer int from non-number string"
         number = number*int(10)+digit
         i = i+1
     if negative 
@@ -172,30 +171,30 @@ def int(cstr|str _s)
 def nat(cstr|str _s)
     doc "converts a string to an unsigned integer"
     s = str _s
-    if 0==len s fail "invalid nat conversion from empty string"
+    if 0==len s: fail "invalid nat conversion from empty string"
     number = mut nat 0
     for i in range of len s
         c = s[i]
         {builtins::bool is_digit=c>='0' && c<='9'; builtins::nat digit=c-'0';}
-        if not is_digit fail "invalid nat conversion from non-number string"
+        if not is_digit: fail "invalid nat conversion from non-number string"
         number = number*10+digit
     return const number
 
 def float(cstr|str _s)
     doc "converts a string to a float"
     s = str _s
-    if 0==len s fail "invalid float conversion from empty string"
+    if 0==len s: fail "invalid float conversion from empty string"
     number = mut 0.0
     i = mut 0
-    if 0==len s fail "invalid float conversion from empty string"
+    if 0==len s: fail "invalid float conversion from empty string"
     i = mut 0
     negative = s[0]==char "-"
     if negative
         i = i+1
-        if i==len s fail "invalid float conversion from string with only a sign"
+        if i==len s: fail "invalid float conversion from string with only a sign"
     else if s[i]==char "+"
         i = i+1
-        if i==len s fail "invalid float conversion from string with only a sign"
+        if i==len s: fail "invalid float conversion from string with only a sign"
     while i<len s
         c = s[i]
         {builtins::bool is_digit=c>='0' && c<='9'; builtins::float digit=c-'0';}
@@ -203,16 +202,16 @@ def float(cstr|str _s)
         if is_dot
             i = i+1
             break
-        if not is_digit fail "invalid float conversion from non-number string"
+        if not is_digit: fail "invalid float conversion from non-number string"
         number = number*10.0+digit
         i = i+1
     if is_dot
-        if i==len s fail "invalid float conversion from string without a value after the dot"
+        if i==len s: fail "invalid float conversion from string without a value after the dot"
         base = mut 0.1
         while i<len s
             d = s[i]
             {builtins::bool is_decimal_digit=d>='0' && d<='9'; builtins::float decimal_digit=d-'0';}
-            if not is_decimal_digit fail "invalid float conversion from non-number string"
+            if not is_decimal_digit: fail "invalid float conversion from non-number string"
             number = number+decimal_digit*base
             base = base*0.1
             i = i+1

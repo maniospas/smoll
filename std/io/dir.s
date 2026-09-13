@@ -43,7 +43,7 @@ def create_dir(cstr path)
         {"-sFORCE_FILESYSTEM=1"}
         {"-lidbfs.js"}
     {builtins::bool result = __smo_create_dir(path);}
-    if not result fail "failed to create directory"
+    if not result: fail "failed to create directory"
 
 def create_dir(str|string_pair path)
     create_dir cstr unsafe_temp path
@@ -78,7 +78,7 @@ def remove(str|cstr|string_pair _path)
     path = cstr unsafe_temp _path
     if is_file path
         {builtins::bool result = __smo_remove_file(path);}
-        if not result fail "failed to remove file"
+        if not result: fail "failed to remove file"
 
 local def closedir(any ptr unsafe_ptr) # super unsafe to expose
     VM "memory.get_foreign($unsafe_ptr).close() or memory.close_foreign($unsafe_ptr)"
@@ -96,7 +96,7 @@ def open(cstr path)
     {builtins::compiler::ptr unsafe_ptr = (char*)opendir(path);}
     defer
         closedir unsafe_ptr
-    if not exists unsafe_ptr fail "failed to open file"
+    if not exists unsafe_ptr: fail "failed to open file"
     return class(unsafe_mut unsafe_ptr)
 
 def open(str|string_pair path)

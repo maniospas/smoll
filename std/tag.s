@@ -25,7 +25,7 @@ def tagged(cstr value)
 
 def unsafe_match(tagged ptr obj, cstr name, any ptr type)
     found = compiler::deref obj.value
-    if found!=name fail "does not match"
+    if found!=name: fail "does not match"
     return unsafe_mut obj.unsafe::add(tagged::size).compiler::unsafe_attach_type(type)
 
 def unsafe_defer_free(mut tagged ptr obj)
@@ -38,10 +38,10 @@ def tagged_alloc(edit arena<char::tag> arena, nat size)
     return allocated.buf[allocated.pos]&
 
 def alloc(cstr|blank surface, cstr obj)
-    if 0==len str obj fail "empty input name"
-    if obj.contains char "," fail "cannot tag a structural type"
+    if 0==len str obj: fail "empty input name"
+    if obj.contains char ",": fail "cannot tag a structural type"
     if not surface is blank
-        if surface.contains char "," fail "tag surface cannot be structural type"
+        if surface.contains char ",": fail "tag surface cannot be structural type"
     CHARS = edit arena char[].alloc 1024
     if surface is blank
         copy "unsafe_defer_free unsafe_mut unsafe::alloc"

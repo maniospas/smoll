@@ -99,7 +99,7 @@ def status(arena|allocated self)
 def get(arena l, nat pos, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "get a list element pointer"
     if inbounds_guarantee is blank
-        if pos>=l.pos fail "out of bounds"
+        if pos>=l.pos: fail "out of bounds"
         return l.buf[pos]&
     else
         doc ""
@@ -109,7 +109,7 @@ def get(arena l, nat pos, "unsafe_assume_inbounds"|blank inbounds_guarantee)
 def mutget(edit arena l, nat pos, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "get a mutable list element pointer"
     if inbounds_guarantee is blank
-        if pos>=l.pos fail "out of bounds"
+        if pos>=l.pos: fail "out of bounds"
         return l.buf[pos]&
     else
         doc ""
@@ -152,7 +152,7 @@ def alloc(edit arena allocator, nat|blank length)
         length = 1
         doc "Creates room for one element."
     next_pos = allocator.pos+length
-    if next_pos>len allocator.buf fail "arena is out of space"
+    if next_pos>len allocator.buf: fail "arena is out of space"
     pos = allocator.pos+0
     allocator.pos = next_pos
     return allocated(allocator.buf, pos)
@@ -207,12 +207,12 @@ def alloc(edit circular allocator, nat|blank length)
     if length is blank
         length = 1
         doc "Creates room for one element."
-    if length>= len allocator.buf fail "does not fit in circular arena"
+    if length>= len allocator.buf: fail "does not fit in circular arena"
     next_pos = mut length + allocator.pos
     if next_pos > len allocator.buf
         next_pos = length
         pos = 0
-    else pos = allocator.pos+0
+    else: pos = allocator.pos+0
     allocator.pos = next_pos
     return allocated(allocator.buf, pos)
 

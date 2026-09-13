@@ -39,8 +39,8 @@ def std(accumulator accum)
 
 def pearson(vec x, vec y)
     doc "pearson correlation between the values of two vectors"
-    if len(x) != len y fail "vectors must have the same length"
-    if len(x) < 2 fail "at least two values required"
+    if len(x) != len y: fail "vectors must have the same length"
+    if len(x) < 2: fail "at least two values required"
     n = len x
     sx = mut 0.0
     sy = mut 0.0
@@ -58,5 +58,5 @@ def pearson(vec x, vec y)
     fn = float n
     numerator = (fn*sxy) - (sx*sy)
     denominator = sqrt((fn*sxx-sx*sx)*(fn*syy-sy*sy))
-    if denominator == 0.0 fail "undefined for constant vectors"
+    if denominator == 0.0: fail "undefined for constant vectors"
     return numerator/denominator

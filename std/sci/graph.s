@@ -32,8 +32,8 @@ def ppr(float alpha, nat|blank max_iters, float|blank tol)
         doc "This version automatically determines the number of iterations to be either 100 if non-zero"
         doc "tolerance is provided, or a probabilistic scheme where most random walks are considered based"
         doc "on the diffusion parameter alpha."
-        if tol!=0.0 max_iters = 100
-        else max_iters = nat(2.0/(1.0-alpha)+0.5)
+        if tol!=0.0: max_iters = 100
+        else: max_iters = nat(2.0/(1.0-alpha)+0.5)
     if tol is blank
         doc "This version sets numerical tolerance to zero, meaning tht only the number of iterations"
         doc "is considered as a convergence criterion."
@@ -49,7 +49,7 @@ def get(ppr ppr, nat i)
     doc "next graph filer parameter"
     doc "Parameters obtained this way do not correspond to the filter polynomial coefficients"
     doc "but rather on factorization coefficient."
-    if i>=ppr.max_iters fail "computational budget reached"
+    if i>=ppr.max_iters: fail "computational budget reached"
     return ppr.alpha
 
 def filter(ppr config, matrix m, vec p0)
@@ -71,7 +71,7 @@ def filter(ppr config, matrix m, vec p0)
         p = self(p)/reduce(p abs)
         if config.tol!=0.0
             err = reduce(prev_p sub p abs)
-            if err<config.tol*float len p break
+            if err<config.tol*float len p: break
         empty = prev_p
         prev_p = p
         FLOATS.pos = empty.pos

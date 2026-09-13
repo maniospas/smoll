@@ -77,7 +77,7 @@ def thread(effect edit growing_thread_pool THREADS, pipe&->blank func, pipe& inp
 
 def unsafe_pipe_match(with obj, cstr name, any& type)
     found = compiler::deref obj.obj.value
-    if found!=name fail "does not match"
+    if found!=name: fail "does not match"
     return unsafe_mut obj.obj.unsafe::add(pipe::size+mutex_size()).compiler::unsafe_attach_type(type)
 
 def unsafe_pipe_defer_free(mut pipe& obj)
@@ -98,10 +98,10 @@ def pipe_alloc(edit arena<char::tag> arena, nat size)
     return allocated.buf[allocated.pos]&
 
 def shared(cstr|blank surface, cstr obj)
-    if 0==len str obj fail "empty input name"
-    if obj.contains char "," fail "cannot tag a structural type"
+    if 0==len str obj: fail "empty input name"
+    if obj.contains char ",": fail "cannot tag a structural type"
     if not surface is blank
-        if surface.contains char "," fail "tag surface cannot be structural type"
+        if surface.contains char ",": fail "tag surface cannot be structural type"
     CHARS = edit arena char[].alloc 1024
     if surface is blank
         copy "unsafe_pipe_mutax_init unsafe_pipe_defer_free unsafe_mut unsafe::alloc"

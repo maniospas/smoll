@@ -20,8 +20,10 @@ import std.io.dir as dir
 import std.io.web as web
 local import std.core
 
-def get(edit dir::open data, nat) 
+def mutget(edit dir::open data, nat) 
     return dir::entry data
 
-def get(effect edit arena<char::tag>|circular<char::tag> CHARS, edit file::File|process::open f, nat)
+def mutget(effect edit arena<char::tag>|circular<char::tag> CHARS, edit file::File|process::open f, nat)
     return file::line|process::line(CHARS, f)
+
+

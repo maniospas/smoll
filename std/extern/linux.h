@@ -19,6 +19,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <pty.h>
+#include <dirent.h>
 
 const char* const __temp_osname = "linux";
 

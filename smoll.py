@@ -1662,6 +1662,16 @@ class ImplementedType:
                         memory.contents[buf_addr : buf_addr + len(data)] = data
                         return len(data) // size
 
+                    if candidate_name == "ftell":
+                        if len(values) != 1: self.at.error("malformed smollC", "'ftell' requires one argument")
+                        if not isinstance(values[0], int): self.at.error("malformed smollC", "non-integer stream argument to 'ftell'")
+                        file_addr = values[0]
+                        if file_addr==0: self.at.error("interpreter", "undefined behavior: 'ftell' stream is a null pointer")
+                        f = memory.get_foreign(file_addr)
+                        if f is None: self.at.error("interpreter", "'ftell' called with invalid or already-closed stream")
+                        try: return f.tell()
+                        except (OSError, ValueError): return -1
+
                     if candidate_name == "sqrt":
                         if len(values) != 1: self.at.error("malformed smollC", "'sqrt' requires one argument")
                         if not isinstance(values[0], float): self.at.error("malformed smollC", "non-float argument to 'sqrt'")

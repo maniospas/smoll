@@ -151,6 +151,14 @@ def nat16(nat x)
     {builtins::nat16 value = x;}
     return value
 
+def nat16(nat x, "truncate")
+    doc "convert unsigned number to 16-bit unsigned number"
+    doc "The conversion truncates the given input, if it would not fit."
+    doc "For example, 65536 would become 1."
+    {builtins::nat16 value = x;}
+    return value
+
+
 def nat32(nat x)
     doc "convert unsigned number to 32-bit unsigned number"
     doc "The conversion checks whether the previous value fits in the new one."

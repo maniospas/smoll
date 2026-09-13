@@ -1,18 +1,21 @@
-import std.core
-import std.io
+import "std/core.s"
+import "std/io/file.s" as file
+
+def load(effect mut console CLI, nat16 address)
+    chunk_buffer = edit alloc 2 # chunk size
+    f = edit file::open("test_file.bin")
+    #f.file::seek address #! seek() doesn't exist yet
+    if try file::chunk(chunk_buffer, f) #! file::chunk returns an interpreter error
+        r_value_h = bits nat chunk_buffer[0]
+        r_value_l = bits nat chunk_buffer[1]
+        r_value = band(r_value_h.lshift 8, r_value_l)
+        return nat16(nat r_value truncate)
+    else
+        print "There was some kind of error"
+        return nat16(0) #! ERROR
 
 def main()
     CLI = edit console()
-    chunk_buffer = edit alloc 2 # chunk size
-    f = edit file::open "README.md"
-    f.file::seek 1
-    f.file::seek (3 forward)
-    f.file::seek (3 backward)
-    if try file::chunk(chunk_buffer, f)
-        first_byte = bits nat chunk_buffer[0] # bits are always 64 bits and can be converted to and from char
-        print chunk_buffer[0]      # char 
-        print nat chunk_buffer[0]  # nat id
-        print nat first_byte       # back to nat (is the same)
-        print tochar nat8 nat first_byte
-
-        print nat((bits chunk_buffer[0]).lshift 8) + nat(chunk_buffer[1])
+    ret = load nat16 0
+    print nat ret
+    

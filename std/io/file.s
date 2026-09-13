@@ -17,7 +17,7 @@
 local import std.core
 local import std.unsafe as unsafe
 
-def open(str|cstr _path)
+def open(cstr path, blank|"binary" mode)
     doc "loads a path as a openable file"
     doc "The file name is not maintained and must be tracked externally, if needed."
     if compiler::back type "emcc"
@@ -26,18 +26,23 @@ def open(str|cstr _path)
         {"-sASYNCIFY_STACK_SIZE=65536"}
         {"-sFORCE_FILESYSTEM=1"}
         {"-lidbfs.js"}
-    path = cstr unsafe_temp _path
-    {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "r");}
+    if mode is "binary": {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "rb");}
+    else: {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "r");}
     defer
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
-    if not exists unsafe_ptr
-        fail "failed to open file"
+    if not exists unsafe_ptr: fail "failed to open file"
     return class unsafe_mut unsafe_ptr
 
-def write(str|cstr _path)
-    path = cstr unsafe_temp _path
-    doc "creates a new file at cstr path as a writable object, fails if it alopeny exists"
-    {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "wx+");}
+def open(str path, blank|"binary" mode)
+    doc "loads a path as a openable file"
+    doc "The file name is not maintained and must be tracked externally, if needed."
+    if mode is blank: return open cstr unsafe_temp path
+    else: return open(cstr unsafe_temp path binary)
+
+def write(cstr path, blank|"binary" mode)
+    doc "creates a new file at cstr path as a writable object, fails if it already exists"
+    if mode is "binary": {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "wbx+");}
+    else: {builtins::compiler::ptr unsafe_ptr = (char*)fopen(path, "wx+");}
     defer
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
         if compiler::back type "emcc"
@@ -45,6 +50,11 @@ def write(str|cstr _path)
     if not exists unsafe_ptr
         fail "failed to create file"
     return class unsafe_mut unsafe_ptr
+
+def write(str|cstr path, blank|"binary" mode)
+    doc "creates a new file at cstr path as a writable object, fails if it already exists"
+    if mode is blank: return write cstr unsafe_temp path
+    else: return write(cstr unsafe_temp path binary)
 
 def terminal()
     doc "opens a new system writable interactive terminal, fails if no display is available"
@@ -69,23 +79,30 @@ def to_end(edit File f)
     doc "move to file end"
     doc "Moves the file opening position to the end of the file"
     doc "but does not close it."
-    if not exists f.unsafe_ptr: fail "file is closed"
+    if not exists f.unsafe_ptr: fail "not open file"
     {fseek((FILE*)f__unsafe_ptr, 0, SEEK_END);}
 
 def seek(edit File f, nat idx, "set"|blank)
     doc "move to a specific position to a file"
-    if not exists f.unsafe_ptr: fail "file is closed"
+    if not exists f.unsafe_ptr: fail "not open file"
     {fseek((FILE*)f__unsafe_ptr, idx, SEEK_SET);}
 
 def seek(edit File f, nat idx, "forward")
     doc "move forward in the file"
-    if not exists f.unsafe_ptr: fail "file is closed"
+    if not exists f.unsafe_ptr: fail "not open file"
     {fseek((FILE*)f__unsafe_ptr, idx, SEEK_CUR);}
 
 def seek(edit File f, nat idx, "backward")
-    doc "move backeward in the file"
-    if not exists f.unsafe_ptr: fail "file is closed"
+    doc "move backward in the file"
+    if not exists f.unsafe_ptr: fail "not open file"
     {fseek((FILE*)f__unsafe_ptr, 0-idx, SEEK_CUR);}
+
+def position(edit File f)
+    doc "get the current position in the file"
+    doc "This can be passed as input to 'seek'."
+    if not exists f.unsafe_ptr: fail "not open file"
+    {builtins::nat ret = ftell((FILE*)f__unsafe_ptr);}
+    return ret
 
 def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     doc "next line"
@@ -124,13 +141,11 @@ def line(effect edit arena<char::tag>|circular<char::tag> CHARS, edit File f)
     if CHARS is circular<char::tag>
         pos = 0
     buf = ref CHARS.buf
-    if not exists buf.unsafe_ptr
-        fail "not open file"
+    if not exists buf.unsafe_ptr: fail "not open file"
     contents = unsafe::add(buf.unsafe_ptr, pos)
     size = buf.unsafe_size-pos
     {if(f__unsafe_ptr){builtins::compiler::ptr obtained = fgets(contents, size, (FILE*)f__unsafe_ptr);}}
-    if not exists obtained
-        fail "end of file"
+    if not exists obtained: fail "end of file"
     {builtins::nat bytes_open = strlen(contents);}
     CHARS.pos = pos+bytes_open
     return str(buf, pos to CHARS.pos)
@@ -144,14 +159,11 @@ local def _print(edit terminal|write f, str text)
         if bytes_written!=len text: fail "failed to write to file"
 
 def print(edit terminal|write f, str|cstr text, cstr|blank endl)
-    if endl is blank
-        endl = "\n"
+    if endl is blank: endl = "\n"
     f._print str text
-    if endl!=""
-        f._print str endl
+    if endl!="": f._print str endl
 
 def print(edit write f, "flush")
     doc "flushes file contents to the disk"
     {builtins::bool success = (__smo_fflush((FILE*)f__unsafe_ptr)!=-1);}
-    if not success
-        fail "failed to flush file contents"
+    if not success: fail "failed to flush file contents"

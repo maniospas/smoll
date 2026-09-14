@@ -136,9 +136,9 @@ def line(effect edit arena<char::tag>|circular<char::tag> CHARS, edit File f)
     doc "new line character, in case the line does not fit onto the buffer"
     doc "at once, in which case it requires multiple opens, or at the"
     doc "output stream's end."
-    if CHARS is arena<char::tag>
+    if CHARS is arena^char_allocator
         pos = CHARS.pos
-    if CHARS is circular<char::tag>
+    if CHARS is circular^char_allocator
         pos = 0
     buf = ref CHARS.buf
     if not exists buf.unsafe_ptr: fail "not open file"

@@ -111,6 +111,11 @@ def bor(bits x, bits y)
     doc "bitwise or"
     {builtins::nat z = (x__value|y__value);}
     return bits z
+    
+def bnot(bits x)
+    doc "bitwise negation"
+    {builtins::nat z = ~x__value;}
+    return bits z
 
 def nat8(nat x)
     doc "convert unsigned number to 8-bit unsigned number"
@@ -184,3 +189,30 @@ def bits(nat8|nat16|nat32 value)
 def bits(char value)
     doc "converts a character to its bit representation"
     return bits nat8 value
+
+def slice(bits self, nat from, nat to)
+    doc "extract a range of bits"
+    doc "The extracted range is shifted down so that `from` becomes bit 0."
+    if from>to: fail "slice start cannot be greater than slice end"
+    if to>64: fail "cannot slice beyond 64 bits"
+    if from==to: return bits nat(0)
+    #if from==0 and to==64: return self
+    mask = bits(lshift(bits 1, to-from).value-1)
+    return band(self.rshift from, mask)
+
+def mask(bits self, nat from, nat to, bits other)
+    doc "overwrite a range of bits"
+    doc "The provided value must fit entirely inside the selected bit range."
+    doc "Bit 0 of `other` is written at position `from`."
+    if from>=to: fail "slice start cannot be greater than or equal to slice end"
+    if to>64: fail "cannot slice beyond 64 bits"
+    width = to-from
+    if width==64: return other
+    mask = bits(lshift(bits 1, width).value-1)
+    if band(other, bnot(mask)).value!=0: fail "value does not fit in bit slice"
+    effective_range = lshift(mask, from)
+    cleared = band(self, bnot(effective_range))
+    replacement = lshift(other, from)
+    return bor(cleared, replacement)
+
+

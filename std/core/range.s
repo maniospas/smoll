@@ -17,34 +17,49 @@
 local import std.core.numbers
 
 def of(nat to)
-    doc "yields a pair of nats"
+    doc "yields a pair of nats based on an interval specification"
     doc "Represents the range [0, to) where 'to' its  its arguments."
-    return (0, to)
+    return (assigned from=0, to)
 
 def of(nat from, "to", nat to)
-    doc "yields a pair of nats"
+    doc "yields a pair of nats based on an interval specification"
     doc "Represents the range [from, to) where 'from' and 'to' are the arguments."
     return (from, to)
 
 def of(nat from, "upto", nat to)
-    doc "yields a pair of nats"
+    doc "yields a pair of nats based on an interval specification"
     doc "Represents the range [from, to] where 'from' and 'to' are the arguments."
     return (from, to+1)
 
 def of(nat from, "len", nat length)
-    doc "yields a pair of nats"
+    doc "yields a pair of nats based on an interval specification"
     doc "Represents the range [from, from+length] where 'from' and 'length' are the arguments."
     return (from, from+length)
 
 def range(nat _from, nat to)
     doc "constructs a range"
     doc "Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration."
+    doc "When iterating over ranges, it matters whether they are constant or not in whether the first"
+    doc "element is modified to track iteration progress or not. Also use 'of' to construct descriptive"
+    doc "ranges. Example:"
+    doc "```python"
+    doc "import std.core"
+    doc "def main()"
+    doc "    CLI = edit console()"
+    doc "    r = range of(0 to 3)"
+    doc "    for i in r: print i"
+    doc "    print r.from"
+    doc "```"
+    doc "In this example, the final print retains value 0 because the range is constant,"
+    doc "which evokes the constant range 'get' iterator. However, if the range was mutable,"
+    doc "the starting position would be modified via the 'mutget' iterator to consume its elements."
+    doc "In most usage scenarios this does not matter, as the range would be a temporary creation."
     from = mut 0+_from
     return class(from, to)
 
 def mutget(edit range r, nat|blank skipped)
     doc "next range number"
-    doc "This increments the r.from position and returns the previous one."
+    doc "This increments the range `from` position and returns the previous one."
     if r.from>=r.to: fail "iteration end"
     ret = const r.from
     r.from = ret+1

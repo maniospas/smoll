@@ -2272,8 +2272,13 @@ class Token:
         print(f"{PURPLE}{errtype} error: {message}{RESET}")
         if suggestions:
             #print("    alternatives")
-            for suggestion in suggestions:
-                print("    -", suggestion)
+            if len(suggestions)>10:
+                for suggestion in suggestions[:9]:
+                    print("    -", suggestion)
+                print("    -", "and "+str(len(suggestions)-9)+" more suggestions...") 
+            else:
+                for suggestion in suggestions:
+                    print("    -", suggestion)
         try:
             f = open(self.file.resolved_path, "r", encoding="utf-8")
             for i, line in enumerate(f, start=1):
@@ -3447,8 +3452,10 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
             return pos, ret
         synthetic_type = ImplementedType(signature_like(ret, temporary_implementation), at=literal_tok)
         synthetic_type.is_literal_of = synthetic_type # self-literals mean unpacking
-        for lit in lits:
-            var = Variable(create_temp(), lit)
+        assert len(lits)==len(ret) # we appended a literal for each ret
+        common_variable = create_temp()+"__"
+        for lit, r in zip(lits, ret):
+            var = Variable(common_variable+r.name, lit)
             synthetic_type.rets.append(var.name)
             synthetic_type.vars[var.name] = var
         synthetic_type_union = UnionType(synthetic_type.name, at=synthetic_type.at)
@@ -5489,6 +5496,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 varsret = [variable]
             elif literal_method.is_literal_of==literal_method: # unpack literal type that points to itself
                 varsret = list()
+                depackaged_tmp = create_temp()
                 for ret in literal_method.rets:
                     lit_method = literal_method.vars[ret].type
                     if lit_method.is_literal_of==CSTR_TYPE or (literal_method.is_literal_of and literal_method.is_forced_pointer_type_of):
@@ -5498,7 +5506,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                             else: print_lsp_literal(call_token, "**literal**\n\nstatic pointer transferred via a char[] representation", defined=lit_method.at)
                         tmp: str|None = global_cstr2var.get(current, None)
                         ptr_type = literal_method.is_forced_pointer_type_of
-                        variable = Variable(tmp if tmp else create_temp(), POINTER_TYPE if ptr_type else lit_method.is_literal_of, token=current_token)
+                        variable = Variable(tmp if tmp else depackaged_tmp+"__"+ret, POINTER_TYPE if ptr_type else lit_method.is_literal_of, token=current_token)
                         if tmp is None: 
                             global_cstr2var[current] = variable.name
                             global_var2cstr[variable.name] = current
@@ -5507,7 +5515,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                         if ptr_type: impl.set_pointer_type(variable, ptr_type)
                         varsret.append(variable)
                     elif lit_method.is_literal_of:
-                        variable = Variable(create_temp(), lit_method.is_literal_of, token=current_token)
+                        variable = Variable(depackaged_tmp+"__"+ret, lit_method.is_literal_of, token=current_token)
                         if is_lsp and file.is_main_file: print_lsp_literal(call_token, "**literal**\n\nnumber defined to be "+literal_method.at.text, defined=lit_method.at)
                         impl.vars[variable.name] = variable
                         impl.implementation.extend([
@@ -5518,7 +5526,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                         ])
                         varsret.append(variable)
                     else:
-                        variable = Variable(create_temp(), literal_method.vars[ret].type)
+                        variable = Variable(depackaged_tmp+"__"+ret, literal_method.vars[ret].type)
                         impl.vars[variable.name] = variable
                         varsret.append(variable)
             elif literal_method.is_literal_of==CSTR_TYPE:
@@ -6550,18 +6558,10 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
 
     # now that we have processed everything, remove all localdefs
     file.namespaces = {k:v for k,v in file.namespaces.items() if v not in file.localdefs}
-    # new_types = dict()
-    # for k,v in file.types.items():
-    #     u = UnionType(v.name, at=v.at)
-    #     for variation in v.variations:
-    #         if variation not in file.localdefs:
-    #             u.variations.append(variation)
-    #     if u.variations: new_types[k] = u
-    # file.types = new_types
-    if debug_mode:
-        for k,v in file.types.items():
-            for variation in v.variations:
-                print(variation.signature())
+    # if debug_mode:
+    #     for k,v in file.types.items():
+    #         for variation in v.variations:
+    #             print(variation.signature())
     return file
 
 async def resolve_name(path: str, at_token: Token|None) -> str:

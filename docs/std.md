@@ -40,7 +40,10 @@
 [xor](#xor) 
 [band](#band) 
 [bor](#bor) 
+[bnot](#bnot) 
 [tochar](#tochar) 
+[slice](#slice) 
+[mask](#mask) 
 [of](#of) 
 [range](#range) 
 [mutget](#mutget) 
@@ -62,7 +65,6 @@
 [list](#list) 
 [unsafe\_alloc](#unsafe\_alloc) 
 [at](#at) 
-[slice](#slice) 
 [char\_allocator](#char\_allocator) 
 [strdat](#strdat) 
 [str](#str) 
@@ -414,7 +416,7 @@ int
 Represents values in the range `2^-63 to 2^63-1`.
 
 ### int - cast to int
-*Defined in: std/core/convert.s line 89*
+*Defined in: std/core/convert.s line 75*
 
 ```rust
 int(bits {tag, nat value}) -> (int)
@@ -432,7 +434,7 @@ Converts a bit representation to the corresponding integer.
 
 
 ### int - cast to int
-*Defined in: std/core/convert.s line 29*
+*Defined in: std/core/convert.s line 27*
 
 ```rust
 int(nat) -> (int)
@@ -450,7 +452,7 @@ Overflows are mapped to negative integers without any numerical safeguards.
 
 
 ### int - cast to int
-*Defined in: std/core/convert.s line 29*
+*Defined in: std/core/convert.s line 27*
 
 ```rust
 int(int) -> (int)
@@ -468,7 +470,7 @@ Serves as a tautology function for code that parses on multiple number types.
 
 
 ### int - cast to int
-*Defined in: std/core/convert.s line 29*
+*Defined in: std/core/convert.s line 27*
 
 ```rust
 int(float) -> (int)
@@ -502,10 +504,10 @@ int(console {tag}) -> (int)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+32. user input was not a float
 2. null pointer
-27. unexpected end of console read
-28. user input was not a float
+22. out of bounds
+31. unexpected end of console read
 </details>
 
 
@@ -526,11 +528,11 @@ int(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
 
 <details><summary>Potential errors</summary>
 
-32. invalid integer int from non-number string
-18. out of bounds
 2. null pointer
-30. invalid int conversion from empty string
-31. invalid int conversion from string with only a sign
+34. invalid int conversion from empty string
+35. invalid int conversion from string with only a sign
+36. invalid integer int from non-number string
+22. out of bounds
 </details>
 
 
@@ -551,11 +553,11 @@ int(cstr) -> (int)
 
 <details><summary>Potential errors</summary>
 
-32. invalid integer int from non-number string
-18. out of bounds
 2. null pointer
-30. invalid int conversion from empty string
-31. invalid int conversion from string with only a sign
+34. invalid int conversion from empty string
+35. invalid int conversion from string with only a sign
+36. invalid integer int from non-number string
+22. out of bounds
 </details>
 
 
@@ -569,40 +571,8 @@ nat
 
 Represents values in the range `0 to 2^64-1`.
 
-### nat - retrieved unsigned number from 8-bit unsigned number
-*Defined in: std/core/convert.s line 172*
-
-```rust
-nat(nat8) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
-### nat - retrieved unsigned number from 16-bit unsigned number
-*Defined in: std/core/convert.s line 167*
-
-```rust
-nat(nat16) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
-### nat - retrieved unsigned number from 32-bit unsigned number
-*Defined in: std/core/convert.s line 162*
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
 
 ```rust
 nat(nat32) -> (nat)
@@ -617,8 +587,40 @@ nat(nat32) -> (nat)
 </details>
 
 
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
+
+```rust
+nat(nat16) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
+
+```rust
+nat(nat8) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
 ### nat - cast to nat
-*Defined in: std/core/convert.s line 84*
+*Defined in: std/core/convert.s line 70*
 
 ```rust
 nat(bits {tag, nat value}) -> (nat)
@@ -636,33 +638,14 @@ Converts a bit representation to the corresponding natural number.
 
 
 ### nat - cast to nat
-*Defined in: std/core/convert.s line 51*
-
-```rust
-nat(char) -> (nat)
-```
-
-Converting a character to a natural number considers
-its bit representation interpreted as an unsigned number.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
+*Defined in: std/core/convert.s line 35*
 
 ```rust
 nat(nat) -> (nat)
 ```
 
 Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
+ Fails on negative inputs to guard against assumption errors.
 
 <details><summary>Complexity</summary>
 
@@ -674,14 +657,14 @@ Converting to natural numbers loses information.
 
 
 ### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
+*Defined in: std/core/convert.s line 35*
 
 ```rust
 nat(int) -> (nat)
 ```
 
 Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
+ Fails on negative inputs to guard against assumption errors.
 
 <details><summary>Complexity</summary>
 
@@ -698,14 +681,14 @@ Converting to natural numbers loses information.
 
 
 ### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
+*Defined in: std/core/convert.s line 35*
 
 ```rust
 nat(float) -> (nat)
 ```
 
 Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
+ Fails on negative inputs to guard against assumption errors.
 
 <details><summary>Complexity</summary>
 
@@ -738,9 +721,9 @@ nat(console {tag}) -> (nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+32. user input was not a float
 2. null pointer
-28. user input was not a float
+22. out of bounds
 </details>
 
 
@@ -761,10 +744,10 @@ nat(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
 
 <details><summary>Potential errors</summary>
 
-33. invalid nat conversion from empty string
-18. out of bounds
+38. invalid nat conversion from non-number string
 2. null pointer
-34. invalid nat conversion from non-number string
+37. invalid nat conversion from empty string
+22. out of bounds
 </details>
 
 
@@ -785,10 +768,10 @@ nat(cstr) -> (nat)
 
 <details><summary>Potential errors</summary>
 
-33. invalid nat conversion from empty string
-18. out of bounds
+38. invalid nat conversion from non-number string
 2. null pointer
-34. invalid nat conversion from non-number string
+37. invalid nat conversion from empty string
+22. out of bounds
 </details>
 
 
@@ -802,6 +785,58 @@ nat32
 
 Represents values in the range `0 to 2^32-1`.
 
+### nat32 - retrieved 32-bit unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 175*
+
+```rust
+nat32(nat16) -> (nat32)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
+### nat32 - retrieved 32-bit unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 175*
+
+```rust
+nat32(nat8) -> (nat32)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
+### nat32 - convert unsigned number to 32-bit unsigned number
+*Defined in: std/core/convert.s line 162*
+
+```rust
+nat32(nat x, "truncate") -> (nat32)
+```
+
+The conversion truncates the given input, if it would not fit.
+For example, 4294967295 becomes 1.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
+
+</details>
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[x%4294967295]`*
 ### nat32 - convert unsigned number to 32-bit unsigned number
 *Defined in: std/core/convert.s line 154*
 
@@ -836,8 +871,43 @@ nat16
 
 Represents values in the range `0 to 2^16-1`.
 
+### nat16 - retrieved 16-bit unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 180*
+
+```rust
+nat16(nat8) -> (nat16)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
 ### nat16 - convert unsigned number to 16-bit unsigned number
-*Defined in: std/core/convert.s line 146*
+*Defined in: std/core/convert.s line 147*
+
+```rust
+nat16(nat x, "truncate") -> (nat16)
+```
+
+This conversion truncates the given input, if it would not fit.
+For example, 65536 becomes 1.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
+
+</details>
+
+
+### nat16 - convert unsigned number to 16-bit unsigned number
+*Defined in: std/core/convert.s line 139*
 
 ```rust
 nat16(nat) -> (nat16)
@@ -871,7 +941,7 @@ nat8
 Represents values in the range `0 to 255`.
 
 ### nat8 - convert a character to 8-bit unsigned number
-*Defined in: std/core/convert.s line 139*
+*Defined in: std/core/convert.s line 132*
 
 ```rust
 nat8(char) -> (nat8)
@@ -890,7 +960,7 @@ If it does not, this operation can fail.
 
 
 ### nat8 - convert unsigned number to 8-bit unsigned number
-*Defined in: std/core/convert.s line 127*
+*Defined in: std/core/convert.s line 120*
 
 ```rust
 nat8(nat) -> (nat8)
@@ -922,7 +992,7 @@ float
 ```
 
 ### float - cast to float
-*Defined in: std/core/convert.s line 95*
+*Defined in: std/core/convert.s line 81*
 
 ```rust
 float(bits {tag, nat value}) -> (float)
@@ -950,9 +1020,9 @@ May lose information because floats are not exact representation of all integers
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 15
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
 
 </details>
 
@@ -968,9 +1038,9 @@ May lose information because floats are not exact representation of all integers
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 15
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
 
 </details>
 
@@ -986,9 +1056,9 @@ Serves as a tautology function for code that parses on multiple number types.
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 15
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
 
 </details>
 
@@ -1010,10 +1080,10 @@ float(console {tag}) -> (float)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+32. user input was not a float
 2. null pointer
-27. unexpected end of console read
-28. user input was not a float
+22. out of bounds
+31. unexpected end of console read
 </details>
 
 
@@ -1035,11 +1105,11 @@ float(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first
 <details><summary>Potential errors</summary>
 
 2. null pointer
-35. invalid float conversion from empty string
-18. out of bounds
-36. invalid float conversion from string with only a sign
-37. invalid float conversion from non-number string
-38. invalid float conversion from string without a value after the dot
+22. out of bounds
+39. invalid float conversion from empty string
+40. invalid float conversion from string with only a sign
+41. invalid float conversion from non-number string
+42. invalid float conversion from string without a value after the dot
 </details>
 
 
@@ -1061,11 +1131,11 @@ float(cstr) -> (float)
 <details><summary>Potential errors</summary>
 
 2. null pointer
-35. invalid float conversion from empty string
-18. out of bounds
-36. invalid float conversion from string with only a sign
-37. invalid float conversion from non-number string
-38. invalid float conversion from string without a value after the dot
+22. out of bounds
+39. invalid float conversion from empty string
+40. invalid float conversion from string with only a sign
+41. invalid float conversion from non-number string
+42. invalid float conversion from string without a value after the dot
 </details>
 
 
@@ -1162,7 +1232,7 @@ char(console {tag}) -> (char)
 
 <details><summary>Potential errors</summary>
 
-27. unexpected end of console read
+31. unexpected end of console read
 </details>
 
 
@@ -1178,6 +1248,124 @@ Represents a generic for buffers and pointers for type-independent code that can
 This type ordains special treatment by the compiler.
 
 # eq
+### eq - equals
+*Defined in: std/core/numbers.s line 56*
+
+```rust
+eq(any ptr x, any ptr y) -> (bool)
+```
+
+Compares the address of two pointers.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/numbers.s line 40*
+
+```rust
+eq(last_error x, last_error y) -> (bool)
+```
+
+Compares two error messages. This comparison is
+used only for comparing error messages produced
+by the same running program.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/numbers.s line 26*
+
+```rust
+eq(nat x, nat y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/numbers.s line 26*
+
+```rust
+eq(int x, int y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/numbers.s line 26*
+
+```rust
+eq(float x, float y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/bool.s line 82*
+
+```rust
+eq(bool value, false) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/bool.s line 78*
+
+```rust
+eq(false, bool value) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
+</details>
+
+
 ### eq - equals
 *Defined in: std/core/bool.s line 74*
 
@@ -1299,140 +1487,6 @@ eq(bool x, bool y) -> (bool)
 
 
 ### eq - equals
-*Defined in: std/core/numbers.s line 56*
-
-```rust
-eq(any ptr x, any ptr y) -> (bool)
-```
-
-Compares the address of two pointers.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 11
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/numbers.s line 40*
-
-```rust
-eq(last_error x, last_error y) -> (bool)
-```
-
-Compares two error messages. This comparison is
-used only for comparing error messages produced
-by the same running program.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 11
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/numbers.s line 26*
-
-```rust
-eq(nat x, nat y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 19
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/numbers.s line 26*
-
-```rust
-eq(int x, int y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 19
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/numbers.s line 26*
-
-```rust
-eq(float x, float y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 3 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 19
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 82*
-
-```rust
-eq(bool value, false) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 11
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 78*
-
-```rust
-eq(false, bool value) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 11
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/string.s line 122*
-
-```rust
-eq(char x, char y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 11
-
-</details>
-
-
-### eq - equals
 *Defined in: std/core/string.s line 287*
 
 ```rust
@@ -1510,6 +1564,22 @@ Comparing two cstrs is as simple as comparing their addresses,
 so this operation is exceedingly lightweight and a convenient
 means for checking for runtime tags. The compier enforces that
 two same-content cstr will always have the same memory address.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/string.s line 122*
+
+```rust
+eq(char x, char y) -> (bool)
+```
 
 <details><summary>Complexity</summary>
 
@@ -1963,86 +2033,6 @@ eq(float ptr _x, float ptr _y) -> (bool)
 
 # neq
 ### neq - not equal
-*Defined in: std/core/bool.s line 66*
-
-```rust
-neq(false x, false y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 21
-
-</details>
-
-
-### neq - not equal
-*Defined in: std/core/bool.s line 66*
-
-```rust
-neq(false x, true y) -> (true)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 21
-
-</details>
-
-
-### neq - not equal
-*Defined in: std/core/bool.s line 66*
-
-```rust
-neq(true x, false y) -> (true)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 21
-
-</details>
-
-
-### neq - not equal
-*Defined in: std/core/bool.s line 66*
-
-```rust
-neq(true x, true y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 21
-
-</details>
-
-
-### neq - not equal
-*Defined in: std/core/bool.s line 25*
-
-```rust
-neq(bool x, bool y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
-
-</details>
-
-
-### neq - not equal
 *Defined in: std/core/numbers.s line 48*
 
 ```rust
@@ -2175,6 +2165,86 @@ neq(true x, bool y) -> (bool)
 
 
 ### neq - not equal
+*Defined in: std/core/bool.s line 66*
+
+```rust
+neq(false x, false y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
+
+</details>
+
+
+### neq - not equal
+*Defined in: std/core/bool.s line 66*
+
+```rust
+neq(false x, true y) -> (true)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
+
+</details>
+
+
+### neq - not equal
+*Defined in: std/core/bool.s line 66*
+
+```rust
+neq(true x, false y) -> (true)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
+
+</details>
+
+
+### neq - not equal
+*Defined in: std/core/bool.s line 66*
+
+```rust
+neq(true x, true y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 21
+
+</details>
+
+
+### neq - not equal
+*Defined in: std/core/bool.s line 25*
+
+```rust
+neq(bool x, bool y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### neq - not equal
 *Defined in: std/unsafe.s line 19*
 
 ```rust
@@ -2182,22 +2252,6 @@ neq(any ptr x, any ptr y) -> (bool)
 ```
 
 Compares the address of two pointers.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 11
-
-</details>
-
-
-### neq - not equals
-*Defined in: std/core/string.s line 127*
-
-```rust
-neq(char x, char y) -> (bool)
-```
 
 <details><summary>Complexity</summary>
 
@@ -2277,6 +2331,106 @@ Negates the outcome of equality checks between cstr and strings.
 - SSA variables: 12
 - Transpiled C size: 33
 
+</details>
+
+
+### neq - not equals
+*Defined in: std/core/string.s line 127*
+
+```rust
+neq(char x, char y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 11
+
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 47*
+
+```rust
+neq(cstr ptr x, cstr y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 37
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 47*
+
+```rust
+neq(cstr ptr x, str) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 43
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 47*
+
+```rust
+neq(str ptr x, cstr y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 47*
+
+```rust
+neq(str ptr x, str) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 85
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
 </details>
 
 
@@ -2621,90 +2775,6 @@ neq(str, cstr ptr y) -> (bool)
 
 ```rust
 neq(str, str ptr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 12
-- Transpiled C size: 85
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 47*
-
-```rust
-neq(cstr ptr x, cstr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 37
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 47*
-
-```rust
-neq(cstr ptr x, str) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 43
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 47*
-
-```rust
-neq(str ptr x, cstr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 47*
-
-```rust
-neq(str ptr x, str) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -3075,272 +3145,6 @@ Adds a natural number offset to a pointer.
 *Defined in: std/core/string.s line 424*
 
 ```rust
-add(edit list, cstr _s1, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 108
-- Transpiled C size: 489
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-4. division by zero
-14. reallocation failed
-17. cannot resize an unallocated or freed buffer
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 424*
-
-```rust
-add(edit list, str, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 108
-- Transpiled C size: 489
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-4. division by zero
-14. reallocation failed
-17. cannot resize an unallocated or freed buffer
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 424*
-
-```rust
-add(edit list, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 112
-- Transpiled C size: 495
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-4. division by zero
-14. reallocation failed
-17. cannot resize an unallocated or freed buffer
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 424*
-
-```rust
-add(edit circular, cstr _s1, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 104
-- Transpiled C size: 483
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-20. does not fit in circular arena
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 424*
-
-```rust
-add(edit circular, cstr _s1, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 108
-- Transpiled C size: 489
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-20. does not fit in circular arena
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 424*
-
-```rust
-add(edit circular, str, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 108
-- Transpiled C size: 489
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-20. does not fit in circular arena
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 424*
-
-```rust
-add(edit circular, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 112
-- Transpiled C size: 495
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-20. does not fit in circular arena
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 424*
-
-```rust
-add(edit bucket, cstr _s1, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 99
-- Transpiled C size: 471
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 424*
-
-```rust
 add(edit bucket, cstr _s1, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
 ```
 
@@ -3363,13 +3167,13 @@ yet safe and fast code.
 <details><summary>Potential errors</summary>
 
 2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+18. reallocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -3399,13 +3203,13 @@ yet safe and fast code.
 <details><summary>Potential errors</summary>
 
 2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+18. reallocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -3435,13 +3239,13 @@ yet safe and fast code.
 <details><summary>Potential errors</summary>
 
 2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+18. reallocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -3470,7 +3274,7 @@ yet safe and fast code.
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
+17. allocation failed
 </details>
 
 
@@ -3506,7 +3310,7 @@ yet safe and fast code.
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
+17. allocation failed
 </details>
 
 
@@ -3542,7 +3346,7 @@ yet safe and fast code.
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
+17. allocation failed
 </details>
 
 
@@ -3578,7 +3382,7 @@ yet safe and fast code.
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
+17. allocation failed
 </details>
 
 
@@ -3625,10 +3429,10 @@ convenient optimizatins when allocating and immediately concatenating.
 
 2. null pointer
 6. nat subtraction would yield a negative
-18. out of bounds
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+22. out of bounds
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -3668,10 +3472,10 @@ convenient optimizatins when allocating and immediately concatenating.
 
 2. null pointer
 6. nat subtraction would yield a negative
-18. out of bounds
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+22. out of bounds
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -3711,10 +3515,10 @@ convenient optimizatins when allocating and immediately concatenating.
 
 2. null pointer
 6. nat subtraction would yield a negative
-18. out of bounds
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+22. out of bounds
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -3754,10 +3558,10 @@ convenient optimizatins when allocating and immediately concatenating.
 
 2. null pointer
 6. nat subtraction would yield a negative
-18. out of bounds
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+22. out of bounds
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -3787,11 +3591,277 @@ yet safe and fast code.
 <details><summary>Potential errors</summary>
 
 4. division by zero
-14. reallocation failed
-17. cannot resize an unallocated or freed buffer
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+18. reallocation failed
+21. cannot resize an unallocated or freed buffer
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 424*
+
+```rust
+add(edit list, cstr _s1, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 108
+- Transpiled C size: 489
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+4. division by zero
+18. reallocation failed
+21. cannot resize an unallocated or freed buffer
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 424*
+
+```rust
+add(edit list, str, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 108
+- Transpiled C size: 489
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+4. division by zero
+18. reallocation failed
+21. cannot resize an unallocated or freed buffer
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 424*
+
+```rust
+add(edit list, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 112
+- Transpiled C size: 495
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+4. division by zero
+18. reallocation failed
+21. cannot resize an unallocated or freed buffer
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 424*
+
+```rust
+add(edit circular, cstr _s1, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 104
+- Transpiled C size: 483
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+23. arena is out of space
+24. does not fit in circular arena
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 424*
+
+```rust
+add(edit circular, cstr _s1, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 108
+- Transpiled C size: 489
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+23. arena is out of space
+24. does not fit in circular arena
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 424*
+
+```rust
+add(edit circular, str, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 108
+- Transpiled C size: 489
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+23. arena is out of space
+24. does not fit in circular arena
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 424*
+
+```rust
+add(edit circular, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 112
+- Transpiled C size: 495
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+23. arena is out of space
+24. does not fit in circular arena
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 424*
+
+```rust
+add(edit bucket, cstr _s1, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 99
+- Transpiled C size: 471
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+17. allocation failed
+18. reallocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -3814,10 +3884,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
+24. does not fit in circular arena
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -3840,10 +3910,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -3866,8 +3936,8 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-13. allocation failed
 </details>
 
 
@@ -3890,10 +3960,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
+24. does not fit in circular arena
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -3916,11 +3986,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-65. different vector sizes
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+68. different vector sizes
+24. does not fit in circular arena
 </details>
 
 
@@ -3943,10 +4013,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -3969,11 +4039,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-65. different vector sizes
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+68. different vector sizes
+23. arena is out of space
 </details>
 
 
@@ -3996,8 +4066,8 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-13. allocation failed
 </details>
 
 
@@ -4020,9 +4090,9 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-65. different vector sizes
+17. allocation failed
 2. null pointer
-13. allocation failed
+68. different vector sizes
 </details>
 
 
@@ -4289,10 +4359,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
+24. does not fit in circular arena
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -4315,10 +4385,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -4341,8 +4411,8 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-13. allocation failed
 </details>
 
 
@@ -4365,10 +4435,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
+24. does not fit in circular arena
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -4391,11 +4461,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-65. different vector sizes
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+68. different vector sizes
+24. does not fit in circular arena
 </details>
 
 
@@ -4418,10 +4488,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -4444,11 +4514,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-65. different vector sizes
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+68. different vector sizes
+23. arena is out of space
 </details>
 
 
@@ -4471,8 +4541,8 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-13. allocation failed
 </details>
 
 
@@ -4495,9 +4565,9 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-65. different vector sizes
+17. allocation failed
 2. null pointer
-13. allocation failed
+68. different vector sizes
 </details>
 
 
@@ -4519,12 +4589,12 @@ mul(edit circular, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat
 <details><summary>Potential errors</summary>
 
 2. null pointer
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-72. row out of bounds
-73. column out of bounds
-76. inner dimensions must agree
-20. does not fit in circular arena
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+75. row out of bounds
+76. column out of bounds
+79. inner dimensions must agree
+24. does not fit in circular arena
 </details>
 
 
@@ -4546,12 +4616,12 @@ mul(edit arena, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat po
 <details><summary>Potential errors</summary>
 
 2. null pointer
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-72. row out of bounds
-73. column out of bounds
-76. inner dimensions must agree
-19. arena is out of space
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+75. row out of bounds
+76. column out of bounds
+79. inner dimensions must agree
+23. arena is out of space
 </details>
 
 
@@ -4573,12 +4643,12 @@ mul(new FLOATS, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat po
 <details><summary>Potential errors</summary>
 
 2. null pointer
-72. row out of bounds
-73. column out of bounds
-76. inner dimensions must agree
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
+75. row out of bounds
+76. column out of bounds
+79. inner dimensions must agree
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -4608,12 +4678,12 @@ mul(edit circular, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-18. out of bounds
-20. does not fit in circular arena
-75. vector length must match matrix rows
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+24. does not fit in circular arena
+78. vector length must match matrix rows
 </details>
 
 
@@ -4636,12 +4706,12 @@ mul(edit arena, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-18. out of bounds
-75. vector length must match matrix rows
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+23. arena is out of space
+78. vector length must match matrix rows
 </details>
 
 
@@ -4664,10 +4734,10 @@ mul(new FLOATS, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+17. allocation failed
 2. null pointer
-75. vector length must match matrix rows
-13. allocation failed
+22. out of bounds
+78. vector length must match matrix rows
 </details>
 
 
@@ -4688,12 +4758,12 @@ mul(edit circular, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-18. out of bounds
-20. does not fit in circular arena
-74. matrix columns must match vector length
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+24. does not fit in circular arena
+77. matrix columns must match vector length
 </details>
 
 
@@ -4714,12 +4784,12 @@ mul(edit arena, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-18. out of bounds
-74. matrix columns must match vector length
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+23. arena is out of space
+77. matrix columns must match vector length
 </details>
 
 
@@ -4740,10 +4810,10 @@ mul(new FLOATS, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+17. allocation failed
 2. null pointer
-74. matrix columns must match vector length
-13. allocation failed
+22. out of bounds
+77. matrix columns must match vector length
 </details>
 
 
@@ -4767,12 +4837,12 @@ Grabs an allocator for the result as an effect.
 <details><summary>Potential errors</summary>
 
 2. null pointer
-20. does not fit in circular arena
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-72. row out of bounds
-73. column out of bounds
-76. inner dimensions must agree
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+75. row out of bounds
+76. column out of bounds
+24. does not fit in circular arena
+79. inner dimensions must agree
 </details>
 
 
@@ -4796,12 +4866,12 @@ Grabs an allocator for the result as an effect.
 <details><summary>Potential errors</summary>
 
 2. null pointer
-19. arena is out of space
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-72. row out of bounds
-73. column out of bounds
-76. inner dimensions must agree
+23. arena is out of space
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+75. row out of bounds
+76. column out of bounds
+79. inner dimensions must agree
 </details>
 
 
@@ -4824,13 +4894,13 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
+17. allocation failed
 2. null pointer
-72. row out of bounds
-73. column out of bounds
-76. inner dimensions must agree
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+75. row out of bounds
+76. column out of bounds
+79. inner dimensions must agree
 </details>
 
 
@@ -4860,12 +4930,12 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-18. out of bounds
-20. does not fit in circular arena
-75. vector length must match matrix rows
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+24. does not fit in circular arena
+78. vector length must match matrix rows
 </details>
 
 
@@ -4888,12 +4958,12 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-18. out of bounds
-75. vector length must match matrix rows
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+23. arena is out of space
+78. vector length must match matrix rows
 </details>
 
 
@@ -4916,10 +4986,10 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+17. allocation failed
 2. null pointer
-75. vector length must match matrix rows
-13. allocation failed
+78. vector length must match matrix rows
+22. out of bounds
 </details>
 
 
@@ -4942,12 +5012,12 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-18. out of bounds
-20. does not fit in circular arena
-74. matrix columns must match vector length
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+24. does not fit in circular arena
+77. matrix columns must match vector length
 </details>
 
 
@@ -4970,12 +5040,12 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-18. out of bounds
-74. matrix columns must match vector length
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+23. arena is out of space
+77. matrix columns must match vector length
 </details>
 
 
@@ -4998,73 +5068,10 @@ Grabs an allocator for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
-74. matrix columns must match vector length
+17. allocation failed
 2. null pointer
-13. allocation failed
-</details>
-
-
-### mul - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 103*
-
-```rust
-mul(int ptr _x, int ptr _y) -> (int)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### mul - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 103*
-
-```rust
-mul(float ptr _x, float _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### mul - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 103*
-
-```rust
-mul(float ptr _x, float ptr _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
+77. matrix columns must match vector length
+22. out of bounds
 </details>
 
 
@@ -5185,6 +5192,69 @@ mul(int ptr _x, int _y) -> (int)
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 9
 - Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### mul - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 103*
+
+```rust
+mul(int ptr _x, int ptr _y) -> (int)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### mul - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 103*
+
+```rust
+mul(float ptr _x, float _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### mul - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 103*
+
+```rust
+mul(float ptr _x, float ptr _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
 
 </details>
 
@@ -5322,140 +5392,6 @@ Divides two numbers of the same type. This is an overload for the / operator.
 
 
 ### div - vector division
-*Defined in: std/sci/vec.s line 167*
-
-```rust
-div(edit circular, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 226
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. cannot place vectors on buffer offsets
-2. null pointer
-20. does not fit in circular arena
-4. division by zero
-63. can only place vectors on contiguous buffers
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 167*
-
-```rust
-div(edit arena, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 226
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. cannot place vectors on buffer offsets
-2. null pointer
-19. arena is out of space
-4. division by zero
-63. can only place vectors on contiguous buffers
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 167*
-
-```rust
-div(new FLOATS, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 28
-- Transpiled C size: 211
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-13. allocation failed
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 155*
-
-```rust
-div(edit circular, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 37
-- Transpiled C size: 240
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. cannot place vectors on buffer offsets
-2. null pointer
-20. does not fit in circular arena
-4. division by zero
-63. can only place vectors on contiguous buffers
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 155*
-
-```rust
-div(edit circular, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 41
-- Transpiled C size: 278
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. cannot place vectors on buffer offsets
-65. different vector sizes
-2. null pointer
-20. does not fit in circular arena
-4. division by zero
-63. can only place vectors on contiguous buffers
-</details>
-
-
-### div - vector division
 *Defined in: std/sci/vec.s line 155*
 
 ```rust
@@ -5474,11 +5410,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 4. division by zero
-63. can only place vectors on contiguous buffers
+23. arena is out of space
 </details>
 
 
@@ -5501,12 +5437,12 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-65. different vector sizes
 2. null pointer
-19. arena is out of space
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+68. different vector sizes
 4. division by zero
-63. can only place vectors on contiguous buffers
+23. arena is out of space
 </details>
 
 
@@ -5529,9 +5465,9 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
 4. division by zero
-13. allocation failed
 </details>
 
 
@@ -5554,10 +5490,144 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-65. different vector sizes
+17. allocation failed
+2. null pointer
+68. different vector sizes
+4. division by zero
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 167*
+
+```rust
+div(edit circular, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 226
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+4. division by zero
+24. does not fit in circular arena
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 167*
+
+```rust
+div(edit arena, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 226
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+4. division by zero
+23. arena is out of space
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 167*
+
+```rust
+div(new FLOATS, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 211
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
 2. null pointer
 4. division by zero
-13. allocation failed
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 155*
+
+```rust
+div(edit circular, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 37
+- Transpiled C size: 240
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+4. division by zero
+24. does not fit in circular arena
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 155*
+
+```rust
+div(edit circular, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 278
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+68. different vector sizes
+4. division by zero
+24. does not fit in circular arena
 </details>
 
 
@@ -6348,6 +6418,90 @@ Compares two numbers of the same type. This is an overload for the <= operator.
 *Defined in: std/ptrpeek.s line 143*
 
 ```rust
+le(float _x, float ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### le - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 143*
+
+```rust
+le(nat ptr _x, nat _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### le - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 143*
+
+```rust
+le(nat ptr _x, nat ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### le - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 143*
+
+```rust
+le(int ptr _x, int _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### le - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 143*
+
+```rust
 le(int ptr _x, int ptr _y) -> (bool)
 ```
 
@@ -6433,90 +6587,6 @@ le(nat _x, nat ptr _y) -> (bool)
 
 ```rust
 le(int _x, int ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### le - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 143*
-
-```rust
-le(float _x, float ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### le - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 143*
-
-```rust
-le(nat ptr _x, nat _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### le - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 143*
-
-```rust
-le(nat ptr _x, nat ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### le - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 143*
-
-```rust
-le(int ptr _x, int _y) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -6880,10 +6950,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
+24. does not fit in circular arena
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -6906,10 +6976,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -6932,8 +7002,8 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-13. allocation failed
 </details>
 
 
@@ -6956,10 +7026,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
+24. does not fit in circular arena
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -6982,11 +7052,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-65. different vector sizes
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+68. different vector sizes
+24. does not fit in circular arena
 </details>
 
 
@@ -7009,10 +7079,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -7035,11 +7105,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-65. different vector sizes
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+68. different vector sizes
+23. arena is out of space
 </details>
 
 
@@ -7062,8 +7132,8 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-13. allocation failed
 </details>
 
 
@@ -7086,9 +7156,72 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-65. different vector sizes
+17. allocation failed
 2. null pointer
-13. allocation failed
+68. different vector sizes
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(int ptr _x, int ptr _y) -> (int)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(float ptr _x, float _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(float ptr _x, float ptr _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
 </details>
 
 
@@ -7221,69 +7354,6 @@ sub(int ptr _x, int _y) -> (int)
 </details>
 
 
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(int ptr _x, int ptr _y) -> (int)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(float ptr _x, float _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(float ptr _x, float ptr _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
 # pow
 ### pow - exponentiate by
 *Defined in: std/core/numbers.s line 161*
@@ -7320,55 +7390,6 @@ pow(float x, float y) -> (float)
 
 
 ### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 135*
-
-```rust
-pow(new FLOATS, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 30
-- Transpiled C size: 210
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-13. allocation failed
-</details>
-
-
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 135*
-
-```rust
-pow(new FLOATS, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 248
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-65. different vector sizes
-2. null pointer
-13. allocation failed
-</details>
-
-
-### pow - vector exponentiation
 *Defined in: std/sci/vec.s line 146*
 
 ```rust
@@ -7387,10 +7408,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
+24. does not fit in circular arena
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -7413,10 +7434,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -7439,8 +7460,8 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-13. allocation failed
 </details>
 
 
@@ -7463,10 +7484,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
+24. does not fit in circular arena
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -7489,11 +7510,11 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-65. different vector sizes
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+68. different vector sizes
+24. does not fit in circular arena
 </details>
 
 
@@ -7516,10 +7537,10 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -7542,11 +7563,60 @@ Grabs a FLOATS allocator effect to store the result.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-65. different vector sizes
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+68. different vector sizes
+23. arena is out of space
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 135*
+
+```rust
+pow(new FLOATS, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 210
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+2. null pointer
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 135*
+
+```rust
+pow(new FLOATS, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) with effects FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 248
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+2. null pointer
+68. different vector sizes
 </details>
 
 
@@ -7598,126 +7668,6 @@ without needing to evoke an effect to pass the normally singleton console.
 
 
 # print
-### print - prints a boolean
-*Defined in: std/core/print.s line 97*
-
-```rust
-print(console CLI, false) -> () with effects CLI
-```
-
-Automatically ends the line too.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 11
-
-</details>
-
-
-### print - prints a boolean
-*Defined in: std/core/print.s line 97*
-
-```rust
-print(console CLI, false, cstr endl) -> () with effects CLI
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 7
-
-</details>
-
-
-### print - prints a boolean
-*Defined in: std/core/print.s line 90*
-
-```rust
-print(console CLI, true) -> () with effects CLI
-```
-
-Automatically ends the line too.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 11
-
-</details>
-
-
-### print - prints a boolean
-*Defined in: std/core/print.s line 90*
-
-```rust
-print(console CLI, true, cstr endl) -> () with effects CLI
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 7
-
-</details>
-
-
-### print - prints a boolean
-*Defined in: std/core/print.s line 83*
-
-```rust
-print(console CLI, bool value) -> () with effects CLI
-```
-
-Automatically ends the line too.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 31
-
-</details>
-
-
-### print - prints a boolean
-*Defined in: std/core/print.s line 83*
-
-```rust
-print(console CLI, bool value, cstr endl) -> () with effects CLI
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 27
-
-</details>
-
-
-### print - prints an unsigned integer
-*Defined in: std/core/print.s line 76*
-
-```rust
-print(console CLI, nat value) -> () with effects CLI
-```
-
-Automatically ends the line too.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 13
-
-</details>
-
-
 ### print - prints an unsigned integer
 *Defined in: std/core/print.s line 76*
 
@@ -7855,6 +7805,126 @@ print(console CLI, "flush") -> () with effects CLI
 </details>
 
 
+### print - prints a boolean
+*Defined in: std/core/print.s line 97*
+
+```rust
+print(console CLI, false) -> () with effects CLI
+```
+
+Automatically ends the line too.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 11
+
+</details>
+
+
+### print - prints a boolean
+*Defined in: std/core/print.s line 97*
+
+```rust
+print(console CLI, false, cstr endl) -> () with effects CLI
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 7
+
+</details>
+
+
+### print - prints a boolean
+*Defined in: std/core/print.s line 90*
+
+```rust
+print(console CLI, true) -> () with effects CLI
+```
+
+Automatically ends the line too.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 11
+
+</details>
+
+
+### print - prints a boolean
+*Defined in: std/core/print.s line 90*
+
+```rust
+print(console CLI, true, cstr endl) -> () with effects CLI
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 7
+
+</details>
+
+
+### print - prints a boolean
+*Defined in: std/core/print.s line 83*
+
+```rust
+print(console CLI, bool value) -> () with effects CLI
+```
+
+Automatically ends the line too.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 31
+
+</details>
+
+
+### print - prints a boolean
+*Defined in: std/core/print.s line 83*
+
+```rust
+print(console CLI, bool value, cstr endl) -> () with effects CLI
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 27
+
+</details>
+
+
+### print - prints an unsigned integer
+*Defined in: std/core/print.s line 76*
+
+```rust
+print(console CLI, nat value) -> () with effects CLI
+```
+
+Automatically ends the line too.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 13
+
+</details>
+
+
 ### print - print a character
 *Defined in: std/core/string.s line 329*
 
@@ -7920,54 +7990,6 @@ print(console CLI, str, cstr endl) -> () with effects CLI
 - SSA variables: 8
 - Transpiled C size: 13
 
-</details>
-
-
-### print - print a matrix with aligned brackets
-*Defined in: std/sci/mat.s line 137*
-
-```rust
-print(console CLI, mat) -> () with effects CLI
-```
-
-single-row matrices stay on one line; taller ones get top/mid/bottom brackets
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 88
-- Transpiled C size: 840
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-</details>
-
-
-### print - print a matrix with aligned brackets
-*Defined in: std/sci/mat.s line 137*
-
-```rust
-print(console CLI, mat, cstr endl) -> () with effects CLI
-```
-
-single-row matrices stay on one line; taller ones get top/mid/bottom brackets
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 87
-- Transpiled C size: 836
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
 </details>
 
 
@@ -8052,6 +8074,54 @@ Prints it as coordinate as list: (i, j): v
 - SSA variables: 21
 - Transpiled C size: 178
 
+</details>
+
+
+### print - print a matrix with aligned brackets
+*Defined in: std/sci/mat.s line 137*
+
+```rust
+print(console CLI, mat) -> () with effects CLI
+```
+
+single-row matrices stay on one line; taller ones get top/mid/bottom brackets
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 88
+- Transpiled C size: 840
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+</details>
+
+
+### print - print a matrix with aligned brackets
+*Defined in: std/sci/mat.s line 137*
+
+```rust
+print(console CLI, mat, cstr endl) -> () with effects CLI
+```
+
+single-row matrices stay on one line; taller ones get top/mid/bottom brackets
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 87
+- Transpiled C size: 836
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
 </details>
 
 
@@ -8218,6 +8288,230 @@ colors(console {tag}) -> (colors {tag, console CLI, bool initialized})
 </details>
 
 # set
+### set
+*Defined in: std/core/print.s line 182*
+
+```rust
+set(colors, "reset_underline") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 180*
+
+```rust
+set(colors, "reset_bold") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 178*
+
+```rust
+set(colors, "reset_bg") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 176*
+
+```rust
+set(colors, "reset_color") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 174*
+
+```rust
+set(colors, "reset") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 172*
+
+```rust
+set(colors, "strikethrough") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 170*
+
+```rust
+set(colors, "reverse") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 168*
+
+```rust
+set(colors, "blink") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 166*
+
+```rust
+set(colors, "underline") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 164*
+
+```rust
+set(colors, "italic") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 162*
+
+```rust
+set(colors, "dim") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 160*
+
+```rust
+set(colors, "bold") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 158*
+
+```rust
+set(colors, "bg_black") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 156*
+
+```rust
+set(colors, "bg_white") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 11
+
+</details>
+
+
 ### set
 *Defined in: std/core/print.s line 154*
 
@@ -8554,233 +8848,9 @@ set(colors, "red") -> ()
 </details>
 
 
-### set
-*Defined in: std/core/print.s line 182*
-
-```rust
-set(colors, "reset_underline") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 180*
-
-```rust
-set(colors, "reset_bold") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 178*
-
-```rust
-set(colors, "reset_bg") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 176*
-
-```rust
-set(colors, "reset_color") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 174*
-
-```rust
-set(colors, "reset") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 172*
-
-```rust
-set(colors, "strikethrough") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 170*
-
-```rust
-set(colors, "reverse") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 168*
-
-```rust
-set(colors, "blink") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 166*
-
-```rust
-set(colors, "underline") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 164*
-
-```rust
-set(colors, "italic") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 162*
-
-```rust
-set(colors, "dim") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 160*
-
-```rust
-set(colors, "bold") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 158*
-
-```rust
-set(colors, "bg_black") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 156*
-
-```rust
-set(colors, "bg_white") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 11
-
-</details>
-
-
 # exists
 ### exists - checks that a pointer exists
-*Defined in: std/core/convert.s line 58*
+*Defined in: std/core/convert.s line 44*
 
 ```rust
 exists(any ptr) -> (bool)
@@ -8828,8 +8898,24 @@ exists(Texture {tag, nat,float,float,nat,nat[]}) -> (bool)
 
 
 # bits
-### bits
-*Defined in: std/core/convert.s line 177*
+### bits - converts a character to its bit representation
+*Defined in: std/core/convert.s line 189*
+
+```rust
+bits(char) -> (bits {tag, nat value})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
+
+</details>
+
+
+### bits - converts unsigned numbers to bits
+*Defined in: std/core/convert.s line 185*
 
 ```rust
 bits(nat32) -> (bits {tag, nat value})
@@ -8844,8 +8930,8 @@ bits(nat32) -> (bits {tag, nat value})
 </details>
 
 
-### bits
-*Defined in: std/core/convert.s line 177*
+### bits - converts unsigned numbers to bits
+*Defined in: std/core/convert.s line 185*
 
 ```rust
 bits(nat16) -> (bits {tag, nat value})
@@ -8860,8 +8946,8 @@ bits(nat16) -> (bits {tag, nat value})
 </details>
 
 
-### bits
-*Defined in: std/core/convert.s line 177*
+### bits - converts unsigned numbers to bits
+*Defined in: std/core/convert.s line 185*
 
 ```rust
 bits(nat8) -> (bits {tag, nat value})
@@ -8876,24 +8962,8 @@ bits(nat8) -> (bits {tag, nat value})
 </details>
 
 
-### bits
-*Defined in: std/core/convert.s line 177*
-
-```rust
-bits(char) -> (bits {tag, nat value})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 19
-
-</details>
-
-
 ### bits - bit representation
-*Defined in: std/core/convert.s line 76*
+*Defined in: std/core/convert.s line 62*
 
 ```rust
 bits(float) -> (bits {tag, nat value})
@@ -8912,7 +8982,7 @@ arithmetics and bitwise operations.
 
 
 ### bits - bit representation
-*Defined in: std/core/convert.s line 69*
+*Defined in: std/core/convert.s line 55*
 
 ```rust
 bits(int) -> (bits {tag, nat value})
@@ -8931,7 +9001,7 @@ arithmetics and bitwise operations.
 
 
 ### bits - bit representation
-*Defined in: std/core/convert.s line 63*
+*Defined in: std/core/convert.s line 49*
 
 ```rust
 bits(nat) -> (bits {tag, nat value})
@@ -8951,11 +9021,14 @@ arithmetics and bitwise operations.
 
 # lshift
 ### lshift - left shift
-*Defined in: std/core/convert.s line 102*
+*Defined in: std/core/convert.s line 88*
 
 ```rust
 lshift(bits, nat y) -> (bits {tag, nat value})
 ```
+
+Reminder that bits store 64 bits and thus this shift should
+be casted to lower-bit numbers (e.g., nat16) to truncate leading ones.
 
 <details><summary>Complexity</summary>
 
@@ -8968,7 +9041,7 @@ lshift(bits, nat y) -> (bits {tag, nat value})
 
 # rshift
 ### rshift - right shift
-*Defined in: std/core/convert.s line 107*
+*Defined in: std/core/convert.s line 95*
 
 ```rust
 rshift(bits, nat y) -> (bits {tag, nat value})
@@ -8985,7 +9058,7 @@ rshift(bits, nat y) -> (bits {tag, nat value})
 
 # xor
 ### xor - bitwise xor
-*Defined in: std/core/convert.s line 112*
+*Defined in: std/core/convert.s line 100*
 
 ```rust
 xor(bits, bits) -> (bits {tag, nat value})
@@ -9002,7 +9075,7 @@ xor(bits, bits) -> (bits {tag, nat value})
 
 # band
 ### band - bitwise and
-*Defined in: std/core/convert.s line 117*
+*Defined in: std/core/convert.s line 105*
 
 ```rust
 band(bits, bits) -> (bits {tag, nat value})
@@ -9019,7 +9092,7 @@ band(bits, bits) -> (bits {tag, nat value})
 
 # bor
 ### bor - bitwise or
-*Defined in: std/core/convert.s line 122*
+*Defined in: std/core/convert.s line 110*
 
 ```rust
 bor(bits, bits) -> (bits {tag, nat value})
@@ -9034,9 +9107,26 @@ bor(bits, bits) -> (bits {tag, nat value})
 </details>
 
 
+# bnot
+### bnot - bitwise negation
+*Defined in: std/core/convert.s line 115*
+
+```rust
+bnot(bits {tag, nat value}) -> (bits {tag, nat value})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 16
+
+</details>
+
+
 # tochar
 ### tochar
-*Defined in: std/core/convert.s line 135*
+*Defined in: std/core/convert.s line 128*
 
 ```rust
 tochar(nat8) -> (char)
@@ -9051,8 +9141,337 @@ tochar(nat8) -> (char)
 </details>
 
 
+# slice
+### slice - extract a range of bits
+*Defined in: std/core/convert.s line 193*
+
+```rust
+slice(bits, nat from, nat to) -> (bits {tag, nat value})
+```
+
+The extracted range is shifted down so that `from` becomes bit 0.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 196
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+12. slice start cannot be greater than slice end
+13. cannot slice beyond 64 bits
+6. nat subtraction would yield a negative
+</details>
+
+
+### slice - a buffer subregion of an arena
+*Defined in: std/core/allocators.s line 235*
+
+```rust
+slice(edit arena, nat length) -> (mut any[] {follows any ptr surface.buf.unsafe_ptr})
+```
+
+This allocates a region of a given number of elements
+within an arena and returns a buffer interface wrapping
+it. It is an alternative to allocating buffers on the
+heap.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 44
+- Transpiled C size: 184
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+11. nat value too large to pack in nat32
+23. arena is out of space
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 410*
+
+```rust
+slice(str, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 46
+- Transpiled C size: 222
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 410*
+
+```rust
+slice(str, str, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 216
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 410*
+
+```rust
+slice(str, cstr _from, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 216
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 410*
+
+```rust
+slice(str, cstr _from, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 210
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 410*
+
+```rust
+slice(cstr _s, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 216
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 410*
+
+```rust
+slice(cstr _s, str, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 210
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 410*
+
+```rust
+slice(cstr _s, cstr _from, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 210
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 410*
+
+```rust
+slice(cstr _s, cstr _from, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 204
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - get a substring view into a string
+*Defined in: std/core/string.s line 336*
+
+```rust
+slice(str, nat from, nat to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+This operation does not perform any additional allocations
+or memory moves and is thus convenient for parsing code.
+Explicitly copy the result to move it away from volatile
+memory, such as circular buffers.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 286
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+29. slice out of string bounds
+22. out of bounds
+</details>
+
+
+### slice - get a substring view into a string
+*Defined in: std/core/string.s line 336*
+
+```rust
+slice(cstr _s, nat from, nat to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+This operation does not perform any additional allocations
+or memory moves and is thus convenient for parsing code.
+Explicitly copy the result to move it away from volatile
+memory, such as circular buffers.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 280
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+29. slice out of string bounds
+22. out of bounds
+</details>
+
+
+# mask
+### mask - overwrite a range of bits
+*Defined in: std/core/convert.s line 203*
+
+```rust
+mask(bits, nat from, nat to, bits) -> (bits {tag, nat value})
+```
+
+The provided value must fit entirely inside the selected bit range.
+Bit 0 of `other` is written at position `from`.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 46
+- Transpiled C size: 269
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+15. value does not fit in bit slice
+13. cannot slice beyond 64 bits
+14. slice start cannot be greater than or equal to slice end
+6. nat subtraction would yield a negative
+</details>
+
+
 # of
-### of - yields a pair of nats
+### of - yields a pair of nats based on an interval specification
 *Defined in: std/core/range.s line 34*
 
 ```rust
@@ -9070,7 +9489,7 @@ Represents the range [from, from+length] where 'from' and 'length' are the argum
 </details>
 
 
-### of - yields a pair of nats
+### of - yields a pair of nats based on an interval specification
 *Defined in: std/core/range.s line 29*
 
 ```rust
@@ -9088,7 +9507,7 @@ Represents the range [from, to] where 'from' and 'to' are the arguments.
 </details>
 
 
-### of - yields a pair of nats
+### of - yields a pair of nats based on an interval specification
 *Defined in: std/core/range.s line 24*
 
 ```rust
@@ -9106,7 +9525,7 @@ Represents the range [from, to) where 'from' and 'to' are the arguments.
 </details>
 
 
-### of - yields a pair of nats
+### of - yields a pair of nats based on an interval specification
 *Defined in: std/core/range.s line 19*
 
 ```rust
@@ -9133,6 +9552,21 @@ range(nat _from, nat to) -> (edit range {tag, mut nat from, nat to})
 ```
 
 Endpoints are natural numbers (unsigned integers). This is handy for several kinds of iteration.
+When iterating over ranges, it matters whether they are constant or not in whether the first
+element is modified to track iteration progress or not. Also use 'of' to construct descriptive
+ranges. Example:
+```python
+import std.core
+def main()
+    CLI = edit console()
+    r = range of(0 to 3)
+    for i in r: print i
+    print r.from
+```
+In this example, the final print retains value 0 because the range is constant,
+which evokes the constant range 'get' iterator. However, if the range was mutable,
+the starting position would be modified via the 'mutget' iterator to consume its elements.
+In most usage scenarios this does not matter, as the range would be a temporary creation.
 
 <details><summary>Complexity</summary>
 
@@ -9145,13 +9579,13 @@ Endpoints are natural numbers (unsigned integers). This is handy for several kin
 
 # mutget
 ### mutget - next range number
-*Defined in: std/core/range.s line 45*
+*Defined in: std/core/range.s line 60*
 
 ```rust
 mutget(edit range {tag, mut nat from, nat to}) -> (nat)
 ```
 
-This increments the r.from position and returns the previous one.
+This increments the range `from` position and returns the previous one.
 
 <details><summary>Complexity</summary>
 
@@ -9163,18 +9597,18 @@ This increments the r.from position and returns the previous one.
 
 <details><summary>Potential errors</summary>
 
-12. iteration end
+16. iteration end
 </details>
 
 
 ### mutget - next range number
-*Defined in: std/core/range.s line 45*
+*Defined in: std/core/range.s line 60*
 
 ```rust
 mutget(edit range, nat skipped) -> (nat)
 ```
 
-This increments the r.from position and returns the previous one.
+This increments the range `from` position and returns the previous one.
 
 <details><summary>Complexity</summary>
 
@@ -9186,7 +9620,7 @@ This increments the r.from position and returns the previous one.
 
 <details><summary>Potential errors</summary>
 
-12. iteration end
+16. iteration end
 </details>
 
 
@@ -9207,7 +9641,7 @@ mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr}
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -9228,7 +9662,7 @@ mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr}
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -9249,7 +9683,7 @@ mutget(edit circular, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -9270,7 +9704,7 @@ mutget(edit arena, nat pos) -> (mut any ptr {follows any ptr l.buf.unsafe_ptr})
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -9315,7 +9749,7 @@ are retrieved or sliced.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -9343,377 +9777,6 @@ are retrieved or sliced.
 
 
 ### mutget - get a mutable hash map entry
-*Defined in: std/map.s line 39*
-
-```rust
-mutget(edit robinhood_str_entry[], edit any[], cstr key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
-```
-
-Implemented for string or cstr keys but buffer of any values.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 18
-- Transpiled C size: 88
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-2. null pointer
-5. modulo by zero
-6. nat subtraction would yield a negative
-60. string buffer is full
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit circular, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 46
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-2. null pointer
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit circular, edit terminal, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-51. not open file
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit circular, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-51. not open file
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit circular, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-51. not open file
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit circular, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-51. not open file
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit circular, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-51. not open file
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit arena, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 46
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-2. null pointer
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit arena, edit terminal, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-51. not open file
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit arena, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-51. not open file
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit arena, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-51. not open file
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit arena, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-51. not open file
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 26*
-
-```rust
-mutget(edit arena, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 15
-- Transpiled C size: 47
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-51. not open file
-21. can only define strings on contiguous buffers
-6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-42. end of file
-</details>
-
-
-### mutget
-*Defined in: std/io.s line 23*
-
-```rust
-mutget(edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 2 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 32
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-57. not open dir
-58. end of dir
-</details>
-
-
-### mutget - get a mutable hash map entry
 *Defined in: std/map.s line 49*
 
 ```rust
@@ -9732,11 +9795,11 @@ Implemented for string or cstr keys but buffer of any values.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-60. string buffer is full
+63. string buffer is full
 </details>
 
 
@@ -9759,11 +9822,382 @@ Implemented for string or cstr keys but buffer of any values.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-60. string buffer is full
+63. string buffer is full
+</details>
+
+
+### mutget - get a mutable hash map entry
+*Defined in: std/map.s line 39*
+
+```rust
+mutget(edit robinhood_str_entry[], edit any[], cstr key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+```
+
+Implemented for string or cstr keys but buffer of any values.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 88
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+5. modulo by zero
+22. out of bounds
+6. nat subtraction would yield a negative
+63. string buffer is full
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit circular, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 46
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit circular, edit terminal, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+54. not open file
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit circular, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+54. not open file
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit circular, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+54. not open file
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit circular, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+54. not open file
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit circular, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+54. not open file
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit arena, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 46
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit arena, edit terminal, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+54. not open file
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit arena, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+54. not open file
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit arena, edit write, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+54. not open file
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit arena, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+54. not open file
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 26*
+
+```rust
+mutget(edit arena, edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 15
+- Transpiled C size: 47
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+54. not open file
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+46. end of file
+</details>
+
+
+### mutget
+*Defined in: std/io.s line 23*
+
+```rust
+mutget(edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 2 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 32
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+60. not open dir
+61. end of dir
 </details>
 
 
@@ -9784,7 +10218,7 @@ mutget(edit vec, nat i) -> (mut float ptr)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -9801,6 +10235,28 @@ mutget(edit vec, nat i, "unsafe_assume_inbounds") -> (mut float ptr)
 - SSA variables: 11
 - Transpiled C size: 37
 
+</details>
+
+
+### mutget - mutable reference to matrix element (i,j)
+*Defined in: std/sci/mat.s line 59*
+
+```rust
+mutget(edit mat, nat i, nat j) -> (mut float ptr)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 103
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+75. row out of bounds
+76. column out of bounds
 </details>
 
 
@@ -9821,7 +10277,7 @@ mutget(edit coo, nat k) -> (mut sparse_element ptr)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -9844,31 +10300,9 @@ mutget(edit coo, nat k, "unsafe_assume_inbounds") -> (mut sparse_element ptr)
 </details>
 
 
-### mutget - mutable reference to matrix element (i,j)
-*Defined in: std/sci/mat.s line 59*
-
-```rust
-mutget(edit mat, nat i, nat j) -> (mut float ptr)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 16
-- Transpiled C size: 103
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-72. row out of bounds
-73. column out of bounds
-</details>
-
-
 # get
 ### get - assert that a number plus range start lies in the range
-*Defined in: std/core/range.s line 53*
+*Defined in: std/core/range.s line 68*
 
 ```rust
 get(range, nat _pos) -> (nat)
@@ -9887,7 +10321,7 @@ per a pattern like `for i in range 10 ...`.
 
 <details><summary>Potential errors</summary>
 
-12. iteration end
+16. iteration end
 </details>
 
 
@@ -9908,7 +10342,7 @@ get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -9929,7 +10363,7 @@ get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -9950,7 +10384,7 @@ get(circular, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -9971,7 +10405,7 @@ get(arena, nat pos) -> (any ptr {follows any ptr l.buf.unsafe_ptr})
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -10016,7 +10450,7 @@ are retrieved or sliced.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -10060,7 +10494,7 @@ get(str, nat i) -> (char ptr)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -10077,60 +10511,6 @@ get(str, nat i, "unsafe_assume_inbounds") -> (char ptr)
 - SSA variables: 10
 - Transpiled C size: 23
 
-</details>
-
-
-### get - get a hash map entry
-*Defined in: std/map.s line 34*
-
-```rust
-get(robinhood_str_entry[], any[], str) -> (any ptr {follows any ptr values.unsafe_ptr})
-```
-
-Implemented for string or cstr keys but buffer of any values.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 22
-- Transpiled C size: 86
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-2. null pointer
-5. modulo by zero
-6. nat subtraction would yield a negative
-59. index not found
-</details>
-
-
-### get - get a hash map entry
-*Defined in: std/map.s line 34*
-
-```rust
-get(robinhood_str_entry[], any[], cstr key) -> (any ptr {follows any ptr values.unsafe_ptr})
-```
-
-Implemented for string or cstr keys but buffer of any values.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 18
-- Transpiled C size: 80
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-2. null pointer
-5. modulo by zero
-6. nat subtraction would yield a negative
-59. index not found
 </details>
 
 
@@ -10153,11 +10533,65 @@ Implemented for string or cstr keys but buffer of any values.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-59. index not found
+62. index not found
+</details>
+
+
+### get - get a hash map entry
+*Defined in: std/map.s line 34*
+
+```rust
+get(robinhood_str_entry[], any[], str) -> (any ptr {follows any ptr values.unsafe_ptr})
+```
+
+Implemented for string or cstr keys but buffer of any values.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 86
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+5. modulo by zero
+22. out of bounds
+6. nat subtraction would yield a negative
+62. index not found
+</details>
+
+
+### get - get a hash map entry
+*Defined in: std/map.s line 34*
+
+```rust
+get(robinhood_str_entry[], any[], cstr key) -> (any ptr {follows any ptr values.unsafe_ptr})
+```
+
+Implemented for string or cstr keys but buffer of any values.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 80
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+5. modulo by zero
+22. out of bounds
+6. nat subtraction would yield a negative
+62. index not found
 </details>
 
 
@@ -10178,13 +10612,13 @@ get(edit circular, cstr url) -> (nat status, str) with effects CHARS
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
-18. out of bounds
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -10205,16 +10639,16 @@ get(edit circular, str) -> (nat status, str) with effects CHARS
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -10235,13 +10669,13 @@ get(edit arena, cstr url) -> (nat status, str) with effects CHARS
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
-18. out of bounds
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -10262,16 +10696,16 @@ get(edit arena, str) -> (nat status, str) with effects CHARS
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -10292,13 +10726,13 @@ get(new CHARS, cstr url) -> (nat status, str) with effects CHARS
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -10327,16 +10761,16 @@ get(new CHARS, str) -> (nat status, str) with effects CHARS
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -10365,7 +10799,7 @@ get(vec, nat i) -> (float ptr)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -10388,46 +10822,6 @@ get(vec, nat i, "unsafe_assume_inbounds") -> (float ptr)
 </details>
 
 
-### get - get a sparse element
-*Defined in: std/sci/coo.s line 43*
-
-```rust
-get(coo, nat k) -> (sparse_element ptr)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 11
-- Transpiled C size: 50
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-18. out of bounds
-</details>
-
-
-### get - get a sparse element
-*Defined in: std/sci/coo.s line 43*
-
-```rust
-get(coo, nat k, "unsafe_assume_inbounds") -> (sparse_element ptr)
-```
-
-
-*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 11
-- Transpiled C size: 27
-
-</details>
-
-
 ### get - reference to matrix element (i,j)
 *Defined in: std/sci/mat.s line 65*
 
@@ -10445,8 +10839,8 @@ get(mat, nat i, nat j) -> (float ptr)
 
 <details><summary>Potential errors</summary>
 
-72. row out of bounds
-73. column out of bounds
+75. row out of bounds
+76. column out of bounds
 </details>
 
 
@@ -10465,6 +10859,46 @@ get(mat, nat i, nat j, "unsafe_assume_inbounds") -> (float ptr)
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 16
 - Transpiled C size: 57
+
+</details>
+
+
+### get - get a sparse element
+*Defined in: std/sci/coo.s line 43*
+
+```rust
+get(coo, nat k) -> (sparse_element ptr)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 50
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+22. out of bounds
+</details>
+
+
+### get - get a sparse element
+*Defined in: std/sci/coo.s line 43*
+
+```rust
+get(coo, nat k, "unsafe_assume_inbounds") -> (sparse_element ptr)
+```
+
+
+*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 11
+- Transpiled C size: 27
 
 </details>
 
@@ -10521,150 +10955,6 @@ GB(nat) -> (nat)
 
 
 # alloc
-### alloc - allocates a buffer
-*Defined in: std/core/array.s line 23*
-
-```rust
-alloc(edit any[], nat size, "unsafe_leaky") -> (edit any[])
-```
-
-Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
-as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
-allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 26
-- Transpiled C size: 182
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-</details>
-
-
-### alloc - allocates a buffer
-*Defined in: std/core/array.s line 23*
-
-```rust
-alloc(edit any[], nat size, "dirty") -> (edit any[])
-```
-
-Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
-as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
-allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 29
-- Transpiled C size: 228
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-</details>
-
-
-<details><summary>Defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
-
-### alloc - allocates a buffer
-*Defined in: std/core/array.s line 23*
-
-```rust
-alloc(edit any[], nat size, "dirty", "unsafe_leaky") -> (edit any[])
-```
-
-Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
-as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
-allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 28
-- Transpiled C size: 201
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-</details>
-
-
-### alloc - allocates a buffer
-*Defined in: std/core/array.s line 23*
-
-```rust
-alloc(edit any[], nat size, "unsafe_first") -> (edit any[])
-```
-
-Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
-as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
-allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 25
-- Transpiled C size: 169
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-</details>
-
-
-<details><summary>Defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
-
-### alloc - allocates a buffer
-*Defined in: std/core/array.s line 23*
-
-```rust
-alloc(edit any[], nat size, "unsafe_first", "unsafe_leaky") -> (edit any[])
-```
-
-Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
-as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
-allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 24
-- Transpiled C size: 142
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-13. allocation failed
-</details>
-
-
 ### alloc - allocate memory
 *Defined in: std/unsafe.s line 25*
 
@@ -10686,32 +10976,7 @@ Allocates a memory of the provided size in bytes.
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
-</details>
-
-
-### alloc
-*Defined in: std/core/string.s line 132*
-
-```rust
-alloc(edit bucket, nat length) -> (edit allocated {tag, edit char[], nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 21
-- Transpiled C size: 97
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. cannot resize buffers with alloc; it promises no data reallocation
-2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
 </details>
 
 
@@ -10732,7 +10997,7 @@ alloc(new CHARS, nat length) -> (mut allocated {tag, mut char[], mut nat pos}) w
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
+17. allocation failed
 </details>
 
 
@@ -10762,9 +11027,9 @@ Creates room for one element.
 
 <details><summary>Potential errors</summary>
 
-17. cannot resize an unallocated or freed buffer
+18. reallocation failed
 4. division by zero
-14. reallocation failed
+21. cannot resize an unallocated or freed buffer
 </details>
 
 
@@ -10785,9 +11050,9 @@ alloc(edit list, nat length) -> (edit allocated {tag, edit any[] {follows any pt
 
 <details><summary>Potential errors</summary>
 
-17. cannot resize an unallocated or freed buffer
+18. reallocation failed
 4. division by zero
-14. reallocation failed
+21. cannot resize an unallocated or freed buffer
 </details>
 
 
@@ -10810,9 +11075,9 @@ Creates room for one element.
 
 <details><summary>Potential errors</summary>
 
-17. cannot resize an unallocated or freed buffer
+18. reallocation failed
 4. division by zero
-14. reallocation failed
+21. cannot resize an unallocated or freed buffer
 </details>
 
 
@@ -10833,9 +11098,9 @@ alloc(edit list, nat length) -> (edit allocated {tag, edit any[] {follows any pt
 
 <details><summary>Potential errors</summary>
 
-17. cannot resize an unallocated or freed buffer
+18. reallocation failed
 4. division by zero
-14. reallocation failed
+21. cannot resize an unallocated or freed buffer
 </details>
 
 
@@ -10858,7 +11123,7 @@ Creates room for one element.
 
 <details><summary>Potential errors</summary>
 
-20. does not fit in circular arena
+24. does not fit in circular arena
 </details>
 
 
@@ -10879,7 +11144,7 @@ alloc(edit circular, nat length) -> (edit allocated {tag, edit any[] {follows an
 
 <details><summary>Potential errors</summary>
 
-20. does not fit in circular arena
+24. does not fit in circular arena
 </details>
 
 
@@ -10907,11 +11172,11 @@ This version allocates a buffer of ONE element.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
+17. allocation failed
 2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+18. reallocation failed
 </details>
 
 
@@ -10939,11 +11204,11 @@ This version allocates a buffer of ONE element.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
+17. allocation failed
 2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+18. reallocation failed
 </details>
 
 
@@ -10971,10 +11236,10 @@ This version allocates a buffer of ONE element.
 
 <details><summary>Potential errors</summary>
 
+18. reallocation failed
+17. allocation failed
 2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
+19. cannot allocate a buffer of unsized type
 </details>
 
 
@@ -11001,11 +11266,11 @@ moved across functions.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
+17. allocation failed
 2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+18. reallocation failed
 </details>
 
 
@@ -11032,11 +11297,11 @@ moved across functions.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
+17. allocation failed
 2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+18. reallocation failed
 </details>
 
 
@@ -11063,10 +11328,10 @@ moved across functions.
 
 <details><summary>Potential errors</summary>
 
+18. reallocation failed
+17. allocation failed
 2. null pointer
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
+19. cannot allocate a buffer of unsized type
 </details>
 
 
@@ -11089,7 +11354,7 @@ Creates room for one element.
 
 <details><summary>Potential errors</summary>
 
-19. arena is out of space
+23. arena is out of space
 </details>
 
 
@@ -11110,7 +11375,7 @@ alloc(edit arena, nat length) -> (edit allocated {tag, edit any[] {follows any p
 
 <details><summary>Potential errors</summary>
 
-19. arena is out of space
+23. arena is out of space
 </details>
 
 
@@ -11131,9 +11396,9 @@ alloc(nat) -> (edit char[])
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -11166,9 +11431,9 @@ This version allocates a buffer of ONE element.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -11201,8 +11466,8 @@ This version allocates a buffer of ONE element.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
+17. allocation failed
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -11228,9 +11493,9 @@ This version allocates a buffer of ONE element.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -11263,8 +11528,8 @@ This version allocates a buffer of ONE element.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
+17. allocation failed
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -11290,8 +11555,8 @@ This version allocates a buffer of ONE element.
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
 </details>
 
 
@@ -11324,7 +11589,7 @@ This version allocates a buffer of ONE element.
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
+17. allocation failed
 </details>
 
 
@@ -11349,9 +11614,9 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -11361,6 +11626,175 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 free(mut any ptr) -> ()
 ```
 </details>
+
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 23*
+
+```rust
+alloc(edit any[], nat size, "unsafe_leaky") -> (edit any[])
+```
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 182
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+20. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 23*
+
+```rust
+alloc(edit any[], nat size, "dirty") -> (edit any[])
+```
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 29
+- Transpiled C size: 228
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+<details><summary>Defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 23*
+
+```rust
+alloc(edit any[], nat size, "dirty", "unsafe_leaky") -> (edit any[])
+```
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 201
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+20. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 23*
+
+```rust
+alloc(edit any[], nat size, "unsafe_first") -> (edit any[])
+```
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 25
+- Transpiled C size: 169
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+</details>
+
+
+<details><summary>Defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
+### alloc - allocates a buffer
+*Defined in: std/core/array.s line 23*
+
+```rust
+alloc(edit any[], nat size, "unsafe_first", "unsafe_leaky") -> (edit any[])
+```
+
+Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,
+as it never reallocates an allocation. Consider freeing the buffer first with `del buffer` to
+allocate again, or use `buffer.resize new_size` once a first non-zero allocation has been made.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 24
+- Transpiled C size: 142
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+</details>
+
+
+### alloc
+*Defined in: std/core/string.s line 132*
+
+```rust
+alloc(edit bucket, nat length) -> (edit allocated {tag, edit char[], nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 97
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+2. null pointer
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+18. reallocation failed
+</details>
+
 
 ### alloc
 *Defined in: std/tag.s line 40*
@@ -11380,15 +11814,15 @@ alloc(cstr) -> (mut char[])
 <details><summary>Potential errors</summary>
 
 2. null pointer
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-81. empty input name
-18. out of bounds
-82. cannot tag a structural type
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+84. empty input name
+85. cannot tag a structural type
+22. out of bounds
+20. cannot resize buffers with alloc; it promises no data reallocation
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -11417,16 +11851,16 @@ alloc(cstr surface, cstr obj) -> (mut char[])
 <details><summary>Potential errors</summary>
 
 2. null pointer
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-81. empty input name
-18. out of bounds
-82. cannot tag a structural type
-83. tag surface cannot be structural type
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+84. empty input name
+85. cannot tag a structural type
+22. out of bounds
+86. tag surface cannot be structural type
+20. cannot resize buffers with alloc; it promises no data reallocation
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+23. arena is out of space
 </details>
 
 
@@ -11459,8 +11893,8 @@ resources.
 
 <details><summary>Potential errors</summary>
 
-17. cannot resize an unallocated or freed buffer
-14. reallocation failed
+18. reallocation failed
+21. cannot resize an unallocated or freed buffer
 </details>
 
 
@@ -11485,7 +11919,7 @@ resources.
 
 <details><summary>Potential errors</summary>
 
-14. reallocation failed
+18. reallocation failed
 </details>
 
 
@@ -11507,27 +11941,11 @@ last(edit any[]) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
 # len
-### len - string length
-*Defined in: std/core/string.s line 105*
-
-```rust
-len(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 3
-
-</details>
-
-
 ### len
 *Defined in: std/core/allocators.s line 135*
 
@@ -11595,6 +12013,22 @@ len(any[]) -> (nat)
 </details>
 
 
+### len - string length
+*Defined in: std/core/string.s line 105*
+
+```rust
+len(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
+</details>
+
+
 ### len - vectot length
 *Defined in: std/sci/vec.s line 57*
 
@@ -11646,7 +12080,7 @@ bucket_contents() -> (edit bucket_contents {tag, mut any ptr elements {follows a
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
+17. allocation failed
 </details>
 
 
@@ -11687,9 +12121,9 @@ def main()
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
+17. allocation failed
 2. null pointer
-13. allocation failed
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -11776,7 +12210,7 @@ with another allocator).
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4097t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4139t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -11792,7 +12226,7 @@ arena("float__t4097t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4031t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4073t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -11808,7 +12242,7 @@ arena("float__t4031t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t3744t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t3786t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -11824,23 +12258,7 @@ arena("float__t3744t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t662t") -> (edit arena {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### arena
-*Defined in: std/sci/vec.s line 23*
-
-```rust
-arena("float__t620t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t655t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -11857,6 +12275,22 @@ arena("float__t620t") -> (edit arena {tag, edit float[], mut nat pos})
 
 ```rust
 arena("float__t616t") -> (edit arena {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t614t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12009,7 +12443,7 @@ circular(edit any[]) -> (edit circular {tag, edit any[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4097t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4139t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12025,7 +12459,7 @@ circular("float__t4097t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4031t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4073t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12041,7 +12475,7 @@ circular("float__t4031t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t3744t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t3786t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12057,23 +12491,7 @@ circular("float__t3744t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t662t") -> (edit circular {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### circular
-*Defined in: std/sci/vec.s line 24*
-
-```rust
-circular("float__t620t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t655t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12090,6 +12508,22 @@ circular("float__t620t") -> (edit circular {tag, edit float[], mut nat pos})
 
 ```rust
 circular("float__t616t") -> (edit circular {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t614t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12151,9 +12585,9 @@ list("char__t9t") -> (edit list {tag, mut char[], mut nat length})
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -12203,9 +12637,9 @@ A capacity is maintained so that resizes are not performed too frequently.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -12220,7 +12654,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t4097t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t4139t") -> (edit list {tag, mut float[], mut nat length})
 ```
 
 <details><summary>Complexity</summary>
@@ -12233,9 +12667,9 @@ list("float__t4097t") -> (edit list {tag, mut float[], mut nat length})
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -12250,7 +12684,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t4031t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t4073t") -> (edit list {tag, mut float[], mut nat length})
 ```
 
 <details><summary>Complexity</summary>
@@ -12263,9 +12697,9 @@ list("float__t4031t") -> (edit list {tag, mut float[], mut nat length})
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -12280,7 +12714,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t3744t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t3786t") -> (edit list {tag, mut float[], mut nat length})
 ```
 
 <details><summary>Complexity</summary>
@@ -12293,9 +12727,9 @@ list("float__t3744t") -> (edit list {tag, mut float[], mut nat length})
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -12310,7 +12744,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t662t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t655t") -> (edit list {tag, mut float[], mut nat length})
 ```
 
 <details><summary>Complexity</summary>
@@ -12323,39 +12757,9 @@ list("float__t662t") -> (edit list {tag, mut float[], mut nat length})
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-</details>
-
-
-<details><summary>Defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
-
-### list
-*Defined in: std/sci/vec.s line 25*
-
-```rust
-list("float__t620t") -> (edit list {tag, mut float[], mut nat length})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 59
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -12383,9 +12787,39 @@ list("float__t616t") -> (edit list {tag, mut float[], mut nat length})
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+<details><summary>Defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
+### list
+*Defined in: std/sci/vec.s line 25*
+
+```rust
+list("float__t614t") -> (edit list {tag, mut float[], mut nat length})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 59
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -12413,9 +12847,9 @@ list("float__t612t") -> (edit list {tag, mut float[], mut nat length})
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -12443,9 +12877,9 @@ list("float__t4t") -> (edit list {tag, mut float[], mut nat length})
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -12476,9 +12910,9 @@ Creates room for one element.
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-13. allocation failed
-14. reallocation failed
+18. reallocation failed
 </details>
 
 
@@ -12499,9 +12933,9 @@ unsafe_alloc(edit bucket, nat bytes) -> (mut any ptr {follows any ptr ..})
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-13. allocation failed
-14. reallocation failed
+18. reallocation failed
 </details>
 
 
@@ -12523,7 +12957,7 @@ at(edit allocated {tag, edit any[], nat pos}) -> (mut any ptr {follows any ptr s
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -12544,11 +12978,11 @@ at(edit robinhood_nat_entry[], nat _k) -> (mut nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-60. string buffer is full
+63. string buffer is full
 </details>
 
 
@@ -12569,11 +13003,11 @@ at(edit robinhood_str_entry[], str) -> (mut nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-60. string buffer is full
+63. string buffer is full
 </details>
 
 
@@ -12594,11 +13028,11 @@ at(edit robinhood_str_entry[], cstr _k) -> (mut nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-60. string buffer is full
+63. string buffer is full
 </details>
 
 
@@ -12639,282 +13073,6 @@ at(float number, nat i) -> (float)
 </details>
 
 
-# slice
-### slice - a buffer subregion of an arena
-*Defined in: std/core/allocators.s line 235*
-
-```rust
-slice(edit arena, nat length) -> (mut any[] {follows any ptr surface.buf.unsafe_ptr})
-```
-
-This allocates a region of a given number of elements
-within an arena and returns a buffer interface wrapping
-it. It is an alternative to allocating buffers on the
-heap.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 44
-- Transpiled C size: 184
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-11. nat value too large to pack in nat32
-19. arena is out of space
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 410*
-
-```rust
-slice(str, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 46
-- Transpiled C size: 222
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-25. slice out of string bounds
-26. not found
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 410*
-
-```rust
-slice(str, str, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 216
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-25. slice out of string bounds
-26. not found
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 410*
-
-```rust
-slice(str, cstr _from, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 216
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-25. slice out of string bounds
-26. not found
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 410*
-
-```rust
-slice(str, cstr _from, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 210
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-25. slice out of string bounds
-26. not found
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 410*
-
-```rust
-slice(cstr _s, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 216
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-25. slice out of string bounds
-26. not found
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 410*
-
-```rust
-slice(cstr _s, str, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 210
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-25. slice out of string bounds
-26. not found
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 410*
-
-```rust
-slice(cstr _s, cstr _from, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 210
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-25. slice out of string bounds
-26. not found
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 410*
-
-```rust
-slice(cstr _s, cstr _from, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 204
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-18. out of bounds
-25. slice out of string bounds
-26. not found
-</details>
-
-
-### slice - get a substring view into a string
-*Defined in: std/core/string.s line 336*
-
-```rust
-slice(str, nat from, nat to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-This operation does not perform any additional allocations
-or memory moves and is thus convenient for parsing code.
-Explicitly copy the result to move it away from volatile
-memory, such as circular buffers.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 286
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-25. slice out of string bounds
-18. out of bounds
-2. null pointer
-</details>
-
-
-### slice - get a substring view into a string
-*Defined in: std/core/string.s line 336*
-
-```rust
-slice(cstr _s, nat from, nat to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-This operation does not perform any additional allocations
-or memory moves and is thus convenient for parsing code.
-Explicitly copy the result to move it away from volatile
-memory, such as circular buffers.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 280
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-25. slice out of string bounds
-18. out of bounds
-2. null pointer
-</details>
-
-
 # char\_allocator
 ### list
 *Defined in: std/core/string.s line 25*
@@ -12933,9 +13091,9 @@ list("char__t9t") -> (edit list {tag, mut char[], mut nat length})
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -13014,9 +13172,9 @@ def main()
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
+17. allocation failed
 2. null pointer
-13. allocation failed
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -13131,11 +13289,11 @@ on comparisons of unequal strings.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -13160,11 +13318,11 @@ on comparisons of unequal strings.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -13189,10 +13347,10 @@ on comparisons of unequal strings.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+25. can only define strings on contiguous buffers
 2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+26. can only define strings on non-offset buffers
+22. out of bounds
 </details>
 
 
@@ -13229,11 +13387,11 @@ str(char[]) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-23. string does not fit on buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+27. string does not fit on buffer
 </details>
 
 
@@ -13254,11 +13412,11 @@ str(char[], nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-23. string does not fit on buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+27. string does not fit on buffer
 </details>
 
 
@@ -13279,8 +13437,8 @@ str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr 
 
 <details><summary>Potential errors</summary>
 
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -13339,15 +13497,15 @@ The resulting memory will consume exactly the required size in bytes.
 2. null pointer
 4. division by zero
 6. nat subtraction would yield a negative
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-17. cannot resize an unallocated or freed buffer
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-27. unexpected end of console read
+17. allocation failed
+18. reallocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+21. cannot resize an unallocated or freed buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+31. unexpected end of console read
 </details>
 
 
@@ -13377,13 +13535,13 @@ The read string is placed on an arena while consuming only the necessarily minim
 
 <details><summary>Potential errors</summary>
 
+33. read string does not fit on buffer
 2. null pointer
 6. nat subtraction would yield a negative
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-27. unexpected end of console read
-29. read string does not fit on buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+31. unexpected end of console read
 </details>
 
 
@@ -13482,6 +13640,238 @@ str(str ptr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, cha
 *Defined in: std/core/string.s line 135*
 
 ```rust
+copy(edit list, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is a fresh string in a new memory surface effect CHARS.
+The result is guaranteed to be a bit-correct replica of the
+string immediately after. But, even though strings cannot be edited,
+their supporting memory can be corrupted with new data, especially
+when they are placed on reused arenas or circular buffers. That
+said, that would be a logical bug of insufficient sizing or
+sequencing. Strings remain valid slices of allocated memory regions
+without runtime failures; they always preserve their size.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 157
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+18. reallocation failed
+4. division by zero
+21. cannot resize an unallocated or freed buffer
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### copy - copy a string
+*Defined in: std/core/string.s line 135*
+
+```rust
+copy(edit list, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is a fresh string in a new memory surface effect CHARS.
+The result is guaranteed to be a bit-correct replica of the
+string immediately after. But, even though strings cannot be edited,
+their supporting memory can be corrupted with new data, especially
+when they are placed on reused arenas or circular buffers. That
+said, that would be a logical bug of insufficient sizing or
+sequencing. Strings remain valid slices of allocated memory regions
+without runtime failures; they always preserve their size.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 163
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+18. reallocation failed
+4. division by zero
+21. cannot resize an unallocated or freed buffer
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### copy - copy a string
+*Defined in: std/core/string.s line 135*
+
+```rust
+copy(edit circular, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is a fresh string in a new memory surface effect CHARS.
+The result is guaranteed to be a bit-correct replica of the
+string immediately after. But, even though strings cannot be edited,
+their supporting memory can be corrupted with new data, especially
+when they are placed on reused arenas or circular buffers. That
+said, that would be a logical bug of insufficient sizing or
+sequencing. Strings remain valid slices of allocated memory regions
+without runtime failures; they always preserve their size.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 157
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+24. does not fit in circular arena
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### copy - copy a string
+*Defined in: std/core/string.s line 135*
+
+```rust
+copy(edit circular, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is a fresh string in a new memory surface effect CHARS.
+The result is guaranteed to be a bit-correct replica of the
+string immediately after. But, even though strings cannot be edited,
+their supporting memory can be corrupted with new data, especially
+when they are placed on reused arenas or circular buffers. That
+said, that would be a logical bug of insufficient sizing or
+sequencing. Strings remain valid slices of allocated memory regions
+without runtime failures; they always preserve their size.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 163
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+24. does not fit in circular arena
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### copy - copy a string
+*Defined in: std/core/string.s line 135*
+
+```rust
+copy(edit arena, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is a fresh string in a new memory surface effect CHARS.
+The result is guaranteed to be a bit-correct replica of the
+string immediately after. But, even though strings cannot be edited,
+their supporting memory can be corrupted with new data, especially
+when they are placed on reused arenas or circular buffers. That
+said, that would be a logical bug of insufficient sizing or
+sequencing. Strings remain valid slices of allocated memory regions
+without runtime failures; they always preserve their size.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 157
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+23. arena is out of space
+</details>
+
+
+### copy - copy a string
+*Defined in: std/core/string.s line 135*
+
+```rust
+copy(edit arena, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is a fresh string in a new memory surface effect CHARS.
+The result is guaranteed to be a bit-correct replica of the
+string immediately after. But, even though strings cannot be edited,
+their supporting memory can be corrupted with new data, especially
+when they are placed on reused arenas or circular buffers. That
+said, that would be a logical bug of insufficient sizing or
+sequencing. Strings remain valid slices of allocated memory regions
+without runtime failures; they always preserve their size.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 163
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+23. arena is out of space
+</details>
+
+
+### copy - copy a string
+*Defined in: std/core/string.s line 135*
+
+```rust
+copy(edit bucket, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is a fresh string in a new memory surface effect CHARS.
+The result is guaranteed to be a bit-correct replica of the
+string immediately after. But, even though strings cannot be edited,
+their supporting memory can be corrupted with new data, especially
+when they are placed on reused arenas or circular buffers. That
+said, that would be a logical bug of insufficient sizing or
+sequencing. Strings remain valid slices of allocated memory regions
+without runtime failures; they always preserve their size.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 145
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+2. null pointer
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+18. reallocation failed
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### copy - copy a string
+*Defined in: std/core/string.s line 135*
+
+```rust
 copy(edit bucket, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
 ```
 
@@ -13504,13 +13894,13 @@ without runtime failures; they always preserve their size.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
+17. allocation failed
 2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+18. reallocation failed
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -13540,9 +13930,9 @@ without runtime failures; they always preserve their size.
 
 <details><summary>Potential errors</summary>
 
-21. can only define strings on contiguous buffers
-13. allocation failed
-22. can only define strings on non-offset buffers
+17. allocation failed
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
 </details>
 
 
@@ -13579,9 +13969,9 @@ without runtime failures; they always preserve their size.
 
 <details><summary>Potential errors</summary>
 
-21. can only define strings on contiguous buffers
-13. allocation failed
-22. can only define strings on non-offset buffers
+17. allocation failed
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
 </details>
 
 
@@ -13591,238 +13981,6 @@ without runtime failures; they always preserve their size.
 free(mut any ptr) -> ()
 ```
 </details>
-
-### copy - copy a string
-*Defined in: std/core/string.s line 135*
-
-```rust
-copy(edit list, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is a fresh string in a new memory surface effect CHARS.
-The result is guaranteed to be a bit-correct replica of the
-string immediately after. But, even though strings cannot be edited,
-their supporting memory can be corrupted with new data, especially
-when they are placed on reused arenas or circular buffers. That
-said, that would be a logical bug of insufficient sizing or
-sequencing. Strings remain valid slices of allocated memory regions
-without runtime failures; they always preserve their size.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 157
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. cannot resize an unallocated or freed buffer
-4. division by zero
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-14. reallocation failed
-</details>
-
-
-### copy - copy a string
-*Defined in: std/core/string.s line 135*
-
-```rust
-copy(edit list, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is a fresh string in a new memory surface effect CHARS.
-The result is guaranteed to be a bit-correct replica of the
-string immediately after. But, even though strings cannot be edited,
-their supporting memory can be corrupted with new data, especially
-when they are placed on reused arenas or circular buffers. That
-said, that would be a logical bug of insufficient sizing or
-sequencing. Strings remain valid slices of allocated memory regions
-without runtime failures; they always preserve their size.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 163
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. cannot resize an unallocated or freed buffer
-4. division by zero
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-14. reallocation failed
-</details>
-
-
-### copy - copy a string
-*Defined in: std/core/string.s line 135*
-
-```rust
-copy(edit circular, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is a fresh string in a new memory surface effect CHARS.
-The result is guaranteed to be a bit-correct replica of the
-string immediately after. But, even though strings cannot be edited,
-their supporting memory can be corrupted with new data, especially
-when they are placed on reused arenas or circular buffers. That
-said, that would be a logical bug of insufficient sizing or
-sequencing. Strings remain valid slices of allocated memory regions
-without runtime failures; they always preserve their size.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 157
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-20. does not fit in circular arena
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### copy - copy a string
-*Defined in: std/core/string.s line 135*
-
-```rust
-copy(edit circular, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is a fresh string in a new memory surface effect CHARS.
-The result is guaranteed to be a bit-correct replica of the
-string immediately after. But, even though strings cannot be edited,
-their supporting memory can be corrupted with new data, especially
-when they are placed on reused arenas or circular buffers. That
-said, that would be a logical bug of insufficient sizing or
-sequencing. Strings remain valid slices of allocated memory regions
-without runtime failures; they always preserve their size.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 163
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-20. does not fit in circular arena
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### copy - copy a string
-*Defined in: std/core/string.s line 135*
-
-```rust
-copy(edit arena, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is a fresh string in a new memory surface effect CHARS.
-The result is guaranteed to be a bit-correct replica of the
-string immediately after. But, even though strings cannot be edited,
-their supporting memory can be corrupted with new data, especially
-when they are placed on reused arenas or circular buffers. That
-said, that would be a logical bug of insufficient sizing or
-sequencing. Strings remain valid slices of allocated memory regions
-without runtime failures; they always preserve their size.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 157
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### copy - copy a string
-*Defined in: std/core/string.s line 135*
-
-```rust
-copy(edit arena, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is a fresh string in a new memory surface effect CHARS.
-The result is guaranteed to be a bit-correct replica of the
-string immediately after. But, even though strings cannot be edited,
-their supporting memory can be corrupted with new data, especially
-when they are placed on reused arenas or circular buffers. That
-said, that would be a logical bug of insufficient sizing or
-sequencing. Strings remain valid slices of allocated memory regions
-without runtime failures; they always preserve their size.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 163
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-</details>
-
-
-### copy - copy a string
-*Defined in: std/core/string.s line 135*
-
-```rust
-copy(edit bucket, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
-```
-
-The result is a fresh string in a new memory surface effect CHARS.
-The result is guaranteed to be a bit-correct replica of the
-string immediately after. But, even though strings cannot be edited,
-their supporting memory can be corrupted with new data, especially
-when they are placed on reused arenas or circular buffers. That
-said, that would be a logical bug of insufficient sizing or
-sequencing. Strings remain valid slices of allocated memory regions
-without runtime failures; they always preserve their size.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 33
-- Transpiled C size: 145
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. cannot resize buffers with alloc; it promises no data reallocation
-2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
-</details>
-
 
 ### copy - convert a number to a string
 *Defined in: std/core/string.s line 560*
@@ -13845,11 +14003,11 @@ copy(edit list, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat
 4. division by zero
 6. nat subtraction would yield a negative
 7. cannot convert negative float to nat
-14. reallocation failed
-17. cannot resize an unallocated or freed buffer
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+18. reallocation failed
+21. cannot resize an unallocated or freed buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -13874,10 +14032,10 @@ copy(edit circular, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat
 4. division by zero
 6. nat subtraction would yield a negative
 7. cannot convert negative float to nat
-18. out of bounds
-20. does not fit in circular arena
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+22. out of bounds
+24. does not fit in circular arena
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -13902,10 +14060,10 @@ copy(edit arena, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat da
 4. division by zero
 6. nat subtraction would yield a negative
 7. cannot convert negative float to nat
-18. out of bounds
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+22. out of bounds
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -13930,13 +14088,13 @@ copy(edit bucket, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat d
 4. division by zero
 6. nat subtraction would yield a negative
 7. cannot convert negative float to nat
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+18. reallocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -13961,10 +14119,10 @@ copy(new CHARS, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat
 4. division by zero
 6. nat subtraction would yield a negative
 7. cannot convert negative float to nat
-13. allocation failed
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -14002,11 +14160,11 @@ s = copy 123
 2. null pointer
 4. division by zero
 6. nat subtraction would yield a negative
-14. reallocation failed
-17. cannot resize an unallocated or freed buffer
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+18. reallocation failed
+21. cannot resize an unallocated or freed buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -14036,10 +14194,10 @@ s = copy 123
 
 2. null pointer
 6. nat subtraction would yield a negative
-18. out of bounds
-20. does not fit in circular arena
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+22. out of bounds
+24. does not fit in circular arena
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -14069,10 +14227,10 @@ s = copy 123
 
 2. null pointer
 6. nat subtraction would yield a negative
-18. out of bounds
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+22. out of bounds
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -14101,13 +14259,13 @@ s = copy 123
 
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+18. reallocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -14137,10 +14295,10 @@ s = copy 123
 
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -14170,10 +14328,10 @@ Grabs a FLOATS for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
+24. does not fit in circular arena
 2. null pointer
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -14196,10 +14354,10 @@ Grabs a FLOATS for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -14222,8 +14380,8 @@ Grabs a FLOATS for the result as an effect.
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-13. allocation failed
 </details>
 
 
@@ -14249,9 +14407,9 @@ This operation may fail if the string does not fit the current allocation - pref
 
 <details><summary>Potential errors</summary>
 
-24. string buffer out of memory
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+28. string buffer out of memory
 </details>
 
 
@@ -14276,9 +14434,9 @@ This operation may fail if the string does not fit the current allocation - pref
 
 <details><summary>Potential errors</summary>
 
-24. string buffer out of memory
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+28. string buffer out of memory
 </details>
 
 
@@ -14302,11 +14460,11 @@ This is mainly useful for supporting 'cstr unsafe_temp'.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -14369,11 +14527,11 @@ passing data to 'compt' or 'macro'.*
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -14417,11 +14575,11 @@ passing data to 'compt' or 'macro'.*
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -14506,9 +14664,9 @@ starts_with(str, str) -> (bool)
 
 <details><summary>Potential errors</summary>
 
-25. slice out of string bounds
-18. out of bounds
 2. null pointer
+29. slice out of string bounds
+22. out of bounds
 </details>
 
 
@@ -14529,9 +14687,9 @@ starts_with(str, cstr _needle) -> (bool)
 
 <details><summary>Potential errors</summary>
 
-25. slice out of string bounds
-18. out of bounds
 2. null pointer
+29. slice out of string bounds
+22. out of bounds
 </details>
 
 
@@ -14552,9 +14710,9 @@ starts_with(cstr _stack, str) -> (bool)
 
 <details><summary>Potential errors</summary>
 
-25. slice out of string bounds
-18. out of bounds
 2. null pointer
+29. slice out of string bounds
+22. out of bounds
 </details>
 
 
@@ -14575,9 +14733,9 @@ starts_with(cstr _stack, cstr _needle) -> (bool)
 
 <details><summary>Potential errors</summary>
 
-25. slice out of string bounds
-18. out of bounds
 2. null pointer
+29. slice out of string bounds
+22. out of bounds
 </details>
 
 
@@ -14599,9 +14757,9 @@ ends_with(str, str) -> (bool)
 
 <details><summary>Potential errors</summary>
 
-25. slice out of string bounds
-18. out of bounds
 2. null pointer
+29. slice out of string bounds
+22. out of bounds
 </details>
 
 
@@ -14622,9 +14780,9 @@ ends_with(str, cstr _needle) -> (bool)
 
 <details><summary>Potential errors</summary>
 
-25. slice out of string bounds
-18. out of bounds
 2. null pointer
+29. slice out of string bounds
+22. out of bounds
 </details>
 
 
@@ -14645,9 +14803,9 @@ ends_with(cstr _stack, str) -> (bool)
 
 <details><summary>Potential errors</summary>
 
-25. slice out of string bounds
-18. out of bounds
 2. null pointer
+29. slice out of string bounds
+22. out of bounds
 </details>
 
 
@@ -14668,9 +14826,9 @@ ends_with(cstr _stack, cstr _needle) -> (bool)
 
 <details><summary>Potential errors</summary>
 
-25. slice out of string bounds
-18. out of bounds
 2. null pointer
+29. slice out of string bounds
+22. out of bounds
 </details>
 
 
@@ -14756,8 +14914,8 @@ contains(str, char needle) -> (bool)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
+22. out of bounds
 </details>
 
 
@@ -14778,8 +14936,8 @@ contains(cstr _stack, char needle) -> (bool)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
+22. out of bounds
 </details>
 
 
@@ -14801,7 +14959,7 @@ find(str, str) -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 </details>
 
 
@@ -14822,7 +14980,7 @@ find(str, str, "end_pos") -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 </details>
 
 
@@ -14843,7 +15001,7 @@ find(str, str, nat _skip) -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 6. nat subtraction would yield a negative
 </details>
 
@@ -14865,7 +15023,7 @@ find(str, str, nat _skip, "end_pos") -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 6. nat subtraction would yield a negative
 </details>
 
@@ -14887,7 +15045,7 @@ find(str, cstr _needle) -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 </details>
 
 
@@ -14908,7 +15066,7 @@ find(str, cstr _needle, "end_pos") -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 </details>
 
 
@@ -14929,7 +15087,7 @@ find(str, cstr _needle, nat _skip) -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 6. nat subtraction would yield a negative
 </details>
 
@@ -14951,7 +15109,7 @@ find(str, cstr _needle, nat _skip, "end_pos") -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 6. nat subtraction would yield a negative
 </details>
 
@@ -14973,7 +15131,7 @@ find(cstr _stack, str) -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 </details>
 
 
@@ -14994,7 +15152,7 @@ find(cstr _stack, str, "end_pos") -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 </details>
 
 
@@ -15015,7 +15173,7 @@ find(cstr _stack, str, nat _skip) -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 6. nat subtraction would yield a negative
 </details>
 
@@ -15037,7 +15195,7 @@ find(cstr _stack, str, nat _skip, "end_pos") -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 6. nat subtraction would yield a negative
 </details>
 
@@ -15059,7 +15217,7 @@ find(cstr _stack, cstr _needle) -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 </details>
 
 
@@ -15080,7 +15238,7 @@ find(cstr _stack, cstr _needle, "end_pos") -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 </details>
 
 
@@ -15101,7 +15259,7 @@ find(cstr _stack, cstr _needle, nat _skip) -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 6. nat subtraction would yield a negative
 </details>
 
@@ -15123,7 +15281,7 @@ find(cstr _stack, cstr _needle, nat _skip, "end_pos") -> (nat)
 
 <details><summary>Potential errors</summary>
 
-26. not found
+30. not found
 6. nat subtraction would yield a negative
 </details>
 
@@ -15145,11 +15303,11 @@ find(nat[], nat _k) -> (mut nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-59. index not found
+62. index not found
 </details>
 
 
@@ -15170,11 +15328,11 @@ find(str[], str) -> (mut nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-59. index not found
+62. index not found
 </details>
 
 
@@ -15195,11 +15353,11 @@ find(str[], cstr _k) -> (mut nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-59. index not found
+62. index not found
 </details>
 
 
@@ -15220,11 +15378,11 @@ find(robinhood_nat_entry[], nat _k) -> (mut nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-59. index not found
+62. index not found
 </details>
 
 
@@ -15245,11 +15403,11 @@ find(robinhood_str_entry[], str) -> (mut nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-59. index not found
+62. index not found
 </details>
 
 
@@ -15270,11 +15428,11 @@ find(robinhood_str_entry[], cstr _k) -> (mut nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 6. nat subtraction would yield a negative
-59. index not found
+62. index not found
 </details>
 
 
@@ -15460,24 +15618,6 @@ on four nat state fields. The version is seed-initalized. Its period is 2^256-1.
 
 
 # next
-### next - next random number
-*Defined in: std/rand.s line 87*
-
-```rust
-next(mut Rand {tag, mut nat s0, mut nat s1, mut nat s2, mut nat s3}) -> (float)
-```
-
-Computes the next random number of a Rand sequence.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 12
-- Transpiled C size: 79
-
-</details>
-
-
 ### next
 *Defined in: std/map.s line 54*
 
@@ -15495,8 +15635,8 @@ next(robinhood_nat_entry[], mut nat pos) -> (mut nat)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
+22. out of bounds
 </details>
 
 
@@ -15517,8 +15657,26 @@ next(robinhood_str_entry[], mut nat pos) -> (mut str {tag, mut char ptr unsafe_p
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
+22. out of bounds
+</details>
+
+
+### next - next random number
+*Defined in: std/rand.s line 87*
+
+```rust
+next(mut Rand {tag, mut nat s0, mut nat s1, mut nat s2, mut nat s3}) -> (float)
+```
+
+Computes the next random number of a Rand sequence.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 79
+
 </details>
 
 
@@ -15546,40 +15704,8 @@ float
 cstr
 ```
 
-### nat - retrieved unsigned number from 8-bit unsigned number
-*Defined in: std/core/convert.s line 172*
-
-```rust
-nat(nat8) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
-### nat - retrieved unsigned number from 16-bit unsigned number
-*Defined in: std/core/convert.s line 167*
-
-```rust
-nat(nat16) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
-### nat - retrieved unsigned number from 32-bit unsigned number
-*Defined in: std/core/convert.s line 162*
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
 
 ```rust
 nat(nat32) -> (nat)
@@ -15594,8 +15720,40 @@ nat(nat32) -> (nat)
 </details>
 
 
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
+
+```rust
+nat(nat16) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
+
+```rust
+nat(nat8) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
 ### float - cast to float
-*Defined in: std/core/convert.s line 95*
+*Defined in: std/core/convert.s line 81*
 
 ```rust
 float(bits {tag, nat value}) -> (float)
@@ -15613,7 +15771,7 @@ Converts a bit representation to the corresponding float number.
 
 
 ### nat - cast to nat
-*Defined in: std/core/convert.s line 84*
+*Defined in: std/core/convert.s line 70*
 
 ```rust
 nat(bits {tag, nat value}) -> (nat)
@@ -15631,33 +15789,14 @@ Converts a bit representation to the corresponding natural number.
 
 
 ### nat - cast to nat
-*Defined in: std/core/convert.s line 51*
-
-```rust
-nat(char) -> (nat)
-```
-
-Converting a character to a natural number considers
-its bit representation interpreted as an unsigned number.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
-### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
+*Defined in: std/core/convert.s line 35*
 
 ```rust
 nat(nat) -> (nat)
 ```
 
 Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
+ Fails on negative inputs to guard against assumption errors.
 
 <details><summary>Complexity</summary>
 
@@ -15669,14 +15808,14 @@ Converting to natural numbers loses information.
 
 
 ### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
+*Defined in: std/core/convert.s line 35*
 
 ```rust
 nat(int) -> (nat)
 ```
 
 Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
+ Fails on negative inputs to guard against assumption errors.
 
 <details><summary>Complexity</summary>
 
@@ -15693,14 +15832,14 @@ Converting to natural numbers loses information.
 
 
 ### nat - cast to nat
-*Defined in: std/core/convert.s line 40*
+*Defined in: std/core/convert.s line 35*
 
 ```rust
 nat(float) -> (nat)
 ```
 
 Converting to natural numbers loses information.
- Failed on negative input because it typically indicates a later error in buffer indexing.
+ Fails on negative inputs to guard against assumption errors.
 
 <details><summary>Complexity</summary>
 
@@ -15727,9 +15866,9 @@ May lose information because floats are not exact representation of all integers
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 15
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
 
 </details>
 
@@ -15745,9 +15884,9 @@ May lose information because floats are not exact representation of all integers
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 15
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
 
 </details>
 
@@ -15763,9 +15902,9 @@ Serves as a tautology function for code that parses on multiple number types.
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 15
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 7
 
 </details>
 
@@ -15810,11 +15949,11 @@ on comparisons of unequal strings.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -15839,11 +15978,11 @@ on comparisons of unequal strings.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -15868,10 +16007,10 @@ on comparisons of unequal strings.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+25. can only define strings on contiguous buffers
 2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+26. can only define strings on non-offset buffers
+22. out of bounds
 </details>
 
 
@@ -15908,11 +16047,11 @@ str(char[]) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-23. string does not fit on buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+27. string does not fit on buffer
 </details>
 
 
@@ -15933,11 +16072,11 @@ str(char[], nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-23. string does not fit on buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+27. string does not fit on buffer
 </details>
 
 
@@ -15958,8 +16097,8 @@ str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr 
 
 <details><summary>Potential errors</summary>
 
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16084,16 +16223,16 @@ hash(str, nat size) -> (nat)
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 31
-- Transpiled C size: 254
+- SSA variables: 32
+- Transpiled C size: 262
 
 </details>
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 5. modulo by zero
+22. out of bounds
 </details>
 
 
@@ -16380,9 +16519,9 @@ Map size is static and cannot be adjusted after initialization.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -16414,9 +16553,9 @@ Map size is static and cannot be adjusted after initialization.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -16445,7 +16584,7 @@ unpack(char[], nat16 dat.pos, nat16 dat.length) -> (str {tag, char ptr unsafe_pt
 
 <details><summary>Potential errors</summary>
 
-23. string does not fit on buffer
+27. string does not fit on buffer
 </details>
 
 
@@ -16488,13 +16627,13 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
-18. out of bounds
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16515,13 +16654,13 @@ post(edit circular, cstr url, cstr _body, cstr content_type) -> (nat status, str
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
-18. out of bounds
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16544,16 +16683,16 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16574,16 +16713,16 @@ post(edit circular, cstr url, str, cstr content_type) -> (nat status, str) with 
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16606,16 +16745,16 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16636,16 +16775,16 @@ post(edit circular, str, cstr _body, cstr content_type) -> (nat status, str) wit
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16668,16 +16807,16 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16698,16 +16837,16 @@ post(edit circular, str, str, cstr content_type) -> (nat status, str) with effec
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16730,13 +16869,13 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
-18. out of bounds
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16757,13 +16896,13 @@ post(edit arena, cstr url, cstr _body, cstr content_type) -> (nat status, str) w
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
-18. out of bounds
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16786,16 +16925,16 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16816,16 +16955,16 @@ post(edit arena, cstr url, str, cstr content_type) -> (nat status, str) with eff
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16848,16 +16987,16 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16878,16 +17017,16 @@ post(edit arena, str, cstr _body, cstr content_type) -> (nat status, str) with e
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16910,16 +17049,16 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16940,16 +17079,16 @@ post(edit arena, str, str, cstr content_type) -> (nat status, str) with effects 
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -16972,13 +17111,13 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -17007,13 +17146,13 @@ post(new CHARS, cstr url, cstr _body, cstr content_type) -> (nat status, str) wi
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -17044,16 +17183,16 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -17082,16 +17221,16 @@ post(new CHARS, cstr url, str, cstr content_type) -> (nat status, str) with effe
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -17122,16 +17261,16 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -17160,16 +17299,16 @@ post(new CHARS, str, cstr _body, cstr content_type) -> (nat status, str) with ef
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -17200,16 +17339,16 @@ The default application/json content type is used.
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -17238,16 +17377,16 @@ post(new CHARS, str, str, cstr content_type) -> (nat status, str) with effects C
 
 <details><summary>Potential errors</summary>
 
+64. curl initialization failed
+65. out of memory while reading response
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-61. curl initialization failed
-62. out of memory while reading response
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -17550,9 +17689,9 @@ vec(edit circular, nat length) -> (mut vec {tag, mut float ptr unsafe_ptr, mut n
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+24. does not fit in circular arena
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -17573,9 +17712,9 @@ vec(edit circular, nat length, "dirty") -> (mut vec {tag, mut float ptr unsafe_p
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+24. does not fit in circular arena
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -17596,9 +17735,9 @@ vec(edit arena, nat length) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat 
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -17619,9 +17758,9 @@ vec(edit arena, nat length, "dirty") -> (mut vec {tag, mut float ptr unsafe_ptr,
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-19. arena is out of space
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+23. arena is out of space
 </details>
 
 
@@ -17642,8 +17781,8 @@ vec(edit float[]) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut n
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -17666,7 +17805,7 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
+17. allocation failed
 </details>
 
 
@@ -17689,7 +17828,7 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
+17. allocation failed
 </details>
 
 
@@ -17728,6 +17867,183 @@ Warning: directly calling this constructor without safety checks is unsafe.
 </details>
 
 
+### mat - matrix on an existing float[] buffer
+*Defined in: std/sci/mat.s line 53*
+
+```rust
+mat(edit float[], nat rows) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 167
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+4. division by zero
+23. arena is out of space
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+74. buffer size not divisible by vector rows
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit circular, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 228
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+24. does not fit in circular arena
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+24. does not fit in circular arena
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit arena, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 228
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+23. arena is out of space
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+23. arena is out of space
+</details>
+
+
+### mat - matrix on a fresh buffer
+*Defined in: std/sci/mat.s line 30*
+
+```rust
+mat(new FLOATS, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 157
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+<details><summary>Defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
+### mat - matrix on a fresh buffer
+*Defined in: std/sci/mat.s line 30*
+
+```rust
+mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 29
+- Transpiled C size: 116
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+<details><summary>Defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
 ### mat - view a vector as a matrix on the same memory
 *Defined in: std/sci/mat.s line 75*
 
@@ -17765,183 +18081,6 @@ to indicate the new matrix's orientation.
 
 </details>
 
-
-### mat - matrix on an existing float[] buffer
-*Defined in: std/sci/mat.s line 53*
-
-```rust
-mat(edit float[], nat rows) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 26
-- Transpiled C size: 167
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-4. division by zero
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-71. buffer size not divisible by vector rows
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit circular, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 43
-- Transpiled C size: 228
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-20. does not fit in circular arena
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 39
-- Transpiled C size: 181
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-20. does not fit in circular arena
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit arena, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 43
-- Transpiled C size: 228
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 39
-- Transpiled C size: 181
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-</details>
-
-
-### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 30*
-
-```rust
-mat(new FLOATS, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 32
-- Transpiled C size: 157
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-</details>
-
-
-<details><summary>Defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
-
-### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 30*
-
-```rust
-mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 29
-- Transpiled C size: 116
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-</details>
-
-
-<details><summary>Defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
 
 # sparse\_element
 ### sparse\_element
@@ -18014,9 +18153,9 @@ This creates a new buffer of sparse elements for convenience.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -18048,7 +18187,7 @@ new() -> (new {tag})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4097t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4139t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18064,7 +18203,7 @@ circular("float__t4097t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4031t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4073t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18080,7 +18219,7 @@ circular("float__t4031t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t3744t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t3786t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18096,23 +18235,7 @@ circular("float__t3744t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t662t") -> (edit circular {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### circular
-*Defined in: std/sci/vec.s line 24*
-
-```rust
-circular("float__t620t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t655t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18129,6 +18252,22 @@ circular("float__t620t") -> (edit circular {tag, edit float[], mut nat pos})
 
 ```rust
 circular("float__t616t") -> (edit circular {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### circular
+*Defined in: std/sci/vec.s line 24*
+
+```rust
+circular("float__t614t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18176,7 +18315,7 @@ circular("float__t4t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4097t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4139t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18192,7 +18331,7 @@ arena("float__t4097t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4031t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4073t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18208,7 +18347,7 @@ arena("float__t4031t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t3744t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t3786t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18224,23 +18363,7 @@ arena("float__t3744t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t662t") -> (edit arena {tag, edit float[], mut nat pos})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 48
-
-</details>
-
-
-### arena
-*Defined in: std/sci/vec.s line 23*
-
-```rust
-arena("float__t620t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t655t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18257,6 +18380,22 @@ arena("float__t620t") -> (edit arena {tag, edit float[], mut nat pos})
 
 ```rust
 arena("float__t616t") -> (edit arena {tag, edit float[], mut nat pos})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 48
+
+</details>
+
+
+### arena
+*Defined in: std/sci/vec.s line 23*
+
+```rust
+arena("float__t614t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18318,8 +18457,8 @@ constvec(float[]) -> (vec {tag, float ptr unsafe_ptr, nat pos, nat length})
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
 </details>
 
 
@@ -18348,7 +18487,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18376,7 +18515,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18404,7 +18543,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18432,7 +18571,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18460,7 +18599,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18488,7 +18627,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18516,7 +18655,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18544,7 +18683,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18572,7 +18711,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18600,7 +18739,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18628,7 +18767,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18656,7 +18795,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18684,7 +18823,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18712,7 +18851,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18740,7 +18879,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18768,7 +18907,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18796,7 +18935,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18824,7 +18963,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18852,7 +18991,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18880,7 +19019,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18908,7 +19047,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18936,7 +19075,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18964,7 +19103,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -18992,7 +19131,7 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -19548,8 +19687,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19577,8 +19716,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19606,8 +19745,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19635,8 +19774,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19664,8 +19803,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19693,8 +19832,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19722,8 +19861,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19751,8 +19890,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19780,8 +19919,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19809,8 +19948,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19838,8 +19977,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19867,8 +20006,8 @@ All computations are branchless, as literals are optimized away during compilati
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -19891,7 +20030,7 @@ dot(vec, vec) -> (float)
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
+22. out of bounds
 </details>
 
 
@@ -19947,11 +20086,11 @@ result[j] = sum of all stored values in column j
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-18. out of bounds
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+24. does not fit in circular arena
 </details>
 
 
@@ -19974,11 +20113,11 @@ result[j] = sum of all stored values in column j
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-18. out of bounds
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+23. arena is out of space
 </details>
 
 
@@ -20001,9 +20140,9 @@ result[j] = sum of all stored values in column j
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-18. out of bounds
-13. allocation failed
+22. out of bounds
 </details>
 
 
@@ -20026,11 +20165,11 @@ result[i] = sum of all stored values in row i
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-18. out of bounds
-20. does not fit in circular arena
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+24. does not fit in circular arena
 </details>
 
 
@@ -20053,11 +20192,11 @@ result[i] = sum of all stored values in row i
 
 <details><summary>Potential errors</summary>
 
-64. cannot place vectors on buffer offsets
 2. null pointer
-19. arena is out of space
-18. out of bounds
-63. can only place vectors on contiguous buffers
+66. can only place vectors on contiguous buffers
+67. cannot place vectors on buffer offsets
+22. out of bounds
+23. arena is out of space
 </details>
 
 
@@ -20080,9 +20219,9 @@ result[i] = sum of all stored values in row i
 
 <details><summary>Potential errors</summary>
 
+17. allocation failed
 2. null pointer
-18. out of bounds
-13. allocation failed
+22. out of bounds
 </details>
 
 
@@ -20147,8 +20286,8 @@ min(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (mut float)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
+22. out of bounds
 </details>
 
 
@@ -20170,8 +20309,8 @@ max(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (mut float)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
+22. out of bounds
 </details>
 
 
@@ -20312,30 +20451,14 @@ pearson(vec, vec) -> (float)
 <details><summary>Potential errors</summary>
 
 2. null pointer
-66. vectors must have the same length
-67. at least two values required
-68. undefined for constant vectors
 4. division by zero
+69. vectors must have the same length
+70. at least two values required
+71. undefined for constant vectors
 </details>
 
 
 # rows
-### rows - number of rows
-*Defined in: std/sci/coo.s line 22*
-
-```rust
-rows(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 3
-
-</details>
-
-
 ### rows - number of rows
 *Defined in: std/sci/mat.s line 22*
 
@@ -20352,12 +20475,11 @@ rows(mat {tag, float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride}) -
 </details>
 
 
-# cols
-### cols - number of columns
-*Defined in: std/sci/coo.s line 26*
+### rows - number of rows
+*Defined in: std/sci/coo.s line 22*
 
 ```rust
-cols(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (nat)
+rows(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (nat)
 ```
 
 <details><summary>Complexity</summary>
@@ -20369,6 +20491,7 @@ cols(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (
 </details>
 
 
+# cols
 ### cols - number of columns
 *Defined in: std/sci/mat.s line 26*
 
@@ -20380,6 +20503,22 @@ cols(mat {tag, float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride}) -
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 6
+- Transpiled C size: 3
+
+</details>
+
+
+### cols - number of columns
+*Defined in: std/sci/coo.s line 26*
+
+```rust
+cols(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
 - Transpiled C size: 3
 
 </details>
@@ -20403,11 +20542,11 @@ constmat(float[], nat rows) -> (mat {tag, float ptr unsafe_ptr, nat pos, nat row
 
 <details><summary>Potential errors</summary>
 
-19. arena is out of space
 4. division by zero
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-71. buffer size not divisible by vector rows
+23. arena is out of space
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+74. buffer size not divisible by vector rows
 </details>
 
 
@@ -20446,7 +20585,7 @@ row(mat, nat i) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat
 
 <details><summary>Potential errors</summary>
 
-72. row out of bounds
+75. row out of bounds
 </details>
 
 
@@ -20486,11 +20625,11 @@ todense(edit circular, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat 
 <details><summary>Potential errors</summary>
 
 2. null pointer
-20. does not fit in circular arena
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-72. row out of bounds
-73. column out of bounds
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+75. row out of bounds
+76. column out of bounds
+24. does not fit in circular arena
 </details>
 
 
@@ -20512,11 +20651,11 @@ todense(edit arena, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos
 <details><summary>Potential errors</summary>
 
 2. null pointer
-19. arena is out of space
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-72. row out of bounds
-73. column out of bounds
+23. arena is out of space
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+75. row out of bounds
+76. column out of bounds
 </details>
 
 
@@ -20537,12 +20676,12 @@ todense(new FLOATS, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
+17. allocation failed
 2. null pointer
-72. row out of bounds
-73. column out of bounds
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+75. row out of bounds
+76. column out of bounds
 </details>
 
 
@@ -20590,6 +20729,183 @@ Warning: directly calling this constructor without safety checks is unsafe.
 </details>
 
 
+### mat - matrix on an existing float[] buffer
+*Defined in: std/sci/mat.s line 53*
+
+```rust
+mat(edit float[], nat rows) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 26
+- Transpiled C size: 167
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+4. division by zero
+23. arena is out of space
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+74. buffer size not divisible by vector rows
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit circular, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 228
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+24. does not fit in circular arena
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+24. does not fit in circular arena
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit arena, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 228
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+23. arena is out of space
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 37*
+
+```rust
+mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+72. can only place matrices on contiguous buffers
+73. cannot place matrices on buffer offsets
+23. arena is out of space
+</details>
+
+
+### mat - matrix on a fresh buffer
+*Defined in: std/sci/mat.s line 30*
+
+```rust
+mat(new FLOATS, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 157
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+<details><summary>Defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
+### mat - matrix on a fresh buffer
+*Defined in: std/sci/mat.s line 30*
+
+```rust
+mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 29
+- Transpiled C size: 116
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+<details><summary>Defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
 ### coo
 *Defined in: std/sci/coo.s line 40*
 
@@ -20625,9 +20941,9 @@ This creates a new buffer of sparse elements for convenience.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -20676,183 +20992,6 @@ to indicate the new matrix's orientation.
 </details>
 
 
-### mat - matrix on an existing float[] buffer
-*Defined in: std/sci/mat.s line 53*
-
-```rust
-mat(edit float[], nat rows) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 26
-- Transpiled C size: 167
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-4. division by zero
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-71. buffer size not divisible by vector rows
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit circular, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 43
-- Transpiled C size: 228
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-20. does not fit in circular arena
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 39
-- Transpiled C size: 181
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-20. does not fit in circular arena
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit arena, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 43
-- Transpiled C size: 228
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 37*
-
-```rust
-mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 39
-- Transpiled C size: 181
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-19. arena is out of space
-69. can only place matrices on contiguous buffers
-70. cannot place matrices on buffer offsets
-</details>
-
-
-### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 30*
-
-```rust
-mat(new FLOATS, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 32
-- Transpiled C size: 157
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-</details>
-
-
-<details><summary>Defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
-
-### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 30*
-
-```rust
-mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) with effects FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 29
-- Transpiled C size: 116
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-</details>
-
-
-<details><summary>Defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
-
 # tagged
 ### tagged - blank tag structure
 *Defined in: std/tag.s line 20*
@@ -20891,8 +21030,8 @@ unsafe_match(tagged ptr obj, cstr name, any ptr type) -> (mut any ptr {follows a
 
 <details><summary>Potential errors</summary>
 
-80. does not match
 2. null pointer
+83. does not match
 </details>
 
 
@@ -20938,8 +21077,8 @@ tagged_alloc(edit arena, nat size) -> (mut char ptr)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
-19. arena is out of space
+22. out of bounds
+23. arena is out of space
 </details>
 
 
@@ -20961,12 +21100,12 @@ match(cstr obj, cstr type_name) -> (mut char[])
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -20994,12 +21133,12 @@ match(cstr obj, cstr type_name) -> (mut char[])
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -21194,10 +21333,10 @@ growing_thread_pool(cpu {tag, nat cores}) -> (edit growing_thread_pool {tag, cpu
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
+17. allocation failed
 2. null pointer
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -21236,8 +21375,8 @@ thread(edit growing_thread_pool, (pipe ptr) -> () func, pipe ptr input) -> (mut 
 <details><summary>Potential errors</summary>
 
 2. null pointer
-18. out of bounds
-19. arena is out of space
+22. out of bounds
+23. arena is out of space
 </details>
 
 
@@ -21259,8 +21398,8 @@ unsafe_pipe_match(with, cstr name, any ptr type) -> (mut any ptr {follows any pt
 
 <details><summary>Potential errors</summary>
 
-80. does not match
 2. null pointer
+83. does not match
 </details>
 
 
@@ -21330,8 +21469,8 @@ pipe_alloc(edit arena, nat size) -> (mut char ptr)
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
-19. arena is out of space
+22. out of bounds
+23. arena is out of space
 </details>
 
 
@@ -21354,15 +21493,15 @@ shared(cstr) -> (mut char[])
 <details><summary>Potential errors</summary>
 
 2. null pointer
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-81. empty input name
-18. out of bounds
-82. cannot tag a structural type
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+84. empty input name
+85. cannot tag a structural type
+22. out of bounds
+20. cannot resize buffers with alloc; it promises no data reallocation
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -21391,16 +21530,16 @@ shared(cstr surface, cstr obj) -> (mut char[])
 <details><summary>Potential errors</summary>
 
 2. null pointer
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-81. empty input name
-18. out of bounds
-82. cannot tag a structural type
-83. tag surface cannot be structural type
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+84. empty input name
+85. cannot tag a structural type
+22. out of bounds
+86. tag surface cannot be structural type
+20. cannot resize buffers with alloc; it promises no data reallocation
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+23. arena is out of space
 </details>
 
 
@@ -21542,12 +21681,12 @@ blob(cstr) -> (mut char[])
 
 <details><summary>Potential errors</summary>
 
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -21689,7 +21828,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-84. cannot cast a blob onto an already allocated array
+87. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21711,7 +21850,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-84. cannot cast a blob onto an already allocated array
+87. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21733,7 +21872,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-84. cannot cast a blob onto an already allocated array
+87. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21755,7 +21894,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-84. cannot cast a blob onto an already allocated array
+87. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21777,7 +21916,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-84. cannot cast a blob onto an already allocated array
+87. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21799,7 +21938,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-84. cannot cast a blob onto an already allocated array
+87. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21821,7 +21960,7 @@ as(unsafe_blob, char[]) -> (char[])
 <details><summary>Potential errors</summary>
 
 11. nat value too large to pack in nat32
-84. cannot cast a blob onto an already allocated array
+87. cannot cast a blob onto an already allocated array
 </details>
 
 
@@ -21845,13 +21984,13 @@ find_compatible_size(nat) -> (mut char[])
 
 2. null pointer
 6. nat subtraction would yield a negative
-13. allocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-18. out of bounds
-19. arena is out of space
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+23. arena is out of space
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -21889,7 +22028,7 @@ as those have the intent of immediate reuse.
 
 <details><summary>Potential errors</summary>
 
-14. reallocation failed
+18. reallocation failed
 </details>
 
 
@@ -21919,7 +22058,7 @@ as those have the intent of immediate reuse.
 
 <details><summary>Potential errors</summary>
 
-14. reallocation failed
+18. reallocation failed
 </details>
 
 
@@ -22179,7 +22318,7 @@ draw(edit window {tag, float size.width, float size.height, cstr title, mut bool
 
 <details><summary>Potential errors</summary>
 
-78. alopeny drawing on window
+81. alopeny drawing on window
 </details>
 
 
@@ -22347,9 +22486,9 @@ Texture(nat id, float size.width, float size.height, nat mipmaps, nat format) ->
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -22378,9 +22517,9 @@ open(cstr) -> (Texture {tag, nat,float,float,nat,nat[]})
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -22409,8 +22548,8 @@ texture(edit window, Texture, float pos.x, float pos.y, float size.width, float 
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
+22. out of bounds
 </details>
 
 
@@ -22431,8 +22570,8 @@ texture(edit window, Texture, float pos.x, float pos.y, float scale, nat8 color.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
+22. out of bounds
 </details>
 
 
@@ -22453,9 +22592,9 @@ texture(edit window, Texture, float pos.x, float pos.y, float size.width, float 
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
 4. division by zero
+22. out of bounds
 </details>
 
 
@@ -22476,8 +22615,8 @@ texture(edit window, Texture, float pos.x, float pos.y, float scale, nat8 color.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
+22. out of bounds
 </details>
 
 
@@ -22498,29 +22637,12 @@ texture(edit window, Texture, float pos.x, float pos.y, nat8 color.r, nat8 color
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
+22. out of bounds
 </details>
 
 
 # circ
-### circ
-*Defined in: std/graphics.s line 318*
-
-```rust
-circ(edit window, float pos.x, float pos.y, float radius, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 16
-- Transpiled C size: 68
-
-</details>
-
-
-*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 ### circ
 *Defined in: std/graphics.s line 231*
 
@@ -22538,6 +22660,23 @@ circ(edit window, float pos.x, float pos.y, float radius, "solid", nat8 color.r,
 
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_circle_v(pyray.Vector2($pos__x,$pos__y),$radius,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
+### circ
+*Defined in: std/graphics.s line 318*
+
+```rust
+circ(edit window, float pos.x, float pos.y, float radius, "line", nat thickness, nat8 color.r, nat8 color.g, nat8 color.b, nat8 color.a) -> () with effects WINDOW
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 16
+- Transpiled C size: 68
+
+</details>
+
+
+*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))`*
 # ellipse
 ### ellipse
 *Defined in: std/graphics.s line 251*
@@ -24501,11 +24640,11 @@ on comparisons of unequal strings.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -24530,11 +24669,11 @@ on comparisons of unequal strings.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
 6. nat subtraction would yield a negative
-22. can only define strings on non-offset buffers
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -24559,10 +24698,10 @@ on comparisons of unequal strings.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
+25. can only define strings on contiguous buffers
 2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+26. can only define strings on non-offset buffers
+22. out of bounds
 </details>
 
 
@@ -24599,11 +24738,11 @@ str(char[]) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-23. string does not fit on buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+27. string does not fit on buffer
 </details>
 
 
@@ -24624,11 +24763,11 @@ str(char[], nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.
 
 <details><summary>Potential errors</summary>
 
-18. out of bounds
 2. null pointer
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-23. string does not fit on buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+27. string does not fit on buffer
 </details>
 
 
@@ -24649,8 +24788,8 @@ str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr 
 
 <details><summary>Potential errors</summary>
 
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
 </details>
 
 
@@ -24766,15 +24905,15 @@ The resulting memory will consume exactly the required size in bytes.
 2. null pointer
 4. division by zero
 6. nat subtraction would yield a negative
-13. allocation failed
-14. reallocation failed
-15. cannot allocate a buffer of unsized type
-16. cannot resize buffers with alloc; it promises no data reallocation
-17. cannot resize an unallocated or freed buffer
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-27. unexpected end of console read
+17. allocation failed
+18. reallocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+21. cannot resize an unallocated or freed buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+31. unexpected end of console read
 </details>
 
 
@@ -24828,13 +24967,13 @@ The read string is placed on an arena while consuming only the necessarily minim
 
 <details><summary>Potential errors</summary>
 
+33. read string does not fit on buffer
 2. null pointer
 6. nat subtraction would yield a negative
-18. out of bounds
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-27. unexpected end of console read
-29. read string does not fit on buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+31. unexpected end of console read
 </details>
 
 
@@ -24856,13 +24995,13 @@ run(console CLI, str) -> (cstr) with effects CLI
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-40. failed to start process
-41. process terminated with unhandled non-zero exit code
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+44. failed to start process
+45. process terminated with unhandled non-zero exit code
 </details>
 
 
@@ -24883,8 +25022,8 @@ run(console CLI, cstr command) -> (cstr) with effects CLI
 
 <details><summary>Potential errors</summary>
 
-40. failed to start process
-41. process terminated with unhandled non-zero exit code
+44. failed to start process
+45. process terminated with unhandled non-zero exit code
 </details>
 
 
@@ -24999,7 +25138,7 @@ even if stout is suppressed during the 'test' function.
 
 <details><summary>Potential errors</summary>
 
-85. assert failed
+88. assert failed
 </details>
 
 
@@ -25024,13 +25163,13 @@ A completion assert is performed at the end.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-40. failed to start process
-41. process terminated with unhandled non-zero exit code
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+44. failed to start process
+45. process terminated with unhandled non-zero exit code
 </details>
 
 
@@ -25054,13 +25193,13 @@ A completion assert is performed at the end.
 
 <details><summary>Potential errors</summary>
 
-16. cannot resize buffers with alloc; it promises no data reallocation
-21. can only define strings on contiguous buffers
-22. can only define strings on non-offset buffers
-40. failed to start process
-41. process terminated with unhandled non-zero exit code
-13. allocation failed
-15. cannot allocate a buffer of unsized type
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+44. failed to start process
+45. process terminated with unhandled non-zero exit code
 </details>
 
 

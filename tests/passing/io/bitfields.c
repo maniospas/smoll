@@ -6,18 +6,18 @@
 typedef void (*__smoll_func_ptr_type)(void);
 int __t_argc;
 char** __t_argv;
-const char* const __t443t="\n";
-const char* const __t5135t="[";
 const char* const __t5150t="] ";
 const char* const __t5209t="assert: ";
-const char* const __t5290t="correctly retrieved data from mask";
-const char* const __t5143t="V";
-const char* const __t5203t="assertion failed: ";
-const char* const __t5160t="failure";
-const char* const __t431t="";
-const char* const __t5197t=" |- ";
-const char* const __t5140t="success";
+const char* const __t443t="\n";
 const char* const __t5163t="X";
+const char* const __t5203t="assertion failed: ";
+const char* const __t431t="";
+const char* const __t5135t="[";
+const char* const __t5140t="success";
+const char* const __t5290t="correctly retrieved data from mask";
+const char* const __t5197t=" |- ";
+const char* const __t5143t="V";
+const char* const __t5160t="failure";
 static const char* __t_all_errcodes[63] = {"noerr",
 "error",
 "null pointer",

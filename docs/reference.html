@@ -1994,7 +1994,7 @@ avoiding short temporary allocations:</p>
 
 <h2 id="defer">defer</h2>
 
-<div class="notice-box box-warning"><strong>Warning:</strong> Deferred execution is mainly useful for safe resource handling when unsafely creating new types of resources. This can be skipped.</div>
+<div class="notice-box box-warning"><strong>Warning:</strong> deferred execution is mainly useful for safe resource handling when unsafely creating new types of resources. This can be skipped.</div>
 
 <p>You can defer code blocks to run later. The &#8220;later&#8221; part is
 ideally the end of the current function, but <em>smoλ</em> may
@@ -2004,7 +2004,7 @@ function data they are refer to, and are called at the calling
 site. The compiler complains if some but not all variables 
 involved in a defer block are returned.</p>
 
-<p>Defer blocks cannot have any return statements or unhandled
+<p>defer blocks cannot have any return statements or unhandled
 errors; explicitly wrap all potentially erroneous function calls 
 in <code>try</code>. Conversely, their eventual execution is guaranteed,
 even if errors are created in the interim.
@@ -2022,7 +2022,7 @@ Below is a simple example.</p>
 </code></pre>
 </div>
 
-<p>Defers can be forcefully executed while invalidating a
+<p>defers can be forcefully executed while invalidating a
 structure. This is done with the <code>del</code> keyword. For
 example, this is typically used to close resources like
 open files and processes.</p>

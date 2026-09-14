@@ -846,6 +846,7 @@ class ImplementedType:
         self.has_retrieved_singleton: Optional["Token"] = None
         self.return_names: dict[str, int] = dict() # map return names to indexes in rets
         self.doc: list[str] = list()
+        self.cached_required_accompany: dict[str, list[Variable]] = dict()
         self.required_accompany: dict[str,list[str]] = dict()
         self.VM: str|None = None # an equivalent python implementation for the VM
         self.VM_cache = None
@@ -883,6 +884,7 @@ class ImplementedType:
         self._pointer_types: dict[str, ImplementedType] = dict() # only place pointer variables here
         self._pointer_type_dependencies: dict[str, str] = dict() # only place pointer variables here
         self.invalidated: dict[str, Token] = dict() # invalidated variables and the place where the invalidation occurred
+        self.invalidated_reason: dict[str, str] = dict() # default is "due to"
         self.invalidate_types_when_called: list[ImplementedType] = list()
         self.invalidate_types_on_defer: list[ImplementedType] = list() # add to invalidate_types_when_called only if there if we keep at least one defer locally
         self.accumulating_defers: list[dict[str, Token]] = [dict()] # for the top level we defer at the end of code block, but track loop defers here
@@ -908,16 +910,21 @@ class ImplementedType:
     def get_required_accompany(self, var: Variable):
         assert isinstance(var, Variable)
         var_stabilized_name = var.stabilized_name()
+        ret = self.cached_required_accompany.get(var_stabilized_name, None)
+        if ret is not None: return ret
         ret = set()
         for acc in self.required_accompany.get(var_stabilized_name, []):
             if acc not in self.vars: continue
             var = self.vars[acc]
             if var not in ret: ret.add(var)
-        return list(ret)
+        ret_list = list(ret)
+        self.cached_required_accompany[var_stabilized_name] = ret_list
+        return ret_list
 
     def add_required_accompany(self, var: Variable, requirement: Variable):
         assert isinstance(var, Variable)
         assert isinstance(requirement, Variable)
+        self.cached_required_accompany.clear()
         var_stabilized_name = var.stabilized_name()
         if var_stabilized_name not in self.required_accompany: self.required_accompany[var.stabilized_name()] = list()
         self.required_accompany[var_stabilized_name].append(requirement.stabilized_name())
@@ -1259,7 +1266,7 @@ class ImplementedType:
                         if (to_defer and not self.get_assignment(to_defer, self.rets)):# and not self.get_assignment(accompanying.stabilized_name(), self.args):# and not any(self.get_assignment(ret, defer_var_names) for ret in self.rets):
                             error_token.error("safety", "to safely "+("return '"if ret in self.rets else "mutate or edit input '")+pretty_name(v.stabilized_name())+"' you must also return the resource '"+pretty_name(accompanying.stabilized_name())+"'", reason=accompanying.token, raason_message="due to", suggestions=["return the accompanying variable", "return a structure containing the accompanying variable", "create a ref to the accompanying variable", "return with 'unsafe_return' (you can even return a blank value)"])
                 if v.stabilized_name() in self.invalidated:
-                    error_token.error("safety", "return '"+pretty_name(v.stabilized_name())+"' has been invalidated", reason=self.invalidated[v.stabilized_name()], raason_message="due to")
+                    error_token.error("safety", "invalidated '"+pretty_name(v.stabilized_name())+"'", reason=self.invalidated[v.stabilized_name()], raason_message=self.invalidated_reason.get(v.stabilized_name(), "due to"))
 
         self.rets = prev_self_rets
         self.has_returned_once = True
@@ -2558,7 +2565,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         ret = rets
         if var is not None and var.isprivate: err_token.error("type", "cannot assign to immutable '"+pretty_name(var.name)+"'")
         if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but got '"+signature_like(rets)+"'")
-        if var.stabilized_name() in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
+        if var.stabilized_name() in impl.invalidated: err_token.error("safety", "invalidated "+signature_like([var], impl)+"'", reason=impl.invalidated[var.stabilized_name()], raason_message="due to", suggestions=["re-obtain it from its buffer"])
         if var.immutable: err_token.error("type", "cannot write to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&' or 'mutget' from an 'edit' or 'mut' buffer if you are working with std", "remove 'const' qualitifier"])
         IFNOT_CHECK_PATTERN[3] = var
         impl.implementation.extend(IFNOT_CHECK_PATTERN)
@@ -2698,7 +2705,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             for var in impl.vars.values():
                 if var.name==effect_var or var.name[:len_effect_var_prefix]==effect_var_prefix: 
                     if var.stabilized_name() in impl.invalidated:
-                        error_token.error("safety", "'"+pretty_name(var.stabilized_name())+"' has been invalidated", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
+                        error_token.error("safety", "invalidated '"+pretty_name(var.stabilized_name())+"'", reason=impl.invalidated[var.stabilized_name()], raason_message=impl.invalidated_reason.get(var.stabilized_name(), "due to"))
                     gathered_vars.append(var)
             if len(vars)+len(gathered_vars)>=len(callee.args): break
         gathered_vars.extend(vars)
@@ -3168,7 +3175,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     if ret[0].type!=POINTER_TYPE:
         if not explicit: return pos, ret
         current_token.error("type", "must dereference a pointer but got '"+signature_like(ret)+"'")
-    if ret[0].stabilized_name() in impl.invalidated: current_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[ret[0].stabilized_name()])
+    if ret[0].stabilized_name() in impl.invalidated: current_token.error("safety", "invalidated '"+signature_like(ret.stabilized_name(), impl)+"'", reason=impl.invalidated[ret[0].stabilized_name()], suggestions=["re-obtain it from its buffer"], raason_message=impl.invalidated_reason.get(ret[0].stabilized_name(), "due to"))
     if unsafe_pointer_type is not None:
         pointer_type = unsafe_pointer_type
     else:
@@ -3404,7 +3411,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         if is_lsp and file.is_main_file: print_lsp_literal(literal_tok, "a float literal: "+literal_tok.text)
         return pos+1, create_literal_type(literal_tok, FLOAT_TYPE)
     if literal_tok.text=="compt":
-        if is_lsp and file.is_main_file: print_lsp_keyword(literal_tok, "**compile time evaluation**\n\nEvaluates the following expression to a literal value during compilation. This requires that the VM is able to axecute all of the expression's dependent code.")
+        if is_lsp and file.is_main_file: print_lsp_keyword(literal_tok, "**compile time evaluation**\n\nEvaluates an expression to a literal value during compilation. The VM may not be able to execute all dependent code (it operates on small memory and recusion limits).")
         temporary_implementation = ImplementedType(literal_tok.text, at=literal_tok)
         pos, ret = await process_statement(file, tokens, pos+1, temporary_implementation, current_operator_priority=0)
         pos, ret = await process_statement_operator(file, tokens, temporary_implementation, pos, ret, current_operator_priority=0)
@@ -4064,7 +4071,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             if var is not None and var.isprivate: err_token.error("type", "cannot set to immutable '"+pretty_name(var.name)+"'")
             if var is None: err_token.error("type", "must write to pointers with '"+op_name+"' but got '"+signature_like(rets)+"'")
             if var.type!=POINTER_TYPE: err_token.error("type", "write to a pointer with '"+op_name+"' but got '"+signature_like(rets)+"'")
-            if var.stabilized_name() in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
+            if var.stabilized_name() in impl.invalidated: err_token.error("safety", "invalidated '"+signature_like([var], impl)+"'", reason=impl.invalidated[var.stabilized_name()], raason_message=impl.invalidated_reason.get(var.stabilized_name(), "due to"), suggestions=["re-obtain it from its buffer"])
             if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&' or 'mutget' from an 'edit' or 'mut' buffer if you are working with std", "remove 'const' qualitifier"])
             pointer_type: ImplementedType|None = impl.get_pointer_type(var)
             if pointer_type is None or pointer_type==ANY_TYPE: err_token.error("type", "cannot write to 'any' pointer")
@@ -4643,7 +4650,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     is_field = True
                     if current in impl.vars: break
                 for r in rets:
-                    if r.stabilized_name() in impl.invalidated: current_token.error("safety", "the variable '"+pretty_name(r.stabilized_name())+"' could have been invalidated", reason=impl.invalidated[r.stabilized_name()], raason_message="due to")
+                    if r.stabilized_name() in impl.invalidated: current_token.error("safety", "invalidated '"+pretty_name(r.stabilized_name())+"'", reason=impl.invalidated[r.stabilized_name()], raason_message=impl.invalidated_reason.get(r.stabilized_name(), "due to"))
                 pos += 1
                 var = impl.vars.get(current, None)
                 if var is None:
@@ -5198,7 +5205,8 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             return pos, [var]
         return await process_try(pos)
     if current=="local":
-        if is_lsp and file.is_main_file: print_lsp_decorator(current_token, "**local**\n\nCreates an anonymized version of the next variable. Anonymization prevents mutable modidications from affecting the original, although it does not safeguard memory contents.")
+        if is_lsp and file.is_main_file: 
+            print_lsp_decorator(current_token, "**local**\n\nCreates an anonymized version of the next variable. Anonymization prevents mutable modifications from affecting the original, although it does not safeguard memory contents.")
         pos, ret = await process_statement(file, tokens, pos+1, impl, current_operator_priority)
         if len(ret)==0: current_token.error("safety", "next value is blank")
         tmp = create_temp()
@@ -5354,7 +5362,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             if var is not None and var.isprivate: err_token.error("type", "cannot set to immutable class field: '"+pretty_name(var.name)+"'")
             if var is None: err_token.error("type", "can only set a value to an existing pointer with '"+op_name+"' but got '"+signature_like(rets)+"'")
             if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but got '"+signature_like(rets)+"'")
-            if var.stabilized_name() in impl.invalidated: err_token.error("safety", "this pointer could have been invalidated by a previous call; re-obtain it from its buffer", reason=impl.invalidated[var.stabilized_name()], raason_message="due to")
+            if var.stabilized_name() in impl.invalidated: err_token.error("safety", "invalidated '"+signature_like([var], impl)+"'", reason=impl.invalidated[var.stabilized_name()], raason_message=impl.invalidated_reason.get(var.stabilized_name(), "due to"), suggestions=["re-obtain it from its buffer"])
             if var.immutable: err_token.error("type", "cannot move data to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&' from an 'edit' or 'mut' buffer when supported by 'mutget' if you are working with std", "remove 'const' qualitifier"])
             pointer_type: ImplementedType|None = impl.get_pointer_type(var)
             if pointer_type is None or pointer_type==ANY_TYPE: err_token.error("type", "cannot "+op_name+" a value onto a pointer with unknown associated type."+(" Perhaps you meant to add '&' after the value to make this a pointer assignment?"if len(ret)==1 and ret[0].type==POINTER_TYPE else ""))
@@ -5442,7 +5450,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if is_lsp and file.is_main_file: print_lsp_field(get(tokens, pos), [var], impl)
         r = var
         if r.stabilized_name() in impl.invalidated: 
-            current_token.error("safety", "the variable '"+pretty_name(r.stabilized_name())+"' could have been invalidated", reason=impl.invalidated[r.stabilized_name()], raason_message="due to")
+            current_token.error("safety", "invalidated '"+pretty_name(r.stabilized_name())+"'", reason=impl.invalidated[r.stabilized_name()], raason_message=impl.invalidated_reason.get(r.stabilized_name(), "due to"))
 
     if var is None:
         # first try to see if this is a group of values
@@ -5453,7 +5461,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         #found = impl.stabilize(found)
         for r in found:
             if r.stabilized_name() in impl.invalidated:
-                current_token.error("safety", "the variable '"+pretty_name(r.stabilized_name())+"' could have been invalidated", reason=impl.invalidated[r.stabilized_name()], raason_message="due to")
+                current_token.error("safety", "invalidated '"+pretty_name(r.stabilized_name())+"'", reason=impl.invalidated[r.stabilized_name()], raason_message=impl.invalidated_reason.get(r.stabilized_name(), "due to"))
         if found and is_lsp and file.is_main_file: print_lsp_field(get(tokens, pos), found, impl)
         if found or peek_text(tokens, pos+1)=="is": return await process_statement_operator(file, tokens, impl, pos+1, found, current_operator_priority) 
 
@@ -5488,10 +5496,11 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             if len(method.variations)==0: call_token.error("type", "cannot have no literal type alternatives")
             if len(method.variations)!=1: call_token.error("type", "cannot have multiple literal type alternatives", suggestions=[variation.signature() for variation in method.variations])
             literal_method = method.variations[0]
+            resolution_type_value = list()
             if is_type_resolution:
                 pos += 1
                 variable = Variable(create_temp(), literal_method, token=current_token)
-                if is_lsp and file.is_main_file: print_lsp_literal(get(tokens,pos-2), "**retrieve literal type**\n\nRetrieves the type defined to evaluate to "+literal_method.at.text)
+                if is_lsp and file.is_main_file: resolution_type_value.append(literal_method.at.text)
                 impl.vars[variable.name] = variable
                 varsret = [variable]
             elif literal_method.is_literal_of==literal_method: # unpack literal type that points to itself
@@ -5502,8 +5511,8 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     if lit_method.is_literal_of==CSTR_TYPE or (literal_method.is_literal_of and literal_method.is_forced_pointer_type_of):
                         current = lit_method.at.text
                         if is_lsp and file.is_main_file: 
-                            if lit_method.is_literal_of==CSTR_TYPE: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text, defined=lit_method.at)
-                            else: print_lsp_literal(call_token, "**literal**\n\nstatic pointer transferred via a char[] representation", defined=lit_method.at)
+                            if lit_method.is_literal_of==CSTR_TYPE: resolution_type_value.append(literal_method.at.text)
+                            else: resolution_type_value.append("")
                         tmp: str|None = global_cstr2var.get(current, None)
                         ptr_type = literal_method.is_forced_pointer_type_of
                         variable = Variable(tmp if tmp else depackaged_tmp+"__"+ret, POINTER_TYPE if ptr_type else lit_method.is_literal_of, token=current_token)
@@ -5516,7 +5525,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                         varsret.append(variable)
                     elif lit_method.is_literal_of:
                         variable = Variable(depackaged_tmp+"__"+ret, lit_method.is_literal_of, token=current_token)
-                        if is_lsp and file.is_main_file: print_lsp_literal(call_token, "**literal**\n\nnumber defined to be "+literal_method.at.text, defined=lit_method.at)
+                        if is_lsp and file.is_main_file: resolution_type_value.append(lit_method.at.text)
                         impl.vars[variable.name] = variable
                         impl.implementation.extend([
                             variable,
@@ -5529,6 +5538,8 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                         variable = Variable(depackaged_tmp+"__"+ret, literal_method.vars[ret].type)
                         impl.vars[variable.name] = variable
                         varsret.append(variable)
+                    if is_lsp and file.is_main_file: print_lsp_literal(call_token, "**literal**\n\nresolves to the outcome of \n```rust\n"+literal_method.signature()+"\n```\n", defined=lit_method.at)
+                    
             elif literal_method.is_literal_of==CSTR_TYPE:
                 current = literal_method.at.text
                 if is_lsp and file.is_main_file: print_lsp_literal(call_token, "**literal**\n\ncstr defined to be "+literal_method.at.text, defined=literal_method.at)
@@ -5577,7 +5588,7 @@ def release_defers(impl: ImplementedType, at: Token):
     rets = [should_invalid for should_invalid in impl.accumulating_defers[-1]]
     for should_invalid in rets:
         if impl.invalidated.get(should_invalid) is not None and (impl.vars[should_invalid].immutable or impl.vars[should_invalid].type==POINTER_TYPE) and impl.invalidated.get(should_invalid).text!="del":
-            impl.accumulating_defers[-1][should_invalid].error("safety", "an automatic defer is overruled later by another defer for immutable variable '"+pretty_name(should_invalid)+"'", reason=impl.invalidated.get(should_invalid), raason_message="due to being released in the loop", suggestions=["create a (temporary) copy", "use 'unsafe_valid' if you are sure about pointer and immutable field validity", "initialize the resource before the loop"])
+            impl.accumulating_defers[-1][should_invalid].error("safety", "an automatic defer is overruled later for variable '"+pretty_name(should_invalid)+"'", reason=impl.invalidated.get(should_invalid), raason_message="due to being released in the loop", suggestions=["create a (temporary) copy", "use 'unsafe_valid' if you are sure about pointer and immutable field validity", "initialize the resource before the loop"])
     accompany_names = set()
     for v in rets:
         for accompany in impl.get_required_accompany(impl.vars[v]):
@@ -5589,11 +5600,13 @@ def release_defers(impl: ImplementedType, at: Token):
             varname = val.stabilized_name()
             if impl.get_assignment(varname, rets) or varname in accompany_names or any(accompany.name in rets for accompany in impl.get_required_accompany(impl.vars[varname])):
                 invalidated.add(val)
+                impl.invalidated_reason[varname] = "due to a 'defer' called at the end of the code block that starts at"
                 impl.invalidated[varname] = name
         for invalid_type in impl.invalidate_types_on_defer: # TODO: track defers for each variable to be deleted
             for varname, val in impl.vars.items():
                 if val.type.invalidated_by == invalid_type:# and not varname.endswith("__unsafe_ptr"):
                     impl.invalidated[val.stabilized_name()] = name
+                    impl.invalidated_reason[val.stabilized_name()] = "due to a 'defer' called at the end of the code block that starts at"
                     if val.name in impl.args: name.error("safety", "cannot invalidate associated argument '"+pretty_name(varname)+"'")
 
         to_remove = list()
@@ -5714,7 +5727,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             continue
         if name.text=="del":
             if is_lsp and file.is_main_file: print_lsp_keyword(name, "invalidates the subsequent value, potentially calling deferred destructors")
-            if impl.is_parsing_a_defer: name.error("safety", "cannot 'del' within a 'defer', as this would at most delay the latter")
+            if impl.is_parsing_a_defer: name.error("safety", "cannot 'del' within a 'defer'")
             async def process_del(pos: int):
                 # if impl.has_returned_once: name.error("safety", "cannot 'del' if you have already returned")
                 # if impl.nesting: name.error("safety", "cannot 'del' within conditions or loops")
@@ -5731,10 +5744,11 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                         #print(accum_defers, varname,assignment)
                         defervarname = varname
                         if any(defervarname in deflevel for deflevel in impl.accumulating_defers):
-                            name.error("safety", "cannot 'del' a variable '"+pretty_name(defervarname)+"' that has not been initialized at exactly this nesting level", reason=impl.accumulating_defers[-1].get(defervarname, None))
+                            name.error("safety", "cannot invalidate '"+pretty_name(defervarname)+"' here", reason=impl.accumulating_defers[-1].get(defervarname, None), suggestions=["invalidate the variable with 'del' in the same code block in which it was created", "let the language automatically handle its 'defer' call"])
                                     
                     invalidated.add(val)
                     impl.invalidated[varname] = name
+                    impl.invalidated_reason[val.stabilized_name()] = "due to user release at"
 
                 # rhandled = [val.name for val in invalidated if val.name not in impl.accumulating_defers[-1]]
                 # if len(rhandled)==len(invalidated):
@@ -5745,10 +5759,10 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                     for varname, val in impl.vars.items():
                         if val.type.invalidated_by == invalid_type:# and not varname.endswith("__unsafe_ptr"):
                             impl.invalidated[val.stabilized_name()] = name
-                            if val.name in impl.args: name.error("safety", "cannot invalidate associated argument '"+pretty_name(varname)+"'")
+                            if val.name in impl.args: name.error("safety", "cannot 'del' associated argument '"+pretty_name(varname)+"'")
                 for defer in impl.returned_defers:
                     if not any(v in defer for v in invalidated): continue
-                    name.error("safety", "trying to 'del' a value that may have already been returned '"+signature_like(ret, impl)+"'")
+                    name.error("safety", "cannot 'del' a value that may have already been returned '"+signature_like(ret, impl)+"'")
                                     
 
                 to_remove = list()
@@ -5758,11 +5772,10 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                         if isinstance(v, Variable):
                             for arg in impl.args:
                                 if (not impl.vars[arg].immutable) and (impl.get_assignment(arg, [v]) or impl.get_required_accompany(impl.vars[arg])): 
-                                    name.error("safety", "this 'del' would evoke a defer that would invalidate the mutable argument '"+pretty_name(arg)+"'")
+                                    name.error("safety", "cannot 'del' because a 'defer' would invalidate a mutable argument '"+pretty_name(arg)+"'")
                     impl.implementation.extend(defer)
                     to_remove.append(defer)
-                if not to_remove:
-                    name.error("safety", "does nothing because it does not call any active 'defer' for '"+signature_like(ret, impl)+"'")
+                if not to_remove: name.error("safety", "does nothing because it does not call any active 'defer' for '"+signature_like(ret, impl)+"'")
                 for v in invalidated:
                     if v.name in impl.args and not v.immutable and v.type.builtin:
                         impl.implementation.extend([
@@ -5777,7 +5790,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             pos, ret = await process_del(pos)
             continue
         if name.text=="defer":
-            if is_lsp and file.is_main_file: print_lsp_definition(name, "defines code to run when all its content variables would no longer be used afterwards")
+            if is_lsp and file.is_main_file: print_lsp_definition(name, "**defer code execution**\n\nCode that runs only if contained variables would no longer be used afterwards.\ndefers accumulated within within functions may be moved to the calling scope. However, conditions and loops prevent resource leaks by forcing the execution of all internal defers at their end.")
             async def process_defer(pos: int):
                 if impl.has_returned_once: name.error("safety", "cannot declare a 'defer' after the first return")
                 if impl.is_parsing_a_defer: name.error("safety", "cannot declare a 'defer' within another")
@@ -5787,6 +5800,12 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 prev_invalidated = {k:v for k,v in impl.invalidated.items()}
                 impl.implementation = list()
                 pos = await process_body(file, tokens, pos, impl, one_line=False)
+                if not impl.implementation: name.error("safety", "cannot declare an empty 'defer'", suggestions=["to invalidate a variable, you need a use it, for example per 'defer: local varname'"])
+                if impl.nesting: 
+                    for var in impl.implementation:
+                        if isinstance(var, Variable): 
+                            if var.name not in impl.accumulating_defers[-1]: impl.accumulating_defers[-1][var.name] = [impl.implementation]
+                            else: impl.accumulating_defers[-1][var.name].append(impl.implementation)
                 impl.defers.append(impl.implementation)
                 impl.implementation = prev_implementation
                 impl.invalidated = prev_invalidated
@@ -7340,7 +7359,7 @@ async def main():
                         docs_file.write("</details>\n\n")
                     docs_file.write("\n")
                     if callee.returned_defers: 
-                        docs_file.write("<details><summary>Defered calls</summary>\n\n")
+                        docs_file.write("<details><summary>defered calls</summary>\n\n")
                         for defer in callee.returned_defers: docs_file.write("```rust\n"+code_summary(defer, callee)+"```\n")
                         docs_file.write("</details>\n\n")
                     singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]

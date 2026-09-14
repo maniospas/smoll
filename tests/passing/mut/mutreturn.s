@@ -26,7 +26,7 @@ def test()
     myparty = mut parties[0]
     myparty.progress = myparty.progress+1
     if false
-        myparty.units = units2.slice 4 # TODO: THIS KIND OF BRANCHING IS NOT PROPERLY ACCOUNTED FOR IF WE DID NOT RETURN units2 (DEFERRING UNITS2 ALONGSIDE MYPARTY IS WRONG)
+        myparty.units = units2.slice 4 # TODO: THIS KIND OF BRANCHING IS NOT PROPERLY ACCOUNTED FOR IF WE DID NOT RETURN units2 (deferRING UNITS2 ALONGSIDE MYPARTY IS WRONG)
     return (myparty, parties, units1, units2)
 
 def main()

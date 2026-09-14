@@ -1,9 +1,12 @@
 import std.core
 import std.test
+import std.scope
 
 def main()
     CLI = edit console()
-    x = mut bits 0
-    mydata = compiler::value(of 3)
-    x = x.mask(mydata, bits 5)
-    assert(5==nat x.slice mydata, "correctly retrieved data from mask")
+    CHARS = edit arena alloc 120
+    if true
+        x = "1"+"2"
+    #print x
+    #print "2"+"3"
+    print "done"

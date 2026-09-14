@@ -1686,7 +1686,7 @@ def main()
 
 ## defer
 
-*Warning: Deferred execution is mainly useful for safe resource handling when unsafely creating new types of resources. This can be skipped.*
+*Warning: deferred execution is mainly useful for safe resource handling when unsafely creating new types of resources. This can be skipped.*
 
 You can defer code blocks to run later. The "later" part is
 ideally the end of the current function, but *smoλ* may
@@ -1696,7 +1696,7 @@ function data they are refer to, and are called at the calling
 site. The compiler complains if some but not all variables 
 involved in a defer block are returned.
 
-Defer blocks cannot have any return statements or unhandled
+defer blocks cannot have any return statements or unhandled
 errors; explicitly wrap all potentially erroneous function calls 
 in `try`. Conversely, their eventual execution is guaranteed,
 even if errors are created in the interim.
@@ -1713,7 +1713,7 @@ def main()
     print "second"
 ```
 
-Defers can be forcefully executed while invalidating a
+defers can be forcefully executed while invalidating a
 structure. This is done with the `del` keyword. For
 example, this is typically used to close resources like
 open files and processes.

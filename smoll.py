@@ -330,7 +330,8 @@ def longest_common_prefix_len(strings: list[str]) -> int:
             c = first[i]
             is_same = True
             for j in range(1,len(strings)):
-                if strings[j][i]!=c:
+                sj = strings[j]
+                if sj[i]!=c:
                     is_same = False
                     break
             if not is_same: break
@@ -338,7 +339,7 @@ def longest_common_prefix_len(strings: list[str]) -> int:
             i += 1
             if next_char and prev_char: found = i
             prev_char = next_char
-    except: found = len(first)
+    except: found = min(len(s) for s in strings)
     if found==2 and first[0]=="_" and first[1]=="_": return found-2
     if found>=4 and first[found-4:found]=="____": return found-2
     # pos = first.rfind("____t", 0, found)
@@ -3491,6 +3492,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 if name==":": tokens[pos].error("syntax", "a single '"+name+"' follows a condition or loop and indicates a same-line expression")
                 tokens[pos].error("syntax", "previous expression ended before operator '"+name+"'")
             candidates: list[ImplementedType] = list()
+            origin: list[str] = list()
             max_candidate_common_length = 0
             for type in file.types.values():
                 for variation in type.variations:
@@ -3498,9 +3500,25 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                     common_length = longest_common_prefix_len([variation.name, name])
                     if common_length>max_candidate_common_length: 
                         candidates = list()
+                        origin = list()
                         max_candidate_common_length = common_length
                     if common_length==max_candidate_common_length: 
                         candidates.append(variation)
+                        origin.append("")
+            for k, namespace in file.namespaces.items():
+                for type in namespace.types.values():
+                    for variation in type.variations:
+                        if "__t" in variation.name: continue
+                        common_length = longest_common_prefix_len([variation.name, name])
+                        if variation in namespace.localdefs: common_length = common_length/10000.0
+                        if common_length>max_candidate_common_length: 
+                            candidates = list()
+                            origin = list()
+                            max_candidate_common_length = common_length
+                        if common_length==max_candidate_common_length: 
+                            candidates.append(variation)
+                            origin.append(k+"::")
+
             if file==tokens[pos].file:
                 if impl:
                     varname = name
@@ -3523,7 +3541,19 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                         ret.variations.append(vars[0].type)
                         return pos+1, ret
                     if vars: tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural or nominal variable with the same name exists '"+signature_like(vars, impl)+"'")
-                suggestions = [candidate.signature() for candidate in candidates]+[("\""+file.path+"\"::" if not file.is_main_file else "")+k+" (namespace)" for k in file.namespaces]
+                signature_counts: dict[str,int] = dict()
+                for o,c in zip(origin, candidates):
+                    ocname = o+c.name
+                    signature_counts[ocname] = signature_counts.get(ocname,0)+1
+                signatures: list[str] = list()
+                for o,c in zip(origin, candidates):
+                    ocname = o+c.name
+                    if signature_counts[ocname]==0: continue
+                    if signature_counts[ocname]==1: signatures.append(o+c.signature())
+                    else: 
+                        signatures.append(ocname+" ("+str(signature_counts[ocname])+" overloads)")
+                        signature_counts[ocname] = 0
+                suggestions = signatures+[("\""+file.path+"\"::" if not file.is_main_file else "")+k+" (namespace)" for k in file.namespaces if k.startswith(name)]
                 if impl is not None:
                     len_name = len(name)
                     varsuggestions = {name+var[len(name):].split("__")[0]+" (variable)" for var in impl.vars if var[:len_name]==name}

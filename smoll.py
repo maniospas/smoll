@@ -744,7 +744,7 @@ class Variable(CodeSegment):
 
 
 
-def signature_like(vars: list[Variable], impl=None, monomorphic=False, short=False):
+def signature_like(vars: list[Variable], impl=None, monomorphic=False, short=False, hide_brackets=False):
     if monomorphic: common_prefix_length = 0
     else: common_prefix_length = longest_common_prefix_len([var.name for var in vars])
     ret = ""
@@ -776,7 +776,7 @@ def signature_like(vars: list[Variable], impl=None, monomorphic=False, short=Fal
                 dependency = impl.follow_pointer_dependency(vars[i])
                 if dependency and dependency!=vars[i]: 
                     dep = impl.get_pointer_type(dependency) 
-                    if not dep or dep==ANY_TYPE: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name if not monomorphic else "")+"}"
+                    if (not dep or dep==ANY_TYPE) and not hide_brackets: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name if not monomorphic else "")+"}"
             i += 1
         elif type.is_literal_of: 
             at = type.at
@@ -794,14 +794,14 @@ def signature_like(vars: list[Variable], impl=None, monomorphic=False, short=Fal
                 dependency = impl.follow_pointer_dependency(vars[i+1])
                 if dependency and dependency!=vars[i+1]: 
                     dep = impl.get_pointer_type(dependency) 
-                    if not dep or dep==ANY_TYPE: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name if not monomorphic else "")+"}"
+                    if (not dep or dep==ANY_TYPE) and not hide_brackets: ret += " {follows "+toname(dep if dep else ANY_TYPE)+" ptr "+pretty_name(dependency.name if not monomorphic else "")+"}"
             i += len(type.rets)
         else:
             if all(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "mut "
             elif all(vars[k].immutable or vars[k].isprivate for k in range(i, min(len(vars),i+len(type.rets)))): pass#ret += "const "
             elif any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "edit "
             ret += toname(type)+arg_name
-            if len(type.rets)==len(vars):
+            if len(type.rets)==len(vars) and vars[0].type==type and not hide_brackets:
                 ret += " {tag"
                 i = i+1
                 close_brackets = close_brackets+1
@@ -998,11 +998,11 @@ class ImplementedType:
             i += 1
         return ret
 
-    def signature(self):
+    def signature(self, compact=False):
         if self.is_buffer_of: return "buffer of "+signature_like([self.is_buffer_of.vars[arg] for arg in self.is_buffer_of.rets], self.is_buffer_of)
         if self.is_pointer_of: return "pointer of "+signature_like([self.is_pointer_of.vars[arg] for arg in self.is_pointer_of.rets], self.is_pointer_of)
-        args = signature_like([self.vars[arg] for arg in self.args], impl=self)
-        rets = signature_like([self.vars[arg] for arg in self.rets], impl=self)
+        args = signature_like([self.vars[arg] for arg in self.args], impl=self, hide_brackets=compact)
+        rets = signature_like([self.vars[arg] for arg in self.rets], impl=self, hide_brackets=compact)
         if self.builtin is not None: return self.name
         return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" with effects "+','.join(self.effect_names) if self.effect_names else "")
 
@@ -2354,12 +2354,11 @@ def match_structure_with(x: ImplementedType, y: ImplementedType):
         #if xrx.type.is_buffer_of!=yry.type.is_buffer_of: return False
         #if xrx.isprivate!=yry.isprivate: return False
     return True
-def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_vars: list[Variable], error_token: Token, out_format=Optional[list[Variable]]) -> ImplementedType:
-    available_types: list[ImplementedType] = list()
+
+
+def _suggest_call_list(file: File, impl: ImplementedType, variations: list[ImplementedType], argument_vars: list[Variable]):
     alternative_list: list[ImplementedType] = list()
-    for variation in method.variations:
-        if variation in available_types: continue
-        if out_format is not None and len(out_format)!=len(variation.rets): continue
+    for variation in variations:
         if len(argument_vars)<len(variation.args):
             vars: list[Variable] = list()
             for effect_var in variation.effect_names: 
@@ -2370,14 +2369,8 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
                 if len(vars)+len(argument_vars)>=len(variation.args): break
             vars.extend(argument_vars)
         else: vars = argument_vars
-        if len(variation.args)!=len(vars): continue
+        if len(variation.args)<len(vars): continue # here allow incomplete arguments
         variation_args = variation.args
-        if out_format is not None:
-            variation_args = variation_args+variation.rets
-            vars = vars+out_format
-        # most signature mistakes will be from mutablity or simple type errors, so have a preferred list for quickly resolving such issues
-        if not variation in alternative_list: alternative_list.append(variation)
-
         is_available = True
         for i in range(len(vars)):
             # we can allow lowering buffers to generic any
@@ -2406,53 +2399,67 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
             other_pointer_type = variation.get_pointer_type(variation.vars[variation_args[varpos]])
             if var_pointer_type not in NONE_OR_ANY and other_pointer_type not in NONE_OR_ANY and not match_structure_with(var_pointer_type, other_pointer_type):
                 is_available = False
-                # TODO: make a proper is_available check, that also accounts for internal pointer types but allows structural equivalence
-                # is_available = len(var_pointer_type.args)==len(other_pointer_type.args)
-                # for arg1, arg2 in zip(var_pointer_type.args, other_pointer_type.args):
-                #     if var_pointer_type
+                if not is_available: break
+        if is_available:
+            if not variation in alternative_list: alternative_list.append(variation)
+    return alternative_list
+
+
+def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_vars: list[Variable], error_token: Token, out_format=Optional[list[Variable]]) -> ImplementedType:
+    available_types: list[ImplementedType] = list()
+    alternative_list: list[ImplementedType] = list()
+    for variation in method.variations:
+        if variation in available_types: continue
+        if out_format is not None and len(out_format)!=len(variation.rets): continue
+        if len(argument_vars)<len(variation.args):
+            vars: list[Variable] = list()
+            for effect_var in variation.effect_names: 
+                effect_var_prefix = effect_var+"__"
+                len_effect_var_prefix = len(effect_var)+2
+                for var in impl.vars.values():
+                    if var.name==effect_var or var.name[:len_effect_var_prefix]==effect_var_prefix: vars.append(var)
+                if len(vars)+len(argument_vars)>=len(variation.args): break
+            vars.extend(argument_vars)
+        else: vars = argument_vars
+        if len(variation.args)!=len(vars): continue
+        variation_args = variation.args
+        if out_format is not None:
+            variation_args = variation_args+variation.rets
+            vars = vars+out_format
+        # most signature mistakes will be from mutablity or simple type errors, so have a preferred list for quickly resolving such issues
+        if not variation in alternative_list: alternative_list.append(variation)
+        is_available = True
+        for i in range(len(vars)):
+            # we can allow lowering buffers to generic any
+            vvva = variation.vars[variation_args[i]]
+            vit = vars[i].type
+            if vit!=vvva.type and vit.is_buffer_of is None:
+                is_available = False
+                break
+            if vit!=vvva.type and vvva.type.is_buffer_of!=ANY_TYPE:
+                is_available = False
+                buffer1 = vit.is_buffer_of
+                buffer2 = vvva.type.is_buffer_of
+                if buffer1 is not None and buffer2 is not None and match_structure_with(buffer1, buffer2):
+                    is_available = True
+                if buffer1 in NONE_OR_ANY and buffer2 not in NONE_OR_ANY:
+                    is_available = False
+                if not is_available: break
+            if not vvva.immutable and vars[i].immutable:
+                is_available = False
+                break
+        # first check for pointer mismatches (this is a safety error)
+        if not is_available: continue
+        for varpos, var in enumerate(vars):
+            if var.type!=POINTER_TYPE: continue
+            var_pointer_type = impl.get_pointer_type(var)
+            other_pointer_type = variation.get_pointer_type(variation.vars[variation_args[varpos]])
+            if var_pointer_type not in NONE_OR_ANY and other_pointer_type not in NONE_OR_ANY and not match_structure_with(var_pointer_type, other_pointer_type):
+                is_available = False
                 if not is_available: break
         if is_available: available_types.append(variation)
-    if len(available_types)==0:
-        same_shapes: list[ImplementedType] = list()
-        for variation in alternative_list:
-            # bring effects here again
-            if len(argument_vars)<len(variation.args):
-                vars: list[Variable] = list()
-                for effect_var in variation.effect_names: 
-                    effect_var_prefix = effect_var+"__"
-                    len_effect_var_prefix = len(effect_var)+2
-                    for var in impl.vars.values():
-                        if var.name==effect_var or var.name[:len_effect_var_prefix]==effect_var_prefix: vars.append(var)
-                    if len(vars)+len(argument_vars)>=len(variation.args): break
-                vars.extend(argument_vars)
-            else: vars = argument_vars
-            variation_args = variation.args
-            if out_format is not None:
-                variation_args = variation_args+variation.rets
-                vars = vars+out_format
-            # most signature mistakes wi
-            # check variable types without any permissions
-            almost_similar = True
-            for i in range(len(vars)):
-                if vars[i].type!=variation.vars[variation_args[i]].type:
-                    almost_similar = False
-                    break
-            if almost_similar: same_shapes.append(variation)
-        if same_shapes: alternative_list = same_shapes
-        out_format_signature = "any" if out_format is None else signature_like(out_format, impl)
-        #if len(method.variations)<5: alternative_list = method.variations
-        if not alternative_list: alternative_list = method.variations
-        # if len(alternative_list)==1: 
-        #     available_types = alternative_list
-        #     error_token.error("type", "no function '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"' even though there is only one option", suggestions=[t.signature() for t in alternative_list])
-        # else: 
-        error_token.error("type", "no function matches '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature() for t in alternative_list])#+([] if alternative_list==method.variations else ["or one of "+str(len(method.variations)-len(alternative_list))+" other overloads"]))
-    if len(available_types)>1:
-        out_format_signature = "any" if out_format is None else signature_like(out_format, impl)
-        error_token.error("type", "more than one functions match '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature()+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in available_types])
 
-    callee: ImplementedType = available_types[0]
-    if is_lsp and file.is_main_file:
+    def send_callee(callee):
         at = callee.at if callee.at else error_token
         print("---")
         # position in processed file
@@ -2487,6 +2494,56 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         if singletons: printid("\nThe following singletons are initialized:")
         for singleton in singletons: printid("```rust\n"+singleton.signature()+"\n```")
         if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*")
+
+    if len(available_types)==0:
+        same_shapes: list[ImplementedType] = list()
+        for variation in alternative_list:
+            # bring effects here again
+            if len(argument_vars)<len(variation.args):
+                vars: list[Variable] = list()
+                for effect_var in variation.effect_names: 
+                    effect_var_prefix = effect_var+"__"
+                    len_effect_var_prefix = len(effect_var)+2
+                    for var in impl.vars.values():
+                        if var.name==effect_var or var.name[:len_effect_var_prefix]==effect_var_prefix: vars.append(var)
+                    if len(vars)+len(argument_vars)>=len(variation.args): break
+                vars.extend(argument_vars)
+            else: vars = argument_vars
+            variation_args = variation.args
+            if out_format is not None:
+                variation_args = variation_args+variation.rets
+                vars = vars+out_format
+            # most signature mistakes wi
+            # check variable types without any permissions
+            almost_similar = True
+            for i in range(len(vars)):
+                if vars[i].type!=variation.vars[variation_args[i]].type:
+                    almost_similar = False
+                    break
+            if almost_similar: same_shapes.append(variation)
+        if same_shapes: alternative_list = same_shapes
+        out_format_signature = "any" if out_format is None else signature_like(out_format, impl)
+        #if len(method.variations)<5: alternative_list = method.variations
+        if not alternative_list: alternative_list = method.variations
+        # if is_lsp and file.is_main_file:
+        #     for callee in alternative_list: send_callee(callee)
+        #     alternative_list.clear()
+
+        # if len(alternative_list)==1: 
+        #     available_types = alternative_list
+        #     error_token.error("type", "no function '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"' even though there is only one option", suggestions=[t.signature() for t in alternative_list])
+        # else: 
+        error_token.error("type", "no function matches '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature() for t in alternative_list])
+    if len(available_types)>1:
+        out_format_signature = "any" if out_format is None else signature_like(out_format, impl)
+        # if is_lsp and file.is_main_file:
+        #     for callee in available_types: send_callee(callee)
+        #     available_types.clear()
+        error_token.error("type", "more than one functions match '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature()+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in available_types])
+
+
+    callee: ImplementedType = available_types[0]
+    if is_lsp and file.is_main_file: send_callee(callee)
     return callee
 
 def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: list[Variable], error_token: Token, out_format: Optional[list[Variable]]=None, _callee:Optional[ImplementedType]=None) -> list[Variable]:
@@ -4669,6 +4726,36 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 pos -= 1
                 call_continuation = False
                 while peek_text(tokens, pos+1) == ".":
+                    if pos+2>=len(tokens) or get(tokens,pos+2).row!=get(tokens,pos+1).row:
+                        field_candidates: list[str] = list()
+                        call_candidates: list[str] = list()
+                        max_candidate_common_length = 0
+                        varname = current
+                        current = current+"__"
+                        for varname in impl.vars:
+                            if not varname.startswith(current): continue 
+                            val = impl.vars[varname]
+                            varname = current+varname[len(current):].split("__")[0]
+                            field_vars = [v for v in impl.vars.values() if v.name.startswith(varname)]
+                            field_signature = signature_like(field_vars, impl, short=True)
+                            if is_lsp: varname = varname.split("__")[-1]
+                            varname = pretty_name(varname)
+                            adding = varname+" (field) "+field_signature
+                            if adding not in field_candidates:
+                                field_candidates.append(adding)
+                                suggest_calls = _suggest_call_list(file, impl, 
+                                    [t for u in file.types.values() for t in u.variations], 
+                                    [v for v in impl.vars.values() if v.name.startswith(current)]
+                                )
+                                for v in suggest_calls:
+                                    signature = v.signature(compact=True)
+                                    if signature not in call_candidates: call_candidates.append(signature)
+
+                        field_candidates = list(set(field_candidates))+call_candidates
+                        extended_token_end = get(tokens,pos+1)
+                        if extended_token_end.row==current_token.row:
+                            current_token = Token(" "*(extended_token_end.col-current_token.col+len(extended_token_end.text)), current_token.file, current_token.row, current_token.col)
+                        current_token.error("type", "must follow '"+pretty_name(current[:-2])+".' with a field or dot function call", suggestions=field_candidates)
                     pos += 2
                     peek = current+"__"+get(tokens, pos).text
                     len_peek = len(peek)
@@ -4704,7 +4791,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                     candidates: list[ImplementedType] = list()
                     max_candidate_common_length = 0
                     for varname in impl.vars:
-                        if varname[:3]=="__t" or "____t" in varname: continue
+                        #if varname[:3]=="__t" or "____t" in varname: continue
                         common_length = longest_common_prefix_len([varname, current])
                         if common_length>max_candidate_common_length: 
                             candidates = list()
@@ -5355,23 +5442,35 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if current in impl.vars: break
         if pos+2>=len(tokens) or get(tokens,pos+2).row!=get(tokens,pos+1).row:
             field_candidates: list[str] = list()
+            call_candidates: list[str] = list()
             max_candidate_common_length = 0
             varname = current
             current = current+"__"
             for varname in impl.vars:
-                if varname[:3]=="__t" or "____t" in varname: continue
+                #if varname[:3]=="__t" or "____t" in varname: continue
                 if not varname.startswith(current): continue 
                 val = impl.vars[varname]
                 varname = current+varname[len(current):].split("__")[0]
-                field_signature = signature_like([v for v in impl.vars.values() if v.name.startswith(varname)], impl, short=True)
+                field_vars = [v for v in impl.vars.values() if v.name.startswith(varname)]
+                field_signature = signature_like(field_vars, impl, short=True)
                 if is_lsp: varname = varname.split("__")[-1]
                 varname = pretty_name(varname)
-                field_candidates.append(varname+" (field) "+field_signature)
-            field_candidates = list(set(field_candidates))
+                adding = varname+" (field) "+field_signature
+                if adding not in field_candidates:
+                    field_candidates.append(adding)
+                    suggest_calls = _suggest_call_list(file, impl, 
+                        [t for u in file.types.values() for t in u.variations], 
+                        [v for v in impl.vars.values() if v.name.startswith(current)]
+                    )
+                    for v in suggest_calls:
+                        signature = v.signature(compact=True)
+                        if signature not in call_candidates: call_candidates.append(signature)
+
+            field_candidates = list(set(field_candidates))+call_candidates
             extended_token_end = get(tokens,pos+1)
             if extended_token_end.row==current_token.row:
                 current_token = Token(" "*(extended_token_end.col-current_token.col+len(extended_token_end.text)), current_token.file, current_token.row, current_token.col)
-            current_token.error("type", "expecting field of '"+pretty_name(current[:-2])+"'", suggestions=field_candidates)
+            current_token.error("type", "must follow '"+pretty_name(current[:-2])+".' with a field or dot function call", suggestions=field_candidates)
         pos += 2
         peek = current+"__"+get(tokens, pos).text
         len_peek = len(peek)
@@ -5518,8 +5617,9 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         if is_field: 
             field_candidates: list[str] = list()
             max_candidate_common_length = 0
+            call_candidates = list()
             for varname in impl.vars:
-                if varname[:3]=="__t" or "____t" in varname: continue
+                #if varname[:3]=="__t" or "____t" in varname: continue
                 common_length = longest_common_prefix_len([varname, current])
                 if common_length>max_candidate_common_length: 
                     field_candidates = list()
@@ -5530,11 +5630,24 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     field_signature = signature_like([v for v in impl.vars.values() if v.name.startswith(varname)], impl, short=True)
                     if is_lsp: varname = varname.split("__")[-1]
                     varname = pretty_name(varname)
-                    field_candidates.append(varname+" (field) "+field_signature)
+                    adding = varname+" (field) "+field_signature
+                    if adding not in field_candidates: 
+                        field_candidates.append(adding)
+                        if common_length!=0:
+                            callname = current.split("__")[-1]
+                            common_current = current[:-len(callname)]
+                            suggest_calls = _suggest_call_list(file, impl, 
+                                [t for u in file.types.values() for t in u.variations if t.name.startswith(callname) and "____t" not in t.name], 
+                                [v for v in impl.vars.values() if v.name.startswith(common_current)])
+                            for v in suggest_calls:
+                                signature = v.signature(compact=True)
+                                if signature not in call_candidates: call_candidates.append(signature)
+            field_candidates += call_candidates
+
             extended_token_end = get(tokens,pos)
             if extended_token_end.row==current_token.row:
                 current_token = Token(" "*(extended_token_end.col-current_token.col+len(extended_token_end.text)), current_token.file, current_token.row, current_token.col)
-            current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=field_candidates)
+            current_token.error("type", "not found field or dot call '"+pretty_name(current)+"'", suggestions=field_candidates)
         start_call = get(tokens,pos)
         is_type_resolution = start_call.text=="type"
         if is_type_resolution:

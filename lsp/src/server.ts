@@ -393,7 +393,7 @@ connection.onDefinition((params: DefinitionParams): Location[] => {
 
 const KEYWORDS = [
   'if', 'while', 'for', 'in', 'is', 'def', 'include', 'local', 'edit',
-  'mut', 'unsafe_mut', 'class', 'singleton', 'const', 'return', 'unsafe_return'
+  'mut', 'unsafe_mut', 'class', 'singleton', 'const', 'return', 'unsafe_return', 'try'
 ];
 
 connection.onCompletion(async (params): Promise<CompletionItem[]> => {
@@ -449,9 +449,9 @@ function extractCodeBlockLineStarts(message: string): CompletionItem[] {
     if (inCodeBlock && line.trim().length > 0) {
       const trimmed = line.trim();
       let kind: CompletionItemKind = CompletionItemKind.Function;
-      if (trimmed.endsWith('(variable)')) 
+      if (trimmed.includes('(variable)') || trimmed.includes('(field)')) 
         kind = CompletionItemKind.Variable;
-      else if (trimmed.endsWith('(namespace)')) 
+      else if (trimmed.includes('(namespace)')) 
         kind = CompletionItemKind.Module;
       items.push({
         label: trimmed.split('(')[0].trim(),

@@ -1,8 +1,11 @@
 import std.core
 import std.io
 
+def pair(nat x, nat y)
+    return class compiler::args()
+
 def main()
     CLI = edit console()
-    CHARS = edit arena alloc 120
+    p = mut [pair(1,2), pair(3,4)]
+    p[0]&.x = 2
     
-    x = mut file::open()

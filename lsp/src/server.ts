@@ -285,8 +285,14 @@ function publishDiagnostics(uri: string, filePath: string, tokens: CompilerToken
   const errors      = mine.filter(t => t.kind === 'error');
   const annotations = mine.filter(t => t.kind === 'annotation');
   log(`diagnostics: ${mine.length} for this file (${errors.length} errors, ${annotations.length} annotations)`);
-  const seen = new Map<string, Set<string>>();
+  const seen = new Set<string>();
   const diagnostics: Diagnostic[] = errors
+    .filter(t => {
+      const key = `${t.line}:${t.col}:${t.length}:${t.tokenType}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
     .map(t => {
       return {
         severity: t.kind==='error'?DiagnosticSeverity.Error:DiagnosticSeverity.Hint,
@@ -398,9 +404,10 @@ connection.onCompletion(async (params): Promise<CompletionItem[]> => {
   if (debounces.has(uri)) { await waitForCache(filePath); }
   const tokens = cache.get(filePath) ?? [];
   const hits = tokens.filter(t =>
+    t.file === filePath &&
     t.line - 1 === cursor.line &&
-    cursor.character >= t.col &&
-    cursor.character <=  t.col + t.length
+    cursor.character >= t.col - 1 &&
+    cursor.character <= t.col - 1 + t.length
   );
   const items: CompletionItem[] = [];
   for (const t of hits) items.push(...extractCodeBlockLineStarts(resolveMessage(t.message)));
@@ -410,10 +417,15 @@ connection.onCompletion(async (params): Promise<CompletionItem[]> => {
   const doc = documents.get(uri);
   const lineText = doc?.getText().split(/\r?\n/)[cursor.line] ?? '';
   const prefix = lineText.slice(0, cursor.character).match(/[A-Za-z_][A-Za-z0-9_]*$/)?.[0] ?? '';
+  const beforeCursor = lineText.slice(0, cursor.character);
+  const prefixStart = beforeCursor.length - prefix.length;
+  const afterDot = prefixStart > 0 && beforeCursor[prefixStart - 1] === '.';
 
-  const keywordItems: CompletionItem[] = KEYWORDS
-    .filter(k => k.startsWith(prefix))
-    .map(k => ({ label: k, kind: CompletionItemKind.Keyword }));
+  const keywordItems: CompletionItem[] = afterDot
+    ? []
+    : KEYWORDS
+        .filter(k => k.startsWith(prefix))
+        .map(k => ({ label: k, kind: CompletionItemKind.Keyword }));
 
   const kindOrder: Partial<Record<CompletionItemKind, number>> = {
     [CompletionItemKind.Variable]: 0,
@@ -444,6 +456,7 @@ function extractCodeBlockLineStarts(message: string): CompletionItem[] {
       items.push({
         label: trimmed.split('(')[0].trim(),
         kind,
+        detail: trimmed.slice(trimmed.indexOf('(')).trim(),
       });
     }
   }

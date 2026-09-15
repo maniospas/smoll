@@ -571,54 +571,6 @@ nat
 
 Represents values in the range `0 to 2^64-1`.
 
-### nat - retrieved unsigned number from lesser-bit unsigned number
-*Defined in: std/core/convert.s line 170*
-
-```rust
-nat(nat32) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
-### nat - retrieved unsigned number from lesser-bit unsigned number
-*Defined in: std/core/convert.s line 170*
-
-```rust
-nat(nat16) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
-### nat - retrieved unsigned number from lesser-bit unsigned number
-*Defined in: std/core/convert.s line 170*
-
-```rust
-nat(nat8) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
 ### nat - cast to nat
 *Defined in: std/core/convert.s line 70*
 
@@ -701,6 +653,54 @@ Converting to natural numbers loses information.
 <details><summary>Potential errors</summary>
 
 7. cannot convert negative float to nat
+</details>
+
+
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
+
+```rust
+nat(nat32) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
+
+```rust
+nat(nat16) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
+
+```rust
+nat(nat8) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
 </details>
 
 
@@ -3103,26 +3103,6 @@ Adds two numbers of the same type. This is an overload for the + operator.
 </details>
 
 
-### add - pointer addition
-*Defined in: std/unsafe.s line 66*
-
-```rust
-add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
-```
-
-Adds a natural number offset to a pointer.
-
-*Warning: Its usage in unsafe and guarded under std/unsafe.s.*
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 19
-
-</details>
-
-
 ### add - add
 *Defined in: std/core/numbers.s line 67*
 
@@ -3141,35 +3121,23 @@ Adds two numbers of the same type. This is an overload for the + operator.
 </details>
 
 
-### add - concatenate two strings
-*Defined in: std/core/string.s line 424*
+### add - pointer addition
+*Defined in: std/unsafe.s line 66*
 
 ```rust
-add(edit circular, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
 ```
 
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
+Adds a natural number offset to a pointer.
+
+*Warning: Its usage in unsafe and guarded under std/unsafe.s.*
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 112
-- Transpiled C size: 495
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 19
 
-</details>
-
-<details><summary>Potential errors</summary>
-
-23. arena is out of space
-24. does not fit in circular arena
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
 </details>
 
 
@@ -3473,12 +3441,15 @@ This implementation ensures that consecutively allocated strings, or
 adding to strings placed at the end of buffers, does not needlessly
 copy memory. This way, consecutive additions do not copy the previous
 result before appending to it. For example, consider the following:
-```
-CHARS = edit arena alloc 10
-s1 = copy 123
-s2 = copy 456
-s3 = s1+s2
-result = s3+copy(78)+copy(9)
+```python
+import std.core
+def main()
+    CLI = edit console()
+    CHARS = edit arena alloc 10
+    s1 = copy 123
+    s2 = copy 456
+    s3 = s1+s2
+    print s3+copy(78)+copy(9)
 ```
 The snippet fits the result in a contiguous area on the arena's buffer,
 with only one copying operation for each character. This does not
@@ -3516,12 +3487,15 @@ This implementation ensures that consecutively allocated strings, or
 adding to strings placed at the end of buffers, does not needlessly
 copy memory. This way, consecutive additions do not copy the previous
 result before appending to it. For example, consider the following:
-```
-CHARS = edit arena alloc 10
-s1 = copy 123
-s2 = copy 456
-s3 = s1+s2
-result = s3+copy(78)+copy(9)
+```python
+import std.core
+def main()
+    CLI = edit console()
+    CHARS = edit arena alloc 10
+    s1 = copy 123
+    s2 = copy 456
+    s3 = s1+s2
+    print s3+copy(78)+copy(9)
 ```
 The snippet fits the result in a contiguous area on the arena's buffer,
 with only one copying operation for each character. This does not
@@ -3559,12 +3533,15 @@ This implementation ensures that consecutively allocated strings, or
 adding to strings placed at the end of buffers, does not needlessly
 copy memory. This way, consecutive additions do not copy the previous
 result before appending to it. For example, consider the following:
-```
-CHARS = edit arena alloc 10
-s1 = copy 123
-s2 = copy 456
-s3 = s1+s2
-result = s3+copy(78)+copy(9)
+```python
+import std.core
+def main()
+    CLI = edit console()
+    CHARS = edit arena alloc 10
+    s1 = copy 123
+    s2 = copy 456
+    s3 = s1+s2
+    print s3+copy(78)+copy(9)
 ```
 The snippet fits the result in a contiguous area on the arena's buffer,
 with only one copying operation for each character. This does not
@@ -3602,12 +3579,15 @@ This implementation ensures that consecutively allocated strings, or
 adding to strings placed at the end of buffers, does not needlessly
 copy memory. This way, consecutive additions do not copy the previous
 result before appending to it. For example, consider the following:
-```
-CHARS = edit arena alloc 10
-s1 = copy 123
-s2 = copy 456
-s3 = s1+s2
-result = s3+copy(78)+copy(9)
+```python
+import std.core
+def main()
+    CLI = edit console()
+    CHARS = edit arena alloc 10
+    s1 = copy 123
+    s2 = copy 456
+    s3 = s1+s2
+    print s3+copy(78)+copy(9)
 ```
 The snippet fits the result in a contiguous area on the arena's buffer,
 with only one copying operation for each character. This does not
@@ -3853,6 +3833,38 @@ yet safe and fast code.
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 108
 - Transpiled C size: 489
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+23. arena is out of space
+24. does not fit in circular arena
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 424*
+
+```rust
+add(edit circular, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 112
+- Transpiled C size: 495
 
 </details>
 
@@ -7166,90 +7178,6 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/ptrpeek.s line 93*
 
 ```rust
-sub(int ptr _x, int _y) -> (int)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(int ptr _x, int ptr _y) -> (int)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(float ptr _x, float _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
-sub(float ptr _x, float ptr _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### sub - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 93*
-
-```rust
 sub(nat _x, nat ptr _y) -> (nat)
 ```
 
@@ -7351,6 +7279,90 @@ sub(nat ptr _x, nat ptr _y) -> (nat)
 
 2. null pointer
 6. nat subtraction would yield a negative
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(int ptr _x, int _y) -> (int)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(int ptr _x, int ptr _y) -> (int)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(float ptr _x, float _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### sub - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 93*
+
+```rust
+sub(float ptr _x, float ptr _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
 </details>
 
 
@@ -8898,6 +8910,63 @@ exists(Texture {tag, nat,float,float,nat,nat[]}) -> (bool)
 
 
 # bits
+### bits - bit representation
+*Defined in: std/core/convert.s line 62*
+
+```rust
+bits(float) -> (bits {tag, nat value})
+```
+
+Retrieves the bit representation of a number of shift
+arithmetics and bitwise operations.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 26
+
+</details>
+
+
+### bits - bit representation
+*Defined in: std/core/convert.s line 55*
+
+```rust
+bits(int) -> (bits {tag, nat value})
+```
+
+Retrieves the bit representation of a number of shift
+arithmetics and bitwise operations.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 15
+
+</details>
+
+
+### bits - bit representation
+*Defined in: std/core/convert.s line 49*
+
+```rust
+bits(nat) -> (bits {tag, nat value})
+```
+
+Retrieves the bit representation of a number of shift
+arithmetics and bitwise operations.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 3
+
+</details>
+
+
 ### bits - converts a character to its bit representation
 *Defined in: std/core/convert.s line 189*
 
@@ -8958,63 +9027,6 @@ bits(nat8) -> (bits {tag, nat value})
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 4
 - Transpiled C size: 19
-
-</details>
-
-
-### bits - bit representation
-*Defined in: std/core/convert.s line 62*
-
-```rust
-bits(float) -> (bits {tag, nat value})
-```
-
-Retrieves the bit representation of a number of shift
-arithmetics and bitwise operations.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 26
-
-</details>
-
-
-### bits - bit representation
-*Defined in: std/core/convert.s line 55*
-
-```rust
-bits(int) -> (bits {tag, nat value})
-```
-
-Retrieves the bit representation of a number of shift
-arithmetics and bitwise operations.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 15
-
-</details>
-
-
-### bits - bit representation
-*Defined in: std/core/convert.s line 49*
-
-```rust
-bits(nat) -> (bits {tag, nat value})
-```
-
-Retrieves the bit representation of a number of shift
-arithmetics and bitwise operations.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 3
 
 </details>
 
@@ -9578,52 +9590,6 @@ In most usage scenarios this does not matter, as the range would be a temporary 
 
 
 # mutget
-### mutget - next range number
-*Defined in: std/core/range.s line 60*
-
-```rust
-mutget(edit range {tag, mut nat from, nat to}) -> (nat)
-```
-
-This increments the range `from` position and returns the previous one.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 7
-- Transpiled C size: 48
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. iteration end
-</details>
-
-
-### mutget - next range number
-*Defined in: std/core/range.s line 60*
-
-```rust
-mutget(edit range, nat skipped) -> (nat)
-```
-
-This increments the range `from` position and returns the previous one.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 48
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. iteration end
-</details>
-
-
 ### mutget - get a mutable list element pointer
 *Defined in: std/core/allocators.s line 109*
 
@@ -9713,6 +9679,52 @@ are retrieved or sliced.
 </details>
 
 
+### mutget - next range number
+*Defined in: std/core/range.s line 60*
+
+```rust
+mutget(edit range {tag, mut nat from, nat to}) -> (nat)
+```
+
+This increments the range `from` position and returns the previous one.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 48
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+16. iteration end
+</details>
+
+
+### mutget - next range number
+*Defined in: std/core/range.s line 60*
+
+```rust
+mutget(edit range, nat skipped) -> (nat)
+```
+
+This increments the range `from` position and returns the previous one.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 48
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+16. iteration end
+</details>
+
+
 ### mutget - get a list element pointer
 *Defined in: std/core/allocators.s line 145*
 
@@ -9773,87 +9785,6 @@ mutget(edit circular, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_
 <details><summary>Potential errors</summary>
 
 22. out of bounds
-</details>
-
-
-### mutget - get a mutable hash map entry
-*Defined in: std/map.s line 49*
-
-```rust
-mutget(edit robinhood_nat_entry[], edit any[], nat key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
-```
-
-Implemented for string or cstr keys but buffer of any values.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 13
-- Transpiled C size: 65
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-5. modulo by zero
-22. out of bounds
-6. nat subtraction would yield a negative
-63. string buffer is full
-</details>
-
-
-### mutget - get a mutable hash map entry
-*Defined in: std/map.s line 39*
-
-```rust
-mutget(edit robinhood_str_entry[], edit any[], str) -> (mut any ptr {follows any ptr values.unsafe_ptr})
-```
-
-Implemented for string or cstr keys but buffer of any values.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 22
-- Transpiled C size: 94
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-5. modulo by zero
-22. out of bounds
-6. nat subtraction would yield a negative
-63. string buffer is full
-</details>
-
-
-### mutget - get a mutable hash map entry
-*Defined in: std/map.s line 39*
-
-```rust
-mutget(edit robinhood_str_entry[], edit any[], cstr key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
-```
-
-Implemented for string or cstr keys but buffer of any values.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 18
-- Transpiled C size: 88
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-5. modulo by zero
-22. out of bounds
-6. nat subtraction would yield a negative
-63. string buffer is full
 </details>
 
 
@@ -10201,6 +10132,87 @@ mutget(edit open, nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.l
 </details>
 
 
+### mutget - get a mutable hash map entry
+*Defined in: std/map.s line 49*
+
+```rust
+mutget(edit robinhood_nat_entry[], edit any[], nat key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+```
+
+Implemented for string or cstr keys but buffer of any values.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 13
+- Transpiled C size: 65
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+5. modulo by zero
+22. out of bounds
+6. nat subtraction would yield a negative
+63. string buffer is full
+</details>
+
+
+### mutget - get a mutable hash map entry
+*Defined in: std/map.s line 39*
+
+```rust
+mutget(edit robinhood_str_entry[], edit any[], str) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+```
+
+Implemented for string or cstr keys but buffer of any values.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 94
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+5. modulo by zero
+22. out of bounds
+6. nat subtraction would yield a negative
+63. string buffer is full
+</details>
+
+
+### mutget - get a mutable hash map entry
+*Defined in: std/map.s line 39*
+
+```rust
+mutget(edit robinhood_str_entry[], edit any[], cstr key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+```
+
+Implemented for string or cstr keys but buffer of any values.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 88
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+5. modulo by zero
+22. out of bounds
+6. nat subtraction would yield a negative
+63. string buffer is full
+</details>
+
+
 ### mutget - modify a vector element at given position
 *Defined in: std/sci/vec.s line 61*
 
@@ -10301,30 +10313,6 @@ mutget(edit coo, nat k, "unsafe_assume_inbounds") -> (mut sparse_element ptr)
 
 
 # get
-### get - assert that a number plus range start lies in the range
-*Defined in: std/core/range.s line 68*
-
-```rust
-get(range, nat _pos) -> (nat)
-```
-
-The item itself is returned. This lets the range be used as an iterator
-per a pattern like `for i in range 10 ...`.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 7
-- Transpiled C size: 40
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-16. iteration end
-</details>
-
-
 ### get - get a list element pointer
 *Defined in: std/core/allocators.s line 99*
 
@@ -10411,6 +10399,30 @@ are retrieved or sliced.
 - SSA variables: 13
 - Transpiled C size: 49
 
+</details>
+
+
+### get - assert that a number plus range start lies in the range
+*Defined in: std/core/range.s line 68*
+
+```rust
+get(range, nat _pos) -> (nat)
+```
+
+The item itself is returned. This lets the range be used as an iterator
+per a pattern like `for i in range 10 ...`.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 40
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+16. iteration end
 </details>
 
 
@@ -10955,31 +10967,6 @@ GB(nat) -> (nat)
 
 
 # alloc
-### alloc - allocate memory
-*Defined in: std/unsafe.s line 25*
-
-```rust
-alloc(nat) -> (mut any ptr)
-```
-
-Allocates a memory of the provided size in bytes.
-
-*Warning: Its usage in unsafe and guarded under std/unsafe.s.*
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 39
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. allocation failed
-</details>
-
-
 ### alloc - allocate a char[] buffer
 *Defined in: std/core/array.s line 55*
 
@@ -11363,6 +11350,31 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 - Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 24
 - Transpiled C size: 142
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+</details>
+
+
+### alloc - allocate memory
+*Defined in: std/unsafe.s line 25*
+
+```rust
+alloc(nat) -> (mut any ptr)
+```
+
+Allocates a memory of the provided size in bytes.
+
+*Warning: Its usage in unsafe and guarded under std/unsafe.s.*
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 39
 
 </details>
 
@@ -11962,22 +11974,6 @@ len(list {tag, any[], nat length}) -> (nat)
 </details>
 
 
-### len
-*Defined in: std/core/allocators.s line 135*
-
-```rust
-len(list {tag, any[], nat length}) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 7
-- Transpiled C size: 3
-
-</details>
-
-
 ### len - allocated arena size
 *Defined in: std/core/allocators.s line 84*
 
@@ -12024,6 +12020,22 @@ len(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 5
+- Transpiled C size: 3
+
+</details>
+
+
+### len
+*Defined in: std/core/allocators.s line 135*
+
+```rust
+len(list {tag, any[], nat length}) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
 - Transpiled C size: 3
 
 </details>
@@ -13983,7 +13995,7 @@ free(mut any ptr) -> ()
 </details>
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 560*
+*Defined in: std/core/string.s line 563*
 
 ```rust
 copy(edit list, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
@@ -14012,7 +14024,7 @@ copy(edit list, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 560*
+*Defined in: std/core/string.s line 563*
 
 ```rust
 copy(edit circular, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
@@ -14040,7 +14052,7 @@ copy(edit circular, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 560*
+*Defined in: std/core/string.s line 563*
 
 ```rust
 copy(edit arena, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
@@ -14068,7 +14080,7 @@ copy(edit arena, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat da
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 560*
+*Defined in: std/core/string.s line 563*
 
 ```rust
 copy(edit bucket, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
@@ -14099,7 +14111,7 @@ copy(edit bucket, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat d
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 560*
+*Defined in: std/core/string.s line 563*
 
 ```rust
 copy(new CHARS, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
@@ -14134,7 +14146,7 @@ free(mut any ptr) -> ()
 </details>
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 499*
+*Defined in: std/core/string.s line 502*
 
 ```rust
 copy(edit list, nat n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
@@ -14169,7 +14181,7 @@ s = copy 123
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 499*
+*Defined in: std/core/string.s line 502*
 
 ```rust
 copy(edit circular, nat n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
@@ -14202,7 +14214,7 @@ s = copy 123
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 499*
+*Defined in: std/core/string.s line 502*
 
 ```rust
 copy(edit arena, nat n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
@@ -14235,7 +14247,7 @@ s = copy 123
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 499*
+*Defined in: std/core/string.s line 502*
 
 ```rust
 copy(edit bucket, nat n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
@@ -14270,7 +14282,7 @@ s = copy 123
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 499*
+*Defined in: std/core/string.s line 502*
 
 ```rust
 copy(new CHARS, nat n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) with effects CHARS
@@ -14651,29 +14663,6 @@ print s2.dat.first # prints 2
 *Defined in: std/core/string.s line 350*
 
 ```rust
-starts_with(cstr _stack, cstr _needle) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 201
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-29. slice out of string bounds
-22. out of bounds
-</details>
-
-
-### starts\_with - check whether a string starts with a particular substring sequence
-*Defined in: std/core/string.s line 350*
-
-```rust
 starts_with(str, str) -> (bool)
 ```
 
@@ -14728,6 +14717,29 @@ starts_with(cstr _stack, str) -> (bool)
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 38
 - Transpiled C size: 207
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+29. slice out of string bounds
+22. out of bounds
+</details>
+
+
+### starts\_with - check whether a string starts with a particular substring sequence
+*Defined in: std/core/string.s line 350*
+
+```rust
+starts_with(cstr _stack, cstr _needle) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 201
 
 </details>
 
@@ -15438,7 +15450,7 @@ find(robinhood_str_entry[], cstr _k) -> (mut nat)
 
 # empty
 ### empty - checks that a string does not have any character
-*Defined in: std/core/string.s line 493*
+*Defined in: std/core/string.s line 496*
 
 ```rust
 empty(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (bool)
@@ -15457,7 +15469,7 @@ than casting to a string.
 
 
 ### empty - checks that a cstr does not have any characters
-*Defined in: std/core/string.s line 485*
+*Defined in: std/core/string.s line 488*
 
 ```rust
 empty(cstr) -> (bool)
@@ -15618,6 +15630,24 @@ on four nat state fields. The version is seed-initalized. Its period is 2^256-1.
 
 
 # next
+### next - next random number
+*Defined in: std/rand.s line 87*
+
+```rust
+next(mut Rand {tag, mut nat s0, mut nat s1, mut nat s2, mut nat s3}) -> (float)
+```
+
+Computes the next random number of a Rand sequence.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 79
+
+</details>
+
+
 ### next
 *Defined in: std/map.s line 54*
 
@@ -15662,24 +15692,6 @@ next(robinhood_str_entry[], mut nat pos) -> (mut str {tag, mut char ptr unsafe_p
 </details>
 
 
-### next - next random number
-*Defined in: std/rand.s line 87*
-
-```rust
-next(mut Rand {tag, mut nat s0, mut nat s1, mut nat s2, mut nat s3}) -> (float)
-```
-
-Computes the next random number of a Rand sequence.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 12
-- Transpiled C size: 79
-
-</details>
-
-
 # Hashable
 ### nat - an unsigned integer value
 *Defined in: builtins line 1*
@@ -15703,54 +15715,6 @@ float
 ```rust
 cstr
 ```
-
-### nat - retrieved unsigned number from lesser-bit unsigned number
-*Defined in: std/core/convert.s line 170*
-
-```rust
-nat(nat32) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
-### nat - retrieved unsigned number from lesser-bit unsigned number
-*Defined in: std/core/convert.s line 170*
-
-```rust
-nat(nat16) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
-
-### nat - retrieved unsigned number from lesser-bit unsigned number
-*Defined in: std/core/convert.s line 170*
-
-```rust
-nat(nat8) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 7
-
-</details>
-
 
 ### float - cast to float
 *Defined in: std/core/convert.s line 81*
@@ -15904,6 +15868,54 @@ Serves as a tautology function for code that parses on multiple number types.
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 3
+- Transpiled C size: 7
+
+</details>
+
+
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
+
+```rust
+nat(nat32) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
+
+```rust
+nat(nat16) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 7
+
+</details>
+
+
+### nat - retrieved unsigned number from lesser-bit unsigned number
+*Defined in: std/core/convert.s line 170*
+
+```rust
+nat(nat8) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
 - Transpiled C size: 7
 
 </details>
@@ -16386,6 +16398,22 @@ robinhood_str_entry(str, nat cost) -> (str, nat cost)
 
 # raw
 ### raw
+*Defined in: std/hash.s line 54*
+
+```rust
+raw(str, nat cost) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
+</details>
+
+
+### raw
 *Defined in: std/hash.s line 60*
 
 ```rust
@@ -16444,22 +16472,6 @@ raw(nat s, nat cost) -> (nat)
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 2
-- Transpiled C size: 3
-
-</details>
-
-
-### raw
-*Defined in: std/hash.s line 54*
-
-```rust
-raw(str, nat cost) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 6
 - Transpiled C size: 3
 
 </details>
@@ -16608,46 +16620,6 @@ that is more efficient for computations in 64-bit architectures.
 
 
 # post
-### post - a post request
-*Defined in: std/net/fetch.s line 92*
-
-```rust
-post(new CHARS, cstr url, str) -> (nat status, str) with effects CHARS
-```
-
-The default application/json content type is used.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 125
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-64. curl initialization failed
-65. out of memory while reading response
-2. null pointer
-6. nat subtraction would yield a negative
-17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
-22. out of bounds
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-</details>
-
-
-<details><summary>defered calls</summary>
-
-```rust
-exists(any ptr) -> (bool)
-free(mut any ptr) -> ()
-```
-</details>
-
 ### post - a post request
 *Defined in: std/net/fetch.s line 92*
 
@@ -17398,6 +17370,46 @@ free(mut any ptr) -> ()
 ```
 </details>
 
+### post - a post request
+*Defined in: std/net/fetch.s line 92*
+
+```rust
+post(new CHARS, cstr url, str) -> (nat status, str) with effects CHARS
+```
+
+The default application/json content type is used.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 125
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+64. curl initialization failed
+65. out of memory while reading response
+2. null pointer
+6. nat subtraction would yield a negative
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+<details><summary>defered calls</summary>
+
+```rust
+exists(any ptr) -> (bool)
+free(mut any ptr) -> ()
+```
+</details>
+
 # abs
 ### abs
 *Defined in: std/sci/math.s line 27*
@@ -17871,25 +17883,6 @@ Warning: directly calling this constructor without safety checks is unsafe.
 *Defined in: std/sci/mat.s line 75*
 
 ```rust
-mat(vec, "col") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
-```
-
-A 'type \"row\"' or 'type \"col\"' marker is needed
-to indicate the new matrix's orientation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 17
-- Transpiled C size: 91
-
-</details>
-
-
-### mat - view a vector as a matrix on the same memory
-*Defined in: std/sci/mat.s line 75*
-
-```rust
 mat(vec, "row") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
 ```
 
@@ -18081,6 +18074,25 @@ mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr uns
 free(mut any ptr) -> ()
 ```
 </details>
+
+### mat - view a vector as a matrix on the same memory
+*Defined in: std/sci/mat.s line 75*
+
+```rust
+mat(vec, "col") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
+```
+
+A 'type \"row\"' or 'type \"col\"' marker is needed
+to indicate the new matrix's orientation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 91
+
+</details>
+
 
 # sparse\_element
 ### sparse\_element
@@ -18463,34 +18475,6 @@ constvec(float[]) -> (vec {tag, float ptr unsafe_ptr, nat pos, nat length})
 
 
 # reduce
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 176*
-
-```rust
-reduce(vec, "mul", vec, "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 41
-- Transpiled C size: 275
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-</details>
-
-
 ### reduce - reduce a vector to one value
 *Defined in: std/sci/vec.s line 176*
 
@@ -20011,6 +19995,34 @@ All computations are branchless, as literals are optimized away during compilati
 </details>
 
 
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 176*
+
+```rust
+reduce(vec, "mul", vec, "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 275
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+</details>
+
+
 # dot
 ### dot - dot product
 *Defined in: std/sci/vec.s line 212*
@@ -20733,25 +20745,6 @@ Warning: directly calling this constructor without safety checks is unsafe.
 *Defined in: std/sci/mat.s line 75*
 
 ```rust
-mat(vec, "col") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
-```
-
-A 'type \"row\"' or 'type \"col\"' marker is needed
-to indicate the new matrix's orientation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 17
-- Transpiled C size: 91
-
-</details>
-
-
-### mat - view a vector as a matrix on the same memory
-*Defined in: std/sci/mat.s line 75*
-
-```rust
 mat(vec, "row") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
 ```
 
@@ -20991,6 +20984,25 @@ This creates a new buffer of sparse elements for convenience.
 free(mut any ptr) -> ()
 ```
 </details>
+
+### mat - view a vector as a matrix on the same memory
+*Defined in: std/sci/mat.s line 75*
+
+```rust
+mat(vec, "col") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
+```
+
+A 'type \"row\"' or 'type \"col\"' marker is needed
+to indicate the new matrix's orientation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 91
+
+</details>
+
 
 # tagged
 ### tagged - blank tag structure

@@ -743,7 +743,7 @@ class Variable(CodeSegment):
 
 
 
-def signature_like(vars: list[Variable], impl=None, monomorphic=False):
+def signature_like(vars: list[Variable], impl=None, monomorphic=False, short=False):
     if monomorphic: common_prefix_length = 0
     else: common_prefix_length = longest_common_prefix_len([var.name for var in vars])
     ret = ""
@@ -756,7 +756,7 @@ def signature_like(vars: list[Variable], impl=None, monomorphic=False):
     while i<len(vars):
         if ret: ret += ", "
         type = vars[i].type
-        if monomorphic: arg_name = ""
+        if monomorphic or short: arg_name = ""
         else:
             arg_name = vars[i].name[common_prefix_length:]
             if arg_name.startswith("__t") or "____" in arg_name: arg_name = ""
@@ -2324,7 +2324,7 @@ class Token:
         errexit()
 
 def get(tokens: list[Token], pos: int) -> Token:
-    if pos>=len(tokens): raise Exception("eof")#tokens[len(tokens)-1].error("syntax", "unexpected end of file")
+    if pos>=len(tokens): tokens[len(tokens)-1].error("syntax", "unexpected end of file")
     if tokens[pos].starts(): tokens[pos].error("syntax", "unexpected indentation - this line starts deeper than the previous one but this can only be done to mark new code blocks within 'def', 'if', 'else', 'while', or 'defer'")
     return tokens[pos]
 
@@ -5323,6 +5323,25 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
     is_field = False
     while peek_text(tokens, pos+1) == ".":
         if current in impl.vars: break
+        if pos+2>=len(tokens) or get(tokens,pos+2).row!=get(tokens,pos+1).row:
+            field_candidates: list[str] = list()
+            max_candidate_common_length = 0
+            varname = current
+            current = current+"__"
+            for varname in impl.vars:
+                if varname[:3]=="__t" or "____t" in varname: continue
+                if not varname.startswith(current): continue 
+                val = impl.vars[varname]
+                varname = current+varname[len(current):].split("__")[0]
+                field_signature = signature_like([v for v in impl.vars.values() if v.name.startswith(varname)], impl, short=True)
+                if is_lsp: varname = varname.split("__")[-1]
+                varname = pretty_name(varname)
+                field_candidates.append(varname+" (field) "+field_signature)
+            field_candidates = list(set(field_candidates))
+            extended_token_end = get(tokens,pos+1)
+            if extended_token_end.row==current_token.row:
+                current_token = Token(" "*(extended_token_end.col-current_token.col+len(extended_token_end.text)), current_token.file, current_token.row, current_token.col)
+            current_token.error("type", "expecting field of '"+pretty_name(current[:-2])+"'", suggestions=field_candidates)
         pos += 2
         peek = current+"__"+get(tokens, pos).text
         len_peek = len(peek)
@@ -5475,11 +5494,17 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 if common_length>max_candidate_common_length: 
                     field_candidates = list()
                     max_candidate_common_length = common_length
+                val = impl.vars[varname]
                 if common_length==max_candidate_common_length: 
                     varname = current+varname[len(current):].split("__")[0]
+                    field_signature = signature_like([v for v in impl.vars.values() if v.name.startswith(varname)], impl, short=True)
+                    if is_lsp: varname = varname.split("__")[-1]
                     varname = pretty_name(varname)
-                    field_candidates.append(varname+" (field)")
-            current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=field_candidates) 
+                    field_candidates.append(varname+" (field) "+field_signature)
+            extended_token_end = get(tokens,pos)
+            if extended_token_end.row==current_token.row:
+                current_token = Token(" "*(extended_token_end.col-current_token.col+len(extended_token_end.text)), current_token.file, current_token.row, current_token.col)
+            current_token.error("type", "not found field '"+pretty_name(current)+"'", suggestions=field_candidates)
         start_call = get(tokens,pos)
         is_type_resolution = start_call.text=="type"
         if is_type_resolution:
@@ -6122,7 +6147,7 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         reduced_token_size = 4
         name_token_text = name_token.text
         pos += 1
-        while peek_text(tokens, pos)==".":
+        while peek_text(tokens, pos)=="." and peek_text(tokens, pos+1) not in ["import", "def", "rec", "local", "as"]:
             pos += 1
             name_token_text += "/"+peek_text(tokens,pos)
             pos += 1
@@ -6137,7 +6162,15 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
 
     if not name_token.is_string(): 
         namespace = file.namespaces.get(name_token.text, None)
-        if namespace is None: tokens[pos].error("syntax", "import expects a cstr filename, a known namespace, or dot-separate path but got '"+name_token.text+"'")
+        if namespace is None: 
+            details = []
+            path = Path(name_token.text).parent
+            if path.is_dir(): 
+                base = "" if is_lsp else name_token.text+"."
+                details.extend(base+(p.name[:-2]+" (file)" if p.is_file() else p.name+" (dir)") for p in path.iterdir() if p.is_dir() or (p.is_file() and p.suffix == ".s"))
+            elif Path(name_token.text[1:-1] + ".s").is_file(): details.append(repr(name_token.text[1:-1] + ".s (file)"))
+            elif Path(name_token.text[1:-1]).is_dir(): details.append(repr(name_token.text[1:-1] + "(dir)"))
+            tokens[pos].error("syntax", "import expects a cstr filename, a known namespace, or dot-separate path but got '"+name_token.text+"'", suggestions=details)
         assert isinstance(namespace, File)
         imported: File|UnionType = namespace
     else: 
@@ -6145,8 +6178,19 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
         name = name[1:len(name)-1]
         prev_name = name
         name = await resolve_name(name, name_token)
-        if name not in file_cache and not os.path.exists(name): name_token.error("import", "non-existent file '"+name+"'")
-        if name not in file_cache and os.path.isdir(name): name_token.error("import", "expecting file but got directory '"+name+"'")
+
+        if name not in file_cache and not os.path.exists(name): 
+            details = []
+            if name.endswith(".s") and Path(name[:-2]).is_dir(): path = Path(name[:-2])
+            else: path = Path(name).parent
+            if path.is_dir(): 
+                base = "" if is_lsp else str(path).replace("/",".")+"." 
+                details.extend(base+(p.name[:-2]+" (file)" if p.is_file() else p.name+" (dir)") for p in path.iterdir() if p.is_dir() or (p.is_file() and p.suffix == ".s"))
+            elif Path(name).is_file(): details.append(repr(name) + " (file)")
+            elif Path(name).is_dir(): details.append(repr(name) + "(dir)")
+            
+            name_token.error("import", "non-existent file '"+name+"'", suggestions=details)
+        if name not in file_cache and os.path.isdir(name): name_token.error("import", "expecting file but got directory '"+name+"'", suggesions=details)
         if name.endswith(".h") or name.endswith(".c"):
             for f in externals:
                 if f.path==name: return pos+1, f
@@ -6891,10 +6935,10 @@ parser = argparse.ArgumentParser(description="Compile a .s file and optionally r
 parser.add_argument("source", metavar="SOURCE", help="Path to the .s source file to compile.",)
 parser.add_argument("--lsp", action="store_true", help="No compilation, and output is meant for the lsp to read.",)
 parser.add_argument("--build", action="store_true", help="Build without running.",)
-parser.add_argument("--perf", action="store_true", help="Add debug symbols and prefer running with 'perf' (grant more permissions like 'sudo sysctl kernel.perf_event_paranoid=1' - they persist until restart).",)
+parser.add_argument("--perf", action="store_true", help="Add debug symbols and prefer running with 'perf' while prettifying the output (grant more permissions like 'sudo sysctl kernel.perf_event_paranoid=1' - they persist until restart).",)
 parser.add_argument("--time", action="store_true", help="Report the time of ending file parses.",)
 parser.add_argument("--docs", action="store_true", help="Export to a markdown file.",)
-parser.add_argument("--cleanup", action="store_true", help="Clean up generated .C files and executables.",)
+parser.add_argument("--cleanup", action="store_true", help="Clean up generated .c files and executables.",)
 parser.add_argument("--debug", action="store_true", help="Show debug messages for all failures.",)
 parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang, none (the last option only creates a C file).",)
 parser.add_argument("--vmkb", action="store", type=int, default=256, help="VM memory in kilobytes.",)
@@ -7310,7 +7354,9 @@ def errexit():
 
 async def main():
     src_path = Path(args.source)
-    if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); errexit()
+    if not src_path.is_file(): 
+        if "/" not in args.source and "\\" not in args.source: src_path = Path(args.source.replace(".","/")+".s")
+        if not src_path.is_file(): print(f"{RED}error{RESET}: source file {src_path} does not exist"); errexit()
     if is_pyodide and not is_lsp: print(f"[{YELLOW}+{RESET}] pyodide mode")
     if not is_lsp: print(f"[{YELLOW}+{RESET}] process      {src_path}")
     file: File = await load(await resolve_name(str(src_path), None), is_main_file=True)
@@ -7368,6 +7414,8 @@ async def main():
                         for singleton in singletons: docs_file.write("```rust\n"+singleton.signature()+"\n```\n")
                         docs_file.write("</details>\n\n")
                     if callee.VM: docs_file.write("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*\n")
+
+        print(f"[{YELLOW}+{RESET}] created      {docs_path}")
     elif not is_lsp:
         main_type: UnionType|None = file.types.get("main", None)
         if not main_type: print(f"{RED}error{RESET}: missing main function (did you mean to run with --docs)"); errexit()

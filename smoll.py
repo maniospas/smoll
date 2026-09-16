@@ -905,6 +905,7 @@ class ImplementedType:
         # this is used to throw a FastReturnException the first time the function returns
         self.fast_return_exception = False
         self.has_been_completed: Optional["Token"] = None
+        self.current_code_block_has_been_completed: Optional["Token"] = None
         self.min_abstraction_level = -1
         self.max_abstraction_level = 0
 
@@ -1159,9 +1160,10 @@ class ImplementedType:
 
     def returns(self, value: list[Variable], error_token: "Token", is_safe: bool):
         if self.has_been_completed is not None:
-            error_token.error("safety", "function has already returned", reason=self.has_been_completed)
+            error_token.error("safety", "function has already concluded", reason=self.has_been_completed, raason_message="in")
         if "if" not in self.nesting and "while" not in self.nesting:
             self.has_been_completed = error_token
+        self.current_code_block_has_been_completed = error_token
         if value:
             for v in value[1:]:
                 if v.type==self:
@@ -4890,9 +4892,15 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
 
 async def process_statement(file: File, tokens: list[Token], pos: int, impl: ImplementedType, current_operator_priority: float, for_call: bool=False) -> tuple[int, list[Variable]]:
     current_token = get(tokens, pos)
+
+    if impl.has_been_completed is not None:
+        current_token.error("safety", "function has already concluded", reason=impl.current_code_block_has_been_completed, raason_message="in")
+    if impl.current_code_block_has_been_completed is not None:
+        current_token.error("safety", "code block has already concluded", reason=impl.current_code_block_has_been_completed, raason_message="in")
+
     current = current_token.text
     if current=="fail":
-        if is_lsp and file.is_main_file: print_lsp_keyword(current_token, "**fail**\n\nImmediately fail during execution with the corresponding string literal message or error code retrieved with 'compiler:catch()' from some other failure statement. Failures cascade to callers and to the callers of callers until the program exits with a corresponding error code, or a 'try' statement intercepts them.")
+        if is_lsp and file.is_main_file: print_lsp_keyword(current_token, "**fail**\n\nImmediately fail during execution with the corresponding string literal message or error code retrieved with 'compiler::last_error()' from some other failure. Failures cascade to callers and to the callers of callers until the program exits with a corresponding error code, or a 'try' statement intercepts them.")
         pos += 1
         impl.needs_failure_mode = current_token
         message = get(tokens, pos)
@@ -4938,7 +4946,12 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     CODEWORD_SEMICOLON
                 ])
                 impl.needs_failure_mode = current_token
-            return await process_statement_operator(file, tokens, impl, pos, [], current_operator_priority)
+            
+            if "if" not in impl.nesting and "while" not in impl.nesting:
+                impl.has_been_completed = current_token
+            impl.current_code_block_has_been_completed = current_token
+            return pos+1, []
+            #return await process_statement_operator(file, tokens, impl, pos, [], current_operator_priority)
         if is_lsp and file.is_main_file: print_lsp_string(message)
         text = message.text
         text = text[1:(len(text)-1)] # remove string limits
@@ -4985,7 +4998,11 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 CODEWORD_SEMICOLON
             ])
             impl.needs_failure_mode = current_token
-        return await process_statement_operator(file, tokens, impl, pos+1, [], current_operator_priority)
+        if "if" not in impl.nesting and "while" not in impl.nesting:
+            impl.has_been_completed = current_token
+        impl.current_code_block_has_been_completed  = current_token
+        return pos+1, []
+        #return await process_statement_operator(file, tokens, impl, pos+1, [], current_operator_priority)
     if current=="true":
         tmp = create_temp()
         variable = Variable(tmp, BOOL_TYPE, token=current_token) 
@@ -5987,6 +6004,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 if name.text=="continue": print_lsp_keyword(name, "continues immediately from the next loop iteration by skipping the rest of the current iteration")
                 else: print_lsp_keyword(name, "stops the current loop immediately")
             impl.implementation.extend([CODEWORD_BREAK if name.text=="break" else CODEWORD_CONTINUE, CODEWORD_SEMICOLON])
+            impl.current_code_block_has_been_completed = name
             continue
         if name.text=="for":
             if is_lsp and file.is_main_file: print_lsp_keyword(name, "**for**\n\nLoop that automatically retrieves index-indexed items. 'for var in iterator ...' is equivalent to 'index =0 while try var=iterator[index] ... index=index+1'")
@@ -6100,6 +6118,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             impl.for_counter.pop()
             impl.nesting.pop()
             impl.accumulating_defers.pop()
+            impl.current_code_block_has_been_completed = None
             continue
         
         if name.text=="while":
@@ -6146,6 +6165,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             impl.implementation.append(CODEWORD_RBRACKET)
             impl.nesting.pop()
             impl.accumulating_defers.pop()
+            impl.current_code_block_has_been_completed = None
             continue
         if name.text=="if":
             if_pos = pos-1
@@ -6208,6 +6228,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
             release_defers(impl, name)
             impl.nesting.pop()
             impl.accumulating_defers.pop()
+            impl.current_code_block_has_been_completed = None
             impl.implementation.append(CODEWORD_RBRACKET)
             if peek_text(tokens, pos)=="else":
                 prev_invalidated = {k: v for k, v in impl.invalidated.items()}
@@ -6226,6 +6247,7 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 release_defers(impl, name)
                 impl.accumulating_defers.pop()
                 impl.nesting.pop()
+                impl.current_code_block_has_been_completed = None
                 impl.implementation.append(CODEWORD_RBRACKET)
                 for k, v in impl.vars.items():
                     var = diff_vars_if.get(k, None)

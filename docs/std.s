@@ -13,3 +13,4 @@ import std.unsafe
 import std.graphics
 import std.ptrpeek
 import std.test
+import std.time

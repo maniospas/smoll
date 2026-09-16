@@ -36,6 +36,8 @@ def size(float width, float height)
 local def unsafe_open_window(size size, cstr title, cstr font_path)
     VM "(pyray.set_trace_log_level(pyray.LOG_NONE), pyray.init_window(int($size__width),int($size__height),$title),pyray.set_target_fps(60),memory.set_global('font', pyray.load_font_ex($font_path,128,None,0) if $font_path else pyray.get_font_default()))"
     {SetTraceLogLevel(LOG_NONE); InitWindow(size__width, size__height, title); }
+    {builtins::bool ready = IsWindowReady();}
+    if not ready: fail "failed to open window"
     if exists font_path
         {
             builtins::int __smolambda_n = 0;
@@ -317,8 +319,9 @@ def tri(effect edit window WINDOW, position p1, position p2, position p3, "line"
 
 def circ(effect edit window WINDOW, position pos, float radius, "line", nat thickness, color color)
     VM "pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))"
+    if radius>float thickness: inner = radius-float thickness
+    else: inner = 0.0
     {
-        builtins::float inner = (radius > thickness) ? (float)(radius - thickness) : 0.0f;
         builtins::float outer = (float)radius;
         DrawRing(
             (Vector2){(float)pos__x, 

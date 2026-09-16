@@ -393,7 +393,7 @@ connection.onDefinition((params: DefinitionParams): Location[] => {
 
 const KEYWORDS = [
   'if', 'while', 'for', 'in', 'is', 'def', 'include', 'local', 'edit',
-  'mut', 'unsafe_mut', 'class', 'singleton', 'const', 'return', 'unsafe_return', 'try'
+  'mut', 'unsafe_mut', 'class', 'singleton', 'const', 'return', 'unsafe_return', 'try', 'doc'
 ];
 
 connection.onCompletion(async (params): Promise<CompletionItem[]> => {

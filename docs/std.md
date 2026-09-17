@@ -1187,7 +1187,7 @@ char(cstr) -> (char)
 ```
 
 The first character of a string is extracted,
-for example to write `c = char \"C\"`.
+for example to write `c = char "C"`.
 
 <details><summary>Complexity</summary>
 
@@ -1206,7 +1206,7 @@ char(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}
 ```
 
 The first character of a string is extracted,
-for example to write `c = char str \"C\"`.
+for example to write `c = char str "C"`.
 
 <details><summary>Complexity</summary>
 
@@ -1250,6 +1250,94 @@ Represents a generic for buffers and pointers for type-independent code that can
 This type ordains special treatment by the compiler.
 
 # eq
+### eq - equals
+*Defined in: std/core/bool.s line 51*
+
+```rust
+eq(false, true) -> (false)
+```
+
+This is a compile-time operation that does not evoke any runtime booleans.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/bool.s line 46*
+
+```rust
+eq(true, false) -> (false)
+```
+
+This is a compile-time operation that does not evoke any runtime booleans.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/bool.s line 41*
+
+```rust
+eq(false, false) -> (true)
+```
+
+This is a compile-time operation that does not evoke any runtime booleans.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/bool.s line 36*
+
+```rust
+eq(true, true) -> (true)
+```
+
+This is a compile-time operation that does not evoke any runtime booleans.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/bool.s line 20*
+
+```rust
+eq(bool x, bool y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
 ### eq - equals
 *Defined in: std/core/numbers.s line 56*
 
@@ -1396,94 +1484,6 @@ eq(true, bool value) -> (bool)
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 2
 - Transpiled C size: 3
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 51*
-
-```rust
-eq(false, true) -> (false)
-```
-
-This is a compile-time operation that does not evoke any runtime booleans.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 46*
-
-```rust
-eq(true, false) -> (false)
-```
-
-This is a compile-time operation that does not evoke any runtime booleans.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 41*
-
-```rust
-eq(false, false) -> (true)
-```
-
-This is a compile-time operation that does not evoke any runtime booleans.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 36*
-
-```rust
-eq(true, true) -> (true)
-```
-
-This is a compile-time operation that does not evoke any runtime booleans.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 20*
-
-```rust
-eq(bool x, bool y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
 
 </details>
 
@@ -2035,6 +2035,22 @@ eq(int ptr _x, int _y) -> (bool)
 
 # neq
 ### neq - not equal
+*Defined in: std/core/bool.s line 25*
+
+```rust
+neq(bool x, bool y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### neq - not equal
 *Defined in: std/core/numbers.s line 48*
 
 ```rust
@@ -2226,22 +2242,6 @@ neq(true x, true y) -> (false)
 - Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 4
 - Transpiled C size: 21
-
-</details>
-
-
-### neq - not equal
-*Defined in: std/core/bool.s line 25*
-
-```rust
-neq(bool x, bool y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
 
 </details>
 
@@ -8146,7 +8146,7 @@ Prints it as coordinate as list: (i, j): v
 nn(nat) -> (nat value, cstr)
 ```
 
-Given a value, creates a tuple of (value, \"\").
+Given a value, creates a tuple of (value, "").
 This enables the pattern 'print nn value'
 to print without automatically adding a new line.
 
@@ -8166,7 +8166,7 @@ to print without automatically adding a new line.
 nn(int) -> (int value, cstr)
 ```
 
-Given a value, creates a tuple of (value, \"\").
+Given a value, creates a tuple of (value, "").
 This enables the pattern 'print nn value'
 to print without automatically adding a new line.
 
@@ -8186,7 +8186,7 @@ to print without automatically adding a new line.
 nn(float) -> (float value, cstr)
 ```
 
-Given a value, creates a tuple of (value, \"\").
+Given a value, creates a tuple of (value, "").
 This enables the pattern 'print nn value'
 to print without automatically adding a new line.
 
@@ -8206,7 +8206,7 @@ to print without automatically adding a new line.
 nn(cstr) -> (cstr value, cstr)
 ```
 
-Given a value, creates a tuple of (value, \"\").
+Given a value, creates a tuple of (value, "").
 This enables the pattern 'print nn value'
 to print without automatically adding a new line.
 
@@ -8226,7 +8226,7 @@ to print without automatically adding a new line.
 nn(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (str, cstr)
 ```
 
-Given a value, creates a tuple of (value, \"\").
+Given a value, creates a tuple of (value, "").
 This enables the pattern 'print nn value'
 to print without a new line.
 
@@ -8246,7 +8246,7 @@ to print without a new line.
 nn(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (vec, cstr)
 ```
 
-Given a value, creates a tuple of (value, \"\").
+Given a value, creates a tuple of (value, "").
 This enables the pattern 'print nn value'
 to print without a new line.
 
@@ -9741,7 +9741,7 @@ mutget(edit arena, nat pos, "unsafe_assume_inbounds") -> (mut any ptr {follows a
 
 
 ### mutget - mutable pointer to buffer element
-*Defined in: std/core/array.s line 82*
+*Defined in: std/core/array.s line 83*
 
 ```rust
 mutget(edit any[], nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
@@ -9767,7 +9767,7 @@ are retrieved or sliced.
 
 
 ### mutget - mutable pointer to buffer element
-*Defined in: std/core/array.s line 82*
+*Defined in: std/core/array.s line 83*
 
 ```rust
 mutget(edit any[], nat i, "unsafe_assume_inbounds") -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
@@ -10442,7 +10442,7 @@ get(arena, nat pos, "unsafe_assume_inbounds") -> (any ptr {follows any ptr l.buf
 
 
 ### get - immutable pointer to buffer element
-*Defined in: std/core/array.s line 95*
+*Defined in: std/core/array.s line 96*
 
 ```rust
 get(any[], nat i) -> (any ptr {follows any ptr buffer.unsafe_ptr})
@@ -10468,7 +10468,7 @@ are retrieved or sliced.
 
 
 ### get - immutable pointer to buffer element
-*Defined in: std/core/array.s line 95*
+*Defined in: std/core/array.s line 96*
 
 ```rust
 get(any[], nat i, "unsafe_assume_inbounds") -> (any ptr {follows any ptr buffer.unsafe_ptr})
@@ -11396,22 +11396,20 @@ alloc(edit arena, nat length) -> (edit allocated {tag, edit any[] {follows any p
 *Defined in: std/core/array.s line 55*
 
 ```rust
-alloc(nat) -> (edit char[])
+alloc(nat) -> (mut char[])
 ```
 
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 11
-- Transpiled C size: 58
+- SSA variables: 23
+- Transpiled C size: 123
 
 </details>
 
 <details><summary>Potential errors</summary>
 
 17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
 </details>
 
 
@@ -11886,7 +11884,7 @@ free(mut any ptr) -> ()
 
 # resize
 ### resize - resize the buffer
-*Defined in: std/core/array.s line 59*
+*Defined in: std/core/array.s line 60*
 
 ```rust
 resize(edit any[], nat size) -> (edit any[])
@@ -11912,7 +11910,7 @@ resources.
 
 
 ### resize - resize the buffer
-*Defined in: std/core/array.s line 59*
+*Defined in: std/core/array.s line 60*
 
 ```rust
 resize(edit any[], nat size, "unsafe") -> (edit any[])
@@ -11938,7 +11936,7 @@ resources.
 
 # last
 ### last - mutable pointer to the last buffer element
-*Defined in: std/core/array.s line 76*
+*Defined in: std/core/array.s line 77*
 
 ```rust
 last(edit any[]) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
@@ -12011,7 +12009,7 @@ of elements actively in use.
 
 
 ### len - the number of buffer elements
-*Defined in: std/core/array.s line 108*
+*Defined in: std/core/array.s line 109*
 
 ```rust
 len(any[]) -> (nat)
@@ -12223,7 +12221,7 @@ with another allocator).
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4171t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4174t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12239,7 +12237,7 @@ arena("float__t4171t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4105t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4108t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12255,7 +12253,7 @@ arena("float__t4105t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t3818t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t3821t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12456,7 +12454,7 @@ circular(edit any[]) -> (edit circular {tag, edit any[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4171t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4174t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12472,7 +12470,7 @@ circular("float__t4171t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4105t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4108t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12488,7 +12486,7 @@ circular("float__t4105t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t3818t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t3821t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -12667,7 +12665,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t4171t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t4174t") -> (edit list {tag, mut float[], mut nat length})
 ```
 
 <details><summary>Complexity</summary>
@@ -12697,7 +12695,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t4105t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t4108t") -> (edit list {tag, mut float[], mut nat length})
 ```
 
 <details><summary>Complexity</summary>
@@ -12727,7 +12725,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t3818t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t3821t") -> (edit list {tag, mut float[], mut nat length})
 ```
 
 <details><summary>Complexity</summary>
@@ -15653,7 +15651,7 @@ ok(last_error) -> (bool)
 
 
 # printf
-### printf - emmits string formatting code
+### printf - prints a formatted string
 *Defined in: std/core/format.s line 4*
 
 ```rust
@@ -15667,42 +15665,23 @@ and expressions. Example, where the default applied call is `print nn`:
 import std.core
 def main()
     CLI = edit console()
-    macro<printf> \"hello {1+1} word\n\"
+    macro<printf> "hello {1+1} word\n"
 ```
-The result is placed on a buffer; this makes no allocation in case of blank types,
-but otherwise this pattern can be used to apply the same conceptual transformation on heterogeneous
-data to yield the same output. Printing like above is the main intended use, but
-consider the logic of the following example too:
-```python
-import std.core
-import std.format::F
-def inc(nat x)
-    return float(x+1)
-def inc(float x)
-    return x+1.0
-def main()
-    CLI = edit console()
-    v = macro<printf>(\"inc\", \"{1}{5.0}\")
-    print v[0] # 2.0
-    print v[1] # 6.0
-```
+This variation outputs an empty buffer.
 
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 165
-- Transpiled C size: 1245
+- Transpiled C size: 1234
 
 </details>
 
 <details><summary>Potential errors</summary>
 
 2. null pointer
-6. nat subtraction would yield a negative
 43. imbalanced brackets
 17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
 23. arena is out of space
 25. can only define strings on contiguous buffers
 26. can only define strings on non-offset buffers
@@ -15725,14 +15704,8 @@ printf(cstr func, cstr args) -> (mut char[])
 
 This splits the provided string into subsegments and bracketed expressions.
 Ignoring empty substrings, the same function call is made for all substrings
-and expressions. Example, where the default applied call is `print nn`:
-```python
-import std.core
-def main()
-    CLI = edit console()
-    macro<printf> \"hello {1+1} word\n\"
-```
-The result is placed on a buffer; this makes no allocation in case of blank types,
+and expressions.
+The results are placed on a buffer; this makes no allocation in case of blank types,
 but otherwise this pattern can be used to apply the same conceptual transformation on heterogeneous
 data to yield the same output. Printing like above is the main intended use, but
 consider the logic of the following example too:
@@ -15745,7 +15718,7 @@ def inc(float x)
     return x+1.0
 def main()
     CLI = edit console()
-    v = macro<printf>(\"inc\", \"{1}{5.0}\")
+    v = macro<printf>("inc", "{1}{5.0}")
     print v[0] # 2.0
     print v[1] # 6.0
 ```
@@ -15754,18 +15727,15 @@ def main()
 
 - Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 164
-- Transpiled C size: 1241
+- Transpiled C size: 1230
 
 </details>
 
 <details><summary>Potential errors</summary>
 
 2. null pointer
-6. nat subtraction would yield a negative
 43. imbalanced brackets
 17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
 23. arena is out of space
 25. can only define strings on contiguous buffers
 26. can only define strings on non-offset buffers
@@ -18202,7 +18172,7 @@ free(mut any ptr) -> ()
 mat(vec, "col") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
 ```
 
-A 'type \"row\"' or 'type \"col\"' marker is needed
+A 'type "row"' or 'type "col"' marker is needed
 to indicate the new matrix's orientation.
 
 <details><summary>Complexity</summary>
@@ -18221,7 +18191,7 @@ to indicate the new matrix's orientation.
 mat(vec, "row") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
 ```
 
-A 'type \"row\"' or 'type \"col\"' marker is needed
+A 'type "row"' or 'type "col"' marker is needed
 to indicate the new matrix's orientation.
 
 <details><summary>Complexity</summary>
@@ -18455,7 +18425,7 @@ new() -> (new {tag})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4171t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4174t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18471,7 +18441,7 @@ circular("float__t4171t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4105t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4108t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18487,7 +18457,7 @@ circular("float__t4105t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t3818t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t3821t") -> (edit circular {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18583,7 +18553,7 @@ circular("float__t4t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4171t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4174t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18599,7 +18569,7 @@ arena("float__t4171t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4105t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4108t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -18615,7 +18585,7 @@ arena("float__t4105t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t3818t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t3821t") -> (edit arena {tag, edit float[], mut nat pos})
 ```
 
 <details><summary>Complexity</summary>
@@ -21112,7 +21082,7 @@ free(mut any ptr) -> ()
 mat(vec, "col") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
 ```
 
-A 'type \"row\"' or 'type \"col\"' marker is needed
+A 'type "row"' or 'type "col"' marker is needed
 to indicate the new matrix's orientation.
 
 <details><summary>Complexity</summary>
@@ -21131,7 +21101,7 @@ to indicate the new matrix's orientation.
 mat(vec, "row") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
 ```
 
-A 'type \"row\"' or 'type \"col\"' marker is needed
+A 'type "row"' or 'type "col"' marker is needed
 to indicate the new matrix's orientation.
 
 <details><summary>Complexity</summary>
@@ -22062,8 +22032,6 @@ blob(cstr) -> (mut char[])
 <details><summary>Potential errors</summary>
 
 17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
 23. arena is out of space
 25. can only define strings on contiguous buffers
 26. can only define strings on non-offset buffers
@@ -22253,8 +22221,6 @@ find_compatible_size(nat) -> (mut char[])
 2. null pointer
 6. nat subtraction would yield a negative
 17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
 22. out of bounds
 23. arena is out of space
 25. can only define strings on contiguous buffers

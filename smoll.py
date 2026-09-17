@@ -2478,7 +2478,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         print(at.row)
         print(at.col)
         # message (may span multiple lines))
-        if callee.doc: print("**"+strip_quotes(callee.doc[0])+"**")
+        if callee.doc: print("**"+(strip_quotes(callee.doc[0]) if len(callee.doc[0])>2 else "function")+"**")
         if callee.max_abstraction_level:
             printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+", size "+str(len(callee.implementation))+")")  
         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
@@ -3625,7 +3625,8 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=suggestions)
             
             namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
-            if namespace is None: tokens[pos].error("import", "unknown namespace, variable, or type '"+name+"'", suggestions=[("\""+file.path+"\"::" if not file.is_main_file else "") +k+" (namespace)" for k in file.namespaces])
+            if namespace is None: 
+                tokens[pos].error("import", "unknown namespace, variable, or type '"+name+"'", suggestions=[("\""+file.path+"\"::" if not file.is_main_file else "") +k+" (namespace)" for k in file.namespaces])
             assert namespace is not None
             if peek_text(tokens, pos+3)=="::":
                 return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)
@@ -4680,11 +4681,13 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             reflection_token = get(tokens, pos)
             pos += 1
             reflection_token_text = reflection_token.text
-            if len(rets)!=1:
-                get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or variable descriptors obtained via 'type(varname)' but got: '"+signature_like(rets, impl)+"'")
+            if len(rets)!=1 and len(rets[0].type.rets)!=len(rets):
+                get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or class variables but got: '"+signature_like(rets, impl)+"'")
             reflection_var = rets[0]
             if reflection_var.type.is_functor_of is None and reflection_var.type.is_literal_of!=ANY_TYPE:
-                get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or variable descriptors obtained via 'type(varname)' but got: '"+signature_like(rets, impl)+"'")
+                # here we know that we are parsing a class variable
+                if len(reflection_var.type.rets)!=len(rets) or len(rets)==0:
+                    get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or class variables but got: '"+signature_like(rets, impl)+"'")
             
             variation = reflection_var.type
             variations = list()
@@ -4701,6 +4704,12 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                 continue
             elif reflection_token_text=="name":
                 lit = create_literal_type(Token("\""+variation.name+"\"", at.file, at.row, at.col), CSTR_TYPE)
+                if is_lsp and file.is_main_file: print_lsp_literal(reflection_token, "**type "+reflection_token_text+" literal**\n\nRetrieves the type's "+reflection_token_text+" as the literal type "+lit.at.text)
+                assert lit is not None
+                for litvar in lit.variations:
+                    if litvar not in variations: variations.append(litvar)
+            elif reflection_token_text=="tag":
+                lit = create_literal_type(Token("\""+variation.monomorphic_name+"\"", at.file, at.row, at.col), CSTR_TYPE)
                 if is_lsp and file.is_main_file: print_lsp_literal(reflection_token, "**type "+reflection_token_text+" literal**\n\nRetrieves the type's "+reflection_token_text+" as the literal type "+lit.at.text)
                 assert lit is not None
                 for litvar in lit.variations:
@@ -5185,7 +5194,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
 
     if current=="macro":
         literal_tok = current_token
-        if is_lsp and file.is_main_file: print_lsp_keyword(literal_tok, "**macro**\n\nEvaluates a dependent user-defined function that manipulates 'cstr' and number literals available at compile-time with the pattern 'macro<builder>(inputs)'. That function must return 'char[]', which is then re-tokenized and parsed as code.")
+        if is_lsp and file.is_main_file: print_lsp_keyword(literal_tok, "**macro**\n\nEvaluates a dependent user-defined function that manipulates 'cstr' and number literals available at compile-time with the pattern 'macro<builder>(inputs)'. That function must build and return 'char[]', which is then re-tokenized and parsed as code.")
         if peek_text(tokens, pos+1)!="<":
             get(tokens, pos+1).error("syntax", "expecting 'macro'-ed string manipulation in 'macro<...>'")
         pos += 1
@@ -5207,11 +5216,11 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     global_cstr2var[current] = variable.name
                     global_var2cstr[variable.name] = current
                 ret[i] = variable
-            elif arg.type.is_literal_of in [UINT_TYPE, UINT16_TYPE, UINT32_TYPE, UINT8_TYPE, INT_TYPE, INT16_TYPE, INT32_TYPE, INT8_TYPE, FLOAT_TYPE]:
+            elif arg.type.is_literal_of in [UINT_TYPE, UINT16_TYPE, UINT32_TYPE, UINT8_TYPE, INT_TYPE, CHAR_TYPE, FLOAT_TYPE]:
                 current = arg.type.at.text
                 ret[i] = Variable(create_temp(), arg.type.is_literal_of, token=current_token)
             else:
-                literal_tok.error("type", "macros can only have known cstr or nat inputs, passed via corresponding literals but got "+signature_like([ret[i]], impl), suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
+                literal_tok.error("type", "macros must have known cstr or number inputs", suggestions=["retrieve inputs with 'compiler::varname'", "pass cstr or number literals", "pass reflection literals like type::tag"])
             
         temporary_implementation = _select_call(file, impl, method, ret, literal_tok, out_format=None)
         input_args = ret
@@ -5219,13 +5228,16 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         memory = MemoryEmulator(1024*vm_memory_kb)
         returned_values = [0 for r in ret if r.type.builtin]
         for i, arg in enumerate(input_args):
-            if arg.type==UINT_TYPE:
+            if arg.type in [UINT_TYPE, UINT16_TYPE, UINT32_TYPE, UINT8_TYPE, INT_TYPE, CHAR_TYPE]:
                 returned_values[i] = int(original_input_args[i].type.at.text)
                 continue
-            if arg.type!=CSTR_TYPE: 
-                literal_tok.error("type", "macros can only have known cstr or nat inputs, passed via corresponding literals", suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
+            if arg.type is FLOAT_TYPE:
+                returned_values[i] = float(original_input_args[i].type.at.text)
+                continue
+            if arg.type is not CSTR_TYPE: 
+                literal_tok.error("type", "macros must have known cstr or number inputs", suggestions=["retrieve inputs with 'compiler::varname'", "pass cstr or number literals", "pass reflection literals like type::tag"])
             if arg.name not in global_var2cstr: 
-                literal_tok.error("type", "macros can only have known cstr or nat inputs, passed via corresponding literals", suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
+                literal_tok.error("type", "macros must have known cstr or number inputs", suggestions=["retrieve inputs with 'compiler::varname'", "pass cstr or number literals", "pass reflection literals like type::tag"])
             returned_values[i] = memory.write_cstr(global_var2cstr[arg.name][1:-1])
         temporary_implementation.defers.clear()
         returned_error = await temporary_implementation.interpret(returned_values, memory, recursion_budget=vm_recursion_budget)
@@ -5238,7 +5250,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             if returned_values[0]==0: literal_tok.error("interpreter", "failed because 'macro' evaluated to a null pointer value")
             text = memory.as_str(returned_values[0]+offset, mem_size)
         else:
-            literal_tok.error("type", "macros can only output char[] but returned '"+signature_like(ret, temporary_implementation)+"'")
+            literal_tok.error("type", "macros must return 'char[]' but got '"+signature_like(ret, temporary_implementation)+"'")
         local_file = File("macro")
         local_file.error_redirect = literal_tok
         local_file.cached = text.split("\n")
@@ -5251,7 +5263,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         #     tok.row = literal_tok.row
         #     tok.col = literal_tok.col
         if len(impl.nesting)>=MACRO_LIMIT:
-            literal_tok.error("interpreter", "macros expanded more than "+str(MACRO_LIMIT)+" nesting levels deep (counting loops and conditions too), which indicates either infinite recursion that should be stopped, or metaprogramming hell the should be avoided; directly call code building")
+            literal_tok.error("interpreter", "macros cannot expand more than "+str(MACRO_LIMIT)+" levels deep (counting loops and conditions too)", suggestions=["stop infinite macro recursion", "avoid metaprogramming hell"])
         impl.nesting.append("macro")
 
         local_pos = 0
@@ -6632,7 +6644,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         print(name_token.row)
                         print(name_token.col)
                         # message (may span multiple lines))
-                        if callee.doc: printid("**"+strip_quotes(callee.doc[0])+"**")
+                        if callee.doc: printid("**"+(strip_quotes(callee.doc[0]) if len(callee.doc[0])>2 else "function")+"**")
                         if callee.max_abstraction_level:
                             printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+", size "+str(len(callee.implementation))+")")
                         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))

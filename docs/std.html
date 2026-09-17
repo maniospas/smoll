@@ -1632,7 +1632,7 @@ If it does not, this operation can fail.</p>
 </div>
 
 <p>The first character of a string is extracted,
-for example to write <code>c = char \"C\"</code>.</p>
+for example to write <code>c = char "C"</code>.</p>
 
 <p><details><summary>Complexity</summary></p>
 
@@ -1654,7 +1654,7 @@ for example to write <code>c = char \"C\"</code>.</p>
 </div>
 
 <p>The first character of a string is extracted,
-for example to write <code>c = char str \"C\"</code>.</p>
+for example to write <code>c = char str "C"</code>.</p>
 
 <p><details><summary>Complexity</summary></p>
 
@@ -1708,7 +1708,110 @@ This type ordains special treatment by the compiler.</p>
 
 </div></div><div class="std-definition"><h1 id="eq">eq</h1>
 
-<div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="eq-equals">eq - equals</h3>
+<div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals">eq - equals</h3>
+
+<p><em>Defined in: std/core/bool.s line 51</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>This is a compile-time operation that does not evoke any runtime booleans.</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 3</li>
+<li>Transpiled C size: 9</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-2">eq - equals</h3>
+
+<p><em>Defined in: std/core/bool.s line 46</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>This is a compile-time operation that does not evoke any runtime booleans.</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 3</li>
+<li>Transpiled C size: 9</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-3">eq - equals</h3>
+
+<p><em>Defined in: std/core/bool.s line 41</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>This is a compile-time operation that does not evoke any runtime booleans.</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 3</li>
+<li>Transpiled C size: 9</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-4">eq - equals</h3>
+
+<p><em>Defined in: std/core/bool.s line 36</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>This is a compile-time operation that does not evoke any runtime booleans.</p>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 3</li>
+<li>Transpiled C size: 9</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-5">eq - equals</h3>
+
+<p><em>Defined in: std/core/bool.s line 20</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 3</li>
+<li>Transpiled C size: 9</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="eq-equals-6">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s line 56</em></p>
 
@@ -1729,7 +1832,7 @@ This type ordains special treatment by the compiler.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="eq-equals-2">eq - equals</h3>
+</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="eq-equals-7">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s line 40</em></p>
 
@@ -1752,7 +1855,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="eq-equals-3">eq - equals</h3>
+</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="eq-equals-8">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s line 26</em></p>
 
@@ -1771,7 +1874,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="eq-equals-4">eq - equals</h3>
+</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="eq-equals-9">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s line 26</em></p>
 
@@ -1790,7 +1893,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="eq-equals-5">eq - equals</h3>
+</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="eq-equals-10">eq - equals</h3>
 
 <p><em>Defined in: std/core/numbers.s line 26</em></p>
 
@@ -1809,7 +1912,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-6">eq - equals</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-11">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s line 82</em></p>
 
@@ -1828,7 +1931,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-7">eq - equals</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-12">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s line 78</em></p>
 
@@ -1847,7 +1950,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-8">eq - equals</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-13">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s line 74</em></p>
 
@@ -1866,7 +1969,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-9">eq - equals</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-14">eq - equals</h3>
 
 <p><em>Defined in: std/core/bool.s line 70</em></p>
 
@@ -1881,109 +1984,6 @@ by the same running program.</p>
 <li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 2</li>
 <li>Transpiled C size: 3</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-10">eq - equals</h3>
-
-<p><em>Defined in: std/core/bool.s line 51</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>This is a compile-time operation that does not evoke any runtime booleans.</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 3</li>
-<li>Transpiled C size: 9</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-11">eq - equals</h3>
-
-<p><em>Defined in: std/core/bool.s line 46</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>This is a compile-time operation that does not evoke any runtime booleans.</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 3</li>
-<li>Transpiled C size: 9</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-12">eq - equals</h3>
-
-<p><em>Defined in: std/core/bool.s line 41</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>This is a compile-time operation that does not evoke any runtime booleans.</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 3</li>
-<li>Transpiled C size: 9</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-13">eq - equals</h3>
-
-<p><em>Defined in: std/core/bool.s line 36</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>This is a compile-time operation that does not evoke any runtime booleans.</p>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 3</li>
-<li>Transpiled C size: 9</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="eq-equals-14">eq - equals</h3>
-
-<p><em>Defined in: std/core/bool.s line 20</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">eq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 3</li>
-<li>Transpiled C size: 9</li>
 </ul>
 
 <p></details></p>
@@ -2655,7 +2655,26 @@ two same-content cstr will always have the same memory address.</p>
 
 </div></div><div class="std-definition"><h1 id="neq">neq</h1>
 
-<div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="neq-not-equal">neq - not equal</h3>
+<div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal">neq - not equal</h3>
+
+<p><em>Defined in: std/core/bool.s line 25</em></p>
+
+<div class="codehilite">
+<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><details><summary>Complexity</summary></p>
+
+<ul>
+<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>SSA variables: 3</li>
+<li>Transpiled C size: 9</li>
+</ul>
+
+<p></details></p>
+
+</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="neq-not-equal-2">neq - not equal</h3>
 
 <p><em>Defined in: std/core/numbers.s line 48</em></p>
 
@@ -2678,7 +2697,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="neq-not-equal-2">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="neq-not-equal-3">neq - not equal</h3>
 
 <p><em>Defined in: std/core/numbers.s line 33</em></p>
 
@@ -2697,7 +2716,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="neq-not-equal-3">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="neq-not-equal-4">neq - not equal</h3>
 
 <p><em>Defined in: std/core/numbers.s line 33</em></p>
 
@@ -2716,7 +2735,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="neq-not-equal-4">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/numbers.s"><h3 id="neq-not-equal-5">neq - not equal</h3>
 
 <p><em>Defined in: std/core/numbers.s line 33</em></p>
 
@@ -2735,7 +2754,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-5">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-6">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s line 90</em></p>
 
@@ -2754,7 +2773,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-6">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-7">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s line 90</em></p>
 
@@ -2773,7 +2792,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-7">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-8">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s line 86</em></p>
 
@@ -2792,7 +2811,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-8">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-9">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s line 86</em></p>
 
@@ -2811,7 +2830,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-9">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-10">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s line 66</em></p>
 
@@ -2830,7 +2849,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-10">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-11">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s line 66</em></p>
 
@@ -2849,7 +2868,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-11">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-12">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s line 66</em></p>
 
@@ -2868,7 +2887,7 @@ by the same running program.</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-12">neq - not equal</h3>
+</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-13">neq - not equal</h3>
 
 <p><em>Defined in: std/core/bool.s line 66</em></p>
 
@@ -2883,25 +2902,6 @@ by the same running program.</p>
 <li>Level of abstraction: 1 to 2 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 4</li>
 <li>Transpiled C size: 21</li>
-</ul>
-
-<p></details></p>
-
-</div><div class="std-subsection" data-defined-in="std/core/bool.s"><h3 id="neq-not-equal-13">neq - not equal</h3>
-
-<p><em>Defined in: std/core/bool.s line 25</em></p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="n">neq</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p><details><summary>Complexity</summary></p>
-
-<ul>
-<li>Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 3</li>
-<li>Transpiled C size: 9</li>
 </ul>
 
 <p></details></p>
@@ -9999,7 +9999,7 @@ Automatically ends the line too.</p>
 </code></pre>
 </div>
 
-<p>Given a value, creates a tuple of (value, "").
+<p>Given a value, creates a tuple of (value, &#8220;").
 This enables the pattern &#8216;print nn value&#8217;
 to print without automatically adding a new line.</p>
 
@@ -10022,7 +10022,7 @@ to print without automatically adding a new line.</p>
 </code></pre>
 </div>
 
-<p>Given a value, creates a tuple of (value, "").
+<p>Given a value, creates a tuple of (value, &#8220;").
 This enables the pattern &#8216;print nn value&#8217;
 to print without automatically adding a new line.</p>
 
@@ -10045,7 +10045,7 @@ to print without automatically adding a new line.</p>
 </code></pre>
 </div>
 
-<p>Given a value, creates a tuple of (value, "").
+<p>Given a value, creates a tuple of (value, &#8220;").
 This enables the pattern &#8216;print nn value&#8217;
 to print without automatically adding a new line.</p>
 
@@ -10068,7 +10068,7 @@ to print without automatically adding a new line.</p>
 </code></pre>
 </div>
 
-<p>Given a value, creates a tuple of (value, "").
+<p>Given a value, creates a tuple of (value, &#8220;").
 This enables the pattern &#8216;print nn value&#8217;
 to print without automatically adding a new line.</p>
 
@@ -10091,7 +10091,7 @@ to print without automatically adding a new line.</p>
 </code></pre>
 </div>
 
-<p>Given a value, creates a tuple of (value, "").
+<p>Given a value, creates a tuple of (value, &#8220;").
 This enables the pattern &#8216;print nn value&#8217;
 to print without a new line.</p>
 
@@ -10114,7 +10114,7 @@ to print without a new line.</p>
 </code></pre>
 </div>
 
-<p>Given a value, creates a tuple of (value, "").
+<p>Given a value, creates a tuple of (value, &#8220;").
 This enables the pattern &#8216;print nn value&#8217;
 to print without a new line.</p>
 
@@ -11909,7 +11909,7 @@ In most usage scenarios this does not matter, as the range would be a temporary 
 
 </div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="mutget-mutable-pointer-to-buffer-element">mutget - mutable pointer to buffer element</h3>
 
-<p><em>Defined in: std/core/array.s line 82</em></p>
+<p><em>Defined in: std/core/array.s line 83</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
@@ -11940,7 +11940,7 @@ are retrieved or sliced.</p>
 
 </div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="mutget-mutable-pointer-to-buffer-element-2">mutget - mutable pointer to buffer element</h3>
 
-<p><em>Defined in: std/core/array.s line 82</em></p>
+<p><em>Defined in: std/core/array.s line 83</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">mutget</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unsafe_assume_inbounds&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
@@ -12746,7 +12746,7 @@ per a pattern like <code>for i in range 10 ...</code>.</p>
 
 </div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="get-immutable-pointer-to-buffer-element">get - immutable pointer to buffer element</h3>
 
-<p><em>Defined in: std/core/array.s line 95</em></p>
+<p><em>Defined in: std/core/array.s line 96</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
@@ -12777,7 +12777,7 @@ are retrieved or sliced.</p>
 
 </div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="get-immutable-pointer-to-buffer-element-2">get - immutable pointer to buffer element</h3>
 
-<p><em>Defined in: std/core/array.s line 95</em></p>
+<p><em>Defined in: std/core/array.s line 96</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unsafe_assume_inbounds&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
@@ -13881,7 +13881,7 @@ moved across functions.</p>
 <p><em>Defined in: std/core/array.s line 55</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">alloc</span><span class="p">(</span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="kt">char</span><span class="p">[])</span>
+<pre><span></span><code><span class="n">alloc</span><span class="p">(</span><span class="n">nat</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="kt">char</span><span class="p">[])</span>
 </code></pre>
 </div>
 
@@ -13889,8 +13889,8 @@ moved across functions.</p>
 
 <ul>
 <li>Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)</li>
-<li>SSA variables: 11</li>
-<li>Transpiled C size: 58</li>
+<li>SSA variables: 23</li>
+<li>Transpiled C size: 123</li>
 </ul>
 
 <p></details></p>
@@ -13898,9 +13898,7 @@ moved across functions.</p>
 <p><details><summary>Potential errors</summary></p>
 
 <ol start="17">
-<li>allocation failed</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation
+<li>allocation failed
 </details></li>
 </ol>
 
@@ -14470,7 +14468,7 @@ allocate again, or use <code>buffer.resize new_size</code> once a first non-zero
 
 <div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="resize-resize-the-buffer">resize - resize the buffer</h3>
 
-<p><em>Defined in: std/core/array.s line 59</em></p>
+<p><em>Defined in: std/core/array.s line 60</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">resize</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[])</span>
@@ -14501,7 +14499,7 @@ resources.</p>
 
 </div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="resize-resize-the-buffer-2">resize - resize the buffer</h3>
 
-<p><em>Defined in: std/core/array.s line 59</em></p>
+<p><em>Defined in: std/core/array.s line 60</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">resize</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[],</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unsafe&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[])</span>
@@ -14533,7 +14531,7 @@ resources.</p>
 
 <div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="last-mutable-pointer-to-the-last-buffer-element">last - mutable pointer to the last buffer element</h3>
 
-<p><em>Defined in: std/core/array.s line 76</em></p>
+<p><em>Defined in: std/core/array.s line 77</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">last</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">any</span><span class="p">[])</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">{</span><span class="n">follows</span><span class="w"> </span><span class="n">any</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">unsafe_ptr</span><span class="p">})</span>
@@ -14621,7 +14619,7 @@ of elements actively in use.</p>
 
 </div><div class="std-subsection" data-defined-in="std/core/array.s"><h3 id="len-the-number-of-buffer-elements">len - the number of buffer elements</h3>
 
-<p><em>Defined in: std/core/array.s line 108</em></p>
+<p><em>Defined in: std/core/array.s line 109</em></p>
 
 <div class="codehilite">
 <pre><span></span><code><span class="n">len</span><span class="p">(</span><span class="n">any</span><span class="p">[])</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">nat</span><span class="p">)</span>
@@ -14872,7 +14870,7 @@ with another allocator).</p>
 <p><em>Defined in: std/sci/vec.s line 23</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t4171t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t4174t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -14891,7 +14889,7 @@ with another allocator).</p>
 <p><em>Defined in: std/sci/vec.s line 23</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t4105t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t4108t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -14910,7 +14908,7 @@ with another allocator).</p>
 <p><em>Defined in: std/sci/vec.s line 23</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t3818t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t3821t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -15150,7 +15148,7 @@ memory data as part of structural input.</p>
 <p><em>Defined in: std/sci/vec.s line 24</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t4171t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t4174t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -15169,7 +15167,7 @@ memory data as part of structural input.</p>
 <p><em>Defined in: std/sci/vec.s line 24</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t4105t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t4108t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -15188,7 +15186,7 @@ memory data as part of structural input.</p>
 <p><em>Defined in: std/sci/vec.s line 24</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t3818t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t3821t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -15403,7 +15401,7 @@ A capacity is maintained so that resizes are not performed too frequently.</p>
 <p><em>Defined in: std/sci/vec.s line 25</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">list</span><span class="p">(</span><span class="s">&quot;float__t4171t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span>
+<pre><span></span><code><span class="n">list</span><span class="p">(</span><span class="s">&quot;float__t4174t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -15440,7 +15438,7 @@ A capacity is maintained so that resizes are not performed too frequently.</p>
 <p><em>Defined in: std/sci/vec.s line 25</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">list</span><span class="p">(</span><span class="s">&quot;float__t4105t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span>
+<pre><span></span><code><span class="n">list</span><span class="p">(</span><span class="s">&quot;float__t4108t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -15477,7 +15475,7 @@ A capacity is maintained so that resizes are not performed too frequently.</p>
 <p><em>Defined in: std/sci/vec.s line 25</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">list</span><span class="p">(</span><span class="s">&quot;float__t3818t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span>
+<pre><span></span><code><span class="n">list</span><span class="p">(</span><span class="s">&quot;float__t3821t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">length</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -18981,7 +18979,7 @@ as there is no need to actually traverse the character contents.</p>
 
 </div></div><div class="std-definition"><h1 id="printf">printf</h1>
 
-<div class="std-subsection" data-defined-in="std/core/format.s"><h3 id="printf-emmits-string-formatting-code">printf - emmits string formatting code</h3>
+<div class="std-subsection" data-defined-in="std/core/format.s"><h3 id="printf-prints-a-formatted-string">printf - prints a formatted string</h3>
 
 <p><em>Defined in: std/core/format.s line 4</em></p>
 
@@ -18998,36 +18996,18 @@ and expressions. Example, where the default applied call is <code>print nn</code
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">macro</span><span class="o">&lt;</span><span class="n">printf</span><span class="o">&gt;</span> \<span class="s2">&quot;hello {1+1} word</span><span class="se">\n\&quot;</span>
+    <span class="n">macro</span><span class="o">&lt;</span><span class="n">printf</span><span class="o">&gt;</span> <span class="s2">&quot;hello {1+1} word</span><span class="se">\n</span><span class="s2">&quot;</span>
 </code></pre>
 </div>
 
-<p>The result is placed on a buffer; this makes no allocation in case of blank types,
-but otherwise this pattern can be used to apply the same conceptual transformation on heterogeneous
-data to yield the same output. Printing like above is the main intended use, but
-consider the logic of the following example too:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">std.format</span><span class="p">::</span><span class="n">F</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="n">nat</span> <span class="n">x</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="nb">float</span> <span class="n">x</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mf">1.0</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">v</span> <span class="o">=</span> <span class="n">macro</span><span class="o">&lt;</span><span class="n">printf</span><span class="o">&gt;</span><span class="p">(</span>\<span class="s2">&quot;inc</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="si">{1}{5.0}</span><span class="se">\&quot;</span><span class="s2">)</span>
-    <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># 2.0</span>
-    <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># 6.0</span>
-</code></pre>
-</div>
+<p>This variation outputs an empty buffer.</p>
 
 <p><details><summary>Complexity</summary></p>
 
 <ul>
 <li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 165</li>
-<li>Transpiled C size: 1245</li>
+<li>Transpiled C size: 1234</li>
 </ul>
 
 <p></details></p>
@@ -19036,11 +19016,8 @@ consider the logic of the following example too:</p>
 
 <ol start="2">
 <li>null pointer</li>
-<li>nat subtraction would yield a negative</li>
 <li>imbalanced brackets</li>
 <li>allocation failed</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
 <li>arena is out of space</li>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers
@@ -19056,7 +19033,7 @@ consider the logic of the following example too:</p>
 
 <p></details></p>
 
-</div><div class="std-subsection" data-defined-in="std/core/format.s"><h3 id="printf-emmits-string-formatting-code-2">printf - emmits string formatting code</h3>
+</div><div class="std-subsection" data-defined-in="std/core/format.s"><h3 id="printf-emmits-string-formatting-code">printf - emmits string formatting code</h3>
 
 <p><em>Defined in: std/core/format.s line 4</em></p>
 
@@ -19067,17 +19044,8 @@ consider the logic of the following example too:</p>
 
 <p>This splits the provided string into subsegments and bracketed expressions.
 Ignoring empty substrings, the same function call is made for all substrings
-and expressions. Example, where the default applied call is <code>print nn</code>:</p>
-
-<div class="codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">macro</span><span class="o">&lt;</span><span class="n">printf</span><span class="o">&gt;</span> \<span class="s2">&quot;hello {1+1} word</span><span class="se">\n\&quot;</span>
-</code></pre>
-</div>
-
-<p>The result is placed on a buffer; this makes no allocation in case of blank types,
+and expressions.
+The results are placed on a buffer; this makes no allocation in case of blank types,
 but otherwise this pattern can be used to apply the same conceptual transformation on heterogeneous
 data to yield the same output. Printing like above is the main intended use, but
 consider the logic of the following example too:</p>
@@ -19091,7 +19059,7 @@ consider the logic of the following example too:</p>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mf">1.0</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
-    <span class="n">v</span> <span class="o">=</span> <span class="n">macro</span><span class="o">&lt;</span><span class="n">printf</span><span class="o">&gt;</span><span class="p">(</span>\<span class="s2">&quot;inc</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="si">{1}{5.0}</span><span class="se">\&quot;</span><span class="s2">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">macro</span><span class="o">&lt;</span><span class="n">printf</span><span class="o">&gt;</span><span class="p">(</span><span class="s2">&quot;inc&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{1}{5.0}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># 2.0</span>
     <span class="nb">print</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># 6.0</span>
 </code></pre>
@@ -19102,7 +19070,7 @@ consider the logic of the following example too:</p>
 <ul>
 <li>Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 164</li>
-<li>Transpiled C size: 1241</li>
+<li>Transpiled C size: 1230</li>
 </ul>
 
 <p></details></p>
@@ -19111,11 +19079,8 @@ consider the logic of the following example too:</p>
 
 <ol start="2">
 <li>null pointer</li>
-<li>nat subtraction would yield a negative</li>
 <li>imbalanced brackets</li>
 <li>allocation failed</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
 <li>arena is out of space</li>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers
@@ -22031,7 +21996,7 @@ that is more efficient for computations in 64-bit architectures.</p>
 </code></pre>
 </div>
 
-<p>A &#8216;type "row"&#8217; or &#8216;type "col"&#8217; marker is needed
+<p>A &#8216;type &#8220;row"&#8217; or &#8216;type &#8220;col"&#8217; marker is needed
 to indicate the new matrix&#8217;s orientation.</p>
 
 <p><details><summary>Complexity</summary></p>
@@ -22053,7 +22018,7 @@ to indicate the new matrix&#8217;s orientation.</p>
 </code></pre>
 </div>
 
-<p>A &#8216;type "row"&#8217; or &#8216;type "col"&#8217; marker is needed
+<p>A &#8216;type &#8220;row"&#8217; or &#8216;type &#8220;col"&#8217; marker is needed
 to indicate the new matrix&#8217;s orientation.</p>
 
 <p><details><summary>Complexity</summary></p>
@@ -22336,7 +22301,7 @@ to indicate the new matrix&#8217;s orientation.</p>
 <p><em>Defined in: std/sci/vec.s line 24</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t4171t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t4174t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -22355,7 +22320,7 @@ to indicate the new matrix&#8217;s orientation.</p>
 <p><em>Defined in: std/sci/vec.s line 24</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t4105t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t4108t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -22374,7 +22339,7 @@ to indicate the new matrix&#8217;s orientation.</p>
 <p><em>Defined in: std/sci/vec.s line 24</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t3818t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">circular</span><span class="p">(</span><span class="s">&quot;float__t3821t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">circular</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -22488,7 +22453,7 @@ to indicate the new matrix&#8217;s orientation.</p>
 <p><em>Defined in: std/sci/vec.s line 23</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t4171t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t4174t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -22507,7 +22472,7 @@ to indicate the new matrix&#8217;s orientation.</p>
 <p><em>Defined in: std/sci/vec.s line 23</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t4105t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t4108t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -22526,7 +22491,7 @@ to indicate the new matrix&#8217;s orientation.</p>
 <p><em>Defined in: std/sci/vec.s line 23</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t3818t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
+<pre><span></span><code><span class="n">arena</span><span class="p">(</span><span class="s">&quot;float__t3821t&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">edit</span><span class="w"> </span><span class="n">float</span><span class="p">[],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">pos</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -25485,7 +25450,7 @@ All computations are branchless, as literals are optimized away during compilati
 </code></pre>
 </div>
 
-<p>A &#8216;type "row"&#8217; or &#8216;type "col"&#8217; marker is needed
+<p>A &#8216;type &#8220;row"&#8217; or &#8216;type &#8220;col"&#8217; marker is needed
 to indicate the new matrix&#8217;s orientation.</p>
 
 <p><details><summary>Complexity</summary></p>
@@ -25507,7 +25472,7 @@ to indicate the new matrix&#8217;s orientation.</p>
 </code></pre>
 </div>
 
-<p>A &#8216;type "row"&#8217; or &#8216;type "col"&#8217; marker is needed
+<p>A &#8216;type &#8220;row"&#8217; or &#8216;type &#8220;col"&#8217; marker is needed
 to indicate the new matrix&#8217;s orientation.</p>
 
 <p><details><summary>Complexity</summary></p>
@@ -26643,8 +26608,6 @@ mutex checking are always valid.</p>
 
 <ol start="17">
 <li>allocation failed</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
 <li>arena is out of space</li>
 <li>can only define strings on contiguous buffers</li>
 <li>can only define strings on non-offset buffers
@@ -26878,8 +26841,6 @@ mutex checking are always valid.</p>
 <li>null pointer</li>
 <li>nat subtraction would yield a negative</li>
 <li>allocation failed</li>
-<li>cannot allocate a buffer of unsized type</li>
-<li>cannot resize buffers with alloc; it promises no data reallocation</li>
 <li>out of bounds</li>
 <li>arena is out of space</li>
 <li>can only define strings on contiguous buffers</li>

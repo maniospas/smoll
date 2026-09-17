@@ -112,7 +112,7 @@ def shared(cstr|blank surface, cstr obj)
     copy "(cstr::size + mutex_size() + compiler::value compiler::size "
     copy obj
     copy ").compiler::unsafe_copy ("
-    copy "pipe compiler::value type "
+    copy "pipe compiler::value "
     copy obj
     copy "::tag,"
     copy obj

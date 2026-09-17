@@ -52,7 +52,7 @@ def alloc(cstr|blank surface, cstr obj)
     copy "(cstr::size + compiler::value compiler::size "
     copy obj
     copy ").compiler::unsafe_copy ("
-    copy "tagged compiler::value type "
+    copy "tagged compiler::value "
     copy obj
     copy "::tag,"
     copy obj

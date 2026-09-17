@@ -327,7 +327,14 @@ connection.onHover((params: TextDocumentPositionParams): Hover | null => {
   return {
     contents: {
       kind: 'markdown',
-      value: sections.join('\n\n---\n\n'),
+      value: sections.map((section, i) => {
+          if (i === 0) return section;
+          const separator = section.startsWith('**')
+            ? '\n\n───────────────────────────────────────────────────────\n\n'
+            : '\n\n---\n\n';
+          return separator + section;
+        })
+        .join(''),
     },
     range: Range.create(
       Position.create(hits[0].line - 1, hits[0].col - 1),

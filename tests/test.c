@@ -6,8 +6,11 @@
 typedef void (*__smoll_func_ptr_type)(void);
 int __t_argc;
 char** __t_argv;
-const char* const __t443t="\n";
-static const char* __t_all_errcodes[62] = {"noerr",
+const char* const __t4378t="hello ";
+const char* const __t4377t="hello {x} world\n";
+const char* const __t4387t=" world\n";
+const char* const __t431t="";
+static const char* __t_all_errcodes[44] = {"noerr",
 "error",
 "null pointer",
 "assertion error",
@@ -50,25 +53,7 @@ static const char* __t_all_errcodes[62] = {"noerr",
 "invalid float conversion from string with only a sign",
 "invalid float conversion from non-number string",
 "invalid float conversion from string without a value after the dot",
-"interrupted by user",
-"failed to start process",
-"process terminated with unhandled non-zero exit code",
-"end of file",
-"unsanitized command: shell metacharacter detected",
-"system call failed",
-"failed to open file",
-"failed to create file",
-"cannot open a new terminal in the current environment",
-"failed to open new terminal",
-"failed to move to start of closed file",
-"not open file",
-"failed to write to closed file",
-"failed to write to file",
-"failed to flush file contents",
-"failed to create directory",
-"failed to remove file",
-"not open dir",
-"end of dir"
+"imbalanced brackets"
 };
 
 static inline __attribute__((always_inline)) void console__t419t() {
@@ -76,36 +61,75 @@ static inline __attribute__((always_inline)) void console__t419t() {
   __t_return:
 }
 
-static inline __attribute__((always_inline)) void test__t5108t(uint64_t* __t5116t) {
-  uint64_t __t5109t=0;
-  uint64_t __t5110t=0;
-  uint64_t x=0;
-  __t5109t=1;
+static inline __attribute__((always_inline)) void nn__t430t(const char* value, const char** __t4391t, const char** __t4392t) {
+  const char* __t432t=0;
+  __t432t=__t431t;
   goto __t_return;
-  __t5110t=1;
-  x=__t5110t;
   __t_return:
-  *__t5116t=__t5109t;
+  *__t4391t=value;
+  *__t4392t=__t432t;
 }
 
-static inline __attribute__((always_inline)) void print__t454t(uint64_t value) {
-  int __t455t=0;
-  const char* endl=0;
-  endl=__t443t;
+static inline __attribute__((always_inline)) void print__t439t(const char* value, const char* endl) {
+  int __t440t=0;
+  printf("%s%s",value,endl);
+}
+
+static inline __attribute__((always_inline)) void nn__t437t(uint64_t value, uint64_t* __t4393t, const char** __t4394t) {
+  const char* __t438t=0;
+  __t438t=__t431t;
+  goto __t_return;
+  __t_return:
+  *__t4393t=value;
+  *__t4394t=__t438t;
+}
+
+static inline __attribute__((always_inline)) void print__t452t(uint64_t value, const char* endl) {
+  int __t453t=0;
   printf("%llu%s",value,endl);
 }
 
-static inline __attribute__((always_inline)) void main__t5111t() {
-  uint64_t __t5114t__=0;
+static inline __attribute__((always_inline)) void ____buffer__t4383t(char** __t4395t, uint64_t* __t4396t, uint32_t* __t4397t, uint32_t* __t4398t) {
+  char* unsafe_ptr=0;
+  uint64_t unsafe_size=0;
+  uint32_t unsafe_offset=0;
+  uint32_t unsafe_align=0;
+  unsafe_align=0;
+  *__t4395t=unsafe_ptr;
+  *__t4396t=unsafe_size;
+  *__t4397t=unsafe_offset;
+  *__t4398t=unsafe_align;
+}
+
+static inline __attribute__((always_inline)) void main__t4373t() {
+  uint64_t __t4376t=0;
+  uint64_t x=0;
+  const char* __t4379t__value=0;
+  const char* __t4379t____t432t=0;
+  uint64_t __t4385t__value=0;
+  const char* __t4385t____t438t=0;
+  const char* __t4388t__value=0;
+  const char* __t4388t____t432t=0;
+  char* __t4390t__unsafe_ptr=0;
+  uint64_t __t4390t__unsafe_size=0;
+  uint32_t __t4390t__unsafe_offset=0;
+  uint32_t __t4390t__unsafe_align=0;
   console__t419t();
-  test__t5108t(&__t5114t__);
-  print__t454t(__t5114t__);
+  __t4376t=2;
+  x=__t4376t;
+  nn__t430t(__t4378t,&__t4379t__value,&__t4379t____t432t);
+  print__t439t(__t4379t__value,__t4379t____t432t);
+  nn__t437t(x,&__t4385t__value,&__t4385t____t438t);
+  print__t452t(__t4385t__value,__t4385t____t438t);
+  nn__t430t(__t4387t,&__t4388t__value,&__t4388t____t432t);
+  print__t439t(__t4388t__value,__t4388t____t432t);
+  ____buffer__t4383t(&__t4390t__unsafe_ptr,&__t4390t__unsafe_size,&__t4390t__unsafe_offset,&__t4390t__unsafe_align);
 }
 
 int main(int argc, char** argv) {
                     __t_argc = argc;
                     __t_argv = argv;
                     DECLARE_HANDLERS;
-                    main__t5111t();
+                    main__t4373t();
                     return 0;
                 }

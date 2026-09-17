@@ -24,7 +24,6 @@ def console()
     doc "an effect for convenience. Standard library print functions provide the CLI effect"
     doc "and you can propagate to this by prepending `effect edit console CLI` to function"
     doc "arguments."
-    doc ""
     doc "The console is a zero-cost abstraction in that it does not transfer any data"
     doc "but relies on singleton safety to synchronize io across threads."
     doc "Quickly print internals for debugging with `unsafe_console()`."

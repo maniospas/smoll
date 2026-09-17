@@ -54,7 +54,8 @@ def alloc(edit any[] buffer, nat|blank size, "unsafe_first"|"dirty"|blank clear_
 
 def alloc(nat size)
     doc "allocate a char[] buffer"
-    return alloc(char[], size)
+    if not try ret = mut alloc(char[], size): fail "allocation failed"
+    return ret
 
 def resize(edit any[] buffer, nat size, "unsafe"|blank prunning)
     doc "resize the buffer"

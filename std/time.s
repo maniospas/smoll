@@ -6,7 +6,7 @@ def sleep(float secs, blank|"skip_on_negative" confirmation_policy)
     doc "but this requires no extra linkage."
     if secs<0.0
         if confirmation_policty is blank: fail "can only sleep for non-negative seconds" 
-        else: return()
+        else: return ()
     {__smo_exact_sleep(secs);}
 
 def time()

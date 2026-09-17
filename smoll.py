@@ -789,7 +789,7 @@ def signature_like(vars: list[Variable], impl=None, monomorphic=False, short=Fal
             elif any(not vars[k].immutable for k in range(i, min(len(vars),i+len(type.rets)))): ret += "edit "
             element_size = type.is_buffer_of.memory_size()
             ret += toname(type.is_buffer_of)+"[]"+arg_name #+" {element size "+(str(element_size) if element_size else "?")+"}"
-            if impl:
+            if impl and i+1<len(vars):
                 #if type.is_buffer_of and type.is_buffer_of != ANY_TYPE: ret += " {"+signature_like([type.is_buffer_of.vars[ret] for ret in type.is_buffer_of.rets], type.is_buffer_of)+"}"
                 dependency = impl.follow_pointer_dependency(vars[i+1])
                 if dependency and dependency!=vars[i+1]: 
@@ -2220,7 +2220,7 @@ class File:
         self.is_extern_file: bool = False
         self.localdefs: set[UnionType|ImplementedType|File] = set() # a set of references to local types and namespaces
         self.cached: Optional[list[str]] = None # do not normally use - onlly proper usage is for macros to tokenize
-        self.expanded: Optional["Token"] = None
+        self.error_redirect: Optional["token"] = None
 
     def open(self):
         if self.cached: return self.cached
@@ -2251,6 +2251,9 @@ class Token:
             return True
         except: return False
     def error(self, errtype: str, message: str, reason: Optional["Token"]=None, raason_message:str="defined in", suggestions:list[str]|None=None):
+        if self.file.error_redirect is not None:
+            return self.file.error_redirect.error(errtype, message, reason, raason_message, suggestions)
+
         if is_lsp:
             if self.file.is_main_file:
                 at = reason if reason else self
@@ -2479,7 +2482,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         if callee.max_abstraction_level:
             printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+", size "+str(len(callee.implementation))+")")  
         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
-        if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
+        if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc.replace("\\\"", "\"")) for doc in callee.doc[1:])+"\n")
         spawned_error_codes = callee.spawned_error_codes
         # if(not callee.count_checkable_copies) and any(callee.vars[v].type==POINTER_TYPE for v in callee.rets+callee.args):
         #     #printid("When this function is called, it does not create a memory dependecy.\n")
@@ -3591,7 +3594,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                             ret = UnionType(var.type.name, at=var.type.at)
                             ret.variations.append(var.type)
                             return pos+1, ret
-                        tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural variable with the same name exists '"+signature_like([var] if var else obj, impl)+"'")
+                        tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural variable with the same name has type '"+signature_like([var] if var else obj, impl)+"'", suggesions=[":: (start reflection)"])
                     varname = name+"__"
                     len_varname = len(name)+2
                     vars = [r for r in impl.vars.values() if r.name[:len_varname]==varname]
@@ -3622,7 +3625,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 tokens[pos].error("type", "unknown type '"+pretty_name(name)+"'", suggestions=suggestions)
             
             namespace: File|None = file if name=="\""+file.path+"\"" else file.namespaces.get(name, None)
-            if namespace is None: tokens[pos].error("import", "unknown namespace or type '"+name+"'", suggestions=[("\""+file.path+"\"::" if not file.is_main_file else "") +k+" (namespace)" for k in file.namespaces])
+            if namespace is None: tokens[pos].error("import", "unknown namespace, variable, or type '"+name+"'", suggestions=[("\""+file.path+"\"::" if not file.is_main_file else "") +k+" (namespace)" for k in file.namespaces])
             assert namespace is not None
             if peek_text(tokens, pos+3)=="::":
                 return await process_type(namespace, tokens, pos+2, reduce_to_unique_variations=reduce_to_unique_variations, impl=impl)
@@ -4031,7 +4034,7 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
                 for litvar in lit.variations:
                     if litvar not in variations: variations.append(litvar)
             else:
-                reflection_token.error("type", "only '::name', '::tag', '::size', '::rets', or '::args' are allowed for reflection but got '::"+reflection_token_text+"'")
+                reflection_token.error("type", "unknown function reflection property '::"+reflection_token_text+"'", suggesions=["name (reflection)", "tag (reflection)", "rets (reflection)", "args (reflection)", "size (reflection)"])
             
         ret = UnionType(type.name+"::"+reflection_token_text, at=reflection_token)
         ret.variations = variations
@@ -5080,8 +5083,10 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         variables_sets: list[list[Variable]] = list()
         pos, buffer_element = await process_statement(file, tokens, pos+1, impl, current_operator_priority=0)
         variables_sets.append(buffer_element)
+        skip_allocation = False
         if not any(element.type.builtin for element in buffer_element): 
-            current_token.error("type", "cannot create a buffer on empty data - it would not perform any allocation")
+            skip_allocation = True
+            #current_token.error("type", "cannot create a buffer on empty data - it would not perform any allocation")
         # find temp type for data on the buffer
 
         if buffer_element and len(buffer_element[0].type.rets)==len(buffer_element):
@@ -5108,28 +5113,29 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             pos += 1
             pos, buffer_element = await process_statement(file, tokens, pos, impl, current_operator_priority=0)
             variables_sets.append(buffer_element)
-            if len(temp_type.rets)!=len(buffer_element): get(tokens, pos).error("type", "mismatching buffer contents")
+            if len(temp_type.rets)!=len(buffer_element): get(tokens, pos).error("type", "expecting the same type as previous buffer elements '"+temp_type.signature()+"' but got '"+signature_like(buffer_element, impl)+"'")
             for rx,ry in zip(buffer_element, temp_type.rets):
-                if rx.type!=temp_type.vars[ry].type: get(tokens, pos).error("type", "mismatching buffer contents")
-                if rx.immutable and not temp_type.vars[ry].immutable: get(tokens, pos).error("type", "mismatching buffer contents")
+                if rx.type!=temp_type.vars[ry].type: get(tokens, pos).error("type", "expecting the same type as previous buffer elements '"+temp_type.signature()+"' but got '"+signature_like(buffer_element, impl)+"'")
+                if rx.immutable and not temp_type.vars[ry].immutable: get(tokens, pos).error("type", "expecting the same type as previous buffer elements '"+temp_type.signature()+"' but got '"+signature_like(buffer_element, impl)+"'")
         if peek_text(tokens, pos)!="]": get(tokens, pos).error("syntax", "expecting closing ']' for 'args' here")
         #should_ref = peek_text(tokens, pos+1)=="&"
         created_buffer = resolve_call(file, impl, buffer_type_method, [], current_token)
         #total_size = temp_type.memory_size()*len(variables_sets)
-        alloc_type = file.types.get("alloc", None)
-        if alloc_type is None: get(tokens, pos).error("syntax", "no valid 'alloc' allocator for buffer")
-        size_var = Variable(create_temp(), UINT_TYPE)
-        impl.vars[size_var.name] = size_var
-        impl.implementation.extend([
-            size_var,
-            CODEWORD_EQUALS,
-            CodeWord(str(len(variables_sets))),
-            CODEWORD_SEMICOLON,
-        ])
-        created_buffer_start = created_buffer[1]
-        impl.set_pointer_type(created_buffer_start, temp_type)
-        #created_buffer = 
-        resolve_call(file, impl, alloc_type, created_buffer+[size_var], current_token)
+        if not skip_allocation:
+            alloc_type = file.types.get("alloc", None)
+            if alloc_type is None: get(tokens, pos).error("syntax", "no valid 'alloc' allocator for buffer")
+            size_var = Variable(create_temp(), UINT_TYPE)
+            impl.vars[size_var.name] = size_var
+            impl.implementation.extend([
+                size_var,
+                CODEWORD_EQUALS,
+                CodeWord(str(len(variables_sets))),
+                CODEWORD_SEMICOLON,
+            ])
+            created_buffer_start = created_buffer[1]
+            impl.set_pointer_type(created_buffer_start, temp_type)
+            #created_buffer = 
+            resolve_call(file, impl, alloc_type, created_buffer+[size_var], current_token)
         # if len(created_buffer)!=5 or not created_buffer[0].type.is_buffer_of:
         #      current_token.error("type", "the locally available 'alloc' failed to output a buffer but instead returned '"+signature_like(created_buffer, impl)+"'")
         progress = 0
@@ -5179,7 +5185,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
 
     if current=="macro":
         literal_tok = current_token
-        if is_lsp and file.is_main_file: print_lsp_keyword(literal_tok, "**macro**\n\nEvaluates a dependent user-defined function that manipulates 'cstr' literals available at compile-time with the pattern 'macro<builder>(inputs)'. That function must return 'char[]', which is then re-tokenized and parsed as code.")
+        if is_lsp and file.is_main_file: print_lsp_keyword(literal_tok, "**macro**\n\nEvaluates a dependent user-defined function that manipulates 'cstr' and number literals available at compile-time with the pattern 'macro<builder>(inputs)'. That function must return 'char[]', which is then re-tokenized and parsed as code.")
         if peek_text(tokens, pos+1)!="<":
             get(tokens, pos+1).error("syntax", "expecting 'macro'-ed string manipulation in 'macro<...>'")
         pos += 1
@@ -5201,9 +5207,9 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                     global_cstr2var[current] = variable.name
                     global_var2cstr[variable.name] = current
                 ret[i] = variable
-            elif arg.type.is_literal_of is UINT_TYPE:
+            elif arg.type.is_literal_of in [UINT_TYPE, UINT16_TYPE, UINT32_TYPE, UINT8_TYPE, INT_TYPE, INT16_TYPE, INT32_TYPE, INT8_TYPE, FLOAT_TYPE]:
                 current = arg.type.at.text
-                ret[i] = Variable(create_temp(), UINT_TYPE, token=current_token)
+                ret[i] = Variable(create_temp(), arg.type.is_literal_of, token=current_token)
             else:
                 literal_tok.error("type", "macros can only have known cstr or nat inputs, passed via corresponding literals but got "+signature_like([ret[i]], impl), suggestions=["retrieve inputs with 'compiler::varname'", "directly pass a string literal", "directly pass a reflection string like type::name"])
             
@@ -5234,22 +5240,24 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         else:
             literal_tok.error("type", "macros can only output char[] but returned '"+signature_like(ret, temporary_implementation)+"'")
         local_file = File("macro")
+        local_file.error_redirect = literal_tok
         local_file.cached = text.split("\n")
         local_file.types = file.types
         local_file.namespaces = file.namespaces
         local_file.localdefs = file.localdefs
         local_file, local_toks = _load(local_file, False, literal_tok)
-        for tok in local_toks:
-            tok.file = literal_tok.file
-            tok.row = literal_tok.row
-            tok.col = literal_tok.col
+        # for tok in local_toks:
+        #     tok.file = literal_tok.file
+        #     tok.row = literal_tok.row
+        #     tok.col = literal_tok.col
         if len(impl.nesting)>=MACRO_LIMIT:
             literal_tok.error("interpreter", "macros expanded more than "+str(MACRO_LIMIT)+" nesting levels deep (counting loops and conditions too), which indicates either infinite recursion that should be stopped, or metaprogramming hell the should be avoided; directly call code building")
         impl.nesting.append("macro")
-        
+
         local_pos = 0
         local_pos, ret = await process_statement(file, local_toks, local_pos, impl, current_operator_priority=0)
         local_pos, ret = await process_statement_operator(file, local_toks, impl, local_pos, ret, current_operator_priority=0)
+
         impl.nesting.pop()
         return pos, ret
         
@@ -6628,7 +6636,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         if callee.max_abstraction_level:
                             printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+", size "+str(len(callee.implementation))+")")
                         printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
-                        if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
+                        if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc.replace("\\\"", "\"")) for doc in callee.doc[1:])+"\n")
                         spawned_error_codes = callee.spawned_error_codes
                         # if(not impl.count_checkable_copies) and any(impl.vars[v].type==POINTER_TYPE for v in impl.rets+impl.args):
                         #     pass
@@ -7549,7 +7557,7 @@ async def main():
                     if callee.at: docs_file.write("*Defined in: "+callee.at.file.path+" line "+str(callee.at.row)+"*\n")
                     else: docs_file.write("*Defined by the compiler*\n")
                     docs_file.write("\n```rust\n"+callee.signature()+"\n```\n")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
-                    if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc) for doc in callee.doc[1:])+"\n")
+                    if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc.replace("\\\"", "\"")) for doc in callee.doc[1:])+"\n")
                     spawned_error_codes = callee.spawned_error_codes
                     if len(callee.implementation):
                         docs_file.write("\n<details><summary>Complexity</summary>\n\n")

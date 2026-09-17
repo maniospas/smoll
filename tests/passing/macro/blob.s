@@ -1,10 +1,9 @@
 import std.core
 import std.blob
-import compiler::varname as @
 
 def create_blob()
     temp = [(72,73)]
-    blobbed = macro<blob> @temp[0]& # convert a typed pointer into an abstract data blob
+    blobbed = macro<blob> compiler::varname temp[0]& # convert a typed pointer into an abstract data blob
     debug::print blobbed
     # next line needed to not return 'temp'; it safely fails the function if the pointers are not equal
     compiler::assert_eq(blobbed.unsafe_ptr, temp.unsafe_ptr)

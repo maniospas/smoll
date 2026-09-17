@@ -116,8 +116,8 @@ def char(cstr s)
     doc "treat as character"
     doc "The first character of a string is extracted,"
     doc "for example to write `c = char \"C\"`."
-    {if(s) {builtins::char c = *s;}}
-    return c
+    #{if(s) {builtins::char c = *s;}}
+    return str(s).dat.first
 
 def eq(char x, char y)
     doc "equals"
@@ -131,6 +131,14 @@ def neq(char x, char y)
 
 local def alloc(edit bucket CHARS, nat length)
     return allocated(char[].alloc(CHARS, length), 0)
+
+def copy(effect edit char_allocator CHARS, char other)
+    surface = alloc(CHARS, 1)
+    {memcpy(surface__buf__unsafe_ptr+surface__pos+surface__buf__unsafe_offset, &other, 1);}
+    if CHARS is char_allocator\bucket
+        compiler::unsafe_declare_deep_copy_only()
+    unsafe_valid CHARS
+    return str(surface.buf, surface.pos, 1, other)
 
 def copy(effect edit char_allocator CHARS, str|cstr _other)
     doc "copy a string"

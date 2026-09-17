@@ -8231,7 +8231,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 153</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -8257,7 +8257,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 153</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -8283,16 +8283,16 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 153</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p><details><summary>Complexity</summary></p>
 
 <ul>
-<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 9</li>
-<li>Transpiled C size: 79</li>
+<li>Transpiled C size: 68</li>
 </ul>
 
 <p></details></p>
@@ -8309,7 +8309,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 153</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -8335,7 +8335,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 153</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -8361,7 +8361,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 153</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -8387,7 +8387,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 153</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -8413,7 +8413,7 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 153</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">nat</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">nat</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -8439,16 +8439,16 @@ Safeguards against division by zero.</p>
 <p><em>Defined in: std/ptrpeek.s line 153</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">int</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+<pre><span></span><code><span class="n">ge</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">_y</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p><details><summary>Complexity</summary></p>
 
 <ul>
-<li>Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
+<li>Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)</li>
 <li>SSA variables: 9</li>
-<li>Transpiled C size: 68</li>
+<li>Transpiled C size: 79</li>
 </ul>
 
 <p></details></p>
@@ -27146,7 +27146,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 <p><em>Defined in: std/graphics.s line 51</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">window</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">font_path</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">openy</span><span class="p">})</span>
+<pre><span></span><code><span class="n">window</span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">font_path</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">ready</span><span class="p">})</span>
 </code></pre>
 </div>
 
@@ -27174,7 +27174,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 <p><em>Defined in: std/graphics.s line 75</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">is_open</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">openy</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
+<pre><span></span><code><span class="n">is_open</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">ready</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
 </code></pre>
 </div>
 
@@ -27243,7 +27243,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 <p><em>Defined in: std/graphics.s line 90</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">draw</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">openy</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
+<pre><span></span><code><span class="n">draw</span><span class="p">(</span><span class="n">edit</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">ready</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
 </code></pre>
 </div>
 
@@ -27260,7 +27260,7 @@ through <code>unsafe_mut</code>, for example to be freed.</p>
 <p><details><summary>Potential errors</summary></p>
 
 <ol start="83">
-<li>alopeny drawing on window
+<li>already drawing on window
 </details></li>
 </ol>
 
@@ -27942,7 +27942,7 @@ but this requires no extra linkage.</p>
 <p><em>Defined in: std/graphics.s line 338</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">dt</span><span class="p">(</span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">openy</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
+<pre><span></span><code><span class="n">dt</span><span class="p">(</span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">ready</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
 </code></pre>
 </div>
 
@@ -27965,7 +27965,7 @@ but this requires no extra linkage.</p>
 <p><em>Defined in: std/graphics.s line 343</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">uptime</span><span class="p">(</span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">openy</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
+<pre><span></span><code><span class="n">uptime</span><span class="p">(</span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">ready</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
 </code></pre>
 </div>
 
@@ -28057,7 +28057,7 @@ but this requires no extra linkage.</p>
 <p><em>Defined in: std/graphics.s line 363</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">mouse_pos</span><span class="p">(</span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">openy</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
+<pre><span></span><code><span class="n">mouse_pos</span><span class="p">(</span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">ready</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
 </code></pre>
 </div>
 
@@ -28126,7 +28126,7 @@ but this requires no extra linkage.</p>
 <p><em>Defined in: std/graphics.s line 381</em></p>
 
 <div class="codehilite">
-<pre><span></span><code><span class="n">mouse_wheel</span><span class="p">(</span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">openy</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
+<pre><span></span><code><span class="n">mouse_wheel</span><span class="p">(</span><span class="n">window</span><span class="w"> </span><span class="p">{</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">float</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">cstr</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">ready</span><span class="p">})</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">float</span><span class="p">)</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="n">WINDOW</span>
 </code></pre>
 </div>
 

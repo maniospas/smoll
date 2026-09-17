@@ -6676,6 +6676,48 @@ Compares two numbers of the same type. This is an overload for the >= operator.
 *Defined in: std/ptrpeek.s line 153*
 
 ```rust
+ge(nat _x, nat ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### ge - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 153*
+
+```rust
+ge(int _x, int ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### ge - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 153*
+
+```rust
 ge(float _x, float ptr _y) -> (bool)
 ```
 
@@ -6810,48 +6852,6 @@ ge(float ptr _x, float ptr _y) -> (bool)
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 9
 - Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### ge - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 153*
-
-```rust
-ge(nat _x, nat ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### ge - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 153*
-
-```rust
-ge(int _x, int ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
 
 </details>
 
@@ -22473,7 +22473,7 @@ unsafe_open_window(float size.width, float size.height, cstr title, cstr font_pa
 *Defined in: std/graphics.s line 51*
 
 ```rust
-window(float size.width, float size.height, cstr title, cstr font_path) -> (edit window {tag, float size.width, float size.height, cstr title, mut bool openy})
+window(float size.width, float size.height, cstr title, cstr font_path) -> (edit window {tag, float size.width, float size.height, cstr title, mut bool ready})
 ```
 
 <details><summary>Complexity</summary>
@@ -22495,7 +22495,7 @@ window(float size.width, float size.height, cstr title, cstr font_path) -> (edit
 *Defined in: std/graphics.s line 75*
 
 ```rust
-is_open(edit window {tag, float size.width, float size.height, cstr title, mut bool openy}) -> (bool) with effects WINDOW
+is_open(edit window {tag, float size.width, float size.height, cstr title, mut bool ready}) -> (bool) with effects WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -22549,7 +22549,7 @@ unsafe_end_drawing() -> ()
 *Defined in: std/graphics.s line 90*
 
 ```rust
-draw(edit window {tag, float size.width, float size.height, cstr title, mut bool openy}) -> (bool) with effects WINDOW
+draw(edit window {tag, float size.width, float size.height, cstr title, mut bool ready}) -> (bool) with effects WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -22562,7 +22562,7 @@ draw(edit window {tag, float size.width, float size.height, cstr title, mut bool
 
 <details><summary>Potential errors</summary>
 
-83. alopeny drawing on window
+83. already drawing on window
 </details>
 
 
@@ -23111,7 +23111,7 @@ tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, flo
 *Defined in: std/graphics.s line 338*
 
 ```rust
-dt(window {tag, float size.width, float size.height, cstr title, bool openy}) -> (float) with effects WINDOW
+dt(window {tag, float size.width, float size.height, cstr title, bool ready}) -> (float) with effects WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -23129,7 +23129,7 @@ dt(window {tag, float size.width, float size.height, cstr title, bool openy}) ->
 *Defined in: std/graphics.s line 343*
 
 ```rust
-uptime(window {tag, float size.width, float size.height, cstr title, bool openy}) -> (float) with effects WINDOW
+uptime(window {tag, float size.width, float size.height, cstr title, bool ready}) -> (float) with effects WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -23201,7 +23201,7 @@ key_released(edit window, nat key) -> (bool) with effects WINDOW
 *Defined in: std/graphics.s line 363*
 
 ```rust
-mouse_pos(window {tag, float size.width, float size.height, cstr title, bool openy}) -> (float x, float y) with effects WINDOW
+mouse_pos(window {tag, float size.width, float size.height, cstr title, bool ready}) -> (float x, float y) with effects WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -23255,7 +23255,7 @@ mouse_pressed(edit window, nat button) -> (bool) with effects WINDOW
 *Defined in: std/graphics.s line 381*
 
 ```rust
-mouse_wheel(window {tag, float size.width, float size.height, cstr title, bool openy}) -> (float) with effects WINDOW
+mouse_wheel(window {tag, float size.width, float size.height, cstr title, bool ready}) -> (float) with effects WINDOW
 ```
 
 <details><summary>Complexity</summary>

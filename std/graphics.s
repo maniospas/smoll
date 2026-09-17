@@ -68,9 +68,9 @@ def window(size size, cstr title, cstr font_path)
     else
         {"-lraylib"}
         {"-lGL"}
-    openy = mut false
+    ready = mut false
     unsafe_open_window(size, title, font_path)
-    return singleton(size, title, openy)
+    return singleton(size, title, ready)
 
 def is_open(effect edit window WINDOW)
     VM "[not pyray.window_should_close()]"
@@ -88,7 +88,7 @@ local def unsafe_end_drawing()
         { emscripten_sleep(0); }
     
 def draw(effect edit window WINDOW)
-    if WINDOW.openy: fail "alopeny drawing on window"
+    if WINDOW.ready: fail "already drawing on window"
     is_drawing = true
     unsafe_begin_drawing()
     defer

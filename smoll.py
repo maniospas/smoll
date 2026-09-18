@@ -6540,8 +6540,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
     name_token = get(tokens, pos+1)
     pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr, effect_names = await _gather_def(file, tokens, pos, fast_return_exception, is_local)
     for abstract_arg_name, abstract_arg_type in zip(abstract_arg_names, abstract_arg_types):
-        if not abstract_arg_type:
-            start_token.error("type", "argument '"+pretty_name(abstract_arg_name)+"' could not be resolved to a type")
+        if not abstract_arg_type:  start_token.error("type", "argument '"+pretty_name(abstract_arg_name)+"' could not be resolved to a type")
     starting_pos = pos
     greatest_pos = None
     candidates: list[ImplementedType] = list()

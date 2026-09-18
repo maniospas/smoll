@@ -34,16 +34,6 @@ def lane(nat bytes)
     copy ")"
     return CHARS.buf 
 
-def arena(nat size, "incorruptible")
-    doc "an arena of incorruptible data"
-    doc "It can grant access to mutable areas, but future allocations"
-    doc "are guaranteed to not overwrite previous data. Thus, it can"
-    doc "be used for safe storage of critical thread data."
-    return class assigned unsafe_arena=mut arena alloc size
-
-def alloc(edit arena<nat, "incorruptible"> arn, nat bytes)
-    return alloc arn.unsafe_arena
-
 def pipe_data(cstr value, nat max_stored_size)
     doc "blank pipe_data structure"
     doc "Ensures that 'pipe_data ptr' has a unique type and allocates at least a cstr's"
@@ -98,7 +88,7 @@ def open(pipe obj, "reader" role)
     status = unsafe_pipe_own(obj, role)
     if status.writers!=0: fail "cannot read pipe while it's being written"
     defer: try unsafe_pipe_disown(obj, role)
-    return class(obj)
+    return class const obj
 
 def open(pipe _obj, "writer" role)
     doc "gain ownership of a pipe for writing"
@@ -130,36 +120,37 @@ def cpu(nat cores)
     doc "For now, the number of cores need to be manually inputted."
     return singleton cores
 
-def growing_thread_pool(effect edit cpu CPU)
+def growing_thread_pool(effect edit cpu CPU, nat shared_storage)
     doc "a thread pool"
     doc "This consumes all CPU cores, and can spawn up to"
     doc "that many threads. Completed threads cannot be"
     doc "recovered, but new ones can be added until the"
     doc "pool is full. This can be used to spawn several"
     doc "workers at program start."
-    threads = mut arena unsafe_spawn[].alloc CPU.cores
+    unsafe_threads = mut arena unsafe_spawn[].alloc CPU.cores
+    unsafe_arena = edit arena alloc shared_storage
     joined = mut false
     defer
         if not joined
-            for i in range of len threads.buf
-                try join threads.buf[i]
+            for i in range of len unsafe_threads.buf
+                try join unsafe_threads.buf[i]
         joined = true
-    unsafe_return class(CPU, threads, joined)
+    unsafe_return class(CPU, unsafe_threads, unsafe_arena, joined)
 
 def thread(effect edit growing_thread_pool THREADS, pipe->blank func, pipe input)
     spawned = edit unsafe_spawn(func, input)
-    (at alloc THREADS.threads) = spawned
+    (at alloc THREADS.unsafe_threads) = spawned
     return spawned
 
-def unsafe_pipe_data_match(open obj, cstr name, any& type)
+def unsafe_pipe_data_match(open<pipe, "reader"> obj, cstr name, any& type)
     found = compiler::deref obj.obj.unsafe_data.value
-    if found!=name: fail "type does not match current pipe contents"
-    return unsafe_mut obj.obj.unsafe_data.unsafe::add(pipe_data::size).compiler::unsafe_attach_type(type)
+    if found!=name: fail "type does not match pipe contents"
+    return obj.obj.unsafe_data.unsafe::add(pipe_data::size).compiler::unsafe_attach_type(type)
 
-def unsafe_pipe_data_defer_free(mut pipe_data& obj)
-    defer
-        unsafe::free obj
-    return obj
+def unsafe_pipe_data_match(open<pipe, "writer"> obj, cstr name, any& type)
+    found = compiler::deref obj.obj.unsafe_data.value
+    if found!=name: fail "type does not match pipe contents"
+    return unsafe_mut obj.obj.unsafe_data.unsafe::add(pipe_data::size).compiler::unsafe_attach_type(type)
 
 def unsafe_pipe_data_mutex_init(mut pipe_data& obj)
     mutex_ptr_construct = obj.unsafe::add(cstr::size)
@@ -169,11 +160,11 @@ def unsafe_pipe_data_mutex_init(mut pipe_data& obj)
         {mutex_destroy((mutex_t*)mutex_ptr);}
     return obj
 
-def pipe_data_alloc(edit arena<nat, "incorruptible"> arena, nat size) 
-    return at arena.alloc size
+def pipe_data_alloc(effect edit growing_thread_pool THREADS, nat size) 
+    return at THREADS.unsafe_arena.alloc size
 
 def shared(cstr|blank surface, cstr obj)
-    if surface is blank: surface = "INCORRUPTIBLE"
+    if surface is blank: surface = "THREADS"
     if 0==len str obj: fail "empty input name"
     if obj.contains char ",": fail "structural types cannot be shared"
     if obj.contains char "->": fail "functors cannot be shared"
@@ -195,11 +186,11 @@ def shared(cstr|blank surface, cstr obj)
     #unsafe_console().print str CHARS.buf
     return CHARS.buf
 
-def match(cstr obj, cstr type_name)
+def match(cstr pipe, cstr type_name)
     if type_name.contains char "->": fail "functors cannot be matched"
     CHARS = edit arena char[].alloc 4096
     copy "unsafe_pipe_data_match("
-    copy obj
+    copy pipe
     copy ","
     copy type_name
     copy "::tag," # tag is the monomorphic name
@@ -207,30 +198,24 @@ def match(cstr obj, cstr type_name)
     copy "[].unsafe_ptr)"
     return CHARS.buf
 
-def verify_opened_pipe_data_fit(pipe obj, nat size)
-    found = compiler::deref obj.unsafe_data.max_stored_size
-    if size>found: fail "type does not fit the pipe's size"
-    return obj
+# def prepare_writer_overwrite(open<pipe, "writer"> opened_pipe, nat size, cstr name)
+#     found = compiler::deref opened_pipe.obj.unsafe_data.max_stored_size
+#     if size>found: fail "type does not fit the pipe's size"
+#     _name = opened_pipe.obj.unsafe_data.value
+#     (unsafe_mut _name) = name
+#     return unsafe_mut opened_pipe.obj.unsafe_data.unsafe::add(pipe_data::size)
 
-def verify_opened_pipe_writer(open<pipe, "writer"> opened_pipe)
-    return opened_pipe
-
-def unsafe_set_new_name_and_get_offset(pipe obj, cstr name)
-    _name = obj.unsafe_data.value
-    (unsafe_mut _name) = name
-    return unsafe_mut obj.unsafe_data.unsafe::add(pipe_data::size)
-
-def unsafe_share(cstr obj, cstr pipe_data)
-    CHARS = edit arena char[].alloc 4096
-    copy "verify_opened_pipe_data_fit(verify_opened_pipe_writer("
-    copy obj
-    copy ").obj,compiler::value compiler::size "
-    copy obj
-    copy ").unsafe_set_new_name_and_get_offset(compiler::value "
-    copy pipe_data
-    copy "::tag).compiler::unsafe_copy("
-    copy obj
-    copy ")"
-    #unsafe_console().print str CHARS.buf
-    return CHARS.buf
+# def unsafe_replace(cstr opened_pipe, cstr pipe_data)
+#     CHARS = edit arena char[].alloc 4096
+#     copy "prepare_writer_overwrite("
+#     copy opened_pipe
+#     copy ",compiler::value compiler::size "
+#     copy opened_pipe
+#     copy ",compiler::value "
+#     copy pipe_data
+#     copy "::tag).compiler::unsafe_copy("
+#     copy pipe_data
+#     copy ")"
+#     #unsafe_console().print str CHARS.buf
+#     return CHARS.buf
     

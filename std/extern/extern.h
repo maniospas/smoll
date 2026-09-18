@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <alloca.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -46,8 +45,13 @@ static void __t_handle_sigint(int sig) {
     while (!__smo_fs_initialized()) emscripten_sleep(0);
 
 #else
+#ifdef _WIN32
+#include <signal.h>
+#define DECLARE_HANDLERS signal(SIGINT, __t_handle_sigint);
+#else
 #define DECLARE_HANDLERS struct sigaction __t_sa = { .sa_handler = __t_handle_sigint };\
     sigemptyset(&__t_sa.sa_mask);\
     __t_sa.sa_flags = 0;\
     sigaction(SIGINT, &__t_sa, NULL);
+#endif
 #endif

@@ -419,7 +419,7 @@ connection.onCompletion(async (params): Promise<CompletionItem[]> => {
   const items: CompletionItem[] = [];
   for (const t of hits) items.push(...extractCodeBlockLineStarts(resolveMessage(t.message)));
   const seen = new Set<string>();
-  const deduped = items.filter(i => seen.has(i.label) ? false : (seen.add(i.label), true));
+  const deduped = items.filter(i => !i.label.startsWith('"') && (seen.has(i.label) ? false : (seen.add(i.label), true)));
 
   const doc = documents.get(uri);
   const lineText = doc?.getText().split(/\r?\n/)[cursor.line] ?? '';
@@ -428,7 +428,9 @@ connection.onCompletion(async (params): Promise<CompletionItem[]> => {
   const prefixStart = beforeCursor.length - prefix.length;
   const afterDot = prefixStart > 0 && beforeCursor[prefixStart - 1] === '.';
 
-  const keywordItems: CompletionItem[] = afterDot
+  const quoteCount = (beforeCursor.match(/"/g) ?? []).length;
+  const insideString = quoteCount % 2 === 1;
+  const keywordItems: CompletionItem[] = (afterDot || insideString)
     ? []
     : KEYWORDS
         .filter(k => k.startsWith(prefix))

@@ -73,6 +73,34 @@ def get(vec v, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
         doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
     return v.unsafe_ptr+8*(i+v.pos)
 
+def iter(vec vec)
+    doc "a zero-cost wrapper over vectors for iteration"
+    doc "This has no additional storage; not even state tracking."
+    doc "Its only purpose is to support a 'get' function that"
+    doc "provides an expected instead of normal failure during"
+    doc "debugging, in order for vector loops to not appear in"
+    doc "in stack traces. The normal '\"out of bounds\"' failure"
+    doc "is reframed as an '\"iteration end\"' expected failure,"
+    doc "as if a 'range' was used. You can still iterate over"
+    doc "the underlying vector, but debug mode will print too"
+    doc "many stack traces when iterating within other loops. Example:"
+    doc "```python"
+    doc "# main.s"
+    doc "import std.core"
+    doc "def main()"
+    doc "    CLI = edit console()"
+    doc "    v = [1.0,2.0,3.0]"
+    doc "    for i in iter v: print i"
+    doc "```"
+    doc "If this example is compiled with './smoll main.s --debug'"
+    doc "there will be no error stack trace."
+    return class vec
+
+def get(iter v, nat i)
+    doc "get an iterated vector element at given position"
+    if i>=v.vec.length: expected_fail "out of bounds"
+    return v.vec[i unsafe_assume_inbounds]
+
 local def at(float number, nat i)
     return number
 
@@ -82,10 +110,9 @@ local def at(vec v, nat i)
 def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector addition"
     doc "Grabs a FLOATS allocator effect to store the result."
-    if v2 is vec and v1.length!=v2.length
-        fail "different vector sizes"
+    if v2 is vec and v1.length!=v2.length: fail "different vector sizes"
     v = mut vec(v1.length dirty)
-    for value in v1
+    for value in iter v1
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = value+v2.at i
     return v
@@ -98,8 +125,7 @@ def add(effect edit float_allocator FLOATS, float v1, vec v2)
 def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector subtraction"
     doc "Grabs a FLOATS allocator effect to store the result."
-    if v2 is vec and v1.length!=v2.length 
-        fail "different vector sizes"
+    if v2 is vec and v1.length!=v2.length: fail "different vector sizes"
     v = mut vec(v1.length dirty)
     for value in v1
         i = compiler::for_counter()
@@ -110,7 +136,7 @@ def sub(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector subtraction"
     doc "Grabs a FLOATS allocator effect to store the result."
     v = mut vec v2.length
-    for value in v2
+    for value in iter v2
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = v1-value
     return v
@@ -118,10 +144,9 @@ def sub(effect edit float_allocator FLOATS, float v1, vec v2)
 def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector multiplication"
     doc "Grabs a FLOATS allocator effect to store the result."
-    if v2 is vec and v1.length!=v2.length 
-        fail "different vector sizes"
+    if v2 is vec and v1.length!=v2.length: fail "different vector sizes"
     v = mut vec(v1.length dirty)
-    for value in v1
+    for value in iter v1
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = value*v2.at i
     return v
@@ -135,10 +160,9 @@ def mul(effect edit float_allocator FLOATS, float v1, vec v2)
 def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector exponentiation"
     doc "Grabs a FLOATS allocator effect to store the result."
-    if v2 is vec and v1.length!=v2.length 
-        fail "different vector sizes"
+    if v2 is vec and v1.length!=v2.length: fail "different vector sizes"
     v = mut vec(v1.length dirty)
-    for value in v1
+    for value in iter v1
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = pow(value, v2.at i)
     return v
@@ -147,7 +171,7 @@ def pow(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector exponentiation"
     doc "Grabs a FLOATS allocator effect to store the result."
     v = mut vec(v2.length dirty)
-    for value in v2
+    for value in iter v2
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = pow(v1, value)
     return v
@@ -155,11 +179,10 @@ def pow(effect edit float_allocator FLOATS, float v1, vec v2)
 def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector division"
     doc "Grabs a FLOATS allocator effect to store the result."
-    if v2 is vec and v1.length!=v2.length 
-        fail "different vector sizes"
+    if v2 is vec and v1.length!=v2.length: fail "different vector sizes"
     v = mut vec(v1.length dirty)
     p1 = v1.unsafe_ptr
-    for value in v1
+    for value in iter v1
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = value/v2.at i
     return v
@@ -168,7 +191,7 @@ def div(effect edit float_allocator FLOATS, float v1, vec v2)
     doc "vector division"
     doc "Grabs a FLOATS allocator effect to store the result."
     v = mut vec(v2.length dirty)
-    for value in v2
+    for value in iter v2
         i = compiler::for_counter()
         v[i unsafe_assume_inbounds] = v1/value
     return v
@@ -186,7 +209,7 @@ def reduce(vec v, blank|"mul"|"sub"|"rel" comparison, blank|vec v2, blank|"add"|
         ret = mut 1.0
     if (v2 is blank) and (not comparison is blank)
         compiler::skip()
-    for _value in v
+    for _value in iter v
         value = mut _value
         if comparison is "sub"
             i = compiler::for_counter()
@@ -266,7 +289,7 @@ def print(effect edit console CLI, vec v, cstr|blank endl)
     print nn "[ "
     for i in range of v.length
         print nn v[i unsafe_assume_inbounds]
-        if i<v.length-1: print nn "  "
+        if i+1<v.length: print nn "  "
     print (" ]", endl)
 
 def copy(effect edit float_allocator FLOATS, vec v)

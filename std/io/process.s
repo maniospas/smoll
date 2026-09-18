@@ -24,14 +24,33 @@ def os_name()
     {builtins::cstr ret=__temp_osname;}
     return ret
 
+def argument(cstr unsafe_value)
+    return class unsafe_value
+
+def str(argument arg)
+    return str arg.unsafe_value
+
 def args()
     doc "process arguments"
     doc "This buffer is stable and accessible from anywhere."
     doc "The first argument is the executable name."
-    ret = const cstr[]
+    ret = const argument[]
     {ret__unsafe_ptr=(char*)__t_argv;}
     {ret__unsafe_size=__t_argc;}
     return ret
+
+def arg_exists(cstr flag)
+    for arg in args()
+        if flag==str(arg): return true
+    return false
+
+def arg_after(cstr flag, blank|str|cstr default_value)
+    args = args()
+    for arg in args
+        if flag==str(arg) and compiler::for_counter()+1<len args
+            return str args[compiler::for_counter()+1]
+    if default_value is blank: fail "arg not found"
+    else: return str default_value
 
 def breakpoint(effect edit console CLI)
     VM "[False]" # not implemented interrupts yet for the VM

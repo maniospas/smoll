@@ -2,6 +2,7 @@ import std.core
 import std.io::dir::is_dir
 import std.io::dir::open
 import std.io::get
+import std.io.process as process
 import std.test
 import std.scope
 
@@ -11,7 +12,9 @@ def _main(effect edit console CLI)
     colors = colors CLI
     CHARS = edit arena alloc 128
     # this one copy suffices to make clever string building additions
-    if compiler::os type "win"
+    if try preferred_backend = process::arg_after("--testback")
+        command_base = "./smoll --back "+preferred_backend+" --cleanup "
+    else if compiler::os type "win"
         command_base = copy "./smoll.exe --back clang --cleanup "
     else
         command_base = copy "./smoll --cleanup "

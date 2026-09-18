@@ -1,14 +1,16 @@
+
+
+
 import std.core
 import std.pipe
 def @ = compiler::varname
-
 
 def pair(float _x, float _y)
     x = mut _x
     y = mut _y
     return class (x, y)
 
-def foo(pipe ptr obj)
+def foo(pipe obj)
     p = mut macro<match> (@with obj, pair::name)
     p.x = 3.0
     unsafe_console().print "ended"
@@ -20,11 +22,6 @@ def main()
     THREADS = edit growing_thread_pool cpu 16
     t = mut thread(type foo, obj)
 
-    # cannot lock both before and after trying to sync the handle
-    # if try p_async = mut macro<match> (@with obj, pair::name)
-    #    print compiler::deref p_async.x
-
-    join t # synchronize by waiting for thread reaease its resources
+    join t # synchronize by waiting for thread to reaease its resources
     if try p = mut macro<match> (@with obj, pair::name)
         print compiler::deref p.x
-    #del THREADS

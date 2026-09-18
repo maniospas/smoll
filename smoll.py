@@ -909,6 +909,15 @@ class ImplementedType:
         self.min_abstraction_level = -1
         self.max_abstraction_level = 0
 
+    def rename_tokens(self, replace: dict[str,str]):
+        for tok in self.implementation:
+            tex = replace.get(tok.tostring(), None)
+            if tex is not None: tok.name = tex
+        for defer in self.defers+self.returned_defers:
+            for tok in defer:
+                tex = replace.get(tok.tostring(), None)
+                if tex is not None: tok.name = tex
+
     def get_required_accompany(self, var: Variable):
         assert isinstance(var, Variable)
         var_stabilized_name = var.stabilized_name()
@@ -2141,7 +2150,9 @@ class ImplementedType:
             prev = tok
             if tok==";": ret += ";\n  "
             elif tok=="{": ret += "{\n  "
-            elif tok=="}": ret += "}\n  "
+            elif tok=="}": 
+                if prev[-1]==":": ret += ";"# c99 compliance
+                ret += "}\n  "
             else: ret += tok
         if self.needs_failure_mode:
             #ret += "\n  goto __t_final;" # skip failure handling
@@ -2156,7 +2167,9 @@ class ImplementedType:
                     prev = tok
                     if tok==";": defer_ret += ";\n  "
                     elif tok=="{": defer_ret += "{\n  "
-                    elif tok=="}": defer_ret += "}\n  "
+                    elif tok=="}": 
+                        if prev[-1]==":": ret += ";"
+                        defer_ret += "}\n  "
                     else: defer_ret += tok
             ret += defer_ret
             ret += "\n  goto __t_skip_returns;"
@@ -2175,7 +2188,9 @@ class ImplementedType:
                     prev = tok
                     if tok==";": defer_ret += ";\n  "
                     elif tok=="{": defer_ret += "{\n  "
-                    elif tok=="}": defer_ret += "}\n  "
+                    elif tok=="}": 
+                        if prev[-1]==":": ret += ";"
+                        defer_ret += "}\n  "
                     else: defer_ret += tok
             ret += defer_ret
             if not for_inlining: ret += "\n  return __t_errcode;\n}"
@@ -2194,10 +2209,14 @@ class ImplementedType:
                     prev = tok
                     if tok==";": defer_ret += ";\n  "
                     elif tok=="{": defer_ret += "{\n  "
-                    elif tok=="}": defer_ret += "}\n  "
+                    elif tok=="}": 
+                        if prev[-1]==":": ret += ";"
+                        defer_ret += "}\n  "
                     else: defer_ret += tok
             ret += defer_ret
-            ret = ret[:-2]+"}"
+            ret = ret[:-2]
+            if ret[-2:]==":\n": ret += ";"
+            ret += "}"
         return ret
 
 class UnionType:
@@ -3491,7 +3510,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         returned_values = [0 for r in ret if r.type.builtin]
         temporary_implementation.defers.clear()
         returned_error = await temporary_implementation.interpret(returned_values, memory, recursion_budget=vm_recursion_budget)
-        if returned_error!=0: literal_tok.error("interpreter", "failed due to "+err_code_list[returned_error][1:-1])
+        if returned_error!=0: literal_tok.error("interpreter", err_code_list[returned_error][1:-1])
 
         lits: list[ImplementedType] = list()
         i = 0
@@ -4123,12 +4142,12 @@ operators = {
     ">=":("ge",7),
     "==":("eq",7),
     "!=":("neq",7),
-    "+": ("add",5),
-    "-": ("sub",6),
-    "*": ("mul",2),
-    "**":("pow",1),
-    "/": ("div",3),
-    "%": ("mod",4),
+    "+": ("add", 6),
+    "-": ("sub", 6),
+    "*": ("mul", 5),
+    "/": ("div", 5),
+    "%": ("mod", 5),
+    "**": ("pow", 4),
     "[": ("get", 0.5),
     ".": ("dot", 0.5),
     "::": ("reflection", 0.5),
@@ -4682,12 +4701,12 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
             pos += 1
             reflection_token_text = reflection_token.text
             if len(rets)!=1 and len(rets[0].type.rets)!=len(rets):
-                get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or class variables but got: '"+signature_like(rets, impl)+"'")
+                get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or class variables but got structure '"+signature_like(rets, impl)+"'")
             reflection_var = rets[0]
             if reflection_var.type.is_functor_of is None and reflection_var.type.is_literal_of!=ANY_TYPE:
                 # here we know that we are parsing a class variable
                 if len(reflection_var.type.rets)!=len(rets) or len(rets)==0:
-                    get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or class variables but got: '"+signature_like(rets, impl)+"'")
+                    get(tokens, pos-2).error("type", "reflection is applicable only to types, functor variables, or class variables but got structure '"+signature_like(rets, impl)+"'")
             
             variation = reflection_var.type
             variations = list()
@@ -4911,8 +4930,9 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
         current_token.error("safety", "code block has already concluded", reason=impl.current_code_block_has_been_completed, raason_message="in")
 
     current = current_token.text
-    if current=="fail":
-        if is_lsp and file.is_main_file: print_lsp_keyword(current_token, "**fail**\n\nImmediately fail during execution with the corresponding string literal message or error code retrieved with 'compiler::last_error()' from some other failure. Failures cascade to callers and to the callers of callers until the program exits with a corresponding error code, or a 'try' statement intercepts them.")
+    if current=="fail" or current=="expected_fail":
+        if is_lsp and file.is_main_file: 
+            print_lsp_keyword(current_token, "**"+current+"**\n\nImmediately fail during execution with the corresponding string literal message or error code retrieved with 'compiler::last_error()' from some other failure. Failures cascade to callers and to the callers of callers until the program exits with a corresponding error code, or a 'try' statement intercepts them. Normal failures are included in stack traces when compiling with '--debug', whereas expected ones are hidden even then.")
         pos += 1
         impl.needs_failure_mode = current_token
         message = get(tokens, pos)
@@ -4921,7 +4941,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             pos, ret = await process_statement_operator(file, tokens, impl, pos, ret, current_operator_priority=0)
             if len(ret)!=1 or ret[0].type!=CAUGHT_TYPE:
                 message.error("syntax", "must contain an error message after 'fail' or resolve to 'catch' type but got "+signature_like(ret, impl))
-            if debug_mode:
+            if debug_mode and current=="fail":
                 text = "\\033[31mfail\\033[0m propagating error"
                 text += "\\n\\033[31mat\\033[0m "+message.file.path.replace('"','\\"')+" line "+str(message.row)+" column "+str(message.col)+"\\n"
                 impl.implementation.extend([
@@ -4973,7 +4993,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
             err_code_table[text] = err_code
             err_code_list.append(message.text)
         impl.spawned_error_codes.add(err_code)
-        if debug_mode:
+        if debug_mode and current=="fail":
             text = "\\033[31mfail\\033[0m "+text
             text += "\\n\\033[31mat\\033[0m "+message.file.path.replace('"','\\"')+" line "+str(message.row)+" column "+str(message.col)+"\\n"
             impl.implementation.extend([
@@ -7128,6 +7148,7 @@ parser.add_argument("--debug", action="store_true", help="Show debug messages fo
 parser.add_argument("--back", action="store", help="Choose a backend compiler among auto, antcc, gcc, clang, none (the last option only creates a C file).",)
 parser.add_argument("--vmkb", action="store", type=int, default=256, help="VM memory in kilobytes.",)
 parser.add_argument("--vmrec", action="store", type=int, default=16, help="VM recursion budget.",)
+parser.add_argument("--maxfuncname", action="store", type=int, default=0, help="EXPERIMENTAL. The maximum emmitted function name size. Default value of 0 disables this feature. Otherwise, names less than both 40 and this value are replaced by temporary values.",)
 parser.add_argument("-o", "--out",metavar="PATH", help="Path for the compiled output.",)
 args, extra_args = parser.parse_known_args()
 global_args = args
@@ -7144,7 +7165,7 @@ vm_recursion_budget = args.vmrec
 if chosen_compiler == "auto":
     if is_pyodide: chosen_compiler = "vm"
     else: chosen_compiler = "gcc"
-
+limit_function_name_size = 0 if not args.maxfuncname else max(args.maxfuncname, 40)
 ADDRESS_SCHEMA_32BIT = chosen_compiler=="emcc"
 
 
@@ -7419,7 +7440,23 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
                 already_generated.add(candidate_def)
                 add_implementation(candidate_def)
         discovered_defs.append(next_def)
-    for main_def in main_defs: add_implementation(main_def)
+    
+    for main_def in main_defs:
+        add_implementation(main_def)
+    
+    # simplify exceedingly large monomoprhic type names (e.g., that hold large buffer info)
+    if limit_function_name_size:
+        print(f"[{PURPLE}?{RESET}] EXPERIMENTAL procude function names of up to "+str(limit_function_name_size)+" characters")
+        replacements = dict()
+        for candidate_def in discovered_defs: 
+            if len(candidate_def.monomorphic_name)<=limit_function_name_size or "(*)" in candidate_def.monomorphic_name: continue
+            replacement = create_temp()
+            replacements[candidate_def.monomorphic_name] = replacement
+            candidate_def.monomorphic_name = replacement
+        for candidate_def in discovered_defs: 
+            candidate_def.rename_tokens(replacements)
+        entry_point = replacements.get(entry_point, entry_point)
+
     used_globs = set(k for main_def in discovered_defs for k in main_def.used_globals)
     linker: list[str] = list()
     for main_def in discovered_defs: 
@@ -7486,6 +7523,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         "gcc": [ "gcc", "-O3", str(src_path), "-o", str(exe_path), "-I."]+linker,
         "clang": [ "clang", "-O2", str(src_path), "-o", str(exe_path), "-I."]+linker,
         "antcc": [ "./antcc", "-O2", str(src_path), "-o", str(exe_path), "-I."]+linker,
+        "tcc": [ "tcc", str(src_path), "-o", str(exe_path), "-I."]+linker,
         "emcc": [ "emcc", "-O3", str(src_path), "-o", str(exe_path)+".js", "-I."]+linker
     }.get(chosen_compiler, None)
     if gcc_cmd is None:

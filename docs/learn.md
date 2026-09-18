@@ -464,13 +464,12 @@ def main()
 ## what next?
 
 This material covered the very basics of *smoλ*. However, there are
-other aspects of the type system and standard library's core 
-that can also contribute to simple programs, like file handling. 
-Not to mention of concepts like conditional compilation and
-compile-time evaluation.
+other aspects of the type system and standard library's core that 
+can contribute to simple programs. These include file handling, web
+operations, graphics, random numbers, and scientific computations.
 
 More memory concepts include safe buffer
-and pointer management for more types than simple characters. 
+and pointer management for arrays of types beyond mere characters. 
 More information can be found 
 in the reference guide, and the standard library's manual under
 the **Documentation** menu above. Also try the **Tutorials** for
@@ -498,18 +497,21 @@ def main()
     for l in lengths: print l
 ```
 
-
-<!-- 
-Recusrsion may be achieved through usage of *functors*,
-which are basically a means for passing abstract functions
-around. These are normal variables with types of the form
-`input_type->output_type` and can be called with the
-`compiler::call` function like below. More on functors
-and compiler functions in the <a href="reference.html">reference guide</a>.
+Finally, there are several compile-time evaluation constructs, 
+including a macro system for calling *smoλ* functions that parse
+strings known by the compiler to generate *smoλ*
+code. This uses bounded compute to prevent exploding compilation
+times (you will typically not notice the bound) and allows 
+expressions like the one below. Notice how explicit it is that 
+we are doing something non-trivial. Furthermore, macros parse
+into complete expressions, so they do not affect code farther away.
 
 ```python
 import std.core
 
-def call(nat->nat inc)
-
-``` -->
+def main()
+    CLI = edit console()
+    x = 2
+    # printf applies 'print nn' to all string segments and bracketed expressions
+    macro<printf> "hello {x} world\n"
+```

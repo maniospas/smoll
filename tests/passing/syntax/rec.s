@@ -10,5 +10,5 @@ def call_fib(nat n)
 
 def main()
     CLI = edit console()
-    print fib(42)
+    print fib(35)
 

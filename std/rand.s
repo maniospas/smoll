@@ -58,7 +58,9 @@ def splitmix64("time")
     doc "Computes the seed of a splitmix64 sequence using the clock"
     doc "as the source of entropy."
     VM "[time.time_ns()]"
-    {builtins::compiler::ptr ts = alloca(sizeof(struct timespec));}
+    #{builtins::compiler::ptr ts = alloca(sizeof(struct timespec));}
+    {struct timespec tss;}
+    {builtins::compiler::ptr ts = (char*)&tss;}
     {clock_gettime(CLOCK_REALTIME, (struct timespec*)ts);}
     {builtins::nat seed = (unsigned long long)((struct timespec*)ts)->tv_sec * (unsigned long long)1000000000 + ((struct timespec*)ts)->tv_nsec;}
     return seed

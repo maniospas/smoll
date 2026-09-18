@@ -60,7 +60,7 @@ def range(nat _from, nat to)
 def mutget(edit range r, nat|blank skipped)
     doc "next range number"
     doc "This increments the range `from` position and returns the previous one."
-    if r.from>=r.to: fail "iteration end"
+    if r.from>=r.to: expected_fail "iteration end"
     ret = const r.from
     r.from = ret+1
     return ret

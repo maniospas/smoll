@@ -65,9 +65,13 @@ def request(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr
         curl_easy_setopt((CURL*)curl, CURLOPT_WRITEDATA,      &__buf);
     }
     if exists opts.body
+        {curl_easy_setopt((CURL*)curl, CURLOPT_POSTFIELDS, opts__body);}
+        {builtins::nat content_type_len = 15 + strlen(opts__content_type) + 1;}
+        if compiler::back type "antcc" # antcc does not support VLA
+            if content_type_len>=255: fail "too large content type"
+            {char __ct[256];}
+        else: {char __ct[content_type_len];}
         {
-            curl_easy_setopt((CURL*)curl, CURLOPT_POSTFIELDS, opts__body);
-            char __ct[15 + strlen(opts__content_type) + 1];
             snprintf(__ct, sizeof(__ct), "Content-Type: %s", opts__content_type);
             __headers = curl_slist_append(__headers, __ct);
             curl_easy_setopt((CURL*)curl, CURLOPT_HTTPHEADER, __headers);

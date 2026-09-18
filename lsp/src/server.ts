@@ -3,10 +3,34 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import { pathToFileURL, fileURLToPath } from 'url';
 import { writeFile, unlink } from 'fs/promises';
 import { tmpdir } from 'os';
-import { join } from 'path';
+import { delimiter, join } from 'path';
 import { platform } from 'os';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import { randomBytes } from 'crypto';
+import { access } from 'fs/promises';
+import { existsSync, accessSync, constants } from 'fs';
+
+
+function findCompiler(): string {
+  const name = platform() === 'win32' ? 'smoll.exe' : 'smoll';
+  const isExecutable = (path: string) => {
+    try {
+      accessSync(
+        path,
+        platform() === 'win32' ? constants.F_OK : constants.X_OK
+      );
+      return true;
+    } catch { return false; }
+  };
+  const local = join(process.cwd(), name);
+  if(isExecutable(local)) return local;
+  for(const dir of (process.env.PATH ?? '').split(delimiter)) {
+    if(!dir) continue;
+    const candidate = join(dir, name);
+    if(isExecutable(candidate)) return candidate;
+  }
+  throw new Error(`Cannot find '${name}' in the current directory or PATH`);
+}
 
 const LOGGING = true;
 function log(msg: string) { if (LOGGING) connection.console.log(`[smoll] ${msg}`); }
@@ -153,7 +177,7 @@ const END_MARKER = '===END===';
 
 function ensureCompilerRunning(firstTmpPath: string) {
   if (compilerProc) return;
-  const BINARY = platform() === 'win32' ? '.\\smoll.exe' : './smoll';
+  const BINARY = findCompiler();
   compilerProc = spawn(BINARY, [firstTmpPath, '--lsp'], {});
   compilerProc.stdout.setEncoding('utf8');
   compilerProc.stdout.on('data', (chunk: string) => {

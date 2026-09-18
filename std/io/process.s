@@ -65,7 +65,7 @@ def breakpoint(effect edit console CLI)
     set(color yellow)
     print nn "Create a safe failure (F), or unsafely crash (C)?\n"
     del color
-    {while(true){builtins::char c = getchar(); if(c=='F'){has_failed=0;break;}if(c=='f'){has_failed=0;break;}if(c=='C'){break;}if(c=='c'){break;}}}
+    {while(1){builtins::char c = getchar(); if(c=='F'){has_failed=0;break;}if(c=='f'){has_failed=0;break;}if(c=='C'){break;}if(c=='c'){break;}}}
     if has_failed: {_exit(1);}
     fail "interrupted by user"
 

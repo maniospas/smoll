@@ -4,14 +4,14 @@ import std.sci
 def @ = compiler::varname
 
 
-def sum_data(vec v)
+def sum_data(nat row, vec v)
     result = mut 0.0
-    return class (v,result)
+    return class (row,v,result)
 
 def parallel_sum(pipe obj)
-    p = mut macro<match> (@with obj, sum_data::name)
+    reader = open(obj reader)
+    p = mut macro<match> (@reader, sum_data::name)
     v = compiler::deref p.v
-    unsafe_console().print v
     p.result = sum compiler::deref p.v
     unsafe_console().print compiler::deref p.result
 
@@ -23,12 +23,17 @@ def main()
         6.0, 7.0, 8.0
     ].any 3
     THREADS = edit growing_thread_pool cpu 16
+    INCORRUPTIBLE = edit arena(1024 incorruptible)
     pending = edit pipe[].alloc mat.rows
-    surface = edit arena(1024 incorruptible)
 
     for i in range of mat.rows
-        #print row(mat, i)
-        pending[i] = macro<shared> (@surface, @sum_data row(mat, i))
+        pending[i] = macro<shared> @sum_data(i, row(mat, i))
+
+        
+        writer = open(pending[i] writer)
+        #(unsafe_mut macro<match>(@writer, sum_data::name)) = sum_data(0, row(mat, 0))
+        macro<unsafe_share> (@writer, @row(mat,0))
+        del writer
         join thread(type parallel_sum, pending[i])
     #del THREADS
     

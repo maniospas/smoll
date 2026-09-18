@@ -142,8 +142,7 @@ def sub(Number x, Number y)
         compiler::skip()
     if x is nat
         doc "Natural numbers are safeguarded against acquiring negative results, which would overflow."
-    if x is nat and x<y
-        fail "nat subtraction would yield a negative"
+    if x is nat and x<y: fail "nat subtraction would yield a negative"
     {type(x) z=x-y;}
     return z
 
@@ -155,6 +154,19 @@ def sub(nat x, nat y, "assume_smaller")
     doc "```rust"
     doc "0-(1 assume_smaller)"
     doc "```"
+    {type(x) z=x-y;}
+    return z
+
+def sub(nat x, nat y, "test_smaller")
+    doc "subtract by"
+    doc "Subtracts two natural numbers without underflow check. This is an overload for the - operator,"
+    doc "for example used like below. This overload never fails and instead adds 0xFFFFFFFFFFFFFFFF to"
+    doc "the result if it would produce a negative."
+    doc "```python"
+    doc "if try result=0-(1 test_smaller): print result"
+    doc "else: print \"would be negative\""
+    doc "```"
+    if x<y: expected_fail "nat subtraction would yield a negative"
     {type(x) z=x-y;}
     return z
 

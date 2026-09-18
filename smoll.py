@@ -2640,15 +2640,14 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
     if UNSAFE_COPY_TYPE in method.variations:
         if len(vars)<2 or vars[0].type!=POINTER_TYPE:
             error_token.error("type", "unsafe copy requires a pointer followed by at least one value, but got '"+signature_like(vars, impl)+"'")
-        var = impl.stabilize([vars[0]])[0]
+        vars = impl.stabilize(vars)
+        var = vars[0]
         rets = vars[1:]
         err_token = error_token
-        rets = impl.stabilize(rets)
-        ret = rets
-        if var is not None and var.isprivate: err_token.error("type", "cannot assign to immutable '"+pretty_name(var.name)+"'")
-        if var.type!=POINTER_TYPE: err_token.error("type", "you can set a value only to an existing pointer's memory contents with '"+op_name+"' but got '"+signature_like(rets)+"'")
+        #if var is not None and var.isprivate: err_token.error("type", "cannot 'compiler::unsafe_copy' to immutable '"+pretty_name(var.name)+"'")
+        if var.type!=POINTER_TYPE: err_token.error("type", "you can 'compiler::unsafe_copy' a value only to an existing pointer's memory contents with '"+op_name+"' but got '"+signature_like(rets)+"'")
         if var.stabilized_name() in impl.invalidated: err_token.error("safety", "invalidated "+signature_like([var], impl)+"'", reason=impl.invalidated[var.stabilized_name()], raason_message="due to", suggestions=["re-obtain it from its buffer"])
-        if var.immutable: err_token.error("type", "cannot write to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&' or 'mutget' from an 'edit' or 'mut' buffer if you are working with std", "remove 'const' qualitifier"])
+        #if var.immutable: err_token.error("type", "'compiler::unsafe_copy' cannot write to an immutable pointer", suggestions=["make it 'mut'", "obtain it with '&' or 'mutget' from an 'edit' or 'mut' buffer if you are working with std", "remove 'const' qualitifier"])
         IFNOT_CHECK_PATTERN[3] = var
         impl.implementation.extend(IFNOT_CHECK_PATTERN)
         try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
@@ -2677,33 +2676,18 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
             impl.needs_failure_mode = error_token
 
         progress = 0
-        for r in ret:
+        for r in rets:
             mem_size = r.type.memory_size() if r.type.builtin else 0
             if not mem_size: continue
             if progress:
-                # impl.implementation.extend([
-                #     CODEWORD_MEMCPY, CODEWORD_LPAR, var,
-                #     CODEWORD_ADD, create_code_word_cached(str(progress)),
-                #     CODEWORD_COMMA, CODEWORD_AMP,
-                #     impl.vars[r.stabilized_name()],
-                #     CODEWORD_COMMA, create_code_word_cached(str(mem_size)),
-                #     CODEWORD_RPAR, CODEWORD_SEMICOLON
-                # ])
                 PREALLOCATED_MEMCPY_OFFSET_PATTERN[2] = var
                 PREALLOCATED_MEMCPY_OFFSET_PATTERN[4] = create_code_word_cached(str(progress))
-                PREALLOCATED_MEMCPY_OFFSET_PATTERN[7] = impl.vars[r.stabilized_name()]
+                PREALLOCATED_MEMCPY_OFFSET_PATTERN[7] = r
                 PREALLOCATED_MEMCPY_OFFSET_PATTERN[9] = create_code_word_cached(str(mem_size))
                 impl.implementation.extend(PREALLOCATED_MEMCPY_OFFSET_PATTERN)
             else:
-                # impl.implementation.extend([
-                #     CODEWORD_MEMCPY, CODEWORD_LPAR, var,
-                #     CODEWORD_COMMA, CODEWORD_AMP,
-                #     impl.vars[r.stabilized_name()],
-                #     CODEWORD_COMMA, create_code_word_cached(str(mem_size)),
-                #     CODEWORD_RPAR, CODEWORD_SEMICOLON
-                # ])
                 PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[2] = var
-                PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[5] = impl.vars[r.stabilized_name()]
+                PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[5] = r
                 PREALLOCATED_MEMCPY_NOOFFSET_PATTERN[7] = create_code_word_cached(str(mem_size))
                 impl.implementation.extend(PREALLOCATED_MEMCPY_NOOFFSET_PATTERN)
             if impl.vars[r.stabilized_name()].type==POINTER_TYPE:

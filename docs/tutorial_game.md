@@ -16,7 +16,8 @@ under the `std/graphics.s` part of the standard library. The wrapper
 remains safe for use in your code, and adds some more safety checks.
 To begin with, a singleton window can be constructed based on desired dimensions, 
 window name, and default font. It must be declared as at least editable and a `WINDOW`
-variable name lets it be passsed automatically to all functions.
+variable name lets it be passsed automatically to all functions. Pass a null 
+string constructed per `cstr()` to user raylib's builtin font.
 
 There may be linking errors if raylib is not installed in your system;
 *smoλ* and gcc need to access its include and linking directories. For example,
@@ -28,13 +29,13 @@ backend to create a *webgl* application running in the browser.
 sudo apt install libraylib-dev
 ```
 
-
 Check for window closing events with `is_open`, or loop forever. Then, in each loop,
 create a drawable frame with the `frame = draw()` function. The frame is drawn when released,
 which occurs either automatically if the draw function call is made within a function,
 or manually with `del frame` if the drawing happens directly inside the loop.  
-The type system will help prevent bugs by complaining of leaking resources if you declare
-but not release a frame within a loop. In general, positions and sizes
+
+The type system will help prevent bugs by automatically ending frames declared within loops,
+and complaining if you use them in code thereon. In general, positions and sizes
 are float numbers. See below for colors.
 
 
@@ -49,7 +50,6 @@ def main()
         frame = draw()
         clear color(255,255,255)
         text("smoll + raylib", 20.0, 20.0, font_size, color(64,0,0))
-        del frame
 ```
 
 ## shapes
@@ -67,6 +67,7 @@ import std.graphics
 import std.io.process::breakpoint
 
 def main()
+    CLI = edit console() # needed for breakpoint
     WINDOW = edit window(800.0, 600.0, "overlap", "std/ArianaVioleta-dz2K.ttf")
     circ_state = (100.0, 100.0, 50.0) # tuples are automatically unpacked when used later
     rect_state = (120.0, 120.0, 200.0, 50.0)
@@ -81,7 +82,6 @@ def main()
         # outlined rect
         rect(rect_state solid color(0,255,0,128))
         rect(rect_state line thickness, color(0,128,0))
-        del frame
 ```
 
 ## textures

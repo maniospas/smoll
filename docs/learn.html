@@ -734,13 +734,12 @@ prefix arguments that you are going to transform with an underscore.</p>
 <h2 id="what-next">what next?</h2>
 
 <p>This material covered the very basics of <em>smoλ</em>. However, there are
-other aspects of the type system and standard library&#8217;s core 
-that can also contribute to simple programs, like file handling. 
-Not to mention of concepts like conditional compilation and
-compile-time evaluation.</p>
+other aspects of the type system and standard library&#8217;s core that 
+can contribute to simple programs. These include file handling, web
+operations, graphics, random numbers, and scientific computations.</p>
 
 <p>More memory concepts include safe buffer
-and pointer management for more types than simple characters. 
+and pointer management for arrays of types beyond mere characters. 
 More information can be found 
 in the reference guide, and the standard library&#8217;s manual under
 the <strong>Documentation</strong> menu above. Also try the <strong>Tutorials</strong> for
@@ -769,20 +768,25 @@ lengths on another buffer.</p>
 </code></pre>
 </div>
 
-<!-- 
-Recusrsion may be achieved through usage of *functors*,
-which are basically a means for passing abstract functions
-around. These are normal variables with types of the form
-`input_type->output_type` and can be called with the
-`compiler::call` function like below. More on functors
-and compiler functions in the <a href="reference.html">reference guide</a>.
+<p>Finally, there are several compile-time evaluation constructs, 
+including a macro system for calling <em>smoλ</em> functions that parse
+strings known by the compiler to generate <em>smoλ</em>
+code. This uses bounded compute to prevent exploding compilation
+times (you will typically not notice the bound) and allows 
+expressions like the one below. Notice how explicit it is that 
+we are doing something non-trivial. Furthermore, macros parse
+into complete expressions, so they do not affect code farther away.</p>
 
-```python
-import std.core
+<div class="codehilite">
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.core</span>
 
-def call(nat->nat inc)
-
-``` -->
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="c1"># printf applies &#39;print nn&#39; to all string segments and bracketed expressions</span>
+    <span class="n">macro</span><span class="o">&lt;</span><span class="n">printf</span><span class="o">&gt;</span> <span class="s2">&quot;hello </span><span class="si">{x}</span><span class="s2"> world</span><span class="se">\n</span><span class="s2">&quot;</span>
+</code></pre>
+</div>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {

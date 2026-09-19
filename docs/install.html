@@ -275,11 +275,13 @@ Get vscode from its official site. You can also use your editor of choice, or vi
 <div class="step">
 <h2>2. Syntax highlighting</h2>
 
-If you use an editor other than vscode, a Python syntax highlighter covers many language aspects.
+If you use an editor other than vscode, a Python syntax highlighter covers many language aspects and you can rely on
+a mixture of comprehensive error messages and creating documentation with <pre class="skiptry">smoll main.s --docs</pre>
 However, a <b>vscode extension</b> is provided. This offers:
 <br>&nbsp;• syntax and error highlighting
 <br>&nbsp;• mouse hover tooltips about types and functions
 <br>&nbsp;• visiting definitions with ctrl+click
+<br>&nbsp;• code completion recommendations for imports, variables, fields, and functions
 <br>Either install the <code>smoll</code> extension
 by searching for the extension within vscode, or visit its page in the vscode marketplace by following the next link.
 <br><br>
@@ -292,8 +294,8 @@ by searching for the extension within vscode, or visit its page in the vscode ma
 <div class="step">
 <h2>3. Create a new project</h2>
 
-Create a new folder. Place within it the executable matching your platform without changing its name. Then, open
-vscode or your editor of choice in that folder.
+Create a new folder. Place within it the executable matching your platform without changing its name. Alternatively,
+add the executable to your system PATH. Then, open vscode or your editor of choice in that folder.
 
 <br><br>
 <a href="https://github.com/maniospas/smoll/releases/download/main/smoll.exe" class="button">➔ Windows (smoll.exe)</a>
@@ -314,7 +316,7 @@ GCC compiler in your system, which the language tries to use by default. Otherwi
 by adding <code>--back vm</code>. This is how the language runs in the web playground too.
 <br>
 <br>
-In <b>windows</b> install GCC by installing msys2 first and then running:
+In <b>windows</b> install GCC by installing msys2 first and then run:
 
 <pre class="skiptry">
 pacman -S mingw-w64-ucrt-x86_64-gcc
@@ -330,17 +332,29 @@ sudo apt update
 sudo apt install build-essential
 </pre>
 
-<details><summary>Expand this to look at other supported compiler backends.</summary>
-You can use the exemplary 
-<a href="https://codeberg.org/lsof/antcc">antcc</a> compiler (and add a star to it)
-for WSL or linux. This is faster than GCC with roughly comparable optimization speeds for smoλ code.
-A fork of that has been tailored to work well for us. Download
+<details><summary><b>Compile with other backends, or for the web.</b></summary>
+<br>
+&nbsp;• <code>--back clang</code> Instead of gcc, use the equally popular clang compiler.
+<br>
+&nbsp;• <code>--back tcc</code> Incredibly fast but unoptimized compilation, use the *tcc* compiler.
+<br>
+&nbsp;• <code>--back antcc</code> A trade-off between fast yet reasonably optimized compilation with the exemplary 
+<a href="https://codeberg.org/lsof/antcc">antcc</a> compiler for WSL or linux. 
+This is faster than GCC with roughly comparable optimization speeds for smoλ code.
+A fork of that compiler has been tailored to work well for us. Download
 the precompiled executable (or compile it from scratch), and place it in your project directory.
-Then add <code>--back antcc</code> to smoll runs.
+<br>
+&nbsp;• <code>--back emcc</code> Compile for the web using emcripten. Since this is typically used for
+creating visual application, refer to the <a href="tutorial_game.html">➔ Game dev tutorial</a>.
+<br>
 
 <br><br>
+<a href="https://releases.llvm.org/download.html" class="button">➔ clang download</a>
+<a href="https://tinycc-tinycc.mintlify.app/installation" class="button">➔ tcc installation</a>
 <a href="https://github.com/maniospas/smoll/raw/refs/heads/main/antcc" class="button">➔ antcc binary</a>
 <br><br>
+
+
 
 </details>
 

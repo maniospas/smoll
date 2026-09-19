@@ -2321,7 +2321,8 @@ class Token:
         except OSError as exc:
             errexit()
         token_len = max(len(self.text), 1)
-        location = f"{self.file.resolved_path} line {self.row} column {self.col}"
+        path = Path(self.file.resolved_path).resolve()
+        location = f"{path.as_uri()} line {self.row} column {self.col}"
         print(f"{RED}at{RESET} {location}")
         print(source_line)
         if not reason: print(RED+" "*(self.col - 1)+"^"*token_len+RESET)
@@ -2338,7 +2339,8 @@ class Token:
                 errexit()
             token_len = max(len(reason.text), 1)
             pointer = " " * (reason.col - 1) + "^" * token_len
-            location = f"{reason.file.resolved_path} line {reason.row} column {reason.col}"
+            path = Path(self.file.resolved_path).resolve()
+            location = f"{path.as_uri()} line {reason.row} column {reason.col}"
             prefix = " "*(self.col-1)
             print(prefix+RED+"^"*orignal_token_len+"|"+RESET)
             print(prefix+RED+" "*orignal_token_len+"|"+raason_message+RESET+" "+location)
@@ -6970,7 +6972,8 @@ def _load(file: File, is_main_file: bool=False, err_token:Token|None=None) -> tu
                 printid(str(err))
             raise FatalException
         print(f"[{RED}X{RESET}] {PURPLE}file read error{RESET} {err}")
-        location = f"{file.path} line {row+1}"
+        path = Path(file.path).resolve()
+        location = f"{path.as_uri()}#L{row+1} line {row+1}"
         print(f"{RED}at{RESET} {location}")
         errexit()
 

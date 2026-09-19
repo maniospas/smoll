@@ -98,11 +98,16 @@ run code via its own virtual machine! Do this by running programs like below:
 ./smol main.s --back vm
 ```
 
-By default, *gcc* is the backend of choice, *vm* is a slow-ish virtual machine that
-is nonetheless used for resolution of compile-time instructions and macros, *antcc*
-is an alternate compiler, and *emcc* is emscripten for export into web applications.
-Here we focus on the last option, which lets us export graphics application to the
-browser.
+Here are available backends, where the corresponding command (other than VM) must
+be installed in the host computer. The last backend is of most interest to this tutorial
+in that it allows porting graphics to web applications that run in the browser.
+
+- *gcc* is the backend of choice 
+- *clang* is a competetitve alternative
+- *vm* is a slow-ish virtual machine that is nonetheless used for resolution of compile-time instructions and macros
+- *antcc* is an alternate compiler for linux that compiles fastly after typechecking, yet performs moderate optimizations
+- *tcc* is a very fast compiler without optimiations
+- *emcc* is emscripten for export into web applications.
 
 To begin with, the `emcc` compiler needs to be present in the current system.
 For, example, install it with the following command or an equivalent.

@@ -277,7 +277,8 @@ under the <code>std/graphics.s</code> part of the standard library. The wrapper
 remains safe for use in your code, and adds some more safety checks.
 To begin with, a singleton window can be constructed based on desired dimensions, 
 window name, and default font. It must be declared as at least editable and a <code>WINDOW</code>
-variable name lets it be passsed automatically to all functions.</p>
+variable name lets it be passsed automatically to all functions. Pass a null 
+string constructed per <code>cstr()</code> to user raylib&#8217;s builtin font.</p>
 
 <p>There may be linking errors if raylib is not installed in your system;
 <em>smoλ</em> and gcc need to access its include and linking directories. For example,
@@ -291,9 +292,10 @@ backend to create a <em>webgl</em> application running in the browser.</p>
 <p>Check for window closing events with <code>is_open</code>, or loop forever. Then, in each loop,
 create a drawable frame with the <code>frame = draw()</code> function. The frame is drawn when released,
 which occurs either automatically if the draw function call is made within a function,
-or manually with <code>del frame</code> if the drawing happens directly inside the loop.<br />
-The type system will help prevent bugs by complaining of leaking resources if you declare
-but not release a frame within a loop. In general, positions and sizes
+or manually with <code>del frame</code> if the drawing happens directly inside the loop.  </p>
+
+<p>The type system will help prevent bugs by automatically ending frames declared within loops,
+and complaining if you use them in code thereon. In general, positions and sizes
 are float numbers. See below for colors.</p>
 
 <div class="codehilite">
@@ -307,7 +309,6 @@ are float numbers. See below for colors.</p>
         <span class="n">frame</span> <span class="o">=</span> <span class="n">draw</span><span class="p">()</span>
         <span class="n">clear</span> <span class="n">color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span>
         <span class="n">text</span><span class="p">(</span><span class="s2">&quot;smoll + raylib&quot;</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="n">font_size</span><span class="p">,</span> <span class="n">color</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-        <span class="k">del</span> <span class="n">frame</span>
 </code></pre>
 </div>
 
@@ -326,6 +327,7 @@ with either transparency or not.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">std.io.process</span><span class="p">::</span><span class="nb">breakpoint</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+    <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span> <span class="c1"># needed for breakpoint</span>
     <span class="n">WINDOW</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">window</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="s2">&quot;overlap&quot;</span><span class="p">,</span> <span class="s2">&quot;std/ArianaVioleta-dz2K.ttf&quot;</span><span class="p">)</span>
     <span class="n">circ_state</span> <span class="o">=</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">)</span> <span class="c1"># tuples are automatically unpacked when used later</span>
     <span class="n">rect_state</span> <span class="o">=</span> <span class="p">(</span><span class="mf">120.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">)</span>
@@ -340,7 +342,6 @@ with either transparency or not.</p>
         <span class="c1"># outlined rect</span>
         <span class="n">rect</span><span class="p">(</span><span class="n">rect_state</span> <span class="n">solid</span> <span class="n">color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">128</span><span class="p">))</span>
         <span class="n">rect</span><span class="p">(</span><span class="n">rect_state</span> <span class="n">line</span> <span class="n">thickness</span><span class="p">,</span> <span class="n">color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">128</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-        <span class="k">del</span> <span class="n">frame</span>
 </code></pre>
 </div>
 
@@ -356,11 +357,18 @@ run code via its own virtual machine! Do this by running programs like below:</p
 <pre><code>./smol main.s --back vm
 </code></pre>
 
-<p>By default, <em>gcc</em> is the backend of choice, <em>vm</em> is a slow-ish virtual machine that
-is nonetheless used for resolution of compile-time instructions and macros, <em>antcc</em>
-is an alternate compiler, and <em>emcc</em> is emscripten for export into web applications.
-Here we focus on the last option, which lets us export graphics application to the
-browser.</p>
+<p>Here are available backends, where the corresponding command (other than VM) must
+be installed in the host computer. The last backend is of most interest to this tutorial
+in that it allows porting graphics to web applications that run in the browser.</p>
+
+<ul>
+<li><em>gcc</em> is the backend of choice </li>
+<li><em>clang</em> is a competetitve alternative</li>
+<li><em>vm</em> is a slow-ish virtual machine that is nonetheless used for resolution of compile-time instructions and macros</li>
+<li><em>antcc</em> is an alternate compiler for linux that compiles fastly after typechecking, yet performs moderate optimizations</li>
+<li><em>tcc</em> is a very fast compiler without optimiations</li>
+<li><em>emcc</em> is emscripten for export into web applications.</li>
+</ul>
 
 <p>To begin with, the <code>emcc</code> compiler needs to be present in the current system.
 For, example, install it with the following command or an equivalent.</p>

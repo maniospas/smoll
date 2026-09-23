@@ -58,7 +58,7 @@ def mutget(edit coo m, nat k, "unsafe_assume_inbounds"|blank inbounds_guarantee)
         doc "*Warning: This version disables internal bound checks, assuming that proper bounds are guaranteed by its caller.*"
     return unsafe_mut m.unsafe_ptr+k*24
 
-def mul(effect edit float_allocator FLOATS, coo m, vec v)
+def mul(on edit float_allocator FLOATS, coo m, vec v)
     doc "sparse matrix*vector multiplication"
     if m.cols!=v.length: fail "matrix columns must match vector length"
     result = edit vec m.rows
@@ -66,9 +66,9 @@ def mul(effect edit float_allocator FLOATS, coo m, vec v)
         result[entry.row] = result[entry.row]+entry.value*v[entry.col]
     return result
 
-def mul(effect edit float_allocator FLOATS, vec v, coo m)
+def mul(on edit float_allocator FLOATS, vec v, coo m)
     doc "vector*sparse matrix multiplication"
-    doc "*Warning: the expression `self(v)*m` yields wrong values"
+    doc "*Warning: The expression `self(v)*m` yields wrong values"
     "because the vector is not modified element-by-element."
     if v.length!=m.rows: fail "vector length must match matrix rows"
     result = edit vec m.cols
@@ -76,7 +76,7 @@ def mul(effect edit float_allocator FLOATS, vec v, coo m)
         result[entry.col] = result[entry.col]+v[entry.row]*entry.value
     return result
 
-def mul(effect edit float_allocator FLOATS, coo m1, mat m2)
+def mul(on edit float_allocator FLOATS, coo m1, mat m2)
     doc "sparse*dense matrix multiplication"
     if m1.cols!=m2.rows: fail "inner dimensions must agree"
     result = edit mat(m1.rows, m2.cols)
@@ -85,14 +85,14 @@ def mul(effect edit float_allocator FLOATS, coo m1, mat m2)
             result[entry.row,j] = result[entry.row,j]+entry.value*m2[entry.col,j]
     return result
 
-def todense(effect edit float_allocator FLOATS, coo m)
+def todense(on edit float_allocator FLOATS, coo m)
     doc "convert to dense mat"
     result = edit mat(m.rows, m.cols)
     for entry in m
         result[entry.row, entry.col] = entry.value
     return result
 
-def print(effect edit console CLI, coo m, cstr|blank endl)
+def print(on CLI, coo m, cstr|blank endl)
     doc "print sparse matrix"
     doc "Prints it as coordinate as list: (i, j): v"
     if endl is blank
@@ -106,7 +106,7 @@ def print(effect edit console CLI, coo m, cstr|blank endl)
         print (entry.value, "")
         print ("", endl)
 
-def sum(effect edit float_allocator FLOATS, coo m, "row")
+def sum(on edit float_allocator FLOATS, coo m, "row")
     doc "sum of each row"
     doc "result[i] = sum of all stored values in row i"
     result = edit vec m.rows
@@ -114,7 +114,7 @@ def sum(effect edit float_allocator FLOATS, coo m, "row")
         result[entry.row] = result[entry.row]+entry.value
     return result
 
-def sum(effect edit float_allocator FLOATS, coo m, "col")
+def sum(on edit float_allocator FLOATS, coo m, "col")
     doc "sum of each column"
     doc "result[j] = sum of all stored values in column j"
     result = edit vec m.cols

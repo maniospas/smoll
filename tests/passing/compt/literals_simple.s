@@ -5,7 +5,6 @@ def inc(nat x, blank|1|2 inc)
         inc = type 1
     return x+compiler::value inc
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     print inc 0
     print inc (0, type 2)

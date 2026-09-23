@@ -3,8 +3,7 @@ import std.sci
 import std.test
 
 def ∅ = compt blank() # blank literal is equivalent to '()'
-def main()
-    CLI = edit console ∅
+def main(on CLI)
     v = vec [1.0, 2.0, 0.0-3.0]
     # can use text like 'add' instead of commas and it's
     # transcribed to  ', type "add",'

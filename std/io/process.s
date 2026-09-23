@@ -52,7 +52,7 @@ def arg_after(cstr flag, blank|str|cstr default_value)
     if default_value is blank: fail "arg not found"
     else: return str default_value
 
-def breakpoint(effect edit console CLI)
+def breakpoint(on CLI)
     doc "checks for SIGINT"
     if compiler::back type "emcc"
         { emscripten_sleep(0); }
@@ -115,7 +115,7 @@ def chunk(char[] buf, mut nat|blank pos, open f)
     pos = pos+bytes_open
     return str(buf, prev_pos len bytes_open)
 
-def line(effect edit arena<char::tag>|circular<char::tag> CHARS, open f)
+def line(on edit arena<char::tag>|circular<char::tag> CHARS, open f)
     doc "next line"
     doc "Retrieves the next line outputted by a process into its stdout,"
     doc "and stores it on a CHARS storage effect."
@@ -152,7 +152,7 @@ def safe(cstr cmd)
     if unsafe_chars: fail "unsanitized command: shell metacharacter detected"
     return cmd
 
-def system(effect edit console CLI, cstr|str _cmd)
+def system(on CLI, cstr|str _cmd)
     doc "system command"
     doc "Runs a system command and waits until that completes."
     doc "Fails if the return code is non-zero, but does not expose that code."

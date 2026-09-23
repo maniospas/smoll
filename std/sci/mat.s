@@ -27,14 +27,15 @@ def cols(mat m)
     doc "number of columns"
     return m.cols
 
-def mat(effect edit new FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
+def mat(on edit new|bucket FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
     doc "matrix on a fresh buffer"
     buf = float[].alloc(rows*cols dirty)
     if clear_policy is blank
         buf.unsafe_ptr.unsafe::zero(0, 8*len buf)
     return mat(buf.unsafe_ptr, 0, rows, cols, cols)
 
-def mat(effect edit float_allocator\new FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
+local def bucket_or_new = new|bucket
+def mat(on edit float_allocator\bucket_or_new FLOATS, nat rows, nat cols, "dirty"|blank clear_policy)
     doc "matrix on an existing vecpos"
     if FLOATS.buf.unsafe_align.nat()!=8: fail "can only place matrices on contiguous buffers"
     if FLOATS.buf.unsafe_offset.nat()!=0: fail "cannot place matrices on buffer offsets"
@@ -96,7 +97,7 @@ def row(mat m, nat i)
     if i>=m.rows: fail "row out of bounds"
     return vec(m.unsafe_ptr, m.pos+i*m.stride, m.cols)
 
-def mul(effect edit float_allocator FLOATS, mat m, vec v)
+def mul(on edit float_allocator FLOATS, mat m, vec v)
     doc "matrix-vector multiplication"
     doc "Grabs an allocator for the result as an effect."
     if m.cols!=v.length: fail "matrix columns must match vector length"
@@ -108,7 +109,7 @@ def mul(effect edit float_allocator FLOATS, mat m, vec v)
         result[i] = acc
     return result
 
-def mul(effect edit float_allocator FLOATS, vec v, mat m)
+def mul(on edit float_allocator FLOATS, vec v, mat m)
     doc "vector-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
     if v.length!=m.rows: fail "vector length must match matrix rows"
@@ -120,7 +121,7 @@ def mul(effect edit float_allocator FLOATS, vec v, mat m)
         result[j] = acc
     return result
 
-def mul(effect edit float_allocator FLOATS, mat m1, mat m2)
+def mul(on edit float_allocator FLOATS, mat m1, mat m2)
     doc "matrix-matrix multiplication"
     doc "Grabs an allocator for the result as an effect."
     if m1.cols!=m2.rows: fail "inner dimensions must agree"
@@ -134,7 +135,7 @@ def mul(effect edit float_allocator FLOATS, mat m1, mat m2)
             result[i,j] = acc
     return result
 
-def print(effect edit console CLI, mat m, cstr|blank endl)
+def print(on CLI, mat m, cstr|blank endl)
     doc "print a matrix with aligned brackets"
     doc "single-row matrices stay on one line; taller ones get top/mid/bottom brackets"
     if endl is blank

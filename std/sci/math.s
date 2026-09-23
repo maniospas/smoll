@@ -18,6 +18,7 @@ local import "std/extern/math.h"
 local import std.core
 
 def abs(float x)
+    doc "absolute value"
     if x<0.0: return neg x
     return x
     # VM "[abs($x)]"
@@ -25,6 +26,7 @@ def abs(float x)
     # return float bits(x).band(bits c)
 
 def abs(int x)
+    doc "absolute value"
     if x<int 0: return neg x
     return x
     # VM "[abs($x)]"
@@ -32,6 +34,13 @@ def abs(int x)
     # return nat xor(mask, bits x+int mask)
 
 def sqrt(float x)
+    doc "square root"
+    doc "There exists only a float version. Other numbers must be cast to"
+    doc "float to obtain their square root."
+    doc "```python"
+    doc "import std.core"
+    doc "def main(on CLI)"
+    doc "    print nat sqrt float 4"
     {"-lm"}
     {builtins::float z = sqrt(x);}
     return z
@@ -87,17 +96,22 @@ def exp(float x)
     return z
 
 def pow(float x, float y)
+    doc "exponentiate by"
     {"-lm"}
     {builtins::float z = pow(x, y);}
     return z
 
 def isnan(float x)
     VM "[math.isnan(x)]"
+    doc "Checks if a float number is nan, for example due to"
+    doc "division by zero or infinities being involved in computations."
     {"-lm"}
     {builtins::bool z = (fpclassify(x)==FP_NAN);}
     return z
 
 def isinf(float x)
+    doc "is infinity"
+    doc "Checks if a float number is positive or negative infinity."
     VM "[math.isinf(x)]"
     {"-lm"}
     {builtins::bool z = (fpclassify(x)==FP_INFINITE);}

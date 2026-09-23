@@ -304,7 +304,7 @@ the start once full. Here is the above snippet using an arena.
 ```python
 import std.core
 
-def greeting(effect edit char_allocator^arena CHARS)
+def greeting(on edit char_allocator^arena CHARS)
     return "hello "+"world"
 
 def main()
@@ -330,7 +330,7 @@ but you can also write `float|int|nat` to indicate type alternatives and `char_a
 allocators other than *new*. Find more about types in the <a href="reference.html">reference guide</a>.
 
 In the most general case,
-one could also define `def greeting(effect edit char_allocator CHARS)` to create generic code that
+one could also define `def greeting(on edit char_allocator CHARS)` to create generic code that
 accepts any character allocator. Having same-named functions with different behavior based on
 their arguments is also known as *polymorphism*.
 

@@ -1,14 +1,13 @@
 import std.core
 
-def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
+def greet(on CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
     print nn compiler::value greeting
     if punctuation is blank
         print ""
     else
         print compiler::value punctuation
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     color = colors CLI
     set(color yellow)
     greet(() hi () !) # prints 'hi!' while validating it as a pattern

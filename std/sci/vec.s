@@ -23,9 +23,9 @@ local import std.unsafe::add
 def arena(float::tag)    return arena float[]
 def circular(float::tag) return circular float[]
 def list(float::tag)     return list float[]
-local def float_allocator = new|arena<float::tag>|circular<float::tag>
+local def float_allocator = new|bucket|arena<float::tag>|circular<float::tag>
 
-def vec(effect new FLOATS, nat length, "dirty"|blank clear_policy)
+def vec(on new|bucket FLOATS, nat length, "dirty"|blank clear_policy)
     doc "vector on a new buffer"
     doc "Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer."
     buf = float[].alloc(length unsafe_first () unsafe_leaky)
@@ -45,7 +45,7 @@ def constvec(float[] buf)
     if buf.unsafe_offset.nat()!=0: fail "cannot place vectors on buffer offsets"
     return const vec(unsafe_mut buf.unsafe_ptr, 0, len buf)
 
-def vec(effect edit float_allocator\new FLOATS, nat length, "dirty"|blank clear_policy)
+def vec(on edit arena<float::tag>|circular<float::tag> FLOATS, nat length, "dirty"|blank clear_policy)
     doc "vector allocation"
     if FLOATS.buf.unsafe_align.nat()!=8: fail "can only place vectors on contiguous buffers"
     if FLOATS.buf.unsafe_offset.nat()!=0: fail "cannot place vectors on buffer offsets"
@@ -107,7 +107,7 @@ local def at(float number, nat i)
 local def at(vec v, nat i)
     return v[i unsafe_assume_inbounds]
 
-def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
+def add(on edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector addition"
     doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length: fail "different vector sizes"
@@ -117,12 +117,12 @@ def add(effect edit float_allocator FLOATS, vec v1, vec|float v2)
         v[i unsafe_assume_inbounds] = value+v2.at i
     return v
 
-def add(effect edit float_allocator FLOATS, float v1, vec v2)
+def add(on edit float_allocator FLOATS, float v1, vec v2)
     doc "vector addition"
     doc "Grabs a FLOATS allocator effect to store the result."
     return v2+v1
 
-def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
+def sub(on edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector subtraction"
     doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length: fail "different vector sizes"
@@ -132,7 +132,7 @@ def sub(effect edit float_allocator FLOATS, vec v1, vec|float v2)
         v[i unsafe_assume_inbounds] = value-v2.at i
     return v
 
-def sub(effect edit float_allocator FLOATS, float v1, vec v2)
+def sub(on edit float_allocator FLOATS, float v1, vec v2)
     doc "vector subtraction"
     doc "Grabs a FLOATS allocator effect to store the result."
     v = mut vec v2.length
@@ -141,7 +141,7 @@ def sub(effect edit float_allocator FLOATS, float v1, vec v2)
         v[i unsafe_assume_inbounds] = v1-value
     return v
 
-def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
+def mul(on edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector multiplication"
     doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length: fail "different vector sizes"
@@ -151,13 +151,13 @@ def mul(effect edit float_allocator FLOATS, vec v1, vec|float v2)
         v[i unsafe_assume_inbounds] = value*v2.at i
     return v
 
-def mul(effect edit float_allocator FLOATS, float v1, vec v2)
+def mul(on edit float_allocator FLOATS, float v1, vec v2)
     doc "vector multiplication"
     doc "Grabs a FLOATS allocator effect to store the result."
     return v2*v1
 
 
-def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
+def pow(on edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector exponentiation"
     doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length: fail "different vector sizes"
@@ -167,7 +167,7 @@ def pow(effect edit float_allocator FLOATS, vec v1, vec|float v2)
         v[i unsafe_assume_inbounds] = pow(value, v2.at i)
     return v
 
-def pow(effect edit float_allocator FLOATS, float v1, vec v2)
+def pow(on edit float_allocator FLOATS, float v1, vec v2)
     doc "vector exponentiation"
     doc "Grabs a FLOATS allocator effect to store the result."
     v = mut vec(v2.length dirty)
@@ -176,7 +176,7 @@ def pow(effect edit float_allocator FLOATS, float v1, vec v2)
         v[i unsafe_assume_inbounds] = pow(v1, value)
     return v
 
-def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
+def div(on edit float_allocator FLOATS, vec v1, vec|float v2)
     doc "vector division"
     doc "Grabs a FLOATS allocator effect to store the result."
     if v2 is vec and v1.length!=v2.length: fail "different vector sizes"
@@ -187,7 +187,7 @@ def div(effect edit float_allocator FLOATS, vec v1, vec|float v2)
         v[i unsafe_assume_inbounds] = value/v2.at i
     return v
 
-def div(effect edit float_allocator FLOATS, float v1, vec v2)
+def div(on edit float_allocator FLOATS, float v1, vec v2)
     doc "vector division"
     doc "Grabs a FLOATS allocator effect to store the result."
     v = mut vec(v2.length dirty)
@@ -281,7 +281,7 @@ def nn(vec value)
     doc "to print without a new line."
     return (value, "")
 
-def print(effect edit console CLI, vec v, cstr|blank endl)
+def print(on CLI, vec v, cstr|blank endl)
     doc "print a vector"
     doc "Prints as a row, such as [ 1.0  2.0  3.0 ]"
     if endl is blank
@@ -292,7 +292,7 @@ def print(effect edit console CLI, vec v, cstr|blank endl)
         if i+1<v.length: print nn "  "
     print (" ]", endl)
 
-def copy(effect edit float_allocator FLOATS, vec v)
+def copy(on edit float_allocator FLOATS, vec v)
     doc "copy a vector"
     doc "Grabs a FLOATS for the result as an effect."
     result = mut vec(v.length dirty)

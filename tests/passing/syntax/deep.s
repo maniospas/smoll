@@ -19,17 +19,17 @@ def test4(edit arena<char::tag> arn)
     compiler::unsafe_declare_deep_copy_only()
     return ret 
 
-def test5(effect edit console CLI, edit arena<char::tag> arn)
+def test5(on CLI, edit arena<char::tag> arn)
     reuse arn
     x = test4 arn
     z = x[0]&
     assert("test2"==compiler::deref z, "correct operations on arena")
     assert(10==len arn, "proper consumption before test ends")
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     arn = edit arena alloc 1024
     test1 arn
+    print arn.pos
     assert(arn.pos==0, "no consumption after reuse")
     test5 arn
     assert(arn.pos==0, "no consumption after complicated reuse")

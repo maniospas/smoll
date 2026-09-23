@@ -9,8 +9,7 @@ def parse(edit user[] users)
     user = mut users[0]&
     user.x = 1
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     users = edit user[].alloc 4
     parse users
     print users[0].x

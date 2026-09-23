@@ -7,7 +7,7 @@ import std.test
 import std.scope
 
 
-def _main(effect edit console CLI)
+def _main(on CLI)
     test_root = str "./tests/passing/"
     colors = colors CLI
     CHARS = edit arena alloc 128

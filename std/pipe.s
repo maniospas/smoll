@@ -120,7 +120,7 @@ def cpu(nat cores)
     doc "For now, the number of cores need to be manually inputted."
     return singleton cores
 
-def growing_thread_pool(effect edit cpu CPU, nat shared_storage)
+def growing_thread_pool(on edit cpu CPU, nat shared_storage)
     doc "a thread pool"
     doc "This consumes all CPU cores, and can spawn up to"
     doc "that many threads. Completed threads cannot be"
@@ -137,7 +137,7 @@ def growing_thread_pool(effect edit cpu CPU, nat shared_storage)
         joined = true
     unsafe_return class(CPU, unsafe_threads, unsafe_arena, joined)
 
-def thread(effect edit growing_thread_pool THREADS, pipe->blank func, pipe input)
+def thread(on edit growing_thread_pool THREADS, pipe->blank func, pipe input)
     spawned = edit unsafe_spawn(func, input)
     (at alloc THREADS.unsafe_threads) = spawned
     return spawned
@@ -160,7 +160,7 @@ def unsafe_pipe_data_mutex_init(mut pipe_data& obj)
         {mutex_destroy((mutex_t*)mutex_ptr);}
     return obj
 
-def pipe_data_alloc(effect edit growing_thread_pool THREADS, nat size) 
+def pipe_data_alloc(on edit growing_thread_pool THREADS, nat size) 
     return at THREADS.unsafe_arena.alloc size
 
 def shared(cstr|blank surface, cstr obj)

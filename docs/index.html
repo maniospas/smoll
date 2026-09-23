@@ -232,30 +232,30 @@
         }
         </style>
     </head>
-    <body>
+    <body class=>
         <nav class="topbar">
-            <a href="index.html" style="position:absolute;left:20px;font-weight:900">Smoλ</a>
-            <a href="install.html" style="font-weight:500">Install</a>
+            <a href="index.html" style="position:absolute;left:20px;font-weight:{'900' if 'index' in target else '500'}">Smoλ</a>
+            <a href="install.html" style="font-weight:{'900' if 'install' in target else '500'}">Install</a>
             <div class="dropdown">
-                <a href="#" style="font-weight:500">Tutorials</a>
+                <a href="#" style="font-weight:{'900' if any(t in target for t in ['tutorial_cli', 'tutorial_web', 'tutorial_game', 'tutorial_data', 'tutorial_graph', 'tutorial_lambda']) else '500'}">Tutorials</a>
                 <div class="dropdown-menu">
-                    <a href="tutorial_cli.html" style="font-weight:400">Command line app</a>
-                    <a href="tutorial_web.html" style="font-weight:400">Web server</a>
-                    <a href="tutorial_game.html" style="font-weight:400">Game dev</a>
-                    <a href="tutorial_data.html" style="font-weight:400">Data analysis</a>
-                    <a href="tutorial_graph.html" style="font-weight:400">Graph mining</a>
-                    <a href="tutorial_lambda.html" style="font-weight:400">Lambda calculus</a>
+                    <a href="tutorial_cli.html" style="font-weight:{'900' if 'tutorial_cli' in target else '400'}">Command line app</a>
+                    <a href="tutorial_web.html" style="font-weight:{'900' if 'tutorial_web' in target else '400'}">Web server</a>
+                    <a href="tutorial_game.html" style="font-weight:{'900' if 'tutorial_game' in target else '400'}">Game dev</a>
+                    <a href="tutorial_data.html" style="font-weight:{'900' if 'tutorial_data' in target else '400'}">Data analysis</a>
+                    <a href="tutorial_graph.html" style="font-weight:{'900' if 'tutorial_graph' in target else '400'}">Graph mining</a>
+                    <a href="tutorial_lambda.html" style="font-weight:{'900' if 'tutorial_lambda' in target else '400'}">Lambda calculus</a>
                 </div>
             </div>
             <div class="dropdown">
-                <a href="#" style="font-weight:500">Documentation</a>
+                <a href="#" style="font-weight:{'900' if 'reference' in target or 'std' in target or 'learn' in target else '500'}">Documentation</a>
                 <div class="dropdown-menu">
-                    <a href="learn.html" style="font-weight:400">Learn</a>
-                    <a href="reference.html" style="font-weight:400">Reference guide</a>
-                    <a href="std.html" style="font-weight:400">Standard library</a>
+                    <a href="learn.html" style="font-weight:{'900' if 'learn' in target else '400'}">Learn</a>
+                    <a href="reference.html" style="font-weight:{'900' if 'reference' in target else '400'}">Reference guide</a>
+                    <a href="std.html" style="font-weight:{'900' if 'std' in target else '400'}">Standard library</a>
                 </div>
             </div>
-            <a href="playground.html" style="font-weight:500">Playground</a>
+            <a href="playground.html" style="font-weight:{'900' if 'playground' in target else '500'}">Playground</a>
             <a href="https://github.com/maniospas/smoll">GitHub</a>
         </nav>
     <div>
@@ -296,7 +296,7 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">README</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md&quot;</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-    <span class="c1"># EFFECTS to automatically pass around (some functions grab these by name).</span>
+    <span class="c1"># EFFECTS to automatically pass around (some functions on these by name).</span>
     <span class="n">CLI</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">console</span><span class="p">()</span>
     <span class="n">CHARS</span> <span class="o">=</span> <span class="n">edit</span> <span class="n">circular</span> <span class="n">alloc</span> <span class="mi">4096</span>
 
@@ -338,7 +338,8 @@
                 const code = pre.querySelector("code")?.innerText ?? pre.innerText;
                 const encoded = btoa(
                     String.fromCharCode(...new TextEncoder().encode(code))
-                ).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                ).split('+').join('-').split('/').join('_');
+                while (encoded.endsWith('=')) encoded = encoded.slice(0, -1);
                 window.location.href = "playground.html?contents=" + encoded;
             });
             pre.appendChild(btn);
@@ -347,26 +348,39 @@
     </script>
     
     <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    (function(){
         function escapeHtml(s){
           return s;//.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         }
+
         function highlightSmoll(raw){
           return escapeHtml(raw).replace(
-            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|return|try|type|effect|fail|mut|edit|unsafe_mut)\b|\b(?:rec|def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
+            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|try|type|fail|mut|edit|on|unsafe_mut)\b|\b(?:rec|def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
             function(m){
               if(m[0]==='#') return '<span style="color:#777777">'+m+'</span>';
               if(m[0]==='"') return '<span style="color:#2c5b19">'+m+'</span>';
-              if(/^(if|while|for|return|in|else|try|type|fail|mut|edit|effect|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
-              if(/^(rec|def|local|import|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
+              if(/^(if|while|for|in|else|try|fail|mut|edit|unsafe_mut|on|type)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
+              if(/^(rec|def|local|import|repo|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
               return '<span style="color:#2e766b">'+m+'</span>';
             }
           );
         }
-        document.querySelectorAll("pre > code").forEach(code => {
-          code.innerHTML = highlightSmoll(code.textContent);
-        });
-    });
+
+        window.highlightSmoll = highlightSmoll;
+
+        function highlightAll(root){
+          (root || document).querySelectorAll("pre > code").forEach(function(code){
+            code.innerHTML = highlightSmoll(code.textContent);
+          });
+        }
+
+        window.highlightAllSmoll = highlightAll;
+
+        if(document.readyState === "loading")
+          document.addEventListener("DOMContentLoaded", function(){ highlightAll(document); });
+        else
+          highlightAll(document);
+    })();
     </script>
     
     </body>

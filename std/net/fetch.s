@@ -35,7 +35,7 @@ def HttpOptions(HttpMethod method, cstr|blank body, cstr|blank content_type)
         content_type = cstr()
     return class(method, body, content_type)
 
-def request(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr _url, HttpOptions opts)
+def request(on edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr _url, HttpOptions opts)
     {"-lcurl"}
     {builtins::compiler::ptr curl = curl_easy_init();}
     if not exists curl: fail "curl initialization failed"
@@ -89,12 +89,12 @@ def request(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr
     {buf__unsafe_ptr = __buf.data;}
     return response(status, str(buf, pos to buf.unsafe_size))
 
-def get(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr url)
-    doc "a get request"
+def get(on edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr url)
+    doc "REST get request"
     return url.request HttpOptions HttpMethod type "GET"
 
-def post(effect edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr url, str|cstr _body, cstr|blank content_type)
-    doc "a post request"
+def post(on edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr url, str|cstr _body, cstr|blank content_type)
+    doc "REST post request"
     if content_type is blank
         doc "The default application/json content type is used."
         content_type = "application/json"

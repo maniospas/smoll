@@ -423,7 +423,7 @@ connection.onDefinition((params: DefinitionParams): Location[] => {
 });
 
 const KEYWORDS = [
-  'if', 'while', 'for', 'in', 'is', 'def', 'include', 'local', 'edit',
+  'if', 'while', 'for', 'in', 'is', 'def', 'include', 'local', 'edit', 'on',
   'mut', 'unsafe_mut', 'class', 'singleton', 'const', 'return', 'unsafe_return', 'try', 'doc'
 ];
 

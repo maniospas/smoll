@@ -1,5 +1,4 @@
 import markdown2
-import re
 import html as html_module
 
 def export(path, target):
@@ -9,153 +8,145 @@ def export(path, target):
     text = text.replace("[https://maniospas.github.io/smoll/](https://maniospas.github.io/smoll/)", "")
 
     html = markdown2.markdown(text, extras=['fenced-code-blocks', 'header-ids', 'smarty-pants', 'markdown-in-html', 'cuddled-lists'])
-    smoll_highlight_script = """
+    smoll_highlight_script = r"""
     <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    (function(){
         function escapeHtml(s){
           return s;//.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         }
+
         function highlightSmoll(raw){
           return escapeHtml(raw).replace(
-            /("(?:[^"\\\\]|\\\\.)*"|#.*|\\b(?:if|while|for|in|else|return|try|type|effect|fail|mut|edit|unsafe_mut)\\b|\\b(?:rec|def|local|import|repo|as)\\b|[+\\-*/%=<>!&|^~:]+)/g,
+            /("(?:[^"\\]|\\.)*"|#.*|\b(?:if|while|for|in|else|try|type|fail|mut|edit|on|unsafe_mut)\b|\b(?:rec|def|local|import|repo|as)\b|[+\-*/%=<>!&|^~:]+)/g,
             function(m){
               if(m[0]==='#') return '<span style="color:#777777">'+m+'</span>';
               if(m[0]==='"') return '<span style="color:#2c5b19">'+m+'</span>';
-              if(/^(if|while|for|return|in|else|try|type|fail|mut|edit|effect|unsafe_mut)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
-              if(/^(rec|def|local|import|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
+              if(/^(if|while|for|in|else|try|fail|mut|edit|unsafe_mut|on|type)$/.test(m)) return '<span style="color:#7a4f7d">'+m+'</span>';
+              if(/^(rec|def|local|import|repo|repo|as)$/.test(m)) return '<span style="color:#8f1818">'+m+'</span>';
               return '<span style="color:#2e766b">'+m+'</span>';
             }
           );
         }
-        document.querySelectorAll("pre > code").forEach(code => {
-          code.innerHTML = highlightSmoll(code.textContent);
-        });
-    });
+
+        window.highlightSmoll = highlightSmoll;
+
+        function highlightAll(root){
+          (root || document).querySelectorAll("pre > code").forEach(function(code){
+            code.innerHTML = highlightSmoll(code.textContent);
+          });
+        }
+
+        window.highlightAllSmoll = highlightAll;
+
+        if(document.readyState === "loading")
+          document.addEventListener("DOMContentLoaded", function(){ highlightAll(document); });
+        else
+          highlightAll(document);
+    })();
     </script>
     """
 
-    def convert_notice_boxes(html):
-        def replacer(match):
-            tag_type = match.group(1).lower()
-            content = match.group(2).strip()
-            css_class = 'box-warning' if tag_type == 'warning' else 'box-info'
-            label = tag_type.capitalize()
-            return f'<div class="notice-box {css_class}"><strong>{label}:</strong> {content}</div>'
-        pattern = re.compile(
-            r'<p><em>(Warning|Info):\s*(.*?)</em></p>',
-            re.IGNORECASE | re.DOTALL
-        )
-        return pattern.sub(replacer, html)
+    def convert_notice_boxes(value):
+        for label, css_class in (("Warning", "box-warning"), ("Info", "box-info")):
+            opening = "<p><em>" + label + ":"
+            closing = "</em></p>"
+            pos = 0
+            while True:
+                start = value.find(opening, pos)
+                if start == -1:
+                    break
+                end = value.find(closing, start)
+                if end == -1:
+                    break
+                content = value[start + len(opening):end].strip()
+                box = '<div class="notice-box ' + css_class + '"><strong>' + label + ':</strong> ' + content + '</div>'
+                value = value[:start] + box + value[end + len(closing):]
+                pos = start + len(box)
+        return value
 
-    def add_std_filter(html):
-        headings = list(re.finditer(
-            r'<h1\b[^>]*>.*?</h1>',
-            html,
-            re.IGNORECASE | re.DOTALL
-        ))
+    def strip_html_tags(value):
+        result = []
+        inside_tag = False
+        for char in value:
+            if char == "<":
+                inside_tag = True
+            elif char == ">":
+                inside_tag = False
+            elif not inside_tag:
+                result.append(char)
+        return html_module.unescape("".join(result))
 
-        files = set()
-        parts = []
-        last = 0
+    def find_tag_sections(value, tag):
+        found = []
+        marker = "<" + tag
+        closing = "</" + tag + ">"
+        pos = 0
+        while True:
+            start = value.find(marker, pos)
+            if start == -1:
+                return found
+            open_end = value.find(">", start)
+            close_start = value.find(closing, open_end)
+            if open_end == -1 or close_start == -1:
+                return found
+            found.append((start, open_end + 1, close_start, close_start + len(closing)))
+            pos = close_start + len(closing)
+
+    def build_std_browser(html):
+        definitions = []
+        headings = find_tag_sections(html, "h1")
 
         for i, heading in enumerate(headings):
-            start = heading.start()
-            end = headings[i + 1].start() if i + 1 < len(headings) else len(html)
-            section = html[start:end]
+            section_end = headings[i + 1][0] if i + 1 < len(headings) else len(html)
+            name = strip_html_tags(html[heading[1]:heading[2]]).strip()
+            section = html[heading[3]:section_end]
+            overloads = find_tag_sections(section, "h3")
 
-            subsections = list(re.finditer(
-                r'<h3\b[^>]*>.*?</h3>',
-                section,
-                re.IGNORECASE | re.DOTALL
-            ))
-
-            section_parts = []
-            section_last = 0
-
-            for j, subsection in enumerate(subsections):
-                subsection_start = subsection.start()
-                subsection_end = subsections[j + 1].start() if j + 1 < len(subsections) else len(section)
-                subsection_html = section[subsection_start:subsection_end]
-
-                match = re.search(
-                    r'Defined in:\s*(.*?)(?:</em>|</p>|<br\s*/?>|\n)',
-                    subsection_html,
-                    re.IGNORECASE | re.DOTALL
-                )
-
-                if not match:
+            for j, overload in enumerate(overloads):
+                overload_end = overloads[j + 1][0] if j + 1 < len(overloads) else len(section)
+                overload_html = section[overload[0]:overload_end]
+                text = " ".join(strip_html_tags(overload_html).split())
+                marker = "Defined in:"
+                marker_at = text.find(marker)
+                if marker_at == -1:
                     continue
 
-                defined_in = re.sub(r'<[^>]+>', '', match.group(1))
-                defined_in = html_module.unescape(defined_in).strip()
-
-                source = re.match(r'(.*?\.s)(?:\s|$)', defined_in)
-                if source:
-                    defined_in = source.group(1)
-
+                after = text[marker_at + len(marker):].strip()
+                defined_in = after.split()[0] if after else ""
+                source_end = defined_in.find(".s")
+                if source_end != -1:
+                    defined_in = defined_in[:source_end + 2]
+                defined_in = defined_in.replace("\\", "/")
                 if not defined_in:
                     continue
 
-                files.add(defined_in)
+                definitions.append({
+                    "name": name,
+                    "definedIn": defined_in,
+                    "html": overload_html,
+                    "text": text,
+                })
 
-                section_parts.append(section[section_last:subsection_start])
-                section_parts.append(
-                    '<div class="std-subsection" data-defined-in="' +
-                    html_module.escape(defined_in, quote=True) +
-                    '">' +
-                    subsection_html +
-                    '</div>'
-                )
-
-                section_last = subsection_end
-
-            if not section_parts:
-                continue
-
-            section_parts.append(section[section_last:])
-            section = ''.join(section_parts)
-
-            parts.append(html[last:start])
-            parts.append(
-                '<div class="std-definition">' +
-                section +
-                '</div>'
-            )
-
-            last = end
-
-        if not files:
+        if not definitions:
             return html
 
-        parts.append(html[last:])
-        html = ''.join(parts)
-
-        file_list = """
-        <div class="std-files">
-            <select id="std-file">
-                <option value="">Show all</option>
-        """
-
-        for file in sorted(files):
-            file_list += (
-                '<option value="' +
-                html_module.escape(file, quote=True) +
-                '">' +
-                html_module.escape(file) +
-                '</option>'
-            )
-
-        file_list += """
-            </select>
-        </div>
-        """
-
-        return file_list + html
+        import json
+        payload = json.dumps(definitions, ensure_ascii=False).replace("</", "<\\/")
+        return """
+<div class="std-browser">
+  <div class="std-search-wrap"><input id="std-search" type="search" placeholder="Search definitions and documentation…" autocomplete="off"></div>
+  <div class="std-workspace">
+    <aside class="std-sidebar"><div id="std-current-path" class="std-current-path"></div><div id="std-nav" class="std-nav"></div></aside>
+    <main id="std-content" class="std-content"></main>
+  </div>
+</div>
+<script id="std-data" type="application/json">""" + payload + """</script>
+"""
 
     html = convert_notice_boxes(html)
 
     if "std" in target:
-        html = add_std_filter(html)
+        html = build_std_browser(html)
 
     run_button_script = "" if "playground" in target or "std" in target else """
     <script>
@@ -171,7 +162,8 @@ def export(path, target):
                 const code = pre.querySelector("code")?.innerText ?? pre.innerText;
                 const encoded = btoa(
                     String.fromCharCode(...new TextEncoder().encode(code))
-                ).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');
+                ).split('+').join('-').split('/').join('_');
+                while (encoded.endsWith('=')) encoded = encoded.slice(0, -1);
                 window.location.href = "playground.html?contents=" + encoded;
             });
             pre.appendChild(btn);
@@ -183,28 +175,327 @@ def export(path, target):
     std_filter_script = "" if "std" not in target else """
     <script>
     document.addEventListener("DOMContentLoaded", () => {
-        const select = document.querySelector("#std-file");
+        const data = document.querySelector("#std-data");
+        if (!data) return;
 
-        select.addEventListener("change", () => {
-            const file = select.value;
+        const definitions = JSON.parse(data.textContent);
+        const nav = document.querySelector("#std-nav");
+        const content = document.querySelector("#std-content");
+        const pathLine = document.querySelector("#std-current-path");
+        const search = document.querySelector("#std-search");
+        let currentPath = "";
+        let selectedName = "";
 
-            document.querySelectorAll(".std-definition").forEach(definition => {
-                let visible = false;
+        function escapeHtml(value) {
+            let out = "";
+            const chars = {"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"};
+            for (const char of String(value)) out += chars[char] || char;
+            return out;
+        }
 
-                definition.querySelectorAll(".std-subsection").forEach(subsection => {
-                    const show =
-                        file === "" ||
-                        subsection.dataset.definedIn === file;
+        function visibleDefinitions() {
+            if (!currentPath) return definitions;
+            if (currentPath.endsWith(".s")) return definitions.filter(d => d.definedIn === currentPath);
+            return definitions.filter(d => d.definedIn.startsWith(currentPath + "/"));
+        }
 
-                    subsection.style.display = show ? "" : "none";
+        function groupByName(items) {
+            const groups = new Map();
+            for (const item of items) {
+                if (!groups.has(item.name)) groups.set(item.name, []);
+                groups.get(item.name).push(item);
+            }
+            return groups;
+        }
 
-                    if(show)
-                        visible = true;
-                });
+        function parseSearch(value) {
+            const terms = [];
+            let current = "";
+            let quoted = false;
+            const forbidden = "+/->()[].,";
 
-                definition.style.display = visible ? "" : "none";
+            for (const char of String(value)) {
+                if (char === '"') {
+                    if (quoted) {
+                        if (current) terms.push(current);
+                        current = "";
+                        quoted = false;
+                    } else {
+                        if (current.trim()) terms.push(current.trim());
+                        current = "";
+                        quoted = true;
+                    }
+                    continue;
+                }
+
+                if (!quoted && forbidden.includes(char)) {
+                    return {terms: [], error: 'Special characters like + / - > ( ) [ ] . , must be quoted. Try searching for exact text such as "' + escapeHtml(value.trim()) + '".'};
+                }
+
+                if (!quoted && char === " ") {
+                    if (current.trim()) terms.push(current.trim());
+                    current = "";
+                    continue;
+                }
+                current += char;
+            }
+
+            if (quoted) return {terms: [], error: 'Missing closing quote. Quote exact text with double quotes, for example "map(x)".'};
+            if (current.trim()) terms.push(current.trim());
+            return {terms, error: ""};
+        }
+
+        function highlightTerms(text, terms) {
+            const source = String(text);
+            if (!terms.length) return escapeHtml(source);
+            const lower = source.toLowerCase();
+            const ranges = [];
+            for (const term of terms) {
+                const needle = term.toLowerCase();
+                if (!needle) continue;
+                let pos = 0;
+                while (pos < source.length) {
+                    const hit = lower.indexOf(needle, pos);
+                    if (hit === -1) break;
+                    ranges.push([hit, hit + needle.length]);
+                    pos = hit + needle.length;
+                }
+            }
+            ranges.sort((a, b) => a[0] - b[0] || b[1] - a[1]);
+            let out = "";
+            let pos = 0;
+            for (const range of ranges) {
+                if (range[1] <= pos) continue;
+                const start = Math.max(pos, range[0]);
+                if (start > pos) out += escapeHtml(source.slice(pos, start));
+                out += "<strong>" + escapeHtml(source.slice(start, range[1])) + "</strong>";
+                pos = range[1];
+            }
+            out += escapeHtml(source.slice(pos));
+            return out;
+        }
+
+        function excerpt(text, terms) {
+            let first = -1;
+            let length = 0;
+            const lower = text.toLowerCase();
+            for (const term of terms) {
+                const hit = lower.indexOf(term.toLowerCase());
+                if (hit !== -1 && (first === -1 || hit < first)) {
+                    first = hit;
+                    length = term.length;
+                }
+            }
+            if (first === -1) return "";
+            const start = Math.max(0, first - 65);
+            const end = Math.min(text.length, first + length + 90);
+            return (start ? "…" : "") + highlightTerms(text.slice(start, end), terms) + (end < text.length ? "…" : "");
+        }
+
+        function childPaths() {
+            const result = new Map();
+            const prefix = currentPath ? currentPath + "/" : "";
+            for (const item of visibleDefinitions()) {
+                const rest = item.definedIn.slice(prefix.length);
+                const slash = rest.indexOf("/");
+                const name = slash === -1 ? rest : rest.slice(0, slash);
+                if (!name) continue;
+                const path = prefix + name;
+                result.set(path, {name, path, file: slash === -1});
+            }
+            return [...result.values()].sort((a, b) => Number(a.file) - Number(b.file) || a.name.localeCompare(b.name));
+        }
+
+        function firstWord(value) {
+            const text = String(value).trim();
+            const space = text.indexOf(" ");
+            const dash = text.indexOf("-");
+            let end = text.length;
+            if (space !== -1 && space < end) end = space;
+            if (dash !== -1 && dash < end) end = dash;
+            return text.slice(0, end).trim();
+        }
+
+        function enhanceOverloads() {
+            for (const overload of content.querySelectorAll(".std-overload")) {
+                const title = overload.querySelector("h3");
+                if (!title) continue;
+
+                const word = firstWord(title.textContent);
+                if (word) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "std-title-search";
+                    button.textContent = "search " + word;
+                    button.title = "Search visible definitions for " + word;
+                    button.onclick = () => {
+                        search.value = word;
+                        renderSearch();
+                        search.focus();
+                    };
+                    title.appendChild(button);
+                }
+
+                const source = overload.dataset.source || "";
+                if (source) {
+                    const sourceUrl = "https://github.com/maniospas/smoll/blob/main/" + source;
+                    let importName = source;
+                    if (importName.endsWith(".s")) importName = importName.slice(0, -2);
+                    importName = importName.split("/").join(".");
+
+                    const sourceButton = document.createElement("a");
+                    sourceButton.className = "std-source-link";
+                    sourceButton.href = sourceUrl;
+                    sourceButton.target = "_blank";
+                    sourceButton.rel = "noopener noreferrer";
+                    sourceButton.textContent = "import " + importName;
+                    title.appendChild(sourceButton);
+
+                    for (const paragraph of overload.querySelectorAll("p")) {
+                        if (!paragraph.textContent.trim().startsWith("Defined in:")) continue;
+                        paragraph.remove();
+                        break;
+                    }
+                }
+
+                for (const pre of overload.querySelectorAll("pre")) {
+                    const code = pre.querySelector("code");
+                    const raw = code ? code.textContent : pre.textContent;
+                    if (code && window.highlightSmoll) code.innerHTML = window.highlightSmoll(raw);
+                    if (!raw.includes("import std.core") || pre.querySelector(".runbutton")) continue;
+                    pre.style.position = "relative";
+                    const button = document.createElement("a");
+                    button.textContent = "▶ try it";
+                    button.className = "runbutton";
+                    button.style.cssText = "position:absolute;bottom:8px;right:8px;cursor:pointer;";
+                    button.onclick = () => {
+                        const current = pre.querySelector("code")?.innerText ?? pre.innerText;
+                        let encoded = btoa(String.fromCharCode(...new TextEncoder().encode(current))).split("+").join("-").split("/").join("_");
+                        while (encoded.endsWith("=")) encoded = encoded.slice(0, -1);
+                        window.location.href = "playground.html?contents=" + encoded;
+                    };
+                    pre.appendChild(button);
+                }
+            }
+        }
+
+        function showDefinition(group) {
+            if (!group || !group.length) return;
+            let html = '<div class="std-definition-heading"><h1 class="std-definition-title">' + escapeHtml(group[0].name) + '</h1></div>';
+            for (const item of group) html += '<section class="std-overload" data-source="' + escapeHtml(item.definedIn) + '">' + item.html + '</section>';
+            content.innerHTML = html;
+            enhanceOverloads();
+        }
+
+        function renderDirectory() {
+            const groups = groupByName(visibleDefinitions());
+            const names = [...groups.keys()].sort((a, b) => a.localeCompare(b));
+
+            pathLine.innerHTML = currentPath ? '<button class="std-up" type="button">←</button><span>' + escapeHtml(currentPath) + '</span>' : '<span>std/</span>';
+            const up = pathLine.querySelector(".std-up");
+            if (up) up.onclick = () => {
+                const parts = currentPath.split("/");
+                parts.pop();
+                currentPath = parts.join("/");
+                selectedName = "";
+                search.value = "";
+                renderDirectory();
+            };
+
+            nav.innerHTML = "";
+            const tree = document.createElement("div");
+            tree.className = "std-tree";
+            for (const item of childPaths()) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "std-path";
+                const name = document.createElement("span");
+                name.className = "std-path-name";
+                name.textContent = item.name;
+                const kind = document.createElement("span");
+                kind.className = "std-path-kind";
+                kind.textContent = item.file ? "(file)" : "(dir)";
+                button.appendChild(name);
+                button.appendChild(kind);
+                button.onclick = () => {
+                    currentPath = item.path;
+                    selectedName = "";
+                    search.value = "";
+                    renderDirectory();
+                };
+                tree.appendChild(button);
+            }
+            nav.appendChild(tree);
+
+            const list = document.createElement("div");
+            list.className = "std-definition-list";
+            for (const name of names) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "std-definition-link" + (name === selectedName ? " selected" : "");
+                button.textContent = name;
+                button.onclick = () => {
+                    selectedName = name;
+                    showDefinition(groups.get(name));
+                    renderDirectory();
+                };
+                list.appendChild(button);
+            }
+            nav.appendChild(list);
+
+            if (!selectedName || !groups.has(selectedName)) selectedName = names[0] || "";
+            if (selectedName) showDefinition(groups.get(selectedName));
+            else content.innerHTML = '<div class="std-empty">No definitions here.</div>';
+        }
+
+        function renderSearch() {
+            const query = search.value.trim();
+            if (!query) {
+                renderDirectory();
+                return;
+            }
+
+            const parsed = parseSearch(query);
+            if (parsed.error) {
+                nav.innerHTML = '<div class="std-search-error">' + parsed.error + '</div>';
+                content.innerHTML = '<div class="std-empty">Fix the search query to continue.</div>';
+                return;
+            }
+
+            const terms = parsed.terms;
+            if (!terms.length) {
+                renderDirectory();
+                return;
+            }
+            const lowered = terms.map(term => term.toLowerCase());
+            const matches = visibleDefinitions().filter(item => {
+                const haystack = (item.name + " " + item.text).toLowerCase();
+                return lowered.every(term => haystack.includes(term));
             });
-        });
+            const groups = groupByName(matches);
+            const names = [...groups.keys()].sort((a, b) => a.localeCompare(b));
+            nav.innerHTML = '<div class="std-search-count">' + matches.length + ' matching overload' + (matches.length === 1 ? '' : 's') + '</div>';
+
+            for (const name of names) {
+                const group = groups.get(name);
+                const hit = group.find(item => {
+                    const haystack = (item.name + " " + item.text).toLowerCase();
+                    return lowered.every(term => haystack.includes(term));
+                }) || group[0];
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "std-search-result";
+                const snippet = excerpt(hit.text, terms) || 'Matched in definition name';
+                button.innerHTML = '<span class="std-result-name">' + highlightTerms(name, terms) + '</span><span class="std-result-source">' + escapeHtml(hit.definedIn) + '</span><span class="std-result-excerpt">' + snippet + '</span>';
+                button.onclick = () => showDefinition(group);
+                nav.appendChild(button);
+            }
+
+            if (!names.length) content.innerHTML = '<div class="std-empty">No matches.</div>';
+        }
+
+        search.addEventListener("input", renderSearch);
+        renderDirectory();
     });
     </script>
     """
@@ -443,7 +734,7 @@ def export(path, target):
         }
         </style>
     </head>"""+f"""
-    <body>
+    <body class=""" + ("std-page" if "std" in target else "") + """>
         <nav class="topbar">
             <a href="index.html" style="position:absolute;left:20px;font-weight:{'900' if 'index' in target else '500'}">Smoλ</a>
             <a href="install.html" style="font-weight:{'900' if 'install' in target else '500'}">Install</a>

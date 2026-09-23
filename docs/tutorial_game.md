@@ -165,5 +165,5 @@ import std.core
 import std.io
 
 def main()
-    while not dir::wait_file "myfile.txt" blank() # wait until this file becomes available
+    while not dir::wait_file "myfile.txt": blank() # wait until this file becomes available
 ```

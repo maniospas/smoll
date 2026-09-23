@@ -13,7 +13,6 @@ def create_str_from_blob()
     blobbed = create_blob()
     return str blobbed.as char[]
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     print create_str_from_blob()
     

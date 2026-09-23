@@ -7,7 +7,6 @@ def inc(float|int|nat x, float|int|nat|blank value)
         compiler::skip() # skip invalid 'inc' definitions
     return x+value
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     print inc 2.0  # prints 3.0
     print inc(2,2) # prints 4

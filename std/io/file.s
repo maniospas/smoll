@@ -127,7 +127,7 @@ def chunk(edit char[] buf, mut nat|blank pos, edit File f)
     pos = pos+bytes_open
     return str(buf, prev_pos len bytes_open)
 
-def line(effect edit arena<char::tag>|circular<char::tag> CHARS, edit File f)
+def line(on edit arena<char::tag>|circular<char::tag> CHARS, edit File f)
     doc "next line"
     doc "Retrieves the next line from a file,"
     doc "and stores it on a CHARS storage effect."
@@ -150,8 +150,10 @@ def line(effect edit arena<char::tag>|circular<char::tag> CHARS, edit File f)
     CHARS.pos = pos+bytes_open
     return str(buf, pos to CHARS.pos)
 
-local def _print(edit terminal|write f, str text)
+local def raw_print(edit terminal|write f, str text)
     doc "writes a string to a write file"
+    doc "This is a common body underneath the file print functions,"
+    doc "so prefer those."
     if not exists f.unsafe_ptr: fail "failed to write to closed file"
     if 0!=text.dat.length
         {builtins::compiler::ptr first_pos = text__unsafe_ptr+text__dat__pos;}
@@ -160,8 +162,8 @@ local def _print(edit terminal|write f, str text)
 
 def print(edit terminal|write f, str|cstr text, cstr|blank endl)
     if endl is blank: endl = "\n"
-    f._print str text
-    if endl!="": f._print str endl
+    f.raw_print str text
+    if endl!="": f.raw_print str endl
 
 def print(edit write f, "flush")
     doc "flushes file contents to the disk"

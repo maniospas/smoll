@@ -1,7 +1,6 @@
 import std.core
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     buf1 = ref float[]
     buf1.alloc 10
     buf1.resize 20

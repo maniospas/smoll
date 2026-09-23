@@ -17,7 +17,6 @@ def addnat(nat x)
     # zero initialization otherwise creates a null pointer error 
     # when trying to call the return
 
-def main()
-    CLI = console()
+def main(on CLI)
     x = call_one(type addnat)
     print x.compiler::call(5) # prints 6

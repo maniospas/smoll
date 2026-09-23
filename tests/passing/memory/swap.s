@@ -6,8 +6,7 @@ def swap(mut any ptr x, mut any ptr y)
     x = y& # pattern for assigning pointer values instead of moving data 
     y = z&
 
-def main()
-    CLI = console()
+def main(on CLI)
     arr = mut [1,2,3]
     #arr2 = mut [1.0,2.0,3.0]
     p1 = mut arr[0]&

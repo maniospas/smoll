@@ -17,7 +17,7 @@
 local import std.core
 local import std.io.process as process
 
-local def raw_get(effect edit console CLI, str url, str path)
+local def raw_get(on CLI, str url, str path)
     VM "download(memory.as_str($url__unsafe_ptr+$url__dat__pos, $url__dat__length), memory.as_str($path__unsafe_ptr+$path__dat__pos, $path__dat__length))"
     prefix = "curl -s -X GET \""
     postfix = "\" -o "
@@ -28,7 +28,7 @@ local def raw_get(effect edit console CLI, str url, str path)
     buf.copy path
     process::system str status buf
 
-def get(effect edit console CLI, str|cstr url, str|cstr|blank path)
+def get(on CLI, str|cstr url, str|cstr|blank path)
     doc "GET with system curl"
     doc "This creates a GET request using the system's curl."
     doc "This implementation is ideal for obtaining individual"

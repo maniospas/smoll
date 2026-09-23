@@ -1,6 +1,6 @@
 import std.core
 
-def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
+def greet(on CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
     print nn compiler::value greeting
     if punctuation is blank
         print ""

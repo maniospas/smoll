@@ -1,7 +1,7 @@
 import std.core
 import std.test
 
-def test1(effect edit console CLI)
+def test1(on CLI)
     x = mut alloc(float[], 2)
     x[0] = 1.0
     x[1] = 2.0
@@ -11,14 +11,13 @@ def test1(effect edit console CLI)
         print len x
     return x
 
-def test2(effect edit console CLI) 
+def test2(on CLI) 
     t = test1()
     j = t
     k = mut alloc(float[], 3)
     return (t,j,k)
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     t = test2()
     assert(t.t[1]==2.0, "read from transferred buffer")
     assert(t.j[1]==2.0, "read from shallow copied buffer")

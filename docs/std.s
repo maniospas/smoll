@@ -1,5 +1,9 @@
 import std.core
 import std.io
+import std.io.process
+import std.io.file
+import std.io.dir
+import std.io.web
 import std.rand
 import std.hash
 import std.map

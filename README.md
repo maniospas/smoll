@@ -47,8 +47,8 @@ import std.io
 
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 def main()
-    # EFFECTS to automatically pass around (some functions grab these by name).
-    CLI = edit console()
+    # EFFECTS to automatically pass around (some functions on these by name).
+    CLI = console()
     CHARS = edit circular alloc 4096
 
     # Easy function synthesis because parentheses are optional for one argument.

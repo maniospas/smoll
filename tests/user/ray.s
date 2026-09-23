@@ -28,7 +28,7 @@ def process(mut circle ptr _self, float dt)
         self.vy = 0.0-(sci::abs self.vy)
     _self = self
 
-def draw(effect edit window WINDOW, circle self)
+def draw(on edit window WINDOW, circle self)
     white  = color(255, 255, 255)
     teal   = color(0,   200, 180)
     shadow = color(0,   200, 180, 60)

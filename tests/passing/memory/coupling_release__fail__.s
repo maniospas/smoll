@@ -6,6 +6,5 @@ def test(nat number)
         s = bucket().copy "123"
     return (s,alloc)
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     print test(1).s

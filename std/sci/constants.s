@@ -16,7 +16,7 @@
 
 local import "std/extern/math.h"
 
-def pi()
+local def pi()
     {builtins::float pi = M_PI;}
     return pi
 

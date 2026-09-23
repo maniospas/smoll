@@ -36,7 +36,7 @@ import std.io
 
 def README = "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/README.md"
 def main()
-    # EFFECTS to automatically pass around (some functions grab these by name).
+    # EFFECTS to automatically pass around (some functions on these by name).
     CLI = edit console()
     CHARS = edit circular alloc 4096
 

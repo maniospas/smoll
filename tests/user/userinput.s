@@ -1,6 +1,6 @@
 import std.core
 
-def read_version(effect edit console CLI)
+def read_version(on CLI)
     print nn "compiled version: "
     try ret = str(new(), CLI)
     return ret

@@ -11,8 +11,7 @@ def add(nat y)
         if y==compiler::value increment
             return compiler::abstract type add<nat,increment>
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     successor_function = next type add<nat>
     if try ret = successor_function.compiler::call 5 # fail to call the "null" functor
         print ret

@@ -6,8 +6,7 @@ def enum = "A"|"B"|"C"
 def Answers(enum first, enum second, nat minutes_to_answer) return compiler::args()
 def answers(cstr first, cstr second, nat minutes_to_answer) return compiler::args()
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     answers = answers("A", "A", 60)
     if not answers is Answers 
         fail "not a valid answer" # this will fail

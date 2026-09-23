@@ -1,7 +1,6 @@
 import std.core
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     x = mut 1
     y = ref x
     z = ref y

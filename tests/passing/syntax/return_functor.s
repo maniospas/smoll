@@ -18,7 +18,6 @@ def release(any ptr self)
 def get(generic self)
     return compiler::deref(unsafe_mut self.data.compiler::unsafe_attach_type(nat[].unsafe_ptr))
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     obj = generic(8, type create, type release)
     print get obj

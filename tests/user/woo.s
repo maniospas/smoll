@@ -1,7 +1,7 @@
 import std.core
 import std.io
 
-rec wooo(effect edit console CLI) 
+rec wooo(on CLI) 
     if false return blank()
     process::breakpoint()
     print "wooo"

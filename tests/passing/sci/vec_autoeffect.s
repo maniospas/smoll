@@ -1,11 +1,9 @@
 import std.core
 import std.sci
 
-def safe_main(on CLI)
-    FLOATS  = ref float[].alloc(200).circular() # effects can on it by name
-    FLOATS2 = ref float[].alloc(200).circular() # useless 
-    v1 = edit new().vec 10 # force our own allocator
-    v2 = edit new().vec 10
+def safe_main(on CLI, on edit bucket FLOATS)
+    v1 = edit vec 10
+    v2 = edit vec 10
     v1[0] = 1.0
     v2[0] = 2.0
     
@@ -15,6 +13,6 @@ def safe_main(on CLI)
         v = 2.0*(v1+v2+v)
     print v[0]
     
-def main(on CLI)
+def main(on CLI, on edit bucket FLOATS)
     if not try safe_main()
         print cstr compiler::last_error()

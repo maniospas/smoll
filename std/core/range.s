@@ -18,23 +18,23 @@ local import std.core.numbers
 
 def of(nat to)
     doc "yields a pair of nats based on an interval specification"
-    doc "Represents the range [0, to) where 'to' its  its arguments."
+    doc "Represents the range [0, to)."
     return (assigned from=0, to)
 
 def of(nat from, "to", nat to)
     doc "yields a pair of nats based on an interval specification"
-    doc "Represents the range [from, to) where 'from' and 'to' are the arguments."
+    doc "Represents the range [from, to)."
     return (from, to)
 
 def of(nat from, "upto", nat to)
     doc "yields a pair of nats based on an interval specification"
-    doc "Represents the range [from, to] where 'from' and 'to' are the arguments."
+    doc "Represents the range [from, to]."
     return (from, to+1)
 
 def of(nat from, "len", nat length)
     doc "yields a pair of nats based on an interval specification"
-    doc "Represents the range [from, from+length] where 'from' and 'length' are the arguments."
-    return (from, from+length)
+    doc "Represents the range [from, from+length)."
+    return (from, assigned to = from+length)
 
 def range(nat _from, nat to)
     doc "constructs a range"
@@ -44,8 +44,7 @@ def range(nat _from, nat to)
     doc "ranges. Example:"
     doc "```python"
     doc "import std.core"
-    doc "def main()"
-    doc "    CLI = edit console()"
+    doc "def main(on CLI)"
     doc "    r = range of(0 to 3)"
     doc "    for i in r: print i"
     doc "    print r.from"

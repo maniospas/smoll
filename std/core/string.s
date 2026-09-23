@@ -23,7 +23,7 @@ local import std.unsafe as unsafe
 def arena(char::tag)    return arena char[]
 def circular(char::tag) return circular char[]
 def list(char::tag)     return list char[]
-local def alloc(effect edit new CHARS, nat length) 
+local def alloc(on edit new CHARS, nat length) 
     if not try ret = mut allocated(char[].alloc length, 0)
         fail "allocation failed"
     return ret
@@ -132,7 +132,7 @@ def neq(char x, char y)
 local def alloc(edit bucket CHARS, nat length)
     return allocated(char[].alloc(CHARS, length), 0)
 
-def copy(effect edit char_allocator CHARS, char other)
+def copy(on edit char_allocator CHARS, char other)
     surface = alloc(CHARS, 1)
     {memcpy(surface__buf__unsafe_ptr+surface__pos+surface__buf__unsafe_offset, &other, 1);}
     if CHARS is char_allocator\bucket
@@ -140,7 +140,7 @@ def copy(effect edit char_allocator CHARS, char other)
     unsafe_valid CHARS
     return str(surface.buf, surface.pos, 1, other)
 
-def copy(effect edit char_allocator CHARS, str|cstr _other)
+def copy(on edit char_allocator CHARS, str|cstr _other)
     doc "copy a string"
     doc "The result is a fresh string in a new memory surface effect CHARS."
     doc "The result is guaranteed to be a bit-correct replica of the"
@@ -158,7 +158,7 @@ def copy(effect edit char_allocator CHARS, str|cstr _other)
     unsafe_valid CHARS
     return str(surface.buf, surface.pos, other.dat.length, other.dat.first)
 
-def copy_null_terminated(effect new CHARS, str other)
+def copy_null_terminated(on new CHARS, str other)
     doc "create null terminated string"
     doc "Copies a string to a new buffer while ensuring null termination."
     doc "This is mainly useful for supporting 'cstr unsafe_temp'."
@@ -303,7 +303,7 @@ def neq(str|cstr x, str|cstr y)
     doc "Negates the outcome of equality checks between cstr and strings."
     return not x==y
 
-def copy_null_terminated(effect edit arena<char::tag> CHARS, str|cstr _other)
+def copy_null_terminated(on edit arena<char::tag> CHARS, str|cstr _other)
     doc "copy a string while adding null termination"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -320,7 +320,7 @@ def copy_null_terminated(effect edit arena<char::tag> CHARS, str|cstr _other)
     CHARS.pos = next_pos
     return str(CHARS.buf, prev_pos, other.dat.length, other.dat.first)
 
-def print(effect edit console CLI, str s, cstr|blank endl)
+def print(on CLI, str s, cstr|blank endl)
     doc "print a string"
     if endl is blank
         doc "Ends the line too."
@@ -334,7 +334,7 @@ def get(str s, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
             fail "out of bounds"
     return s.unsafe_ptr.unsafe::add(s.dat.pos+i)
 
-def print(effect edit console CLI, char c, cstr|blank endl)
+def print(on CLI, char c, cstr|blank endl)
     doc "print a character"
     if endl is blank
         doc "Ends the line too."
@@ -429,7 +429,7 @@ def nn(str value)
     doc "to print without a new line."
     return (value, "")
 
-def add(effect edit char_allocator\arena\circular CHARS, str|cstr _s1, str|cstr _s2)
+def add(on edit char_allocator\arena\circular CHARS, str|cstr _s1, str|cstr _s2)
     doc "concatenate two strings"
     doc "The result is placed on an allocator effect CHARS."
     doc "This implementation creates a new allocation and is therefore"
@@ -455,7 +455,7 @@ def add(effect edit char_allocator\arena\circular CHARS, str|cstr _s1, str|cstr 
     try ret = str(status surface from start)
     return ret
 
-def add(effect edit arena<char::tag>|circular<char::tag> CHARS, str|cstr _s1, str|cstr _s2)
+def add(on edit arena<char::tag>|circular<char::tag> CHARS, str|cstr _s1, str|cstr _s2)
     doc "concatenate two strings"
     doc "The result is placed on an allocator effect CHARS."
     doc "This implementation ensures that consecutively allocated strings, or"
@@ -507,7 +507,7 @@ def empty(str c)
     doc "than casting to a string."
     return 0==len c
 
-def copy(effect edit char_allocator CHARS, nat n)
+def copy(on edit char_allocator CHARS, nat n)
     doc "convert a number to a string"
     doc "The result is placed on a character memory surface effect CHARS."
     doc "Example:"
@@ -538,7 +538,7 @@ def copy(effect edit char_allocator CHARS, nat n)
     return str(status surface len digits)
 
 
-# def copy(effect edit char_allocator CHARS, int n)
+# def copy(on edit char_allocator CHARS, int n)
 #     doc "convert a number to a string"
 
 #     negative = n < int 0
@@ -568,7 +568,7 @@ def copy(effect edit char_allocator CHARS, nat n)
 #     return str(status surface len digits+offset)
 
 
-def copy(effect edit char_allocator CHARS, float n)
+def copy(on edit char_allocator CHARS, float n)
     doc "convert a number to a string"
 
     negative = n < 0.0

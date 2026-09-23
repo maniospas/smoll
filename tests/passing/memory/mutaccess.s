@@ -12,11 +12,10 @@ def listofdat()
     data = edit dat[].alloc 4
     return class(data)
 
-def accessible(effect edit console CLI, listofdat obj)
+def accessible(on CLI, listofdat obj)
     print obj.data[0].data[0]
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     obj = mut listofdat()
     obj.data[0] = dat()
     obj.data[0]&.value = 0

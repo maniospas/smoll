@@ -86,6 +86,6 @@ def dereference_ptr(any ptr allocated)
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
     {builtins::compiler::ptr ret = 0;}
-    ptr_size = compiler::size compiler::ptr()
+    ptr_size = compiler::value compiler::size compiler::ptr()
     {memcpy(&ret, allocated, ptr_size);}
     return ret

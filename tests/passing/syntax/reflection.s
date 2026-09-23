@@ -3,8 +3,7 @@ import std.core
 def inc(mut float x)
     x = x+1.0
 
-def main()
-    CLI = console()
+def main(on CLI)
     print inc::name
     x = mut 0.0
     for arg is inc::args

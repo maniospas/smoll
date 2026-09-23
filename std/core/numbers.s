@@ -25,15 +25,13 @@ def is_different(Number x, Number y)
 
 def eq(Number x, Number y)
     doc "equals"
-    if is_different(x,y)
-        compiler::skip()
+    if is_different(x,y): compiler::skip()
     {builtins::bool z = x==y;}
     return z
 
 def neq(Number x, Number y)
     doc "not equal"
-    if is_different(x,y)
-        compiler::skip()
+    if is_different(x,y): compiler::skip()
     {builtins::bool z = x!=y;}
     return z
 
@@ -67,16 +65,14 @@ def neg(Number x)
 def add(Number x, Number y)
     doc "add"
     doc "Adds two numbers of the same type. This is an overload for the + operator."
-    if is_different(x,y)
-        compiler::skip()
+    if is_different(x,y): compiler::skip()
     {type(x) z=x+y;}
     return z
 
 def mul(Number x, Number y)
     doc "multiply with"
     doc "Multiplies two numbers of the same type. This is an overload for the * operator."
-    if is_different(x,y)
-        compiler::skip()
+    if is_different(x,y): compiler::skip()
     {type(x) z=x*y;}
     return z
 
@@ -97,51 +93,52 @@ def mod(nat x, nat y, "unsafe_assume_nonzero"|blank nonzero_guarantee)
     doc "modulo by"
     doc "Computes the modulo between two natural numbers. This is an overload for the % operator."
     if nonzero_guarantee is blank
-        {type(x) zero = 0;}
-        if y==zero
-            fail "modulo by zero"
+        if y==0: fail "modulo by zero"
     {type(x) z=x%y;}
     return z
 
 def lt(Number x, Number y)
     doc "less than"
     doc "Compares two numbers of the same type. This is an overload for the < operator."
-    if is_different(x,y)
-        compiler::skip()
+    if is_different(x,y): compiler::skip()
     {builtins::bool z = x<y;}
     return z
 
 def gt(Number x, Number y)
     doc "Compares two numbers of the same type. This is an overload for the > operator."
     doc "greater than"
-    if is_different(x,y)
-        compiler::skip()
+    if is_different(x,y): compiler::skip()
     {builtins::bool z = x>y;}
     return z
 
 def le(Number x, Number y)
     doc "less than or equal to"
     doc "Compares two numbers of the same type. This is an overload for the <= operator."
-    if is_different(x,y)
-        compiler::skip()
+    if is_different(x,y): compiler::skip()
     {builtins::bool z = x<=y;}
     return z
 
 def ge(Number x, Number y)
     doc "greater than or equal to"
     doc "Compares two numbers of the same type. This is an overload for the >= operator."
-    if is_different(x,y)
-        compiler::skip()
+    if is_different(x,y): compiler::skip()
     {builtins::bool z = x>=y;}
     return z
     
 def sub(Number x, Number y)
     doc "subtract by"
     doc "Subtracts two numbers of the same type. This is an overload for the - operator."
-    if is_different(x,y) 
-        compiler::skip()
+    if is_different(x,y): compiler::skip()
     if x is nat
         doc "Natural numbers are safeguarded against acquiring negative results, which would overflow."
+        doc "There exist overloaded variations of natural number substraction that skip or completely"
+        doc "remove the failure mode. For example, this variation overflows:"
+        doc "```python"
+        doc "import std.core"
+        doc "def main(on CLI)"
+        doc "    print 5-3"
+        doc "    print 0-(1 assume_smaller)"
+        doc "```"
     if x is nat and x<y: fail "nat subtraction would yield a negative"
     {type(x) z=x-y;}
     return z
@@ -151,8 +148,10 @@ def sub(nat x, nat y, "assume_smaller")
     doc "Subtracts two natural numbers without underflow check. This is an overload for the - operator,"
     doc "for example used like below. This overload never fails and instead adds 0xFFFFFFFFFFFFFFFF to"
     doc "the result if it would produce a negative."
-    doc "```rust"
-    doc "0-(1 assume_smaller)"
+    doc "```python"
+    doc "import std.core"
+    doc "def main(on CLI)"
+    doc "    print 0-(1 assume_smaller)"
     doc "```"
     {type(x) z=x-y;}
     return z
@@ -160,11 +159,13 @@ def sub(nat x, nat y, "assume_smaller")
 def sub(nat x, nat y, "test_smaller")
     doc "subtract by"
     doc "Subtracts two natural numbers without underflow check. This is an overload for the - operator,"
-    doc "for example used like below. This overload never fails and instead adds 0xFFFFFFFFFFFFFFFF to"
-    doc "the result if it would produce a negative."
+    doc "for example used like below. This overload fails but uses an `expected_fail` rather than typical"
+    doc "failure so that compiling in `--debug` mode does not show an error message."
     doc "```python"
-    doc "if try result=0-(1 test_smaller): print result"
-    doc "else: print \"would be negative\""
+    doc "import std.core"
+    doc "def main(on CLI)"
+    doc "    if try result=0-(1 test_smaller): print result"
+    doc "    else: print \"would be negative\""
     doc "```"
     if x<y: expected_fail "nat subtraction would yield a negative"
     {type(x) z=x-y;}

@@ -1,8 +1,8 @@
 import std.core
 import std.sci
 
-def safe_main(effect edit console CLI)
-    FLOATS  = ref float[].alloc(200).circular() # effects can grab it by name
+def safe_main(on CLI)
+    FLOATS  = ref float[].alloc(200).circular() # effects can on it by name
     FLOATS2 = ref float[].alloc(200).circular() # useless 
     v1 = edit new().vec 10 # force our own allocator
     v2 = edit new().vec 10
@@ -16,8 +16,7 @@ def safe_main(effect edit console CLI)
         v = FLOATS2.mul(2.0, v1+v2+v) # THIS SHOULD CREATE AN ERROR
     print v[0]
     
-def main()
-    CLI = edit console()
+def main(on CLI)
     try safe_main()
     if try error=compiler::last_error()
         print cstr error

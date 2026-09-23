@@ -1014,14 +1014,14 @@ class ImplementedType:
         args = signature_like([self.vars[arg] for arg in self.args], impl=self, hide_brackets=compact)
         rets = signature_like([self.vars[arg] for arg in self.rets], impl=self, hide_brackets=compact)
         if self.builtin is not None: return self.name
-        return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" with effects "+','.join(self.effect_names) if self.effect_names else "")
+        return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" on "+','.join(self.effect_names) if self.effect_names else "")
 
     def canonical_signature(self, source=None):
         if self.is_buffer_of: return "buffer of "+signature_like([self.is_buffer_of.vars[arg] for arg in self.is_buffer_of.rets], self.is_buffer_of, monomorphic=True)
         if self.is_pointer_of: return "pointer of "+signature_like([self.is_pointer_of.vars[arg] for arg in self.is_pointer_of.rets], self.is_pointer_of, monomorphic=True)
         args = signature_like([self.vars[arg] for arg in self.args], impl=self, monomorphic=True)
         rets = signature_like([self.vars[arg] for arg in self.rets], impl=self, monomorphic=True)
-        return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" with effects "+','.join(self.effect_names) if self.effect_names else "")
+        return ("" if "__" in self.name else self.name)+"("+args+") -> ("+rets+")"+(" on "+','.join(self.effect_names) if self.effect_names else "")
 
     def assign(self, varname: str, value: list[Variable], error_token: "Token", perform_immutability_checks: bool=True, top_entry: bool=True, strip_mutability: bool=False, is_field: bool=True):
         # for segment in varname.split("--"):
@@ -2339,7 +2339,7 @@ class Token:
                 errexit()
             token_len = max(len(reason.text), 1)
             pointer = " " * (reason.col - 1) + "^" * token_len
-            path = Path(self.file.resolved_path).resolve()
+            path = Path(reason.file.resolved_path).resolve()
             location = f"{path.as_uri()} line {reason.row} column {reason.col}"
             prefix = " "*(self.col-1)
             print(prefix+RED+"^"*orignal_token_len+"|"+RESET)
@@ -2740,6 +2740,7 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
                     CODEWORD_SEMICOLON
                 ])
                 new_vars.append(variable)
+                #assert literal_method.is_literal_of.is_functor_of is not None, "Unforeseen internal functor here"
         if is_lsp and file.is_main_file: print_lsp_literal(error_token, "**type to value**\n\nConverts a tuple containing literal types, including the outcome of 'compt', to a local variable of type:\n```rust\n"+signature_like(new_vars, impl)+"\n```")
             
         return new_vars
@@ -2792,19 +2793,40 @@ def resolve_call(file: File, impl: ImplementedType, method: UnionType, vars: lis
         tmp = create_temp()
         var = Variable(tmp, CAUGHT_TYPE, token=error_token)
         impl.vars[tmp] = var
-        if not impl.used_error_codes: error_token.error("safety", "no error to retrieve")
+        if not impl.used_error_codes and not impl.is_parsing_a_defer: error_token.error("safety", "no error to retrieve")
         impl.has_caught_used_error_codes = True
         
-        impl.implementation.extend([
-            var,
-            CODEWORD_EQUALS,
-            CODEWORD_TCOMPLAIN,
-            CODEWORD_SEMICOLON,
-            # CODEWORD_TCOMPLAIN,
-            # CODEWORD_EQUALS,
-            # CODEWORD_ZERO,
-            # CODEWORD_SEMICOLON
-        ])
+        if impl.is_parsing_a_defer:
+            impl.implementation.extend([
+                CODEWORD_IF,
+                CODEWORD_LPAR,
+                CODEWORD_TCOMPLAIN,
+                CODEWORD_RPAR,
+                CODEWORD_LBRACKET,
+                var,
+                CODEWORD_EQUALS,
+                CODEWORD_TCOMPLAIN,
+                CODEWORD_SEMICOLON,
+                CODEWORD_RBRACKET,
+                CODEWORD_ELSE,
+                CODEWORD_LBRACKET,
+                var,
+                CODEWORD_EQUALS,
+                CODEWORD_TERRCODE,
+                CODEWORD_SEMICOLON,
+                CODEWORD_RBRACKET,
+            ])
+        else:
+            impl.implementation.extend([
+                var,
+                CODEWORD_EQUALS,
+                CODEWORD_TCOMPLAIN,
+                CODEWORD_SEMICOLON,
+                # CODEWORD_TCOMPLAIN,
+                # CODEWORD_EQUALS,
+                # CODEWORD_ZERO,
+                # CODEWORD_SEMICOLON
+            ])
 
         #try_var = impl.is_parsing_a_try[-1] if impl.is_parsing_a_try else None
         # if try_var is None: error_token.error("safety", "you can only catch within a `try`, for example per `if try error=compiler::last_error() print cstr error`")
@@ -3489,8 +3511,12 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 if any(r.type.is_buffer_of.vars[r_ret].type is POINTER_TYPE for r_ret in r.type.is_buffer_of.rets):
                     literal_tok.error("interpreter", "'compt' cannot serialize pointer indirection, like pointers within buffers in "+signature_like(ret, temporary_implementation))
             if not r.type.builtin: continue
+            if r.type.is_functor_of:
+                #print(r.type.is_functor_of.signature())
+                r = ret[i]
+                continue
             if r.type not in [FLOAT_TYPE, UINT_TYPE, INT_TYPE, CSTR_TYPE, BOOL_TYPE, POINTER_TYPE, UINT16_TYPE, UINT32_TYPE, UINT8_TYPE]:
-                literal_tok.error("interpreter", "'compt' requires that primitives are retrieved but got '"+signature_like(ret, temporary_implementation)+"' that contains '"+pretty_name(r.type.name)+"'")
+                literal_tok.error("interpreter", "'compt' must only return primitives or buffers, but got '"+signature_like(ret, temporary_implementation)+"' that contains '"+pretty_name(r.type.name)+"'")
         temporary_implementation.returns(ret, literal_tok, is_safe=True)
         memory = MemoryEmulator(1024*vm_memory_kb)
         returned_values = [0 for r in ret if r.type.builtin]
@@ -3501,6 +3527,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
         lits: list[ImplementedType] = list()
         i = 0
         for r in ret:
+            if r.type.has_retrieved_singleton: literal_tok.error("safety", "'compt' cannot define singletons", reason=r.type.has_retrieved_singleton, raason_message="defined in")
             if not r.type.builtin:
                 lits.append(r.type)
                 continue
@@ -3512,12 +3539,21 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                 lits.append(create_literal_type(Token(str(int(returned_values[i])), file, literal_tok.row, literal_tok.col), BOOL_TYPE).variations[0])
             elif r.type is POINTER_TYPE:
                 mem_size = memory.alloc_sizes.get(returned_values[i], None)
-                if returned_values[i]==0: literal_tok.error("interpreter", "failed because 'compt' evaluated to a null pointer value")
-                if mem_size is None: literal_tok.error("interpreter", "failed because 'compt' can not capture pointers to foreign resources (like file handles)")
+                if returned_values[i]==0: literal_tok.error("interpreter", "'compt' evaluated to a null pointer value")
+                if mem_size is None: literal_tok.error("interpreter", "'compt' can not capture pointers to foreign resources (like file handles)")
                 lits.append(create_literal_type(Token("\""+memory.as_rawstr(returned_values[i], mem_size)+"\"", literal_tok.file, literal_tok.row, literal_tok.col), POINTER_TYPE, allow_cache=False).variations[0])
                 raw_type = temporary_implementation.get_pointer_type(r)
                 if raw_type and raw_type!=ANY_TYPE: lits[-1].is_forced_pointer_type_of = raw_type
                 else: lits[-1].is_forced_pointer_type_of = ANY_TYPE
+            elif r.type.is_functor_of:
+                returned_function = memory.read_uint64(returned_values[i])
+                functor = memory.foreign_objects.get(returned_function, None)
+                if functor is None: literal_tok.error('interpreter', "'compt' can not return a null functor")
+                functor = functor[0]
+                if not isinstance(functor, ImplementedType): literal_tok.error('interpret', "'compt' tried to return a functor but a different kind of value was found")
+                functor_tok = Token(functor.monomorphic_name, file, literal_tok.row, literal_tok.col)
+                functor_tok.name_refereal = functor
+                lits.append(create_literal_type(functor_tok, r.type).variations[0])
             else: 
                 lits.append(create_literal_type(Token("\""+memory.as_cstr(returned_values[i])+"\"", file, literal_tok.row, literal_tok.col), CSTR_TYPE).variations[0])
             i += 1
@@ -4453,6 +4489,7 @@ async def process_statement_operator(file: File, tokens: list[Token], impl: Impl
                                     CODEWORD_RBRACKET,
                                 ])
                             else:
+                                #assert literal_method.is_literal_of.is_functor_of is not None, "Unforeseen internal functor here"
                                 variable = Variable(create_temp(), literal_method.is_literal_of, token=op_token)
                                 impl.vars[variable.name] = variable
                                 impl.implementation.extend([
@@ -5738,13 +5775,42 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                         variable = Variable(depackaged_tmp+"__"+ret, lit_method.is_literal_of, token=current_token)
                         if is_lsp and file.is_main_file: resolution_type_value.append(lit_method.at.text)
                         impl.vars[variable.name] = variable
-                        impl.implementation.extend([
-                            variable,
-                            CODEWORD_EQUALS,
-                            CodeWord(lit_method.at.text),
-                            CODEWORD_SEMICOLON
-                        ])
                         varsret.append(variable)
+                        if lit_method.is_literal_of.is_functor_of is not None: 
+                            functor_known_implementation = lit_method.at.name_refereal
+                            if functor_known_implementation not in impl.dependent_implementations:
+                                impl.dependent_implementations.append(functor_known_implementation)
+                            impl.implementation.extend([
+                                variable,
+                                CODEWORD_EQUALS,
+                                CODEWORD_LPAR,
+                                CODEWORD_CAST_FUNC_PTR,
+                                CODEWORD_RPAR,
+                                CodeWord(lit_method.at.text),
+                                CODEWORD_SEMICOLON
+                            ])
+                        else:
+                            if lit_method.is_literal_of.is_functor_of is not None: 
+                                functor_known_implementation = lit_method.at.name_refereal
+                                if functor_known_implementation not in impl.dependent_implementations:
+                                    impl.dependent_implementations.append(functor_known_implementation)
+                                impl.implementation.extend([
+                                    variable,
+                                    CODEWORD_EQUALS,
+                                    CODEWORD_LPAR,
+                                    CODEWORD_CAST_FUNC_PTR,
+                                    CODEWORD_RPAR,
+                                    CodeWord(lit_method.at.text),
+                                    CODEWORD_SEMICOLON
+                                ])
+                            else:
+                                impl.implementation.extend([
+                                    variable,
+                                    CODEWORD_EQUALS,
+                                    CodeWord(lit_method.at.text),
+                                    CODEWORD_SEMICOLON
+                                ])
+
                     else:
                         variable = Variable(depackaged_tmp+"__"+ret, literal_method.vars[ret].type)
                         impl.vars[variable.name] = variable
@@ -5763,6 +5829,7 @@ async def process_statement(file: File, tokens: list[Token], pos: int, impl: Imp
                 impl.used_globals.add(variable.name)
                 varsret = [variable]
             else:
+                #assert literal_method.is_literal_of.is_functor_of is not None, "Unforeseen internal functor here"
                 variable = Variable(create_temp(), literal_method.is_literal_of, token=current_token)
                 if is_lsp and file.is_main_file: print_lsp_literal(call_token, "**literal**\n\nnumber defined to be "+literal_method.at.text, defined=literal_method.at)
                 impl.vars[variable.name] = variable
@@ -6471,8 +6538,13 @@ async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exc
     while peek_text(tokens, pos)!=end_symbol:
         arg_immutability = -1
         is_effect = False
-        if get(tokens, pos).text=="effect":
+        if get(tokens, pos).text=="on":
             if is_lsp and file.is_main_file: print_lsp_decorator(get(tokens,pos), "**effect argument**\n\nDeclares that the provided argument should be autonomously gathered from the calling context's variables.")
+            if len(effect_names)<len(abstract_arg_names): get(tokens,pos).error("type", "effects can only be declared as the first arguments")
+            pos += 1
+            is_effect = True
+        if get(tokens, pos).text=="effect":
+            if is_lsp and file.is_main_file: print_lsp_decorator(get(tokens,pos), "**effect argument (DEPRECATED)**\n\nDeclares that the provided argument should be autonomously gathered from the calling context's variables.")
             if len(effect_names)<len(abstract_arg_names): get(tokens,pos).error("type", "effects can only be declared as the first arguments")
             pos += 1
             is_effect = True
@@ -6518,10 +6590,25 @@ async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exc
             pos += 1
             abstract_arg_convert_to_ptr.append(True)
         else: abstract_arg_convert_to_ptr.append(False)
+        arg_type_name_auto = peek_text(tokens, pos-1)
+        if peek_text(tokens, pos-2)=="::": arg_type_name_auto = "-"
         arg_name = peek_text(tokens, pos)
-        if is_effect: effect_names.append(arg_name)
-        if arg_name==end_symbol or arg_name==",": arg_name = "__t_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
+        if arg_name==end_symbol or arg_name==",":
+            if end_symbol==">":
+                arg_name = "__t_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
+            else:
+                # if len(arg_type.variations)!=1:
+                #     tokens[pos].error("safety", "ommited argument names assume the type name, but here there are multiple types")
+                #     arg_name = "__t_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
+                if any(x in arg_type_name_auto for x in "<>()-\""):
+                    #tokens[pos].error("safety", "ommited argument names assume the type name, but would assume invalid characters here")
+                    arg_name = "__t_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
+                else: 
+                    arg_name = arg_type_name_auto
+                    if is_lsp and file.is_main_file: print_lsp_decorator(get(tokens,pos-1), "**type-named variable**\n\nSingle-word type arguments without a variable name spawn variables with the same name as them.")
+            
         else: pos += 1
+        if is_effect: effect_names.append(arg_name)
         arg_type_variations: list[ImplementedType] = find_unique_variations(arg_type.variations)
         abstract_arg_types.append(arg_type_variations)
         #if arg_immutability==-1 and all(variation.builtin for variation in arg_type.variations):
@@ -6632,8 +6719,9 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                     if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
                     else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
                     #pos = await process_body(file, tokens, pos, impl)
-                    if not impl.has_returned_once: 
-                        impl.returns([], start_token, True)
+                    if not impl.has_been_completed: 
+                        impl.returns([impl.vars[var] for var in impl.rets], start_token, is_safe=True)
+                        impl.implementation.extend([CODEWORD_GOTO, CODEWORD_TRETURN, CODEWORD_SEMICOLON])
                     
                     if is_lsp and file.is_main_file:
                         callee = impl
@@ -6674,6 +6762,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                 if impl.has_been_completed is None:
                     impl.nesting.clear()
                     impl.returns([impl.vars[var] for var in impl.rets], start_token, is_safe=True)
+                    impl.implementation.extend([CODEWORD_GOTO, CODEWORD_TRETURN, CODEWORD_SEMICOLON])
             except FastReturnException: 
                 assert fast_return_exception
                 #start_token.error("safety", "missing uncoditional return")
@@ -7412,7 +7501,8 @@ def platform_exe_path(output_name: str):
     if sys.platform == "win32" and chosen_compiler not in ("none", "emcc"): return str(output_name)+".exe"
     return str(output_name)
 
-def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_point: str|None) -> None:
+def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry_point: ImplementedType|None) -> None:
+    entry_point = _entry_point.monomorphic_name if _entry_point is not None else None
     src_path = Path(f"{output_name}.c")
     exe_path = Path(platform_exe_path(output_name))
     header = "\n".join("#include \""+k.path+"\"" for k in externals)+"\n"
@@ -7426,7 +7516,26 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
                 already_generated.add(candidate_def)
                 add_implementation(candidate_def)
         discovered_defs.append(next_def)
-    
+
+    # find how to construct main arguments
+    main_arg_defs: list[ImplementedType] = list()
+    if _entry_point is not None:
+        i = 0
+        while i<len(_entry_point.args):
+            arg = _entry_point.args[i]
+            var = _entry_point.vars[arg]
+            type = var.type
+            arg_len = len(type.rets) if type.rets else 1
+            args = _entry_point.args[i:i+arg_len]
+            candidates = [variation for union in _entry_point.at.file.types.values() for variation in union.variations if not variation.args and len(variation.rets)==arg_len and all(variation.vars[ret].type==_entry_point.vars[arg].type for ret,arg in zip(variation.rets,args))]
+            candidates = list(set(candidates))
+            if not candidates: _entry_point.at.error("type", "cannot find a function to create main argument '"+pretty_name(arg)+"' of type '"+type.signature()+"' from a zero-argument call")
+            if len(candidates)>1: _entry_point.at.error("type", "more than one zero-argument functions can create main argument '"+pretty_name(arg)+"' of type '"+type.signature()+"'", suggestions=[candidate.signature() for candidate in candidates])
+            main_arg_defs.append(candidates[0])
+            i += arg_len
+        main_defs = main_arg_defs+main_defs
+
+    # collect all dependencies
     for main_def in main_defs:
         add_implementation(main_def)
     
@@ -7481,26 +7590,54 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], entry_
         generated_c_funcs.append(transpiled)
     header += "typedef void (*__smoll_func_ptr_type)(void);\n"
     if entry_point:
+        internal_singletons = {dep for dep in _entry_point.dependent_implementations if dep.has_retrieved_singleton}
+        i = 0
+        while i<len(_entry_point.args):
+            var = _entry_point.vars[_entry_point.args[i]]
+            type = var.type
+            if type.has_retrieved_singleton and type in internal_singletons:
+                _entry_point.at.error("safety", "singleton '"+type.signature()+"' automatically constructed for this main function is also produced internally", reason=type.has_retrieved_singleton, raason_message="defined in")
+            i += len(type.rets) if type.rets else 1
+
+        constructor_singletons: dict[ImplementedType,ImplementedType] = dict()
+        for constructor in main_arg_defs:
+            for singleton in constructor.dependent_implementations:
+                if not singleton.has_retrieved_singleton: continue
+                previous = constructor_singletons.get(singleton, None)
+                if previous is not None and previous!=constructor:
+                    _entry_point.at.error("safety", "main arguments '"+previous.signature()+"' and '"+constructor.signature()+"' would be created while creating the same singleton '"+singleton.signature()+"'", reason=singleton.has_retrieved_singleton, raason_message="defined in")
+                constructor_singletons[singleton] = constructor
+            if len(_entry_point.rets):
+                _entry_point.at.error("safety", "main function cannot return values", suggestions=["return 'blank()'", "'fail' to produce non-zero exit codes"])
+
         header += "int __t_argc;\nchar** __t_argv;\n"
-        if main_defs[0].needs_failure_mode:
-            generated_c_funcs.append(
-                f"""int main(int argc, char** argv) {{
-                    __t_argc = argc;
-                    __t_argv = argv;
-                    DECLARE_HANDLERS;
-                    return {entry_point}();
-                }}"""
-            )
-        else:
-            generated_c_funcs.append(
-                f"""int main(int argc, char** argv) {{
-                    __t_argc = argc;
-                    __t_argv = argv;
-                    DECLARE_HANDLERS;
-                    {entry_point}();
-                    return 0;
-                }}"""
-            )
+        main_impl = ImplementedType("__smoll_main", at=_entry_point.at)
+        main_impl.monomorphic_name = "main"
+        main_impl.force_not_inline = True
+        main_impl.implementation.extend([
+            CodeWord("__t_argc=argc"),
+            CODEWORD_SEMICOLON,
+            CodeWord("__t_argv=argv"),
+            CODEWORD_SEMICOLON,
+            CodeWord("DECLARE_HANDLERS"),
+            CODEWORD_SEMICOLON,
+        ])
+
+        main_args: list[Variable] = list()
+        for constructor in main_arg_defs:
+            type = UnionType(constructor.name, at=constructor.at)
+            type.variations.append(constructor)
+            main_args.extend(resolve_call(_entry_point.at.file, main_impl, type, [], _entry_point.at, _callee=constructor))
+
+        type = UnionType(_entry_point.name, at=_entry_point.at)
+        type.variations.append(_entry_point)
+        resolve_call(_entry_point.at.file, main_impl, type, main_args, _entry_point.at, _callee=_entry_point)
+
+        transpiled = main_impl.transpile()
+        transpiled = transpiled.replace("int main()", "int main(int argc, char** argv)", 1) if main_impl.needs_failure_mode else transpiled.replace("void main()", "int main(int argc, char** argv)", 1)
+        if not main_impl.needs_failure_mode: transpiled = transpiled[:-2]+"  return 0;\n}\n"
+        generated_c_funcs.append(transpiled)
+        
     body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
     src_path.write_text(header + globs + set_errcodes + define_errors + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")
@@ -7630,7 +7767,7 @@ async def main():
         if not main_type: print(f"{RED}error{RESET}: missing main function (did you mean to run with --docs)"); errexit()
         main_type_variations = [variation for variation in main_type.variations if variation.at.file==file]
         if len(main_type_variations) > 1: print(f"{RED}error{RESET}: more than one main type in this file"); errexit()
-        if main_type_variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); errexit()
+        #if main_type_variations[0].rets: print(f"{RED}error{RESET}: main type can only fail or return 'blank()'"); errexit()
         exe_path = src_path.with_suffix("") if args.out is None else Path(args.out)
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
@@ -7643,7 +7780,7 @@ async def main():
             for k,v in memory.foreign_objects.items(): 
                 if v[1]: print("non-freed foreign object "+v[1])
         else:
-            func_defs = write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0].monomorphic_name)
+            func_defs = write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0])
             original_exe_path = exe_path
             if not args.build and chosen_compiler!="none":
                 if chosen_compiler=="emcc":

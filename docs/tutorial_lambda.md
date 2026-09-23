@@ -27,7 +27,7 @@ The `CLI` effect is also a *singleton* in that only one can be created in your p
 # our program - this is a line comment
 import std.core
 
-def greet(effect edit console CLI)
+def greet(on CLI)
     print nn "hello " # adds an empty string instead of new line at end of print 
     print "world!"
 

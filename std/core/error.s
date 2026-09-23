@@ -32,3 +32,33 @@ def ok(compiler::last_error value)
     doc "checks that an error code is an error"
     {builtins::bool ret = (value==0);}
     return ret
+
+def WHICHERR()
+    doc "automatically print exit errors"
+    doc "This function defers error printing, including in"
+    doc "case of failure. Since it has not arguments, it can beprovided"
+    doc "to the `main` function as an automatically created parameter"
+    doc "that prints encountered error messages rather than silently"
+    doc "exiting on unhandled errors. You can show errors by"
+    doc "compiling with --debug, but this WHICHERR no overhead"
+    doc "during runtime and can thus be used in production versions"
+    doc "for minimal error checking support. Declaring it in the"
+    doc "main's title is just declarative syntax sugar for calling."
+    doc "Example:"
+    doc "```python"
+    doc "import std.core"
+    doc "def main(on CLI, WHICHERR)"
+    doc "    print \"what's your name\""
+    doc "    name = str CLI"
+    doc "    if empty name: fail \"why no name?\""
+    doc "    macro<printf> \"hello {name}!\n\""
+    doc "```"
+    doc "*Warning: This is mainly intended for consumption by the"
+    doc "main function, as it uses a thread-unsafe console handler"
+    doc "that does not respect singleton console rules."
+    init = true
+    defer
+        if init
+            err = compiler::last_error()
+            if not ok err: console(()unsafe).print cstr err
+    return class init

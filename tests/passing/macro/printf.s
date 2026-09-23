@@ -1,6 +1,5 @@
 import std.core
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     x = 2
     macro<printf> "hello {x} world\n"

@@ -1,14 +1,14 @@
 import std.core
 
-def main()
-    CLI = edit console()
-    CHARS = new()
+def main(on CLI, on new CHAR, WHICHERR)
     print "what's your name"
     name = str CLI
-    print ("hello", " ")
-    print (name, "!\n")
-
-    while not try x = CLI.float print "Please give a number:"
-        print "invalid number"
-    print "this is its square"
-    print x*x
+    if empty name: fail "why no name?"
+    macro<printf> "hello {name}!\n"
+    
+    
+    # also works
+    # while not try x = CLI.float print "Please give a number:"
+    #     print "invalid number"
+    # print "this is its square"
+    # print x*x

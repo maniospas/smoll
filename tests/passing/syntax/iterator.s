@@ -1,11 +1,10 @@
 import std.core
 
-def print(effect edit console CLI, cstr[] sentences)
+def print(on CLI, cstr[] sentences)
     for sentence in sentences
         print sentence
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     for i in range of 10
         print i
 

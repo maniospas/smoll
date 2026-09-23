@@ -440,7 +440,7 @@ def test()
     y = 2
     return class(x, y)
 
-def run(effect edit console CLI, edit test t)
+def run(on CLI, edit test t)
     t.x = 10 # allowed only thanks to 'edit'
     print t.x
 
@@ -748,7 +748,7 @@ initialization is used to ensure that a printable console exists.
 ```python
 import std.core
 
-def greet(effect edit console CLI)
+def greet(on CLI)
     print "hello world"
 
 def main()
@@ -886,10 +886,10 @@ import std.core
 
 def VERSION = "two"
 
-def version(effect edit console CLI, "one") # just a literal type
+def version(on CLI, "one") # just a literal type
     print "version one"
 
-def version(effect edit console CLI, "two")
+def version(on CLI, "two")
     print "version two"
 
 def main()
@@ -1008,7 +1008,7 @@ as the standard library's core. Below is an example of a conditional check.
 ```python
 import std.core
 
-def typed_print(effect edit console CLI, nat|int|float|cstr value) 
+def typed_print(on CLI, nat|int|float|cstr value) 
     if value is nat|int|float
         print nn "this is a number: "
     else
@@ -1282,7 +1282,7 @@ is used to make the allocation.
 ```python
 import std.core
 
-def print(effect edit console CLI, cstr[] sentences)
+def print(on CLI, cstr[] sentences)
     for sentence in sentences
         print sentence
 
@@ -1514,7 +1514,7 @@ You can manually `fail` like so:
 ```python
 import std.core
 
-def always_fail(effect edit console CLI)
+def always_fail(on CLI)
     print "we are failing"
     fail "we failed!"
 
@@ -1742,7 +1742,7 @@ by applying a namesake function.
 import std.core
 import compiler as cp
 
-def _main(effect edit console CLI)
+def _main(on CLI)
     print 2*3-20 # cannot substract two nat numbers and obtain a negative result
 
 def main()
@@ -1802,7 +1802,7 @@ to all needed vector construction. Effects do not propagate outwards,
 so you can only look at function signatures to know which effects can
 be declared. For example, one of the possible
 additions involving vectors, which is used by the `+` operator,
-is declared as `add(effect edit vec_allocator allocator, vec v1, vec v2)`.
+is declared as `add(on edit vec_allocator allocator, vec v1, vec v2)`.
 
 ```python
 import std.core
@@ -2002,7 +2002,7 @@ platform-dependent error codes for unbounded recursion that exceeds system resou
 import std.core
 import compiler as cp
 
-rec wooo(effect edit range SAFETY, nat i)
+rec wooo(on edit range SAFETY, nat i)
     next SAFETY
     if false return blank() # do not return anything
     return wooo(i+1)
@@ -2027,7 +2027,7 @@ this function asks for user input on whether the program should be terminated.
 import std.core
 import std.io
 
-rec wooo(effect edit console CLI)
+rec wooo(on CLI)
     if false return blank()
     process::interrupt_point()
     print "wooo"

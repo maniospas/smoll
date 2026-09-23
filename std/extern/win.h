@@ -2,6 +2,9 @@
 #define SMOLAMBDA_OS_WINDOWS_H
 #if defined(_WIN32) || defined(_WIN64)
 
+#define WIN32_LEAN_AND_MEAN
+#define NOGDI
+#define NOUSER
 #include <windows.h>
 #include <io.h>
 #include <direct.h>

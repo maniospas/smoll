@@ -1,7 +1,6 @@
 import std.core
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     li = mut list float[] # SHOULD FAIL when using mut instead of ref to manage lists
     (at alloc li) = 0.1
     (at alloc li) = 0.1

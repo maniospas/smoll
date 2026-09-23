@@ -17,7 +17,7 @@ def test4(edit arena<char::tag> arn)
     compiler::unsafe_declare_deep_copy_only()
     return ret 
 
-def test5(effect edit console CLI, edit arena<char::tag> arn)
+def test5(on CLI, edit arena<char::tag> arn)
     gc arn
     x = test4 arn
     z = x[0]&

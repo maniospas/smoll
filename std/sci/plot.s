@@ -9,27 +9,27 @@ def range(float _min, float _max)
         assigned max = mut _max
     )
 
-def area(effect edit window WINDOW, position pos, size size)
+def area(on edit window WINDOW, position pos, size size)
     return class (
         compiler::args(),
         assigned x_range = mut range(0.0,0.0),
         assigned y_range = mut range(0.0,0.0)
     )
 
-def fit(effect mut area AREA, float x, "horizontal")
+def fit(on mut area AREA, float x, "horizontal")
     if AREA.x_range.min>x: AREA.x_range.min = x
     if AREA.x_range.max<x: AREA.x_range.max = x
 
-def fit(effect mut area AREA, float y, "vertical")
+def fit(on mut area AREA, float y, "vertical")
     if AREA.y_range.min>y: AREA.y_range.min = y
     if AREA.y_range.max<y: AREA.y_range.max = y
 
-def fit(effect mut area AREA, vec v, "horizontal"|"vertical" dim)
+def fit(on mut area AREA, vec v, "horizontal"|"vertical" dim)
     fit(min v, dim)
     fit(max v, dim)
     return AREA
     
-def area(effect edit window WINDOW)
+def area(on edit window WINDOW)
     return area(80.0, 30.0, WINDOW.size.width-120.0, WINDOW.size.height-70.0)
 
 def plot_config("line"|"scatter" _method, color|blank _line_color)
@@ -51,7 +51,7 @@ def plot_config("line"|"scatter" _method, color|blank _line_color)
         assigned font_size = mut 16.0
     )
 
-def plot(effect area AREA, vec x, vec y, plot_config config)
+def plot(on area AREA, vec x, vec y, plot_config config)
     WINDOW = edit AREA.WINDOW
     if len(x)!= len y
         fail "plot vectors must have the same length"

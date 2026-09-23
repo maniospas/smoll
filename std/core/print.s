@@ -22,24 +22,26 @@ def console()
     doc "As a singleton, the console should usually be instantiated"
     doc "in the `main()` function and then passed to dependent calls, for example via an"
     doc "an effect for convenience. Standard library print functions provide the CLI effect"
-    doc "and you can propagate to this by prepending `effect edit console CLI` to function"
+    doc "and you can propagate to this by prepending `on CLI` to function"
     doc "arguments."
     doc "The console is a zero-cost abstraction in that it does not transfer any data"
     doc "but relies on singleton safety to synchronize io across threads."
     doc "Quickly print internals for debugging with `unsafe_console()`."
     # this trick of going through a mut, allows edit console to be an available action
     handler = mut singleton()
-    return const handler 
+    return const handler
 
-def unsafe_console()
+def CLI = console
+
+def console("unsafe")
     doc "references the system console unsafely"
-    doc "This is convenient for print debugging by writing `unsafe_console().print ...`"
+    doc "This is convenient for print debugging by writing `console(type \"unsafe\").print ...`"
     doc "without needing to evoke an effect to pass the normally singleton console."
     CLI = edit console()
     debug::unsafe_singletons()
     return CLI
 
-def print(effect edit console CLI, "flush")
+def print(on CLI, "flush")
     doc "flushes the print buffer on the console"
     {fflush(stdout);}
 
@@ -50,14 +52,14 @@ def nn(cstr|float|int|nat value)
     doc "to print without automatically adding a new line."
     return (value, "")
 
-def print(effect edit console CLI, cstr value, cstr|blank endl)
+def print(on CLI, cstr value, cstr|blank endl)
     doc "prints a cstr"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%s%s", value, endl);}
 
-def print(effect edit console CLI, float value, cstr|blank endl)
+def print(on CLI, float value, cstr|blank endl)
     doc "prints a float"
     doc "To pre-specified 6 decimal digits."
     if endl is blank 
@@ -65,35 +67,35 @@ def print(effect edit console CLI, float value, cstr|blank endl)
         endl = "\n"
     {printf("%.6f%s", value, endl);}
 
-def print(effect edit console CLI, int value, cstr|blank endl)
+def print(on CLI, int value, cstr|blank endl)
     doc "prints an integer"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%lld%s", value, endl);}
 
-def print(effect edit console CLI, nat value, cstr|blank endl)
+def print(on CLI, nat value, cstr|blank endl)
     doc "prints an unsigned integer"
     if endl is blank 
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("%llu%s", value, endl);}
 
-def print(effect edit console CLI, bool value, cstr|blank endl)
+def print(on CLI, bool value, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
     {if(value){printf("%s%s", "true", endl);}else{printf("%s%s", "false", endl);}}
 
-def print(effect edit console CLI, compiler::true, cstr|blank endl)
+def print(on CLI, compiler::true, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."
         endl = "\n"
     {printf("true%s", endl);}
     
-def print(effect edit console CLI, compiler::false, cstr|blank endl)
+def print(on CLI, compiler::false, cstr|blank endl)
     doc "prints a boolean"
     if endl is blank
         doc "Automatically ends the line too."

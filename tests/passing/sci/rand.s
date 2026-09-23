@@ -2,8 +2,7 @@ import std.core
 import std.test
 import std.rand as rand
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     rnd = mut rand::Rand()
     r1 = rand::next rnd
     r2 = rand::next rnd

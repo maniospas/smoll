@@ -1,10 +1,7 @@
 import std.core
 import std.sci
 
-def main()
-    CLI = edit console()
-    FLOATS = new() # allocate to new memory whenever needed
-
+def main(on CLI, on new FLOATS)
     a = edit mat [
         1.0, 0.0, 2.0,
         0.0, 3.0, 1.0

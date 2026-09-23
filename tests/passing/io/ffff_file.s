@@ -1,7 +1,7 @@
 import "std/core.s"
 import "std/io/file.s" as file
 
-def load(effect mut console CLI, nat16 address)
+def load(on console CLI, nat16 address)
     chunk_buffer = edit alloc 2 # chunk size
     f = edit file::open("test_file.bin" binary)
     f.file::seek nat address
@@ -11,8 +11,7 @@ def load(effect mut console CLI, nat16 address)
     r_value = bor(r_value_h.lshift 8, r_value_l)
     return nat16 nat r_value
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     try ret = load nat16 0 # zero-initialized on failure (we don't need to do it ourselves)
     print nat ret
     

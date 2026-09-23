@@ -66,13 +66,23 @@ def window(size size, cstr title, cstr font_path)
         {"-sASYNCIFY_STACK_SIZE=65536"}
         {"-flto"}
     else
-        {"-lraylib"}
-        {"-lGL"}
+        if compiler::os type "win"
+            {"-IC:\raylib\raylib\src"}
+            {"-LC:\raylib\raylib\src"} 
+            # {"-lraylib"} 
+            # {"-lopengl32"} 
+            # {"-lgdi32"} 
+            # {"-lwinmm"}
+        else
+            {"-lraylib"}
+            {"-lGL"}
     ready = mut false
     unsafe_open_window(size, title, font_path)
     return singleton(size, title, ready)
 
-def is_open(effect edit window WINDOW)
+def WINDOW = window
+
+def is_open(on edit WINDOW)
     VM "[not pyray.window_should_close()]"
     {builtins::bool ret = WindowShouldClose(); }
     return not ret
@@ -87,7 +97,7 @@ local def unsafe_end_drawing()
     if compiler::back type "emcc"
         { emscripten_sleep(0); }
     
-def draw(effect edit window WINDOW)
+def draw(on edit WINDOW)
     if WINDOW.ready: fail "already drawing on window"
     is_drawing = true
     unsafe_begin_drawing()
@@ -96,11 +106,11 @@ def draw(effect edit window WINDOW)
             unsafe_end_drawing()
     return is_drawing
 
-def clear(effect edit window WINDOW, color color)
+def clear(on edit WINDOW, color color)
     VM "pyray.clear_background(pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {ClearBackground((Color){color__r,color__g,color__b,color__a});}
 
-def text(effect edit window WINDOW, cstr txt, position pos, float size, color color)
+def text(on edit WINDOW, cstr txt, position pos, float size, color color)
     VM "pyray.draw_text_ex(memory.globals['font'],$txt,pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTextEx(
@@ -113,7 +123,7 @@ def text(effect edit window WINDOW, cstr txt, position pos, float size, color co
         ); 
     }
 
-def text(effect edit window WINDOW, str txt, position pos, float size, color color)
+def text(on edit WINDOW, str txt, position pos, float size, color color)
     VM "pyray.draw_text_ex(memory.globals['font'],str($txt),pyray.Vector2($pos__x,$pos__y),$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTextEx(
@@ -126,7 +136,7 @@ def text(effect edit window WINDOW, str txt, position pos, float size, color col
         ); 
     }
     
-def text(effect edit window WINDOW, str txt, position pos, float size, color color, "rotate", position origin, float rotation)
+def text(on edit WINDOW, str txt, position pos, float size, color color, "rotate", position origin, float rotation)
     VM "pyray.draw_text_pro(memory.globals['font'].font,str($txt),pyray.Vector2($pos__x,$pos__y),pyray.Vector2($origin__x,$origin__y),$rotation,$size,1.0,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTextPro(
@@ -168,7 +178,7 @@ def open(cstr path)
         {UnloadTexture((Texture2D){id, (int)width, (int)height, (int)mipmaps, (int)format});}
     return Texture(id, size(width, height), mipmaps, format)
 
-def texture(effect edit window WINDOW, Texture _tex, position pos, color color)
+def texture(on edit WINDOW, Texture _tex, position pos, color color)
     tex = TextureData _tex.data[0]
     { 
         DrawTexture(
@@ -178,7 +188,7 @@ def texture(effect edit window WINDOW, Texture _tex, position pos, color color)
         ); 
     }
 
-def texture(effect edit window WINDOW, Texture _tex, position pos, float scale, color color, "rotate", float rotation)
+def texture(on edit WINDOW, Texture _tex, position pos, float scale, color color, "rotate", float rotation)
     tex = TextureData _tex.data[0]
     { 
         DrawTextureEx(
@@ -190,7 +200,7 @@ def texture(effect edit window WINDOW, Texture _tex, position pos, float scale, 
         ); 
     }
 
-def texture(effect edit window WINDOW, Texture _tex, position pos, size size, color color, "rotate", float rotation)
+def texture(on edit WINDOW, Texture _tex, position pos, size size, color color, "rotate", float rotation)
     tex = TextureData _tex.data[0]
     scale_x = size.width/float tex.size.width
     scale_y = size.height/float tex.size.height
@@ -204,7 +214,7 @@ def texture(effect edit window WINDOW, Texture _tex, position pos, size size, co
         ); 
     }
 
-def texture(effect edit window WINDOW, Texture _tex, position pos, float scale, color color, "rotate", position origin, float rotation)
+def texture(on edit WINDOW, Texture _tex, position pos, float scale, color color, "rotate", position origin, float rotation)
     tex = TextureData _tex.data[0]
     {
         DrawTexturePro(
@@ -217,7 +227,7 @@ def texture(effect edit window WINDOW, Texture _tex, position pos, float scale, 
         );
     }
 
-def texture(effect edit window WINDOW, Texture _tex, position pos, size size, color color, "rotate", position origin, float rotation)
+def texture(on edit WINDOW, Texture _tex, position pos, size size, color color, "rotate", position origin, float rotation)
     tex = TextureData _tex.data[0]
     {
         DrawTexturePro(
@@ -230,7 +240,7 @@ def texture(effect edit window WINDOW, Texture _tex, position pos, size size, co
         );
     }
 
-def circ(effect edit window WINDOW, position pos, float radius, "solid", color color)
+def circ(on edit WINDOW, position pos, float radius, "solid", color color)
     VM "pyray.draw_circle_v(pyray.Vector2($pos__x,$pos__y),$radius,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawCircleV(
@@ -240,7 +250,7 @@ def circ(effect edit window WINDOW, position pos, float radius, "solid", color c
         );
     }
 
-def ellipse(effect edit window WINDOW, position pos, position radius, "solid", color color)
+def ellipse(on edit WINDOW, position pos, position radius, "solid", color color)
     {
         DrawEllipseV(
             (Vector2){(float)pos__x, (float)pos__y}, 
@@ -250,7 +260,7 @@ def ellipse(effect edit window WINDOW, position pos, position radius, "solid", c
         );
     }
 
-def ellipse(effect edit window WINDOW, position pos, position radius, "line", nat thickness, color color)
+def ellipse(on edit WINDOW, position pos, position radius, "line", nat thickness, color color)
     {
         DrawEllipseLines(
             (int)pos__x, (int)pos__y,
@@ -260,7 +270,7 @@ def ellipse(effect edit window WINDOW, position pos, position radius, "line", na
         );
     }
 
-def line(effect edit window WINDOW, position p1, position p2, float thickness, color color)
+def line(on edit WINDOW, position p1, position p2, float thickness, color color)
     VM "pyray.draw_line_ex(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),$thickness,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawLineEx(
@@ -271,7 +281,7 @@ def line(effect edit window WINDOW, position p1, position p2, float thickness, c
         );
     }
 
-def rect(effect edit window WINDOW, position pos, size size, "solid", color color)
+def rect(on edit WINDOW, position pos, size size, "solid", color color)
     VM "pyray.draw_rectangle(int($pos__x),int($pos__y),int($size__width),int($size__height),pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawRectangle(
@@ -281,11 +291,11 @@ def rect(effect edit window WINDOW, position pos, size size, "solid", color colo
         );
     }
 
-def rect(effect edit window WINDOW, position pos, size size, "line", nat thickness, color color)
+def rect(on edit WINDOW, position pos, size size, "line", nat thickness, color color)
     VM "pyray.draw_rectangle_lines_ex(pyray.Rectangle($pos__x,$pos__y,$size__width,$size__height),$thickness,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {DrawRectangleLinesEx((Rectangle){(float)pos__x, (float)pos__y, (float)size__width, (float)size__height}, (int)thickness, (Color){color__r,color__g,color__b,color__a});}
 
-def rect(effect edit window WINDOW, position pos, size size, "solid", color color, "rotate", position origin, float rotation)
+def rect(on edit WINDOW, position pos, size size, "solid", color color, "rotate", position origin, float rotation)
     {
         DrawRectanglePro(
             (Rectangle){(float)pos__x, (float)pos__y, (float)size__width, (float)size__height},
@@ -295,7 +305,7 @@ def rect(effect edit window WINDOW, position pos, size size, "solid", color colo
         );
     }
 
-def tri(effect edit window WINDOW, position p1, position p2, position p3, "solid", color color)
+def tri(on edit WINDOW, position p1, position p2, position p3, "solid", color color)
     VM "pyray.draw_triangle(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),pyray.Vector2($p3__x,$p3__y),pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTriangle(
@@ -306,7 +316,7 @@ def tri(effect edit window WINDOW, position p1, position p2, position p3, "solid
         );
     }
 
-def tri(effect edit window WINDOW, position p1, position p2, position p3, "line", color color)
+def tri(on edit WINDOW, position p1, position p2, position p3, "line", color color)
     VM "pyray.draw_triangle_lines(pyray.Vector2($p1__x,$p1__y),pyray.Vector2($p2__x,$p2__y),pyray.Vector2($p3__x,$p3__y),pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTriangleLines(
@@ -317,7 +327,7 @@ def tri(effect edit window WINDOW, position p1, position p2, position p3, "line"
         );
     }
 
-def circ(effect edit window WINDOW, position pos, float radius, "line", nat thickness, color color)
+def circ(on edit WINDOW, position pos, float radius, "line", nat thickness, color color)
     VM "pyray.draw_ring(pyray.Vector2($pos__x,$pos__y),max(0,$radius-$thickness),$radius,0,360,64,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     if radius>float thickness: inner = radius-float thickness
     else: inner = 0.0
@@ -335,32 +345,32 @@ def circ(effect edit window WINDOW, position pos, float radius, "line", nat thic
         );
     }
 
-def dt(effect window WINDOW)
+def dt(on WINDOW)
     VM "[pyray.get_frame_time()]"
     {builtins::float dt = GetFrameTime();}
     return dt
 
-def uptime(effect window WINDOW)
+def uptime(on WINDOW)
     VM "[pyray.get_time()]"
     {builtins::float t = GetTime();}
     return t
 
-def key_down(effect window WINDOW, nat key)
+def key_down(on WINDOW, nat key)
     VM "[pyray.is_key_down($key)]"
     {builtins::bool ret = IsKeyDown(key);}
     return ret
 
-def key_pressed(effect edit window WINDOW, nat key)
+def key_pressed(on edit WINDOW, nat key)
     VM "[pyray.is_key_pressed($key)]"
     {builtins::bool ret = IsKeyPressed(key);}
     return ret
 
-def key_released(effect edit window WINDOW, nat key)
+def key_released(on edit WINDOW, nat key)
     VM "[pyray.is_key_released($key)]"
     {builtins::bool ret = IsKeyReleased(key);}
     return ret
 
-def mouse_pos(effect window WINDOW)
+def mouse_pos(on window WINDOW)
     VM "[(lambda p=pyray.get_mouse_position():(p.x,p.y))()]"
     {
         builtins::float x = GetMouseX();
@@ -368,17 +378,17 @@ def mouse_pos(effect window WINDOW)
     }
     return position(x, y)
 
-def mouse_down(effect window WINDOW, nat button)
+def mouse_down(on window WINDOW, nat button)
     VM "[pyray.is_mouse_button_down($button)]"
     {builtins::bool ret = IsMouseButtonDown(button);}
     return ret
 
-def mouse_pressed(effect edit window WINDOW, nat button)
+def mouse_pressed(on edit WINDOW, nat button)
     VM "[pyray.is_mouse_button_pressed($button)]"
     {builtins::bool ret = IsMouseButtonPressed(button);}
     return ret
 
-def mouse_wheel(effect window WINDOW)
+def mouse_wheel(on window WINDOW)
     VM "[pyray.get_mouse_wheel_move()]"
     {builtins::float ret = GetMouseWheelMove();}
     return ret

@@ -67,7 +67,7 @@ Finally, the `console` type of the argument is declared, followed by its name.
 ```python
 import std.core
 
-def greet(effect edit console CLI)
+def greet(on CLI)
     print "hello world!"
 
 def main()
@@ -109,7 +109,7 @@ for debugging and more dynamic programs.
 ```python
 import std.core
 
-def read_number(effect edit console CLI, cstr message)
+def read_number(on CLI, cstr message)
     print nn message
     return float CLI # errors not intercepted by try just cascade to caller
 
@@ -129,7 +129,7 @@ input by substituting the `if` with a `while` loop, like below.
 ```python
 import std.core
 
-def read_number(effect edit console CLI, cstr message)
+def read_number(on CLI, cstr message)
     print nn message
     return float CLI
 
@@ -215,7 +215,7 @@ But enough talking. Here is some code.
 ```python
 import std.core
 
-def greet(effect edit console CLI, str name)
+def greet(on CLI, str name)
     print nn "hello "
     print nn name
     print "!"
@@ -397,7 +397,7 @@ def total_length(str[] parts)
     return size
 
 def concat(str[] parts)
-    # we don't need to grab effects from elsewhere if they are not singletons
+    # we don't need to on effects from elsewhere if they are not singletons
     CHARS = edit arena char[].alloc total_length parts
     for part in parts
         copy part
@@ -646,7 +646,7 @@ same mechanism as above grants us zero-cost literal comparison.
 ```python
 import std.core
 
-def greet(effect edit console CLI, "hello"|"hi" greeting)
+def greet(on CLI, "hello"|"hi" greeting)
     print nn compiler::value greeting
     if greeting is "hello" # 'is' starts type parsing
         print nn " world"
@@ -667,14 +667,14 @@ as an argument. Here is a simple example.
 ```python
 import std.core
 
-def print(effect edit console CLI, float start, "upto", float end)
+def print(on CLI, float start, "upto", float end)
     print nn "["
     print nn start
     print nn ","
     print nn end
     print "]" # inclusive range
 
-def print(effect edit console CLI, float start, "to", float end)
+def print(on CLI, float start, "to", float end)
     print nn "["
     print nn start
     print nn ","
@@ -711,7 +711,7 @@ you can only find them within parentheses.
 ```python
 import std.core
 
-def greet(effect edit console CLI, "hello"|"hi" greeting, blank|"world" world, blank|"."|"!" punctuation)
+def greet(on CLI, "hello"|"hi" greeting, blank|"world" world, blank|"."|"!" punctuation)
     print nn compiler::value greeting
     if not world is blank
         print nn " "
@@ -794,7 +794,7 @@ for `cstr` and repeating it can be a hidden expense.
 ```python
 import std.core
 
-def receive(effect edit console CLI, str|cstr _message)
+def receive(on CLI, str|cstr _message)
     message = str _message
     if _message=="hello"
         print "they said hello!"
@@ -960,7 +960,7 @@ def create_map()
 def strstrmap()
     return strmap str[]
 
-def print(effect edit console CLI, strstrmap map)
+def print(on CLI, strstrmap map)
     # do not forget the CLI effect for printing
     print map["hello"]
     print map["manio"]

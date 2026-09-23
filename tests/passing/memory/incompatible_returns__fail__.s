@@ -6,6 +6,5 @@ def test(nat number)
         return str ""
     return new().copy "123"
 
-def main()
-    CLI = edit console()
+def main(on CLI)
     print test(1)

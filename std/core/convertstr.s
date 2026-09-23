@@ -74,7 +74,7 @@ def nat(console console)
         while not eof
             if "\n\r".contains c: break
             eof = not try c=char console
-        fail "user input was not a float"
+        fail "user input was not a natural number"
     return const number
 
 def float(console console)
@@ -110,7 +110,7 @@ def float(console console)
         fail "user input was not a float"
     return const number
 
-def str(effect edit char_allocator CHARS, edit console console)
+def str(on edit char_allocator CHARS, edit console console)
     doc "reads a string from the console"
     if CHARS is arena<char::tag>
         doc "The read string is placed on an arena while consuming only the necessarily minimum size."
@@ -141,8 +141,10 @@ def str(effect edit char_allocator CHARS, edit console console)
         CHARS.pos = ch.pos
     if CHARS is new
         if ch.pos==0
+            ch.buf = ch.buf.resize(ch.pos+1 unsafe) # an allocation of one byte, because we can't resize to zero
+        else
             ch.pos = ch.pos+1
-        ch.buf = ch.buf.resize(ch.pos unsafe)
+            ch.buf = ch.buf.resize(ch.pos unsafe)
     return str(ch.buf, start to ch.pos)
 
 def int(cstr|str _s)

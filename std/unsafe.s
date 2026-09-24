@@ -81,7 +81,7 @@ def dereference_ptr(any ptr allocated)
     doc "a well-controlled indirection instead that does not leave"
     doc "any safety tracking residues AT ALL when called."
     doc "To make absolutely sure that using this is properly understood"
-    doc "the result is an immutable pointer, which often needs to be pass"
+    doc "the result is an immutable pointer, which often needs to pass"
     doc "through `unsafe_mut`, for example to be freed."
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"

@@ -19,23 +19,53 @@ local import std.sci.math
 local import std.sci.vec
 
 def accumulator()
-    sums = mut 0.0
-    square_sums = mut 0.0
-    count = mut 0
-    return class(sums, square_sums, count)
+    doc "accumulate statistics to produce mean and std values"
+    doc "This does not consume any memory, and is stable while"
+    doc "streaming data. The maximum number of observations that"
+    doc "can be recorded without buffer overflows destroyng correctness"
+    doc "are `2^64-1`. Example:"
+    doc "```python"
+    doc "import std.core"
+    doc "import std.sci.stats"
+    doc "def main(on CLI)"
+    doc "    accum = accumulator()"
+    doc "    accum.append 0.1"
+    doc "    accum.append 0.2"
+    doc "    accum.append 0.3"
+    doc "    print nn \"mean:\""
+    doc "    print mean accum"
+    doc "    print nn \"std:\""
+    doc "    print std accum"
+    doc "```"
+    return class(
+        assigned mean_value=mut 0.0, 
+        assigned m2=mut 0.0, 
+        assigned count=mut 0)
 
 def append(edit accumulator accum, float value)
-    accum.sums = accum.sums+value
-    accum.square_sums = accum.square_sums+value*value
+    doc "append a value to a statics accumulator"
     accum.count = accum.count+1
+    delta = value-accum.mean_value
+    accum.mean_value = accum.mean_value+delta/(float accum.count unsafe_assume_nonzero)
+    delta2 = value-accum.mean_value
+    accum.m2 = accum.m2+delta*delta2
 
 def mean(accumulator accum)
-    return accum.sums/float accum.count
+    doc "the mean value obtained"
+    doc "This is obtained from a zero-memory statistics accumulator."
+    return accum.mean_value
 
 def std(accumulator accum)
-    m = mean accum
-    return sqrt(accum.square_sums/float(accum.count)-m*m)
-    
+    doc "the standard deviation"
+    doc "This is obtained from a zero-memory statistics accumulator."
+    return sqrt(accum.m2/float(accum.count))
+
+def std(accumulator accum, "sample")
+    doc "the sample standard deviation"
+    doc "This is obtained from a zero-memory statistics accumulator."
+    doc "It is the sample standard deviation, whose average is statistically"
+    doc "unbiased."
+    return sqrt(accum.m2/float(accum.count-1))
 
 def pearson(vec x, vec y)
     doc "pearson correlation between the values of two vectors"

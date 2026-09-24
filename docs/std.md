@@ -360,7 +360,7 @@ cstr
 ```
 
 ### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 218*
+*Defined in: std/core/string.s line 228*
 
 ```rust
 cstr(cstr cstr, str) -> (cstr)
@@ -379,10 +379,10 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 
 
 ### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 218*
+*Defined in: std/core/string.s line 228*
 
 ```rust
-cstr(unsafe_temp {tag, cstr cstr, str}) -> (cstr)
+cstr(unsafe_temp) -> (cstr)
 ```
 
 This function's return is meant to be passed to operating system calls,
@@ -398,10 +398,10 @@ or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
 
 
 ### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 218*
+*Defined in: std/core/string.s line 228*
 
 ```rust
-cstr(unsafe_temp {tag, cstr cstr, str}) -> (cstr)
+cstr(unsafe_temp) -> (cstr)
 ```
 
 This function's return is meant to be passed to operating system calls,
@@ -454,7 +454,7 @@ Represents values in the range `2^-63 to 2^63-1`.
 *Defined in: std/core/convert.s line 75*
 
 ```rust
-int(bits {tag, nat value}) -> (int)
+int(bits) -> (int)
 ```
 
 Converts a bit representation to the corresponding integer.
@@ -522,11 +522,35 @@ May lose information due to truncating.
 </details>
 
 
+### int - reads an integer from the console
+*Defined in: std/core/convertstr.s line 36*
+
+```rust
+int(console) -> (int)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 50
+- Transpiled C size: 527
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+32. user input was not a float
+2. null pointer
+22. out of bounds
+31. unexpected end of console read
+</details>
+
+
 ### int - converts a string to an integer
 *Defined in: std/core/convertstr.s line 150*
 
 ```rust
-int(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (int)
+int(str) -> (int)
 ```
 
 <details><summary>Complexity</summary>
@@ -569,30 +593,6 @@ int(cstr) -> (int)
 36. invalid int conversion from string with only a sign
 37. invalid integer int from non-number string
 22. out of bounds
-</details>
-
-
-### int - reads an integer from the console
-*Defined in: std/core/convertstr.s line 36*
-
-```rust
-int(console {tag}) -> (int)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 50
-- Transpiled C size: 527
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-32. user input was not a float
-2. null pointer
-22. out of bounds
-31. unexpected end of console read
 </details>
 
 
@@ -658,7 +658,7 @@ nat(nat8) -> (nat)
 *Defined in: std/core/convert.s line 70*
 
 ```rust
-nat(bits {tag, nat value}) -> (nat)
+nat(bits) -> (nat)
 ```
 
 Converts a bit representation to the corresponding natural number.
@@ -739,11 +739,34 @@ Converting to natural numbers loses information.
 </details>
 
 
+### nat - reads an unsigned integer from the console
+*Defined in: std/core/convertstr.s line 60*
+
+```rust
+nat(console) -> (nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 390
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+33. user input was not a natural number
+2. null pointer
+22. out of bounds
+</details>
+
+
 ### nat - converts a string to an unsigned integer
 *Defined in: std/core/convertstr.s line 173*
 
 ```rust
-nat(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (nat)
+nat(str) -> (nat)
 ```
 
 <details><summary>Complexity</summary>
@@ -783,29 +806,6 @@ nat(cstr) -> (nat)
 2. null pointer
 39. invalid nat conversion from non-number string
 38. invalid nat conversion from empty string
-22. out of bounds
-</details>
-
-
-### nat - reads an unsigned integer from the console
-*Defined in: std/core/convertstr.s line 60*
-
-```rust
-nat(console {tag}) -> (nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 36
-- Transpiled C size: 390
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-33. user input was not a natural number
-2. null pointer
 22. out of bounds
 </details>
 
@@ -1030,7 +1030,7 @@ float
 *Defined in: std/core/convert.s line 81*
 
 ```rust
-float(bits {tag, nat value}) -> (float)
+float(bits) -> (float)
 ```
 
 Converts a bit representation to the corresponding float number.
@@ -1098,11 +1098,35 @@ Serves as a tautology function for code that parses on multiple number types.
 </details>
 
 
+### float - reads a float from the console
+*Defined in: std/core/convertstr.s line 80*
+
+```rust
+float(console) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 67
+- Transpiled C size: 722
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+32. user input was not a float
+2. null pointer
+22. out of bounds
+31. unexpected end of console read
+</details>
+
+
 ### float - converts a string to a float
 *Defined in: std/core/convertstr.s line 185*
 
 ```rust
-float(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (float)
+float(str) -> (float)
 ```
 
 <details><summary>Complexity</summary>
@@ -1150,30 +1174,6 @@ float(cstr) -> (float)
 </details>
 
 
-### float - reads a float from the console
-*Defined in: std/core/convertstr.s line 80*
-
-```rust
-float(console {tag}) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 67
-- Transpiled C size: 722
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-32. user input was not a float
-2. null pointer
-22. out of bounds
-31. unexpected end of console read
-</details>
-
-
 # bool
 ### bool - boolean value
 *Defined in: builtins line 1*
@@ -1213,7 +1213,7 @@ char
 Represents characters in the numeric range `0 to 255`.
 
 ### char - treat as character
-*Defined in: std/core/string.s line 115*
+*Defined in: std/core/string.s line 125*
 
 ```rust
 char(cstr) -> (char)
@@ -1232,10 +1232,10 @@ for example to write `c = char "C"`.
 
 
 ### char - treat as character
-*Defined in: std/core/string.s line 109*
+*Defined in: std/core/string.s line 119*
 
 ```rust
-char(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (char)
+char(str) -> (char)
 ```
 
 The first character of a string is extracted,
@@ -1254,7 +1254,7 @@ for example to write `c = char str "C"`.
 *Defined in: std/core/convertstr.s line 24*
 
 ```rust
-char(console {tag}) -> (char)
+char(console) -> (char)
 ```
 
 <details><summary>Complexity</summary>
@@ -1283,94 +1283,6 @@ Represents a generic for buffers and pointers for type-independent code that can
 This type ordains special treatment by the compiler.
 
 # eq
-### eq - equals
-*Defined in: std/core/bool.s line 51*
-
-```rust
-eq(false, true) -> (false)
-```
-
-This is a compile-time operation that does not evoke any runtime booleans.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 46*
-
-```rust
-eq(true, false) -> (false)
-```
-
-This is a compile-time operation that does not evoke any runtime booleans.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 41*
-
-```rust
-eq(false, false) -> (true)
-```
-
-This is a compile-time operation that does not evoke any runtime booleans.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 36*
-
-```rust
-eq(true, true) -> (true)
-```
-
-This is a compile-time operation that does not evoke any runtime booleans.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
-
-</details>
-
-
-### eq - equals
-*Defined in: std/core/bool.s line 20*
-
-```rust
-eq(bool x, bool y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
-
-</details>
-
-
 ### eq - equals
 *Defined in: std/core/numbers.s line 54*
 
@@ -1522,7 +1434,95 @@ eq(true, bool value) -> (bool)
 
 
 ### eq - equals
-*Defined in: std/core/string.s line 295*
+*Defined in: std/core/bool.s line 51*
+
+```rust
+eq(false, true) -> (false)
+```
+
+This is a compile-time operation that does not evoke any runtime booleans.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/bool.s line 46*
+
+```rust
+eq(true, false) -> (false)
+```
+
+This is a compile-time operation that does not evoke any runtime booleans.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/bool.s line 41*
+
+```rust
+eq(false, false) -> (true)
+```
+
+This is a compile-time operation that does not evoke any runtime booleans.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/bool.s line 36*
+
+```rust
+eq(true, true) -> (true)
+```
+
+This is a compile-time operation that does not evoke any runtime booleans.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/bool.s line 20*
+
+```rust
+eq(bool x, bool y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### eq - equals
+*Defined in: std/core/string.s line 305*
 
 ```rust
 eq(cstr x, str) -> (bool)
@@ -1538,7 +1538,7 @@ eq(cstr x, str) -> (bool)
 
 
 ### eq - equals
-*Defined in: std/core/string.s line 289*
+*Defined in: std/core/string.s line 299*
 
 ```rust
 eq(str, cstr y) -> (bool)
@@ -1554,7 +1554,7 @@ eq(str, cstr y) -> (bool)
 
 
 ### eq - equals
-*Defined in: std/core/string.s line 261*
+*Defined in: std/core/string.s line 271*
 
 ```rust
 eq(str, str) -> (bool)
@@ -1589,7 +1589,7 @@ yield false.
 
 
 ### eq - equals
-*Defined in: std/core/string.s line 252*
+*Defined in: std/core/string.s line 262*
 
 ```rust
 eq(cstr x, cstr y) -> (bool)
@@ -1610,7 +1610,7 @@ two same-content cstr will always have the same memory address.
 
 
 ### eq - equals
-*Defined in: std/core/string.s line 122*
+*Defined in: std/core/string.s line 132*
 
 ```rust
 eq(char x, char y) -> (bool)
@@ -1622,174 +1622,6 @@ eq(char x, char y) -> (bool)
 - SSA variables: 3
 - Transpiled C size: 11
 
-</details>
-
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 39*
-
-```rust
-eq(cstr x, cstr ptr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 37
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 39*
-
-```rust
-eq(cstr x, str ptr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 39*
-
-```rust
-eq(str, cstr ptr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 43
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 39*
-
-```rust
-eq(str, str ptr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 12
-- Transpiled C size: 85
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 35*
-
-```rust
-eq(cstr ptr x, cstr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 37
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 35*
-
-```rust
-eq(cstr ptr x, str) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 43
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 35*
-
-```rust
-eq(str ptr x, cstr y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### eq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 35*
-
-```rust
-eq(str ptr x, str) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 12
-- Transpiled C size: 85
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
 </details>
 
 
@@ -2066,23 +1898,175 @@ eq(str ptr x, str ptr y) -> (bool)
 </details>
 
 
-# neq
-### neq - not equal
-*Defined in: std/core/bool.s line 25*
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 39*
 
 ```rust
-neq(bool x, bool y) -> (bool)
+eq(cstr x, cstr ptr y) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 3
-- Transpiled C size: 9
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 37
 
 </details>
 
+<details><summary>Potential errors</summary>
 
+2. null pointer
+</details>
+
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 39*
+
+```rust
+eq(cstr x, str ptr y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 39*
+
+```rust
+eq(str, cstr ptr y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 43
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 39*
+
+```rust
+eq(str, str ptr y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 85
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 35*
+
+```rust
+eq(cstr ptr x, cstr y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 37
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 35*
+
+```rust
+eq(cstr ptr x, str) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 43
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 35*
+
+```rust
+eq(str ptr x, cstr y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 8
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### eq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 35*
+
+```rust
+eq(str ptr x, str) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 85
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+# neq
 ### neq - not equal
 *Defined in: std/core/numbers.s line 46*
 
@@ -2280,6 +2264,22 @@ neq(true x, true y) -> (false)
 
 
 ### neq - not equal
+*Defined in: std/core/bool.s line 25*
+
+```rust
+neq(bool x, bool y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 3
+- Transpiled C size: 9
+
+</details>
+
+
+### neq - not equal
 *Defined in: std/unsafe.s line 19*
 
 ```rust
@@ -2298,7 +2298,7 @@ Compares the address of two pointers.
 
 
 ### neq - not equals
-*Defined in: std/core/string.s line 301*
+*Defined in: std/core/string.s line 311*
 
 ```rust
 neq(cstr x, cstr y) -> (bool)
@@ -2316,7 +2316,7 @@ Negates the outcome of equality checks between cstr and strings.
 
 
 ### neq - not equals
-*Defined in: std/core/string.s line 301*
+*Defined in: std/core/string.s line 311*
 
 ```rust
 neq(cstr x, str) -> (bool)
@@ -2334,7 +2334,7 @@ Negates the outcome of equality checks between cstr and strings.
 
 
 ### neq - not equals
-*Defined in: std/core/string.s line 301*
+*Defined in: std/core/string.s line 311*
 
 ```rust
 neq(str, cstr y) -> (bool)
@@ -2352,7 +2352,7 @@ Negates the outcome of equality checks between cstr and strings.
 
 
 ### neq - not equals
-*Defined in: std/core/string.s line 301*
+*Defined in: std/core/string.s line 311*
 
 ```rust
 neq(str, str) -> (bool)
@@ -2370,7 +2370,7 @@ Negates the outcome of equality checks between cstr and strings.
 
 
 ### neq - not equals
-*Defined in: std/core/string.s line 127*
+*Defined in: std/core/string.s line 137*
 
 ```rust
 neq(char x, char y) -> (bool)
@@ -2382,174 +2382,6 @@ neq(char x, char y) -> (bool)
 - SSA variables: 3
 - Transpiled C size: 11
 
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(nat _x, nat ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(int _x, int ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(float _x, float ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(nat ptr _x, nat _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(nat ptr _x, nat ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(int ptr _x, int _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(int ptr _x, int ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### neq - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 73*
-
-```rust
-neq(float ptr _x, float _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
 </details>
 
 
@@ -2817,6 +2649,174 @@ neq(str ptr x, str) -> (bool)
 - Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 12
 - Transpiled C size: 85
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(nat _x, nat ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(int _x, int ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(float _x, float ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(nat ptr _x, nat _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(nat ptr _x, nat ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(int ptr _x, int _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(int ptr _x, int ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### neq - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 73*
+
+```rust
+neq(float ptr _x, float _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
 
 </details>
 
@@ -3157,13 +3157,18 @@ Adds two numbers of the same type. This is an overload for the + operator.
 
 
 ### add - pointer addition
-*Defined in: std/unsafe.s line 66*
+*Defined in: std/unsafe.s line 95*
 
 ```rust
-add(any ptr allocated, nat offset) -> (any ptr {follows any ptr allocated})
+add(any ptr allocated, nat offset) -> (any ptr)
 ```
 
-Adds a natural number offset to a pointer.
+Adds a natural number offset to a pointer. The offset is ALWAYS
+in bytes, irrespective of the pointer's assocated type. However,
+the result will have the same associated type and attachmentss.
+Prefer using this function only locally and return a pairs of pointers
+and offsets, as you would need to alreantively release two pointers
+(the offset-ed address and the one that should be released).
 
 *Warning: Its usage in unsafe and guarded under std/unsafe.s.*
 
@@ -3177,10 +3182,82 @@ Adds a natural number offset to a pointer.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 458*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit arena, cstr _s1, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(new CHARS, str, cstr _s2) -> (str) on CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 104
+- Transpiled C size: 498
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+</details>
+
+
+<details><summary>defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 442*
+
+```rust
+add(new CHARS, str, str) -> (str) on CHARS
+```
+
+The result is placed on an allocator effect CHARS.
+This implementation creates a new allocation and is therefore
+slower compared to using a simple arena, circular buffer, or even
+an automatically resized list. Since that allocation defers its
+deallocation too, it cannot be returned from nested code blocks.
+Switch to a different character allocator to produce more dynamic
+yet safe and fast code.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 108
+- Transpiled C size: 504
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+</details>
+
+
+<details><summary>defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
+### add - concatenate two strings
+*Defined in: std/core/string.s line 468*
+
+```rust
+add(edit arena, cstr _s1, cstr _s2) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3223,10 +3300,10 @@ convenient optimizatins when allocating and immediately concatenating.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 458*
+*Defined in: std/core/string.s line 468*
 
 ```rust
-add(edit arena, cstr _s1, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit arena, cstr _s1, str) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3269,10 +3346,10 @@ convenient optimizatins when allocating and immediately concatenating.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 458*
+*Defined in: std/core/string.s line 468*
 
 ```rust
-add(edit arena, str, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit arena, str, cstr _s2) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3315,10 +3392,10 @@ convenient optimizatins when allocating and immediately concatenating.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 458*
+*Defined in: std/core/string.s line 468*
 
 ```rust
-add(edit arena, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit arena, str, str) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3361,10 +3438,10 @@ convenient optimizatins when allocating and immediately concatenating.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit list, cstr _s1, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit list, cstr _s1, cstr _s2) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3395,10 +3472,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit list, cstr _s1, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit list, cstr _s1, str) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3429,10 +3506,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit list, str, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit list, str, cstr _s2) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3463,10 +3540,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit list, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit list, str, str) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3497,10 +3574,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit circular, cstr _s1, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit circular, cstr _s1, cstr _s2) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3529,10 +3606,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit circular, cstr _s1, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit circular, cstr _s1, str) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3561,10 +3638,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit circular, str, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit circular, str, cstr _s2) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3593,10 +3670,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit circular, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit circular, str, str) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3625,10 +3702,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit bucket, cstr _s1, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit bucket, cstr _s1, cstr _s2) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3661,10 +3738,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit bucket, cstr _s1, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit bucket, cstr _s1, str) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3697,10 +3774,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit bucket, str, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit bucket, str, cstr _s2) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3733,10 +3810,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(edit bucket, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(edit bucket, str, str) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3769,10 +3846,10 @@ yet safe and fast code.
 
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(new CHARS, cstr _s1, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(new CHARS, cstr _s1, cstr _s2) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3805,10 +3882,10 @@ free(mut any ptr) -> ()
 </details>
 
 ### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
+*Defined in: std/core/string.s line 442*
 
 ```rust
-add(new CHARS, cstr _s1, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+add(new CHARS, cstr _s1, str) -> (str) on CHARS
 ```
 
 The result is placed on an allocator effect CHARS.
@@ -3824,78 +3901,6 @@ yet safe and fast code.
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 104
 - Transpiled C size: 498
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. allocation failed
-</details>
-
-
-<details><summary>defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
-
-```rust
-add(new CHARS, str, cstr _s2) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 104
-- Transpiled C size: 498
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. allocation failed
-</details>
-
-
-<details><summary>defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
-
-### add - concatenate two strings
-*Defined in: std/core/string.s line 432*
-
-```rust
-add(new CHARS, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-The result is placed on an allocator effect CHARS.
-This implementation creates a new allocation and is therefore
-slower compared to using a simple arena, circular buffer, or even
-an automatically resized list. Since that allocation defers its
-deallocation too, it cannot be returned from nested code blocks.
-Switch to a different character allocator to produce more dynamic
-yet safe and fast code.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 108
-- Transpiled C size: 504
 
 </details>
 
@@ -3916,7 +3921,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 120*
 
 ```rust
-add(edit circular, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(edit circular, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -3942,7 +3947,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 120*
 
 ```rust
-add(edit arena, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(edit arena, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -3968,7 +3973,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 120*
 
 ```rust
-add(edit bucket, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(edit bucket, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -3992,7 +3997,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 120*
 
 ```rust
-add(new FLOATS, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(new FLOATS, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4016,7 +4021,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 110*
 
 ```rust
-add(edit circular, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(edit circular, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4042,7 +4047,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 110*
 
 ```rust
-add(edit circular, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(edit circular, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4069,7 +4074,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 110*
 
 ```rust
-add(edit arena, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(edit arena, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4095,7 +4100,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 110*
 
 ```rust
-add(edit arena, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(edit arena, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4122,7 +4127,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 110*
 
 ```rust
-add(edit bucket, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(edit bucket, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4146,7 +4151,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 110*
 
 ```rust
-add(edit bucket, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(edit bucket, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4171,7 +4176,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 110*
 
 ```rust
-add(new FLOATS, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(new FLOATS, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4195,7 +4200,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 110*
 
 ```rust
-add(new FLOATS, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+add(new FLOATS, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4213,48 +4218,6 @@ Grabs a FLOATS allocator effect to store the result.
 17. allocation failed
 2. null pointer
 71. different vector sizes
-</details>
-
-
-### add - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 83*
-
-```rust
-add(float ptr _x, float _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### add - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 83*
-
-```rust
-add(float ptr _x, float ptr _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
 </details>
 
 
@@ -4405,6 +4368,48 @@ add(int ptr _x, int ptr _y) -> (int)
 </details>
 
 
+### add - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 83*
+
+```rust
+add(float ptr _x, float _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### add - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 83*
+
+```rust
+add(float ptr _x, float ptr _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 79
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
 # mul
 ### mul - multiply with
 *Defined in: std/core/numbers.s line 72*
@@ -4464,7 +4469,7 @@ Multiplies two numbers of the same type. This is an overload for the * operator.
 *Defined in: std/sci/vec.s line 154*
 
 ```rust
-mul(edit circular, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit circular, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4490,7 +4495,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 154*
 
 ```rust
-mul(edit arena, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit arena, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4516,7 +4521,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 154*
 
 ```rust
-mul(edit bucket, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit bucket, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4540,7 +4545,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 154*
 
 ```rust
-mul(new FLOATS, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(new FLOATS, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4564,7 +4569,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 144*
 
 ```rust
-mul(edit circular, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit circular, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4590,7 +4595,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 144*
 
 ```rust
-mul(edit circular, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit circular, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4617,7 +4622,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 144*
 
 ```rust
-mul(edit arena, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit arena, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4643,7 +4648,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 144*
 
 ```rust
-mul(edit arena, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit arena, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4670,7 +4675,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 144*
 
 ```rust
-mul(edit bucket, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit bucket, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4694,7 +4699,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 144*
 
 ```rust
-mul(edit bucket, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit bucket, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4719,7 +4724,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 144*
 
 ```rust
-mul(new FLOATS, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(new FLOATS, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4743,7 +4748,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 144*
 
 ```rust
-mul(new FLOATS, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(new FLOATS, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -4768,34 +4773,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/coo.s line 79*
 
 ```rust
-mul(edit circular, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 62
-- Transpiled C size: 521
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-75. can only place matrices on contiguous buffers
-76. cannot place matrices on buffer offsets
-78. row out of bounds
-79. column out of bounds
-82. inner dimensions must agree
-24. does not fit in circular arena
-</details>
-
-
-### mul - sparse*dense matrix multiplication
-*Defined in: std/sci/coo.s line 79*
-
-```rust
-mul(edit arena, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mul(edit arena, coo, mat) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -4822,7 +4800,7 @@ mul(edit arena, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat po
 *Defined in: std/sci/coo.s line 79*
 
 ```rust
-mul(edit bucket, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mul(edit bucket, coo, mat) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -4856,7 +4834,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/coo.s line 79*
 
 ```rust
-mul(new FLOATS, coo, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mul(new FLOATS, coo, mat) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -4890,7 +4868,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/coo.s line 69*
 
 ```rust
-mul(edit circular, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit circular, vec, coo) -> (mut vec) on FLOATS
 ```
 
 *Warning: The expression `self(v)*m` yields wrong values
@@ -4918,7 +4896,7 @@ mul(edit circular, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat
 *Defined in: std/sci/coo.s line 69*
 
 ```rust
-mul(edit arena, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit arena, vec, coo) -> (mut vec) on FLOATS
 ```
 
 *Warning: The expression `self(v)*m` yields wrong values
@@ -4946,7 +4924,7 @@ mul(edit arena, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 *Defined in: std/sci/coo.s line 69*
 
 ```rust
-mul(edit bucket, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit bucket, vec, coo) -> (mut vec) on FLOATS
 ```
 
 *Warning: The expression `self(v)*m` yields wrong values
@@ -4972,7 +4950,7 @@ mul(edit bucket, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat p
 *Defined in: std/sci/coo.s line 69*
 
 ```rust
-mul(new FLOATS, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(new FLOATS, vec, coo) -> (mut vec) on FLOATS
 ```
 
 *Warning: The expression `self(v)*m` yields wrong values
@@ -4998,7 +4976,7 @@ mul(new FLOATS, vec, coo) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 *Defined in: std/sci/coo.s line 61*
 
 ```rust
-mul(edit circular, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit circular, coo, vec) -> (mut vec) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -5024,7 +5002,7 @@ mul(edit circular, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat
 *Defined in: std/sci/coo.s line 61*
 
 ```rust
-mul(edit arena, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit arena, coo, vec) -> (mut vec) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -5050,7 +5028,7 @@ mul(edit arena, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 *Defined in: std/sci/coo.s line 61*
 
 ```rust
-mul(edit bucket, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit bucket, coo, vec) -> (mut vec) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -5074,7 +5052,7 @@ mul(edit bucket, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat p
 *Defined in: std/sci/coo.s line 61*
 
 ```rust
-mul(new FLOATS, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(new FLOATS, coo, vec) -> (mut vec) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -5095,10 +5073,10 @@ mul(new FLOATS, coo, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat po
 
 
 ### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 124*
+*Defined in: std/sci/mat.s line 128*
 
 ```rust
-mul(edit circular, mat, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mul(edit circular, mat, mat) -> (mut mat) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5124,10 +5102,10 @@ Grabs an allocator for the result as an effect.
 
 
 ### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 124*
+*Defined in: std/sci/mat.s line 128*
 
 ```rust
-mul(edit arena, mat, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mul(edit arena, mat, mat) -> (mut mat) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5153,10 +5131,10 @@ Grabs an allocator for the result as an effect.
 
 
 ### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 124*
+*Defined in: std/sci/mat.s line 128*
 
 ```rust
-mul(edit bucket, mat, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mul(edit bucket, mat, mat) -> (mut mat) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5189,10 +5167,10 @@ free(mut any ptr) -> ()
 </details>
 
 ### mul - matrix-matrix multiplication
-*Defined in: std/sci/mat.s line 124*
+*Defined in: std/sci/mat.s line 128*
 
 ```rust
-mul(new FLOATS, mat, mat) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mul(new FLOATS, mat, mat) -> (mut mat) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5225,10 +5203,10 @@ free(mut any ptr) -> ()
 </details>
 
 ### mul - vector-matrix multiplication
-*Defined in: std/sci/mat.s line 112*
+*Defined in: std/sci/mat.s line 116*
 
 ```rust
-mul(edit circular, vec, mat) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit circular, vec, mat) -> (mut vec) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5253,10 +5231,10 @@ Grabs an allocator for the result as an effect.
 
 
 ### mul - vector-matrix multiplication
-*Defined in: std/sci/mat.s line 112*
+*Defined in: std/sci/mat.s line 116*
 
 ```rust
-mul(edit arena, vec, mat) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit arena, vec, mat) -> (mut vec) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5281,10 +5259,10 @@ Grabs an allocator for the result as an effect.
 
 
 ### mul - vector-matrix multiplication
-*Defined in: std/sci/mat.s line 112*
+*Defined in: std/sci/mat.s line 116*
 
 ```rust
-mul(edit bucket, vec, mat) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit bucket, vec, mat) -> (mut vec) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5307,10 +5285,10 @@ Grabs an allocator for the result as an effect.
 
 
 ### mul - vector-matrix multiplication
-*Defined in: std/sci/mat.s line 112*
+*Defined in: std/sci/mat.s line 116*
 
 ```rust
-mul(new FLOATS, vec, mat) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(new FLOATS, vec, mat) -> (mut vec) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5333,10 +5311,10 @@ Grabs an allocator for the result as an effect.
 
 
 ### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s line 100*
+*Defined in: std/sci/mat.s line 104*
 
 ```rust
-mul(edit circular, mat, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit circular, mat, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5361,10 +5339,10 @@ Grabs an allocator for the result as an effect.
 
 
 ### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s line 100*
+*Defined in: std/sci/mat.s line 104*
 
 ```rust
-mul(edit arena, mat, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit arena, mat, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5389,10 +5367,10 @@ Grabs an allocator for the result as an effect.
 
 
 ### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s line 100*
+*Defined in: std/sci/mat.s line 104*
 
 ```rust
-mul(edit bucket, mat, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(edit bucket, mat, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5415,10 +5393,10 @@ Grabs an allocator for the result as an effect.
 
 
 ### mul - matrix-vector multiplication
-*Defined in: std/sci/mat.s line 100*
+*Defined in: std/sci/mat.s line 104*
 
 ```rust
-mul(new FLOATS, mat, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+mul(new FLOATS, mat, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs an allocator for the result as an effect.
@@ -5437,6 +5415,33 @@ Grabs an allocator for the result as an effect.
 17. allocation failed
 2. null pointer
 22. out of bounds
+</details>
+
+
+### mul - sparse*dense matrix multiplication
+*Defined in: std/sci/coo.s line 79*
+
+```rust
+mul(edit circular, coo, mat) -> (mut mat) on FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 62
+- Transpiled C size: 521
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+75. can only place matrices on contiguous buffers
+76. cannot place matrices on buffer offsets
+78. row out of bounds
+79. column out of bounds
+82. inner dimensions must agree
+24. does not fit in circular arena
 </details>
 
 
@@ -5757,224 +5762,10 @@ Divides two numbers of the same type. This is an overload for the / operator.
 
 
 ### div - vector division
-*Defined in: std/sci/vec.s line 190*
-
-```rust
-div(edit circular, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 217
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-69. can only place vectors on contiguous buffers
-70. cannot place vectors on buffer offsets
-24. does not fit in circular arena
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 190*
-
-```rust
-div(edit arena, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 217
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-69. can only place vectors on contiguous buffers
-70. cannot place vectors on buffer offsets
-23. arena is out of space
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 190*
-
-```rust
-div(edit bucket, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 33
-- Transpiled C size: 204
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. allocation failed
-2. null pointer
-4. division by zero
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 190*
-
-```rust
-div(new FLOATS, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 32
-- Transpiled C size: 202
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. allocation failed
-2. null pointer
-4. division by zero
-</details>
-
-
-### div - vector division
 *Defined in: std/sci/vec.s line 179*
 
 ```rust
-div(edit circular, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 41
-- Transpiled C size: 231
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-69. can only place vectors on contiguous buffers
-70. cannot place vectors on buffer offsets
-24. does not fit in circular arena
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 179*
-
-```rust
-div(edit circular, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 45
-- Transpiled C size: 269
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-69. can only place vectors on contiguous buffers
-70. cannot place vectors on buffer offsets
-71. different vector sizes
-24. does not fit in circular arena
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 179*
-
-```rust
-div(edit arena, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 41
-- Transpiled C size: 231
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-69. can only place vectors on contiguous buffers
-70. cannot place vectors on buffer offsets
-23. arena is out of space
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 179*
-
-```rust
-div(edit arena, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 45
-- Transpiled C size: 269
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-69. can only place vectors on contiguous buffers
-70. cannot place vectors on buffer offsets
-23. arena is out of space
-71. different vector sizes
-</details>
-
-
-### div - vector division
-*Defined in: std/sci/vec.s line 179*
-
-```rust
-div(edit bucket, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+div(edit bucket, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -5999,7 +5790,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 179*
 
 ```rust
-div(edit bucket, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+div(edit bucket, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -6025,7 +5816,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 179*
 
 ```rust
-div(new FLOATS, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+div(new FLOATS, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -6050,7 +5841,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 179*
 
 ```rust
-div(new FLOATS, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+div(new FLOATS, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -6069,6 +5860,242 @@ Grabs a FLOATS allocator effect to store the result.
 2. null pointer
 4. division by zero
 71. different vector sizes
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 190*
+
+```rust
+div(edit circular, float v1, vec) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 217
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+69. can only place vectors on contiguous buffers
+70. cannot place vectors on buffer offsets
+24. does not fit in circular arena
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 190*
+
+```rust
+div(edit arena, float v1, vec) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 217
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+69. can only place vectors on contiguous buffers
+70. cannot place vectors on buffer offsets
+23. arena is out of space
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 190*
+
+```rust
+div(edit bucket, float v1, vec) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 204
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+2. null pointer
+4. division by zero
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 190*
+
+```rust
+div(new FLOATS, float v1, vec) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 202
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+2. null pointer
+4. division by zero
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 179*
+
+```rust
+div(edit circular, vec, float v2) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 231
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+69. can only place vectors on contiguous buffers
+70. cannot place vectors on buffer offsets
+24. does not fit in circular arena
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 179*
+
+```rust
+div(edit circular, vec, vec) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 269
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+69. can only place vectors on contiguous buffers
+70. cannot place vectors on buffer offsets
+71. different vector sizes
+24. does not fit in circular arena
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 179*
+
+```rust
+div(edit arena, vec, float v2) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 231
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+69. can only place vectors on contiguous buffers
+70. cannot place vectors on buffer offsets
+23. arena is out of space
+</details>
+
+
+### div - vector division
+*Defined in: std/sci/vec.s line 179*
+
+```rust
+div(edit arena, vec, vec) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 269
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+69. can only place vectors on contiguous buffers
+70. cannot place vectors on buffer offsets
+23. arena is out of space
+71. different vector sizes
+</details>
+
+
+### div - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 113*
+
+```rust
+div(float ptr _x, float ptr _y) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 90
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
 </details>
 
 
@@ -6238,28 +6265,6 @@ div(float ptr _x, float _y) -> (float)
 - Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 9
 - Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-</details>
-
-
-### div - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 113*
-
-```rust
-div(float ptr _x, float ptr _y) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 90
 
 </details>
 
@@ -6615,6 +6620,69 @@ greater than
 *Defined in: std/ptrpeek.s line 133*
 
 ```rust
+gt(nat _x, nat ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
+gt(int _x, int ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
+gt(float _x, float ptr _y) -> (bool)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 9
+- Transpiled C size: 68
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+</details>
+
+
+### gt - overloads an operator while dereferencing pointer data
+*Defined in: std/ptrpeek.s line 133*
+
+```rust
 gt(nat ptr _x, nat _y) -> (bool)
 ```
 
@@ -6728,69 +6796,6 @@ gt(float ptr _x, float ptr _y) -> (bool)
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 9
 - Transpiled C size: 79
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
-gt(nat _x, nat ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
-gt(int _x, int ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-</details>
-
-
-### gt - overloads an operator while dereferencing pointer data
-*Defined in: std/ptrpeek.s line 133*
-
-```rust
-gt(float _x, float ptr _y) -> (bool)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 9
-- Transpiled C size: 68
 
 </details>
 
@@ -7417,7 +7422,7 @@ Subtracts two numbers of the same type. This is an overload for the - operator.
 *Defined in: std/sci/vec.s line 135*
 
 ```rust
-sub(edit circular, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(edit circular, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7443,7 +7448,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 135*
 
 ```rust
-sub(edit arena, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(edit arena, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7469,7 +7474,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 135*
 
 ```rust
-sub(edit bucket, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(edit bucket, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7493,7 +7498,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 135*
 
 ```rust
-sub(new FLOATS, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(new FLOATS, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7517,7 +7522,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 125*
 
 ```rust
-sub(edit circular, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(edit circular, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7543,7 +7548,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 125*
 
 ```rust
-sub(edit circular, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(edit circular, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7570,7 +7575,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 125*
 
 ```rust
-sub(edit arena, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(edit arena, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7596,7 +7601,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 125*
 
 ```rust
-sub(edit arena, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(edit arena, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7623,7 +7628,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 125*
 
 ```rust
-sub(edit bucket, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(edit bucket, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7647,7 +7652,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 125*
 
 ```rust
-sub(edit bucket, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(edit bucket, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7672,7 +7677,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 125*
 
 ```rust
-sub(new FLOATS, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(new FLOATS, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7696,7 +7701,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 125*
 
 ```rust
-sub(new FLOATS, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sub(new FLOATS, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7948,7 +7953,83 @@ pow(float x, float y) -> (float)
 *Defined in: std/sci/vec.s line 170*
 
 ```rust
-pow(new FLOATS, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+pow(edit circular, float v1, vec) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 206
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+24. does not fit in circular arena
+2. null pointer
+69. can only place vectors on contiguous buffers
+70. cannot place vectors on buffer offsets
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 170*
+
+```rust
+pow(edit arena, float v1, vec) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 206
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+69. can only place vectors on contiguous buffers
+70. cannot place vectors on buffer offsets
+23. arena is out of space
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 170*
+
+```rust
+pow(edit bucket, float v1, vec) -> (mut vec) on FLOATS
+```
+
+Grabs a FLOATS allocator effect to store the result.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 193
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+2. null pointer
+</details>
+
+
+### pow - vector exponentiation
+*Defined in: std/sci/vec.s line 170*
+
+```rust
+pow(new FLOATS, float v1, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7972,7 +8053,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 160*
 
 ```rust
-pow(edit circular, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+pow(edit circular, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -7998,7 +8079,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 160*
 
 ```rust
-pow(edit circular, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+pow(edit circular, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -8025,7 +8106,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 160*
 
 ```rust
-pow(edit arena, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+pow(edit arena, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -8051,7 +8132,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 160*
 
 ```rust
-pow(edit arena, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+pow(edit arena, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -8078,7 +8159,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 160*
 
 ```rust
-pow(edit bucket, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+pow(edit bucket, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -8102,7 +8183,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 160*
 
 ```rust
-pow(edit bucket, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+pow(edit bucket, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -8127,7 +8208,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 160*
 
 ```rust
-pow(new FLOATS, vec, float v2) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+pow(new FLOATS, vec, float v2) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -8151,7 +8232,7 @@ Grabs a FLOATS allocator effect to store the result.
 *Defined in: std/sci/vec.s line 160*
 
 ```rust
-pow(new FLOATS, vec, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+pow(new FLOATS, vec, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS allocator effect to store the result.
@@ -8172,88 +8253,12 @@ Grabs a FLOATS allocator effect to store the result.
 </details>
 
 
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 170*
-
-```rust
-pow(edit circular, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 206
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-24. does not fit in circular arena
-2. null pointer
-69. can only place vectors on contiguous buffers
-70. cannot place vectors on buffer offsets
-</details>
-
-
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 170*
-
-```rust
-pow(edit arena, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 206
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-69. can only place vectors on contiguous buffers
-70. cannot place vectors on buffer offsets
-23. arena is out of space
-</details>
-
-
-### pow - vector exponentiation
-*Defined in: std/sci/vec.s line 170*
-
-```rust
-pow(edit bucket, float v1, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
-```
-
-Grabs a FLOATS allocator effect to store the result.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 33
-- Transpiled C size: 193
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. allocation failed
-2. null pointer
-</details>
-
-
 # console
 ### console - references the system console unsafely
 *Defined in: std/core/print.s line 36*
 
 ```rust
-console("unsafe") -> (mut console {tag})
+console("unsafe") -> (mut console)
 ```
 
 This is convenient for print debugging by writing `console(type "unsafe").print ...`
@@ -8320,6 +8325,127 @@ Quickly print internals for debugging with `unsafe_console()`.
 
 
 # print
+### print - prints an integer
+*Defined in: std/core/print.s line 70*
+
+```rust
+print(console CLI, int value) -> () on CLI
+```
+
+Automatically ends the line too.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 16
+
+</details>
+
+
+### print - prints an integer
+*Defined in: std/core/print.s line 70*
+
+```rust
+print(console CLI, int value, cstr endl) -> () on CLI
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 12
+
+</details>
+
+
+### print - prints a float
+*Defined in: std/core/print.s line 62*
+
+```rust
+print(console CLI, float value) -> () on CLI
+```
+
+To pre-specified 6 decimal digits.
+Automatically ends the line too.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 16
+
+</details>
+
+
+### print - prints a float
+*Defined in: std/core/print.s line 62*
+
+```rust
+print(console CLI, float value, cstr endl) -> () on CLI
+```
+
+To pre-specified 6 decimal digits.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 12
+
+</details>
+
+
+### print - prints a cstr
+*Defined in: std/core/print.s line 55*
+
+```rust
+print(console CLI, cstr value) -> () on CLI
+```
+
+Automatically ends the line too.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 16
+
+</details>
+
+
+### print - prints a cstr
+*Defined in: std/core/print.s line 55*
+
+```rust
+print(console CLI, cstr value, cstr endl) -> () on CLI
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 12
+
+</details>
+
+
+### print - flushes the print buffer on the console
+*Defined in: std/core/print.s line 44*
+
+```rust
+print(console CLI, "flush") -> () on CLI
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 8
+
+</details>
+
+
 ### print - prints a boolean
 *Defined in: std/core/print.s line 98*
 
@@ -8456,129 +8582,8 @@ print(console CLI, nat value, cstr endl) -> () on CLI
 </details>
 
 
-### print - prints an integer
-*Defined in: std/core/print.s line 70*
-
-```rust
-print(console CLI, int value) -> () on CLI
-```
-
-Automatically ends the line too.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 16
-
-</details>
-
-
-### print - prints an integer
-*Defined in: std/core/print.s line 70*
-
-```rust
-print(console CLI, int value, cstr endl) -> () on CLI
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 12
-
-</details>
-
-
-### print - prints a float
-*Defined in: std/core/print.s line 62*
-
-```rust
-print(console CLI, float value) -> () on CLI
-```
-
-To pre-specified 6 decimal digits.
-Automatically ends the line too.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 16
-
-</details>
-
-
-### print - prints a float
-*Defined in: std/core/print.s line 62*
-
-```rust
-print(console CLI, float value, cstr endl) -> () on CLI
-```
-
-To pre-specified 6 decimal digits.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 12
-
-</details>
-
-
-### print - prints a cstr
-*Defined in: std/core/print.s line 55*
-
-```rust
-print(console CLI, cstr value) -> () on CLI
-```
-
-Automatically ends the line too.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 16
-
-</details>
-
-
-### print - prints a cstr
-*Defined in: std/core/print.s line 55*
-
-```rust
-print(console CLI, cstr value, cstr endl) -> () on CLI
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 12
-
-</details>
-
-
-### print - flushes the print buffer on the console
-*Defined in: std/core/print.s line 44*
-
-```rust
-print(console CLI, "flush") -> () on CLI
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 8
-
-</details>
-
-
 ### print - print a character
-*Defined in: std/core/string.s line 337*
+*Defined in: std/core/string.s line 347*
 
 ```rust
 print(console CLI, char c) -> () on CLI
@@ -8596,7 +8601,7 @@ Ends the line too.
 
 
 ### print - print a character
-*Defined in: std/core/string.s line 337*
+*Defined in: std/core/string.s line 347*
 
 ```rust
 print(console CLI, char c, cstr endl) -> () on CLI
@@ -8612,7 +8617,7 @@ print(console CLI, char c, cstr endl) -> () on CLI
 
 
 ### print - print a string
-*Defined in: std/core/string.s line 323*
+*Defined in: std/core/string.s line 333*
 
 ```rust
 print(console CLI, str) -> () on CLI
@@ -8630,7 +8635,7 @@ Ends the line too.
 
 
 ### print - print a string
-*Defined in: std/core/string.s line 323*
+*Defined in: std/core/string.s line 333*
 
 ```rust
 print(console CLI, str, cstr endl) -> () on CLI
@@ -8645,52 +8650,50 @@ print(console CLI, str, cstr endl) -> () on CLI
 </details>
 
 
-### print
-*Defined in: std/io/file.s line 163*
+### print - flushes file contents to the disk
+*Defined in: std/io/file.s line 172*
 
 ```rust
-print(edit write, str) -> ()
+print(edit write, "flush") -> ()
 ```
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 22
-- Transpiled C size: 113
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 40
 
 </details>
 
 <details><summary>Potential errors</summary>
 
-58. failed to write to closed file
-59. failed to write to file
+60. failed to flush file contents
 </details>
 
 
-### print
-*Defined in: std/io/file.s line 163*
+### print - flushes file contents to the disk
+*Defined in: std/io/file.s line 172*
 
 ```rust
-print(edit write, str, cstr endl) -> ()
+print(edit write, "flush") -> ()
 ```
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 21
-- Transpiled C size: 109
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 40
 
 </details>
 
 <details><summary>Potential errors</summary>
 
-58. failed to write to closed file
-59. failed to write to file
+60. failed to flush file contents
 </details>
 
 
 ### print
-*Defined in: std/io/file.s line 163*
+*Defined in: std/io/file.s line 167*
 
 ```rust
 print(edit write, cstr text) -> ()
@@ -8712,7 +8715,7 @@ print(edit write, cstr text) -> ()
 
 
 ### print
-*Defined in: std/io/file.s line 163*
+*Defined in: std/io/file.s line 167*
 
 ```rust
 print(edit write, cstr text, cstr endl) -> ()
@@ -8734,7 +8737,7 @@ print(edit write, cstr text, cstr endl) -> ()
 
 
 ### print
-*Defined in: std/io/file.s line 163*
+*Defined in: std/io/file.s line 167*
 
 ```rust
 print(edit write, str) -> ()
@@ -8756,7 +8759,7 @@ print(edit write, str) -> ()
 
 
 ### print
-*Defined in: std/io/file.s line 163*
+*Defined in: std/io/file.s line 167*
 
 ```rust
 print(edit write, str, cstr endl) -> ()
@@ -8778,7 +8781,95 @@ print(edit write, str, cstr endl) -> ()
 
 
 ### print
-*Defined in: std/io/file.s line 163*
+*Defined in: std/io/file.s line 167*
+
+```rust
+print(edit write, cstr text) -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 18
+- Transpiled C size: 107
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+58. failed to write to closed file
+59. failed to write to file
+</details>
+
+
+### print
+*Defined in: std/io/file.s line 167*
+
+```rust
+print(edit write, cstr text, cstr endl) -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
+- Transpiled C size: 103
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+58. failed to write to closed file
+59. failed to write to file
+</details>
+
+
+### print
+*Defined in: std/io/file.s line 167*
+
+```rust
+print(edit write, str) -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 22
+- Transpiled C size: 113
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+58. failed to write to closed file
+59. failed to write to file
+</details>
+
+
+### print
+*Defined in: std/io/file.s line 167*
+
+```rust
+print(edit write, str, cstr endl) -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 109
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+58. failed to write to closed file
+59. failed to write to file
+</details>
+
+
+### print
+*Defined in: std/io/file.s line 167*
 
 ```rust
 print(edit terminal, cstr text) -> ()
@@ -8800,7 +8891,7 @@ print(edit terminal, cstr text) -> ()
 
 
 ### print
-*Defined in: std/io/file.s line 163*
+*Defined in: std/io/file.s line 167*
 
 ```rust
 print(edit terminal, cstr text, cstr endl) -> ()
@@ -8822,7 +8913,7 @@ print(edit terminal, cstr text, cstr endl) -> ()
 
 
 ### print
-*Defined in: std/io/file.s line 163*
+*Defined in: std/io/file.s line 167*
 
 ```rust
 print(edit terminal, str) -> ()
@@ -8844,7 +8935,7 @@ print(edit terminal, str) -> ()
 
 
 ### print
-*Defined in: std/io/file.s line 163*
+*Defined in: std/io/file.s line 167*
 
 ```rust
 print(edit terminal, str, cstr endl) -> ()
@@ -8855,92 +8946,6 @@ print(edit terminal, str, cstr endl) -> ()
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 21
 - Transpiled C size: 109
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-58. failed to write to closed file
-59. failed to write to file
-</details>
-
-
-### print - flushes file contents to the disk
-*Defined in: std/io/file.s line 168*
-
-```rust
-print(edit write, "flush") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 40
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-60. failed to flush file contents
-</details>
-
-
-### print - flushes file contents to the disk
-*Defined in: std/io/file.s line 168*
-
-```rust
-print(edit write, "flush") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 40
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-60. failed to flush file contents
-</details>
-
-
-### print
-*Defined in: std/io/file.s line 163*
-
-```rust
-print(edit write, cstr text) -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 18
-- Transpiled C size: 107
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-58. failed to write to closed file
-59. failed to write to file
-</details>
-
-
-### print
-*Defined in: std/io/file.s line 163*
-
-```rust
-print(edit write, cstr text, cstr endl) -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 17
-- Transpiled C size: 103
 
 </details>
 
@@ -8997,6 +9002,54 @@ Prints as a row, such as [ 1.0  2.0  3.0 ]
 </details>
 
 
+### print - print a matrix with aligned brackets
+*Defined in: std/sci/mat.s line 142*
+
+```rust
+print(console CLI, mat) -> () on CLI
+```
+
+single-row matrices stay on one line; taller ones get top/mid/bottom brackets
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 88
+- Transpiled C size: 843
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+</details>
+
+
+### print - print a matrix with aligned brackets
+*Defined in: std/sci/mat.s line 142*
+
+```rust
+print(console CLI, mat, cstr endl) -> () on CLI
+```
+
+single-row matrices stay on one line; taller ones get top/mid/bottom brackets
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 87
+- Transpiled C size: 839
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+</details>
+
+
 ### print - print sparse matrix
 *Defined in: std/sci/coo.s line 95*
 
@@ -9030,54 +9083,6 @@ Prints it as coordinate as list: (i, j): v
 - SSA variables: 21
 - Transpiled C size: 181
 
-</details>
-
-
-### print - print a matrix with aligned brackets
-*Defined in: std/sci/mat.s line 138*
-
-```rust
-print(console CLI, mat) -> () on CLI
-```
-
-single-row matrices stay on one line; taller ones get top/mid/bottom brackets
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 88
-- Transpiled C size: 843
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-</details>
-
-
-### print - print a matrix with aligned brackets
-*Defined in: std/sci/mat.s line 138*
-
-```rust
-print(console CLI, mat, cstr endl) -> () on CLI
-```
-
-single-row matrices stay on one line; taller ones get top/mid/bottom brackets
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 87
-- Transpiled C size: 839
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
 </details>
 
 
@@ -9163,10 +9168,10 @@ to print without automatically adding a new line.
 
 
 ### nn - no new line
-*Defined in: std/core/string.s line 425*
+*Defined in: std/core/string.s line 435*
 
 ```rust
-nn(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (str, cstr)
+nn(str) -> (str, cstr)
 ```
 
 Given a value, creates a tuple of (value, "").
@@ -9186,7 +9191,7 @@ to print without a new line.
 *Defined in: std/sci/vec.s line 277*
 
 ```rust
-nn(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (vec, cstr)
+nn(vec) -> (vec, cstr)
 ```
 
 Given a value, creates a tuple of (value, "").
@@ -9207,7 +9212,7 @@ to print without a new line.
 *Defined in: std/core/print.s line 105*
 
 ```rust
-supports_ansi(console {tag}) -> (bool)
+supports_ansi(console) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -9244,262 +9249,6 @@ colors(console {tag}) -> (colors {tag, console CLI, bool initialized})
 </details>
 
 # set
-### set
-*Defined in: std/core/print.s line 145*
-
-```rust
-set(colors, "bg_red") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 143*
-
-```rust
-set(colors, "bright_white") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 141*
-
-```rust
-set(colors, "bright_cyan") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 139*
-
-```rust
-set(colors, "bright_magenta") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 137*
-
-```rust
-set(colors, "bright_blue") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 135*
-
-```rust
-set(colors, "bright_yellow") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 133*
-
-```rust
-set(colors, "bright_green") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 131*
-
-```rust
-set(colors, "bright_red") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 129*
-
-```rust
-set(colors, "black") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 127*
-
-```rust
-set(colors, "white") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 125*
-
-```rust
-set(colors, "cyan") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 123*
-
-```rust
-set(colors, "magenta") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 121*
-
-```rust
-set(colors, "blue") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 119*
-
-```rust
-set(colors, "yellow") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 117*
-
-```rust
-set(colors, "green") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
-### set
-*Defined in: std/core/print.s line 115*
-
-```rust
-set(colors, "red") -> ()
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 14
-
-</details>
-
-
 ### set
 *Defined in: std/core/print.s line 183*
 
@@ -9804,6 +9553,262 @@ set(colors, "bg_green") -> ()
 </details>
 
 
+### set
+*Defined in: std/core/print.s line 145*
+
+```rust
+set(colors, "bg_red") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 143*
+
+```rust
+set(colors, "bright_white") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 141*
+
+```rust
+set(colors, "bright_cyan") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 139*
+
+```rust
+set(colors, "bright_magenta") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 137*
+
+```rust
+set(colors, "bright_blue") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 135*
+
+```rust
+set(colors, "bright_yellow") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 133*
+
+```rust
+set(colors, "bright_green") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 131*
+
+```rust
+set(colors, "bright_red") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 129*
+
+```rust
+set(colors, "black") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 127*
+
+```rust
+set(colors, "white") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 125*
+
+```rust
+set(colors, "cyan") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 123*
+
+```rust
+set(colors, "magenta") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 121*
+
+```rust
+set(colors, "blue") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 119*
+
+```rust
+set(colors, "yellow") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 117*
+
+```rust
+set(colors, "green") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
+### set
+*Defined in: std/core/print.s line 115*
+
+```rust
+set(colors, "red") -> ()
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 14
+
+</details>
+
+
 # exists
 ### exists - checks that a pointer exists
 *Defined in: std/core/convert.s line 44*
@@ -9822,7 +9827,7 @@ exists(any ptr) -> (bool)
 
 
 ### exists - checks whether a cstr is not zero-initialized
-*Defined in: std/core/string.s line 32*
+*Defined in: std/core/string.s line 42*
 
 ```rust
 exists(cstr) -> (bool)
@@ -9841,7 +9846,7 @@ exists(cstr) -> (bool)
 *Defined in: std/graphics.s line 165*
 
 ```rust
-exists(Texture {tag, nat,float,float,nat,nat[]}) -> (bool)
+exists(Texture) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -9858,7 +9863,7 @@ exists(Texture {tag, nat,float,float,nat,nat[]}) -> (bool)
 *Defined in: std/core/convert.s line 189*
 
 ```rust
-bits(char) -> (bits {tag, nat value})
+bits(char) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -9874,7 +9879,7 @@ bits(char) -> (bits {tag, nat value})
 *Defined in: std/core/convert.s line 185*
 
 ```rust
-bits(nat32) -> (bits {tag, nat value})
+bits(nat32) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -9890,7 +9895,7 @@ bits(nat32) -> (bits {tag, nat value})
 *Defined in: std/core/convert.s line 185*
 
 ```rust
-bits(nat16) -> (bits {tag, nat value})
+bits(nat16) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -9906,7 +9911,7 @@ bits(nat16) -> (bits {tag, nat value})
 *Defined in: std/core/convert.s line 185*
 
 ```rust
-bits(nat8) -> (bits {tag, nat value})
+bits(nat8) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -9922,7 +9927,7 @@ bits(nat8) -> (bits {tag, nat value})
 *Defined in: std/core/convert.s line 62*
 
 ```rust
-bits(float) -> (bits {tag, nat value})
+bits(float) -> (bits)
 ```
 
 Retrieves the bit representation of a number of shift
@@ -9941,7 +9946,7 @@ arithmetics and bitwise operations.
 *Defined in: std/core/convert.s line 55*
 
 ```rust
-bits(int) -> (bits {tag, nat value})
+bits(int) -> (bits)
 ```
 
 Retrieves the bit representation of a number of shift
@@ -9980,7 +9985,7 @@ arithmetics and bitwise operations.
 *Defined in: std/core/convert.s line 88*
 
 ```rust
-lshift(bits, nat y) -> (bits {tag, nat value})
+lshift(bits, nat y) -> (bits)
 ```
 
 Reminder that bits store 64 bits and thus this shift should
@@ -10000,7 +10005,7 @@ be casted to lower-bit numbers (e.g., nat16) to truncate leading ones.
 *Defined in: std/core/convert.s line 95*
 
 ```rust
-rshift(bits, nat y) -> (bits {tag, nat value})
+rshift(bits, nat y) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -10017,7 +10022,7 @@ rshift(bits, nat y) -> (bits {tag, nat value})
 *Defined in: std/core/convert.s line 100*
 
 ```rust
-xor(bits, bits) -> (bits {tag, nat value})
+xor(bits, bits) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -10034,7 +10039,7 @@ xor(bits, bits) -> (bits {tag, nat value})
 *Defined in: std/core/convert.s line 105*
 
 ```rust
-band(bits, bits) -> (bits {tag, nat value})
+band(bits, bits) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -10051,7 +10056,7 @@ band(bits, bits) -> (bits {tag, nat value})
 *Defined in: std/core/convert.s line 110*
 
 ```rust
-bor(bits, bits) -> (bits {tag, nat value})
+bor(bits, bits) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -10068,7 +10073,7 @@ bor(bits, bits) -> (bits {tag, nat value})
 *Defined in: std/core/convert.s line 115*
 
 ```rust
-bnot(bits {tag, nat value}) -> (bits {tag, nat value})
+bnot(bits) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -10102,7 +10107,7 @@ tochar(nat8) -> (char)
 *Defined in: std/core/convert.s line 193*
 
 ```rust
-slice(bits, nat from, nat to) -> (bits {tag, nat value})
+slice(bits, nat from, nat to) -> (bits)
 ```
 
 The extracted range is shifted down so that `from` becomes bit 0.
@@ -10124,10 +10129,10 @@ The extracted range is shifted down so that `from` becomes bit 0.
 
 
 ### slice - a buffer subregion of an arena
-*Defined in: std/core/allocators.s line 235*
+*Defined in: std/core/allocators.s line 308*
 
 ```rust
-slice(edit arena, nat length) -> (mut any[] {follows any ptr surface.buf.unsafe_ptr})
+slice(edit arena, nat length) -> (mut any[])
 ```
 
 This allocates a region of a given number of elements
@@ -10151,10 +10156,34 @@ heap.
 
 
 ### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 418*
+*Defined in: std/core/string.s line 428*
 
 ```rust
-slice(cstr _s, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+slice(str, str, str) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 46
+- Transpiled C size: 222
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 428*
+
+```rust
+slice(str, str, cstr _to) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -10175,10 +10204,34 @@ slice(cstr _s, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat
 
 
 ### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 418*
+*Defined in: std/core/string.s line 428*
 
 ```rust
-slice(cstr _s, str, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+slice(str, cstr _from, str) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 216
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 428*
+
+```rust
+slice(str, cstr _from, cstr _to) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -10199,10 +10252,34 @@ slice(cstr _s, str, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, na
 
 
 ### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 418*
+*Defined in: std/core/string.s line 428*
 
 ```rust
-slice(cstr _s, cstr _from, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+slice(cstr _s, str, str) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 216
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 428*
+
+```rust
+slice(cstr _s, str, cstr _to) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -10223,10 +10300,34 @@ slice(cstr _s, cstr _from, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, 
 
 
 ### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 418*
+*Defined in: std/core/string.s line 428*
 
 ```rust
-slice(cstr _s, cstr _from, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+slice(cstr _s, cstr _from, str) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 210
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+29. slice out of string bounds
+30. not found
+</details>
+
+
+### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
+*Defined in: std/core/string.s line 428*
+
+```rust
+slice(cstr _s, cstr _from, cstr _to) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -10247,10 +10348,10 @@ slice(cstr _s, cstr _from, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.
 
 
 ### slice - get a substring view into a string
-*Defined in: std/core/string.s line 344*
+*Defined in: std/core/string.s line 354*
 
 ```rust
-slice(str, nat from, nat to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+slice(str, nat from, nat to) -> (str)
 ```
 
 This operation does not perform any additional allocations
@@ -10275,10 +10376,10 @@ memory, such as circular buffers.
 
 
 ### slice - get a substring view into a string
-*Defined in: std/core/string.s line 344*
+*Defined in: std/core/string.s line 354*
 
 ```rust
-slice(cstr _s, nat from, nat to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+slice(cstr _s, nat from, nat to) -> (str)
 ```
 
 This operation does not perform any additional allocations
@@ -10302,108 +10403,12 @@ memory, such as circular buffers.
 </details>
 
 
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 418*
-
-```rust
-slice(str, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 46
-- Transpiled C size: 222
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-29. slice out of string bounds
-30. not found
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 418*
-
-```rust
-slice(str, str, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 216
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-29. slice out of string bounds
-30. not found
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 418*
-
-```rust
-slice(str, cstr _from, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 216
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-29. slice out of string bounds
-30. not found
-</details>
-
-
-### slice - slice a string based on a prefix and postfix (those are not included in the found substring)
-*Defined in: std/core/string.s line 418*
-
-```rust
-slice(str, cstr _from, cstr _to) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 9 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 210
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-29. slice out of string bounds
-30. not found
-</details>
-
-
 # mask
 ### mask - overwrite a range of bits
 *Defined in: std/core/convert.s line 203*
 
 ```rust
-mask(bits, nat from, nat to, bits) -> (bits {tag, nat value})
+mask(bits, nat from, nat to, bits) -> (bits)
 ```
 
 The provided value must fit entirely inside the selected bit range.
@@ -10537,7 +10542,7 @@ In most usage scenarios this does not matter, as the range would be a temporary 
 *Defined in: std/core/range.s line 59*
 
 ```rust
-mutget(edit range {tag, mut nat from, nat to}) -> (nat)
+mutget(edit range) -> (nat)
 ```
 
 This increments the range `from` position and returns the previous one.
@@ -10580,10 +10585,10 @@ This increments the range `from` position and returns the previous one.
 
 
 ### mutget - get a list element pointer
-*Defined in: std/core/allocators.s line 145*
+*Defined in: std/core/allocators.s line 218*
 
 ```rust
-mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
+mutget(edit list, nat pos) -> (mut any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -10601,10 +10606,10 @@ mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr}
 
 
 ### mutget - get a list element pointer
-*Defined in: std/core/allocators.s line 145*
+*Defined in: std/core/allocators.s line 218*
 
 ```rust
-mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
+mutget(edit list, nat pos) -> (mut any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -10622,10 +10627,10 @@ mutget(edit list, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr}
 
 
 ### mutget - get a list element pointer
-*Defined in: std/core/allocators.s line 145*
+*Defined in: std/core/allocators.s line 218*
 
 ```rust
-mutget(edit circular, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_ptr})
+mutget(edit circular, nat pos) -> (mut any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -10643,10 +10648,10 @@ mutget(edit circular, nat pos) -> (mut any ptr {follows any ptr self.buf.unsafe_
 
 
 ### mutget - get a mutable list element pointer
-*Defined in: std/core/allocators.s line 109*
+*Defined in: std/core/allocators.s line 182*
 
 ```rust
-mutget(edit arena, nat pos) -> (mut any ptr {follows any ptr l.buf.unsafe_ptr})
+mutget(edit arena, nat pos) -> (mut any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -10664,10 +10669,10 @@ mutget(edit arena, nat pos) -> (mut any ptr {follows any ptr l.buf.unsafe_ptr})
 
 
 ### mutget - get a mutable list element pointer
-*Defined in: std/core/allocators.s line 109*
+*Defined in: std/core/allocators.s line 182*
 
 ```rust
-mutget(edit arena, nat pos, "unsafe_assume_inbounds") -> (mut any ptr {follows any ptr l.buf.unsafe_ptr})
+mutget(edit arena, nat pos, "unsafe_assume_inbounds") -> (mut any ptr)
 ```
 
 
@@ -10686,7 +10691,7 @@ mutget(edit arena, nat pos, "unsafe_assume_inbounds") -> (mut any ptr {follows a
 *Defined in: std/core/array.s line 83*
 
 ```rust
-mutget(edit any[], nat i) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
+mutget(edit any[], nat i) -> (mut any ptr)
 ```
 
 This uses pointer arithmetics to index the buffer, basically performing the operation
@@ -10712,7 +10717,7 @@ are retrieved or sliced.
 *Defined in: std/core/array.s line 83*
 
 ```rust
-mutget(edit any[], nat i, "unsafe_assume_inbounds") -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
+mutget(edit any[], nat i, "unsafe_assume_inbounds") -> (mut any ptr)
 ```
 
 This uses pointer arithmetics to index the buffer, basically performing the operation
@@ -10735,7 +10740,7 @@ are retrieved or sliced.
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit circular, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit circular, edit open, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -10761,7 +10766,7 @@ mutget(edit circular, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit circular, edit terminal, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit circular, edit terminal, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -10788,7 +10793,7 @@ mutget(edit circular, edit terminal, nat nat) -> (str {tag, char ptr unsafe_ptr,
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit circular, edit write, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit circular, edit write, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -10815,7 +10820,7 @@ mutget(edit circular, edit write, nat nat) -> (str {tag, char ptr unsafe_ptr, na
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit circular, edit write, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit circular, edit write, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -10842,7 +10847,7 @@ mutget(edit circular, edit write, nat nat) -> (str {tag, char ptr unsafe_ptr, na
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit circular, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit circular, edit open, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -10869,7 +10874,7 @@ mutget(edit circular, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit circular, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit circular, edit open, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -10896,7 +10901,7 @@ mutget(edit circular, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit arena, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit arena, edit open, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -10922,7 +10927,7 @@ mutget(edit arena, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat da
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit arena, edit terminal, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit arena, edit terminal, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -10949,7 +10954,7 @@ mutget(edit arena, edit terminal, nat nat) -> (str {tag, char ptr unsafe_ptr, na
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit arena, edit write, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit arena, edit write, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -10976,7 +10981,7 @@ mutget(edit arena, edit write, nat nat) -> (str {tag, char ptr unsafe_ptr, nat d
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit arena, edit write, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit arena, edit write, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -11003,7 +11008,7 @@ mutget(edit arena, edit write, nat nat) -> (str {tag, char ptr unsafe_ptr, nat d
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit arena, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit arena, edit open, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -11030,7 +11035,7 @@ mutget(edit arena, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat da
 *Defined in: std/io.s line 26*
 
 ```rust
-mutget(edit arena, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+mutget(edit arena, edit open, nat nat) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -11057,7 +11062,7 @@ mutget(edit arena, edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat da
 *Defined in: std/io.s line 23*
 
 ```rust
-mutget(edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+mutget(edit open, nat nat) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -11079,7 +11084,7 @@ mutget(edit open, nat nat) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat d
 *Defined in: std/map.s line 49*
 
 ```rust
-mutget(edit robinhood_nat_entry[], edit any[], nat key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+mutget(edit robinhood_nat_entry[], edit any[], nat key) -> (mut any ptr)
 ```
 
 Implemented for string or cstr keys but buffer of any values.
@@ -11106,7 +11111,7 @@ Implemented for string or cstr keys but buffer of any values.
 *Defined in: std/map.s line 39*
 
 ```rust
-mutget(edit robinhood_str_entry[], edit any[], str) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+mutget(edit robinhood_str_entry[], edit any[], str) -> (mut any ptr)
 ```
 
 Implemented for string or cstr keys but buffer of any values.
@@ -11133,7 +11138,7 @@ Implemented for string or cstr keys but buffer of any values.
 *Defined in: std/map.s line 39*
 
 ```rust
-mutget(edit robinhood_str_entry[], edit any[], cstr key) -> (mut any ptr {follows any ptr values.unsafe_ptr})
+mutget(edit robinhood_str_entry[], edit any[], cstr key) -> (mut any ptr)
 ```
 
 Implemented for string or cstr keys but buffer of any values.
@@ -11281,10 +11286,10 @@ per a pattern like `for i in range 10 ...`.
 
 
 ### get - get a list element pointer
-*Defined in: std/core/allocators.s line 138*
+*Defined in: std/core/allocators.s line 212*
 
 ```rust
-get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
+get(list, nat pos) -> (any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -11302,10 +11307,10 @@ get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 
 
 ### get - get a list element pointer
-*Defined in: std/core/allocators.s line 138*
+*Defined in: std/core/allocators.s line 212*
 
 ```rust
-get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
+get(list, nat pos) -> (any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -11323,10 +11328,10 @@ get(list, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 
 
 ### get - get a list element pointer
-*Defined in: std/core/allocators.s line 138*
+*Defined in: std/core/allocators.s line 212*
 
 ```rust
-get(circular, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
+get(circular, nat pos) -> (any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -11344,10 +11349,10 @@ get(circular, nat pos) -> (any ptr {follows any ptr self.buf.unsafe_ptr})
 
 
 ### get - get a list element pointer
-*Defined in: std/core/allocators.s line 99*
+*Defined in: std/core/allocators.s line 172*
 
 ```rust
-get(arena, nat pos) -> (any ptr {follows any ptr l.buf.unsafe_ptr})
+get(arena, nat pos) -> (any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -11365,10 +11370,10 @@ get(arena, nat pos) -> (any ptr {follows any ptr l.buf.unsafe_ptr})
 
 
 ### get - get a list element pointer
-*Defined in: std/core/allocators.s line 99*
+*Defined in: std/core/allocators.s line 172*
 
 ```rust
-get(arena, nat pos, "unsafe_assume_inbounds") -> (any ptr {follows any ptr l.buf.unsafe_ptr})
+get(arena, nat pos, "unsafe_assume_inbounds") -> (any ptr)
 ```
 
 
@@ -11387,7 +11392,7 @@ get(arena, nat pos, "unsafe_assume_inbounds") -> (any ptr {follows any ptr l.buf
 *Defined in: std/core/array.s line 96*
 
 ```rust
-get(any[], nat i) -> (any ptr {follows any ptr buffer.unsafe_ptr})
+get(any[], nat i) -> (any ptr)
 ```
 
 This uses pointer arithmetics to index the buffer, basically performing the operation
@@ -11413,7 +11418,7 @@ are retrieved or sliced.
 *Defined in: std/core/array.s line 96*
 
 ```rust
-get(any[], nat i, "unsafe_assume_inbounds") -> (any ptr {follows any ptr buffer.unsafe_ptr})
+get(any[], nat i, "unsafe_assume_inbounds") -> (any ptr)
 ```
 
 This uses pointer arithmetics to index the buffer, basically performing the operation
@@ -11433,7 +11438,7 @@ are retrieved or sliced.
 
 
 ### get - a character in a string
-*Defined in: std/core/string.s line 330*
+*Defined in: std/core/string.s line 340*
 
 ```rust
 get(str, nat i) -> (char ptr)
@@ -11454,7 +11459,7 @@ get(str, nat i) -> (char ptr)
 
 
 ### get - a character in a string
-*Defined in: std/core/string.s line 330*
+*Defined in: std/core/string.s line 340*
 
 ```rust
 get(str, nat i, "unsafe_assume_inbounds") -> (char ptr)
@@ -11473,7 +11478,7 @@ get(str, nat i, "unsafe_assume_inbounds") -> (char ptr)
 *Defined in: std/io/web.s line 31*
 
 ```rust
-get(console CLI, cstr url) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CLI
+get(console CLI, cstr url) -> (str) on CLI
 ```
 
 This creates a GET request using the system's curl.
@@ -11511,7 +11516,7 @@ This version downloads to a '.tmp' file.
 *Defined in: std/io/web.s line 31*
 
 ```rust
-get(console CLI, cstr url, cstr path) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CLI
+get(console CLI, cstr url, cstr path) -> (str) on CLI
 ```
 
 This creates a GET request using the system's curl.
@@ -11548,7 +11553,7 @@ For ease of use, the path is returned.
 *Defined in: std/io/web.s line 31*
 
 ```rust
-get(console CLI, cstr url, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CLI
+get(console CLI, cstr url, str) -> (str) on CLI
 ```
 
 This creates a GET request using the system's curl.
@@ -11585,7 +11590,7 @@ For ease of use, the path is returned.
 *Defined in: std/io/web.s line 31*
 
 ```rust
-get(console CLI, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CLI
+get(console CLI, str) -> (str) on CLI
 ```
 
 This creates a GET request using the system's curl.
@@ -11623,7 +11628,7 @@ This version downloads to a '.tmp' file.
 *Defined in: std/io/web.s line 31*
 
 ```rust
-get(console CLI, str, cstr path) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CLI
+get(console CLI, str, cstr path) -> (str) on CLI
 ```
 
 This creates a GET request using the system's curl.
@@ -11660,7 +11665,7 @@ For ease of use, the path is returned.
 *Defined in: std/io/web.s line 31*
 
 ```rust
-get(console CLI, str, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CLI
+get(console CLI, str, str) -> (str) on CLI
 ```
 
 This creates a GET request using the system's curl.
@@ -11697,7 +11702,7 @@ For ease of use, the path is returned.
 *Defined in: std/map.s line 44*
 
 ```rust
-get(robinhood_nat_entry[], any[], nat key) -> (any ptr {follows any ptr values.unsafe_ptr})
+get(robinhood_nat_entry[], any[], nat key) -> (any ptr)
 ```
 
 Implemented for string or cstr keys but buffer of any values.
@@ -11724,7 +11729,7 @@ Implemented for string or cstr keys but buffer of any values.
 *Defined in: std/map.s line 34*
 
 ```rust
-get(robinhood_str_entry[], any[], str) -> (any ptr {follows any ptr values.unsafe_ptr})
+get(robinhood_str_entry[], any[], str) -> (any ptr)
 ```
 
 Implemented for string or cstr keys but buffer of any values.
@@ -11751,7 +11756,7 @@ Implemented for string or cstr keys but buffer of any values.
 *Defined in: std/map.s line 34*
 
 ```rust
-get(robinhood_str_entry[], any[], cstr key) -> (any ptr {follows any ptr values.unsafe_ptr})
+get(robinhood_str_entry[], any[], cstr key) -> (any ptr)
 ```
 
 Implemented for string or cstr keys but buffer of any values.
@@ -12163,7 +12168,14 @@ GB(nat) -> (nat)
 alloc(nat) -> (mut any ptr)
 ```
 
-Allocates a memory of the provided size in bytes.
+Allocates a memory of the provided size in bytes. It then checks for
+a null pointer result, which indicates operating system failure and
+escapes through an allocation failure. This function does not release
+the allocated memory, and the produced result is a pointer not associated
+with any type contents. You can associate the pointer with a specific
+content type the `compiler::unsafe_attach_type` function. Memory must
+be released using the `free` function (see that one's documentation)
+on how ensure safety via usage of `defer`.
 
 *Warning: Its usage in unsafe and guarded under std/unsafe.s.*
 
@@ -12182,10 +12194,10 @@ Allocates a memory of the provided size in bytes.
 
 
 ### alloc
-*Defined in: std/core/string.s line 26*
+*Defined in: std/core/string.s line 35*
 
 ```rust
-alloc(new CHARS, nat length) -> (mut allocated {tag, mut char[], mut nat pos}) on CHARS
+alloc(new CHARS, nat length) -> (mut allocated) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -12210,10 +12222,10 @@ free(mut any ptr) -> ()
 </details>
 
 ### alloc - list allocation
-*Defined in: std/core/allocators.s line 219*
+*Defined in: std/core/allocators.s line 292*
 
 ```rust
-alloc(edit list {tag, mut any[], mut nat length}) -> (edit allocated {tag, edit any[] {follows any ptr allocator.buf.unsafe_ptr}, nat pos})
+alloc(edit list) -> (edit allocated)
 ```
 
 Creates room for one element.
@@ -12235,10 +12247,10 @@ Creates room for one element.
 
 
 ### alloc - list allocation
-*Defined in: std/core/allocators.s line 219*
+*Defined in: std/core/allocators.s line 292*
 
 ```rust
-alloc(edit list, nat length) -> (edit allocated {tag, edit any[] {follows any ptr allocator.buf.unsafe_ptr}, nat pos})
+alloc(edit list, nat length) -> (edit allocated)
 ```
 
 <details><summary>Complexity</summary>
@@ -12258,10 +12270,10 @@ alloc(edit list, nat length) -> (edit allocated {tag, edit any[] {follows any pt
 
 
 ### alloc - list allocation
-*Defined in: std/core/allocators.s line 219*
+*Defined in: std/core/allocators.s line 292*
 
 ```rust
-alloc(edit list {tag, mut any[], mut nat length}) -> (edit allocated {tag, edit any[] {follows any ptr allocator.buf.unsafe_ptr}, nat pos})
+alloc(edit list) -> (edit allocated)
 ```
 
 Creates room for one element.
@@ -12283,10 +12295,10 @@ Creates room for one element.
 
 
 ### alloc - list allocation
-*Defined in: std/core/allocators.s line 219*
+*Defined in: std/core/allocators.s line 292*
 
 ```rust
-alloc(edit list, nat length) -> (edit allocated {tag, edit any[] {follows any ptr allocator.buf.unsafe_ptr}, nat pos})
+alloc(edit list, nat length) -> (edit allocated)
 ```
 
 <details><summary>Complexity</summary>
@@ -12306,10 +12318,10 @@ alloc(edit list, nat length) -> (edit allocated {tag, edit any[] {follows any pt
 
 
 ### alloc - circular arena allocation
-*Defined in: std/core/allocators.s line 205*
+*Defined in: std/core/allocators.s line 278*
 
 ```rust
-alloc(edit circular {tag, edit any[], mut nat pos}) -> (edit allocated {tag, edit any[] {follows any ptr allocator.buf.unsafe_ptr}, nat pos})
+alloc(edit circular) -> (edit allocated)
 ```
 
 Creates room for one element.
@@ -12329,10 +12341,10 @@ Creates room for one element.
 
 
 ### alloc - circular arena allocation
-*Defined in: std/core/allocators.s line 205*
+*Defined in: std/core/allocators.s line 278*
 
 ```rust
-alloc(edit circular, nat length) -> (edit allocated {tag, edit any[] {follows any ptr allocator.buf.unsafe_ptr}, nat pos})
+alloc(edit circular, nat length) -> (edit allocated)
 ```
 
 <details><summary>Complexity</summary>
@@ -12350,7 +12362,7 @@ alloc(edit circular, nat length) -> (edit allocated {tag, edit any[] {follows an
 
 
 ### alloc - allocates a buffer
-*Defined in: std/core/allocators.s line 179*
+*Defined in: std/core/allocators.s line 252*
 
 ```rust
 alloc(edit any[], edit bucket) -> (edit any[])
@@ -12382,7 +12394,7 @@ This version allocates a buffer of ONE element.
 
 
 ### alloc - allocates a buffer
-*Defined in: std/core/allocators.s line 179*
+*Defined in: std/core/allocators.s line 252*
 
 ```rust
 alloc(edit any[], edit bucket, "dirty") -> (edit any[])
@@ -12414,7 +12426,7 @@ This version allocates a buffer of ONE element.
 
 
 ### alloc - allocates a buffer
-*Defined in: std/core/allocators.s line 179*
+*Defined in: std/core/allocators.s line 252*
 
 ```rust
 alloc(edit any[], edit bucket, "unsafe_first") -> (edit any[])
@@ -12445,7 +12457,7 @@ This version allocates a buffer of ONE element.
 
 
 ### alloc - allocates a buffer
-*Defined in: std/core/allocators.s line 179*
+*Defined in: std/core/allocators.s line 252*
 
 ```rust
 alloc(edit any[], edit bucket, nat size) -> (edit any[])
@@ -12476,7 +12488,7 @@ moved across functions.
 
 
 ### alloc - allocates a buffer
-*Defined in: std/core/allocators.s line 179*
+*Defined in: std/core/allocators.s line 252*
 
 ```rust
 alloc(edit any[], edit bucket, nat size, "dirty") -> (edit any[])
@@ -12507,7 +12519,7 @@ moved across functions.
 
 
 ### alloc - allocates a buffer
-*Defined in: std/core/allocators.s line 179*
+*Defined in: std/core/allocators.s line 252*
 
 ```rust
 alloc(edit any[], edit bucket, nat size, "unsafe_first") -> (edit any[])
@@ -12537,10 +12549,10 @@ moved across functions.
 
 
 ### alloc - arena allocation
-*Defined in: std/core/allocators.s line 149*
+*Defined in: std/core/allocators.s line 222*
 
 ```rust
-alloc(edit arena {tag, edit any[], mut nat pos}) -> (edit allocated {tag, edit any[] {follows any ptr allocator.buf.unsafe_ptr}, nat pos})
+alloc(edit arena) -> (edit allocated)
 ```
 
 Creates room for one element.
@@ -12560,10 +12572,10 @@ Creates room for one element.
 
 
 ### alloc - arena allocation
-*Defined in: std/core/allocators.s line 149*
+*Defined in: std/core/allocators.s line 222*
 
 ```rust
-alloc(edit arena, nat length) -> (edit allocated {tag, edit any[] {follows any ptr allocator.buf.unsafe_ptr}, nat pos})
+alloc(edit arena, nat length) -> (edit allocated)
 ```
 
 <details><summary>Complexity</summary>
@@ -12971,10 +12983,10 @@ allocate again, or use `buffer.resize new_size` once a first non-zero allocation
 
 
 ### alloc
-*Defined in: std/core/string.s line 132*
+*Defined in: std/core/string.s line 142*
 
 ```rust
-alloc(edit bucket, nat length) -> (edit allocated {tag, edit char[], nat pos})
+alloc(edit bucket, nat length) -> (edit allocated)
 ```
 
 <details><summary>Complexity</summary>
@@ -12994,6 +13006,43 @@ alloc(edit bucket, nat length) -> (edit allocated {tag, edit char[], nat pos})
 18. reallocation failed
 </details>
 
+
+### alloc
+*Defined in: std/tag.s line 40*
+
+```rust
+alloc(cstr) -> (mut char[])
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 98
+- Transpiled C size: 627
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+22. out of bounds
+23. arena is out of space
+88. empty input name
+89. cannot tag a structural type
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+<details><summary>defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
 
 ### alloc
 *Defined in: std/tag.s line 40*
@@ -13022,43 +13071,6 @@ alloc(cstr surface, cstr obj) -> (mut char[])
 88. empty input name
 89. cannot tag a structural type
 90. tag surface cannot be structural type
-25. can only define strings on contiguous buffers
-</details>
-
-
-<details><summary>defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
-
-### alloc
-*Defined in: std/tag.s line 40*
-
-```rust
-alloc(cstr) -> (mut char[])
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 8 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 98
-- Transpiled C size: 627
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
-22. out of bounds
-23. arena is out of space
-88. empty input name
-89. cannot tag a structural type
-26. can only define strings on non-offset buffers
 25. can only define strings on contiguous buffers
 </details>
 
@@ -13127,7 +13139,7 @@ resources.
 *Defined in: std/core/array.s line 77*
 
 ```rust
-last(edit any[]) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
+last(edit any[]) -> (mut any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -13145,12 +13157,15 @@ last(edit any[]) -> (mut any ptr {follows any ptr buffer.unsafe_ptr})
 
 
 # len
-### len
-*Defined in: std/core/allocators.s line 135*
+### len - list length
+*Defined in: std/core/allocators.s line 206*
 
 ```rust
-len(list {tag, any[], nat length}) -> (nat)
+len(list) -> (nat)
 ```
+
+This is the number of user-facing allocation elements. The list may have
+allocated space for more elements internally.
 
 <details><summary>Complexity</summary>
 
@@ -13161,12 +13176,15 @@ len(list {tag, any[], nat length}) -> (nat)
 </details>
 
 
-### len
-*Defined in: std/core/allocators.s line 135*
+### len - list length
+*Defined in: std/core/allocators.s line 206*
 
 ```rust
-len(list {tag, any[], nat length}) -> (nat)
+len(list) -> (nat)
 ```
+
+This is the number of user-facing allocation elements. The list may have
+allocated space for more elements internally.
 
 <details><summary>Complexity</summary>
 
@@ -13178,10 +13196,10 @@ len(list {tag, any[], nat length}) -> (nat)
 
 
 ### len - allocated arena size
-*Defined in: std/core/allocators.s line 84*
+*Defined in: std/core/allocators.s line 129*
 
 ```rust
-len(arena {tag, any[], nat pos}) -> (nat)
+len(arena) -> (nat)
 ```
 
 This is not the total arena size, but rather the number
@@ -13213,10 +13231,10 @@ len(any[]) -> (nat)
 
 
 ### len - string length
-*Defined in: std/core/string.s line 105*
+*Defined in: std/core/string.s line 115*
 
 ```rust
-len(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (nat)
+len(str) -> (nat)
 ```
 
 <details><summary>Complexity</summary>
@@ -13232,7 +13250,7 @@ len(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
 *Defined in: std/sci/vec.s line 57*
 
 ```rust
-len(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (nat)
+len(vec) -> (nat)
 ```
 
 <details><summary>Complexity</summary>
@@ -13252,6 +13270,30 @@ len(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (nat)
 new() -> (new {tag})
 ```
 
+This is the laziest means of allocation that has no state and
+signfies the intent to have any allocations be handled by the
+operating system. It has the disadvantage that it cannot really
+perform allocations within conditions or loops that escape
+their scope. However, allocations made within the top level
+of functions *will* be properly deferred to the calling scope.
+Thus, the following exammple is valid, where `CHARS` is an effect;
+a variable automatically passed to string allocators.
+```python
+import std.core
+def combine_with_space(on new CHARS, cstr s1, cstr s2)
+    return s1+s2+" "
+def main(on CLI, on new CHARS)
+    list_s1 = ["hel", "de", "wo"]
+    list_s2 = ["lo", "ar", "rld"]
+    for i in range of 2
+        print nn combine_with_space(list_s1[i], list_s2[i])
+```
+In the above example, intermediate strings are released within `combine_with_space`,
+and its return is released at the end of each loop. Thus, although this pattern
+is easy to write, it cannot really escape the declared scope. Repeat allocations
+are also significantly slower than just using something a circular buffer in place of the
+CHARS effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -13262,12 +13304,16 @@ new() -> (new {tag})
 
 
 # bucket\_contents
-### bucket\_contents
-*Defined in: std/core/allocators.s line 26*
+### bucket\_contents - structure of an allocated bucket allocator
+*Defined in: std/core/allocators.s line 49*
 
 ```rust
 bucket_contents() -> (edit bucket_contents {tag, mut any ptr elements {follows any ptr ..}, mut nat size, mut nat allocated})
 ```
+
+This is the actual structure of a bucket allocator, moved via one
+indirection onto memory. Then, bucket allocations retrieve this
+structure and register onto it a new memory element.
 
 <details><summary>Complexity</summary>
 
@@ -13285,17 +13331,21 @@ bucket_contents() -> (edit bucket_contents {tag, mut any ptr elements {follows a
 
 # bucket
 ### bucket - grouped allocations on new memory
-*Defined in: std/core/allocators.s line 33*
+*Defined in: std/core/allocators.s line 60*
 
 ```rust
 bucket() -> (edit bucket {tag, mut bucket_contents ptr unsafe_ptr})
 ```
 
-This is similar to 'new' but moves all allocated memory together,
-releasing it only when there is no further use for any of its contents.
+This allocator is similar to `new` in that directly allocates
+using the operating system's `malloc`. However, it does not allow
+each allocated memory segment to manage its own deferred dellocation,
+and instead bundles all allocations it is involved in to have them
+be released together, once no longer in use.
 Do note that this operation is typically the lazy way out,
-as it acquires and releases memory using one extra layer of indirection
-compared to structures like arenas. On the other hand, it's pretty versatile
+as it must accompany the allocated values within function returns. It also
+ acquires and releases memory using one extra layer of indirection
+compared to allocators like arenas. On the other hand, it is pretty versatile
 for holding conditional results. Example:
 ```python
 import std.core
@@ -13303,11 +13353,10 @@ def conditional(bool case)
     CHARS = edit bucket()
     if case: s = copy 123
     else:    s = copy 345
-    return (s, CHARS) # this would not be possible with 'CHARS = new()'
-def main()
-    CLI = edit console()
-    print conditional true
-    print conditional false
+    return (s, CHARS) # returning s would not be possible with 'CHARS = new()'
+def main(on CLI)
+    conditional(true).s.print()
+    conditional(false).s.print()
 ```
 
 <details><summary>Complexity</summary>
@@ -13343,11 +13392,11 @@ free(mut any ptr) -> ()
 </details>
 
 # arena
-### arena
+### arena - arena of characters
 *Defined in: std/core/string.s line 23*
 
 ```rust
-arena("char__t9t") -> (edit arena {tag, edit char[], mut nat pos})
+arena("char__t9t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -13359,18 +13408,32 @@ arena("char__t9t") -> (edit arena {tag, edit char[], mut nat pos})
 </details>
 
 
-### arena - a buffer and mutable position pair
-*Defined in: std/core/allocators.s line 75*
+### arena - arena buffer
+*Defined in: std/core/allocators.s line 106*
 
 ```rust
-arena(edit any[]) -> (edit arena {tag, edit any[] {follows any ptr buf.unsafe_ptr}, mut nat pos})
+arena(edit any[]) -> (edit arena)
 ```
 
-The position starts from 0. This structure is often used
-to track the size of allocated data within the buffer.
-Contrary to circular buffers, arenas are not freed automatically
-and therefore eventually run out of space. However, they come
-with data integrity guarantees.
+This consists of a buffer and mutable position pair, where the
+position is often used to track the size of used
+data within the buffer. Allocating in an arena just consume more
+of its region.
+Contrary to circular buffers, arena data are not overwritten
+on-demand. This has the advantage that data remain intact until
+the arena is manuall cleared, but has the disadnvatage that
+arena allocations may fail due to running out of space.
+This is the version most often used in practice to initialize
+arenas from allocated buffers. Example:
+```python
+import std.core
+def main(on CLI)
+    CHARS = edit arena alloc 4096 # allocated buffer of 4K characters
+    message = "hello"+" "+"world!"
+    print message
+```
+In the example above, string addition automatically uses the arena
+by grabbing it via string addition.
 
 <details><summary>Complexity</summary>
 
@@ -13381,20 +13444,21 @@ with data integrity guarantees.
 </details>
 
 
-### arena - a buffer and mutable position pair
-*Defined in: std/core/allocators.s line 63*
+### arena - arena buffer
+*Defined in: std/core/allocators.s line 93*
 
 ```rust
 arena(edit any[], nat _pos) -> (edit arena {tag, edit any[], mut nat pos})
 ```
 
-This structure is often used to track the size of allocated
-data within the buffer.
-Contrary to circular buffers, arenas are not freed automatically
-and therefore eventually run out of space. However, they come
-with data integrity guarantees. Attach a garbage
-collector to an arena per `gc arena alloc 4` (or construct it
-with another allocator).
+This consists of a buffer and mutable position pair, where the
+position is often used to track the size of used
+data within the buffer. Allocating in an arena just consumes more
+of its memory region allowance.
+Contrary to circular buffers, arena data are not overwritten
+on-demand. This has the advantage that data remain intact until
+the arena is manuall cleared, but has the disadnvatage that
+arena allocations may fail due to running out of space.
 
 <details><summary>Complexity</summary>
 
@@ -13409,7 +13473,7 @@ with another allocator).
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4186t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4186t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -13425,7 +13489,7 @@ arena("float__t4186t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4120t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4120t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -13441,7 +13505,7 @@ arena("float__t4120t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t3829t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t3829t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -13457,7 +13521,7 @@ arena("float__t3829t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t664t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t664t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -13473,7 +13537,7 @@ arena("float__t664t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t625t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t625t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -13489,7 +13553,7 @@ arena("float__t625t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t623t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t623t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -13505,7 +13569,7 @@ arena("float__t623t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t621t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t621t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -13521,7 +13585,7 @@ arena("float__t621t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -13537,7 +13601,7 @@ arena("float__t4t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 304*
 
 ```rust
-arena(edit vec {tag, mut float ptr unsafe_ptr, nat pos, nat length}) -> (edit arena {tag, edit float[], mut nat pos})
+arena(edit vec) -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -13550,12 +13614,40 @@ arena(edit vec {tag, mut float ptr unsafe_ptr, nat pos, nat length}) -> (edit ar
 
 
 # allocated
-### allocated
-*Defined in: std/core/allocators.s line 90*
+### allocated - an allocated buffer region
+*Defined in: std/core/allocators.s line 135*
 
 ```rust
 allocated(edit any[], nat pos) -> (edit allocated {tag, edit any[], nat pos})
 ```
+
+This function is used mainly to declare a class that indicates
+the outcome of calling an `alloc` function on safe memory constructs,
+like `new,bucket,arena,circular,list`. For abstraction purposes it
+holds a buffer component and a position index on that buffer. There is
+no global guarantee about what each or future allocators will choose
+for the buffer construction and offset, other than that the buffer's
+pointer offset by the buffer's internal offset and this structure's
+position yield the correct element address of elements. For this reason,
+assuming that `A` is an allocator, get addresses to its elements via
+`A.buf[A.pos]&, or, better via the equivalent `at A`.
+**Prefer using functions like `at` on an allocated result**
+to safelyconver. That pair can freely be passed as an argument to new consturctors,
+such as strings or new arenas. Here is an example:
+```python
+import std.core
+import compiler as cp
+def main(on CLI)
+    mydata = edit arena float[].alloc 10
+    float_ptr = at mydata.alloc() # allocate one element
+    float_ptr = 5.0               # move data to a pointer
+    print cp::deref float_ptr     # dereference pointer data
+```
+Allocations differ to arenas as a type, despite holding the same
+data internally in that arenas track the end of their allocated region, whereas
+allocations track the starting position within a buffer; the allocation size
+is external knowledge, and safety is enforced purely through buffer bounds
+checking.
 
 <details><summary>Complexity</summary>
 
@@ -13568,10 +13660,10 @@ allocated(edit any[], nat pos) -> (edit allocated {tag, edit any[], nat pos})
 
 # status
 ### status - convert to a nameless buffer and position pair
-*Defined in: std/core/allocators.s line 93*
+*Defined in: std/core/allocators.s line 166*
 
 ```rust
-status(allocated {tag, any[], nat pos}) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat)
+status(allocated) -> (any[], nat)
 ```
 
 This unpacking is used to pass an arena's state or allocated
@@ -13587,10 +13679,10 @@ memory data as part of structural input.
 
 
 ### status - convert to a nameless buffer and position pair
-*Defined in: std/core/allocators.s line 93*
+*Defined in: std/core/allocators.s line 166*
 
 ```rust
-status(arena {tag, any[], nat pos}) -> (any[] {follows any ptr self.buf.unsafe_ptr}, nat)
+status(arena) -> (any[], nat)
 ```
 
 This unpacking is used to pass an arena's state or allocated
@@ -13606,11 +13698,11 @@ memory data as part of structural input.
 
 
 # circular
-### circular
-*Defined in: std/core/string.s line 24*
+### circular - circular buffer of characters
+*Defined in: std/core/string.s line 27*
 
 ```rust
-circular("char__t9t") -> (edit circular {tag, edit char[], mut nat pos})
+circular("char__t9t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -13623,7 +13715,7 @@ circular("char__t9t") -> (edit circular {tag, edit char[], mut nat pos})
 
 
 ### circular - circular buffer
-*Defined in: std/core/allocators.s line 119*
+*Defined in: std/core/allocators.s line 192*
 
 ```rust
 circular(edit any[]) -> (edit circular {tag, edit any[], mut nat pos})
@@ -13642,7 +13734,7 @@ circular(edit any[]) -> (edit circular {tag, edit any[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4186t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4186t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -13658,7 +13750,7 @@ circular("float__t4186t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4120t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4120t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -13674,7 +13766,7 @@ circular("float__t4120t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t3829t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t3829t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -13690,7 +13782,7 @@ circular("float__t3829t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t664t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t664t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -13706,7 +13798,7 @@ circular("float__t664t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t625t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t625t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -13722,7 +13814,7 @@ circular("float__t625t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t623t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t623t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -13738,7 +13830,7 @@ circular("float__t623t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t621t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t621t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -13754,7 +13846,7 @@ circular("float__t621t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -13767,11 +13859,11 @@ circular("float__t4t") -> (edit circular {tag, edit float[], mut nat pos})
 
 
 # list
-### list
-*Defined in: std/core/string.s line 25*
+### list - list of characters
+*Defined in: std/core/string.s line 31*
 
 ```rust
-list("char__t9t") -> (edit list {tag, mut char[], mut nat length})
+list("char__t9t") -> (edit list)
 ```
 
 <details><summary>Complexity</summary>
@@ -13798,7 +13890,7 @@ free(mut any ptr) -> ()
 </details>
 
 ### list - list buffer management
-*Defined in: std/core/allocators.s line 124*
+*Defined in: std/core/allocators.s line 197*
 
 ```rust
 list(edit any[], "external") -> (edit list {tag, mut any[] {follows any ptr _buf.unsafe_ptr}, mut nat length})
@@ -13817,7 +13909,7 @@ A capacity is maintained so that resizes are not performed too frequently.
 
 
 ### list - list buffer management
-*Defined in: std/core/allocators.s line 124*
+*Defined in: std/core/allocators.s line 197*
 
 ```rust
 list(edit any[]) -> (edit list {tag, mut any[] {follows any ptr _buf.unsafe_ptr}, mut nat length})
@@ -13853,7 +13945,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t4186t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t4186t") -> (edit list)
 ```
 
 <details><summary>Complexity</summary>
@@ -13883,7 +13975,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t4120t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t4120t") -> (edit list)
 ```
 
 <details><summary>Complexity</summary>
@@ -13913,7 +14005,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t3829t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t3829t") -> (edit list)
 ```
 
 <details><summary>Complexity</summary>
@@ -13943,7 +14035,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t664t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t664t") -> (edit list)
 ```
 
 <details><summary>Complexity</summary>
@@ -13973,7 +14065,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t625t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t625t") -> (edit list)
 ```
 
 <details><summary>Complexity</summary>
@@ -14003,7 +14095,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t623t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t623t") -> (edit list)
 ```
 
 <details><summary>Complexity</summary>
@@ -14033,7 +14125,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t621t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t621t") -> (edit list)
 ```
 
 <details><summary>Complexity</summary>
@@ -14063,7 +14155,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/vec.s line 25*
 
 ```rust
-list("float__t4t") -> (edit list {tag, mut float[], mut nat length})
+list("float__t4t") -> (edit list)
 ```
 
 <details><summary>Complexity</summary>
@@ -14091,10 +14183,10 @@ free(mut any ptr) -> ()
 
 # unsafe\_alloc
 ### unsafe\_alloc - bucket allocation
-*Defined in: std/core/allocators.s line 160*
+*Defined in: std/core/allocators.s line 233*
 
 ```rust
-unsafe_alloc(edit bucket {tag, mut bucket_contents ptr unsafe_ptr}) -> (mut any ptr {follows any ptr ..})
+unsafe_alloc(edit bucket) -> (mut any ptr)
 ```
 
 Creates room for one element.
@@ -14116,10 +14208,10 @@ Creates room for one element.
 
 
 ### unsafe\_alloc - bucket allocation
-*Defined in: std/core/allocators.s line 160*
+*Defined in: std/core/allocators.s line 233*
 
 ```rust
-unsafe_alloc(edit bucket, nat bytes) -> (mut any ptr {follows any ptr ..})
+unsafe_alloc(edit bucket, nat bytes) -> (mut any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -14140,10 +14232,10 @@ unsafe_alloc(edit bucket, nat bytes) -> (mut any ptr {follows any ptr ..})
 
 # at
 ### at - get a mutable pointer to the last buffer element
-*Defined in: std/core/allocators.s line 231*
+*Defined in: std/core/allocators.s line 304*
 
 ```rust
-at(edit allocated {tag, edit any[], nat pos}) -> (mut any ptr {follows any ptr surface.buf.unsafe_ptr})
+at(edit allocated) -> (mut any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -14157,6 +14249,31 @@ at(edit allocated {tag, edit any[], nat pos}) -> (mut any ptr {follows any ptr s
 <details><summary>Potential errors</summary>
 
 22. out of bounds
+</details>
+
+
+### at - find or add an item in a robinhood_entry list
+*Defined in: std/hash.s line 87*
+
+```rust
+at(edit robinhood_nat_entry[], nat _k) -> (mut nat)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 54
+- Transpiled C size: 718
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+66. string buffer is full
+5. modulo by zero
+22. out of bounds
+6. nat subtraction would yield a negative
 </details>
 
 
@@ -14210,31 +14327,6 @@ at(edit robinhood_str_entry[], cstr _k) -> (mut nat)
 </details>
 
 
-### at - find or add an item in a robinhood_entry list
-*Defined in: std/hash.s line 87*
-
-```rust
-at(edit robinhood_nat_entry[], nat _k) -> (mut nat)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 54
-- Transpiled C size: 718
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-66. string buffer is full
-5. modulo by zero
-22. out of bounds
-6. nat subtraction would yield a negative
-</details>
-
-
 ### at
 *Defined in: std/sci/vec.s line 107*
 
@@ -14273,11 +14365,11 @@ at(float number, nat i) -> (float)
 
 
 # char\_allocator
-### list
-*Defined in: std/core/string.s line 25*
+### list - list of characters
+*Defined in: std/core/string.s line 31*
 
 ```rust
-list("char__t9t") -> (edit list {tag, mut char[], mut nat length})
+list("char__t9t") -> (edit list)
 ```
 
 <details><summary>Complexity</summary>
@@ -14303,11 +14395,11 @@ free(mut any ptr) -> ()
 ```
 </details>
 
-### circular
-*Defined in: std/core/string.s line 24*
+### circular - circular buffer of characters
+*Defined in: std/core/string.s line 27*
 
 ```rust
-circular("char__t9t") -> (edit circular {tag, edit char[], mut nat pos})
+circular("char__t9t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -14319,11 +14411,11 @@ circular("char__t9t") -> (edit circular {tag, edit char[], mut nat pos})
 </details>
 
 
-### arena
+### arena - arena of characters
 *Defined in: std/core/string.s line 23*
 
 ```rust
-arena("char__t9t") -> (edit arena {tag, edit char[], mut nat pos})
+arena("char__t9t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -14336,17 +14428,21 @@ arena("char__t9t") -> (edit arena {tag, edit char[], mut nat pos})
 
 
 ### bucket - grouped allocations on new memory
-*Defined in: std/core/allocators.s line 33*
+*Defined in: std/core/allocators.s line 60*
 
 ```rust
 bucket() -> (edit bucket {tag, mut bucket_contents ptr unsafe_ptr})
 ```
 
-This is similar to 'new' but moves all allocated memory together,
-releasing it only when there is no further use for any of its contents.
+This allocator is similar to `new` in that directly allocates
+using the operating system's `malloc`. However, it does not allow
+each allocated memory segment to manage its own deferred dellocation,
+and instead bundles all allocations it is involved in to have them
+be released together, once no longer in use.
 Do note that this operation is typically the lazy way out,
-as it acquires and releases memory using one extra layer of indirection
-compared to structures like arenas. On the other hand, it's pretty versatile
+as it must accompany the allocated values within function returns. It also
+ acquires and releases memory using one extra layer of indirection
+compared to allocators like arenas. On the other hand, it is pretty versatile
 for holding conditional results. Example:
 ```python
 import std.core
@@ -14354,11 +14450,10 @@ def conditional(bool case)
     CHARS = edit bucket()
     if case: s = copy 123
     else:    s = copy 345
-    return (s, CHARS) # this would not be possible with 'CHARS = new()'
-def main()
-    CLI = edit console()
-    print conditional true
-    print conditional false
+    return (s, CHARS) # returning s would not be possible with 'CHARS = new()'
+def main(on CLI)
+    conditional(true).s.print()
+    conditional(false).s.print()
 ```
 
 <details><summary>Complexity</summary>
@@ -14400,6 +14495,30 @@ free(mut any ptr) -> ()
 new() -> (new {tag})
 ```
 
+This is the laziest means of allocation that has no state and
+signfies the intent to have any allocations be handled by the
+operating system. It has the disadvantage that it cannot really
+perform allocations within conditions or loops that escape
+their scope. However, allocations made within the top level
+of functions *will* be properly deferred to the calling scope.
+Thus, the following exammple is valid, where `CHARS` is an effect;
+a variable automatically passed to string allocators.
+```python
+import std.core
+def combine_with_space(on new CHARS, cstr s1, cstr s2)
+    return s1+s2+" "
+def main(on CLI, on new CHARS)
+    list_s1 = ["hel", "de", "wo"]
+    list_s2 = ["lo", "ar", "rld"]
+    for i in range of 2
+        print nn combine_with_space(list_s1[i], list_s2[i])
+```
+In the above example, intermediate strings are released within `combine_with_space`,
+and its return is released at the end of each loop. Thus, although this pattern
+is easy to write, it cannot really escape the declared scope. Repeat allocations
+are also significantly slower than just using something a circular buffer in place of the
+CHARS effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -14411,7 +14530,7 @@ new() -> (new {tag})
 
 # strdat
 ### strdat - string data without the buffer storage
-*Defined in: std/core/string.s line 37*
+*Defined in: std/core/string.s line 47*
 
 ```rust
 strdat(nat pos, nat length, char first) -> (nat pos, nat length, char first)
@@ -14448,131 +14567,11 @@ strdat(nat _pos, nat _length) -> (nat16 pos, nat16 length)
 
 
 # str
-### str - tautology function for strings
-*Defined in: std/core/string.s line 65*
-
-```rust
-str(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 3
-
-</details>
-
-
-### str - a string residing on the full breadth of a buffer
-*Defined in: std/core/string.s line 57*
-
-```rust
-str(char[]) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 21
-- Transpiled C size: 165
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-27. string does not fit on buffer
-</details>
-
-
-### str - a string residing on the full breadth of a buffer
-*Defined in: std/core/string.s line 57*
-
-```rust
-str(char[], nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 20
-- Transpiled C size: 147
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-27. string does not fit on buffer
-</details>
-
-
-### str - a string residing on a buffer
-*Defined in: std/core/string.s line 50*
-
-```rust
-str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 20
-- Transpiled C size: 100
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-</details>
-
-
-### str - a string residing on a buffer
-*Defined in: std/core/string.s line 45*
-
-```rust
-str(char ptr unsafe_ptr, nat pos, nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 10
-- Transpiled C size: 43
-
-</details>
-
-
-### str - a string residing on a buffer
-*Defined in: std/core/string.s line 41*
-
-```rust
-str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 3
-
-</details>
-
-
 ### str - convert to string
-*Defined in: std/core/string.s line 93*
+*Defined in: std/core/string.s line 103*
 
 ```rust
-str(cstr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(cstr) -> (str)
 ```
 
 Defines an implicit constant buffer using the cstr's memory data.
@@ -14588,10 +14587,10 @@ Subsequent comparisons no longer use the underlying pointer value.
 
 
 ### str - a string residing on a buffer
-*Defined in: std/core/string.s line 86*
+*Defined in: std/core/string.s line 96*
 
 ```rust
-str(char[], nat endpos, "from", nat pos) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(char[], nat endpos, "from", nat pos) -> (str)
 ```
 
 The string automatically detects the first character,
@@ -14617,10 +14616,10 @@ on comparisons of unequal strings.
 
 
 ### str - a string residing on a buffer
-*Defined in: std/core/string.s line 77*
+*Defined in: std/core/string.s line 87*
 
 ```rust
-str(char[], nat pos, "to", nat endpos) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(char[], nat pos, "to", nat endpos) -> (str)
 ```
 
 The string automatically detects the first character,
@@ -14646,10 +14645,10 @@ on comparisons of unequal strings.
 
 
 ### str - a string residing on a buffer
-*Defined in: std/core/string.s line 69*
+*Defined in: std/core/string.s line 79*
 
 ```rust
-str(char[], nat pos, "len", nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(char[], nat pos, "len", nat length) -> (str)
 ```
 
 The string automatically detects the first character,
@@ -14673,32 +14672,123 @@ on comparisons of unequal strings.
 </details>
 
 
-### str - reads a string from the console
-*Defined in: std/core/convertstr.s line 113*
+### str - tautology function for strings
+*Defined in: std/core/string.s line 75*
 
 ```rust
-str(edit arena, console console) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+str(str) -> (str)
 ```
-
-The read string is placed on an arena while consuming only the necessarily minimum size.
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 47
-- Transpiled C size: 279
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
+</details>
+
+
+### str - a string residing on the full breadth of a buffer
+*Defined in: std/core/string.s line 67*
+
+```rust
+str(char[]) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 165
 
 </details>
 
 <details><summary>Potential errors</summary>
 
-34. read string does not fit on buffer
 2. null pointer
-6. nat subtraction would yield a negative
 22. out of bounds
 25. can only define strings on contiguous buffers
 26. can only define strings on non-offset buffers
-31. unexpected end of console read
+27. string does not fit on buffer
+</details>
+
+
+### str - a string residing on the full breadth of a buffer
+*Defined in: std/core/string.s line 67*
+
+```rust
+str(char[], nat length) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 147
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+27. string does not fit on buffer
+</details>
+
+
+### str - a string residing on a buffer
+*Defined in: std/core/string.s line 60*
+
+```rust
+str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 100
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### str - a string residing on a buffer
+*Defined in: std/core/string.s line 55*
+
+```rust
+str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 43
+
+</details>
+
+
+### str - a string residing on a buffer
+*Defined in: std/core/string.s line 51*
+
+```rust
+str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
 </details>
 
 
@@ -14706,7 +14796,7 @@ The read string is placed on an arena while consuming only the necessarily minim
 *Defined in: std/core/convertstr.s line 113*
 
 ```rust
-str(new CHARS, console console) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+str(new CHARS, console console) -> (str) on CHARS
 ```
 
 The read string is placed onto memory that keeps being reallocated to accommodate its size.
@@ -14748,7 +14838,7 @@ free(mut any ptr) -> ()
 *Defined in: std/io/process.s line 30*
 
 ```rust
-str(argument {tag, cstr unsafe_value}) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(argument) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -14760,11 +14850,40 @@ str(argument {tag, cstr unsafe_value}) -> (str {tag, char ptr unsafe_ptr, nat da
 </details>
 
 
+### str - reads a string from the console
+*Defined in: std/core/convertstr.s line 113*
+
+```rust
+str(edit arena, console console) -> (str) on CHARS
+```
+
+The read string is placed on an arena while consuming only the necessarily minimum size.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 47
+- Transpiled C size: 279
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+34. read string does not fit on buffer
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+31. unexpected end of console read
+</details>
+
+
 ### str - create a compact str
 *Defined in: std/mini.s line 35*
 
 ```rust
-str(cstr) -> (str {tag, char ptr unsafe_ptr, nat16 dat.pos, nat16 dat.length})
+str(cstr) -> (str)
 ```
 
 The created str variation should be used only for storng and
@@ -14812,7 +14931,7 @@ retrieving data with 'unpack' for memory efficiency.
 *Defined in: std/ptrpeek.s line 59*
 
 ```rust
-str(cstr ptr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(cstr ptr) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -14833,7 +14952,7 @@ str(cstr ptr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, ch
 *Defined in: std/ptrpeek.s line 59*
 
 ```rust
-str(str ptr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(str ptr) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -14852,10 +14971,10 @@ str(str ptr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, cha
 
 # copy
 ### copy - copy a string
-*Defined in: std/core/string.s line 143*
+*Defined in: std/core/string.s line 153*
 
 ```rust
-copy(edit list, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit list, cstr _other) -> (str) on CHARS
 ```
 
 The result is a fresh string in a new memory surface effect CHARS.
@@ -14886,10 +15005,10 @@ without runtime failures; they always preserve their size.
 
 
 ### copy - copy a string
-*Defined in: std/core/string.s line 143*
+*Defined in: std/core/string.s line 153*
 
 ```rust
-copy(edit list, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit list, str) -> (str) on CHARS
 ```
 
 The result is a fresh string in a new memory surface effect CHARS.
@@ -14920,10 +15039,10 @@ without runtime failures; they always preserve their size.
 
 
 ### copy - copy a string
-*Defined in: std/core/string.s line 143*
+*Defined in: std/core/string.s line 153*
 
 ```rust
-copy(edit circular, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit circular, cstr _other) -> (str) on CHARS
 ```
 
 The result is a fresh string in a new memory surface effect CHARS.
@@ -14952,10 +15071,10 @@ without runtime failures; they always preserve their size.
 
 
 ### copy - copy a string
-*Defined in: std/core/string.s line 143*
+*Defined in: std/core/string.s line 153*
 
 ```rust
-copy(edit circular, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit circular, str) -> (str) on CHARS
 ```
 
 The result is a fresh string in a new memory surface effect CHARS.
@@ -14984,10 +15103,10 @@ without runtime failures; they always preserve their size.
 
 
 ### copy - copy a string
-*Defined in: std/core/string.s line 143*
+*Defined in: std/core/string.s line 153*
 
 ```rust
-copy(edit arena, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit arena, cstr _other) -> (str) on CHARS
 ```
 
 The result is a fresh string in a new memory surface effect CHARS.
@@ -15016,10 +15135,10 @@ without runtime failures; they always preserve their size.
 
 
 ### copy - copy a string
-*Defined in: std/core/string.s line 143*
+*Defined in: std/core/string.s line 153*
 
 ```rust
-copy(edit arena, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit arena, str) -> (str) on CHARS
 ```
 
 The result is a fresh string in a new memory surface effect CHARS.
@@ -15048,10 +15167,10 @@ without runtime failures; they always preserve their size.
 
 
 ### copy - copy a string
-*Defined in: std/core/string.s line 143*
+*Defined in: std/core/string.s line 153*
 
 ```rust
-copy(edit bucket, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit bucket, cstr _other) -> (str) on CHARS
 ```
 
 The result is a fresh string in a new memory surface effect CHARS.
@@ -15084,10 +15203,10 @@ without runtime failures; they always preserve their size.
 
 
 ### copy - copy a string
-*Defined in: std/core/string.s line 143*
+*Defined in: std/core/string.s line 153*
 
 ```rust
-copy(edit bucket, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit bucket, str) -> (str) on CHARS
 ```
 
 The result is a fresh string in a new memory surface effect CHARS.
@@ -15120,10 +15239,10 @@ without runtime failures; they always preserve their size.
 
 
 ### copy - copy a string
-*Defined in: std/core/string.s line 143*
+*Defined in: std/core/string.s line 153*
 
 ```rust
-copy(new CHARS, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(new CHARS, cstr _other) -> (str) on CHARS
 ```
 
 The result is a fresh string in a new memory surface effect CHARS.
@@ -15159,10 +15278,10 @@ free(mut any ptr) -> ()
 </details>
 
 ### copy - copy a string
-*Defined in: std/core/string.s line 143*
+*Defined in: std/core/string.s line 153*
 
 ```rust
-copy(new CHARS, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(new CHARS, str) -> (str) on CHARS
 ```
 
 The result is a fresh string in a new memory surface effect CHARS.
@@ -15198,10 +15317,10 @@ free(mut any ptr) -> ()
 </details>
 
 ### copy
-*Defined in: std/core/string.s line 135*
+*Defined in: std/core/string.s line 145*
 
 ```rust
-copy(edit list, char other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit list, char other) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -15223,10 +15342,10 @@ copy(edit list, char other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat 
 
 
 ### copy
-*Defined in: std/core/string.s line 135*
+*Defined in: std/core/string.s line 145*
 
 ```rust
-copy(edit circular, char other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit circular, char other) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -15246,10 +15365,10 @@ copy(edit circular, char other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, 
 
 
 ### copy
-*Defined in: std/core/string.s line 135*
+*Defined in: std/core/string.s line 145*
 
 ```rust
-copy(edit arena, char other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit arena, char other) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -15269,10 +15388,10 @@ copy(edit arena, char other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat
 
 
 ### copy
-*Defined in: std/core/string.s line 135*
+*Defined in: std/core/string.s line 145*
 
 ```rust
-copy(edit bucket, char other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit bucket, char other) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -15296,10 +15415,10 @@ copy(edit bucket, char other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, na
 
 
 ### copy
-*Defined in: std/core/string.s line 135*
+*Defined in: std/core/string.s line 145*
 
 ```rust
-copy(new CHARS, char other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(new CHARS, char other) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -15326,10 +15445,39 @@ free(mut any ptr) -> ()
 </details>
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 571*
+*Defined in: std/core/string.s line 581*
 
 ```rust
-copy(edit circular, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit list, float n) -> (str) on CHARS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 134
+- Transpiled C size: 1210
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+6. nat subtraction would yield a negative
+7. cannot convert negative float to nat
+18. reallocation failed
+21. cannot resize an unallocated or freed buffer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### copy - convert a number to a string
+*Defined in: std/core/string.s line 581*
+
+```rust
+copy(edit circular, float n) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -15354,10 +15502,10 @@ copy(edit circular, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 571*
+*Defined in: std/core/string.s line 581*
 
 ```rust
-copy(edit arena, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit arena, float n) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -15382,10 +15530,10 @@ copy(edit arena, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat da
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 571*
+*Defined in: std/core/string.s line 581*
 
 ```rust
-copy(edit bucket, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit bucket, float n) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -15413,10 +15561,10 @@ copy(edit bucket, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat d
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 571*
+*Defined in: std/core/string.s line 581*
 
 ```rust
-copy(new CHARS, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(new CHARS, float n) -> (str) on CHARS
 ```
 
 <details><summary>Complexity</summary>
@@ -15448,10 +15596,10 @@ free(mut any ptr) -> ()
 </details>
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 510*
+*Defined in: std/core/string.s line 520*
 
 ```rust
-copy(edit list, nat n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit list, nat n) -> (str) on CHARS
 ```
 
 The result is placed on a character memory surface effect CHARS.
@@ -15483,10 +15631,10 @@ s = copy 123
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 510*
+*Defined in: std/core/string.s line 520*
 
 ```rust
-copy(edit circular, nat n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit circular, nat n) -> (str) on CHARS
 ```
 
 The result is placed on a character memory surface effect CHARS.
@@ -15516,10 +15664,10 @@ s = copy 123
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 510*
+*Defined in: std/core/string.s line 520*
 
 ```rust
-copy(edit arena, nat n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit arena, nat n) -> (str) on CHARS
 ```
 
 The result is placed on a character memory surface effect CHARS.
@@ -15549,10 +15697,10 @@ s = copy 123
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 510*
+*Defined in: std/core/string.s line 520*
 
 ```rust
-copy(edit bucket, nat n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(edit bucket, nat n) -> (str) on CHARS
 ```
 
 The result is placed on a character memory surface effect CHARS.
@@ -15584,10 +15732,10 @@ s = copy 123
 
 
 ### copy - convert a number to a string
-*Defined in: std/core/string.s line 510*
+*Defined in: std/core/string.s line 520*
 
 ```rust
-copy(new CHARS, nat n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy(new CHARS, nat n) -> (str) on CHARS
 ```
 
 The result is placed on a character memory surface effect CHARS.
@@ -15623,40 +15771,11 @@ free(mut any ptr) -> ()
 ```
 </details>
 
-### copy - convert a number to a string
-*Defined in: std/core/string.s line 571*
-
-```rust
-copy(edit list, float n) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 134
-- Transpiled C size: 1210
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-6. nat subtraction would yield a negative
-7. cannot convert negative float to nat
-18. reallocation failed
-21. cannot resize an unallocated or freed buffer
-22. out of bounds
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-</details>
-
-
 ### copy - copy a vector
 *Defined in: std/sci/vec.s line 295*
 
 ```rust
-copy(edit circular, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+copy(edit circular, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS for the result as an effect.
@@ -15682,7 +15801,7 @@ Grabs a FLOATS for the result as an effect.
 *Defined in: std/sci/vec.s line 295*
 
 ```rust
-copy(edit arena, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+copy(edit arena, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS for the result as an effect.
@@ -15708,7 +15827,7 @@ Grabs a FLOATS for the result as an effect.
 *Defined in: std/sci/vec.s line 295*
 
 ```rust
-copy(edit bucket, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+copy(edit bucket, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS for the result as an effect.
@@ -15732,7 +15851,7 @@ Grabs a FLOATS for the result as an effect.
 *Defined in: std/sci/vec.s line 295*
 
 ```rust
-copy(new FLOATS, vec) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+copy(new FLOATS, vec) -> (mut vec) on FLOATS
 ```
 
 Grabs a FLOATS for the result as an effect.
@@ -15754,10 +15873,10 @@ Grabs a FLOATS for the result as an effect.
 
 # copy\_null\_terminated
 ### copy\_null\_terminated - copy a string while adding null termination
-*Defined in: std/core/string.s line 306*
+*Defined in: std/core/string.s line 316*
 
 ```rust
-copy_null_terminated(edit arena, cstr _other) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy_null_terminated(edit arena, cstr _other) -> (str) on CHARS
 ```
 
 Constructs the copy on the buffer at a given position and returns it.
@@ -15781,10 +15900,10 @@ This operation may fail if the string does not fit the current allocation - pref
 
 
 ### copy\_null\_terminated - copy a string while adding null termination
-*Defined in: std/core/string.s line 306*
+*Defined in: std/core/string.s line 316*
 
 ```rust
-copy_null_terminated(edit arena, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy_null_terminated(edit arena, str) -> (str) on CHARS
 ```
 
 Constructs the copy on the buffer at a given position and returns it.
@@ -15808,10 +15927,10 @@ This operation may fail if the string does not fit the current allocation - pref
 
 
 ### copy\_null\_terminated - create null terminated string
-*Defined in: std/core/string.s line 161*
+*Defined in: std/core/string.s line 171*
 
 ```rust
-copy_null_terminated(new CHARS, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+copy_null_terminated(new CHARS, str) -> (str) on CHARS
 ```
 
 Copies a string to a new buffer while ensuring null termination.
@@ -15844,7 +15963,7 @@ free(mut any ptr) -> ()
 
 # unsafe\_temp
 ### unsafe\_temp - tautology function for cstr
-*Defined in: std/core/string.s line 212*
+*Defined in: std/core/string.s line 222*
 
 ```rust
 unsafe_temp(cstr) -> (cstr cstr, str)
@@ -15862,7 +15981,7 @@ This is mainly used as a stt-input counterpart for converting str|cstr to cstr.
 
 
 ### unsafe\_temp - convert a string to a temporary null-terminated (cstr,str) pair
-*Defined in: std/core/string.s line 173*
+*Defined in: std/core/string.s line 183*
 
 ```rust
 unsafe_temp(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (unsafe_temp {tag, cstr cstr, str})
@@ -15910,7 +16029,7 @@ free(mut any ptr) -> ()
 </details>
 
 ### unsafe\_temp - convert a string to a temporary null-terminated (cstr,str) pair
-*Defined in: std/core/string.s line 173*
+*Defined in: std/core/string.s line 183*
 
 ```rust
 unsafe_temp(str, str) -> (unsafe_temp {tag, cstr cstr, str})
@@ -15959,10 +16078,10 @@ free(mut any ptr) -> ()
 
 # endpos
 ### endpos - the end position of a string
-*Defined in: std/core/string.s line 224*
+*Defined in: std/core/string.s line 234*
 
 ```rust
-endpos(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (nat)
+endpos(str) -> (nat)
 ```
 
 This position is computed relative to its start in its
@@ -15979,10 +16098,10 @@ enclosing buffer.
 
 # revalidate
 ### revalidate - re-obtains the string's first charcater
-*Defined in: std/core/string.s line 230*
+*Defined in: std/core/string.s line 240*
 
 ```rust
-revalidate(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+revalidate(str) -> (str)
 ```
 
 This operation should be rarely used, if at all.
@@ -16015,7 +16134,7 @@ print s2.dat.first # prints 2
 
 # starts\_with
 ### starts\_with - check whether a string starts with a particular substring sequence
-*Defined in: std/core/string.s line 358*
+*Defined in: std/core/string.s line 368*
 
 ```rust
 starts_with(str, str) -> (bool)
@@ -16038,7 +16157,7 @@ starts_with(str, str) -> (bool)
 
 
 ### starts\_with - check whether a string starts with a particular substring sequence
-*Defined in: std/core/string.s line 358*
+*Defined in: std/core/string.s line 368*
 
 ```rust
 starts_with(str, cstr _needle) -> (bool)
@@ -16061,7 +16180,7 @@ starts_with(str, cstr _needle) -> (bool)
 
 
 ### starts\_with - check whether a string starts with a particular substring sequence
-*Defined in: std/core/string.s line 358*
+*Defined in: std/core/string.s line 368*
 
 ```rust
 starts_with(cstr _stack, str) -> (bool)
@@ -16084,7 +16203,7 @@ starts_with(cstr _stack, str) -> (bool)
 
 
 ### starts\_with - check whether a string starts with a particular substring sequence
-*Defined in: std/core/string.s line 358*
+*Defined in: std/core/string.s line 368*
 
 ```rust
 starts_with(cstr _stack, cstr _needle) -> (bool)
@@ -16108,7 +16227,7 @@ starts_with(cstr _stack, cstr _needle) -> (bool)
 
 # ends\_with
 ### ends\_with - check whether a string ends with a particular substring sequence
-*Defined in: std/core/string.s line 366*
+*Defined in: std/core/string.s line 376*
 
 ```rust
 ends_with(str, str) -> (bool)
@@ -16131,7 +16250,7 @@ ends_with(str, str) -> (bool)
 
 
 ### ends\_with - check whether a string ends with a particular substring sequence
-*Defined in: std/core/string.s line 366*
+*Defined in: std/core/string.s line 376*
 
 ```rust
 ends_with(str, cstr _needle) -> (bool)
@@ -16154,7 +16273,7 @@ ends_with(str, cstr _needle) -> (bool)
 
 
 ### ends\_with - check whether a string ends with a particular substring sequence
-*Defined in: std/core/string.s line 366*
+*Defined in: std/core/string.s line 376*
 
 ```rust
 ends_with(cstr _stack, str) -> (bool)
@@ -16177,7 +16296,7 @@ ends_with(cstr _stack, str) -> (bool)
 
 
 ### ends\_with - check whether a string ends with a particular substring sequence
-*Defined in: std/core/string.s line 366*
+*Defined in: std/core/string.s line 376*
 
 ```rust
 ends_with(cstr _stack, cstr _needle) -> (bool)
@@ -16201,7 +16320,7 @@ ends_with(cstr _stack, cstr _needle) -> (bool)
 
 # contains
 ### contains - check whether a string contains a needle substring
-*Defined in: std/core/string.s line 384*
+*Defined in: std/core/string.s line 394*
 
 ```rust
 contains(str, str) -> (bool)
@@ -16217,7 +16336,7 @@ contains(str, str) -> (bool)
 
 
 ### contains - check whether a string contains a needle substring
-*Defined in: std/core/string.s line 384*
+*Defined in: std/core/string.s line 394*
 
 ```rust
 contains(str, cstr _needle) -> (bool)
@@ -16233,7 +16352,7 @@ contains(str, cstr _needle) -> (bool)
 
 
 ### contains - check whether a string contains a needle substring
-*Defined in: std/core/string.s line 384*
+*Defined in: std/core/string.s line 394*
 
 ```rust
 contains(cstr _stack, str) -> (bool)
@@ -16249,7 +16368,7 @@ contains(cstr _stack, str) -> (bool)
 
 
 ### contains - check whether a string contains a needle substring
-*Defined in: std/core/string.s line 384*
+*Defined in: std/core/string.s line 394*
 
 ```rust
 contains(cstr _stack, cstr _needle) -> (bool)
@@ -16265,7 +16384,7 @@ contains(cstr _stack, cstr _needle) -> (bool)
 
 
 ### contains - check whether a string contains a needle character
-*Defined in: std/core/string.s line 376*
+*Defined in: std/core/string.s line 386*
 
 ```rust
 contains(str, char needle) -> (bool)
@@ -16287,7 +16406,7 @@ contains(str, char needle) -> (bool)
 
 
 ### contains - check whether a string contains a needle character
-*Defined in: std/core/string.s line 376*
+*Defined in: std/core/string.s line 386*
 
 ```rust
 contains(cstr _stack, char needle) -> (bool)
@@ -16310,7 +16429,7 @@ contains(cstr _stack, char needle) -> (bool)
 
 # find
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(str, str) -> (nat)
@@ -16331,7 +16450,7 @@ find(str, str) -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(str, str, "end_pos") -> (nat)
@@ -16352,7 +16471,7 @@ find(str, str, "end_pos") -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(str, str, nat _skip) -> (nat)
@@ -16374,7 +16493,7 @@ find(str, str, nat _skip) -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(str, str, nat _skip, "end_pos") -> (nat)
@@ -16396,7 +16515,7 @@ find(str, str, nat _skip, "end_pos") -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(str, cstr _needle) -> (nat)
@@ -16417,7 +16536,7 @@ find(str, cstr _needle) -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(str, cstr _needle, "end_pos") -> (nat)
@@ -16438,7 +16557,7 @@ find(str, cstr _needle, "end_pos") -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(str, cstr _needle, nat _skip) -> (nat)
@@ -16460,7 +16579,7 @@ find(str, cstr _needle, nat _skip) -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(str, cstr _needle, nat _skip, "end_pos") -> (nat)
@@ -16482,7 +16601,7 @@ find(str, cstr _needle, nat _skip, "end_pos") -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(cstr _stack, str) -> (nat)
@@ -16503,7 +16622,7 @@ find(cstr _stack, str) -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(cstr _stack, str, "end_pos") -> (nat)
@@ -16524,7 +16643,7 @@ find(cstr _stack, str, "end_pos") -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(cstr _stack, str, nat _skip) -> (nat)
@@ -16546,7 +16665,7 @@ find(cstr _stack, str, nat _skip) -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(cstr _stack, str, nat _skip, "end_pos") -> (nat)
@@ -16568,7 +16687,7 @@ find(cstr _stack, str, nat _skip, "end_pos") -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(cstr _stack, cstr _needle) -> (nat)
@@ -16589,7 +16708,7 @@ find(cstr _stack, cstr _needle) -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(cstr _stack, cstr _needle, "end_pos") -> (nat)
@@ -16610,7 +16729,7 @@ find(cstr _stack, cstr _needle, "end_pos") -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(cstr _stack, cstr _needle, nat _skip) -> (nat)
@@ -16632,7 +16751,7 @@ find(cstr _stack, cstr _needle, nat _skip) -> (nat)
 
 
 ### find - find within a string a needle substring's first ocurence
-*Defined in: std/core/string.s line 397*
+*Defined in: std/core/string.s line 407*
 
 ```rust
 find(cstr _stack, cstr _needle, nat _skip, "end_pos") -> (nat)
@@ -16805,10 +16924,10 @@ find(robinhood_str_entry[], cstr _k) -> (mut nat)
 
 # empty
 ### empty - checks that a string does not have any character
-*Defined in: std/core/string.s line 504*
+*Defined in: std/core/string.s line 514*
 
 ```rust
-empty(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (bool)
+empty(str) -> (bool)
 ```
 
 Prefer this check because its cstr-checking counterpar is faster
@@ -16824,7 +16943,7 @@ than casting to a string.
 
 
 ### empty - checks that a cstr does not have any characters
-*Defined in: std/core/string.s line 496*
+*Defined in: std/core/string.s line 506*
 
 ```rust
 empty(cstr) -> (bool)
@@ -16906,7 +17025,7 @@ def main(on CLI, WHICHERR)
 ```
 *Warning: This is mainly intended for consumption by the
 main function, as it uses a thread-unsafe console handler
-that does not respect singleton console rules.
+that does not respect singleton console rules.*
 
 <details><summary>Complexity</summary>
 
@@ -16941,7 +17060,8 @@ Ignoring empty substrings, the same function call is made for all substrings
 and expressions. Example, where the default applied call is `print nn`:
 ```python
 import std.core
-def main(on CLI)
+def main()
+    CLI = edit console()
     macro<printf> "hello {1+1} word\n"
 ```
 This variation outputs an empty buffer.
@@ -17105,7 +17225,7 @@ arg_exists(cstr) -> (bool)
 *Defined in: std/io/process.s line 47*
 
 ```rust
-arg_after(cstr flag, cstr default_value) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+arg_after(cstr flag, cstr default_value) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -17127,7 +17247,7 @@ arg_after(cstr flag, cstr default_value) -> (str {tag, char ptr unsafe_ptr, nat 
 *Defined in: std/io/process.s line 47*
 
 ```rust
-arg_after(cstr flag, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+arg_after(cstr flag, str) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -17149,7 +17269,7 @@ arg_after(cstr flag, str) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat da
 *Defined in: std/io/process.s line 47*
 
 ```rust
-arg_after(cstr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+arg_after(cstr) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -17173,7 +17293,7 @@ arg_after(cstr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, 
 *Defined in: std/io/process.s line 55*
 
 ```rust
-breakpoint(console {tag}) -> () on CLI
+breakpoint(console) -> () on CLI
 ```
 
 <details><summary>Complexity</summary>
@@ -17227,19 +17347,56 @@ popen(cstr) -> (any ptr)
 
 *Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `[memory.register_foreign(subprocess.Popen($cmd.split(),stdout=subprocess.PIPE,stderr=subprocess.PIPE), 'process '+$cmd)]`*
 # open
-### open - loads a path as a openable file
-*Defined in: std/io/file.s line 36*
+### open - opens a path as a readable file
+*Defined in: std/io/file.s line 38*
 
 ```rust
-open(str, "binary") -> (edit open {tag, mut any ptr unsafe_ptr})
+open(str, "binary") -> (edit open)
 ```
 
-The file name is not maintained and must be tracked externally, if needed.
+The file is opened in binary mode.
+The file is opened is text mode.
+The file name is not maintained and, if needed, must be tracked externally.
 
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 18
+- SSA variables: 21
+- Transpiled C size: 110
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+52. failed to open file
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+<details><summary>defered calls</summary>
+
+```rust
+```
+</details>
+
+### open - opens a path as a readable file
+*Defined in: std/io/file.s line 38*
+
+```rust
+open(str) -> (edit open)
+```
+
+The file is opened is text mode.
+The file name is not maintained and, if needed, must be tracked externally.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
 - Transpiled C size: 75
 
 </details>
@@ -17261,54 +17418,22 @@ The file name is not maintained and must be tracked externally, if needed.
 ```
 </details>
 
-### open - loads a path as a openable file
-*Defined in: std/io/file.s line 36*
-
-```rust
-open(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (edit open {tag, mut any ptr unsafe_ptr})
-```
-
-The file name is not maintained and must be tracked externally, if needed.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 16
-- Transpiled C size: 75
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
-52. failed to open file
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-</details>
-
-
-<details><summary>defered calls</summary>
-
-```rust
-```
-</details>
-
-### open - loads a path as a openable file
+### open - opens a path as a readable file
 *Defined in: std/io/file.s line 20*
 
 ```rust
 open(cstr path, "binary") -> (edit open {tag, mut any ptr unsafe_ptr})
 ```
 
-The file name is not maintained and must be tracked externally, if needed.
+The file is opened in binary mode.
+The file is opened is text mode.
+The file name is not maintained and, if needed, must be tracked externally.
 
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 11
-- Transpiled C size: 93
+- SSA variables: 13
+- Transpiled C size: 128
 
 </details>
 
@@ -17324,19 +17449,20 @@ The file name is not maintained and must be tracked externally, if needed.
 ```
 </details>
 
-### open - loads a path as a openable file
+### open - opens a path as a readable file
 *Defined in: std/io/file.s line 20*
 
 ```rust
 open(cstr) -> (edit open {tag, mut any ptr unsafe_ptr})
 ```
 
-The file name is not maintained and must be tracked externally, if needed.
+The file is opened is text mode.
+The file name is not maintained and, if needed, must be tracked externally.
 
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
+- SSA variables: 9
 - Transpiled C size: 45
 
 </details>
@@ -17357,7 +17483,7 @@ The file name is not maintained and must be tracked externally, if needed.
 *Defined in: std/io/process.s line 95*
 
 ```rust
-open(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (edit open {tag, mut any ptr unsafe_ptr})
+open(str) -> (edit open)
 ```
 
 <details><summary>Complexity</summary>
@@ -17426,7 +17552,7 @@ neq(int x, int y) -> (bool)
 *Defined in: std/io/dir.s line 102*
 
 ```rust
-open(str, str) -> (edit open {tag, mut any ptr unsafe_ptr})
+open(str, str) -> (edit open)
 ```
 
 <details><summary>Complexity</summary>
@@ -17459,7 +17585,7 @@ closedir(any ptr) -> ()
 *Defined in: std/io/dir.s line 102*
 
 ```rust
-open(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (edit open {tag, mut any ptr unsafe_ptr})
+open(str) -> (edit open)
 ```
 
 <details><summary>Complexity</summary>
@@ -17521,7 +17647,7 @@ closedir(any ptr) -> ()
 *Defined in: std/graphics.s line 168*
 
 ```rust
-open(cstr) -> (Texture {tag, nat,float,float,nat,nat[]})
+open(cstr) -> (Texture)
 ```
 
 <details><summary>Complexity</summary>
@@ -17614,380 +17740,10 @@ unsafe_pipe_disown(pipe, "reader") -> ()
 
 # chunk
 ### chunk - next line
-*Defined in: std/io/file.s line 107*
-
-```rust
-chunk(edit char[], edit terminal) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-Retrieves the next chunk of data from a file,
-and stores it on a char[] buffer at a given position.
-A string representation of the stored data is returned,
-but do note that this may interweave null character data
-because strings are defined over char[] buffers.
-The read chunk will have size up to the remainder size of
-the buffer, so it is better (safer) to access character data
-from the result.
-An error is created if the buffer's size is exceeded.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 30
-- Transpiled C size: 209
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-49. end of file
-2. null pointer
-6. nat subtraction would yield a negative
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### chunk - next line
-*Defined in: std/io/file.s line 107*
-
-```rust
-chunk(edit char[], edit write) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-Retrieves the next chunk of data from a file,
-and stores it on a char[] buffer at a given position.
-A string representation of the stored data is returned,
-but do note that this may interweave null character data
-because strings are defined over char[] buffers.
-The read chunk will have size up to the remainder size of
-the buffer, so it is better (safer) to access character data
-from the result.
-An error is created if the buffer's size is exceeded.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 30
-- Transpiled C size: 209
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-49. end of file
-2. null pointer
-6. nat subtraction would yield a negative
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### chunk - next line
-*Defined in: std/io/file.s line 107*
-
-```rust
-chunk(edit char[], edit write) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-Retrieves the next chunk of data from a file,
-and stores it on a char[] buffer at a given position.
-A string representation of the stored data is returned,
-but do note that this may interweave null character data
-because strings are defined over char[] buffers.
-The read chunk will have size up to the remainder size of
-the buffer, so it is better (safer) to access character data
-from the result.
-An error is created if the buffer's size is exceeded.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 30
-- Transpiled C size: 209
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-49. end of file
-2. null pointer
-6. nat subtraction would yield a negative
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### chunk - next line
-*Defined in: std/io/file.s line 107*
-
-```rust
-chunk(edit char[], edit open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-Retrieves the next chunk of data from a file,
-and stores it on a char[] buffer at a given position.
-A string representation of the stored data is returned,
-but do note that this may interweave null character data
-because strings are defined over char[] buffers.
-The read chunk will have size up to the remainder size of
-the buffer, so it is better (safer) to access character data
-from the result.
-An error is created if the buffer's size is exceeded.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 30
-- Transpiled C size: 209
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-49. end of file
-2. null pointer
-6. nat subtraction would yield a negative
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### chunk - next line
-*Defined in: std/io/file.s line 107*
-
-```rust
-chunk(edit char[], edit open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-Retrieves the next chunk of data from a file,
-and stores it on a char[] buffer at a given position.
-A string representation of the stored data is returned,
-but do note that this may interweave null character data
-because strings are defined over char[] buffers.
-The read chunk will have size up to the remainder size of
-the buffer, so it is better (safer) to access character data
-from the result.
-An error is created if the buffer's size is exceeded.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 30
-- Transpiled C size: 209
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-49. end of file
-2. null pointer
-6. nat subtraction would yield a negative
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### chunk - next line
-*Defined in: std/io/file.s line 107*
-
-```rust
-chunk(edit char[], mut nat pos, edit terminal) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-Retrieves the next chunk of data from a file,
-and stores it on a char[] buffer at a given position.
-A string representation of the stored data is returned,
-but do note that this may interweave null character data
-because strings are defined over char[] buffers.
-The read chunk will have size up to the remainder size of
-the buffer, so it is better (safer) to access character data
-from the result.
-An error is created if the buffer's size is exceeded.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 28
-- Transpiled C size: 197
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-49. end of file
-2. null pointer
-6. nat subtraction would yield a negative
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### chunk - next line
-*Defined in: std/io/file.s line 107*
-
-```rust
-chunk(edit char[], mut nat pos, edit write) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-Retrieves the next chunk of data from a file,
-and stores it on a char[] buffer at a given position.
-A string representation of the stored data is returned,
-but do note that this may interweave null character data
-because strings are defined over char[] buffers.
-The read chunk will have size up to the remainder size of
-the buffer, so it is better (safer) to access character data
-from the result.
-An error is created if the buffer's size is exceeded.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 28
-- Transpiled C size: 197
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-49. end of file
-2. null pointer
-6. nat subtraction would yield a negative
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### chunk - next line
-*Defined in: std/io/file.s line 107*
-
-```rust
-chunk(edit char[], mut nat pos, edit write) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-Retrieves the next chunk of data from a file,
-and stores it on a char[] buffer at a given position.
-A string representation of the stored data is returned,
-but do note that this may interweave null character data
-because strings are defined over char[] buffers.
-The read chunk will have size up to the remainder size of
-the buffer, so it is better (safer) to access character data
-from the result.
-An error is created if the buffer's size is exceeded.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 28
-- Transpiled C size: 197
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-49. end of file
-2. null pointer
-6. nat subtraction would yield a negative
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### chunk - next line
-*Defined in: std/io/file.s line 107*
-
-```rust
-chunk(edit char[], mut nat pos, edit open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-Retrieves the next chunk of data from a file,
-and stores it on a char[] buffer at a given position.
-A string representation of the stored data is returned,
-but do note that this may interweave null character data
-because strings are defined over char[] buffers.
-The read chunk will have size up to the remainder size of
-the buffer, so it is better (safer) to access character data
-from the result.
-An error is created if the buffer's size is exceeded.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 28
-- Transpiled C size: 197
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-49. end of file
-2. null pointer
-6. nat subtraction would yield a negative
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### chunk - next line
-*Defined in: std/io/file.s line 107*
-
-```rust
-chunk(edit char[], mut nat pos, edit open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-Retrieves the next chunk of data from a file,
-and stores it on a char[] buffer at a given position.
-A string representation of the stored data is returned,
-but do note that this may interweave null character data
-because strings are defined over char[] buffers.
-The read chunk will have size up to the remainder size of
-the buffer, so it is better (safer) to access character data
-from the result.
-An error is created if the buffer's size is exceeded.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 28
-- Transpiled C size: 197
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-49. end of file
-2. null pointer
-6. nat subtraction would yield a negative
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### chunk - next line
 *Defined in: std/io/process.s line 99*
 
 ```rust
-chunk(char[], open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+chunk(char[], open) -> (str)
 ```
 
 Retrieves the next chunk of data outputted by a process into its stdout,
@@ -18020,7 +17776,7 @@ The starting position is the buffer's beginning.
 *Defined in: std/io/process.s line 99*
 
 ```rust
-chunk(char[], mut nat pos, open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+chunk(char[], mut nat pos, open) -> (str)
 ```
 
 Retrieves the next chunk of data outputted by a process into its stdout,
@@ -18048,362 +17804,382 @@ size is exceeded.
 </details>
 
 
+### chunk - next line
+*Defined in: std/io/file.s line 111*
+
+```rust
+chunk(edit char[], edit terminal) -> (str)
+```
+
+Retrieves the next chunk of data from a file,
+and stores it on a char[] buffer at a given position.
+A string representation of the stored data is returned,
+but do note that this may interweave null character data
+because strings are defined over char[] buffers.
+The read chunk will have size up to the remainder size of
+the buffer, so it is better (safer) to access character data
+from the result.
+An error is created if the buffer's size is exceeded.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 209
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+49. end of file
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### chunk - next line
+*Defined in: std/io/file.s line 111*
+
+```rust
+chunk(edit char[], edit write) -> (str)
+```
+
+Retrieves the next chunk of data from a file,
+and stores it on a char[] buffer at a given position.
+A string representation of the stored data is returned,
+but do note that this may interweave null character data
+because strings are defined over char[] buffers.
+The read chunk will have size up to the remainder size of
+the buffer, so it is better (safer) to access character data
+from the result.
+An error is created if the buffer's size is exceeded.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 209
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+49. end of file
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### chunk - next line
+*Defined in: std/io/file.s line 111*
+
+```rust
+chunk(edit char[], edit write) -> (str)
+```
+
+Retrieves the next chunk of data from a file,
+and stores it on a char[] buffer at a given position.
+A string representation of the stored data is returned,
+but do note that this may interweave null character data
+because strings are defined over char[] buffers.
+The read chunk will have size up to the remainder size of
+the buffer, so it is better (safer) to access character data
+from the result.
+An error is created if the buffer's size is exceeded.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 209
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+49. end of file
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### chunk - next line
+*Defined in: std/io/file.s line 111*
+
+```rust
+chunk(edit char[], edit open) -> (str)
+```
+
+Retrieves the next chunk of data from a file,
+and stores it on a char[] buffer at a given position.
+A string representation of the stored data is returned,
+but do note that this may interweave null character data
+because strings are defined over char[] buffers.
+The read chunk will have size up to the remainder size of
+the buffer, so it is better (safer) to access character data
+from the result.
+An error is created if the buffer's size is exceeded.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 209
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+49. end of file
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### chunk - next line
+*Defined in: std/io/file.s line 111*
+
+```rust
+chunk(edit char[], edit open) -> (str)
+```
+
+Retrieves the next chunk of data from a file,
+and stores it on a char[] buffer at a given position.
+A string representation of the stored data is returned,
+but do note that this may interweave null character data
+because strings are defined over char[] buffers.
+The read chunk will have size up to the remainder size of
+the buffer, so it is better (safer) to access character data
+from the result.
+An error is created if the buffer's size is exceeded.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 30
+- Transpiled C size: 209
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+49. end of file
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### chunk - next line
+*Defined in: std/io/file.s line 111*
+
+```rust
+chunk(edit char[], mut nat pos, edit terminal) -> (str)
+```
+
+Retrieves the next chunk of data from a file,
+and stores it on a char[] buffer at a given position.
+A string representation of the stored data is returned,
+but do note that this may interweave null character data
+because strings are defined over char[] buffers.
+The read chunk will have size up to the remainder size of
+the buffer, so it is better (safer) to access character data
+from the result.
+An error is created if the buffer's size is exceeded.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 197
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+49. end of file
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### chunk - next line
+*Defined in: std/io/file.s line 111*
+
+```rust
+chunk(edit char[], mut nat pos, edit write) -> (str)
+```
+
+Retrieves the next chunk of data from a file,
+and stores it on a char[] buffer at a given position.
+A string representation of the stored data is returned,
+but do note that this may interweave null character data
+because strings are defined over char[] buffers.
+The read chunk will have size up to the remainder size of
+the buffer, so it is better (safer) to access character data
+from the result.
+An error is created if the buffer's size is exceeded.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 197
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+49. end of file
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### chunk - next line
+*Defined in: std/io/file.s line 111*
+
+```rust
+chunk(edit char[], mut nat pos, edit write) -> (str)
+```
+
+Retrieves the next chunk of data from a file,
+and stores it on a char[] buffer at a given position.
+A string representation of the stored data is returned,
+but do note that this may interweave null character data
+because strings are defined over char[] buffers.
+The read chunk will have size up to the remainder size of
+the buffer, so it is better (safer) to access character data
+from the result.
+An error is created if the buffer's size is exceeded.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 197
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+49. end of file
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### chunk - next line
+*Defined in: std/io/file.s line 111*
+
+```rust
+chunk(edit char[], mut nat pos, edit open) -> (str)
+```
+
+Retrieves the next chunk of data from a file,
+and stores it on a char[] buffer at a given position.
+A string representation of the stored data is returned,
+but do note that this may interweave null character data
+because strings are defined over char[] buffers.
+The read chunk will have size up to the remainder size of
+the buffer, so it is better (safer) to access character data
+from the result.
+An error is created if the buffer's size is exceeded.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 197
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+49. end of file
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### chunk - next line
+*Defined in: std/io/file.s line 111*
+
+```rust
+chunk(edit char[], mut nat pos, edit open) -> (str)
+```
+
+Retrieves the next chunk of data from a file,
+and stores it on a char[] buffer at a given position.
+A string representation of the stored data is returned,
+but do note that this may interweave null character data
+because strings are defined over char[] buffers.
+The read chunk will have size up to the remainder size of
+the buffer, so it is better (safer) to access character data
+from the result.
+An error is created if the buffer's size is exceeded.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 28
+- Transpiled C size: 197
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+49. end of file
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
 # line
-### line - next line
-*Defined in: std/io/file.s line 130*
-
-```rust
-line(edit circular, edit terminal) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-Retrieves the next line from a file,
-and stores it on a CHARS storage effect.
-A string representation of the stored data are returned.
-The result may not end at a
-new line character, in case the line does not fit onto the buffer
-at once, in which case it requires multiple opens, or at the
-output stream's end.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 35
-- Transpiled C size: 192
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-49. end of file
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### line - next line
-*Defined in: std/io/file.s line 130*
-
-```rust
-line(edit circular, edit write) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-Retrieves the next line from a file,
-and stores it on a CHARS storage effect.
-A string representation of the stored data are returned.
-The result may not end at a
-new line character, in case the line does not fit onto the buffer
-at once, in which case it requires multiple opens, or at the
-output stream's end.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 35
-- Transpiled C size: 192
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-49. end of file
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### line - next line
-*Defined in: std/io/file.s line 130*
-
-```rust
-line(edit circular, edit write) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-Retrieves the next line from a file,
-and stores it on a CHARS storage effect.
-A string representation of the stored data are returned.
-The result may not end at a
-new line character, in case the line does not fit onto the buffer
-at once, in which case it requires multiple opens, or at the
-output stream's end.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 35
-- Transpiled C size: 192
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-49. end of file
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### line - next line
-*Defined in: std/io/file.s line 130*
-
-```rust
-line(edit circular, edit open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-Retrieves the next line from a file,
-and stores it on a CHARS storage effect.
-A string representation of the stored data are returned.
-The result may not end at a
-new line character, in case the line does not fit onto the buffer
-at once, in which case it requires multiple opens, or at the
-output stream's end.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 35
-- Transpiled C size: 192
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-49. end of file
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### line - next line
-*Defined in: std/io/file.s line 130*
-
-```rust
-line(edit circular, edit open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-Retrieves the next line from a file,
-and stores it on a CHARS storage effect.
-A string representation of the stored data are returned.
-The result may not end at a
-new line character, in case the line does not fit onto the buffer
-at once, in which case it requires multiple opens, or at the
-output stream's end.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 35
-- Transpiled C size: 192
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-49. end of file
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### line - next line
-*Defined in: std/io/file.s line 130*
-
-```rust
-line(edit arena, edit terminal) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-Retrieves the next line from a file,
-and stores it on a CHARS storage effect.
-A string representation of the stored data are returned.
-The result may not end at a
-new line character, in case the line does not fit onto the buffer
-at once, in which case it requires multiple opens, or at the
-output stream's end.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 188
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-49. end of file
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### line - next line
-*Defined in: std/io/file.s line 130*
-
-```rust
-line(edit arena, edit write) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-Retrieves the next line from a file,
-and stores it on a CHARS storage effect.
-A string representation of the stored data are returned.
-The result may not end at a
-new line character, in case the line does not fit onto the buffer
-at once, in which case it requires multiple opens, or at the
-output stream's end.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 188
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-49. end of file
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### line - next line
-*Defined in: std/io/file.s line 130*
-
-```rust
-line(edit arena, edit write) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-Retrieves the next line from a file,
-and stores it on a CHARS storage effect.
-A string representation of the stored data are returned.
-The result may not end at a
-new line character, in case the line does not fit onto the buffer
-at once, in which case it requires multiple opens, or at the
-output stream's end.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 188
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-49. end of file
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### line - next line
-*Defined in: std/io/file.s line 130*
-
-```rust
-line(edit arena, edit open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-Retrieves the next line from a file,
-and stores it on a CHARS storage effect.
-A string representation of the stored data are returned.
-The result may not end at a
-new line character, in case the line does not fit onto the buffer
-at once, in which case it requires multiple opens, or at the
-output stream's end.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 188
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-49. end of file
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
-### line - next line
-*Defined in: std/io/file.s line 130*
-
-```rust
-line(edit arena, edit open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
-```
-
-Retrieves the next line from a file,
-and stores it on a CHARS storage effect.
-A string representation of the stored data are returned.
-The result may not end at a
-new line character, in case the line does not fit onto the buffer
-at once, in which case it requires multiple opens, or at the
-output stream's end.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 188
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-6. nat subtraction would yield a negative
-49. end of file
-22. out of bounds
-57. not open file
-26. can only define strings on non-offset buffers
-25. can only define strings on contiguous buffers
-</details>
-
-
 ### line - next line
 *Defined in: std/io/process.s line 118*
 
 ```rust
-line(edit circular, open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+line(edit circular, open) -> (str) on CHARS
 ```
 
 Retrieves the next line outputted by a process into its stdout,
@@ -18437,7 +18213,7 @@ output stream's end.
 *Defined in: std/io/process.s line 118*
 
 ```rust
-line(edit arena, open) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+line(edit arena, open) -> (str) on CHARS
 ```
 
 Retrieves the next line outputted by a process into its stdout,
@@ -18464,6 +18240,356 @@ output stream's end.
 22. out of bounds
 25. can only define strings on contiguous buffers
 26. can only define strings on non-offset buffers
+</details>
+
+
+### line - next line
+*Defined in: std/io/file.s line 134*
+
+```rust
+line(edit circular, edit terminal) -> (str) on CHARS
+```
+
+Retrieves the next line from a file,
+and stores it on a CHARS storage effect.
+A string representation of the stored data are returned.
+The result may not end at a
+new line character, in case the line does not fit onto the buffer
+at once, in which case it requires multiple opens, or at the
+output stream's end.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 35
+- Transpiled C size: 192
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+49. end of file
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### line - next line
+*Defined in: std/io/file.s line 134*
+
+```rust
+line(edit circular, edit write) -> (str) on CHARS
+```
+
+Retrieves the next line from a file,
+and stores it on a CHARS storage effect.
+A string representation of the stored data are returned.
+The result may not end at a
+new line character, in case the line does not fit onto the buffer
+at once, in which case it requires multiple opens, or at the
+output stream's end.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 35
+- Transpiled C size: 192
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+49. end of file
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### line - next line
+*Defined in: std/io/file.s line 134*
+
+```rust
+line(edit circular, edit write) -> (str) on CHARS
+```
+
+Retrieves the next line from a file,
+and stores it on a CHARS storage effect.
+A string representation of the stored data are returned.
+The result may not end at a
+new line character, in case the line does not fit onto the buffer
+at once, in which case it requires multiple opens, or at the
+output stream's end.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 35
+- Transpiled C size: 192
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+49. end of file
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### line - next line
+*Defined in: std/io/file.s line 134*
+
+```rust
+line(edit circular, edit open) -> (str) on CHARS
+```
+
+Retrieves the next line from a file,
+and stores it on a CHARS storage effect.
+A string representation of the stored data are returned.
+The result may not end at a
+new line character, in case the line does not fit onto the buffer
+at once, in which case it requires multiple opens, or at the
+output stream's end.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 35
+- Transpiled C size: 192
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+49. end of file
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### line - next line
+*Defined in: std/io/file.s line 134*
+
+```rust
+line(edit circular, edit open) -> (str) on CHARS
+```
+
+Retrieves the next line from a file,
+and stores it on a CHARS storage effect.
+A string representation of the stored data are returned.
+The result may not end at a
+new line character, in case the line does not fit onto the buffer
+at once, in which case it requires multiple opens, or at the
+output stream's end.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 35
+- Transpiled C size: 192
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+49. end of file
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### line - next line
+*Defined in: std/io/file.s line 134*
+
+```rust
+line(edit arena, edit terminal) -> (str) on CHARS
+```
+
+Retrieves the next line from a file,
+and stores it on a CHARS storage effect.
+A string representation of the stored data are returned.
+The result may not end at a
+new line character, in case the line does not fit onto the buffer
+at once, in which case it requires multiple opens, or at the
+output stream's end.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 188
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+49. end of file
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### line - next line
+*Defined in: std/io/file.s line 134*
+
+```rust
+line(edit arena, edit write) -> (str) on CHARS
+```
+
+Retrieves the next line from a file,
+and stores it on a CHARS storage effect.
+A string representation of the stored data are returned.
+The result may not end at a
+new line character, in case the line does not fit onto the buffer
+at once, in which case it requires multiple opens, or at the
+output stream's end.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 188
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+49. end of file
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### line - next line
+*Defined in: std/io/file.s line 134*
+
+```rust
+line(edit arena, edit write) -> (str) on CHARS
+```
+
+Retrieves the next line from a file,
+and stores it on a CHARS storage effect.
+A string representation of the stored data are returned.
+The result may not end at a
+new line character, in case the line does not fit onto the buffer
+at once, in which case it requires multiple opens, or at the
+output stream's end.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 188
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+49. end of file
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### line - next line
+*Defined in: std/io/file.s line 134*
+
+```rust
+line(edit arena, edit open) -> (str) on CHARS
+```
+
+Retrieves the next line from a file,
+and stores it on a CHARS storage effect.
+A string representation of the stored data are returned.
+The result may not end at a
+new line character, in case the line does not fit onto the buffer
+at once, in which case it requires multiple opens, or at the
+output stream's end.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 188
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+49. end of file
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
+</details>
+
+
+### line - next line
+*Defined in: std/io/file.s line 134*
+
+```rust
+line(edit arena, edit open) -> (str) on CHARS
+```
+
+Retrieves the next line from a file,
+and stores it on a CHARS storage effect.
+A string representation of the stored data are returned.
+The result may not end at a
+new line character, in case the line does not fit onto the buffer
+at once, in which case it requires multiple opens, or at the
+output stream's end.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 188
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+6. nat subtraction would yield a negative
+49. end of file
+22. out of bounds
+57. not open file
+26. can only define strings on non-offset buffers
+25. can only define strings on contiguous buffers
 </details>
 
 
@@ -18585,10 +18711,10 @@ Fails if the return code is non-zero, but does not expose that code.
 
 # write
 ### write - creates a new file at cstr path as a writable object, fails if it already exists
-*Defined in: std/io/file.s line 54*
+*Defined in: std/io/file.s line 58*
 
 ```rust
-write(str, "binary") -> (edit write {tag, mut any ptr unsafe_ptr})
+write(str, "binary") -> (edit write)
 ```
 
 <details><summary>Complexity</summary>
@@ -18617,10 +18743,10 @@ write(str, "binary") -> (edit write {tag, mut any ptr unsafe_ptr})
 </details>
 
 ### write - creates a new file at cstr path as a writable object, fails if it already exists
-*Defined in: std/io/file.s line 54*
+*Defined in: std/io/file.s line 58*
 
 ```rust
-write(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (edit write {tag, mut any ptr unsafe_ptr})
+write(str) -> (edit write)
 ```
 
 <details><summary>Complexity</summary>
@@ -18649,7 +18775,7 @@ write(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first
 </details>
 
 ### write - creates a new file at cstr path as a writable object, fails if it already exists
-*Defined in: std/io/file.s line 42*
+*Defined in: std/io/file.s line 46*
 
 ```rust
 write(cstr path, "binary") -> (edit write {tag, mut any ptr unsafe_ptr})
@@ -18676,7 +18802,7 @@ write(cstr path, "binary") -> (edit write {tag, mut any ptr unsafe_ptr})
 </details>
 
 ### write - creates a new file at cstr path as a writable object, fails if it already exists
-*Defined in: std/io/file.s line 42*
+*Defined in: std/io/file.s line 46*
 
 ```rust
 write(cstr) -> (edit write {tag, mut any ptr unsafe_ptr})
@@ -18704,7 +18830,7 @@ write(cstr) -> (edit write {tag, mut any ptr unsafe_ptr})
 
 # terminal
 ### terminal - opens a new system writable interactive terminal, fails if no display is available
-*Defined in: std/io/file.s line 59*
+*Defined in: std/io/file.s line 63*
 
 ```rust
 terminal() -> (edit terminal {tag, mut any ptr unsafe_ptr})
@@ -18733,7 +18859,7 @@ terminal() -> (edit terminal {tag, mut any ptr unsafe_ptr})
 
 # File
 ### terminal - opens a new system writable interactive terminal, fails if no display is available
-*Defined in: std/io/file.s line 59*
+*Defined in: std/io/file.s line 63*
 
 ```rust
 terminal() -> (edit terminal {tag, mut any ptr unsafe_ptr})
@@ -18761,10 +18887,10 @@ terminal() -> (edit terminal {tag, mut any ptr unsafe_ptr})
 </details>
 
 ### write - creates a new file at cstr path as a writable object, fails if it already exists
-*Defined in: std/io/file.s line 54*
+*Defined in: std/io/file.s line 58*
 
 ```rust
-write(str, "binary") -> (edit write {tag, mut any ptr unsafe_ptr})
+write(str, "binary") -> (edit write)
 ```
 
 <details><summary>Complexity</summary>
@@ -18793,10 +18919,10 @@ write(str, "binary") -> (edit write {tag, mut any ptr unsafe_ptr})
 </details>
 
 ### write - creates a new file at cstr path as a writable object, fails if it already exists
-*Defined in: std/io/file.s line 54*
+*Defined in: std/io/file.s line 58*
 
 ```rust
-write(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (edit write {tag, mut any ptr unsafe_ptr})
+write(str) -> (edit write)
 ```
 
 <details><summary>Complexity</summary>
@@ -18825,7 +18951,7 @@ write(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first
 </details>
 
 ### write - creates a new file at cstr path as a writable object, fails if it already exists
-*Defined in: std/io/file.s line 42*
+*Defined in: std/io/file.s line 46*
 
 ```rust
 write(cstr path, "binary") -> (edit write {tag, mut any ptr unsafe_ptr})
@@ -18852,7 +18978,7 @@ write(cstr path, "binary") -> (edit write {tag, mut any ptr unsafe_ptr})
 </details>
 
 ### write - creates a new file at cstr path as a writable object, fails if it already exists
-*Defined in: std/io/file.s line 42*
+*Defined in: std/io/file.s line 46*
 
 ```rust
 write(cstr) -> (edit write {tag, mut any ptr unsafe_ptr})
@@ -18878,19 +19004,56 @@ write(cstr) -> (edit write {tag, mut any ptr unsafe_ptr})
 ```
 </details>
 
-### open - loads a path as a openable file
-*Defined in: std/io/file.s line 36*
+### open - opens a path as a readable file
+*Defined in: std/io/file.s line 38*
 
 ```rust
-open(str, "binary") -> (edit open {tag, mut any ptr unsafe_ptr})
+open(str, "binary") -> (edit open)
 ```
 
-The file name is not maintained and must be tracked externally, if needed.
+The file is opened in binary mode.
+The file is opened is text mode.
+The file name is not maintained and, if needed, must be tracked externally.
 
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 18
+- SSA variables: 21
+- Transpiled C size: 110
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+52. failed to open file
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+<details><summary>defered calls</summary>
+
+```rust
+```
+</details>
+
+### open - opens a path as a readable file
+*Defined in: std/io/file.s line 38*
+
+```rust
+open(str) -> (edit open)
+```
+
+The file is opened is text mode.
+The file name is not maintained and, if needed, must be tracked externally.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 17
 - Transpiled C size: 75
 
 </details>
@@ -18912,54 +19075,22 @@ The file name is not maintained and must be tracked externally, if needed.
 ```
 </details>
 
-### open - loads a path as a openable file
-*Defined in: std/io/file.s line 36*
-
-```rust
-open(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (edit open {tag, mut any ptr unsafe_ptr})
-```
-
-The file name is not maintained and must be tracked externally, if needed.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 7 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 16
-- Transpiled C size: 75
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
-52. failed to open file
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-</details>
-
-
-<details><summary>defered calls</summary>
-
-```rust
-```
-</details>
-
-### open - loads a path as a openable file
+### open - opens a path as a readable file
 *Defined in: std/io/file.s line 20*
 
 ```rust
 open(cstr path, "binary") -> (edit open {tag, mut any ptr unsafe_ptr})
 ```
 
-The file name is not maintained and must be tracked externally, if needed.
+The file is opened in binary mode.
+The file is opened is text mode.
+The file name is not maintained and, if needed, must be tracked externally.
 
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 11
-- Transpiled C size: 93
+- SSA variables: 13
+- Transpiled C size: 128
 
 </details>
 
@@ -18975,19 +19106,20 @@ The file name is not maintained and must be tracked externally, if needed.
 ```
 </details>
 
-### open - loads a path as a openable file
+### open - opens a path as a readable file
 *Defined in: std/io/file.s line 20*
 
 ```rust
 open(cstr) -> (edit open {tag, mut any ptr unsafe_ptr})
 ```
 
-The file name is not maintained and must be tracked externally, if needed.
+The file is opened is text mode.
+The file name is not maintained and, if needed, must be tracked externally.
 
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 8
+- SSA variables: 9
 - Transpiled C size: 45
 
 </details>
@@ -19006,10 +19138,10 @@ The file name is not maintained and must be tracked externally, if needed.
 
 # to\_start
 ### to\_start - move to file start
-*Defined in: std/io/file.s line 72*
+*Defined in: std/io/file.s line 76*
 
 ```rust
-to_start(edit terminal {tag, mut any ptr unsafe_ptr}) -> ()
+to_start(edit terminal) -> ()
 ```
 
 Moves the file opening position to the start of the file.
@@ -19029,10 +19161,10 @@ Moves the file opening position to the start of the file.
 
 
 ### to\_start - move to file start
-*Defined in: std/io/file.s line 72*
+*Defined in: std/io/file.s line 76*
 
 ```rust
-to_start(edit write {tag, mut any ptr unsafe_ptr}) -> ()
+to_start(edit write) -> ()
 ```
 
 Moves the file opening position to the start of the file.
@@ -19052,10 +19184,10 @@ Moves the file opening position to the start of the file.
 
 
 ### to\_start - move to file start
-*Defined in: std/io/file.s line 72*
+*Defined in: std/io/file.s line 76*
 
 ```rust
-to_start(edit write {tag, mut any ptr unsafe_ptr}) -> ()
+to_start(edit write) -> ()
 ```
 
 Moves the file opening position to the start of the file.
@@ -19075,10 +19207,10 @@ Moves the file opening position to the start of the file.
 
 
 ### to\_start - move to file start
-*Defined in: std/io/file.s line 72*
+*Defined in: std/io/file.s line 76*
 
 ```rust
-to_start(edit open {tag, mut any ptr unsafe_ptr}) -> ()
+to_start(edit open) -> ()
 ```
 
 Moves the file opening position to the start of the file.
@@ -19098,10 +19230,10 @@ Moves the file opening position to the start of the file.
 
 
 ### to\_start - move to file start
-*Defined in: std/io/file.s line 72*
+*Defined in: std/io/file.s line 76*
 
 ```rust
-to_start(edit open {tag, mut any ptr unsafe_ptr}) -> ()
+to_start(edit open) -> ()
 ```
 
 Moves the file opening position to the start of the file.
@@ -19122,10 +19254,10 @@ Moves the file opening position to the start of the file.
 
 # to\_end
 ### to\_end - move to file end
-*Defined in: std/io/file.s line 78*
+*Defined in: std/io/file.s line 82*
 
 ```rust
-to_end(edit terminal {tag, mut any ptr unsafe_ptr}) -> ()
+to_end(edit terminal) -> ()
 ```
 
 Moves the file opening position to the end of the file
@@ -19146,10 +19278,10 @@ but does not close it.
 
 
 ### to\_end - move to file end
-*Defined in: std/io/file.s line 78*
+*Defined in: std/io/file.s line 82*
 
 ```rust
-to_end(edit write {tag, mut any ptr unsafe_ptr}) -> ()
+to_end(edit write) -> ()
 ```
 
 Moves the file opening position to the end of the file
@@ -19170,10 +19302,10 @@ but does not close it.
 
 
 ### to\_end - move to file end
-*Defined in: std/io/file.s line 78*
+*Defined in: std/io/file.s line 82*
 
 ```rust
-to_end(edit write {tag, mut any ptr unsafe_ptr}) -> ()
+to_end(edit write) -> ()
 ```
 
 Moves the file opening position to the end of the file
@@ -19194,10 +19326,10 @@ but does not close it.
 
 
 ### to\_end - move to file end
-*Defined in: std/io/file.s line 78*
+*Defined in: std/io/file.s line 82*
 
 ```rust
-to_end(edit open {tag, mut any ptr unsafe_ptr}) -> ()
+to_end(edit open) -> ()
 ```
 
 Moves the file opening position to the end of the file
@@ -19218,10 +19350,10 @@ but does not close it.
 
 
 ### to\_end - move to file end
-*Defined in: std/io/file.s line 78*
+*Defined in: std/io/file.s line 82*
 
 ```rust
-to_end(edit open {tag, mut any ptr unsafe_ptr}) -> ()
+to_end(edit open) -> ()
 ```
 
 Moves the file opening position to the end of the file
@@ -19243,7 +19375,7 @@ but does not close it.
 
 # seek
 ### seek - move backward in the file
-*Defined in: std/io/file.s line 95*
+*Defined in: std/io/file.s line 99*
 
 ```rust
 seek(edit terminal, nat idx, "backward") -> ()
@@ -19264,7 +19396,7 @@ seek(edit terminal, nat idx, "backward") -> ()
 
 
 ### seek - move backward in the file
-*Defined in: std/io/file.s line 95*
+*Defined in: std/io/file.s line 99*
 
 ```rust
 seek(edit write, nat idx, "backward") -> ()
@@ -19285,7 +19417,7 @@ seek(edit write, nat idx, "backward") -> ()
 
 
 ### seek - move backward in the file
-*Defined in: std/io/file.s line 95*
+*Defined in: std/io/file.s line 99*
 
 ```rust
 seek(edit write, nat idx, "backward") -> ()
@@ -19306,7 +19438,7 @@ seek(edit write, nat idx, "backward") -> ()
 
 
 ### seek - move backward in the file
-*Defined in: std/io/file.s line 95*
+*Defined in: std/io/file.s line 99*
 
 ```rust
 seek(edit open, nat idx, "backward") -> ()
@@ -19327,7 +19459,7 @@ seek(edit open, nat idx, "backward") -> ()
 
 
 ### seek - move backward in the file
-*Defined in: std/io/file.s line 95*
+*Defined in: std/io/file.s line 99*
 
 ```rust
 seek(edit open, nat idx, "backward") -> ()
@@ -19348,7 +19480,7 @@ seek(edit open, nat idx, "backward") -> ()
 
 
 ### seek - move forward in the file
-*Defined in: std/io/file.s line 90*
+*Defined in: std/io/file.s line 94*
 
 ```rust
 seek(edit terminal, nat idx, "forward") -> ()
@@ -19369,7 +19501,7 @@ seek(edit terminal, nat idx, "forward") -> ()
 
 
 ### seek - move forward in the file
-*Defined in: std/io/file.s line 90*
+*Defined in: std/io/file.s line 94*
 
 ```rust
 seek(edit write, nat idx, "forward") -> ()
@@ -19390,7 +19522,7 @@ seek(edit write, nat idx, "forward") -> ()
 
 
 ### seek - move forward in the file
-*Defined in: std/io/file.s line 90*
+*Defined in: std/io/file.s line 94*
 
 ```rust
 seek(edit write, nat idx, "forward") -> ()
@@ -19411,7 +19543,7 @@ seek(edit write, nat idx, "forward") -> ()
 
 
 ### seek - move forward in the file
-*Defined in: std/io/file.s line 90*
+*Defined in: std/io/file.s line 94*
 
 ```rust
 seek(edit open, nat idx, "forward") -> ()
@@ -19432,7 +19564,7 @@ seek(edit open, nat idx, "forward") -> ()
 
 
 ### seek - move forward in the file
-*Defined in: std/io/file.s line 90*
+*Defined in: std/io/file.s line 94*
 
 ```rust
 seek(edit open, nat idx, "forward") -> ()
@@ -19453,7 +19585,7 @@ seek(edit open, nat idx, "forward") -> ()
 
 
 ### seek - move to a specific position to a file
-*Defined in: std/io/file.s line 85*
+*Defined in: std/io/file.s line 89*
 
 ```rust
 seek(edit terminal, nat idx) -> ()
@@ -19474,7 +19606,7 @@ seek(edit terminal, nat idx) -> ()
 
 
 ### seek - move to a specific position to a file
-*Defined in: std/io/file.s line 85*
+*Defined in: std/io/file.s line 89*
 
 ```rust
 seek(edit terminal, nat idx, "set") -> ()
@@ -19495,7 +19627,7 @@ seek(edit terminal, nat idx, "set") -> ()
 
 
 ### seek - move to a specific position to a file
-*Defined in: std/io/file.s line 85*
+*Defined in: std/io/file.s line 89*
 
 ```rust
 seek(edit write, nat idx) -> ()
@@ -19516,7 +19648,7 @@ seek(edit write, nat idx) -> ()
 
 
 ### seek - move to a specific position to a file
-*Defined in: std/io/file.s line 85*
+*Defined in: std/io/file.s line 89*
 
 ```rust
 seek(edit write, nat idx, "set") -> ()
@@ -19537,7 +19669,7 @@ seek(edit write, nat idx, "set") -> ()
 
 
 ### seek - move to a specific position to a file
-*Defined in: std/io/file.s line 85*
+*Defined in: std/io/file.s line 89*
 
 ```rust
 seek(edit write, nat idx) -> ()
@@ -19558,7 +19690,7 @@ seek(edit write, nat idx) -> ()
 
 
 ### seek - move to a specific position to a file
-*Defined in: std/io/file.s line 85*
+*Defined in: std/io/file.s line 89*
 
 ```rust
 seek(edit write, nat idx, "set") -> ()
@@ -19579,7 +19711,7 @@ seek(edit write, nat idx, "set") -> ()
 
 
 ### seek - move to a specific position to a file
-*Defined in: std/io/file.s line 85*
+*Defined in: std/io/file.s line 89*
 
 ```rust
 seek(edit open, nat idx) -> ()
@@ -19600,7 +19732,7 @@ seek(edit open, nat idx) -> ()
 
 
 ### seek - move to a specific position to a file
-*Defined in: std/io/file.s line 85*
+*Defined in: std/io/file.s line 89*
 
 ```rust
 seek(edit open, nat idx, "set") -> ()
@@ -19621,7 +19753,7 @@ seek(edit open, nat idx, "set") -> ()
 
 
 ### seek - move to a specific position to a file
-*Defined in: std/io/file.s line 85*
+*Defined in: std/io/file.s line 89*
 
 ```rust
 seek(edit open, nat idx) -> ()
@@ -19642,7 +19774,7 @@ seek(edit open, nat idx) -> ()
 
 
 ### seek - move to a specific position to a file
-*Defined in: std/io/file.s line 85*
+*Defined in: std/io/file.s line 89*
 
 ```rust
 seek(edit open, nat idx, "set") -> ()
@@ -19664,10 +19796,10 @@ seek(edit open, nat idx, "set") -> ()
 
 # position
 ### position - get the current position in the file
-*Defined in: std/io/file.s line 100*
+*Defined in: std/io/file.s line 104*
 
 ```rust
-position(edit terminal {tag, mut any ptr unsafe_ptr}) -> (nat)
+position(edit terminal) -> (nat)
 ```
 
 This can be passed as input to 'seek'.
@@ -19687,10 +19819,10 @@ This can be passed as input to 'seek'.
 
 
 ### position - get the current position in the file
-*Defined in: std/io/file.s line 100*
+*Defined in: std/io/file.s line 104*
 
 ```rust
-position(edit write {tag, mut any ptr unsafe_ptr}) -> (nat)
+position(edit write) -> (nat)
 ```
 
 This can be passed as input to 'seek'.
@@ -19710,10 +19842,10 @@ This can be passed as input to 'seek'.
 
 
 ### position - get the current position in the file
-*Defined in: std/io/file.s line 100*
+*Defined in: std/io/file.s line 104*
 
 ```rust
-position(edit write {tag, mut any ptr unsafe_ptr}) -> (nat)
+position(edit write) -> (nat)
 ```
 
 This can be passed as input to 'seek'.
@@ -19733,10 +19865,10 @@ This can be passed as input to 'seek'.
 
 
 ### position - get the current position in the file
-*Defined in: std/io/file.s line 100*
+*Defined in: std/io/file.s line 104*
 
 ```rust
-position(edit open {tag, mut any ptr unsafe_ptr}) -> (nat)
+position(edit open) -> (nat)
 ```
 
 This can be passed as input to 'seek'.
@@ -19756,10 +19888,10 @@ This can be passed as input to 'seek'.
 
 
 ### position - get the current position in the file
-*Defined in: std/io/file.s line 100*
+*Defined in: std/io/file.s line 104*
 
 ```rust
-position(edit open {tag, mut any ptr unsafe_ptr}) -> (nat)
+position(edit open) -> (nat)
 ```
 
 This can be passed as input to 'seek'.
@@ -19796,7 +19928,7 @@ position(float x, float y) -> (float x, float y)
 
 # raw\_print
 ### raw\_print - writes a string to a write file
-*Defined in: std/io/file.s line 153*
+*Defined in: std/io/file.s line 157*
 
 ```rust
 raw_print(edit write, str) -> ()
@@ -19821,7 +19953,7 @@ so prefer those.
 
 
 ### raw\_print - writes a string to a write file
-*Defined in: std/io/file.s line 153*
+*Defined in: std/io/file.s line 157*
 
 ```rust
 raw_print(edit write, str) -> ()
@@ -19846,7 +19978,7 @@ so prefer those.
 
 
 ### raw\_print - writes a string to a write file
-*Defined in: std/io/file.s line 153*
+*Defined in: std/io/file.s line 157*
 
 ```rust
 raw_print(edit terminal, str) -> ()
@@ -19917,7 +20049,7 @@ is_dir(str, str) -> (bool)
 *Defined in: std/io/dir.s line 32*
 
 ```rust
-is_dir(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (bool)
+is_dir(str) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -19986,7 +20118,7 @@ create_dir(str, str) -> ()
 *Defined in: std/io/dir.s line 48*
 
 ```rust
-create_dir(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> ()
+create_dir(str) -> ()
 ```
 
 <details><summary>Complexity</summary>
@@ -20060,7 +20192,7 @@ is_file(str, str) -> (bool)
 *Defined in: std/io/dir.s line 57*
 
 ```rust
-is_file(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (bool)
+is_file(str) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -20128,7 +20260,7 @@ wait_file(str, str) -> (bool)
 *Defined in: std/io/dir.s line 72*
 
 ```rust
-wait_file(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (bool)
+wait_file(str) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -20218,7 +20350,7 @@ remove(cstr) -> ()
 *Defined in: std/io/dir.s line 76*
 
 ```rust
-remove(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> ()
+remove(str) -> ()
 ```
 
 <details><summary>Complexity</summary>
@@ -20263,7 +20395,7 @@ closedir(any ptr) -> ()
 *Defined in: std/io/dir.s line 105*
 
 ```rust
-raw_entry(edit open {tag, mut any ptr unsafe_ptr}) -> (cstr)
+raw_entry(edit open) -> (cstr)
 ```
 
 <details><summary>Complexity</summary>
@@ -20287,7 +20419,7 @@ raw_entry(edit open {tag, mut any ptr unsafe_ptr}) -> (cstr)
 *Defined in: std/io/dir.s line 115*
 
 ```rust
-entry(edit open {tag, mut any ptr unsafe_ptr}) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+entry(edit open) -> (str)
 ```
 
 This value is modified as you continue opening
@@ -20409,7 +20541,7 @@ not random).
 *Defined in: std/rand.s line 81*
 
 ```rust
-Rand() -> (edit Rand {tag, mut nat s0, mut nat s1, mut nat s2, mut nat s3})
+Rand() -> (edit Rand)
 ```
 
 Xoshiro256plus random numbers from https://prng.di.unimi.it/
@@ -20448,24 +20580,6 @@ on four nat state fields. The version is seed-initalized. Its period is 2^256-1.
 
 
 # next
-### next - next random number
-*Defined in: std/rand.s line 89*
-
-```rust
-next(mut Rand {tag, mut nat s0, mut nat s1, mut nat s2, mut nat s3}) -> (float)
-```
-
-Computes the next random number of a Rand sequence.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 12
-- Transpiled C size: 79
-
-</details>
-
-
 ### next
 *Defined in: std/map.s line 54*
 
@@ -20492,7 +20606,7 @@ next(robinhood_nat_entry[], mut nat pos) -> (mut nat)
 *Defined in: std/map.s line 54*
 
 ```rust
-next(robinhood_str_entry[], mut nat pos) -> (mut str {tag, mut char ptr unsafe_ptr, mut nat dat.pos, mut nat dat.length, mut char dat.first})
+next(robinhood_str_entry[], mut nat pos) -> (mut str)
 ```
 
 <details><summary>Complexity</summary>
@@ -20507,6 +20621,24 @@ next(robinhood_str_entry[], mut nat pos) -> (mut str {tag, mut char ptr unsafe_p
 
 2. null pointer
 22. out of bounds
+</details>
+
+
+### next - next random number
+*Defined in: std/rand.s line 89*
+
+```rust
+next(mut Rand) -> (float)
+```
+
+Computes the next random number of a Rand sequence.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 12
+- Transpiled C size: 79
+
 </details>
 
 
@@ -20586,7 +20718,7 @@ nat(nat8) -> (nat)
 *Defined in: std/core/convert.s line 81*
 
 ```rust
-float(bits {tag, nat value}) -> (float)
+float(bits) -> (float)
 ```
 
 Converts a bit representation to the corresponding float number.
@@ -20604,7 +20736,7 @@ Converts a bit representation to the corresponding float number.
 *Defined in: std/core/convert.s line 70*
 
 ```rust
-nat(bits {tag, nat value}) -> (nat)
+nat(bits) -> (nat)
 ```
 
 Converts a bit representation to the corresponding natural number.
@@ -20739,188 +20871,11 @@ Serves as a tautology function for code that parses on multiple number types.
 </details>
 
 
-### str - tautology function for strings
-*Defined in: std/core/string.s line 65*
-
-```rust
-str(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 3
-
-</details>
-
-
-### str - a string residing on the full breadth of a buffer
-*Defined in: std/core/string.s line 57*
-
-```rust
-str(char[]) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 21
-- Transpiled C size: 165
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-27. string does not fit on buffer
-</details>
-
-
-### str - a string residing on the full breadth of a buffer
-*Defined in: std/core/string.s line 57*
-
-```rust
-str(char[], nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 20
-- Transpiled C size: 147
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-27. string does not fit on buffer
-</details>
-
-
-### str - a string residing on a buffer
-*Defined in: std/core/string.s line 50*
-
-```rust
-str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 20
-- Transpiled C size: 100
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-</details>
-
-
-### str - a string residing on a buffer
-*Defined in: std/core/string.s line 45*
-
-```rust
-str(char ptr unsafe_ptr, nat pos, nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 10
-- Transpiled C size: 43
-
-</details>
-
-
-### str - a string residing on a buffer
-*Defined in: std/core/string.s line 41*
-
-```rust
-str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 3
-
-</details>
-
-
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 218*
-
-```rust
-cstr(cstr cstr, str) -> (cstr)
-```
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 6
-- Transpiled C size: 3
-
-</details>
-
-
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 218*
-
-```rust
-cstr(unsafe_temp {tag, cstr cstr, str}) -> (cstr)
-```
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 7
-- Transpiled C size: 3
-
-</details>
-
-
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 218*
-
-```rust
-cstr(unsafe_temp {tag, cstr cstr, str}) -> (cstr)
-```
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 7
-- Transpiled C size: 3
-
-</details>
-
-
 ### str - convert to string
-*Defined in: std/core/string.s line 93*
+*Defined in: std/core/string.s line 103*
 
 ```rust
-str(cstr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(cstr) -> (str)
 ```
 
 Defines an implicit constant buffer using the cstr's memory data.
@@ -20936,10 +20891,10 @@ Subsequent comparisons no longer use the underlying pointer value.
 
 
 ### str - a string residing on a buffer
-*Defined in: std/core/string.s line 86*
+*Defined in: std/core/string.s line 96*
 
 ```rust
-str(char[], nat endpos, "from", nat pos) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(char[], nat endpos, "from", nat pos) -> (str)
 ```
 
 The string automatically detects the first character,
@@ -20965,10 +20920,10 @@ on comparisons of unequal strings.
 
 
 ### str - a string residing on a buffer
-*Defined in: std/core/string.s line 77*
+*Defined in: std/core/string.s line 87*
 
 ```rust
-str(char[], nat pos, "to", nat endpos) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(char[], nat pos, "to", nat endpos) -> (str)
 ```
 
 The string automatically detects the first character,
@@ -20994,10 +20949,10 @@ on comparisons of unequal strings.
 
 
 ### str - a string residing on a buffer
-*Defined in: std/core/string.s line 69*
+*Defined in: std/core/string.s line 79*
 
 ```rust
-str(char[], nat pos, "len", nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(char[], nat pos, "len", nat length) -> (str)
 ```
 
 The string automatically detects the first character,
@@ -21018,6 +20973,183 @@ on comparisons of unequal strings.
 2. null pointer
 26. can only define strings on non-offset buffers
 22. out of bounds
+</details>
+
+
+### str - tautology function for strings
+*Defined in: std/core/string.s line 75*
+
+```rust
+str(str) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
+</details>
+
+
+### str - a string residing on the full breadth of a buffer
+*Defined in: std/core/string.s line 67*
+
+```rust
+str(char[]) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 165
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+27. string does not fit on buffer
+</details>
+
+
+### str - a string residing on the full breadth of a buffer
+*Defined in: std/core/string.s line 67*
+
+```rust
+str(char[], nat length) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 147
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+27. string does not fit on buffer
+</details>
+
+
+### str - a string residing on a buffer
+*Defined in: std/core/string.s line 60*
+
+```rust
+str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 100
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### str - a string residing on a buffer
+*Defined in: std/core/string.s line 55*
+
+```rust
+str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 43
+
+</details>
+
+
+### str - a string residing on a buffer
+*Defined in: std/core/string.s line 51*
+
+```rust
+str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
+</details>
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 228*
+
+```rust
+cstr(cstr cstr, str) -> (cstr)
+```
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
+</details>
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 228*
+
+```rust
+cstr(unsafe_temp) -> (cstr)
+```
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
+</details>
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 228*
+
+```rust
+cstr(unsafe_temp) -> (cstr)
+```
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 </details>
 
 
@@ -21071,7 +21203,7 @@ hash(str, nat size) -> (nat)
 *Defined in: std/hash.s line 43*
 
 ```rust
-to_hash_base(nat) -> (bits {tag, nat value})
+to_hash_base(nat) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -21087,7 +21219,7 @@ to_hash_base(nat) -> (bits {tag, nat value})
 *Defined in: std/hash.s line 43*
 
 ```rust
-to_hash_base(int) -> (bits {tag, nat value})
+to_hash_base(int) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -21103,7 +21235,7 @@ to_hash_base(int) -> (bits {tag, nat value})
 *Defined in: std/hash.s line 43*
 
 ```rust
-to_hash_base(float) -> (bits {tag, nat value})
+to_hash_base(float) -> (bits)
 ```
 
 <details><summary>Complexity</summary>
@@ -21119,7 +21251,7 @@ to_hash_base(float) -> (bits {tag, nat value})
 *Defined in: std/hash.s line 40*
 
 ```rust
-to_hash_base(cstr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+to_hash_base(cstr) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -21135,7 +21267,7 @@ to_hash_base(cstr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.lengt
 *Defined in: std/hash.s line 40*
 
 ```rust
-to_hash_base(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+to_hash_base(str) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -21219,7 +21351,7 @@ robinhood_str_entry(str, nat cost) -> (str, nat cost)
 *Defined in: std/hash.s line 60*
 
 ```rust
-raw(cstr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+raw(cstr) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -21251,7 +21383,7 @@ raw(nat) -> (nat)
 *Defined in: std/hash.s line 57*
 
 ```rust
-raw(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+raw(str) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -21283,7 +21415,7 @@ raw(nat s, nat cost) -> (nat)
 *Defined in: std/hash.s line 54*
 
 ```rust
-raw(str, nat cost) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+raw(str, nat cost) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -21316,7 +21448,7 @@ is_zero(nat) -> (bool)
 *Defined in: std/hash.s line 63*
 
 ```rust
-is_zero(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (bool)
+is_zero(str) -> (bool)
 ```
 
 <details><summary>Complexity</summary>
@@ -21401,7 +21533,7 @@ free(mut any ptr) -> ()
 *Defined in: std/mini.s line 47*
 
 ```rust
-unpack(char[], nat16 dat.pos, nat16 dat.length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+unpack(char[], nat16 dat.pos, nat16 dat.length) -> (str)
 ```
 
 <details><summary>Complexity</summary>
@@ -21422,7 +21554,7 @@ unpack(char[], nat16 dat.pos, nat16 dat.length) -> (str {tag, char ptr unsafe_pt
 *Defined in: std/mini.s line 41*
 
 ```rust
-unpack(str {tag, char ptr unsafe_ptr, nat16 dat.pos, nat16 dat.length}) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+unpack(str) -> (str)
 ```
 
 The created compact str is unpacked into its 'nat'-using representation
@@ -22230,22 +22362,6 @@ free(mut any ptr) -> ()
 
 # abs
 ### abs - absolute value
-*Defined in: std/sci/math.s line 20*
-
-```rust
-abs(float) -> (float)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 38
-
-</details>
-
-
-### abs - absolute value
 *Defined in: std/sci/math.s line 28*
 
 ```rust
@@ -22257,6 +22373,22 @@ abs(int) -> (int)
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
 - SSA variables: 5
 - Transpiled C size: 46
+
+</details>
+
+
+### abs - absolute value
+*Defined in: std/sci/math.s line 20*
+
+```rust
+abs(float) -> (float)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 38
 
 </details>
 
@@ -22517,7 +22649,7 @@ Warning: Directly calling this constructor without safety checks is unsafe.
 *Defined in: std/sci/vec.s line 48*
 
 ```rust
-vec(edit circular, nat length) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+vec(edit circular, nat length) -> (mut vec) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -22540,7 +22672,7 @@ vec(edit circular, nat length) -> (mut vec {tag, mut float ptr unsafe_ptr, mut n
 *Defined in: std/sci/vec.s line 48*
 
 ```rust
-vec(edit circular, nat length, "dirty") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+vec(edit circular, nat length, "dirty") -> (mut vec) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -22563,7 +22695,7 @@ vec(edit circular, nat length, "dirty") -> (mut vec {tag, mut float ptr unsafe_p
 *Defined in: std/sci/vec.s line 48*
 
 ```rust
-vec(edit arena, nat length) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+vec(edit arena, nat length) -> (mut vec) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -22586,7 +22718,7 @@ vec(edit arena, nat length) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat 
 *Defined in: std/sci/vec.s line 48*
 
 ```rust
-vec(edit arena, nat length, "dirty") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+vec(edit arena, nat length, "dirty") -> (mut vec) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -22609,7 +22741,7 @@ vec(edit arena, nat length, "dirty") -> (mut vec {tag, mut float ptr unsafe_ptr,
 *Defined in: std/sci/vec.s line 36*
 
 ```rust
-vec(edit float[]) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length})
+vec(edit float[]) -> (mut vec)
 ```
 
 <details><summary>Complexity</summary>
@@ -22631,7 +22763,7 @@ vec(edit float[]) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut n
 *Defined in: std/sci/vec.s line 28*
 
 ```rust
-vec(bucket, nat length) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+vec(bucket, nat length) -> (mut vec) on FLOATS
 ```
 
 Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer.
@@ -22654,7 +22786,7 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 *Defined in: std/sci/vec.s line 28*
 
 ```rust
-vec(bucket, nat length, "dirty") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+vec(bucket, nat length, "dirty") -> (mut vec) on FLOATS
 ```
 
 Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer.
@@ -22677,7 +22809,7 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 *Defined in: std/sci/vec.s line 28*
 
 ```rust
-vec(new FLOATS, nat length) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+vec(new FLOATS, nat length) -> (mut vec) on FLOATS
 ```
 
 Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer.
@@ -22700,7 +22832,7 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 *Defined in: std/sci/vec.s line 28*
 
 ```rust
-vec(new FLOATS, nat length, "dirty") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+vec(new FLOATS, nat length, "dirty") -> (mut vec) on FLOATS
 ```
 
 Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer.
@@ -22723,7 +22855,7 @@ Has the provided length. Requires a 'new()' allocator to denote that the vector 
 *Defined in: std/sci/mat.s line 87*
 
 ```rust
-vec(mat {tag, float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride}) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length})
+vec(mat) -> (mut vec)
 ```
 
 <details><summary>Complexity</summary>
@@ -22754,11 +22886,110 @@ Warning: Directly calling this constructor without safety checks is unsafe.
 </details>
 
 
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 38*
+
+```rust
+mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) on FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+24. does not fit in circular arena
+75. can only place matrices on contiguous buffers
+76. cannot place matrices on buffer offsets
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 38*
+
+```rust
+mat(edit arena, nat rows, nat cols) -> (mut mat) on FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 228
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+75. can only place matrices on contiguous buffers
+76. cannot place matrices on buffer offsets
+23. arena is out of space
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 38*
+
+```rust
+mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) on FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+75. can only place matrices on contiguous buffers
+76. cannot place matrices on buffer offsets
+23. arena is out of space
+</details>
+
+
 ### mat - matrix on a fresh buffer
 *Defined in: std/sci/mat.s line 30*
 
 ```rust
-mat(edit bucket, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mat(edit bucket, nat rows, nat cols) -> (mut mat) on FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 157
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+<details><summary>defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
+### mat - matrix on a fresh buffer
+*Defined in: std/sci/mat.s line 30*
+
+```rust
+mat(edit bucket, nat rows, nat cols, "dirty") -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -22788,7 +23019,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/mat.s line 30*
 
 ```rust
-mat(new FLOATS, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mat(new FLOATS, nat rows, nat cols) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -22818,7 +23049,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/mat.s line 30*
 
 ```rust
-mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -22848,7 +23079,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/mat.s line 76*
 
 ```rust
-mat(vec, "col") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
+mat(vec, "col") -> (mut mat)
 ```
 
 A 'type "row"' or 'type "col"' marker is needed
@@ -22867,7 +23098,7 @@ to indicate the new matrix's orientation.
 *Defined in: std/sci/mat.s line 76*
 
 ```rust
-mat(vec, "row") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
+mat(vec, "row") -> (mut mat)
 ```
 
 A 'type "row"' or 'type "col"' marker is needed
@@ -22886,7 +23117,7 @@ to indicate the new matrix's orientation.
 *Defined in: std/sci/mat.s line 54*
 
 ```rust
-mat(edit float[], nat rows) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
+mat(edit float[], nat rows) -> (mut mat)
 ```
 
 <details><summary>Complexity</summary>
@@ -22911,7 +23142,7 @@ mat(edit float[], nat rows) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat 
 *Defined in: std/sci/mat.s line 38*
 
 ```rust
-mat(edit circular, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mat(edit circular, nat rows, nat cols) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -22929,105 +23160,6 @@ mat(edit circular, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_pt
 76. cannot place matrices on buffer offsets
 </details>
 
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 38*
-
-```rust
-mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 39
-- Transpiled C size: 181
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-24. does not fit in circular arena
-75. can only place matrices on contiguous buffers
-76. cannot place matrices on buffer offsets
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 38*
-
-```rust
-mat(edit arena, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 43
-- Transpiled C size: 228
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-75. can only place matrices on contiguous buffers
-76. cannot place matrices on buffer offsets
-23. arena is out of space
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 38*
-
-```rust
-mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 39
-- Transpiled C size: 181
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-75. can only place matrices on contiguous buffers
-76. cannot place matrices on buffer offsets
-23. arena is out of space
-</details>
-
-
-### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 30*
-
-```rust
-mat(edit bucket, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 33
-- Transpiled C size: 157
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
-</details>
-
-
-<details><summary>defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
 
 # sparse\_element
 ### sparse\_element
@@ -23069,7 +23201,7 @@ Warning: Directly calling this constructor without safety checks is unsafe.
 *Defined in: std/sci/coo.s line 40*
 
 ```rust
-coo(sparse_element[], nat rows, nat cols) -> (mut coo {tag, mut sparse_element ptr unsafe_ptr, mut nat rows, mut nat cols, mut nat nnz})
+coo(sparse_element[], nat rows, nat cols) -> (mut coo)
 ```
 
 <details><summary>Complexity</summary>
@@ -23085,7 +23217,7 @@ coo(sparse_element[], nat rows, nat cols) -> (mut coo {tag, mut sparse_element p
 *Defined in: std/sci/coo.s line 34*
 
 ```rust
-coo(nat rows, nat cols, nat nnz) -> (mut coo {tag, mut sparse_element ptr unsafe_ptr, mut nat rows, mut nat cols, mut nat nnz})
+coo(nat rows, nat cols, nat nnz) -> (mut coo)
 ```
 
 This creates a new buffer of sparse elements for convenience.
@@ -23115,17 +23247,21 @@ free(mut any ptr) -> ()
 
 # float\_allocator
 ### bucket - grouped allocations on new memory
-*Defined in: std/core/allocators.s line 33*
+*Defined in: std/core/allocators.s line 60*
 
 ```rust
 bucket() -> (edit bucket {tag, mut bucket_contents ptr unsafe_ptr})
 ```
 
-This is similar to 'new' but moves all allocated memory together,
-releasing it only when there is no further use for any of its contents.
+This allocator is similar to `new` in that directly allocates
+using the operating system's `malloc`. However, it does not allow
+each allocated memory segment to manage its own deferred dellocation,
+and instead bundles all allocations it is involved in to have them
+be released together, once no longer in use.
 Do note that this operation is typically the lazy way out,
-as it acquires and releases memory using one extra layer of indirection
-compared to structures like arenas. On the other hand, it's pretty versatile
+as it must accompany the allocated values within function returns. It also
+ acquires and releases memory using one extra layer of indirection
+compared to allocators like arenas. On the other hand, it is pretty versatile
 for holding conditional results. Example:
 ```python
 import std.core
@@ -23133,11 +23269,10 @@ def conditional(bool case)
     CHARS = edit bucket()
     if case: s = copy 123
     else:    s = copy 345
-    return (s, CHARS) # this would not be possible with 'CHARS = new()'
-def main()
-    CLI = edit console()
-    print conditional true
-    print conditional false
+    return (s, CHARS) # returning s would not be possible with 'CHARS = new()'
+def main(on CLI)
+    conditional(true).s.print()
+    conditional(false).s.print()
 ```
 
 <details><summary>Complexity</summary>
@@ -23179,6 +23314,30 @@ free(mut any ptr) -> ()
 new() -> (new {tag})
 ```
 
+This is the laziest means of allocation that has no state and
+signfies the intent to have any allocations be handled by the
+operating system. It has the disadvantage that it cannot really
+perform allocations within conditions or loops that escape
+their scope. However, allocations made within the top level
+of functions *will* be properly deferred to the calling scope.
+Thus, the following exammple is valid, where `CHARS` is an effect;
+a variable automatically passed to string allocators.
+```python
+import std.core
+def combine_with_space(on new CHARS, cstr s1, cstr s2)
+    return s1+s2+" "
+def main(on CLI, on new CHARS)
+    list_s1 = ["hel", "de", "wo"]
+    list_s2 = ["lo", "ar", "rld"]
+    for i in range of 2
+        print nn combine_with_space(list_s1[i], list_s2[i])
+```
+In the above example, intermediate strings are released within `combine_with_space`,
+and its return is released at the end of each loop. Thus, although this pattern
+is easy to write, it cannot really escape the declared scope. Repeat allocations
+are also significantly slower than just using something a circular buffer in place of the
+CHARS effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -23192,7 +23351,7 @@ new() -> (new {tag})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4186t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4186t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -23208,7 +23367,7 @@ circular("float__t4186t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4120t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4120t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -23224,7 +23383,7 @@ circular("float__t4120t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t3829t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t3829t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -23240,7 +23399,7 @@ circular("float__t3829t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t664t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t664t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -23256,7 +23415,7 @@ circular("float__t664t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t625t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t625t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -23272,7 +23431,7 @@ circular("float__t625t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t623t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t623t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -23288,7 +23447,7 @@ circular("float__t623t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t621t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t621t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -23304,7 +23463,7 @@ circular("float__t621t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 24*
 
 ```rust
-circular("float__t4t") -> (edit circular {tag, edit float[], mut nat pos})
+circular("float__t4t") -> (edit circular)
 ```
 
 <details><summary>Complexity</summary>
@@ -23320,7 +23479,7 @@ circular("float__t4t") -> (edit circular {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4186t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4186t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -23336,7 +23495,7 @@ arena("float__t4186t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4120t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4120t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -23352,7 +23511,7 @@ arena("float__t4120t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t3829t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t3829t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -23368,7 +23527,7 @@ arena("float__t3829t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t664t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t664t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -23384,7 +23543,7 @@ arena("float__t664t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t625t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t625t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -23400,7 +23559,7 @@ arena("float__t625t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t623t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t623t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -23416,7 +23575,7 @@ arena("float__t623t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t621t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t621t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -23432,7 +23591,7 @@ arena("float__t621t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 23*
 
 ```rust
-arena("float__t4t") -> (edit arena {tag, edit float[], mut nat pos})
+arena("float__t4t") -> (edit arena)
 ```
 
 <details><summary>Complexity</summary>
@@ -23449,7 +23608,7 @@ arena("float__t4t") -> (edit arena {tag, edit float[], mut nat pos})
 *Defined in: std/sci/vec.s line 42*
 
 ```rust
-constvec(float[]) -> (vec {tag, float ptr unsafe_ptr, nat pos, nat length})
+constvec(float[]) -> (vec)
 ```
 
 <details><summary>Complexity</summary>
@@ -23505,6 +23664,882 @@ there will be no error stack trace.
 
 
 # reduce
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "mul", "l2") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 283
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "mul", "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 233
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "mul", "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 231
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "mul") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 187
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "add", "l2") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 45
+- Transpiled C size: 283
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "add", "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 233
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "add", "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 42
+- Transpiled C size: 231
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "add") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 187
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "l2") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 41
+- Transpiled C size: 219
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 169
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec, "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 38
+- Transpiled C size: 167
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, vec) -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 34
+- Transpiled C size: 123
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "mul", "l2") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 291
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "mul", "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 241
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "mul", "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 239
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "mul") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 195
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "add", "l2") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 291
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "add", "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 241
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "add", "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 40
+- Transpiled C size: 239
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "add") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 195
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "l2") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 227
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 177
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 36
+- Transpiled C size: 175
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec) -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 32
+- Transpiled C size: 131
+
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "mul", "l2") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 60
+- Transpiled C size: 492
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "mul", "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 57
+- Transpiled C size: 442
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "mul", "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 57
+- Transpiled C size: 440
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "mul") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 396
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "add", "l2") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 60
+- Transpiled C size: 492
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "add", "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 57
+- Transpiled C size: 442
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "add", "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 57
+- Transpiled C size: 440
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "add") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 396
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "l2") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 56
+- Transpiled C size: 428
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "sqr") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 378
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec, "abs") -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 53
+- Transpiled C size: 376
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
+### reduce - reduce a vector to one value
+*Defined in: std/sci/vec.s line 199*
+
+```rust
+reduce(vec, "rel", vec) -> (float)
+```
+
+You can specify an additive or multiplicative reduction,
+as well as some transformation that can be applied.
+A second vector can also be provided to be subtracted or obtain relative value differences
+without allocating any memory for operation results.
+All computations are branchless, as literals are optimized away during compilation.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 49
+- Transpiled C size: 332
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+4. division by zero
+22. out of bounds
+</details>
+
+
 ### reduce - reduce a vector to one value
 *Defined in: std/sci/vec.s line 199*
 
@@ -24177,882 +25212,6 @@ All computations are branchless, as literals are optimized away during compilati
 </details>
 
 
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "mul", "l2") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 45
-- Transpiled C size: 283
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "mul", "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 233
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "mul", "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 231
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "mul") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 187
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "add", "l2") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 45
-- Transpiled C size: 283
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "add", "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 233
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "add", "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 42
-- Transpiled C size: 231
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "add") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 187
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "l2") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 41
-- Transpiled C size: 219
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 169
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec, "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 38
-- Transpiled C size: 167
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, vec) -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 34
-- Transpiled C size: 123
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "mul", "l2") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 43
-- Transpiled C size: 291
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "mul", "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 40
-- Transpiled C size: 241
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "mul", "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 40
-- Transpiled C size: 239
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "mul") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 36
-- Transpiled C size: 195
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "add", "l2") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 43
-- Transpiled C size: 291
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "add", "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 40
-- Transpiled C size: 241
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "add", "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 40
-- Transpiled C size: 239
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "add") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 36
-- Transpiled C size: 195
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "l2") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 39
-- Transpiled C size: 227
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 36
-- Transpiled C size: 177
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 36
-- Transpiled C size: 175
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 32
-- Transpiled C size: 131
-
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "mul", "l2") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 60
-- Transpiled C size: 492
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "mul", "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 57
-- Transpiled C size: 442
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "mul", "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 57
-- Transpiled C size: 440
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "mul") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 53
-- Transpiled C size: 396
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "add", "l2") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 60
-- Transpiled C size: 492
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "add", "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 57
-- Transpiled C size: 442
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "add", "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 57
-- Transpiled C size: 440
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "add") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 53
-- Transpiled C size: 396
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "l2") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 56
-- Transpiled C size: 428
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "sqr") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 53
-- Transpiled C size: 378
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec, "abs") -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 53
-- Transpiled C size: 376
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
-### reduce - reduce a vector to one value
-*Defined in: std/sci/vec.s line 199*
-
-```rust
-reduce(vec, "rel", vec) -> (float)
-```
-
-You can specify an additive or multiplicative reduction,
-as well as some transformation that can be applied.
-A second vector can also be provided to be subtracted or obtain relative value differences
-without allocating any memory for operation results.
-All computations are branchless, as literals are optimized away during compilation.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 49
-- Transpiled C size: 332
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-4. division by zero
-22. out of bounds
-</details>
-
-
 # dot
 ### dot - dot product
 *Defined in: std/sci/vec.s line 235*
@@ -25081,7 +25240,7 @@ dot(vec, vec) -> (float)
 *Defined in: std/sci/vec.s line 239*
 
 ```rust
-sum(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (float)
+sum(vec) -> (float)
 ```
 
 <details><summary>Complexity</summary>
@@ -25113,7 +25272,7 @@ sum(coo, "all") -> (mut float)
 *Defined in: std/sci/coo.s line 117*
 
 ```rust
-sum(edit circular, coo, "col") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sum(edit circular, coo, "col") -> (mut vec) on FLOATS
 ```
 
 result[j] = sum of all stored values in column j
@@ -25140,7 +25299,7 @@ result[j] = sum of all stored values in column j
 *Defined in: std/sci/coo.s line 117*
 
 ```rust
-sum(edit arena, coo, "col") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sum(edit arena, coo, "col") -> (mut vec) on FLOATS
 ```
 
 result[j] = sum of all stored values in column j
@@ -25167,7 +25326,7 @@ result[j] = sum of all stored values in column j
 *Defined in: std/sci/coo.s line 117*
 
 ```rust
-sum(edit bucket, coo, "col") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sum(edit bucket, coo, "col") -> (mut vec) on FLOATS
 ```
 
 result[j] = sum of all stored values in column j
@@ -25192,7 +25351,7 @@ result[j] = sum of all stored values in column j
 *Defined in: std/sci/coo.s line 117*
 
 ```rust
-sum(new FLOATS, coo, "col") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sum(new FLOATS, coo, "col") -> (mut vec) on FLOATS
 ```
 
 result[j] = sum of all stored values in column j
@@ -25217,7 +25376,7 @@ result[j] = sum of all stored values in column j
 *Defined in: std/sci/coo.s line 109*
 
 ```rust
-sum(edit circular, coo, "row") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sum(edit circular, coo, "row") -> (mut vec) on FLOATS
 ```
 
 result[i] = sum of all stored values in row i
@@ -25244,7 +25403,7 @@ result[i] = sum of all stored values in row i
 *Defined in: std/sci/coo.s line 109*
 
 ```rust
-sum(edit arena, coo, "row") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sum(edit arena, coo, "row") -> (mut vec) on FLOATS
 ```
 
 result[i] = sum of all stored values in row i
@@ -25271,7 +25430,7 @@ result[i] = sum of all stored values in row i
 *Defined in: std/sci/coo.s line 109*
 
 ```rust
-sum(edit bucket, coo, "row") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sum(edit bucket, coo, "row") -> (mut vec) on FLOATS
 ```
 
 result[i] = sum of all stored values in row i
@@ -25296,7 +25455,7 @@ result[i] = sum of all stored values in row i
 *Defined in: std/sci/coo.s line 109*
 
 ```rust
-sum(new FLOATS, coo, "row") -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) on FLOATS
+sum(new FLOATS, coo, "row") -> (mut vec) on FLOATS
 ```
 
 result[i] = sum of all stored values in row i
@@ -25318,24 +25477,21 @@ result[i] = sum of all stored values in row i
 
 
 # mean
-### mean
-*Defined in: std/sci/stats.s line 32*
+### mean - the mean value obtained
+*Defined in: std/sci/stats.s line 53*
 
 ```rust
-mean(accumulator {tag, float sums, float square_sums, nat count}) -> (float)
+mean(accumulator) -> (float)
 ```
+
+This is obtained from a zero-memory statistics accumulator.
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 6
-- Transpiled C size: 32
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 3
 
-</details>
-
-<details><summary>Potential errors</summary>
-
-4. division by zero
 </details>
 
 
@@ -25343,7 +25499,7 @@ mean(accumulator {tag, float sums, float square_sums, nat count}) -> (float)
 *Defined in: std/sci/vec.s line 243*
 
 ```rust
-mean(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (float)
+mean(vec) -> (float)
 ```
 
 <details><summary>Complexity</summary>
@@ -25365,7 +25521,7 @@ mean(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (float)
 *Defined in: std/sci/vec.s line 247*
 
 ```rust
-min(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (mut float)
+min(vec) -> (mut float)
 ```
 
 <details><summary>Complexity</summary>
@@ -25388,7 +25544,7 @@ min(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (mut float)
 *Defined in: std/sci/vec.s line 254*
 
 ```rust
-max(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (mut float)
+max(vec) -> (mut float)
 ```
 
 <details><summary>Complexity</summary>
@@ -25411,7 +25567,7 @@ max(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (mut float)
 *Defined in: std/sci/vec.s line 262*
 
 ```rust
-var(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (float)
+var(vec) -> (float)
 ```
 
 <details><summary>Complexity</summary>
@@ -25430,18 +25586,46 @@ var(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (float)
 
 
 # std
-### std
-*Defined in: std/sci/stats.s line 35*
+### std - the sample standard deviation
+*Defined in: std/sci/stats.s line 63*
 
 ```rust
-std(accumulator {tag, float sums, float square_sums, nat count}) -> (float)
+std(accumulator, "sample") -> (float)
 ```
+
+This is obtained from a zero-memory statistics accumulator.
+It is the sample standard deviation, whose average is statistically
+unbiased.
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 1 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 11
-- Transpiled C size: 87
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 65
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+4. division by zero
+6. nat subtraction would yield a negative
+</details>
+
+
+### std - the standard deviation
+*Defined in: std/sci/stats.s line 58*
+
+```rust
+std(accumulator) -> (float)
+```
+
+This is obtained from a zero-memory statistics accumulator.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 1 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 40
 
 </details>
 
@@ -25455,7 +25639,7 @@ std(accumulator {tag, float sums, float square_sums, nat count}) -> (float)
 *Defined in: std/sci/vec.s line 273*
 
 ```rust
-std(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (float)
+std(vec) -> (float)
 ```
 
 <details><summary>Complexity</summary>
@@ -25478,7 +25662,7 @@ std(vec {tag, float ptr unsafe_ptr, nat pos, nat length}) -> (float)
 *Defined in: std/sci/vec.s line 311*
 
 ```rust
-self(mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) -> (edit arena, mut vec)
+self(mut vec) -> (edit arena, mut vec)
 ```
 
 <details><summary>Complexity</summary>
@@ -25491,11 +25675,29 @@ self(mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length}) -> (e
 
 
 # accumulator
-### accumulator
+### accumulator - accumulate statistics to produce mean and std values
 *Defined in: std/sci/stats.s line 21*
 
 ```rust
-accumulator() -> (edit accumulator {tag, mut float sums, mut float square_sums, mut nat count})
+accumulator() -> (edit accumulator {tag, mut float mean_value, mut float m2, mut nat count})
+```
+
+This does not consume any memory, and is stable while
+streaming data. The maximum number of observations that
+can be recorded without buffer overflows destroyng correctness
+are `2^64-1`. Example:
+```python
+import std.core
+import std.sci.stats
+def main(on CLI)
+    accum = accumulator()
+    accum.append 0.1
+    accum.append 0.2
+    accum.append 0.3
+    print nn "mean:"
+    print mean accum
+    print nn "std:"
+    print std accum
 ```
 
 <details><summary>Complexity</summary>
@@ -25508,8 +25710,8 @@ accumulator() -> (edit accumulator {tag, mut float sums, mut float square_sums, 
 
 
 # append
-### append
-*Defined in: std/sci/stats.s line 27*
+### append - append a value to a statics accumulator
+*Defined in: std/sci/stats.s line 45*
 
 ```rust
 append(edit accumulator, float value) -> ()
@@ -25518,15 +25720,15 @@ append(edit accumulator, float value) -> ()
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 1 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 10
-- Transpiled C size: 59
+- SSA variables: 17
+- Transpiled C size: 105
 
 </details>
 
 
 # pearson
 ### pearson - pearson correlation between the values of two vectors
-*Defined in: std/sci/stats.s line 40*
+*Defined in: std/sci/stats.s line 70*
 
 ```rust
 pearson(vec, vec) -> (float)
@@ -25555,7 +25757,7 @@ pearson(vec, vec) -> (float)
 *Defined in: std/sci/mat.s line 22*
 
 ```rust
-rows(mat {tag, float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride}) -> (nat)
+rows(mat) -> (nat)
 ```
 
 <details><summary>Complexity</summary>
@@ -25571,7 +25773,7 @@ rows(mat {tag, float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride}) -
 *Defined in: std/sci/coo.s line 22*
 
 ```rust
-rows(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (nat)
+rows(coo) -> (nat)
 ```
 
 <details><summary>Complexity</summary>
@@ -25588,7 +25790,7 @@ rows(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (
 *Defined in: std/sci/mat.s line 26*
 
 ```rust
-cols(mat {tag, float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride}) -> (nat)
+cols(mat) -> (nat)
 ```
 
 <details><summary>Complexity</summary>
@@ -25604,7 +25806,7 @@ cols(mat {tag, float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride}) -
 *Defined in: std/sci/coo.s line 26*
 
 ```rust
-cols(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (nat)
+cols(coo) -> (nat)
 ```
 
 <details><summary>Complexity</summary>
@@ -25618,17 +25820,21 @@ cols(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (
 
 # bucket\_or\_new
 ### bucket - grouped allocations on new memory
-*Defined in: std/core/allocators.s line 33*
+*Defined in: std/core/allocators.s line 60*
 
 ```rust
 bucket() -> (edit bucket {tag, mut bucket_contents ptr unsafe_ptr})
 ```
 
-This is similar to 'new' but moves all allocated memory together,
-releasing it only when there is no further use for any of its contents.
+This allocator is similar to `new` in that directly allocates
+using the operating system's `malloc`. However, it does not allow
+each allocated memory segment to manage its own deferred dellocation,
+and instead bundles all allocations it is involved in to have them
+be released together, once no longer in use.
 Do note that this operation is typically the lazy way out,
-as it acquires and releases memory using one extra layer of indirection
-compared to structures like arenas. On the other hand, it's pretty versatile
+as it must accompany the allocated values within function returns. It also
+ acquires and releases memory using one extra layer of indirection
+compared to allocators like arenas. On the other hand, it is pretty versatile
 for holding conditional results. Example:
 ```python
 import std.core
@@ -25636,11 +25842,10 @@ def conditional(bool case)
     CHARS = edit bucket()
     if case: s = copy 123
     else:    s = copy 345
-    return (s, CHARS) # this would not be possible with 'CHARS = new()'
-def main()
-    CLI = edit console()
-    print conditional true
-    print conditional false
+    return (s, CHARS) # returning s would not be possible with 'CHARS = new()'
+def main(on CLI)
+    conditional(true).s.print()
+    conditional(false).s.print()
 ```
 
 <details><summary>Complexity</summary>
@@ -25682,6 +25887,30 @@ free(mut any ptr) -> ()
 new() -> (new {tag})
 ```
 
+This is the laziest means of allocation that has no state and
+signfies the intent to have any allocations be handled by the
+operating system. It has the disadvantage that it cannot really
+perform allocations within conditions or loops that escape
+their scope. However, allocations made within the top level
+of functions *will* be properly deferred to the calling scope.
+Thus, the following exammple is valid, where `CHARS` is an effect;
+a variable automatically passed to string allocators.
+```python
+import std.core
+def combine_with_space(on new CHARS, cstr s1, cstr s2)
+    return s1+s2+" "
+def main(on CLI, on new CHARS)
+    list_s1 = ["hel", "de", "wo"]
+    list_s2 = ["lo", "ar", "rld"]
+    for i in range of 2
+        print nn combine_with_space(list_s1[i], list_s2[i])
+```
+In the above example, intermediate strings are released within `combine_with_space`,
+and its return is released at the end of each loop. Thus, although this pattern
+is easy to write, it cannot really escape the declared scope. Repeat allocations
+are also significantly slower than just using something a circular buffer in place of the
+CHARS effect.
+
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
@@ -25696,7 +25925,7 @@ new() -> (new {tag})
 *Defined in: std/sci/mat.s line 48*
 
 ```rust
-constmat(float[], nat rows) -> (mat {tag, float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride})
+constmat(float[], nat rows) -> (mat)
 ```
 
 <details><summary>Complexity</summary>
@@ -25718,11 +25947,11 @@ constmat(float[], nat rows) -> (mat {tag, float ptr unsafe_ptr, nat pos, nat row
 
 
 # mutvec
-### mutvec - view a matrix as a vector
+### mutvec - view a matrix as a mutable vector
 *Defined in: std/sci/mat.s line 91*
 
 ```rust
-mutvec(mat {tag, float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride}) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length})
+mutvec(mat) -> (mut vec)
 ```
 
 <details><summary>Complexity</summary>
@@ -25739,8 +25968,13 @@ mutvec(mat {tag, float ptr unsafe_ptr, nat pos, nat rows, nat cols, nat stride})
 *Defined in: std/sci/mat.s line 95*
 
 ```rust
-row(mat, nat i) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat length})
+row(mat, nat i) -> (mut vec)
 ```
+
+This is possible due to the contiguous representation
+of matrices. There is no equivalent operations for
+columns, given that those are not contiguously represented
+in memory and thus operating on them can be slow.
 
 <details><summary>Complexity</summary>
 
@@ -25761,7 +25995,7 @@ row(mat, nat i) -> (mut vec {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat
 *Defined in: std/sci/coo.s line 30*
 
 ```rust
-nnz(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (nat)
+nnz(coo) -> (nat)
 ```
 
 <details><summary>Complexity</summary>
@@ -25778,7 +26012,7 @@ nnz(coo {tag, sparse_element ptr unsafe_ptr, nat rows, nat cols, nat nnz}) -> (n
 *Defined in: std/sci/coo.s line 88*
 
 ```rust
-todense(edit circular, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+todense(edit circular, coo) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -25804,7 +26038,7 @@ todense(edit circular, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat 
 *Defined in: std/sci/coo.s line 88*
 
 ```rust
-todense(edit arena, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+todense(edit arena, coo) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -25830,7 +26064,7 @@ todense(edit arena, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos
 *Defined in: std/sci/coo.s line 88*
 
 ```rust
-todense(edit bucket, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+todense(edit bucket, coo) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -25863,7 +26097,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/coo.s line 88*
 
 ```rust
-todense(new FLOATS, coo) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+todense(new FLOATS, coo) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -25929,11 +26163,110 @@ Warning: Directly calling this constructor without safety checks is unsafe.
 </details>
 
 
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 38*
+
+```rust
+mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat) on FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+24. does not fit in circular arena
+75. can only place matrices on contiguous buffers
+76. cannot place matrices on buffer offsets
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 38*
+
+```rust
+mat(edit arena, nat rows, nat cols) -> (mut mat) on FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 43
+- Transpiled C size: 228
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+75. can only place matrices on contiguous buffers
+76. cannot place matrices on buffer offsets
+23. arena is out of space
+</details>
+
+
+### mat - matrix on an existing vecpos
+*Defined in: std/sci/mat.s line 38*
+
+```rust
+mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat) on FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 39
+- Transpiled C size: 181
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+75. can only place matrices on contiguous buffers
+76. cannot place matrices on buffer offsets
+23. arena is out of space
+</details>
+
+
 ### mat - matrix on a fresh buffer
 *Defined in: std/sci/mat.s line 30*
 
 ```rust
-mat(edit bucket, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mat(edit bucket, nat rows, nat cols) -> (mut mat) on FLOATS
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 33
+- Transpiled C size: 157
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+17. allocation failed
+19. cannot allocate a buffer of unsized type
+20. cannot resize buffers with alloc; it promises no data reallocation
+</details>
+
+
+<details><summary>defered calls</summary>
+
+```rust
+free(mut any ptr) -> ()
+```
+</details>
+
+### mat - matrix on a fresh buffer
+*Defined in: std/sci/mat.s line 30*
+
+```rust
+mat(edit bucket, nat rows, nat cols, "dirty") -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -25963,7 +26296,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/mat.s line 30*
 
 ```rust
-mat(new FLOATS, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mat(new FLOATS, nat rows, nat cols) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -25993,7 +26326,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/mat.s line 30*
 
 ```rust
-mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mat(new FLOATS, nat rows, nat cols, "dirty") -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -26023,7 +26356,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/coo.s line 40*
 
 ```rust
-coo(sparse_element[], nat rows, nat cols) -> (mut coo {tag, mut sparse_element ptr unsafe_ptr, mut nat rows, mut nat cols, mut nat nnz})
+coo(sparse_element[], nat rows, nat cols) -> (mut coo)
 ```
 
 <details><summary>Complexity</summary>
@@ -26039,7 +26372,7 @@ coo(sparse_element[], nat rows, nat cols) -> (mut coo {tag, mut sparse_element p
 *Defined in: std/sci/coo.s line 34*
 
 ```rust
-coo(nat rows, nat cols, nat nnz) -> (mut coo {tag, mut sparse_element ptr unsafe_ptr, mut nat rows, mut nat cols, mut nat nnz})
+coo(nat rows, nat cols, nat nnz) -> (mut coo)
 ```
 
 This creates a new buffer of sparse elements for convenience.
@@ -26071,7 +26404,7 @@ free(mut any ptr) -> ()
 *Defined in: std/sci/mat.s line 76*
 
 ```rust
-mat(vec, "col") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
+mat(vec, "col") -> (mut mat)
 ```
 
 A 'type "row"' or 'type "col"' marker is needed
@@ -26090,7 +26423,7 @@ to indicate the new matrix's orientation.
 *Defined in: std/sci/mat.s line 76*
 
 ```rust
-mat(vec, "row") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
+mat(vec, "row") -> (mut mat)
 ```
 
 A 'type "row"' or 'type "col"' marker is needed
@@ -26109,7 +26442,7 @@ to indicate the new matrix's orientation.
 *Defined in: std/sci/mat.s line 54*
 
 ```rust
-mat(edit float[], nat rows) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride})
+mat(edit float[], nat rows) -> (mut mat)
 ```
 
 <details><summary>Complexity</summary>
@@ -26134,7 +26467,7 @@ mat(edit float[], nat rows) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat 
 *Defined in: std/sci/mat.s line 38*
 
 ```rust
-mat(edit circular, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
+mat(edit circular, nat rows, nat cols) -> (mut mat) on FLOATS
 ```
 
 <details><summary>Complexity</summary>
@@ -26152,105 +26485,6 @@ mat(edit circular, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_pt
 76. cannot place matrices on buffer offsets
 </details>
 
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 38*
-
-```rust
-mat(edit circular, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 39
-- Transpiled C size: 181
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-24. does not fit in circular arena
-75. can only place matrices on contiguous buffers
-76. cannot place matrices on buffer offsets
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 38*
-
-```rust
-mat(edit arena, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 43
-- Transpiled C size: 228
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-75. can only place matrices on contiguous buffers
-76. cannot place matrices on buffer offsets
-23. arena is out of space
-</details>
-
-
-### mat - matrix on an existing vecpos
-*Defined in: std/sci/mat.s line 38*
-
-```rust
-mat(edit arena, nat rows, nat cols, "dirty") -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 39
-- Transpiled C size: 181
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-75. can only place matrices on contiguous buffers
-76. cannot place matrices on buffer offsets
-23. arena is out of space
-</details>
-
-
-### mat - matrix on a fresh buffer
-*Defined in: std/sci/mat.s line 30*
-
-```rust
-mat(edit bucket, nat rows, nat cols) -> (mut mat {tag, mut float ptr unsafe_ptr, mut nat pos, mut nat rows, mut nat cols, mut nat stride}) on FLOATS
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 33
-- Transpiled C size: 157
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-17. allocation failed
-19. cannot allocate a buffer of unsized type
-20. cannot resize buffers with alloc; it promises no data reallocation
-</details>
-
-
-<details><summary>defered calls</summary>
-
-```rust
-free(mut any ptr) -> ()
-```
-</details>
 
 # tagged
 ### tagged - blank tag structure
@@ -26277,7 +26511,7 @@ Ensures that 'tag ptr' has a unique type and allocates at least a cstr's
 *Defined in: std/tag.s line 26*
 
 ```rust
-unsafe_match(tagged ptr obj, cstr name, any ptr type) -> (mut any ptr {follows any ptr type})
+unsafe_match(tagged ptr obj, cstr name, any ptr type) -> (mut any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -26490,7 +26724,7 @@ pipe(pipe_data ptr) -> (pipe {tag, pipe_data ptr unsafe_data})
 *Defined in: std/pipe.s line 53*
 
 ```rust
-unsafe_pipe_lock(pipe {tag, pipe_data ptr unsafe_data}) -> ()
+unsafe_pipe_lock(pipe) -> ()
 ```
 
 <details><summary>Complexity</summary>
@@ -26513,7 +26747,7 @@ unsafe_pipe_lock(pipe {tag, pipe_data ptr unsafe_data}) -> ()
 *Defined in: std/pipe.s line 59*
 
 ```rust
-unsafe_pipe_unlock(pipe {tag, pipe_data ptr unsafe_data}) -> ()
+unsafe_pipe_unlock(pipe) -> ()
 ```
 
 <details><summary>Complexity</summary>
@@ -26645,7 +26879,7 @@ unsafe_spawn((pipe {tag, pipe_data ptr}) -> () func, pipe) -> (edit unsafe_spawn
 *Defined in: std/pipe.s line 114*
 
 ```rust
-join(edit unsafe_spawn {tag, mut any ptr unsafe_ptr}) -> ()
+join(edit unsafe_spawn) -> ()
 ```
 
 <details><summary>Complexity</summary>
@@ -26731,7 +26965,7 @@ join(edit unsafe_spawn {tag, mut any ptr unsafe_ptr}) -> ()
 *Defined in: std/pipe.s line 140*
 
 ```rust
-thread(edit growing_thread_pool, (pipe {tag, pipe_data ptr}) -> () func, pipe) -> (mut unsafe_spawn {tag, mut any ptr unsafe_ptr {follows any ptr ..unsafe_ptr}}) on THREADS
+thread(edit growing_thread_pool, (pipe {tag, pipe_data ptr}) -> () func, pipe) -> (mut unsafe_spawn) on THREADS
 ```
 
 <details><summary>Complexity</summary>
@@ -26755,7 +26989,7 @@ thread(edit growing_thread_pool, (pipe {tag, pipe_data ptr}) -> () func, pipe) -
 *Defined in: std/pipe.s line 150*
 
 ```rust
-unsafe_pipe_data_match(open, cstr name, any ptr type) -> (mut any ptr {follows any ptr type})
+unsafe_pipe_data_match(open, cstr name, any ptr type) -> (mut any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -26777,7 +27011,7 @@ unsafe_pipe_data_match(open, cstr name, any ptr type) -> (mut any ptr {follows a
 *Defined in: std/pipe.s line 145*
 
 ```rust
-unsafe_pipe_data_match(open, cstr name, any ptr type) -> (any ptr {follows any ptr type})
+unsafe_pipe_data_match(open, cstr name, any ptr type) -> (any ptr)
 ```
 
 <details><summary>Complexity</summary>
@@ -27070,7 +27304,7 @@ free(mut any ptr) -> ()
 *Defined in: std/blob.s line 23*
 
 ```rust
-blob(64) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 64})
+blob(64) -> (unsafe_blob)
 ```
 
 <details><summary>Complexity</summary>
@@ -27086,7 +27320,7 @@ blob(64) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 64})
 *Defined in: std/blob.s line 23*
 
 ```rust
-blob(32) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 32})
+blob(32) -> (unsafe_blob)
 ```
 
 <details><summary>Complexity</summary>
@@ -27102,7 +27336,7 @@ blob(32) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 32})
 *Defined in: std/blob.s line 23*
 
 ```rust
-blob(16) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 16})
+blob(16) -> (unsafe_blob)
 ```
 
 <details><summary>Complexity</summary>
@@ -27118,7 +27352,7 @@ blob(16) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 16})
 *Defined in: std/blob.s line 23*
 
 ```rust
-blob(8) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 8})
+blob(8) -> (unsafe_blob)
 ```
 
 <details><summary>Complexity</summary>
@@ -27134,7 +27368,7 @@ blob(8) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 8})
 *Defined in: std/blob.s line 23*
 
 ```rust
-blob(4) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 4})
+blob(4) -> (unsafe_blob)
 ```
 
 <details><summary>Complexity</summary>
@@ -27150,7 +27384,7 @@ blob(4) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 4})
 *Defined in: std/blob.s line 23*
 
 ```rust
-blob(2) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 2})
+blob(2) -> (unsafe_blob)
 ```
 
 <details><summary>Complexity</summary>
@@ -27166,7 +27400,7 @@ blob(2) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 2})
 *Defined in: std/blob.s line 23*
 
 ```rust
-blob(1) -> (unsafe_blob {tag, any ptr unsafe_ptr {follows any ptr ..}, 1})
+blob(1) -> (unsafe_blob)
 ```
 
 <details><summary>Complexity</summary>
@@ -27370,10 +27604,10 @@ free(mut any ptr) -> ()
 
 # realloc
 ### realloc - reallocate memory
-*Defined in: std/unsafe.s line 34*
+*Defined in: std/unsafe.s line 41*
 
 ```rust
-realloc(any ptr allocated, nat bytes) -> (any ptr {follows any ptr allocated})
+realloc(any ptr allocated, nat bytes) -> (any ptr)
 ```
 
 Reallocates an allocated memory pointer, potentially invalidating
@@ -27400,10 +27634,10 @@ as those have the intent of immediate reuse.
 
 
 ### realloc - reallocate memory
-*Defined in: std/unsafe.s line 34*
+*Defined in: std/unsafe.s line 41*
 
 ```rust
-realloc(any ptr allocated, nat bytes, "super_unsafe") -> (any ptr {follows any ptr allocated})
+realloc(any ptr allocated, nat bytes, "super_unsafe") -> (any ptr)
 ```
 
 Reallocates an allocated memory pointer, potentially invalidating
@@ -27431,13 +27665,33 @@ as those have the intent of immediate reuse.
 
 # free
 ### free - free memory
-*Defined in: std/unsafe.s line 52*
+*Defined in: std/unsafe.s line 59*
 
 ```rust
 free(mut any ptr) -> ()
 ```
 
-Frees allocated memory.
+Frees up allocated memory. This does not guard automatically against
+double frees or use-after free. To produce safe code, you must declare
+a defer that will eventually free allocated memory. Do note that defers are
+automatically transferred to called scopres, and often the compiler
+may ask the user to transfer variables via returns, thus ensuring that
+resources are properly released after last usage. An important note is
+that defers are always called, even upon errors. In that case, would-be
+would be zero-initialized without the allocation code being actually called.
+Thus, always check for null pointer values before freeing.
+Example that is safe and should be followed for unsafe resource
+acquisition code/libraries to make resource safe:
+```python
+import std.core
+import std.unsafe as unsafe
+def main(on CLI)
+    my_ptr = unsafe::alloc compiler::value float::size
+    defer
+        if exists my_ptr: free my_ptr
+        print "freed"
+    print "allocated"
+```
 
 *Warning: Its usage in unsafe and guarded under std/unsafe.s.*
 
@@ -27452,13 +27706,15 @@ Frees allocated memory.
 
 # zero
 ### zero - set memory to zero
-*Defined in: std/unsafe.s line 59*
+*Defined in: std/unsafe.s line 86*
 
 ```rust
 zero(any ptr allocated, nat from, nat to) -> ()
 ```
 
-Memsets a memory region to zero.
+Memsets a memory region to zero. This assumes that the pointer
+is non-zero, and initialized on the desired region. This function
+is used mainly by safe buffers to zero-out new allocations.
 
 *Warning: Its usage in unsafe and guarded under std/unsafe.s.*
 
@@ -27473,12 +27729,13 @@ Memsets a memory region to zero.
 
 # dereference\_ptr
 ### dereference\_ptr - dereference a pointer pointing to a pointer
-*Defined in: std/unsafe.s line 74*
+*Defined in: std/unsafe.s line 108*
 
 ```rust
 dereference_ptr(any ptr) -> (any ptr)
 ```
 
+The result is the internal pointer and has no associated type.
 Pointers directly pointing to pointers induce both indirection
 and unsafety to the degree that idiomatic code just cannot do
 without massive safety violations that the unsafety-inducing
@@ -27487,7 +27744,7 @@ type system or derefencing mechanisms. This function performs
 a well-controlled indirection instead that does not leave
 any safety tracking residues AT ALL when called.
 To make absolutely sure that using this is properly understood
-the result is an immutable pointer, which often needs to be pass
+the result is an immutable pointer, which often needs to pass
 through `unsafe_mut`, for example to be freed.
 
 *Warning: Its usage in unsafe and guarded under std/unsafe.s.*
@@ -27633,7 +27890,7 @@ window(float size.width, float size.height, cstr title, cstr font_path) -> (edit
 *Defined in: std/graphics.s line 85*
 
 ```rust
-is_open(edit window {tag, float size.width, float size.height, cstr title, mut bool ready}) -> (bool) on WINDOW
+is_open(edit window) -> (bool) on WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -27687,7 +27944,7 @@ unsafe_end_drawing() -> ()
 *Defined in: std/graphics.s line 100*
 
 ```rust
-draw(edit window {tag, float size.width, float size.height, cstr title, mut bool ready}) -> (bool) on WINDOW
+draw(edit window) -> (bool) on WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -28200,7 +28457,7 @@ tri(edit window, float p1.x, float p1.y, float p2.x, float p2.y, float p3.x, flo
 *Defined in: std/graphics.s line 348*
 
 ```rust
-dt(window {tag, float size.width, float size.height, cstr title, bool ready}) -> (float) on WINDOW
+dt(window) -> (float) on WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -28218,7 +28475,7 @@ dt(window {tag, float size.width, float size.height, cstr title, bool ready}) ->
 *Defined in: std/graphics.s line 353*
 
 ```rust
-uptime(window {tag, float size.width, float size.height, cstr title, bool ready}) -> (float) on WINDOW
+uptime(window) -> (float) on WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -28290,7 +28547,7 @@ key_released(edit window, nat key) -> (bool) on WINDOW
 *Defined in: std/graphics.s line 373*
 
 ```rust
-mouse_pos(window {tag, float size.width, float size.height, cstr title, bool ready}) -> (float x, float y) on WINDOW
+mouse_pos(window) -> (float x, float y) on WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -28344,7 +28601,7 @@ mouse_pressed(edit window, nat button) -> (bool) on WINDOW
 *Defined in: std/graphics.s line 391*
 
 ```rust
-mouse_wheel(window {tag, float size.width, float size.height, cstr title, bool ready}) -> (float) on WINDOW
+mouse_wheel(window) -> (float) on WINDOW
 ```
 
 <details><summary>Complexity</summary>
@@ -29401,6 +29658,198 @@ to_number(float ptr) -> (float)
 *Defined in: std/ptrpeek.s line 27*
 
 ```rust
+already_defined(int ptr x, nat y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(int ptr x, int y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(int ptr x, float y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(int ptr x, nat ptr y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(int ptr x, int ptr y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(int ptr x, float ptr y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(float ptr x, nat y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(float ptr x, int y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(float ptr x, float y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(float ptr x, nat ptr y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(float ptr x, int ptr y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
+already_defined(float ptr x, float ptr y) -> (false)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 4
+- Transpiled C size: 9
+
+</details>
+
+
+### already\_defined
+*Defined in: std/ptrpeek.s line 27*
+
+```rust
 already_defined(nat x, nat y) -> (true)
 ```
 
@@ -29781,198 +30230,6 @@ already_defined(nat ptr x, float ptr y) -> (false)
 </details>
 
 
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(int ptr x, nat y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(int ptr x, int y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(int ptr x, float y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(int ptr x, nat ptr y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(int ptr x, int ptr y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(int ptr x, float ptr y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(float ptr x, nat y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(float ptr x, int y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(float ptr x, float y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(float ptr x, nat ptr y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(float ptr x, int ptr y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
-### already\_defined
-*Defined in: std/ptrpeek.s line 27*
-
-```rust
-already_defined(float ptr x, float ptr y) -> (false)
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 4
-- Transpiled C size: 9
-
-</details>
-
-
 # String
 ### cstr - constant string
 *Defined in: builtins line 1*
@@ -29981,188 +30238,11 @@ already_defined(float ptr x, float ptr y) -> (false)
 cstr
 ```
 
-### str - tautology function for strings
-*Defined in: std/core/string.s line 65*
-
-```rust
-str(str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 3
-
-</details>
-
-
-### str - a string residing on the full breadth of a buffer
-*Defined in: std/core/string.s line 57*
-
-```rust
-str(char[]) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 21
-- Transpiled C size: 165
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-27. string does not fit on buffer
-</details>
-
-
-### str - a string residing on the full breadth of a buffer
-*Defined in: std/core/string.s line 57*
-
-```rust
-str(char[], nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 20
-- Transpiled C size: 147
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-2. null pointer
-22. out of bounds
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-27. string does not fit on buffer
-</details>
-
-
-### str - a string residing on a buffer
-*Defined in: std/core/string.s line 50*
-
-```rust
-str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 20
-- Transpiled C size: 100
-
-</details>
-
-<details><summary>Potential errors</summary>
-
-25. can only define strings on contiguous buffers
-26. can only define strings on non-offset buffers
-</details>
-
-
-### str - a string residing on a buffer
-*Defined in: std/core/string.s line 45*
-
-```rust
-str(char ptr unsafe_ptr, nat pos, nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 10
-- Transpiled C size: 43
-
-</details>
-
-
-### str - a string residing on a buffer
-*Defined in: std/core/string.s line 41*
-
-```rust
-str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
-```
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 5
-- Transpiled C size: 3
-
-</details>
-
-
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 218*
-
-```rust
-cstr(cstr cstr, str) -> (cstr)
-```
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 6
-- Transpiled C size: 3
-
-</details>
-
-
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 218*
-
-```rust
-cstr(unsafe_temp {tag, cstr cstr, str}) -> (cstr)
-```
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 7
-- Transpiled C size: 3
-
-</details>
-
-
-### cstr - extract the cstr from unsafe_temp string
-*Defined in: std/core/string.s line 218*
-
-```rust
-cstr(unsafe_temp {tag, cstr cstr, str}) -> (cstr)
-```
-
-This function's return is meant to be passed to operating system calls,
-or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
-
-<details><summary>Complexity</summary>
-
-- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 7
-- Transpiled C size: 3
-
-</details>
-
-
 ### str - convert to string
-*Defined in: std/core/string.s line 93*
+*Defined in: std/core/string.s line 103*
 
 ```rust
-str(cstr) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(cstr) -> (str)
 ```
 
 Defines an implicit constant buffer using the cstr's memory data.
@@ -30178,10 +30258,10 @@ Subsequent comparisons no longer use the underlying pointer value.
 
 
 ### str - a string residing on a buffer
-*Defined in: std/core/string.s line 86*
+*Defined in: std/core/string.s line 96*
 
 ```rust
-str(char[], nat endpos, "from", nat pos) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(char[], nat endpos, "from", nat pos) -> (str)
 ```
 
 The string automatically detects the first character,
@@ -30207,10 +30287,10 @@ on comparisons of unequal strings.
 
 
 ### str - a string residing on a buffer
-*Defined in: std/core/string.s line 77*
+*Defined in: std/core/string.s line 87*
 
 ```rust
-str(char[], nat pos, "to", nat endpos) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(char[], nat pos, "to", nat endpos) -> (str)
 ```
 
 The string automatically detects the first character,
@@ -30236,10 +30316,10 @@ on comparisons of unequal strings.
 
 
 ### str - a string residing on a buffer
-*Defined in: std/core/string.s line 69*
+*Defined in: std/core/string.s line 79*
 
 ```rust
-str(char[], nat pos, "len", nat length) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+str(char[], nat pos, "len", nat length) -> (str)
 ```
 
 The string automatically detects the first character,
@@ -30263,56 +30343,180 @@ on comparisons of unequal strings.
 </details>
 
 
-### cstr - a cstr description of an error code
-*Defined in: std/core/error.s line 19*
+### str - tautology function for strings
+*Defined in: std/core/string.s line 75*
 
 ```rust
-cstr(last_error) -> (cstr)
+str(str) -> (str)
 ```
-
-Error codes should *not* be compared numerically against
-given numbers, as their numbering changes for different
-programs. Instead, they should be converted to a cstr
-string with this function, which can then be compared.
-This comparison is also one numerical comparison, as
-care is taken for all cstr to point to the same memory
-location.
 
 <details><summary>Complexity</summary>
 
 - Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 2
-- Transpiled C size: 10
+- SSA variables: 5
+- Transpiled C size: 3
 
 </details>
 
 
-### str - reads a string from the console
-*Defined in: std/core/convertstr.s line 113*
+### str - a string residing on the full breadth of a buffer
+*Defined in: std/core/string.s line 67*
 
 ```rust
-str(edit arena, console console) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+str(char[]) -> (str)
 ```
-
-The read string is placed on an arena while consuming only the necessarily minimum size.
 
 <details><summary>Complexity</summary>
 
-- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
-- SSA variables: 47
-- Transpiled C size: 279
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 21
+- Transpiled C size: 165
 
 </details>
 
 <details><summary>Potential errors</summary>
 
-34. read string does not fit on buffer
 2. null pointer
-6. nat subtraction would yield a negative
 22. out of bounds
 25. can only define strings on contiguous buffers
 26. can only define strings on non-offset buffers
-31. unexpected end of console read
+27. string does not fit on buffer
+</details>
+
+
+### str - a string residing on the full breadth of a buffer
+*Defined in: std/core/string.s line 67*
+
+```rust
+str(char[], nat length) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 5 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 147
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+2. null pointer
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+27. string does not fit on buffer
+</details>
+
+
+### str - a string residing on a buffer
+*Defined in: std/core/string.s line 60*
+
+```rust
+str(char[], nat dat.pos, nat dat.length, char dat.first) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 4 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 20
+- Transpiled C size: 100
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+</details>
+
+
+### str - a string residing on a buffer
+*Defined in: std/core/string.s line 55*
+
+```rust
+str(char ptr unsafe_ptr, nat pos, nat length) -> (str)
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 1 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 10
+- Transpiled C size: 43
+
+</details>
+
+
+### str - a string residing on a buffer
+*Defined in: std/core/string.s line 51*
+
+```rust
+str(char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first})
+```
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 5
+- Transpiled C size: 3
+
+</details>
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 228*
+
+```rust
+cstr(cstr cstr, str) -> (cstr)
+```
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 6
+- Transpiled C size: 3
+
+</details>
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 228*
+
+```rust
+cstr(unsafe_temp) -> (cstr)
+```
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
+</details>
+
+
+### cstr - extract the cstr from unsafe_temp string
+*Defined in: std/core/string.s line 228*
+
+```rust
+cstr(unsafe_temp) -> (cstr)
+```
+
+This function's return is meant to be passed to operating system calls,
+or to comptime returns with the pattern 'cstr unsafe_temp string_value'.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 7
+- Transpiled C size: 3
+
 </details>
 
 
@@ -30320,7 +30524,7 @@ The read string is placed on an arena while consuming only the necessarily minim
 *Defined in: std/core/convertstr.s line 113*
 
 ```rust
-str(new CHARS, console console) -> (str {tag, char ptr unsafe_ptr, nat dat.pos, nat dat.length, char dat.first}) on CHARS
+str(new CHARS, console console) -> (str) on CHARS
 ```
 
 The read string is placed onto memory that keeps being reallocated to accommodate its size.
@@ -30357,6 +30561,59 @@ The resulting memory will consume exactly the required size in bytes.
 free(mut any ptr) -> ()
 ```
 </details>
+
+### cstr - a cstr description of an error code
+*Defined in: std/core/error.s line 19*
+
+```rust
+cstr(last_error) -> (cstr)
+```
+
+Error codes should *not* be compared numerically against
+given numbers, as their numbering changes for different
+programs. Instead, they should be converted to a cstr
+string with this function, which can then be compared.
+This comparison is also one numerical comparison, as
+care is taken for all cstr to point to the same memory
+location.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 0 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 2
+- Transpiled C size: 10
+
+</details>
+
+
+### str - reads a string from the console
+*Defined in: std/core/convertstr.s line 113*
+
+```rust
+str(edit arena, console console) -> (str) on CHARS
+```
+
+The read string is placed on an arena while consuming only the necessarily minimum size.
+
+<details><summary>Complexity</summary>
+
+- Level of abstraction: 0 to 6 (0 are builtins or raw C code, 1 calls those, etc.)
+- SSA variables: 47
+- Transpiled C size: 279
+
+</details>
+
+<details><summary>Potential errors</summary>
+
+34. read string does not fit on buffer
+2. null pointer
+6. nat subtraction would yield a negative
+22. out of bounds
+25. can only define strings on contiguous buffers
+26. can only define strings on non-offset buffers
+31. unexpected end of console read
+</details>
+
 
 # run
 ### run
@@ -30479,7 +30736,7 @@ restore_stdout(int) -> ()
 *Defined in: std/test.s line 33*
 
 ```rust
-stdout_to_err(console {tag}) -> (int) on CLI
+stdout_to_err(console) -> (int) on CLI
 ```
 
 <details><summary>Complexity</summary>

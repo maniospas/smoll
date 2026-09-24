@@ -24,7 +24,14 @@ def neq(any ptr x, any ptr y)
 
 def alloc(nat bytes)
     doc "allocate memory"
-    doc "Allocates a memory of the provided size in bytes."
+    doc "Allocates a memory of the provided size in bytes. It then checks for"
+    doc "a null pointer result, which indicates operating system failure and"
+    doc "escapes through an allocation failure. This function does not release"
+    doc "the allocated memory, and the produced result is a pointer not associated"
+    doc "with any type contents. You can associate the pointer with a specific"
+    doc "content type the `compiler::unsafe_attach_type` function. Memory must"
+    doc "be released using the `free` function (see that one's documentation)"
+    doc "on how ensure safety via usage of `defer`."
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
     {builtins::compiler::ptr allocated = malloc(bytes);}
@@ -51,21 +58,48 @@ def realloc(any ptr allocated, nat bytes, "super_unsafe"|blank unsafe_invalidati
 
 def free(mut any ptr allocated)
     doc "free memory"
-    doc "Frees allocated memory."
+    doc "Frees up allocated memory. This does not guard automatically against"
+    doc "double frees or use-after free. To produce safe code, you must declare"
+    doc "a defer that will eventually free allocated memory. Do note that defers are"
+    doc "automatically transferred to called scopres, and often the compiler"
+    doc "may ask the user to transfer variables via returns, thus ensuring that"
+    doc "resources are properly released after last usage. An important note is"
+    doc "that defers are always called, even upon errors. In that case, would-be"
+    doc "would be zero-initialized without the allocation code being actually called."
+    doc "Thus, always check for null pointer values before freeing."
+    doc "Example that is safe and should be followed for unsafe resource"
+    doc "acquisition code/libraries to make resource safe:"
+    doc "```python"
+    doc "import std.core"
+    doc "import std.unsafe as unsafe"
+    doc "def main(on CLI)"
+    doc "    my_ptr = unsafe::alloc compiler::value float::size"
+    doc "    defer"
+    doc "        if exists my_ptr: free my_ptr"
+    doc "        print \"freed\""
+    doc "    print \"allocated\""
+    doc "```"
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
     {if(allocated){free(allocated);allocated=0;}}
 
 def zero(any ptr allocated, nat from, nat to)
     doc "set memory to zero"
-    doc "Memsets a memory region to zero."
+    doc "Memsets a memory region to zero. This assumes that the pointer"
+    doc "is non-zero, and initialized on the desired region. This function"
+    doc "is used mainly by safe buffers to zero-out new allocations."
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
     {ptr_memzero(allocated, from, to);}
 
 def add(any ptr allocated, nat offset)
     doc "pointer addition"
-    doc "Adds a natural number offset to a pointer."
+    doc "Adds a natural number offset to a pointer. The offset is ALWAYS"
+    doc "in bytes, irrespective of the pointer's assocated type. However,"
+    doc "the result will have the same associated type and attachmentss."
+    doc "Prefer using this function only locally and return a pairs of pointers"
+    doc "and offsets, as you would need to alreantively release two pointers"
+    doc "(the offset-ed address and the one that should be released)."
     doc ""
     doc "*Warning: Its usage in unsafe and guarded under std/unsafe.s.*"
     {builtins::compiler::ptr element = allocated + offset;}
@@ -73,6 +107,7 @@ def add(any ptr allocated, nat offset)
 
 def dereference_ptr(any ptr allocated)
     doc "dereference a pointer pointing to a pointer"
+    doc "The result is the internal pointer and has no associated type."
     doc "Pointers directly pointing to pointers induce both indirection"
     doc "and unsafety to the degree that idiomatic code just cannot do"
     doc "without massive safety violations that the unsafety-inducing"

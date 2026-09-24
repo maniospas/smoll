@@ -2523,7 +2523,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
 
     if len(available_types)==0:
         same_shapes: list[ImplementedType] = list()
-        for variation in alternative_list:
+        for variation in method.variations:
             # bring effects here again
             if len(argument_vars)<len(variation.args):
                 vars: list[Variable] = list()
@@ -2542,8 +2542,11 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
             # most signature mistakes wi
             # check variable types without any permissions
             almost_similar = True
-            for i in range(len(vars)):
-                if vars[i].type!=variation.vars[variation_args[i]].type:
+            offset = 0
+            if vars and variation_args:
+                if vars[0].type != variation.vars[variation_args[0]].type: offset = max(0,len(variation_args) - len(vars))
+            for i in range(min(len(vars),len(variation_args))):
+                if i+offset<len(variation_args) and vars[i].type!=variation.vars[variation_args[i+offset]].type:
                     almost_similar = False
                     break
             if almost_similar: same_shapes.append(variation)
@@ -2559,13 +2562,13 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         #     available_types = alternative_list
         #     error_token.error("type", "no function '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"' even though there is only one option", suggestions=[t.signature() for t in alternative_list])
         # else: 
-        error_token.error("type", "no function matches '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature() for t in alternative_list])
+        error_token.error("type", "no function matches '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature(compact=True) for t in alternative_list])
     if len(available_types)>1:
         out_format_signature = "any" if out_format is None else signature_like(out_format, impl)
         # if is_lsp and file.is_main_file:
         #     for callee in available_types: send_callee(callee)
         #     available_types.clear()
-        error_token.error("type", "more than one functions match '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature()+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in available_types])
+        error_token.error("type", "more than one functions match '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature(compact=True)+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in available_types])
 
 
     callee: ImplementedType = available_types[0]
@@ -7729,7 +7732,7 @@ async def main():
                     else: docs_file.write("\n")
                     if callee.at: docs_file.write("*Defined in: "+callee.at.file.path+" line "+str(callee.at.row)+"*\n")
                     else: docs_file.write("*Defined by the compiler*\n")
-                    docs_file.write("\n```rust\n"+callee.signature()+"\n```\n")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+                    docs_file.write("\n```rust\n"+callee.signature(compact=callee.has_retrieved_class is None and callee.has_retrieved_singleton is None)+"\n```\n")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
                     if len(callee.doc)>1: docs_file.write("\n"+"\n".join(strip_quotes(doc.replace("\\\"", "\"")) for doc in callee.doc[1:])+"\n")
                     spawned_error_codes = callee.spawned_error_codes
                     if len(callee.implementation):

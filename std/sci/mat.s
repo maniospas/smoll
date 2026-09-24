@@ -89,11 +89,15 @@ def vec(mat m)
     return vec(m.unsafe_ptr, m.pos, m.rows*m.cols)
 
 def mutvec(mat m)
-    doc "view a matrix as a vector"
+    doc "view a matrix as a mutable vector"
     return unsafe_mut vec(m.unsafe_ptr, m.pos, m.rows*m.cols)
 
 def row(mat m, nat i)
     doc "view matrix row as a vector"
+    doc "This is possible due to the contiguous representation"
+    doc "of matrices. There is no equivalent operations for"
+    doc "columns, given that those are not contiguously represented"
+    doc "in memory and thus operating on them can be slow."
     if i>=m.rows: fail "row out of bounds"
     return vec(m.unsafe_ptr, m.pos+i*m.stride, m.cols)
 

@@ -1,21 +1,12 @@
 import std.core
-import std.scope
+def @ = compiler::varname
 
-def budget(nat capacity)
-    return class assigned remaining=mut capacity
+def conditional(bool case)
+    CHARS = edit bucket()
+    if case: s = copy 123
+    else:    s = copy 345
+    return (s, CHARS) # this would not be possible with 'CHARS = new()'
 
-def consume(on edit budget FINITE, nat|blank cost)
-    if cost is blank: cost = 1
-    FINITE.remaining = FINITE.remaining-cost
-
-def FINITE()
-    compt console().print "What's the runtime budget?"
-    return budget compt (try capacity=nat console()) and capacity 
-    # Note:
-    # 'true and value' -> value
-    # 'false and value' -> zero-initialized
-
-def main(on CLI, on edit FINITE)
-    for i in range of 10
-        consume()
-        print i
+def main(on CLI)
+    print conditional(true).s
+    print conditional(false).s

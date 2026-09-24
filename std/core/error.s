@@ -55,7 +55,7 @@ def WHICHERR()
     doc "```"
     doc "*Warning: This is mainly intended for consumption by the"
     doc "main function, as it uses a thread-unsafe console handler"
-    doc "that does not respect singleton console rules."
+    doc "that does not respect singleton console rules.*"
     init = true
     defer
         if init

@@ -18,8 +18,10 @@ local import std.core
 local import std.unsafe as unsafe
 
 def open(cstr path, blank|"binary" mode)
-    doc "loads a path as a openable file"
-    doc "The file name is not maintained and must be tracked externally, if needed."
+    doc "opens a path as a readable file"
+    if mode is "binary": doc "The file is opened in binary mode."
+    else: doc "The file is opened is text mode."
+    doc "The file name is not maintained and, if needed, must be tracked externally."
     if compiler::back type "emcc"
         {"-sFETCH"}
         {"-sASYNCIFY"}
@@ -34,8 +36,10 @@ def open(cstr path, blank|"binary" mode)
     return class unsafe_mut unsafe_ptr
 
 def open(str path, blank|"binary" mode)
-    doc "loads a path as a openable file"
-    doc "The file name is not maintained and must be tracked externally, if needed."
+    doc "opens a path as a readable file"
+    if mode is "binary": doc "The file is opened in binary mode."
+    else: doc "The file is opened is text mode."
+    doc "The file name is not maintained and, if needed, must be tracked externally."
     if mode is blank: return open cstr unsafe_temp path
     else: return open(cstr unsafe_temp path binary)
 

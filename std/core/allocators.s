@@ -21,9 +21,36 @@ local import compiler as cp
 
 def new()
     doc "allocations on new memory"
+    doc "This is the laziest means of allocation that has no state and"
+    doc "signfies the intent to have any allocations be handled by the"
+    doc "operating system. It has the disadvantage that it cannot really"
+    doc "perform allocations within conditions or loops that escape"
+    doc "their scope. However, allocations made within the top level"
+    doc "of functions *will* be properly deferred to the calling scope."
+    doc "Thus, the following exammple is valid, where `CHARS` is an effect;"
+    doc "a variable automatically passed to string allocators."
+    doc "```python"
+    doc "import std.core"
+    doc "def combine_with_space(on new CHARS, cstr s1, cstr s2)"
+    doc "    return s1+s2+\" \""
+    doc "def main(on CLI, on new CHARS)" # could just write CHARS=new() inside
+    doc "    list_s1 = [\"hel\", \"de\", \"wo\"]"
+    doc "    list_s2 = [\"lo\", \"ar\", \"rld\"]"
+    doc "    for i in range of 2"
+    doc "        print nn combine_with_space(list_s1[i], list_s2[i])"
+    doc "```"
+    doc "In the above example, intermediate strings are released within `combine_with_space`,"
+    doc "and its return is released at the end of each loop. Thus, although this pattern"
+    doc "is easy to write, it cannot really escape the declared scope. Repeat allocations"
+    doc "are also significantly slower than just using something a circular buffer in place of the"
+    doc "CHARS effect."
     return class()
 
 local def bucket_contents()
+    doc "structure of an allocated bucket allocator"
+    doc "This is the actual structure of a bucket allocator, moved via one"
+    doc "indirection onto memory. Then, bucket allocations retrieve this"
+    doc "structure and register onto it a new memory element."
     return class (
         assigned elements = mut unsafe::alloc cp::value cp::size cp::ptr(),
         assigned size = mut 0,
@@ -32,11 +59,15 @@ local def bucket_contents()
 
 def bucket()
     doc "grouped allocations on new memory"
-    doc "This is similar to 'new' but moves all allocated memory together,"
-    doc "releasing it only when there is no further use for any of its contents."
+    doc "This allocator is similar to `new` in that directly allocates"
+    doc "using the operating system's `malloc`. However, it does not allow"
+    doc "each allocated memory segment to manage its own deferred dellocation,"
+    doc "and instead bundles all allocations it is involved in to have them"
+    doc "be released together, once no longer in use."
     doc "Do note that this operation is typically the lazy way out,"
-    doc "as it acquires and releases memory using one extra layer of indirection"
-    doc "compared to structures like arenas. On the other hand, it's pretty versatile"
+    doc "as it must accompany the allocated values within function returns. It also"
+    doc " acquires and releases memory using one extra layer of indirection"
+    doc "compared to allocators like arenas. On the other hand, it is pretty versatile"
     doc "for holding conditional results. Example:"
     doc "```python"
     doc "import std.core"
@@ -44,11 +75,10 @@ def bucket()
     doc "    CHARS = edit bucket()"
     doc "    if case: s = copy 123"
     doc "    else:    s = copy 345"
-    doc "    return (s, CHARS) # this would not be possible with 'CHARS = new()'"
-    doc "def main()"
-    doc "    CLI = edit console()"
-    doc "    print conditional true"
-    doc "    print conditional false"
+    doc "    return (s, CHARS) # returning s would not be possible with 'CHARS = new()'"
+    doc "def main(on CLI)"
+    doc "    conditional(true).s.print()"
+    doc "    conditional(false).s.print()"
     doc "```"
     unsafe_ptr = mut bucket_contents[].alloc(1 unsafe_leaky).unsafe_ptr
     defer
@@ -61,24 +91,39 @@ def bucket()
     return class(unsafe_ptr)
     
 def arena(edit any[] buf, nat _pos)
-    doc "a buffer and mutable position pair"
-    doc "This structure is often used to track the size of allocated"
-    doc "data within the buffer."
-    doc "Contrary to circular buffers, arenas are not freed automatically"
-    doc "and therefore eventually run out of space. However, they come"
-    doc "with data integrity guarantees. Attach a garbage"
-    doc "collector to an arena per `gc arena alloc 4` (or construct it"
-    doc "with another allocator)." 
+    doc "arena buffer"
+    doc "This consists of a buffer and mutable position pair, where the"
+    doc "position is often used to track the size of used"
+    doc "data within the buffer. Allocating in an arena just consumes more"
+    doc "of its memory region allowance."
+    doc "Contrary to circular buffers, arena data are not overwritten"
+    doc "on-demand. This has the advantage that data remain intact until"
+    doc "the arena is manuall cleared, but has the disadnvatage that"
+    doc "arena allocations may fail due to running out of space."
     pos = mut _pos
     return class(buf, pos)
 
 def arena(edit any[] buf)
-    doc "a buffer and mutable position pair"
-    doc "The position starts from 0. This structure is often used"
-    doc "to track the size of allocated data within the buffer."
-    doc "Contrary to circular buffers, arenas are not freed automatically"
-    doc "and therefore eventually run out of space. However, they come"
-    doc "with data integrity guarantees."
+    doc "arena buffer"
+    doc "This consists of a buffer and mutable position pair, where the"
+    doc "position is often used to track the size of used"
+    doc "data within the buffer. Allocating in an arena just consume more"
+    doc "of its region."
+    doc "Contrary to circular buffers, arena data are not overwritten"
+    doc "on-demand. This has the advantage that data remain intact until"
+    doc "the arena is manuall cleared, but has the disadnvatage that"
+    doc "arena allocations may fail due to running out of space."
+    doc "This is the version most often used in practice to initialize"
+    doc "arenas from allocated buffers. Example:"
+    doc "```python"
+    doc "import std.core"
+    doc "def main(on CLI)"
+    doc "    CHARS = edit arena alloc 4096 # allocated buffer of 4K characters"
+    doc "    message = \"hello\"+\" \"+\"world!\""
+    doc "    print message"
+    doc "```"
+    doc "In the example above, string addition automatically uses the arena"
+    doc "by grabbing it via string addition."
     return arena(buf, 0)
 
 def len(arena arn)
@@ -88,6 +133,34 @@ def len(arena arn)
     return arn.pos
 
 def allocated(edit any[] buf, nat pos)
+    doc "an allocated buffer region"
+    doc "This function is used mainly to declare a class that indicates"
+    doc "the outcome of calling an `alloc` function on safe memory constructs,"
+    doc "like `new,bucket,arena,circular,list`. For abstraction purposes it"
+    doc "holds a buffer component and a position index on that buffer. There is"
+    doc "no global guarantee about what each or future allocators will choose"
+    doc "for the buffer construction and offset, other than that the buffer's"
+    doc "pointer offset by the buffer's internal offset and this structure's"
+    doc "position yield the correct element address of elements. For this reason,"
+    doc "assuming that `A` is an allocator, get addresses to its elements via"
+    doc "`A.buf[A.pos]&, or, better via the equivalent `at A`."
+    doc "**Prefer using functions like `at` on an allocated result**"
+    doc "to safelyconver. That pair can freely be passed as an argument to new consturctors,"
+    doc "such as strings or new arenas. Here is an example:"
+    doc "```python"
+    doc "import std.core"
+    doc "import compiler as cp"
+    doc "def main(on CLI)"
+    doc "    mydata = edit arena float[].alloc 10"
+    doc "    float_ptr = at mydata.alloc() # allocate one element"
+    doc "    float_ptr = 5.0               # move data to a pointer"
+    doc "    print cp::deref float_ptr     # dereference pointer data"
+    doc "```"
+    doc "Allocations differ to arenas as a type, despite holding the same"
+    doc "data internally in that arenas track the end of their allocated region, whereas"
+    doc "allocations track the starting position within a buffer; the allocation size"
+    doc "is external knowledge, and safety is enforced purely through buffer bounds"
+    doc "checking."
     return class(buf, pos)
 
 def status(arena|allocated self)
@@ -125,21 +198,21 @@ def list(edit any[] _buf, blank|"external" init_strategy)
     doc "list buffer management"
     doc "List defined over a mutable buf that is automatically managed and resized."
     doc "A capacity is maintained so that resizes are not performed too frequently."
-    if init_strategy is blank
-        buf = mut _buf.alloc 1
-    else
-        buf = mut _buf
+    if init_strategy is blank: buf = mut _buf.alloc 1
+    else: buf = mut _buf
     length = mut 0
     return class(buf, length)
 
 def len(list self)
+    doc "list length"
+    doc "This is the number of user-facing allocation elements. The list may have"
+    doc "allocated space for more elements internally."
     return self.length
     
 def get(circular|list self, nat pos)
     doc "get a list element pointer"
     if self is list and inbounds_guarantee is blank
-        if pos>=self.length
-            fail "out of bounds"
+        if pos>=self.length: fail "out of bounds"
     return self.buf[pos]&
 
 def mutget(edit circular|list self, nat pos)

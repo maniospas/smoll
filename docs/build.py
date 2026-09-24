@@ -120,11 +120,24 @@ def export(path, target):
                 if not defined_in:
                     continue
 
+                code_blocks = find_tag_sections(overload_html, "code")
+                is_class = False
+                if code_blocks:
+                    first_code = strip_html_tags(
+                        overload_html[code_blocks[0][1]:code_blocks[0][2]]
+                    )
+                    arrow = first_code.find("->")
+                    if arrow != -1:
+                        import re
+                        # A class return starts a tagged record, e.g. {tag} or {tag, mut ...}.
+                        is_class = re.search(r"\{tag(?=\s*[,}])", first_code[arrow + 2:]) is not None
+
                 definitions.append({
                     "name": name,
                     "definedIn": defined_in,
                     "html": overload_html,
                     "text": text,
+                    "isClass": is_class,
                 })
 
         if not definitions:
@@ -389,7 +402,12 @@ def export(path, target):
 
         function renderDirectory() {
             const groups = groupByName(visibleDefinitions());
-            const names = [...groups.keys()].sort((a, b) => a.localeCompare(b));
+            const names = [...groups.keys()].sort((a, b) => {
+                const aClass = groups.get(a).some(item => item.isClass);
+                const bClass = groups.get(b).some(item => item.isClass);
+                if (aClass !== bClass) return aClass ? -1 : 1;
+                return a.localeCompare(b);
+            });
 
             pathLine.innerHTML = currentPath ? '<button class="std-up" type="button">←</button><span>' + escapeHtml(currentPath) + '</span>' : '<span>std/</span>';
             const up = pathLine.querySelector(".std-up");
@@ -433,7 +451,15 @@ def export(path, target):
                 const button = document.createElement("button");
                 button.type = "button";
                 button.className = "std-definition-link" + (name === selectedName ? " selected" : "");
-                button.textContent = name;
+                const nameText = document.createElement("span");
+                nameText.textContent = name;
+                button.appendChild(nameText);
+                if (groups.get(name).some(item => item.isClass)) {
+                    const classLabel = document.createElement("span");
+                    classLabel.className = "std-class-label";
+                    classLabel.textContent = "(class)";
+                    button.appendChild(classLabel);
+                }
                 button.onclick = () => {
                     selectedName = name;
                     showDefinition(groups.get(name));
@@ -602,6 +628,16 @@ def export(path, target):
             height: 100vh;
         }
         .toc i {color: #888}
+        .std-definition-link {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .std-class-label {
+            margin-left: auto;
+            font-size: 0.75em;
+            color: #888;
+        }
         .std-files {
             margin-top: 80px;
             margin-bottom: 40px;

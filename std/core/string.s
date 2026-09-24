@@ -20,13 +20,23 @@ local import std.core.allocators
 local import std.unsafe as unsafe
 
 
-def arena(char::tag)    return arena char[]
-def circular(char::tag) return circular char[]
-def list(char::tag)     return list char[]
+def arena(char::tag)
+    doc "arena of characters"
+    return arena char[]
+
+def circular(char::tag)
+    doc "circular buffer of characters"
+    return circular char[]
+
+def list(char::tag)
+    doc "list of characters"
+    return list char[]
+
 local def alloc(on edit new CHARS, nat length) 
     if not try ret = mut allocated(char[].alloc length, 0)
         fail "allocation failed"
     return ret
+    
 def char_allocator = new|bucket|arena<char::tag>|circular<char::tag>|list<char::tag>
 
 def exists(cstr c)

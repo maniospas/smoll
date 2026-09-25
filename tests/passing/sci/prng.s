@@ -76,7 +76,7 @@ def test_bounds(on CLI, on edit RAND)
         assert(x < 6, "rand of 6 is in [0,6)" failure_only)
 
 
-def main(CLI, on edit RAND)
+def main(CLI, edit RAND)
     test_float()
     test_bounded()
     test_low_bit()

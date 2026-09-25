@@ -2,7 +2,7 @@ import std.core
 import std.test
 import std.rand
 
-def main(CLI, on edit RAND)
+def main(CLI, edit RAND)
     r1 = rand()
     r2 = rand()
     assert(r1 >= 0.0, "rand is >= 0")

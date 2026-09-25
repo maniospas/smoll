@@ -11,7 +11,7 @@ def foo(pipe obj)
     p = mut macro<match> (@open(obj writer), pair::name)
     p.x = 3.0
 
-def main(on CLI)
+def main(CLI)
     THREADS = edit growing_thread_pool(cpu 16, 1024)
 
     obj = mut macro<shared> @pair(1.0,2.0)

@@ -7,5 +7,5 @@ def select(cstr operation)
 
 def OP = compt select "sub"
 
-def main(on CLI)
+def main(CLI)
     assert(3==OP.compiler::call 2, "properly called the compile-time determined functor")

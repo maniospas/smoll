@@ -23,5 +23,5 @@ def print(on CLI, const strstrmap map)
     print map["hello"]
     print map["manio"]
 
-def main(on CLI)
+def main(CLI)
     print test2().map

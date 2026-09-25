@@ -5,6 +5,6 @@ def choose(nat x)
     if x==0: return "hello"
     return "world"
 
-def main(on CLI)
+def main(CLI)
     print choose 0
     print choose 1

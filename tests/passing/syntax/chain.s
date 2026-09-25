@@ -1,4 +1,4 @@
 import std.core
 
-def main(on CLI)
+def main(CLI)
     print("123"=="123")

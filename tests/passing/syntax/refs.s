@@ -1,6 +1,6 @@
 import std.core
 
-def main(on CLI)
+def main(CLI)
     x = mut 1
     y = ref x
     z = ref y

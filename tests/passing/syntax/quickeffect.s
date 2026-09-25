@@ -11,7 +11,7 @@ def consume(on edit budget FINITE, nat|blank cost)
 def FINITE()
     return budget 12
 
-def main(on CLI, on edit FINITE)
+def main(CLI, on edit FINITE)
     for i in range of 10
         consume()
         print i

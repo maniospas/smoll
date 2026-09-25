@@ -23,10 +23,26 @@ def console()
     doc "in the `main()` function and then passed to dependent calls, for example via an"
     doc "an effect for convenience. Standard library print functions provide the CLI effect"
     doc "and you can propagate to this by prepending `on CLI` to function"
-    doc "arguments."
-    doc "The console is a zero-cost abstraction in that it does not transfer any data"
-    doc "but relies on singleton safety to synchronize io across threads."
-    doc "Quickly print internals for debugging with `unsafe_console()`."
+    doc "arguments. Two equivalent examples:"
+    doc "```python"
+    doc "import std.core"
+    doc "def main()"
+    doc "    CLI = console()"
+    doc "    print \"hello world!\" # automatically pass CLI as argument"
+    doc "```"
+    doc "```python"
+    doc "import std.core"
+    doc "def main(CLI) # recommended pattern"
+    doc "    print \"hello world!\""
+    doc "```"
+    doc "The last example is the recommended way of creating main functions. It works"
+    doc "because CLI is a name alias for the console and also an effect for print functions."
+    doc "The CLI argument does not have a variable name, which makes it adopt the name of the"
+    doc "last type word, if possible. Finally, the arguments of main are automatically contructed,"
+    doc "if it is possible to do so with a function without arguments - like `console()`."
+    doc "As a last remark, the console is a zero-cost abstraction in that it does"
+    doc "not transfer any data, but relies on singleton safety to synchronize io across threads."
+    doc "Quickly print internals for debugging with `console(type \"unsage\")`."
     # this trick of going through a mut, allows edit console to be an available action
     handler = mut singleton()
     return const handler
@@ -36,7 +52,7 @@ def CLI = console
 def console("unsafe")
     doc "references the system console unsafely"
     doc "This is convenient for print debugging by writing `console(type \"unsafe\").print ...`"
-    doc "without needing to evoke an effect to pass the normally singleton console."
+    doc "without needing to pass the console singleton."
     CLI = edit console()
     debug::unsafe_singletons()
     return CLI
@@ -107,7 +123,31 @@ def supports_ansi(console CLI)
     {builtins::bool supports = __smo_ansi_supported();}
     return supports
 
-def colors(edit console CLI)
+def colors(console CLI)
+    doc "ansi colorization controls for the console"
+    doc "Using this rather than direct ansi codes has three"
+    doc "advantages:"
+    doc "- a reset code is deferred to be emmited even"
+    doc "in case of errors, so that a color does"
+    doc "not persist in the console"
+    doc "- it automatically"
+    doc "checks if the console supports colors and, if not,"
+    doc "throttles ansi code to not be printed and weird"
+    doc "out the the output"
+    doc "- it uses color names for colorizing the console"
+    doc ""
+    doc "The main main usage pattern is to initialize this"
+    doc "and then set colors similarly to the example:"
+    doc "```python"
+    doc "import std.core"
+    doc "def main(CLI)"
+    doc "    colors = colors CLI"
+    doc "    set(colors italic)"
+    doc "    set(colors green)"
+    doc "    print \"hello world!\""
+    doc "```"
+    doc "It is recommended to not pass this between functions,"
+    doc "but instead construct the color handler from the console."
     initialized = supports_ansi CLI
     defer
         if initialized: {printf("\033[0m");}

@@ -26,7 +26,7 @@ def test5(on CLI, edit arena<char::tag> arn)
     assert("test2"==compiler::deref z, "correct operations on arena")
     assert(10==len arn, "proper consumption before test ends")
 
-def main(on CLI)
+def main(CLI)
     arn = edit arena alloc 1024
     test1 arn
     print arn.pos

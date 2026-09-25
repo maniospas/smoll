@@ -17,7 +17,7 @@ def test2(on CLI)
     k = mut alloc(float[], 3)
     return (t,j,k)
 
-def main(on CLI)
+def main(CLI)
     t = test2()
     assert(t.t[1]==2.0, "read from transferred buffer")
     assert(t.j[1]==2.0, "read from shallow copied buffer")

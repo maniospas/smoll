@@ -20,14 +20,57 @@ local import std.sci.unsafe
 local import std.unsafe as unsafe
 local import std.unsafe::add
 
-def arena(float::tag)    return arena float[]
-def circular(float::tag) return circular float[]
-def list(float::tag)     return list float[]
-local def float_allocator = new|bucket|arena<float::tag>|circular<float::tag>
+def arena(float<float>::tag)
+    doc "arena of floats"
+    doc "This can be used as part of a signature to indicate"
+    doc "that an arena of floats is the expected input, and not"
+    doc "any arena. The `float<float>::tag` is purely a mnemonic."
+    doc "That said, instead of obtaining this type per"
+    doc "`arena<float<float>::tag>`, prefer the following pattern,"
+    doc "which selects float allocators that are also arenas."
+    doc "```python"
+    doc "import std.core"
+    doc "import std.sci"
+    doc "def affine(on edit float_allocator^arena FLOATS, vec v1, vec v2, float offset)"
+    doc "    return v1+v2+offset"
+    doc "def main(CLI)"
+    doc "    FLOATS = edit arena float[].alloc 1024"
+    doc "    x = vec[1.0, 2.0, 3.0]"
+    doc "    print affine(x, x, 1.0)"
+    doc "```"
+    return arena float[]
+
+def circular(float<float>::tag) 
+    doc "circular buffer of floats"
+    doc "This can be used as part of a signature to indicate"
+    doc "that a circular buffer of floats is the expected input, and not"
+    doc "any circular buffer. The `float<float>::tag` is purely a mnemonic."
+    doc "That said, instead of obtaining this type per"
+    doc "`circular<float<float>::tag>`, prefer the following pattern,"
+    doc "which selects float allocators that are also arenas."
+    doc "```python"
+    doc "import std.core"
+    doc "import std.sci"
+    doc "def affine(on edit float_allocator^circular FLOATS, vec v1, vec v2, float offset)"
+    doc "    return v1+v2+offset"
+    doc "def main(CLI)"
+    doc "    FLOATS = edit circular float[].alloc 1024"
+    doc "    x = vec[1.0, 2.0, 3.0]"
+    doc "    print affine(x, x, 1.0)"
+    doc "```"
+    return circular float[]
+
+def list(float<float>::tag)
+    return list float[]
+
+local def float_allocator = new|bucket|arena<float<float>::tag>|circular<float<float>::tag>
 
 def vec(on new|bucket FLOATS, nat length, "dirty"|blank clear_policy)
     doc "vector on a new buffer"
-    doc "Has the provided length. Requires a 'new()' allocator to denote that the vector will be placed on a new buffer."
+    doc "Has the provided length. Requires a `new()` allocator to denote that the vector"
+    doc "will be placed on a new buffer. There is an optional dirty overload that retains"
+    doc "garbage data instead of zero-initializing the vector. That is mainly used if you"
+    doc "plan to fill the vector."
     buf = float[].alloc(length unsafe_first () unsafe_leaky)
     if clear_policy is blank
         buf.unsafe_ptr.unsafe::zero(0, 8*length)
@@ -45,7 +88,7 @@ def constvec(float[] buf)
     if buf.unsafe_offset.nat()!=0: fail "cannot place vectors on buffer offsets"
     return const vec(unsafe_mut buf.unsafe_ptr, 0, len buf)
 
-def vec(on edit arena<float::tag>|circular<float::tag> FLOATS, nat length, "dirty"|blank clear_policy)
+def vec(on edit arena<float<float>::tag>|circular<float<float>::tag> FLOATS, nat length, "dirty"|blank clear_policy)
     doc "vector allocation"
     if FLOATS.buf.unsafe_align.nat()!=8: fail "can only place vectors on contiguous buffers"
     if FLOATS.buf.unsafe_offset.nat()!=0: fail "cannot place vectors on buffer offsets"
@@ -55,7 +98,7 @@ def vec(on edit arena<float::tag>|circular<float::tag> FLOATS, nat length, "dirt
     return vec(surface.buf.unsafe_ptr, surface.pos, length)
 
 def len(vec v)
-    doc "vectot length"
+    doc "vector length"
     return v.length
 
 def mutget(edit vec v, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
@@ -302,6 +345,21 @@ def copy(on edit float_allocator FLOATS, vec v)
     return result
 
 def arena(edit vec v)
+    doc "treat a vector surface as an arena"
+    doc "This can be useful for interfacing and storting the"
+    doc "results of operations onto a vector. It is also used"
+    doc "by the `self` function to perform in-place operations."
+    doc "Example, where default vector allocations are `new` allocations:"
+    doc "```python"
+    doc "import std.core"
+    doc "import std.sci"
+    doc "def main(CLI)"
+    doc "    v = edit new().vec 3"
+    doc "    x = vec [1.0, 2.0, 3.0]"
+    doc "    FLOATS = edit arena v"
+    doc "    print x+x"
+    doc "    print v # same as above"
+    doc "```"
     buf = edit float[]
     buf.unsafe_ptr = v.unsafe_ptr&
     buf.unsafe_size = v.pos+len v
@@ -309,4 +367,16 @@ def arena(edit vec v)
     return arena(buf, pos)
 
 def self(mut vec v)
+    doc "prepares a structural type for in-place vector operations"
+    doc "This defines an arena on a vector surface and then returns"
+    doc "the arena and vector pair. As a result, numeric vector operations"
+    doc "like `self(x)+y` are performed in-place on vector `x`. Example:"
+    doc "```python"
+    doc "import std.core"
+    doc "import std.sci"
+    doc "def main(CLI)"
+    doc "    x = edit new().vec 3"
+    doc "    y = vec [1.0, 2.0, 3.0]"
+    doc "    print self(x)+y # no new allocation"
+    doc "```"
     return (arena(v), v)

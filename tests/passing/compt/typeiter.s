@@ -12,6 +12,6 @@ def addnat(nat x)
         if x==value v
             return abstract type add<nat,v>
 
-def main(on CLI)
+def main(CLI)
     x = call_one type addnat
     print x.call 5 # prints 6

@@ -24,11 +24,12 @@ local def to_number(NumberOrPtr x)
     else
         return cp::deref x
 
-local def already_defined(NumberOrPtr x, NumberOrPtr y)
-    if x is Number and y is Number
-        return compiler::true()
-    else
-        return compiler::false()
+local def is_number_pair(NumberOrPtr x, NumberOrPtr y)
+    doc "whether two NumberOrPtr are both numbers"
+    doc "This is yields a compile-time boolean, as the information"
+    doc "is extracted from the type system."
+    if x is Number and y is Number: return compiler::true()
+    else: return compiler::false()
 
 local def String = str|cstr
 
@@ -66,13 +67,13 @@ def eq(NumberOrPtr _x, NumberOrPtr _y)
     y = to_number _y
     if is_different(x,y)
         cp::skip()
-    if already_defined(_x, _y)
+    if is_number_pair(_x, _y)
         cp::skip()
     return x==y
 
 def neq(NumberOrPtr _x, NumberOrPtr _y)
     doc "overloads an operator while dereferencing pointer data"
-    if already_defined(_x, _y)
+    if is_number_pair(_x, _y)
         cp::skip()
     x = to_number _x
     y = to_number _y
@@ -82,7 +83,7 @@ def neq(NumberOrPtr _x, NumberOrPtr _y)
 
 def add(NumberOrPtr _x, NumberOrPtr _y)
     doc "overloads an operator while dereferencing pointer data"
-    if already_defined(_x, _y)
+    if is_number_pair(_x, _y)
         cp::skip()
     x = to_number _x
     y = to_number _y
@@ -92,7 +93,7 @@ def add(NumberOrPtr _x, NumberOrPtr _y)
 
 def sub(NumberOrPtr _x, NumberOrPtr _y)
     doc "overloads an operator while dereferencing pointer data"
-    if already_defined(_x, _y)
+    if is_number_pair(_x, _y)
         cp::skip()
     x = to_number _x
     y = to_number _y
@@ -102,7 +103,7 @@ def sub(NumberOrPtr _x, NumberOrPtr _y)
 
 def mul(NumberOrPtr _x, NumberOrPtr _y)
     doc "overloads an operator while dereferencing pointer data"
-    if already_defined(_x, _y)
+    if is_number_pair(_x, _y)
         cp::skip()
     x = to_number _x
     y = to_number _y
@@ -112,7 +113,7 @@ def mul(NumberOrPtr _x, NumberOrPtr _y)
 
 def div(NumberOrPtr _x, NumberOrPtr _y)
     doc "overloads an operator while dereferencing pointer data"
-    if already_defined(_x, _y)
+    if is_number_pair(_x, _y)
         cp::skip()
     x = to_number _x
     y = to_number _y
@@ -122,7 +123,7 @@ def div(NumberOrPtr _x, NumberOrPtr _y)
 
 def lt(NumberOrPtr _x, NumberOrPtr _y)
     doc "overloads an operator while dereferencing pointer data"
-    if already_defined(_x, _y)
+    if is_number_pair(_x, _y)
         cp::skip()
     x = to_number _x
     y = to_number _y
@@ -132,7 +133,7 @@ def lt(NumberOrPtr _x, NumberOrPtr _y)
 
 def gt(NumberOrPtr _x, NumberOrPtr _y)
     doc "overloads an operator while dereferencing pointer data"
-    if already_defined(_x, _y)
+    if is_number_pair(_x, _y)
         cp::skip()
     x = to_number _x
     y = to_number _y
@@ -142,7 +143,7 @@ def gt(NumberOrPtr _x, NumberOrPtr _y)
 
 def le(NumberOrPtr _x, NumberOrPtr _y)
     doc "overloads an operator while dereferencing pointer data"
-    if already_defined(_x, _y)
+    if is_number_pair(_x, _y)
         cp::skip()
     x = to_number _x
     y = to_number _y
@@ -152,7 +153,7 @@ def le(NumberOrPtr _x, NumberOrPtr _y)
 
 def ge(NumberOrPtr _x, NumberOrPtr _y)
     doc "overloads an operator while dereferencing pointer data"
-    if already_defined(_x, _y)
+    if is_number_pair(_x, _y)
         cp::skip()
     x = to_number _x
     y = to_number _y

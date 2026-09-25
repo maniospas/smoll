@@ -176,8 +176,7 @@ The default ending is otherwise *"\n"*.
 ```python
 import std.core
 
-def main()
-    CLI = edit console() 
+def main(CLI)
     print nn "hello " # equivalent to print("hello", "")
     print "world!"
 ```

@@ -75,7 +75,7 @@ def get(mat m, nat i, nat j, "unsafe_assume_inbounds"|blank inbounds_guarantee)
 
 def mat(vec v, "row"|"col" orientation)
     doc "view a vector as a matrix on the same memory"
-    doc "A 'type \"row\"' or 'type \"col\"' marker is needed"
+    doc "A `type \"row\"` or `type \"col\"` marker is needed"
     doc "to indicate the new matrix's orientation."
     if orientation is "row"
         return mat(v.unsafe_ptr, v.pos, 1, v.length, v.length)
@@ -83,7 +83,6 @@ def mat(vec v, "row"|"col" orientation)
         # stride=1: consecutive elements of the column are adjacent
         return mat(v.unsafe_ptr, v.pos, v.length, 1, 1)
     
-
 def vec(mat m)
     doc "view a matrix as a vector"
     return vec(m.unsafe_ptr, m.pos, m.rows*m.cols)

@@ -11,7 +11,7 @@ def load(on console CLI, nat16 address)
     r_value = bor(r_value_h.lshift 8, r_value_l)
     return nat16 nat r_value
 
-def main(on CLI)
+def main(CLI)
     try ret = load nat16 0 # zero-initialized on failure (we don't need to do it ourselves)
     print nat ret
     

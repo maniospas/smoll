@@ -16,7 +16,7 @@ def safe_main(on CLI)
         v = FLOATS2.mul(2.0, v1+v2+v) # THIS SHOULD CREATE AN ERROR
     print v[0]
     
-def main(on CLI)
+def main(CLI)
     try safe_main()
     if try error=compiler::last_error()
         print cstr error

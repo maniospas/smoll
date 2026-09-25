@@ -9,6 +9,6 @@ def test()
         x = x+reuse i
     return x
 
-def main(on CLI)
+def main(CLI)
     r = test()
     print r

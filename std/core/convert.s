@@ -34,8 +34,9 @@ def int(Number x)
 
 def nat(Number x)
     doc "cast to nat"
-    doc "Converting to natural numbers loses information."
-    doc" Fails on negative inputs to guard against assumption errors."
+    if not x is nat
+        doc "Converting to natural numbers loses information."
+        doc" Fails on negative inputs to guard against assumption errors."
     if x is int   and x<int(0): fail "cannot convert negative int to nat"
     if x is float and x<float(0): fail "cannot convert negative float to nat"
     {builtins::nat value=x;}
@@ -48,21 +49,41 @@ def exists(const any ptr x)
 
 def bits(nat value)
     doc "bit representation"
-    doc "Retrieves the bit representation of a number of shift"
-    doc "arithmetics and bitwise operations."
+    doc "Retrieves the bit representation of a number for shift"
+    doc "arithmetics and bitwise operations. This uses a `nat`"
+    doc "storage container underneath but provides type-safe"
+    doc "abstractions on top of it. In addition to bit representation"
+    doc "operators, as well as getting and setting specific bits, it"
+    doc "it possible to work with bitfield slices and store small"
+    doc "non-overlapping data there. Here is an advanced example:"
+    doc "```python"
+    doc "import std.core"
+    doc "def MYBITFIELD = compt ( # compile-time declaration"
+    doc "   assigned first = of 3,"
+    doc "   assigned second = of(3 to 5)"
+    doc ")"
+    doc "def main(CLI)"
+    doc "    x = mut bits 0"
+    doc "    x = x.mask(MYBITFIELD.first, bits 5)"
+    doc "    print nat x.slice MYBITFIELD.first # prints 5"
+    doc "```"
     return class value
 
 def bits(int x)
     doc "bit representation"
-    doc "Retrieves the bit representation of a number of shift"
-    doc "arithmetics and bitwise operations."
+    doc "Retrieves the bit representation of an integer."
+    doc "This uses a `nat` storage but performs type-safe"
+    doc "abstractions - see `bits(nat)`."
     {builtins::nat z=x;}
     return bits z
 
 def bits(float x)
     doc "bit representation"
-    doc "Retrieves the bit representation of a number of shift"
-    doc "arithmetics and bitwise operations."
+    doc "Retrieves the bit representation of a float."
+    doc "This uses a `nat` storage but performs type-safe"
+    doc "abstractions - see `bits(nat)`."
+    doc "This is not a cast from natural numbes, but a bit-perfect convertion"
+    doc "of the number's representation."
     {builtins::nat z=0;}
     {memcpy(&z, &x, 8);}
     return bits z
@@ -81,6 +102,8 @@ def int(bits x)
 def float(bits x)
     doc "cast to float"
     doc "Converts a bit representation to the corresponding float number."
+    doc "This is not a cast from natural numbes, but a bit-perfect convertion"
+    doc "of the number's representation."
     {builtins::float z=0;}
     {memcpy(&z, &x__value, 8);}
     return z
@@ -88,7 +111,15 @@ def float(bits x)
 def lshift(bits x, nat y) 
     doc "left shift"
     doc "Reminder that bits store 64 bits and thus this shift should"
-    doc "be casted to lower-bit numbers (e.g., nat16) to truncate leading ones."
+    doc "be casted to lower-bit numbers via truncation specifiers"
+    doc "to remove them. Example:"
+    doc "```python"
+    doc "import std.main"
+    doc "def main(CLI)"
+    doc "    x = bits(1).lshift 20"
+    doc "    y = bits nat16(nat x truncate) # convert to nut, then to nat16 while truncating"
+    doc "    print nat y # prints 0"
+    doc "```"
     {builtins::nat z = (x__value<<y);}
     return bits z
 
@@ -114,13 +145,14 @@ def bor(bits x, bits y)
     
 def bnot(bits x)
     doc "bitwise negation"
-    {builtins::nat z = ~x__value;}
+    {builtins::nat z = (~x__value);}
     return bits z
 
 def nat8(nat x)
     doc "convert unsigned number to 8-bit unsigned number"
     doc "The conversion checks whether the previous value fits in the new one."
-    doc "If it does not, this operation can fail."
+    doc "If it does not, this operation can fail. Consider using"
+    doc "a truncated overload if you desire truncation instead of failure."
     if x>255: fail "nat value too large to pack in nat8"
     {builtins::nat8 value = x;}
     return value
@@ -139,7 +171,8 @@ def nat8(char x)
 def nat16(nat x)
     doc "convert unsigned number to 16-bit unsigned number"
     doc "The conversion checks whether the previous value fits in the new one."
-    doc "If it does not, this operation can fail."
+    doc "If it does not, this operation can fail. Consider using"
+    doc "a truncated overload if you desire truncation instead of failure."
     if x>65535: fail "nat value too large to pack in nat16"
     {builtins::nat16 value = x;}
     return value
@@ -147,14 +180,16 @@ def nat16(nat x)
 def nat16(nat x, "truncate")
     doc "convert unsigned number to 16-bit unsigned number"
     doc "This conversion truncates the given input, if it would not fit."
-    doc "For example, 65536 becomes 1."
+    doc "For example, `truncate(65537 truncate)` yields 1."
+    VM "[x%65536]"
     {builtins::nat16 value = x;}
     return value
 
 def nat32(nat x)
     doc "convert unsigned number to 32-bit unsigned number"
     doc "The conversion checks whether the previous value fits in the new one."
-    doc "If it does not, this operation can fail."
+    doc "If it does not, this operation can fail. Consider using"
+    doc "a truncated overload if you desire truncation instead of failure."
     if x>4294967295: fail "nat value too large to pack in nat32"
     {builtins::nat32 value = x;}
     return value
@@ -162,8 +197,8 @@ def nat32(nat x)
 def nat32(nat x, "truncate")
     doc "convert unsigned number to 32-bit unsigned number"
     doc "The conversion truncates the given input, if it would not fit."
-    doc "For example, 4294967295 becomes 1."
-    VM "[x%4294967295]"
+    doc "For example, `nat32(4294967297 truncate)` yields 1."
+    VM "[x%4294967296]"
     {builtins::nat32 value = x;}
     return value
     
@@ -188,6 +223,10 @@ def bits(nat8|nat16|nat32 value)
 
 def bits(char value)
     doc "converts a character to its bit representation"
+    doc "The `bits` type is always 64 bytes wide, and this conversion places"
+    doc "the character at its least significant bits. This is different than"
+    doc "directly casting the character to a `nat`; it is cast to a `nat8`"
+    doc "first to achieve the desired result. You can recover the same character."
     return bits nat8 value
 
 def slice(bits self, nat from, nat to)

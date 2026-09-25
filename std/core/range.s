@@ -44,7 +44,7 @@ def range(nat _from, nat to)
     doc "ranges. Example:"
     doc "```python"
     doc "import std.core"
-    doc "def main(on CLI)"
+    doc "def main(CLI)"
     doc "    r = range of(0 to 3)"
     doc "    for i in r: print i"
     doc "    print r.from"

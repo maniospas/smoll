@@ -1,7 +1,7 @@
 import std.core
 import std.test
 
-def main(on CLI)
+def main(CLI)
     # same-precedence associativity
     assert(5-2-1==2, "sub sub")
     assert(10-3-2==5, "sub sub 2")

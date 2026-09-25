@@ -27,7 +27,7 @@ def accumulator()
     doc "```python"
     doc "import std.core"
     doc "import std.sci.stats"
-    doc "def main(on CLI)"
+    doc "def main(CLI)"
     doc "    accum = accumulator()"
     doc "    accum.append 0.1"
     doc "    accum.append 0.2"

@@ -40,7 +40,7 @@ def stdout_to_err(on CLI)
     return saved_stdout
 
 
-def assert(on CLI, bool condition, cstr text)
+def assert(on CLI, bool condition, cstr|str text, blank|"failure_only" print_mode)
     doc "assert a condition given a corresponding message"
     doc "This outputs to stderr, so that asserts are printed"
     doc "even if stout is suppressed during the 'test' function."
@@ -48,19 +48,21 @@ def assert(on CLI, bool condition, cstr text)
     colors = edit colors CLI
     #print ""
     # print nn compt process::args()[0]
-    print nn " |- "
     if not condition
+        print nn " |- "
         print_marker type "failure"
         print nn "assertion failed: "
         print text
         # print nn "\r"
         # print type "flush"
         fail "assert failed"
-    print_marker type "success"
-    print nn "assert: "
-    print text
-    # print nn "\r"
-    # print type "flush"
+    if print_mode is blank
+        print nn " |- "
+        print_marker type "success"
+        print nn "assert: "
+        print text
+        # print nn "\r"
+        # print type "flush"
 
 def test(on edit colors colors, str command, bool|blank should_fail)
     doc "prints and tests a system command"

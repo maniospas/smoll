@@ -29,7 +29,7 @@ def test()
         myparty.units = units2.slice 4 # TODO: THIS KIND OF BRANCHING IS NOT PROPERLY ACCOUNTED FOR IF WE DID NOT RETURN units2 (deferRING UNITS2 ALONGSIDE MYPARTY IS WRONG)
     return (myparty, parties, units1, units2)
 
-def main(on CLI)
+def main(CLI)
     r = test()
     assert(r.myparty.units[0].name=="name1", "original object returned")
     assert(r.parties[1].units[0].name=="name2", "overwritten buffer returned")

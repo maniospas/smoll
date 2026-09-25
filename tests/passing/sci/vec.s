@@ -15,6 +15,6 @@ def safe_main(on CLI)
         v = 2.0*(v1+v2+v)
     print v[0]
     
-def main(on CLI)
+def main(CLI)
     if not try safe_main()
         print cstr compiler::last_error()

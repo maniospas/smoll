@@ -15,5 +15,5 @@ def string_creator(arena<char::tag> _CHARS)
     strings = [copy "created"]
     unsafe_return strings[0]
 
-def main(on CLI)
+def main(CLI)
     print test(type string_creator)

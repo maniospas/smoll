@@ -8,6 +8,6 @@ rec fib(nat n)
 def call_fib(nat n)
     return fib(n)
 
-def main(on CLI)
+def main(CLI)
     print fib(35)
 

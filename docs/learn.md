@@ -20,83 +20,75 @@ _9._ [what next?](#what-next) <br>
 
 ## hello world!
 
-In accordance to tradition, our first program below greets everyone!
-We use `repo` to tell the language that it should automatically download
-code under *std/* from a corresponding web URL (downloaded code is stored in a *.cache* folder).
-Following examples will not have this command for brevity.
-
-The program imports the standard library's collections of basic yet useful functions, 
-and defines a `main` function to serve as the
-entry point of our program. The function's body is indented, which is how
-the language tracks code blocks.
-
+As tradition dictates, our first program below greets the world!
+It also uses `repo` to tell the language that it should automatically 
+find code under *std/* from a corresponding web URL (that is cached locally in
+a -you guessed it- *.cache* dir). Following examples will not have this command for brevity.
 
 ```python
 repo "https://raw.githubusercontent.com/maniospas/smoll/refs/heads/main/std/" as "std/"
 import std.core
 
-def main()
-    CLI = edit console()
+def main(CLI)
     print "hello world!"
 ```
 
-The program above defines `CLI` as a variable that can edit the console.
-It then calls the `print` function with a string greeting in quotations. 
-This function automatically grabs the `CLI` variable by name from the calling
-context; this is called an *effect* and covered later.
-
+The program imports the standard library's core functions, 
+and defines a `main` function to serve as its entry point. 
+The function's body is indented, which is how the language tracks code blocks.
+It also has that mysterious `CLI` argument that is mandatory for interacting
+with the console, but will be explained later.
 
 As *smoλ* is compiled, there is a great deal of difference on whether strings
 are string literals known during compilation -we call these `cstr`- or dynamically
 generated strings that appear during runtime. To convert this string into a runtime
-string type called `str` just call a namesake function like below.
+`str` one just call a namesake function. Like this.
 
 
 ```python
 import std.core
 
-def main()
-    CLI = edit console()
+def main(CLI)
     greeting = str "hello world!"
     print greeting
 ```
 
-We have sneakily introduced the concept of variables too, by storing the
-string value on a variable called *greeting*. A different `print` function
-is also used for the string type, but the code largely looks
-the same. Do note that the language recognizes `str` as known during
-compilation and thus ensures that the created program
-becomes equivalent to the first one without needing memory allocation. Yet.
+We sneakily introduced the concept of variables by storing
+the string's data on the variable *greeting*. Doubly sneakily,
+we also introduced polymorphic functions; `print` now is a different
+function that can print `str` instead of `cstr`, but the two versions
+deliberately look and feel the same. 
+
+**Note:** Even this conversion to `cstr` has not allocated any memory at
+runtime yet. The language tries to be clever about not wasting
+resources and just redirects to the original `cstr` under the hood.
 
 ## numbers
 
 Before continuing with strings and how they can be created -and manipulated- 
 dynamically, let us skim over some more basics. First: numbers. Usually you will
-use one of `float`, `int`, `nat` that use 64 bits to correspondingly represent
-floating point numbers, integers, and natural numbers. Natural numbers
-are also known as unsigned integers or non-negative integers if you are more of a math person.
+use one of `float`, `int`, `nat` that employ 64 bits to correspondingly represent
+floating point numbers, integers, and natural numbers/unsigned integers.
 
-*Smoλ* takes a principled stance of not allowing you to mix these types unintentionally,
-because this is how bad things happen in compiled code (like *1.0* not having the same bit
-representation as *1*). To begin with, you can declare floats by writing a decimal 
-number like `1.0` and natural numbers by writing them without decimals like *1*. You cannot
-represent integers and need to convert with them from the other types. This is deliberate
-because natural numbers are used for a lot of stuff in programming with regards to indexing
-memory; their usage makes some nice optimizations possible while staying safe.
+*Smoλ* takes a principled stance of not mixing these types in numerical operations
+arbitrarily. Because this is how bad things happen in compiled code, like *1.0* not 
+having the same bit representation as *1*; the former is a float, because it has
+a decimal indicator, and the latter a nat. Ints cannot be represented and need to 
+be converted to from the other types. This is by design; the language's nefarious plan
+is to avoid signed operations for the data structure used to index memory... and boom!
+A lot of errors are prevented, and a lot of optimizations become possible.
 
 Below is an example that uses different numbers, as well as some basic arithmetic
-operations on those. Convert number formats to 
-others (as well as from `cstr` and `str` data) by using the number type as a function. 
-We still need to import the standard library's core because this
-is where those operations are implemented - you can even make your own version of all
-operations by interweaving C code in there (we will not cover how in this tutorial)! 
-By the way, text after `#` are line comments and ignored.
+operations. Convert number formats to each other
+other (as well as from `cstr` and `str` data) by using namesake functions. All generous
+provenance of `std.core`.
+
+Oh, by the way: text after `#` are line comments and ignored.
 
 ```python
 import std.core
 
-def main()
-    CLI = edit console()
+def main(CLI)
     print 1.0+2.0-3.0    # prints 0.0
     print 1+2
     int_zero = int 0
@@ -106,22 +98,28 @@ def main()
 
 ## conditions and loops
 
-There are `if-else` conditional statements to change what is being
-executed based on a condition. Conditions evaluate to a `bool` type.
+Now let's make the language Turing-complete! 
+Basically we need to emulate a Turing machine's theoretical model that... 
+
+Ok, ok, not the time for theory. Basically we need conditions and loops.
+Actually conditions are loops if you squint, but it's convenient to have 
+both. So *smoλ* has `if-else` are conditional 
+statements that change what is being executed based on a condition. 
+Conditions evaluate to a `bool` type.
 
 ```python
 import std.core
 
-def main()
-    CLI = edit console()
+def main(CLI)
     x = 1.0-2.0
     if x<0
         print "x is negative"
     print "done"
 ```
 
-Loops either have the form `while condition body`, which looks
-similar to conditions, or an iterator-based form shown below. Parentheses are 
+Loops either have the form `while condition` followed by a code
+block to repeatedly execute. But there is a way to *iterate* across
+some constructs, as shown below. Parentheses are 
 optional when passing one argument to a function, which allows us to
 construct a natural number range, which normally takes exactly two arguments,
 by calling the `of` function to construct a range from `0` to `10` (non-inclusive).
@@ -129,37 +127,46 @@ by calling the `of` function to construct a range from `0` to `10` (non-inclusiv
 ```python
 import std.core
 
-def main()
-    CLI = edit console()
+def main(CLI)
     for x in range of 10
         print x
 ```
 
-The `of` function supports various range constructions that 
-make code more explicit. Next are some patterns that use 
-a concept called literal keywords *to, upto, len* for explicitness.
-(See the [reference guide](reference.html) on how to define such
-keywords for your own functions.)
+The `of` function supports various range constructions patterns that 
+make code more explicit.
 
 -  `range of 10` becomes `range(0,10)` 
 -  `range of (1 to 10)` becomes `range(1,10)` 
 -  `range of (1 upto 10)` becomes `range(1,11)` 
 -  `range of (2 len 10)` becomes `range(2,12)`
 
+Notice those symbols `to`, `upto`, `len`? Some functions allow
+textual specialization between their variations by denoting some
+keywords that could be used where commas would be normally expected
+to separate their arguments. See the [reference guide](reference.html) 
+on how to define such keywords for your own functions.
+
 If there is only one expression within a condition or loop, you can 
-place it in the same line after `:`. Do note that -again very sneakily-
-the example showcases the special case of also using `else if` as a shorthand
+place it in the same line after the separator `:` 
+(the new expression must end in the same line too). Another 
+specific by very useful syntax is `else if` as a shorthand
 to nesting a new condition within an `else`.
+Finally, the typical `break` and `continue` commands allow 
+stopping or continuing with the next iteration of a loop, 
+usually based on some condition.
 
 ```python
 import std.core
 
 def main()
     CLI = edit console()
-    x = 1.0-2.0
-    if x<0: print "x is negative"
-    else if x==0: print "x is negative"
-    else: print "x is positive"
+    n = mut 27 # a variable that we can replace
+    while true
+        print n
+        if n==1: break
+        else if n % 2 == 0: n = n / 2
+        else: n = 3*n + 1
+    print "Woot! Collatz conjecture converged."
 ```
 
 
@@ -167,38 +174,61 @@ def main()
 
 Since we are still talking about numbers, it is a good time to also talk about errors, like division by zero.
 Ok, we will ignore floats where division by zero is well-defined, and consider expressions like `1/0`.
-Functions -division in this case- can fail freely and you should not bother too much about that, 
-unless you know of a way to recover from failure or need to do something special. You will never leak
-resources from failure (e.g., memory leaks, unclosed files), so you can continue with your program like 
-normal wherever errors are handled. For example, one error is natural number subtraction that would create a 
-negative.
+Functions -division in this case- can fail whenever, BUT you should not worry too much about that.
 
 To check whether an expression has any errors, start it with `try`. The outcome is a boolean value
 that can be checked for success, for example in a condition. Otherwise, errors cascade in the
-call stack, until they are intercepted from some caller. Erroring is safe in that it does not
-leak resources by automatically releasing them. At worst, your whole program will terminate
-safely.
+call stack, until they are intercepted from some caller for recovery actions.
+You will never leak memory/opened files/etc, unless you do not deliberately evoke unsafe code 
+(like the `unsafe_mut` keyword - notice that it's very explicit about its own unsafety?) . 
+
+```python
+import std.core
+
+def main(CLI)
+    if not try result=0-1: print "failed to decrease"
+    print result # unset on error and thus zero-initialized by policy
+```
+
+You can get full stack traces by compiling your program with the `--debug` flag. But if that
+is too borhtersome you can add ... a little something on the main function to print the
+terminating error's message:
+
+```python
+import std.core
+
+def main(CLI, WHICHERR)
+    print 0-1
+```
+
+To not drag on the mystery, the main function's arguments are just syntax sugar for the 
+following:
 
 ```python
 import std.core
 
 def main()
-    CLI = edit console()
-    value = 0
-    if not try result=0-1
-        print "failed to decrease"
-    else
-        print result
+    CLI = CLI()
+    WHICHERR = WHICHERR()
+    print 0-1
 ```
 
+Basically, an argument without a name is converted as a variable with itself as the
+name. Furthermore, as a special case, *smoλ* tries to create arguments to the main function
+automatically. Finally, where is CLI used? It's an *effect* of print functions, which means
+that they try to grab the `CLI` variable from wherever they are called automatically. We will
+later see how to also tell our functions to grab `CLI` or other variables autoamtically. 
+Hint: there's a keyword for it.
 
 ## tuples and functions
 
 Place expressions in parentheses to make functions call only those,
-for example per `print int(0)-int(1)`; if one wrote `print int 0-int 1`,
-it would be interpreted per
-`print(int( 0-int(1) ))`, and the compiler would complain that an *int*
-cannot be subtracted from a natural number in the middle.
+for example per `print int(0)-int(1)`. If one wrote `print int 0-int 1`,
+it would be interpreted per `print(int( 0-int(1) ))`, and the compiler would 
+complain abou substracting a nat from an int.
+
+**Notice how function calls end expressions!** Thus `print(0)-1` is invalid,
+as it would be equivalent to `(print 0)-1`.
 
 In general, all functions accept one argument and parentheses are just a means of defining tuples, which
 is what we call sequences of a fixed number of values with potentially different types. Up to now, 
@@ -211,11 +241,31 @@ use instead of the line break character, you can do the following.
 ```python
 import std.core
 
-def main()
-    CLI = edit console()
+def main(CLI)
     print nn "hello " # 'nn' creates the tuple ("hello ", "") to avoid newlines
     print "world!"
 ```
+
+So, how do we define our own functions? Like main:
+
+```python
+import std.core
+
+def greet(on CLI, str message)
+    print "hello world!"
+    print message
+
+def main(CLI)
+    greet "how are you?"
+```
+
+Functions have comma-separateed arguments. Arguments have the
+form of [qualifiers] type [name]. Optional qualifiers can be 
+`edit/mut/on` where the latter can be mixed with the ohter two 
+and lets the argument behave like an effect (effects must be 
+declared before all non-effect arguments). That is, the provided
+name will be gathered from the calling scope. The name is the 
+same as the type, if the type is a single word.
 
 ## strings
 
@@ -234,36 +284,18 @@ def greeting()
     CHARS = new()
     return "hello "+"world"
 
-def main()
-    CLI = edit console()
+def main(CLI)
     print greeting()
 ```
 
 The above snippet is deceptively simple in that *smoλ* tries its best to not
-annoy you with manual memory management requirements. In particular,
-it *defers* releasing the allocated memory back to the operating system
-to a later point, where the outcome of `greeting()` is no longer used. To see
-this, mouse-over the greeting function's name if the language's LSP is enabled,
-or run `./smoll main.s --docs` to export documentation for all functions 
-involved in the program. The function's documentation would look like this:
+annoy you with manual memory management. In particular, it delays releasing
+memory until no longer used. This is called *deferring* the release.
+To see that it happens, mouse-over the greeting function's name in the LSP
+or run `./smoll main.s --docs` to export documentation for the function.
 
-```python
-(abstraction 0-8, ssa vars 9, size 37)
-greeting() -> (str)
-
-Potential errors:
-1.  allocation failed
-
-Returned values defer use of the following functions:
-free(mut any ptr) -> ()
-```
-
-There are some complexity details at the top, a signature showing that
-a string is returned, unhandled errors, and finally a message at the bottom 
-explaining that some memory free operation is deferred for later.
-
-**Question:** Why would anyone need anything else than a `new()` allocator if it's so
-smart? 
+**Question:** Why would anyone need anything else than a `new()` allocator 
+if it's so smart? 
 
 **Answer:** Speed, as small allocations can be quite costly, and it's not so smart in some cases.
 For example, the following snippet cannot compile:
@@ -275,31 +307,21 @@ def greeting()
     CHARS = new()
     return "hello "+"world"
 
-def main()
-    CLI = edit console()
-    a = 1
-    b = 0
+def main(CLI)
     if true
         message = greeting()
-        print a-b
     else
         message = greeting()
-        print 0
     print message  # CREATES AN ERROR
 ```
 
-The error message lets us know that the *message* resource was created within a condition or loop
-that starts line 9; resources are released and subsequently invalidated when exiting that condition or loop
-in which they are defined.
-This guarantees the absence of memory leaks or double frees. In this
-particular case we humans can reason that something is allocated in both cases. 
-The trap is that we can rarely reason adequately well either!!! For example, even here,
-we could forget to account for error handling! 
+Since *smoλ* couldn't just leak resources from the conditional statement, it releases the string
+at its end. A human could theoretically reason about workarounds, but this is hard!!! For example, 
+they could forget to account for error handling and make the implementation unsafe.
 
-The trick is to either move the common code outside the conditions or, if not possible, use another
-allocator. This brings us to arenas and circular buffers. Arenas are memory regions of fixed size
-that are gradually used until full. Circular buffers are arenas that overwrite previous values from
-the start once full. Here is the above snippet using an arena. 
+The trick is usually use other allocators, like arenas and circular buffers. Arenas are memory 
+regions of fixed size that are gradually used until full. Circular buffers are arenas that
+overwrite previous values from the start once full. Here is the above snippet using an arena. 
 
 ```python
 import std.core
@@ -307,37 +329,22 @@ import std.core
 def greeting(on edit char_allocator^arena CHARS)
     return "hello "+"world"
 
-def main()
-    CLI = edit console()
+def main(CLI)
     CHARS = edit arena alloc 1024
-    a = 1
-    b = 0
     if true
         message = greeting()
-        print a-b
     else
         message = greeting()
-        print 0
     print message
 ```
 
-In the snippet above, the `arena` type may not refer only to character regions in memory;
-in normal code such abstractions are disambiguated, but the *greeting* function would try -and fail-
-to erroneously use any arena type as an allocator, even those that are defined for non-character data types.
-Thus the syntax `char_allocator^arena` is used to select character allocators that are also arenas.
-In general, *smoll* has an algebraic type system; this is the operation for getting common type elements, 
-but you can also write `float|int|nat` to indicate type alternatives and `char_allocator\new` to get character
-allocators other than *new*. Find more about types in the <a href="reference.html">reference guide</a>.
+Above, the *greeting* function needs to only grab an arena out of available character allocators
+(rather than among all special arena types that have been overloaded). This is done with the syntax
+ `char_allocator^arena`. Find more about the whole algebraic type system <a href="reference.html">reference guide</a>.
 
 In the most general case,
-one could also define `def greeting(on edit char_allocator CHARS)` to create generic code that
-accepts any character allocator. Having same-named functions with different behavior based on
-their arguments is also known as *polymorphism*.
-
-Finally note the `effect` keyword that tells the greeting function to look for `CHARS` in the calling context without
-necessarily expecting that as an argument. Effect variables can only be placed before other arguments. 
-Since effects could be hard to spot for the sake of concise code, you could follow the naming convention of capitalizing them.
-
+one could also define `def greeting(on edit char_allocator CHARS)` to create function variations for all character
+allocators
 
 ## recursion
 
@@ -405,22 +412,19 @@ import std.core
 def point(nat x, nat y)
     return class compiler::args()
 
-def main()
-    CLI = edit console()
+def main(CLI)
     p = point(1,2)
     print p.x # prints 1
     print p.y # prints 2
 ```
 
 
-All data encountered until now have been immutable in that
-variable values cannot be modified. There 
-are two mechanisms for elevated permissions: `edit` that we 
-have partly encountered already and `mut`. Of the two, `edit`
-allows modifying data structure values only (given that they,
-in turn have modification permissions), whereas `mut`
-allows replacing the whole structure. These qualifiers can
-only be placed in function signatures, or after the `=` symbol.
+Most data encountered until now have been immutable (aka they don't change).
+There are two keywords that allow modifications: 
+-`edit` allows modifying data structure values only (given that they, in turn have modification permissions) 
+- `mut` allows replacing the whole structure, for example for one created with a new constructor function.
+
+These qualifiers can only be placed in function signatures, or after the `=` symbol.
 
 ```python
 import std.core
@@ -432,8 +436,7 @@ def mutable_point(nat _x, nat _y)
     y = y+1
     return class (x, y)
 
-def main()
-    CLI = edit console()
+def main(CLI)
     p = edit mutable_point(1,2)
     p.x = p.y+10 # can modify because 'p' can be edited and 'p.x' can be mutated
     print p.x    # prints 13
@@ -454,8 +457,7 @@ def mutable_point(nat _x, nat _Y)
         assigned y=mut _y+1
     )
 
-def main()
-    CLI = edit console()
+def main(CLI)
     p = edit mutable_point(1,2)
     p.x = p.y+10 # can modify because 'p' can be edited and 'p.x' can be mutated
     print p.x    # prints 13
@@ -484,8 +486,7 @@ lengths on another buffer.
 ```python
 import std.core
 
-def main()
-    CLI = edit console()
+def main(CLI)
     CHARS = edit arena alloc 1024
     lengths = edit nat[].alloc 2 # equivalent to 'edit alloc(nat[], 2)'
     for s in [
@@ -509,8 +510,7 @@ into complete expressions, so they do not affect code farther away.
 ```python
 import std.core
 
-def main()
-    CLI = edit console()
+def main(CLI)
     x = 2
     # printf applies 'print nn' to all string segments and bracketed expressions
     macro<printf> "hello {x} world\n"

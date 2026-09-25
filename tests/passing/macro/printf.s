@@ -1,5 +1,5 @@
 import std.core
 
-def main(on CLI)
+def main(CLI)
     x = 2
     macro<printf> "hello {x} world\n"

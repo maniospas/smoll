@@ -14,7 +14,7 @@ def print(on CLI, Field ptr f)
     assert(3.0==cp::deref f.b.x, "correctly derefed f.b.x")
     assert(4.0==cp::deref f.b.y, "correctly derefed f.b.y")
 
-def main(on CLI)
+def main(CLI)
     f = ref float[].alloc 1  # preffer alloc than resizing empty buffers (no pointer invalidation)
     f[0] = 1.0 # move data to pointer
     print f[0]

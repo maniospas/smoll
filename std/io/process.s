@@ -17,14 +17,40 @@
 local import std.core
 local import std.unsafe as unsafe
 
-def os_name() 
+def os_name()
     doc "the operating system name"
-    doc "One of \"linux\", \"windows\", \"mac\"."
+    doc "One of \"linux\", \"windows\", \"mac\", \"web\"."
+    doc "This is *runtime* information. You can typecheck"
+    doc "the compiler's operating system via `compiler::os type \"checked_osname\"`."
+    doc "*Warning: Operating system detection is a bit clunky right now, and this function's output must be cast to `str` for proper comparison."
     VM "[memory.write_cstr(os.name)]"
     {builtins::cstr ret=__temp_osname;}
     return ret
 
 def argument(cstr unsafe_value)
+    doc "represents console arguments"
+    doc "This refers to runtime arguments passed via"
+    doc "the command line. A buffer of arguments can be retrieved from the "
+    doc "`args()` function. Internally, console arguments are represented as null-terminated,"
+    doc "strings. But it is not possible to satisfy `cstr` equality for those - hence this class."
+    doc "In particular, this class is necessary to obtain the same"
+    doc "bit representation of buffer information (by adding only a non-stored class tag)"
+    doc "while forcing casting to `str` for string operations."
+    doc "That is, you can only use arguments by casting them to strings."
+    doc "This will typically be either a zero-cost or faster-than-zero-cost"
+    doc "abstraction, however."
+    doc "Here is an example on how to print the first argument, which by"
+    doc "convention will correspond to the executable path."
+    doc "```python"
+    doc "import std.core"
+    doc "import std.io.process as proc"
+    doc "def main(CLI)"
+    doc "    args = proc::args()"
+    doc "    exe_path = proc::str args[0]"
+    doc "    print exe_path"
+    doc "```"
+    doc "*Info: There may be ways of obtaining runtime arguments without the console in the future."
+    
     return class unsafe_value
 
 def str(argument arg)
@@ -40,11 +66,36 @@ def args()
     return ret
 
 def arg_exists(cstr flag)
+    doc "check if an console argument exists"
+    doc "Check whether the console argument exists."
+    doc "Example:"
+    doc "```python"
+    doc "import std.core"
+    doc "import std.core.process as proc"
+    doc "main on CLI"
+    doc "    print nat proc::arg_after(\"--mynat\", \"0\")"
+    doc "```"
     for arg in args()
         if flag==str(arg): return true
     return false
 
-def arg_after(cstr flag, blank|str|cstr default_value)
+def arg_after(cstr|str flag, blank|str|cstr default_value)
+    doc "find the console argument after the given flag"
+    doc "This is a quick function for retrieving values of"
+    doc "runtime program flags instead of manually inspecting"
+    doc "the outcome of `args()`. The outcome is an `str` without"
+    doc "any associated defer statement. There are several overloads"
+    doc "depending on the string type, and whether a default"
+    doc "value is provided. If a default is provided and the query"
+    doc "flag is not found, it is returned. If there is no default,"
+    doc "the function may fail to find the flag."
+    doc "Example:"
+    doc "```python"
+    doc "import std.core"
+    doc "import std.core.process as proc"
+    doc "main on CLI"
+    doc "    print nat proc::arg_after(\"--mynat\", \"0\")"
+    doc "```"
     args = args()
     for arg in args
         if flag==str(arg) and compiler::for_counter()+1<len args

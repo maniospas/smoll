@@ -39,7 +39,7 @@ def sqrt(float x)
     doc "float to obtain their square root."
     doc "```python"
     doc "import std.core"
-    doc "def main(on CLI)"
+    doc "def main(CLI)"
     doc "    print nat sqrt float 4"
     {"-lm"}
     {builtins::float z = sqrt(x);}

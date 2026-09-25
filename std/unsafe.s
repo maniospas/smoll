@@ -72,7 +72,7 @@ def free(mut any ptr allocated)
     doc "```python"
     doc "import std.core"
     doc "import std.unsafe as unsafe"
-    doc "def main(on CLI)"
+    doc "def main(CLI)"
     doc "    my_ptr = unsafe::alloc compiler::value float::size"
     doc "    defer"
     doc "        if exists my_ptr: free my_ptr"

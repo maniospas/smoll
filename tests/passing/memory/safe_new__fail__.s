@@ -6,5 +6,5 @@ def test(nat number)
         s = new().copy "123"
     return s
 
-def main(on CLI)
+def main(CLI)
     print test(1).s

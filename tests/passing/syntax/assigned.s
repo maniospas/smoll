@@ -7,7 +7,7 @@ def point()
         assigned y = mut 1
     )
 
-def main(on CLI)
+def main(CLI)
     p = edit point()
     assert(p.x==1, "initialized class field")
     p.x = 0

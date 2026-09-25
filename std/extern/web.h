@@ -12,6 +12,7 @@
 
 #include <emscripten.h>
 #include <emscripten/fetch.h>
+const char* const __temp_osname = "web";
 
 #ifdef __cplusplus
 extern "C" {

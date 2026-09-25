@@ -5,7 +5,7 @@ import std.test
 def point(nat x, nat y)
     return class compiler::args()
 
-def main(on CLI)
+def main(CLI)
     a = last [point(0,0)]
     b = last [point(1,1)]
     debug::print a

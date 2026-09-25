@@ -15,7 +15,7 @@ def listofdat()
 def accessible(on CLI, listofdat obj)
     print obj.data[0].data[0]
 
-def main(on CLI)
+def main(CLI)
     obj = mut listofdat()
     obj.data[0] = dat()
     obj.data[0]&.value = 0

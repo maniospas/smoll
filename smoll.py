@@ -1373,7 +1373,7 @@ class ImplementedType:
             if pos==end:
                 tok = impl[pos]
                 k = tok.tostring()
-                value: float|int|None = local_vars.get(tok.tostring(), None)
+                value: float|int|None = local_vars.get(k, None)
                 if value is not None: return value
                 if k=="EOF": return -1
                 if k in global_var2cstr: 
@@ -1395,14 +1395,14 @@ class ImplementedType:
                         return ord(inner)
                     except: self.at.error("interpreter", "failed to understand character "+k)
                 try:
-                    s = tok.tostring().rstrip('UuLl')
+                    s = k.rstrip('UuLl')
                     if s[:2]=='0x' or s[:2]=='0X': int_ret = int(s, 16)
                     elif len(s) > 1 and s[:0]=='0': int_ret = int(s, 8)
                     else: int_ret = int(s, 10)
                     return int_ret
                 except: pass
                 try:
-                    float_ret = float(tok.tostring())
+                    float_ret = float(k)
                     return float_ret
                 except: pass
                 if k in self.vars: 
@@ -1419,7 +1419,14 @@ class ImplementedType:
                 if k == "SEEK_CUR": return 1
                 if k == "SEEK_SET": return 0
                 if k == "SEEK_END": return 2
+                if k == "__t_argc=argc" or k=="__t_argv=argv" or k=="DECLARE_HANDLERS": return 0 # stuff needed by the actual code
                 return self.at.error("interpreter", "failed to parse '"+k+"' in '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+            elif impl[pos].tostring()=="~":
+                parsed_value: float|int = await process_expression(impl, pos+1,end)
+                if parsed_value is None: 
+                    self.at.error("interpreter", "failed to parse value at '"+" ".join([impl[i].tostring() for i in range(pos,end+1)])+"'")
+                parsed_value = int(parsed_value)
+                return ~parsed_value
             elif impl[pos+1].tostring()=="=":
                 varname = impl[pos].tostring()
                 parsed_value: float|int = await process_expression(impl, pos+2,end)
@@ -2519,7 +2526,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
         if singletons: printid("\nThe following singletons are initialized:")
         for singleton in singletons: printid("```rust\n"+singleton.signature()+"\n```")
-        if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*")
+        if callee.VM: printid("*Warning: Running this function during 'compt', 'macro', or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*")
 
     if len(available_types)==0:
         same_shapes: list[ImplementedType] = list()
@@ -3638,7 +3645,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                             ret = UnionType(var.type.name, at=var.type.at)
                             ret.variations.append(var.type)
                             return pos+1, ret
-                        tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural variable with the same name has type '"+signature_like([var] if var else obj, impl)+"'", suggesions=[":: (start reflection)"])
+                        tokens[pos].error("type", "unknown type '"+pretty_name(name)+"' but a local structural variable with the same name has type '"+signature_like([var] if var else obj, impl)+"'", suggestions=[":: (start reflection)"])
                     varname = name+"__"
                     len_varname = len(name)+2
                     vars = [r for r in impl.vars.values() if r.name[:len_varname]==varname]
@@ -4079,7 +4086,7 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
                 for litvar in lit.variations:
                     if litvar not in variations: variations.append(litvar)
             else:
-                reflection_token.error("type", "unknown function reflection property '::"+reflection_token_text+"'", suggesions=["name (reflection)", "tag (reflection)", "rets (reflection)", "args (reflection)", "size (reflection)"])
+                reflection_token.error("type", "unknown function reflection property '::"+reflection_token_text+"'", suggestions=["name (reflection)", "tag (reflection)", "rets (reflection)", "args (reflection)", "size (reflection)"])
             
         ret = UnionType(type.name+"::"+reflection_token_text, at=reflection_token)
         ret.variations = variations
@@ -6451,7 +6458,7 @@ async def process_import(file: File, tokens: list[Token], pos: int, is_local: bo
             elif Path(name).is_dir(): details.append(repr(name) + "(dir)")
             
             name_token.error("import", "non-existent file '"+name+"'", suggestions=details)
-        if name not in file_cache and os.path.isdir(name): name_token.error("import", "expecting file but got directory '"+name+"'", suggesions=details)
+        if name not in file_cache and os.path.isdir(name): name_token.error("import", "expecting file but got directory '"+name+"'", suggestions=details)
         if name.endswith(".h") or name.endswith(".c"):
             for f in externals:
                 if f.path==name: return pos+1, f
@@ -7504,11 +7511,12 @@ def platform_exe_path(output_name: str):
     if sys.platform == "win32" and chosen_compiler not in ("none", "emcc"): return str(output_name)+".exe"
     return str(output_name)
 
-def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry_point: ImplementedType|None) -> None:
+def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry_point: ImplementedType|None, skip_write_and_return_actual_main=False) -> None:
     entry_point = _entry_point.monomorphic_name if _entry_point is not None else None
-    src_path = Path(f"{output_name}.c")
-    exe_path = Path(platform_exe_path(output_name))
-    header = "\n".join("#include \""+k.path+"\"" for k in externals)+"\n"
+    if not skip_write_and_return_actual_main:
+        src_path = Path(f"{output_name}.c")
+        exe_path = Path(platform_exe_path(output_name))
+        header = "\n".join("#include \""+k.path+"\"" for k in externals)+"\n"
 
     discovered_defs: list[ImplementedType] = list()
     already_generated: set[ImplementedType] = set()
@@ -7587,11 +7595,12 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry
     # declarations only after error codes because transpilation simplifications can affect error detection
     c_decls = list()
     generated_c_funcs = list()
-    for next_def in discovered_defs:
-        transpiled = next_def.transpile()
-        if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
-        generated_c_funcs.append(transpiled)
-    header += "typedef void (*__smoll_func_ptr_type)(void);\n"
+    if not skip_write_and_return_actual_main:
+        for next_def in discovered_defs:
+            transpiled = next_def.transpile()
+            if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
+            generated_c_funcs.append(transpiled)
+        header += "typedef void (*__smoll_func_ptr_type)(void);\n"
     if entry_point:
         internal_singletons = {dep for dep in _entry_point.dependent_implementations if dep.has_retrieved_singleton}
         i = 0
@@ -7612,8 +7621,8 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry
                 constructor_singletons[singleton] = constructor
             if len(_entry_point.rets):
                 _entry_point.at.error("safety", "main function cannot return values", suggestions=["return 'blank()'", "'fail' to produce non-zero exit codes"])
-
-        header += "int __t_argc;\nchar** __t_argv;\n"
+        if not skip_write_and_return_actual_main:
+            header += "int __t_argc;\nchar** __t_argv;\n"
         main_impl = ImplementedType("__smoll_main", at=_entry_point.at)
         main_impl.monomorphic_name = "main"
         main_impl.force_not_inline = True
@@ -7635,12 +7644,13 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry
         type = UnionType(_entry_point.name, at=_entry_point.at)
         type.variations.append(_entry_point)
         resolve_call(_entry_point.at.file, main_impl, type, main_args, _entry_point.at, _callee=_entry_point)
+        if skip_write_and_return_actual_main: return main_impl
 
         transpiled = main_impl.transpile()
         transpiled = transpiled.replace("int main()", "int main(int argc, char** argv)", 1) if main_impl.needs_failure_mode else transpiled.replace("void main()", "int main(int argc, char** argv)", 1)
         if not main_impl.needs_failure_mode: transpiled = transpiled[:-2]+"  return 0;\n}\n"
         generated_c_funcs.append(transpiled)
-        
+    
     body = "\n".join(c_decls)+"\n"+"\n\n".join(generated_c_funcs)
     src_path.write_text(header + globs + set_errcodes + define_errors + body, encoding="utf-8")
     print(f"[{YELLOW}+{RESET}] transpile    {src_path}")
@@ -7775,7 +7785,13 @@ async def main():
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
             memory = MemoryEmulator(1024*vm_memory_kb)
-            await main_type_variations[0].interpret([], memory, recursion_budget=vm_recursion_budget) # emulate 16kb memory
+            vm_main = write_and_compile(
+                str(exe_path),
+                [main_type_variations[0]],
+                main_type.variations[0],
+                skip_write_and_return_actual_main=True,
+            )
+            await vm_main.interpret([], memory, recursion_budget=vm_recursion_budget) # emulate 16kb memory
             for pos in memory.must_free:
                 if pos in memory.alloc_sizes:
                     try: print(("non-freed memory at "+str(pos)+" size "+str(memory.alloc_sizes[pos])+": ").ljust(20)+memory.as_cstr(pos))

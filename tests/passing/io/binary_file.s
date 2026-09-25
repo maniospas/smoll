@@ -2,7 +2,7 @@ import std.core
 import std.io
 import std.test
 
-def main(on CLI)
+def main(CLI)
     chunk_buffer = edit alloc 2 # chunk size
     f = edit file::open("README.md" binary)
     f.file::seek 1

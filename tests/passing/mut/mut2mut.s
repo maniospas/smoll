@@ -14,7 +14,7 @@ def party(str name, edit unit_arena unit_arena)
     progress = mut 0
     return class (name, units, progress)
 
-def main(on CLI)
+def main(CLI)
     units = edit unit_arena 32
     parties = edit party[].alloc 4
     parties[0] = party(str "myparty", units)

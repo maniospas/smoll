@@ -7,7 +7,7 @@ def greet(on CLI, "hello"|"hi" greeting, blank|"."|"!" punctuation)
     else
         print compiler::value punctuation
 
-def main(on CLI)
+def main(CLI)
     color = colors CLI
     set(color yellow)
     greet(() hi () !) # prints 'hi!' while validating it as a pattern

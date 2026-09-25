@@ -13,6 +13,6 @@ def safe_main(on CLI, on edit bucket FLOATS)
         v = 2.0*(v1+v2+v)
     print v[0]
     
-def main(on CLI, on edit bucket FLOATS)
+def main(CLI, on edit bucket FLOATS)
     if not try safe_main()
         print cstr compiler::last_error()

@@ -1,7 +1,7 @@
 import std.core
 import std.test
 
-def main(on CLI)
+def main(CLI)
     li = ref list float[]
     (at alloc li) = 0.1
     (at alloc li) = 0.1

@@ -394,8 +394,10 @@ def export(path, target):
 
         function showDefinition(group) {
             if (!group || !group.length) return;
-            let html = '<div class="std-definition-heading"><h1 class="std-definition-title">' + escapeHtml(group[0].name) + '</h1></div>';
-            for (const item of group) html += '<section class="std-overload" data-source="' + escapeHtml(item.definedIn) + '">' + item.html + '</section>';
+            // Within a selected definition name, show class overloads first too.
+            const ordered = [...group].sort((a, b) => Number(b.isClass) - Number(a.isClass));
+            let html = '<div class="std-definition-heading"><h1 class="std-definition-title">' + escapeHtml(ordered[0].name) + '</h1></div>';
+            for (const item of ordered) html += '<section class="std-overload" data-source="' + escapeHtml(item.definedIn) + '">' + item.html + '</section>';
             content.innerHTML = html;
             enhanceOverloads();
         }
@@ -499,7 +501,12 @@ def export(path, target):
                 return lowered.every(term => haystack.includes(term));
             });
             const groups = groupByName(matches);
-            const names = [...groups.keys()].sort((a, b) => a.localeCompare(b));
+            const names = [...groups.keys()].sort((a, b) => {
+                const aClass = groups.get(a).some(item => item.isClass);
+                const bClass = groups.get(b).some(item => item.isClass);
+                if (aClass !== bClass) return aClass ? -1 : 1;
+                return a.localeCompare(b);
+            });
             nav.innerHTML = '<div class="std-search-count">' + matches.length + ' matching overload' + (matches.length === 1 ? '' : 's') + '</div>';
 
             for (const name of names) {
@@ -512,7 +519,8 @@ def export(path, target):
                 button.type = "button";
                 button.className = "std-search-result";
                 const snippet = excerpt(hit.text, terms) || 'Matched in definition name';
-                button.innerHTML = '<span class="std-result-name">' + highlightTerms(name, terms) + '</span><span class="std-result-source">' + escapeHtml(hit.definedIn) + '</span><span class="std-result-excerpt">' + snippet + '</span>';
+                const isClass = group.some(item => item.isClass);
+                button.innerHTML = '<span class="std-result-name">' + highlightTerms(name, terms) + (isClass ? '<span class="std-class-label">(class)</span>' : '') + '</span><span class="std-result-source">' + escapeHtml(hit.definedIn) + '</span><span class="std-result-excerpt">' + snippet + '</span>';
                 button.onclick = () => showDefinition(group);
                 nav.appendChild(button);
             }

@@ -1,7 +1,7 @@
 import std.core
 import std.core.range as range
 
-def main(on CLI)
+def main(CLI)
     r = mut range::range range::of(10)
     while try value = mut r.range::mutget()
         print value

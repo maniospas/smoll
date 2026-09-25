@@ -12,7 +12,7 @@ def inc(nat x, "two")
 def which(on CLI, OPTIONS option)
     print compiler::value option
 
-def main(on CLI)
+def main(CLI)
     lit = type "one"
     which lit
     print inc 0

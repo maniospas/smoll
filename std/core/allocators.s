@@ -33,7 +33,7 @@ def new()
     doc "import std.core"
     doc "def combine_with_space(on new CHARS, cstr s1, cstr s2)"
     doc "    return s1+s2+\" \""
-    doc "def main(on CLI, on new CHARS)" # could just write CHARS=new() inside
+    doc "def main(CLI, on new CHARS)" # could just write CHARS=new() inside
     doc "    list_s1 = [\"hel\", \"de\", \"wo\"]"
     doc "    list_s2 = [\"lo\", \"ar\", \"rld\"]"
     doc "    for i in range of 2"
@@ -57,6 +57,19 @@ local def bucket_contents()
         assigned allocated = mut 0
     )
 
+def unsafe_free(edit bucket_contents contents)
+    doc "release bucket contents"
+    doc "Release bucket contents. If these are obtained from a bucket pointer,"
+    doc "however, that is not freed and its usage becomes unsafe."
+    doc "*Warning: Calling this is utterly unsafe, because normally the"
+    doc "bucket defer statement calls it. The only reason this is a separate"
+    doc "function is because defers have some issues with some label handling"
+    doc "so loops inside them should better be turned into separate functions.*"
+    for i in range of contents.size
+        position = contents.elements.unsafe::add(i*cp::value cp::size cp::ptr())
+        unsafe::free unsafe_mut unsafe::dereference_ptr position
+    unsafe::free contents.elements
+
 def bucket()
     doc "grouped allocations on new memory"
     doc "This allocator is similar to `new` in that directly allocates"
@@ -76,26 +89,23 @@ def bucket()
     doc "    if case: s = copy 123"
     doc "    else:    s = copy 345"
     doc "    return (s, CHARS) # returning s would not be possible with 'CHARS = new()'"
-    doc "def main(on CLI)"
-    doc "    conditional(true).s.print()"
-    doc "    conditional(false).s.print()"
+    doc "def main(CLI)"
+    doc "    print conditional(true).s"
+    doc "    print conditional(false).s"
     doc "```"
     unsafe_ptr = mut bucket_contents[].alloc(1 unsafe_leaky).unsafe_ptr
     defer
         contents = mut cp::deref unsafe_ptr
-        for i in range of contents.size
-            position = contents.elements.unsafe::add(i*cp::value cp::size cp::ptr())
-            unsafe::free unsafe_mut unsafe::dereference_ptr position
-        unsafe::free contents.elements
+        unsafe_free contents
         unsafe::free unsafe_ptr
+        
     return class(unsafe_ptr)
     
 def arena(edit any[] buf, nat _pos)
     doc "arena buffer"
-    doc "This consists of a buffer and mutable position pair, where the"
-    doc "position is often used to track the size of used"
-    doc "data within the buffer. Allocating in an arena just consumes more"
-    doc "of its memory region allowance."
+    doc "This consists of a buffer and mutable position pair. The"
+    doc "tracks the size of used data within the buffer. Allocating"
+    doc "in an arena just consumes more of its memory region allowance."
     doc "Contrary to circular buffers, arena data are not overwritten"
     doc "on-demand. This has the advantage that data remain intact until"
     doc "the arena is manuall cleared, but has the disadnvatage that"
@@ -105,10 +115,9 @@ def arena(edit any[] buf, nat _pos)
 
 def arena(edit any[] buf)
     doc "arena buffer"
-    doc "This consists of a buffer and mutable position pair, where the"
-    doc "position is often used to track the size of used"
-    doc "data within the buffer. Allocating in an arena just consume more"
-    doc "of its region."
+    doc "This consists of a buffer and mutable position pair. The"
+    doc "tracks the size of used data within the buffer. Allocating"
+    doc "in an arena just consumes more of its memory region allowance."
     doc "Contrary to circular buffers, arena data are not overwritten"
     doc "on-demand. This has the advantage that data remain intact until"
     doc "the arena is manuall cleared, but has the disadnvatage that"
@@ -117,7 +126,7 @@ def arena(edit any[] buf)
     doc "arenas from allocated buffers. Example:"
     doc "```python"
     doc "import std.core"
-    doc "def main(on CLI)"
+    doc "def main(CLI)"
     doc "    CHARS = edit arena alloc 4096 # allocated buffer of 4K characters"
     doc "    message = \"hello\"+\" \"+\"world!\""
     doc "    print message"
@@ -139,25 +148,22 @@ def allocated(edit any[] buf, nat pos)
     doc "like `new,bucket,arena,circular,list`. For abstraction purposes it"
     doc "holds a buffer component and a position index on that buffer. There is"
     doc "no global guarantee about what each or future allocators will choose"
-    doc "for the buffer construction and offset, other than that the buffer's"
-    doc "pointer offset by the buffer's internal offset and this structure's"
-    doc "position yield the correct element address of elements. For this reason,"
-    doc "assuming that `A` is an allocator, get addresses to its elements via"
-    doc "`A.buf[A.pos]&, or, better via the equivalent `at A`."
+    doc "to split offsets between the buffer internal offeset and position."
+    doc "However, assuming that `A` is allocated, get addresses to its first"
+    doc "elements via `A.buf[A.pos]&`, or (preferred) via the equivalent `at A`."
     doc "**Prefer using functions like `at` on an allocated result**"
-    doc "to safelyconver. That pair can freely be passed as an argument to new consturctors,"
-    doc "such as strings or new arenas. Here is an example:"
+    doc "to ensure safe usage. Here is an example:"
     doc "```python"
     doc "import std.core"
     doc "import compiler as cp"
-    doc "def main(on CLI)"
+    doc "def main(CLI)"
     doc "    mydata = edit arena float[].alloc 10"
-    doc "    float_ptr = at mydata.alloc() # allocate one element"
-    doc "    float_ptr = 5.0               # move data to a pointer"
-    doc "    print cp::deref float_ptr     # dereference pointer data"
+    doc "    float_ptr = mut at mydata.alloc() # allocate one element"
+    doc "    float_ptr = 5.0                   # move data to a pointer"
+    doc "    print cp::deref float_ptr         # dereference pointer data"
     doc "```"
-    doc "Allocations differ to arenas as a type, despite holding the same"
-    doc "data internally in that arenas track the end of their allocated region, whereas"
+    doc "Allocations are not the same as arenas, despite holding the same"
+    doc "data internally. Arenas track the end of their allocated region, whereas"
     doc "allocations track the starting position within a buffer; the allocation size"
     doc "is external knowledge, and safety is enforced purely through buffer bounds"
     doc "checking."
@@ -244,7 +250,7 @@ local def unsafe_alloc(edit bucket allocator, nat|blank bytes)
         contents.elements = new_elements&
     position_ptr = contents.elements.unsafe::add(prev_size*cp::value cp::size cp::ptr())
     new_allocation = unsafe_mut unsafe::alloc bytes
-    ptr_size = cp::size cp::ptr()
+    ptr_size = cp::value cp::size cp::ptr()
     {memcpy(position_ptr, &new_allocation, ptr_size);}
     allocator.unsafe_ptr = contents
     return new_allocation

@@ -13,6 +13,6 @@ def to_functor(cstr functor_name)
     copy functor_name
     return CHARS.buf
 
-def main(on CLI)
+def main(CLI)
     for x is "test1"|"test2"
         print compiler::call(macro<to_functor> x, 1,1)

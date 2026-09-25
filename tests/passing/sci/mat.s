@@ -1,7 +1,7 @@
 import std.core
 import std.sci
 
-def main(on CLI, on new FLOATS)
+def main(CLI, on new FLOATS)
     a = edit mat [
         1.0, 0.0, 2.0,
         0.0, 3.0, 1.0

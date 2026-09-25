@@ -135,7 +135,7 @@ def sub(Number x, Number y)
         doc "remove the failure mode. For example, this variation overflows:"
         doc "```python"
         doc "import std.core"
-        doc "def main(on CLI)"
+        doc "def main(CLI)"
         doc "    print 5-3"
         doc "    print 0-(1 assume_smaller)"
         doc "```"
@@ -150,7 +150,7 @@ def sub(nat x, nat y, "assume_smaller")
     doc "the result if it would produce a negative."
     doc "```python"
     doc "import std.core"
-    doc "def main(on CLI)"
+    doc "def main(CLI)"
     doc "    print 0-(1 assume_smaller)"
     doc "```"
     {type(x) z=x-y;}
@@ -163,7 +163,7 @@ def sub(nat x, nat y, "test_smaller")
     doc "failure so that compiling in `--debug` mode does not show an error message."
     doc "```python"
     doc "import std.core"
-    doc "def main(on CLI)"
+    doc "def main(CLI)"
     doc "    if try result=0-(1 test_smaller): print result"
     doc "    else: print \"would be negative\""
     doc "```"
@@ -180,3 +180,15 @@ def pow(nat x, nat y)
         ret = ret*x
         i = i+1
     return ret
+
+def absdiff(Number\nat x, Number\nat y)
+    doc "absolute difference"
+    if is_different(x,y): compiler::skip()
+    if x>y: return x-y
+    return y-x
+
+def absdiff(nat x, nat y)
+    doc "absolute difference"
+    if is_different(x,y): compiler::skip()
+    if x>y: return x-(y assume_smaller)
+    return y-(x assume_smaller)

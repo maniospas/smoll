@@ -1,7 +1,7 @@
 import std.core
 import std.test
 
-def main(on CLI)
+def main(CLI)
     xall = edit arena nat[].alloc 10
     x1 = mut xall.slice 3
     x2 = mut xall.slice 3

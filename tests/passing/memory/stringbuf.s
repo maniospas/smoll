@@ -21,6 +21,6 @@ def test(on CLI)
   assert(people.name[0]=="it's a me", "moved string to buffer")
   return (buf, dat)
 
-def main(on CLI)
+def main(CLI)
   t = test()
   assert(str(t.buf.buf, t.dat[0])=="it's a me", "string reconstructed from its data and buffer")

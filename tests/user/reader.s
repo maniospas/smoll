@@ -1,6 +1,6 @@
 import std.core
 
-def main(on CLI, on new CHARS, WHICHERR)
+def main(CLI, on new CHARS, WHICHERR)
     print "what's your name"
     name = str CLI
     if empty name: fail "why no name?"

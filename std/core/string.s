@@ -22,20 +22,59 @@ local import std.unsafe as unsafe
 
 def arena(char::tag)
     doc "arena of characters"
+    doc "This can be used as part of a signature to indicate"
+    doc "that an arena of characters is the expected input, and not"
+    doc "any arena. The `char::tag` is purely a mnemonic. That said,"
+    doc "instead of obtaining this type per `arena<char::tag>`,"
+    doc "prefer the following pattern, which selects"
+    doc "character allocators that are also arenas."
+    doc "```python"
+    doc "import std.core"
+    doc "def combine(on edit char_allocator^arena CHARS, cstr s1, cstr s2)"
+    doc "    return s1+\" \"+s2"
+    doc "def main(CLI)"
+    doc "    CHARS = edit arena alloc 1024"
+    doc "    print combine(\"hello\", \"world!\")"
+    doc "```"
     return arena char[]
 
 def circular(char::tag)
     doc "circular buffer of characters"
+    doc "This can be used as part of a signature to indicate"
+    doc "that a circular buffer of characters is the expected input, and not"
+    doc "any circular buffer. The `char::tag` is purely a mnemonic. That said,"
+    doc "instead of obtaining this type per `arena<char::tag>`,"
+    doc "prefer the following pattern, which selects"
+    doc "character allocators that are also circular buffers."
+    doc "```python"
+    doc "import std.core"
+    doc "def combine(on edit char_allocator^circular CHARS, cstr s1, cstr s2)"
+    doc "    return s1+\" \"+s2"
+    doc "def main(CLI)"
+    doc "    CHARS = edit circular alloc 1024"
+    doc "    print combine(\"hello\", \"world!\")"
+    doc "```"
     return circular char[]
 
 def list(char::tag)
     doc "list of characters"
     return list char[]
 
-local def alloc(on edit new CHARS, nat length) 
+local def alloc(on edit new CHARS, nat length)
+    doc "an allocation for character buffers"
+    doc "This definition is local to its defining file,"
+    doc "and is created merely to allow allocation via `alloc` on all"
+    doc "character allocators."
     if not try ret = mut allocated(char[].alloc length, 0)
         fail "allocation failed"
     return ret
+
+local def alloc(edit bucket CHARS, nat length)
+    doc "an allocation for character buffers"
+    doc "This definition is local to its defining file,"
+    doc "and is created merely to allow allocation via `alloc` on all"
+    doc "character allocators."
+    return allocated(char[].alloc(CHARS, length), 0)
     
 def char_allocator = new|bucket|arena<char::tag>|circular<char::tag>|list<char::tag>
 
@@ -139,9 +178,6 @@ def neq(char x, char y)
     {builtins::bool z = (x!=y);}
     return z
 
-local def alloc(edit bucket CHARS, nat length)
-    return allocated(char[].alloc(CHARS, length), 0)
-
 def copy(on edit char_allocator CHARS, char other)
     surface = alloc(CHARS, 1)
     {memcpy(surface__buf__unsafe_ptr+surface__pos+surface__buf__unsafe_offset, &other, 1);}
@@ -194,9 +230,9 @@ def unsafe_temp(str|blank prefix, str other)
     doc "strings while this is used in code; use it only for its intended purposes."
     doc ""
     doc "*Warning: This is unsafe, unless 'cstr unsafe_temp' is the last call before"
-    doc "passing data to 'compt' or 'macro'.*"
+    doc "returning data from 'compt' or 'macro'.*"
     doc ""
-    doc "*Info: This is safe to run during 'compt' or 'macro' in that the latter will fail gracefully.*"
+    doc "*Info: This is safe to run during 'compt' or 'macro', as those run on a hardened memory model.*"
     
     if prefix is blank
         str = new().copy_null_terminated(other)

@@ -14,13 +14,6 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-
-local import std.core.builtinsext
-local import std.core.array
-local import std.core.allocators.allocated
-local import std.unsafe as unsafe
-local import compiler as cp
-
 def new()
     doc "allocations on new memory"
     doc "This is the laziest means of allocation that has no state and"

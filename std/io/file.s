@@ -33,7 +33,7 @@ def open(cstr path, blank|"binary" mode)
     defer
         {if(unsafe_ptr) {fclose((FILE*)unsafe_ptr); unsafe_ptr=0;}}
     if not exists unsafe_ptr: fail "failed to open file"
-    return class unsafe_mut unsafe_ptr
+    return unsafe_mut class unsafe_ptr
 
 def open(str path, blank|"binary" mode)
     doc "opens a path as a readable file"

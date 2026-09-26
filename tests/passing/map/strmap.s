@@ -6,8 +6,8 @@ def strstrmap(nat size)
 
 def test(on CLI, edit char_arena buf)
     map = edit strmap str[].alloc 128
-    map["hello"] = buf.copy str "hello world!"
-    map["manio"] = buf.copy str "it's a me, manio."
+    map["hello" place] = buf.copy str "hello world!"
+    map["manio" place] = buf.copy str "it's a me, manio."
     
     it = mut(map.keys, 0)
     while try key=next it

@@ -16,6 +16,7 @@
 
 local import std.core.builtinsext
 local import std.unsafe as unsafe
+local import std.core.allocators.new
 
 # a convention to make pointer operations safe outside the unsafe:: namespace
 # is that we GUARANTEE that non-zero pointers to a memory region contain

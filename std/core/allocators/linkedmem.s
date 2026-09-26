@@ -67,7 +67,7 @@ def ensure_arena(edit linkedmem, edit blank|consumption, nat minimum_capacity)
     multiple = linkedmem.multiple
     capacity = ((minimum_capacity+multiple-1)/multiple)*multiple
     buf = mut linkedmem.unsafe_current.buf
-    buf = linkedmem.unsafe_current.buf.alloc(linkedmem.BUFFERS, capacity*nat buf.unsafe_align unsafe_first)
+    buf = linkedmem.BUFFERS.alloc(linkedmem.unsafe_current.buf, capacity*nat buf.unsafe_align unsafe_first)
     linkedmem.unsafe_current = mut arena(buf)
     return const linkedmem.unsafe_current
 

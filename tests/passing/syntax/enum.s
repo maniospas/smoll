@@ -3,8 +3,8 @@ import std.core
 def enum = "A"|"B"|"C"
 
 # bad practice to create all combinations of enums
-def Answers(enum first, enum second, nat minutes_to_answer) return compiler::args()
-def answers(cstr first, cstr second, nat minutes_to_answer) return compiler::args()
+def Answers(enum first, enum second, nat minutes_to_answer): return compiler::args()
+def answers(cstr first, cstr second, nat minutes_to_answer): return compiler::args()
 
 def main(CLI)
     answers = answers("A", "A", 60)

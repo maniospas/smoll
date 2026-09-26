@@ -69,10 +69,8 @@ def is_zero(nat k)
 def find(robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
     doc "find an item in a robinhood_entry list"
     k = raw _k
-    if is_zero k
-        return 0
-    if not k is type raw data[0]
-        compiler::skip()
+    if is_zero k: return 0
+    if not k is type raw data[0]: compiler::skip()
     n = len data
     pos = hash(k, n)
     for i in range of n
@@ -84,26 +82,50 @@ def find(robinhood_entry[]|str[]|nat[] data, cstr|str|nat _k)
         if k==raw entry: return idx
     fail "index not found"
 
+# def at(edit robinhood_entry[] data, cstr|str|nat _k)
+#     doc "find or add an item in a robinhood_entry list"
+#     k = unsafe_mut raw _k
+#     if is_zero k: return 0
+#     if not k is type raw data[0]: compiler::skip()
+#     n = len data
+#     pos = hash(k, n)
+#     for i in range of n
+#         idx = mut (pos+i)
+#         if idx>=n: idx = idx-n
+#         if idx==0:  continue
+#         entry = data[idx]
+#         if is_zero raw entry 
+#             data[idx] = (k,i)
+#             return idx
+#         if k==raw entry: return idx
+#         if i>entry.cost
+#             tmp = k
+#             k = unsafe_mut raw data[idx]
+#             data[idx] = (tmp, i)
+#     fail "index is full"
+
 def at(edit robinhood_entry[] data, cstr|str|nat _k)
     doc "find or add an item in a robinhood_entry list"
     k = unsafe_mut raw _k
-    if is_zero k
-        return 0
-    if not k is type raw data[0]
-        compiler::skip()
+    if is_zero k: return 0
+    if not k is type raw data[0]: compiler::skip()
     n = len data
     pos = hash(k, n)
+    cost = mut 0
     for i in range of n
         idx = mut (pos+i)
         if idx>=n: idx = idx-n
-        if idx==0:  continue
+        if idx==0: continue
         entry = data[idx]
-        if is_zero raw entry 
-            data[idx] = (k,i)
+        if is_zero raw entry
+            data[idx] = (k,cost)
             return idx
         if k==raw entry: return idx
-        if i>entry.cost
-            tmp = k
+        if cost>entry.cost
+            tmp_k = k
+            tmp_cost = entry.cost
             k = unsafe_mut raw data[idx]
-            data[idx] = (tmp, i)
-    fail "string buffer is full"
+            data[idx] = (tmp_k,cost)
+            cost = tmp_cost
+        cost = cost+1
+    fail "index is full"

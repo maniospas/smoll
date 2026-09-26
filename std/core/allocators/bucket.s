@@ -68,15 +68,13 @@ def bucket()
     doc "    print conditional(true).s"
     doc "    print conditional(false).s"
     doc "```"
-    unsafe_ptr = mut bucket_contents[].alloc(1 unsafe_leaky).unsafe_ptr
+    unsafe_ptr = mut alloc(bucket_contents[], 1 unsafe_leaky).unsafe_ptr
     defer
         if try contents = mut cp::deref unsafe_ptr
             unsafe_free contents
             unsafe::free unsafe_ptr
         
     return class(unsafe_ptr)
-
-
 
 local def unsafe_alloc(edit bucket allocator, nat|blank bytes)
     doc "bucket allocation"
@@ -97,7 +95,7 @@ local def unsafe_alloc(edit bucket allocator, nat|blank bytes)
     allocator.unsafe_ptr = contents
     return new_allocation
 
-def alloc(edit any[] buffer, edit bucket BUCKET, nat|blank size, "unsafe_first"|"dirty"|blank clear_policy)
+def alloc(on edit bucket BUCKET, edit any[] buffer, nat|blank size, "unsafe_first"|"dirty"|blank clear_policy)
     doc "allocates a buffer"
     doc "Allocates an empty buffer and zero-initializes it. This is stable with regards to pointers,"
     doc "as it never reallocates an allocation. The allocated memory is tracked alongside others on"
@@ -122,3 +120,5 @@ def alloc(edit any[] buffer, edit bucket BUCKET, nat|blank size, "unsafe_first"|
     if clear_policy is blank
         buffer.unsafe_ptr.unsafe::zero(0, bytes)
     unsafe_return buffer
+
+def BUCKET = bucket

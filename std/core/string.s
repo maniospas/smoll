@@ -78,7 +78,7 @@ local def alloc(edit bucket CHARS, nat length)
     doc "This definition is local to its defining file,"
     doc "and is created merely to allow allocation via `alloc` on all"
     doc "character allocators."
-    return allocated(char[].alloc(CHARS, length), 0)
+    return allocated(CHARS.alloc(char[], length), 0)
 
 def char_allocator = new|bucket|char_arena|char_circular|char_linkedmem|char_list
 
@@ -443,16 +443,26 @@ def contains(cstr|str _stack, cstr|str _needle)
             return true
     return false
 
-def find(cstr|str _stack, cstr|str _needle, nat|blank _skip, "end_pos"|blank offset)
+def strip(cstr|str _data, char c, blank|"start"|"end" direction)
+    data = str _data
+    if 0==len data: return data
+    start = mut 0
+    end = mut (len data)-1
+    if not direction is "end"
+        while data[start]==c and start+1<len data: start = start+1
+    if not direction is "start"
+        while data[end]==c and end>0: end = end-1
+    return data.slice of(start upto end)
+
+def find(cstr|str _stack, cstr|str _needle, nat|blank _skip, "end_pos"|blank offset, blank|range slice_range)
     doc "find within a string a needle substring's first ocurence"
     stack = str _stack
     needle = str _needle
     d = needle.dat.length
-    if not try n = stack.dat.length-d
-        fail "not found"
-    if not _skip is blank
-        skip = mut _skip
-    for i in range of n
+    if not try n = stack.dat.length-d: fail "not found"
+    if not _skip is blank: skip = mut _skip
+    if slice_range is blank: slice_range = range of n
+    for i in slice_range
         try sliced = stack.slice(i,i+d) # guaranteed to not have issues
         if sliced==needle
             if not _skip is blank
@@ -561,7 +571,9 @@ def add(on edit contiguous_char_allocator CHARS, str|cstr _s1, str|cstr _s2) -> 
     else
         if CHARS is bucket: prev_pos = 0
         else 
-            if CHARS is char_circular: if CHARS.pos+len_sums>CHARS.buf.unsafe_size: prev_pos = 0
+            if CHARS is char_circular
+                if CHARS.pos+len_sums>CHARS.buf.unsafe_size: prev_pos = 0
+                else: prev_pos = CHARS.pos
             else: prev_pos = CHARS.pos
     surface = mut arena unsafe_mut status CHARS.alloc(len_sums) # TODO: fix std so that unsafe_mut is not needed
     copy(surface, s1)

@@ -70,9 +70,9 @@ def bucket()
     doc "```"
     unsafe_ptr = mut bucket_contents[].alloc(1 unsafe_leaky).unsafe_ptr
     defer
-        contents = mut cp::deref unsafe_ptr
-        unsafe_free contents
-        unsafe::free unsafe_ptr
+        if try contents = mut cp::deref unsafe_ptr
+            unsafe_free contents
+            unsafe::free unsafe_ptr
         
     return class(unsafe_ptr)
 

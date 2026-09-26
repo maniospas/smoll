@@ -33,7 +33,7 @@ def is_number(char c)
     {builtins::bool le=(c<='9');}
     return ge and le
 
-def int(console console)
+def int(console console) -> int
     doc "reads an integer from the console"
     while try c=mut char console 
         if not "\t ".contains c: break
@@ -57,7 +57,7 @@ def int(console console)
         fail "user input was not a float"
     return const number
 
-def nat(console console)
+def nat(console console) -> nat
     doc "reads an unsigned integer from the console"
     while try c=mut char console 
         if not "\t ".contains c: break
@@ -77,7 +77,7 @@ def nat(console console)
         fail "user input was not a natural number"
     return const number
 
-def float(console console)
+def float(console console) -> float
     doc "reads a float from the console"
     while try c=mut char console 
         if not "\t ".contains c: break
@@ -110,18 +110,12 @@ def float(console console)
         fail "user input was not a float"
     return const number
 
-def str(on edit char_allocator CHARS, edit console console)
+def str(on edit char_allocator\new CHARS, edit console console)
     doc "reads a string from the console"
     if CHARS is char_arena
         doc "The read string is placed on an arena while consuming only the necessarily minimum size."
         ch = edit CHARS
-    else 
-        if CHARS is new
-            doc "The read string is placed onto memory that keeps being reallocated to accommodate its size."
-            doc "The resulting memory will consume exactly the required size in bytes."
-            ch = edit arena ref char[].alloc 8
-        else
-            compiler::skip()
+    else: compiler::skip()
     if ch.buf.unsafe_align.nat()!=1: fail "can only define strings on contiguous buffers"
     if ch.buf.unsafe_offset.nat()!=0: fail "can only define strings on non-offset buffers"
     start = const ch.pos
@@ -129,22 +123,33 @@ def str(on edit char_allocator CHARS, edit console console)
         _c = char console
         {if(_c=='\n'){break;}}
         {if(_c=='\r'){break;}}
-        if ch.pos>=ch.buf.unsafe_size 
-            if CHARS is new
-                ch.buf = ch.buf.resize ch.buf.unsafe_size*3/2
-            else
-                fail "read string does not fit on buffer"
+        if ch.pos>=ch.buf.unsafe_size: fail "read string does not fit on buffer"
         ptr_pos = ch.buf.unsafe_ptr.unsafe::add ch.pos
         {*ptr_pos=_c;}
         ch.pos = ch.pos+1
-    if CHARS is char_arena
-        CHARS.pos = ch.pos
-    if CHARS is new
-        if ch.pos==0
-            ch.buf = ch.buf.resize(ch.pos+1 unsafe) # an allocation of one byte, because we can't resize to zero
-        else
-            ch.pos = ch.pos+1
-            ch.buf = ch.buf.resize(ch.pos unsafe)
+    if CHARS is char_arena: CHARS.pos = ch.pos
+    return str(ch.buf, start to ch.pos)
+
+def str(on edit new CHARS, edit console console)
+    doc "reads a string from the console"
+    doc "The read string is placed onto memory that keeps being reallocated to accommodate its size."
+    doc "The resulting memory will consume exactly the required size in bytes."
+    ch = edit arena ref char[].alloc 8
+    start = const ch.pos
+    while true
+        _c = char console
+        {if(_c=='\n'){break;}}
+        {if(_c=='\r'){break;}}
+        if ch.pos>=ch.buf.unsafe_size 
+            ch.buf = ch.buf.resize ch.buf.unsafe_size*3/2
+        ptr_pos = ch.buf.unsafe_ptr.unsafe::add ch.pos
+        {*ptr_pos=_c;}
+        ch.pos = ch.pos+1
+    if ch.pos==0
+        ch.buf = ch.buf.resize(ch.pos+1 unsafe) # an allocation of one byte, because we can't resize to zero
+    else
+        ch.pos = ch.pos+1
+        ch.buf = ch.buf.resize(ch.pos unsafe)
     return str(ch.buf, start to ch.pos)
 
 def int(cstr|str _s)

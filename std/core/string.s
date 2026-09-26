@@ -52,7 +52,7 @@ def char_circular()
     doc "```"
     return circular char[]
 
-def char_linkedmem()
+def char_linkedmem("notrack")
     doc "linked character arenas"
     return linkedmem char[]
 
@@ -79,8 +79,8 @@ local def alloc(edit bucket CHARS, nat length)
     doc "and is created merely to allow allocation via `alloc` on all"
     doc "character allocators."
     return allocated(char[].alloc(CHARS, length), 0)
-    
-def char_allocator = new|bucket|char_arena|char_circular|char_list|char_linkedmem|char_linkedmem<"track">
+
+def char_allocator = new|bucket|char_arena|char_circular|char_linkedmem|char_list
 
 def exists(cstr c)
     doc "checks whether a cstr is not zero-initialized"
@@ -182,7 +182,7 @@ def neq(char x, char y)
     {builtins::bool z = (x!=y);}
     return z
 
-def copy(on edit char_allocator CHARS, char other)
+rec copy(on edit char_allocator CHARS, char other)
     surface = alloc(CHARS, 1)
     {memcpy(surface__buf__unsafe_ptr+surface__pos+surface__buf__unsafe_offset, &other, 1);}
     if CHARS is char_allocator\bucket
@@ -478,9 +478,28 @@ def nn(str value)
     doc "to print without a new line."
     return (value, "")
 
-local def contiguous_char_allocator = char_arena|char_circular|char_linkedmem|char_linkedmem<"track">
+local def contiguous_char_allocator = bucket|char_arena|char_circular|char_linkedmem
 
-def add(on edit char_allocator\contiguous_char_allocator CHARS, str|cstr _s1, str|cstr _s2)
+def add(on edit new CHARS, str|cstr _s1, str|cstr _s2)
+    doc "concatenate two strings"
+    doc "The result is placed on an allocator effect CHARS."
+    doc "This implementation creates a new allocation and is therefore"
+    doc "slower compared to using a simple arena, circular buffer, or even"
+    doc "an automatically resized list. Since that allocation defers its"
+    doc "deallocation too, it cannot be returned from nested code blocks."
+    doc "Switch to a different character allocator to produce more dynamic"
+    doc "yet safe and fast code."
+    s1 = str _s1
+    s2 = str _s2
+    charalloc = unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
+    surface = mut arena charalloc
+    start = surface.pos+0
+    try copy(surface, s1)
+    try copy(surface, s2)
+    try ret = str(status surface from start)
+    return ret
+
+def add(on edit char_list CHARS, str|cstr _s1, str|cstr _s2) -> str
     doc "concatenate two strings"
     doc "The result is placed on an allocator effect CHARS."
     doc "This implementation creates a new allocation and is therefore"
@@ -497,16 +516,13 @@ def add(on edit char_allocator\contiguous_char_allocator CHARS, str|cstr _s1, st
     unsafe_valid CHARS
     unsafe_valid s1
     unsafe_valid s2
-    if CHARS is new
-        try copy(surface, s1)
-        try copy(surface, s2)
-    else
-        copy(surface, s1)
-        copy(surface, s2)
+    copy(surface, s1)
+    copy(surface, s2)
     try ret = str(status surface from start)
     return ret
 
-def add(on edit contiguous_char_allocator CHARS, str|cstr _s1, str|cstr _s2)
+
+def add(on edit contiguous_char_allocator CHARS, str|cstr _s1, str|cstr _s2) -> str
     doc "concatenate two strings"
     doc "The result is placed on an allocator effect CHARS."
     doc "This implementation ensures that consecutively allocated strings, or"
@@ -515,34 +531,38 @@ def add(on edit contiguous_char_allocator CHARS, str|cstr _s1, str|cstr _s2)
     doc "result before appending to it. For example, consider the following:"
     doc "```python"
     doc "import std.core"
-    doc "def main()"
-    doc "    CLI = edit console()"
+    doc "def main(CLI)"
     doc "    CHARS = edit arena alloc 10"
-    doc "    s1 = copy 123"
-    doc "    s2 = copy 456"
+    doc "    s1 = copy \"123\""
+    doc "    s2 = copy \"345\""
     doc "    s3 = s1+s2"
     doc "    print s3+copy(78)+copy(9)"
     doc "```"
     doc "The snippet fits the result in a contiguous area on the arena's buffer,"
     doc "with only one copying operation for each character. This does not"
-    doc "magically optimize all copying operations, but it does makes most"
+    doc "magically optimize all copying operations, but it does make most"
     doc "convenient optimizatins when allocating and immediately concatenating."
 
-    if CHARS is char_linkedmem: peek_allocator = CHARS.unsafe_peek_arena()
-    else: peek_allocator = CHARS
     s1 = str _s1
     s2 = str _s2
 
-    if s1.unsafe_ptr==peek_allocator.buf.unsafe_ptr and peek_allocator.pos==s1.dat.pos+s1.dat.length and peek_allocator.pos+s2.dat.length<peek_allocator.buf.unsafe_size
-        surface = mut arena unsafe_mut status CHARS.alloc len s2
-        copy(surface, s2)
-        return str(status surface from s1.dat.pos+0)
-    if s1.unsafe_ptr==peek_allocator.buf.unsafe_ptr and s2.unsafe_ptr==peek_allocator.buf.unsafe_ptr and s2.dat.pos==s1.dat.pos+s1.dat.length
-        return str(peek_allocator.buf, s2.dat.pos+s2.dat.length from s1.dat.pos)
+    if not CHARS is bucket
+        if CHARS is char_linkedmem: peek_allocator = CHARS.unsafe_peek_arena()
+        else: peek_allocator = CHARS
+        if s1.unsafe_ptr==peek_allocator.buf.unsafe_ptr and peek_allocator.pos==s1.dat.pos+s1.dat.length and peek_allocator.pos+s2.dat.length<peek_allocator.buf.unsafe_size
+            surface = mut arena unsafe_mut status CHARS.alloc len s2
+            copy(surface, s2)
+            return str(status surface from s1.dat.pos+0)
+        if s1.unsafe_ptr==peek_allocator.buf.unsafe_ptr and s2.unsafe_ptr==peek_allocator.buf.unsafe_ptr and s2.dat.pos==s1.dat.pos+s1.dat.length
+            return str(peek_allocator.buf, s2.dat.pos+s2.dat.length from s1.dat.pos)
     
     len_sums = len(s1)+len(s2)
     if CHARS is char_linkedmem: prev_pos = CHARS.ensure_arena(len_sums).pos
-    else: prev_pos = CHARS.pos
+    else
+        if CHARS is bucket: prev_pos = 0
+        else 
+            if CHARS is char_circular: if CHARS.pos+len_sums>CHARS.buf.unsafe_size: prev_pos = 0
+            else: prev_pos = CHARS.pos
     surface = mut arena unsafe_mut status CHARS.alloc(len_sums) # TODO: fix std so that unsafe_mut is not needed
     copy(surface, s1)
     copy(surface, s2)
@@ -568,14 +588,11 @@ def copy(on edit char_allocator CHARS, nat n)
     doc "The result is placed on a character memory surface effect CHARS."
     doc "Example:"
     doc "```"
-    if CHARS is new
-        doc "CHARS = new()"
-    if CHARS is arena
-        doc "CHARS = edit arena alloc 10"
-    if CHARS is circular
-        doc "CHARS = edit circular alloc 10"
-    if CHARS is list
-        doc "CHARS = edit list char[]"
+    if CHARS is new:           doc "CHARS = new()"
+    if CHARS is bucket:        doc "CHARS = bucket()"
+    if CHARS is char_arena:    doc "CHARS = edit arena alloc 10"
+    if CHARS is char_circular: doc "CHARS = edit circular alloc 10"
+    if CHARS is char_list:     doc "CHARS = edit list char[]"
     doc "s = copy 123"
     doc "```"
     v = mut n
@@ -624,7 +641,49 @@ def copy(on edit char_allocator CHARS, nat n)
 #     return str(status surface len digits+offset)
 
 
-def copy(on edit char_allocator CHARS, float n)
+def copy(on edit char_allocator\new CHARS, float n)->str
+    doc "convert a number to a string"
+    negative = n < 0.0
+    value = mut n
+    if negative
+        value = neg value
+        offset = 1
+    whole = nat value
+    fraction = nat ((value-float whole)*1000.0)
+    v = mut whole
+    digits = mut 1
+    while v>=10
+        v = v/(10 unsafe_assume_nonzero)
+        digits = digits+1
+    surface = edit alloc(CHARS, offset+digits+4)
+    if negative: surface.buf[surface.pos] = '-'
+    v = whole
+    dig = mut 0 # helper
+    for i in range of digits
+        dig = v.mod(10 unsafe_assume_nonzero)
+        {builtins::char digit='0'+dig;}
+        surface.buf[surface.pos+offset+digits-(i+1)] = digit
+        v = v/(10 unsafe_assume_nonzero)
+
+    surface.buf[surface.pos+offset+digits] = '.'
+
+    dig = (fraction/100).mod(10 unsafe_assume_nonzero)
+    {digit='0'+dig;}
+    surface.buf[surface.pos+offset+digits+1] = digit
+
+    dig = (fraction/10).mod(10 unsafe_assume_nonzero)
+    {digit='0'+dig;}
+    surface.buf[surface.pos+offset+digits+2] = digit
+
+    dig = fraction.mod(10 unsafe_assume_nonzero)
+    {digit='0'+dig;}
+    surface.buf[surface.pos+offset+digits+3] = digit
+
+    unsafe_valid CHARS
+    return str(status surface len offset+digits+4)
+
+
+def copy(on edit new CHARS, float n)
     doc "convert a number to a string"
 
     negative = n < 0.0

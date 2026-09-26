@@ -103,4 +103,5 @@ def linkedmem(edit any[] buf, nat|blank multiple, "track")
     else
         return (linkedmem(buf, multiple), consumption())
 
-local def _blank() return()
+local def _blank()
+    return()

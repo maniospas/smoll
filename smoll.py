@@ -838,6 +838,7 @@ def rename(seq: list, substitute: dict[str, Variable], others: dict[str, CodeWor
 class ImplementedType:
     def __init__(self, name: str, builtin:str|None=None, at:Optional["Token"]=None, memory_size=0):
         self.name = name
+        self.lazy_def = None
         self.count_checkable_copies: int = 1
         self.invalidated_by = self # which type's invalidation cause invalidation of this - right now helps invalidate pointer buffers
         self.is_literal_of: Optional["ImplementedType"] = None
@@ -1096,7 +1097,7 @@ class ImplementedType:
             other_pointer_type = self.get_pointer_type(value0)
             if existing_pointer_type not in NONE_OR_ANY:
                 if existing_pointer_type!=other_pointer_type and (other_pointer_type is None or not match_structure_with(existing_pointer_type, other_pointer_type)):
-                    error_token.error("safety", "cannot change pointer to from '"+existing_pointer_type.signature()+"' to '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
+                    error_token.error("safety", "cannot change pointer type from '"+existing_pointer_type.signature()+"' to '"+(other_pointer_type.signature() if other_pointer_type else "missing type")+"'")
             else:
                 self.set_pointer_depedency(existing, value0)
         accumulated_defer = self.accumulating_defers[-1].get(existing.name, None)
@@ -2106,7 +2107,7 @@ class ImplementedType:
             del self.vars[name]
         return bool(unused)
             
-    def transpile(self, for_inlining=False) -> str:
+    async def transpile(self, for_inlining=False) -> str:
         if self.never_implement: return ""
         #while self.simplify(): pass
         if not self.needs_failure_mode and self.force_not_inline: self.needs_failure_mode = self.at
@@ -2232,6 +2233,11 @@ class UnionType:
         self.variations: list[ImplementedType] = list()
         self.at = at
 
+    def copy_state(self):
+        ret = UnionType(self.name, self.at)
+        ret.variations = [v for v in self.variations]
+        return ret
+
     def append(self, variation: ImplementedType):
         self.variations.append(variation)
         return self
@@ -2245,8 +2251,24 @@ class File:
         self.is_main_file: bool = False
         self.is_extern_file: bool = False
         self.localdefs: set[UnionType|ImplementedType|File] = set() # a set of references to local types and namespaces
-        self.cached: Optional[list[str]] = None # do not normally use - onlly proper usage is for macros to tokenize
+        self.cached: Optional[list[str]] = None # do not normally use - only proper usage is for macros to tokenize
         self.error_redirect: Optional["token"] = None
+        self._cached_lazy_context: Optional["File"] = None
+
+    def lazy_context(self)->File:
+        if self._cached_lazy_context: return self._cached_lazy_context
+        # if self._cached_lazy_context is not None and len(self._cached_lazy_context.localdefs)==len(self.localdefs):
+        #     return self._cached_lazy_context
+        f = File(self.path)
+        f.resolved_path = self.resolved_path
+        f.types = {k:v.copy_state() for k,v in self.types.items()}
+        f.namespaces = {k:v for k,v in self.namespaces.items()}
+        f.is_main_file = self.is_main_file
+        f.localdefs = {t for t in self.localdefs}
+        #f.cached = self.cached
+        f.error_redirect = self.error_redirect
+        self._cached_lazy_context = f
+        return f
 
     def open(self):
         if self.cached: return self.cached
@@ -2569,7 +2591,7 @@ def _select_call(file: File, impl: ImplementedType, method: UnionType, argument_
         #     available_types = alternative_list
         #     error_token.error("type", "no function '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"' even though there is only one option", suggestions=[t.signature() for t in alternative_list])
         # else: 
-        error_token.error("type", "no function matches '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature(compact=True) for t in alternative_list])
+        error_token.error("type", "no function matches '"+("" if "__" in method.name else method.name)+"("+signature_like(argument_vars, impl)+") -> "+out_format_signature+"'", suggestions=[t.signature(compact=True)+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in alternative_list])
     if len(available_types)>1:
         out_format_signature = "any" if out_format is None else signature_like(out_format, impl)
         # if is_lsp and file.is_main_file:
@@ -3275,6 +3297,7 @@ def process_deref(file: File, pos: int, ret: list[Variable], impl: ImplementedTy
     if ret[0].type!=POINTER_TYPE:
         if not explicit: return pos, ret
         current_token.error("type", "must dereference a pointer but got '"+signature_like(ret)+"'")
+    if not impl.is_parsing_a_try and impl.is_parsing_a_defer: current_token.error("safety", "cannot directly derefence within a `defer`", suggestions=["wrap the dereference with a `try` statement"])
     if ret[0].stabilized_name() in impl.invalidated: current_token.error("safety", "invalidated '"+signature_like(ret.stabilized_name(), impl)+"'", reason=impl.invalidated[ret[0].stabilized_name()], suggestions=["re-obtain it from its buffer"], raason_message=impl.invalidated_reason.get(ret[0].stabilized_name(), "due to"))
     if unsafe_pointer_type is not None:
         pointer_type = unsafe_pointer_type
@@ -3595,7 +3618,7 @@ async def process_type(file: File, tokens: list[Token], pos: int, show_lsp: bool
                     if peek_text(tokens, tokpos+2)=="=": tokens[pos].error("type", "type union is declared later per 'def "+name+"'")
                     else:
                         if pos>tokpos: 
-                            tokens[pos].error("type", "usage of 'def "+name+"' before its definition", suggestions=["fix compilation errors", "declare it as 'rec'"])
+                            tokens[pos].error("type", "usage of 'def "+name+"' before its definition", suggestions=["fix compilation errors", "declare it as 'rec'", "add '-> return_type' to the end of its signature"])
                         else:
                             tokens[pos].error("type", "usage of 'def "+name+"' defined later, but the present function must return non-recursively before its first recursive call")
                 elif tok.text=="rec" and peek_text(tokens, tokpos+1)==name:
@@ -4113,10 +4136,6 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
         functor_token = get(tokens, pos)
         pos, output_type = await process_linear_type(file, tokens, pos, show_lsp, reduce_to_unique_variations, impl=impl)
         type = create_functor(type, output_type, functor_token)
-    if parentheses:
-        if peek_text(tokens, pos)==",": get(tokens, pos).error("syntax", "fully anonymous structural type declarations are not yet supported; for the time being, define a function with the return type and use it here")
-        if peek_text(tokens, pos)!=")": get(tokens, start_pos-1).error("type", "unclosed type definition parenthesis")
-        pos += 1
     if peek_text(tokens, pos) == "|":
         if is_lsp and file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "**type alternatives**\n\neither of the types")
         prev_pos = pos
@@ -4134,6 +4153,8 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
         ret = UnionType(type.name+"^"+alternatives.name, at=get(tokens, prev_pos))
         alternative_variations = set(alternatives.variations)
         ret.variations = [variation for variation in type.variations if variation in alternative_variations]
+        if len(ret.variations)==len(type.variations): get(tokens, prev_pos).error("safety", "this type conjunction did not change anything", suggestions=["the types could be independent", "perhaps you meant 'A^B' instead of 'B^A' (conjunction is not order-independent)"])
+        if len(ret.variations)==0: get(tokens, prev_pos).error("safety", "this type conjunction did not yield any alternatives", suggestions=["the types should be partially overlapping", "remove the argument", "use 'blank'"])
         type = ret
     elif peek_text(tokens, pos) == "\\":
         if is_lsp and file.is_main_file and show_lsp: print_lsp_keyword(get(tokens, pos), "**type set difference**\n\nexclude elements of the right type union from the left")
@@ -4142,7 +4163,13 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
         ret = UnionType(type.name+"\\"+alternatives.name, at=get(tokens, prev_pos))
         alternative_variations = set(alternatives.variations)
         ret.variations = [variation for variation in type.variations if variation not in alternative_variations]
+        if len(ret.variations)==len(type.variations): get(tokens, prev_pos).error("safety", "this type difference did not change anything", suggestions=["use 'A\\B|C', which parses to 'A\\(B|C),' to remove both alternatives from a larger one", "the types could be independent"])
+        if len(ret.variations)==0: get(tokens, prev_pos).error("safety", "this type difference did not yield any alternatives", suggestions=["try more explicit parentheses; 'A\\B|C' parses to 'A\\(B|C)' and NOT '(A\\B)|C", "the types should be partially overlapping", "remove the argument", "use 'blank'"])
         type = ret
+    if parentheses:
+        if peek_text(tokens, pos)==",": get(tokens, pos).error("syntax", "fully anonymous structural type declarations are not yet supported; for the time being, define a function with the return type and use it here")
+        if peek_text(tokens, pos)!=")": get(tokens, start_pos-1).error("type", "unclosed type definition parenthesis")
+        pos += 1
     return pos, type
 
 def skip_statement(file: File, tokens: list[Token], pos: int):
@@ -6284,12 +6311,15 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 if peek_text(tokens, pos)=="else":
                     if is_lsp and file.is_main_file: print_lsp_keyword(get(tokens,pos), "**else**\n\nAlternative to conditional statement.")
                     pos += 1
-                    if get_skip(tokens, pos).text!=START_TOKEN:
+                    next_token = get_skip(tokens, pos)
+                    if next_token.text!=START_TOKEN and next_token.text!="if":
                         get(tokens, pos).error("syntax", "condition must be followed by an indented code block or ':'")
                         pos = skip_statement(file, tokens, pos)
                     else:
-                        depth = 1
-                        pos += 1
+                        if next_token.text!="if": 
+                            pos += 1
+                            depth = 1
+                        else: depth = 0
                         while depth:
                             next_token = get_skip(tokens, pos).text
                             if next_token==START_TOKEN: depth += 1
@@ -6312,9 +6342,11 @@ async def process_body(file: File, tokens: list[Token], pos: int, impl: Implemen
                 if get_skip(tokens, pos).text=="else":
                     if is_lsp and file.is_main_file: print_lsp_keyword(get(tokens,pos), "**else**\n\nAlternative to conditional statement.")
                     pos += 1
-                    if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
+                    next_token = get_skip(tokens, pos)
+                    if next_token.text==START_TOKEN: 
+                        pos = await process_body(file, tokens, pos, impl)
                     else:
-                        get(tokens, pos).error("syntax", "condition must be followed by an indented code block or ':'") 
+                        if next_token.text!="if": get(tokens, pos).error("syntax", "condition must be followed by an indented code block or ':'") 
                         pos = await process_body(file, tokens, pos-1, impl, one_line=True)
                 continue
             if is_lsp and file.is_main_file: print_lsp_keyword(name, "**if**\n\nStart a conditional statement and run a code block if it is true.")
@@ -6603,6 +6635,7 @@ async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exc
         arg_type_name_auto = peek_text(tokens, pos-1)
         if peek_text(tokens, pos-2)=="::": arg_type_name_auto = "-"
         arg_name = peek_text(tokens, pos)
+        arg_name_token = get(tokens, pos)
         if arg_name==end_symbol or arg_name==",":
             if end_symbol==">":
                 arg_name = "__t_anon"+str(len(abstract_arg_types)) # reproducible argument names for is_same checks
@@ -6624,6 +6657,13 @@ async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exc
         #if arg_immutability==-1 and all(variation.builtin for variation in arg_type.variations):
         #    tokens[pos].error("type", "all argument parameters are builtin types, so 'const' is redundant")
         if POINTER_TYPE in arg_type.variations: tokens[pos].error("syntax", "'ptr' should follow after its attached data type. Perhaps you meant 'any ptr'?")
+        if is_lsp and file.is_main_file:
+            for variation in arg_type_variations:
+                if abstract_arg_convert_to_ptr[-1]:
+                    print_lsp_var(arg_name_token, "ptr {"+signature_like([variation.vars[r] for r in variation.rets], variation)+"}") 
+                else:
+                    print_lsp_var(arg_name_token, signature_like([variation.vars[r] for r in variation.rets], variation))    
+        
         abstract_arg_names.append(arg_name)
         abstract_arg_immutability.append(arg_immutability)
         next_symbol = peek_text(tokens, pos)
@@ -6634,7 +6674,20 @@ async def _gather_def(file: File, tokens: list[Token], pos: int, fast_return_exc
     pos += 1
     return pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr, effect_names
 
-async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception: bool, is_local: bool):
+async def lazy_def(impl: ImplementedType):
+    if impl.lazy_def is None: return impl
+    await process_body(impl.lazy_def[0]._cached_lazy_context, *impl.lazy_def[1:-2])
+    if not impl.has_been_completed: 
+        impl.nesting.clear()
+        start_token = impl.lazy_def[-1]
+        impl.returns([impl.vars[var] for var in impl.rets], start_token, is_safe=True)
+        impl.implementation.extend([CODEWORD_GOTO, CODEWORD_TRETURN, CODEWORD_SEMICOLON])
+    if impl.returned_defers: impl.at.error("safety", "cannot create singlatons on lazily parsed functions (with -> returns)")
+    impl.lazy_def = None
+    if [dep for dep in impl.dependent_implementations if dep.has_retrieved_singleton]: impl.at.error("safety", "cannot return defers in lazily parsed functions (with -> returns)")
+    return impl
+
+async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exception: bool, is_local: bool, allow_lazy: bool=False):
     start_token = get(tokens, pos)
     name_token = get(tokens, pos+1)
     pos, name, abstract_arg_types, abstract_arg_names, abstract_arg_immutability, abstract_arg_convert_to_ptr, effect_names = await _gather_def(file, tokens, pos, fast_return_exception, is_local)
@@ -6725,11 +6778,65 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                 if peek_text(tokens, pos) in ["def", "repo", "import", "local"]:
                     start_token.error("safety", "function definitions cannot be missing their implementation; consider returning 'return compiler::args()'")
                     impl.rets = [arg for arg in impl.args]
+                elif allow_lazy and peek_text(tokens, pos)=="->":#
+                    if is_lsp and file.is_main_file: 
+                        print_lsp_definition(get(tokens, pos), "**return declaration (enables lazy compilation)**\n\nAdjusts the function definition to consider all functions in the file by declaring its return type. Furthermore, the function is lazily parsed, reducing compile times (instead pass `--verify` to the compiler to guarantee type checking of all those functions). Functions with such explicit return demands will be matched by the internal returns, are always allowed to fail, and cannot return singletons or defers for releasing resources.")
+                    
+                    ret_token = get(tokens, pos)
+                    pos = pos+1
+                    pos, ret_type = await process_linear_type(file, tokens, pos, show_lsp=True, impl=impl)
+                    ret_type_variations = find_unique_variations(ret_type.variations)
+                    if len(ret_type_variations)!=1: ret_token.error("type", "failed to resolve to exactly one type", suggestions=[t.signature(compact=True)+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in ret_type.variations])
+                    ret_variation = ret_type_variations[0]
+                    impl.needs_failure_mode = True
+                    ret_var = peek_text(tokens, pos)
+                    ret_var = create_temp() 
+                    for ret in ret_variation.rets:
+                        variable = ret_variation.vars[ret].renamed_copy(ret_var+"__"+ret, token=ret_token)
+                        impl.vars[variable.name] = variable
+                        impl.rets.append(variable.name)
+                        impl.has_returned_once = True
+                    
+                    if peek_text(tokens, pos)!=START_TOKEN: get(tokens, pos).error("syntax", "expected ':' or indentation to start a block here")
+                    impl.lazy_def = (file, tokens, pos, impl, name_token, ret_token)
+                    impl.force_not_inline = True
+                    depth = 0
+                    pos += 1
+                    while pos<len(tokens):
+                        if tokens[pos].text==START_TOKEN: depth += 1
+                        if tokens[pos].text==END_TOKEN:
+                            if depth==0: 
+                                pos += 1
+                                break
+                            depth -= 1
+                        pos = pos+1
+
+                    
                 else:
+                    if peek_text(tokens, pos)=="->":
+                        if is_lsp and file.is_main_file: 
+                            print_lsp_definition(get(tokens, pos), "**return declaration (enables lazy compilation)**\n\nAdjusts the function definition to consider all functions in the file by declaring its return type. Furthermore, the function is lazily parsed, reducing compile times (instead pass `--verify` to the compiler to guarantee type checking of all those functions). Functions with such explicit return demands will be matched by the internal returns, are always allowed to fail, and cannot return singletons or defers for releasing resources.")
+                    
+                        ret_token = get(tokens, pos)
+                        pos, ret_type = await process_linear_type(file, tokens, pos+1, show_lsp=False, impl=impl)
+                        ret_type_variations = find_unique_variations(ret_type.variations)
+                        if len(ret_type_variations)!=1: ret_token.error("type", "failed to resolve to exactly one type", suggestions=[t.signature(compact=True)+(" defined in "+t.at.file.path+" line "+str(t.at.row) if t.at else " from compiler definitions") for t in ret_type.variations])
+                        ret_variation = ret_type_variations[0]
+                        impl.needs_failure_mode = True
+                        ret_var = peek_text(tokens, pos)
+                        ret_var = create_temp() 
+                        for ret in ret_variation.rets:
+                            variable = ret_variation.vars[ret].renamed_copy(ret_var+"__"+ret, token=ret_token)
+                            impl.vars[variable.name] = variable
+                            impl.rets.append(variable.name)
+                            impl.has_returned_once = True
+
+                    if peek_text(tokens, pos)!=START_TOKEN: get(tokens, pos).error("syntax", "expected ':' or indentation to start a block here")
                     if peek_text(tokens, pos)==START_TOKEN: pos = await process_body(file, tokens, pos, impl)
                     else: pos = await process_body(file, tokens, pos-1, impl, one_line=True)
                     #pos = await process_body(file, tokens, pos, impl)
                     if not impl.has_been_completed: 
+                        impl.nesting.clear()
                         impl.returns([impl.vars[var] for var in impl.rets], start_token, is_safe=True)
                         impl.implementation.extend([CODEWORD_GOTO, CODEWORD_TRETURN, CODEWORD_SEMICOLON])
                     
@@ -6769,10 +6876,10 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         for singleton in singletons: printid("```rust\n"+singleton.signature()+"\n```")
                         if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*")
                 #if impl.has_returned_once and impl.has_been_completed is None:
-                if impl.has_been_completed is None:
-                    impl.nesting.clear()
-                    impl.returns([impl.vars[var] for var in impl.rets], start_token, is_safe=True)
-                    impl.implementation.extend([CODEWORD_GOTO, CODEWORD_TRETURN, CODEWORD_SEMICOLON])
+                # if impl.has_been_completed is None:
+                #     impl.nesting.clear()
+                #     impl.returns([impl.vars[var] for var in impl.rets], start_token, is_safe=True)
+                #     impl.implementation.extend([CODEWORD_GOTO, CODEWORD_TRETURN, CODEWORD_SEMICOLON])
             except FastReturnException: 
                 assert fast_return_exception
                 #start_token.error("safety", "missing uncoditional return")
@@ -6852,7 +6959,7 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
                                 depth -= 1
                                 if depth==0: break
                             pos_end += 1
-                    i = await process_def(file, tokens, i, fast_return_exception=tok.text=="rec", is_local=is_local)                 
+                    i = await process_def(file, tokens, i, fast_return_exception=tok.text=="rec", is_local=is_local, allow_lazy=tok.text!="rec")                 
                     if followed_by_body: i = pos_end+1
             elif tok.text=="import": 
                 if has_made_def: tok.error("safety", "can only import before the file's first definition", reason=first_def_tok, raason_message="first definition at")
@@ -6907,6 +7014,56 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
             except FatalException:
                 i += 1
         else: i += 1
+
+    # cache the current file context used for lazy functions
+    file.lazy_context()
+
+    # actually resolve all the lazy defs of the current file, if that is parsed by the lsp
+    if (is_lsp and file.is_main_file) or verify_mode:
+        for u in file.types.values():
+            for v in u.variations:
+                try: 
+                    if v.lazy_def is None: continue
+                    name_token = v.lazy_def[-2]
+                    await lazy_def(v)
+                    if not (is_lsp and file.is_main_file): continue 
+                    callee = v
+                    print(v.signature())
+                    print("---")
+                    # position in processed file
+                    print("function")
+                    printid(os.path.abspath(name_token.file.resolved_path))
+                    print(name_token.row)
+                    print(name_token.col)
+                    print(len(name_token.text))
+                    # defined at
+                    printid(os.path.abspath(name_token.file.resolved_path))
+                    print(name_token.row)
+                    print(name_token.col)
+                    # message (may span multiple lines))
+                    if callee.doc: printid("**"+(strip_quotes(callee.doc[0]) if len(callee.doc[0])>2 else "function")+"**")
+                    if callee.max_abstraction_level:
+                        printid(" (abstraction "+str(max(0,callee.min_abstraction_level))+"-"+str(callee.max_abstraction_level)+", ssa vars "+str(len(callee.vars))+", size "+str(len(callee.implementation))+")")
+                    printid("```rust\n"+callee.signature()+"\n```")#+(" defined in "+at.file.path if callee.at else " from compiler definitions"))
+                    if len(callee.doc)>1: printid("\n\n"+"\n".join(strip_quotes(doc.replace("\\\"", "\"")) for doc in callee.doc[1:])+"\n")
+                    spawned_error_codes = callee.spawned_error_codes
+                    # if(not impl.count_checkable_copies) and any(impl.vars[v].type==POINTER_TYPE for v in impl.rets+impl.args):
+                    #     pass
+                    #     #printid("When this function is called, it does not create a memory dependecy.\n")
+                    # else:
+                    #     printid("When this function is called, it creates at least one memory dependecy.\n")
+                    if len(spawned_error_codes):
+                        if callee.needs_failure_mode: printid("Potential errors:\n")
+                        else: printid("No failing errors, but can catch these intercepted ones:\n")
+                    for code in spawned_error_codes: printid(str(code)+". "+err_code_list[code][1:-1]+"\n")
+                    if callee.returned_defers: printid("\nReturned values defer use of the following functions:")
+                    for defer in callee.returned_defers: printid("```rust\n"+code_summary(defer, callee)+"```")
+                    singletons = [dep for dep in callee.dependent_implementations if dep.has_retrieved_singleton]
+                    if singletons: printid("\nThe following singletons are initialized:")
+                    for singleton in singletons: printid("```rust\n"+singleton.signature()+"\n```")
+                    if callee.VM: printid("*Warning: Running this function during 'compt' or under a '--back vm' backend involves arbitrary code execution. Always be careful of your dependencies! The executed code is: `"+callee.VM[1:-1]+"`*")
+            
+                except FatalException: continue
 
     # now that we have processed everything, remove all localdefs
     file.namespaces = {k:v for k,v in file.namespaces.items() if v not in file.localdefs}
@@ -7224,6 +7381,7 @@ def check_unloads():
 parser = argparse.ArgumentParser(description="Compile a .s file and optionally run the result.")
 parser.add_argument("source", metavar="SOURCE", help="Path to the .s source file to compile.",)
 parser.add_argument("--lsp", action="store_true", help="No compilation, and output is meant for the lsp to read.",)
+parser.add_argument("--verify", action="store_true", help="Verify functions with return type demands within their declared file (otherwise, they are only lazily parsed).",)
 parser.add_argument("--build", action="store_true", help="Build without running.",)
 parser.add_argument("--perf", action="store_true", help="Add debug symbols and prefer running with 'perf' while prettifying the output (grant more permissions like 'sudo sysctl kernel.perf_event_paranoid=1' - they persist until restart).",)
 parser.add_argument("--time", action="store_true", help="Report the time of ending file parses.",)
@@ -7244,6 +7402,7 @@ perf_mode = args.perf
 chosen_compiler = args.back or "auto"
 is_time = args.time
 is_lsp = args.lsp
+verify_mode = args.verify or docs_mode
 is_pyodide = sys.platform == "emscripten"
 vm_memory_kb = args.vmkb
 vm_recursion_budget = args.vmrec
@@ -7511,7 +7670,7 @@ def platform_exe_path(output_name: str):
     if sys.platform == "win32" and chosen_compiler not in ("none", "emcc"): return str(output_name)+".exe"
     return str(output_name)
 
-def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry_point: ImplementedType|None, skip_write_and_return_actual_main=False) -> None:
+async def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry_point: ImplementedType|None, skip_write_and_return_actual_main=False) -> None:
     entry_point = _entry_point.monomorphic_name if _entry_point is not None else None
     if not skip_write_and_return_actual_main:
         src_path = Path(f"{output_name}.c")
@@ -7521,11 +7680,12 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry
     discovered_defs: list[ImplementedType] = list()
     already_generated: set[ImplementedType] = set()
     new_error_code_list: list[str] = list()
-    def add_implementation(next_def: ImplementedType):
+    async def add_implementation(next_def: ImplementedType):
+        if next_def.lazy_def is not None: await lazy_def(next_def)
         for candidate_def in next_def.dependent_implementations:
             if candidate_def not in already_generated:
                 already_generated.add(candidate_def)
-                add_implementation(candidate_def)
+                await add_implementation(candidate_def)
         discovered_defs.append(next_def)
 
     # find how to construct main arguments
@@ -7548,7 +7708,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry
 
     # collect all dependencies
     for main_def in main_defs:
-        add_implementation(main_def)
+        await add_implementation(main_def)
     
     # simplify exceedingly large monomoprhic type names (e.g., that hold large buffer info)
     if limit_function_name_size:
@@ -7597,7 +7757,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry
     generated_c_funcs = list()
     if not skip_write_and_return_actual_main:
         for next_def in discovered_defs:
-            transpiled = next_def.transpile()
+            transpiled = await next_def.transpile()
             if next_def.force_not_inline: c_decls.append(transpiled[:transpiled.find("{")]+";")
             generated_c_funcs.append(transpiled)
         header += "typedef void (*__smoll_func_ptr_type)(void);\n"
@@ -7646,7 +7806,7 @@ def write_and_compile(output_name: str, main_defs: list[ImplementedType], _entry
         resolve_call(_entry_point.at.file, main_impl, type, main_args, _entry_point.at, _callee=_entry_point)
         if skip_write_and_return_actual_main: return main_impl
 
-        transpiled = main_impl.transpile()
+        transpiled = await main_impl.transpile()
         transpiled = transpiled.replace("int main()", "int main(int argc, char** argv)", 1) if main_impl.needs_failure_mode else transpiled.replace("void main()", "int main(int argc, char** argv)", 1)
         if not main_impl.needs_failure_mode: transpiled = transpiled[:-2]+"  return 0;\n}\n"
         generated_c_funcs.append(transpiled)
@@ -7785,7 +7945,7 @@ async def main():
         if chosen_compiler=="vm":
             print(f"[{YELLOW}+{RESET}] interpret    {src_path}")
             memory = MemoryEmulator(1024*vm_memory_kb)
-            vm_main = write_and_compile(
+            vm_main = await write_and_compile(
                 str(exe_path),
                 [main_type_variations[0]],
                 main_type.variations[0],
@@ -7799,7 +7959,7 @@ async def main():
             for k,v in memory.foreign_objects.items(): 
                 if v[1]: print("non-freed foreign object "+v[1])
         else:
-            func_defs = write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0])
+            func_defs = await write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0])
             original_exe_path = exe_path
             if not args.build and chosen_compiler!="none":
                 if chosen_compiler=="emcc":

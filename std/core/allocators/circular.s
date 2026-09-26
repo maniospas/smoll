@@ -17,6 +17,7 @@
 local import std.core.builtinsext
 local import std.core.array
 local import std.core.allocators.allocated
+local import std.core.allocators.arena
 local import std.unsafe as unsafe
 local import compiler as cp
 
@@ -77,3 +78,6 @@ def alloc(edit list allocator, nat|blank length)
         allocator.buf = allocator.buf.resize(prev_length+prev_length/2+1)
     allocator.length = prev_length
     return allocated(allocator.buf, pos)
+
+def unsafe_peek_arena(edit list allocator)
+    return arena(allocator.buf, allocator.length)

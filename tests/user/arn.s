@@ -1,23 +1,23 @@
 import std.core
 
-def test1(edit arena<char::tag> arn)
+def test1(edit char_arena arn)
     gc arn
     arn.slice(5)
 
-def test2(edit arena<char::tag> CHARS)
+def test2(edit char_arena CHARS)
     gc CHARS
     return "test"+"2"
 
-def test3(edit arena<char::tag> CHARS)
+def test3(edit char_arena CHARS)
     return copy test2(CHARS)
 
-def test4(edit arena<char::tag> arn)
+def test4(edit char_arena arn)
     gc arn
     ret = [test3 arn]
     compiler::unsafe_declare_deep_copy_only()
     return ret 
 
-def test5(on CLI, edit arena<char::tag> arn)
+def test5(on CLI, edit char_arena arn)
     gc arn
     x = test4 arn
     z = x[0]&

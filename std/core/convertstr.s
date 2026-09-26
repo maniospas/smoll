@@ -112,7 +112,7 @@ def float(console console)
 
 def str(on edit char_allocator CHARS, edit console console)
     doc "reads a string from the console"
-    if CHARS is arena<char::tag>
+    if CHARS is char_arena
         doc "The read string is placed on an arena while consuming only the necessarily minimum size."
         ch = edit CHARS
     else 
@@ -137,7 +137,7 @@ def str(on edit char_allocator CHARS, edit console console)
         ptr_pos = ch.buf.unsafe_ptr.unsafe::add ch.pos
         {*ptr_pos=_c;}
         ch.pos = ch.pos+1
-    if CHARS is arena<char::tag>
+    if CHARS is char_arena
         CHARS.pos = ch.pos
     if CHARS is new
         if ch.pos==0

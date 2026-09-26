@@ -23,6 +23,6 @@ local import std.core
 def mutget(edit dir::open data, nat) 
     return dir::entry data
 
-def mutget(on edit arena<char::tag>|circular<char::tag> CHARS, edit file::File|process::open f, nat)
+def mutget(on edit char_arena|char_circular CHARS, edit file::File|process::open f, nat)
     return file::line|process::line(CHARS, f)
 

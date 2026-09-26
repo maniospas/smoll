@@ -3977,7 +3977,7 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
                     impl.vars[arg_name] = Variable(arg_name, POINTER_TYPE, immutable!=0, token=functor_token)
                     impl.args.append(arg_name)
                     impl.set_pointer_type(impl.vars[arg_name], arg_type)
-                    if immutable==1: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
+                    #if immutable==1: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
                     continue
                 elif arg_type.builtin:
                     impl.vars[arg_name] = Variable(arg_name, arg_type, immutable!=0, token=functor_token)
@@ -4009,7 +4009,7 @@ async def process_linear_type(file: File, tokens: list[Token], pos: int, show_ls
                         #else:
                         #    dep = arg_type.follow_pointer_dependency(arg_type.vars[ret])
                         #    if dep is not None: impl.set_pointer_depedency(dep.renamed_copy(arg_name+"__"+dep.name[prefix_len:]))
-                if immutable==1 and not used_immutable: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
+                #if immutable==1 and not used_immutable: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
             for variation in type.variations:
                 if len(variation.args)!=len(impl.args): continue
                 compliant = True
@@ -6658,7 +6658,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                     impl.args.append(arg_name)
                     impl.set_pointer_type(impl.vars[arg_name], arg_type)
                     if arg_type!=ANY_TYPE and len([ret for ret in arg_type.rets if arg_type.vars[ret].type.builtin])==0: tokens[pos-1].error("safety", "cannot convert a data type with no runtime storage to a pointer")
-                    if immutable==1: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
+                    #if immutable==1: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
                     continue
                 elif arg_type.builtin:
                     impl.vars[arg_name] = Variable(arg_name, arg_type, immutable!=0, token=start_token)
@@ -6692,7 +6692,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         #else:
                         #    dep = arg_type.follow_pointer_dependency(arg_type.vars[ret])
                         #    if dep is not None: impl.set_pointer_depedency(dep.renamed_copy(arg_name+"__"+dep.name[prefix_len:]))
-                if immutable==1 and not used_immutable: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
+                #if immutable==1 and not used_immutable: tokens[pos-1].error("safety", "'edit' is identical to 'mut' here; use the latter instead or remove the edentifier to prevent any editing")
             found_type: UnionType|None = file.types.get(impl.name)
             already_parsed = None
             if found_type is not None:

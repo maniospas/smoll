@@ -35,7 +35,7 @@ def HttpOptions(HttpMethod method, cstr|blank body, cstr|blank content_type)
         content_type = cstr()
     return class(method, body, content_type)
 
-def request(on edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr _url, HttpOptions opts)
+def request(on edit new|char_arena|char_circular CHARS, str|cstr _url, HttpOptions opts)
     {"-lcurl"}
     {builtins::compiler::ptr curl = curl_easy_init();}
     if not exists curl: fail "curl initialization failed"
@@ -45,13 +45,13 @@ def request(on edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr _ur
         pos = 0
         defer
             if exists buf.unsafe_ptr: buf.unsafe_ptr.unsafe::free()
-    if CHARS is arena<char::tag>
+    if CHARS is char_arena
         buf = CHARS.buf
         pos = CHARS.pos
-    if CHARS is circular<char::tag>
+    if CHARS is char_circular
         buf = CHARS.buf
         pos = 0
-    if CHARS is arena<char::tag>|circular<char::tag>
+    if CHARS is char_arena|char_circular
         if buf.unsafe_align.nat()!=1: fail "can only define strings on contiguous buffers"
         if buf.unsafe_offset.nat()!=0: fail "can only define strings on non-offset buffers"
     {
@@ -89,11 +89,11 @@ def request(on edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr _ur
     {buf__unsafe_ptr = __buf.data;}
     return response(status, str(buf, pos to buf.unsafe_size))
 
-def get(on edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr url)
+def get(on edit new|char_arena|char_circular CHARS, str|cstr url)
     doc "REST get request"
     return url.request HttpOptions HttpMethod type "GET"
 
-def post(on edit new|arena<char::tag>|circular<char::tag> CHARS, str|cstr url, str|cstr _body, cstr|blank content_type)
+def post(on edit new|char_arena|char_circular CHARS, str|cstr url, str|cstr _body, cstr|blank content_type)
     doc "REST post request"
     if content_type is blank
         doc "The default application/json content type is used."

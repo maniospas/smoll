@@ -20,14 +20,12 @@ local import std.core.allocators
 local import std.unsafe as unsafe
 
 
-def arena(char::tag)
+def char_arena()
     doc "arena of characters"
     doc "This can be used as part of a signature to indicate"
     doc "that an arena of characters is the expected input, and not"
-    doc "any arena. The `char::tag` is purely a mnemonic. That said,"
-    doc "instead of obtaining this type per `arena<char::tag>`,"
-    doc "prefer the following pattern, which selects"
-    doc "character allocators that are also arenas."
+    doc "any arena. Prefer recovering this with the following pattern,"
+    doc "as an intersection between character allocators and arenas."
     doc "```python"
     doc "import std.core"
     doc "def combine(on edit char_allocator^arena CHARS, cstr s1, cstr s2)"
@@ -38,14 +36,12 @@ def arena(char::tag)
     doc "```"
     return arena char[]
 
-def circular(char::tag)
+def char_circular()
     doc "circular buffer of characters"
     doc "This can be used as part of a signature to indicate"
     doc "that a circular buffer of characters is the expected input, and not"
-    doc "any circular buffer. The `char::tag` is purely a mnemonic. That said,"
-    doc "instead of obtaining this type per `arena<char::tag>`,"
-    doc "prefer the following pattern, which selects"
-    doc "character allocators that are also circular buffers."
+    doc "any circular buffer. Prefer recovering this with the following pattern,"
+    doc "as an intersection between character allocators and circular buffers."
     doc "```python"
     doc "import std.core"
     doc "def combine(on edit char_allocator^circular CHARS, cstr s1, cstr s2)"
@@ -56,7 +52,15 @@ def circular(char::tag)
     doc "```"
     return circular char[]
 
-def list(char::tag)
+def char_linkedmem()
+    doc "linked character arenas"
+    return linkedmem char[]
+
+def char_linkedmem("track")
+    doc "linked character arenas"
+    return linkedmem(char[] track)
+
+def char_list()
     doc "list of characters"
     return list char[]
 
@@ -76,7 +80,7 @@ local def alloc(edit bucket CHARS, nat length)
     doc "character allocators."
     return allocated(char[].alloc(CHARS, length), 0)
     
-def char_allocator = new|bucket|arena<char::tag>|circular<char::tag>|list<char::tag>
+def char_allocator = new|bucket|char_arena|char_circular|char_list|char_linkedmem|char_linkedmem<"track">
 
 def exists(cstr c)
     doc "checks whether a cstr is not zero-initialized"
@@ -349,7 +353,7 @@ def neq(str|cstr x, str|cstr y)
     doc "Negates the outcome of equality checks between cstr and strings."
     return not x==y
 
-def copy_null_terminated(on edit arena<char::tag> CHARS, str|cstr _other)
+def copy_null_terminated(on edit char_arena CHARS, str|cstr _other)
     doc "copy a string while adding null termination"
     doc "Constructs the copy on the buffer at a given position and returns it."
     doc "The position is mutated to indicate where the string ends (e.g., to copy more strings)."
@@ -376,8 +380,7 @@ def print(on CLI, str s, cstr|blank endl)
 def get(str s, nat i, "unsafe_assume_inbounds"|blank inbounds_guarantee)
     doc "a character in a string"
     if inbounds_guarantee is blank
-        if i>=s.dat.length
-            fail "out of bounds"
+        if i>=s.dat.length: fail "out of bounds"
     return s.unsafe_ptr.unsafe::add(s.dat.pos+i)
 
 def print(on CLI, char c, cstr|blank endl)
@@ -475,7 +478,9 @@ def nn(str value)
     doc "to print without a new line."
     return (value, "")
 
-def add(on edit char_allocator\arena\circular CHARS, str|cstr _s1, str|cstr _s2)
+local def contiguous_char_allocator = char_arena|char_circular|char_linkedmem|char_linkedmem<"track">
+
+def add(on edit char_allocator\contiguous_char_allocator CHARS, str|cstr _s1, str|cstr _s2)
     doc "concatenate two strings"
     doc "The result is placed on an allocator effect CHARS."
     doc "This implementation creates a new allocation and is therefore"
@@ -501,7 +506,7 @@ def add(on edit char_allocator\arena\circular CHARS, str|cstr _s1, str|cstr _s2)
     try ret = str(status surface from start)
     return ret
 
-def add(on edit arena<char::tag>|circular<char::tag> CHARS, str|cstr _s1, str|cstr _s2)
+def add(on edit contiguous_char_allocator CHARS, str|cstr _s1, str|cstr _s2)
     doc "concatenate two strings"
     doc "The result is placed on an allocator effect CHARS."
     doc "This implementation ensures that consecutively allocated strings, or"
@@ -523,17 +528,22 @@ def add(on edit arena<char::tag>|circular<char::tag> CHARS, str|cstr _s1, str|cs
     doc "magically optimize all copying operations, but it does makes most"
     doc "convenient optimizatins when allocating and immediately concatenating."
 
+    if CHARS is char_linkedmem: peek_allocator = CHARS.unsafe_peek_arena()
+    else: peek_allocator = CHARS
     s1 = str _s1
     s2 = str _s2
-    if s1.unsafe_ptr==CHARS.buf.unsafe_ptr and CHARS.pos==s1.dat.pos+s1.dat.length and CHARS.pos+s2.dat.length<CHARS.buf.unsafe_size
+
+    if s1.unsafe_ptr==peek_allocator.buf.unsafe_ptr and peek_allocator.pos==s1.dat.pos+s1.dat.length and peek_allocator.pos+s2.dat.length<peek_allocator.buf.unsafe_size
         surface = mut arena unsafe_mut status CHARS.alloc len s2
         copy(surface, s2)
         return str(status surface from s1.dat.pos+0)
-    if s1.unsafe_ptr==CHARS.buf.unsafe_ptr and s2.unsafe_ptr==CHARS.buf.unsafe_ptr and s2.dat.pos==s1.dat.pos+s1.dat.length
-        return str(CHARS.buf, s2.dat.pos+s2.dat.length from s1.dat.pos)
+    if s1.unsafe_ptr==peek_allocator.buf.unsafe_ptr and s2.unsafe_ptr==peek_allocator.buf.unsafe_ptr and s2.dat.pos==s1.dat.pos+s1.dat.length
+        return str(peek_allocator.buf, s2.dat.pos+s2.dat.length from s1.dat.pos)
     
-    prev_pos = CHARS.pos
-    surface = mut arena unsafe_mut status CHARS.alloc(len(s1)+len(s2)) # TODO: fix std so that unsafe_mut is not needed
+    len_sums = len(s1)+len(s2)
+    if CHARS is char_linkedmem: prev_pos = CHARS.ensure_arena(len_sums).pos
+    else: prev_pos = CHARS.pos
+    surface = mut arena unsafe_mut status CHARS.alloc(len_sums) # TODO: fix std so that unsafe_mut is not needed
     copy(surface, s1)
     copy(surface, s2)
     try ret = str(status surface from prev_pos+0)

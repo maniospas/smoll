@@ -165,6 +165,10 @@ def Texture(TextureData _data)
 def exists(Texture tex)
     return 0!=len tex.data
 
+def unsafe_unload_texture(Texture tex)
+    if try data = tex.data[0]
+        {UnloadTexture((Texture2D){data__id, (int)data__size__width, (int)data__size__height, (int)data__mipmaps, (int)data__format});}
+
 def open(cstr path)
     {
         builtins::nat id = 0;
@@ -172,11 +176,12 @@ def open(cstr path)
         builtins::float height = 0;
         builtins::nat mipmaps = 0;
         builtins::nat format = 0;
-        __smolambda_ray_texture(path__contents, id, width, height, mipmaps, format);
+        __smolambda_ray_texture(path, id, width, height, mipmaps, format);
     }
-    defer
-        {UnloadTexture((Texture2D){id, (int)width, (int)height, (int)mipmaps, (int)format});}
-    return Texture(id, size(width, height), mipmaps, format)
+    if id==0: fail "failed to load texture"
+    ret = Texture(id, size(width, height), mipmaps, format)
+    defer: unsafe_unload_texture ret
+    return ret
 
 def texture(on edit WINDOW, Texture _tex, position pos, color color)
     tex = TextureData _tex.data[0]
@@ -204,6 +209,8 @@ def texture(on edit WINDOW, Texture _tex, position pos, size size, color color, 
     tex = TextureData _tex.data[0]
     scale_x = size.width/float tex.size.width
     scale_y = size.height/float tex.size.height
+    scale = mut scale_x
+    if scale_y<scale_x: scale = scale_y
     { 
         DrawTextureEx(
             (Texture2D){tex__id, (int)tex__size__width, (int)tex__size__height, (int)tex__mipmaps, (int)tex__format},

@@ -83,7 +83,10 @@ CC0 for the standard library.
 
 *No AI was used in the development of the language's core.
 Some AI was used for boilerplate cross-platform implementations 
-in the standard library and lsp, as well as for validation. Such
+in the standard library and LSP, as well as for validation. Such
 usage has been incremental, fixed by hand at pain points, tested
 similarly to the rest of the project, logically validated 
-line-by-line, and refactored into the project's coding style.*
+line-by-line, and refactored into the project's coding style.
+See the vibe-scale classification below.*
+
+[![Vibe-Scale 0.5(V1|U0|T0): AI-assisted, fully reviewed](https://img.shields.io/badge/Vibe--Scale%200.5(V1%7CU0%7CT0)-AI--assisted%2C%20fully%20reviewed-3558a0)](https://github.com/vibesdk/vibe-scale/blob/main/scale/vibe-1.md#v1-u0-t0-score-05--ai-assisted-fully-reviewed)

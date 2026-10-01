@@ -2326,7 +2326,7 @@ class Token:
                             printid("```rust\n"+suggestion_splits[0]+"\n```")
                             #if len(suggestion_splits)>1: print("defined in "+suggestion_splits[1])
                         else: printid("\n- "+suggestion)
-            if is_lsp and self.file.is_main_file and errtype=="safety": return
+            if is_lsp and self.file.is_main_file and errtype=="safety": return None
             raise FatalException
 
 
@@ -2376,7 +2376,10 @@ class Token:
             prefix += " "*orignal_token_len+" "
             print(prefix+source_line)
             print(prefix+f"{RED}{pointer}{RESET}")
-
+        
+        if show_all_errors:
+            if errtype=="safety": return None
+            raise FatalException
         errexit()
 
 def get(tokens: list[Token], pos: int) -> Token:
@@ -7385,6 +7388,7 @@ parser.add_argument("--verify", action="store_true", help="Verify functions with
 parser.add_argument("--build", action="store_true", help="Build without running.",)
 parser.add_argument("--perf", action="store_true", help="Add debug symbols and prefer running with 'perf' while prettifying the output (grant more permissions like 'sudo sysctl kernel.perf_event_paranoid=1' - they persist until restart).",)
 parser.add_argument("--time", action="store_true", help="Report the time of ending file parses.",)
+parser.add_argument("--errors", action="store_true", help="Show all compilation errors, without stopping at the first one.",)
 parser.add_argument("--docs", action="store_true", help="Export to a markdown file.",)
 parser.add_argument("--cleanup", action="store_true", help="Clean up generated .c files and executables.",)
 parser.add_argument("--debug", action="store_true", help="Show debug messages for all failures.",)
@@ -7399,10 +7403,11 @@ debug_mode = args.debug
 cleanup_mode = args.cleanup
 docs_mode = args.docs
 perf_mode = args.perf
+show_all_errors = args.errors
 chosen_compiler = args.back or "auto"
 is_time = args.time
 is_lsp = args.lsp
-verify_mode = args.verify or docs_mode
+verify_mode = args.verify or docs_mode or show_all_errors
 is_pyodide = sys.platform == "emscripten"
 vm_memory_kb = args.vmkb
 vm_recursion_budget = args.vmrec
@@ -7959,7 +7964,8 @@ async def main():
             for k,v in memory.foreign_objects.items(): 
                 if v[1]: print("non-freed foreign object "+v[1])
         else:
-            func_defs = await write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0])
+            try: func_defs = await write_and_compile(str(exe_path), [main_type_variations[0]], main_type.variations[0])
+            except FatalException: os._exit(1)
             original_exe_path = exe_path
             if not args.build and chosen_compiler!="none":
                 if chosen_compiler=="emcc":

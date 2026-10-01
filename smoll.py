@@ -6870,7 +6870,7 @@ async def process_def(file: File, tokens: list[Token], pos: int, fast_return_exc
                         #     printid("When this function is called, it creates at least one memory dependecy.\n")
                         if len(spawned_error_codes):
                             if callee.needs_failure_mode: printid("Potential errors:\n")
-                            else: printid("No failing errors, but can catch these intercepted ones:\n")
+                            else: printid("No failing errors, but after calling this 'compiler::last_error()'may find these intercepted ones:\n")
                         for code in spawned_error_codes: printid(str(code)+". "+err_code_list[code][1:-1]+"\n")
                         if callee.returned_defers: printid("\nReturned values defer use of the following functions:")
                         for defer in callee.returned_defers: printid("```rust\n"+code_summary(defer, callee)+"```")
@@ -7057,7 +7057,7 @@ async def process(file: File, tokens: list[Token], pos: int) -> File:
                     #     printid("When this function is called, it creates at least one memory dependecy.\n")
                     if len(spawned_error_codes):
                         if callee.needs_failure_mode: printid("Potential errors:\n")
-                        else: printid("No failing errors, but can catch these intercepted ones:\n")
+                        else: printid("No failing errors, but after calling this 'compiler::last_error()'may find these intercepted ones:\n")
                     for code in spawned_error_codes: printid(str(code)+". "+err_code_list[code][1:-1]+"\n")
                     if callee.returned_defers: printid("\nReturned values defer use of the following functions:")
                     for defer in callee.returned_defers: printid("```rust\n"+code_summary(defer, callee)+"```")

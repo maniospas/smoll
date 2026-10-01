@@ -261,7 +261,7 @@ def unsafe_temp(str|blank prefix, str other)
 
 def unsafe_temp(cstr cstr)
     doc "tautology function for cstr"
-    doc "This is mainly used as a stt-input counterpart for converting str|cstr to cstr."
+    doc "This is mainly used as a counterpart to its variation with str input for converting str|cstr to cstr."
     str = str cstr
     return (cstr, str)
 

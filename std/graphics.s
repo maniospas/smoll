@@ -15,7 +15,6 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 import std.core
-import std.mini
 import "std/extern/raysupport.h"
 
 def color(nat _r, nat _g, nat _b, nat|blank _a)
@@ -34,8 +33,9 @@ def size(float width, float height)
     return compiler::args()
 
 local def unsafe_open_window(size size, cstr title, cstr font_path)
-    VM "(pyray.set_trace_log_level(pyray.LOG_NONE), pyray.init_window(int($size__width),int($size__height),$title),pyray.set_target_fps(60),memory.set_global('font', pyray.load_font_ex($font_path,128,None,0) if $font_path else pyray.get_font_default()))"
-    {SetTraceLogLevel(LOG_NONE); InitWindow(size__width, size__height, title); }
+    VM "(pyray.set_trace_log_level(pyray.LOG_NONE), pyray.init_window(int($size__width),int($size__height),$title),pyray.set_target_fps(60),pyray.set_exit_key(pyray.KEY_NULL),memory.set_global('font', pyray.load_font_ex($font_path,128,None,0) if $font_path else pyray.get_font_default()))"
+    # if size.width==0.0 or size.height==0.0: fail "zero dimension"
+    {SetTraceLogLevel(LOG_NONE); InitWindow(size__width, size__height, title); SetExitKey(KEY_NULL);}
     {builtins::bool ready = IsWindowReady();}
     if not ready: fail "failed to open window"
     if exists font_path
@@ -48,7 +48,12 @@ local def unsafe_open_window(size size, cstr title, cstr font_path)
             __smolambda_font = __smo_load_font(font_path, 128, __smolambda_codepoints, __smolambda_n);
         }
 
-def window(size size, cstr title, cstr font_path)
+def unsafe_close_window(bool ready)
+    VM "(pyray.toggle_fullscreen() if pyray.is_window_fullscreen() else None,pyray.close_window())"
+    {if (IsWindowFullscreen()) ToggleFullscreen();}
+    {CloseWindow();}
+
+def window(size, cstr title, cstr font_path)
     # HOW TO INSTALL RAYLIB FOR UBUNTU
     # sudo apt install libraylib-dev
     # HOW TO INSTALL RAYLIB FOR EMSCRIPTEN (--back emcc)
@@ -76,13 +81,87 @@ def window(size size, cstr title, cstr font_path)
         else
             {"-lraylib"}
             {"-lGL"}
+    
     ready = mut false
     unsafe_open_window(size, title, font_path)
+    defer: unsafe_close_window(ready)
     return singleton(size, title, ready)
+
+
+def window(cstr title, cstr font_path, "fullscreen" fullscreen)
+    VM "pyray.set_config_flags(pyray.FLAG_FULLSCREEN_MODE)"
+    {SetConfigFlags(FLAG_FULLSCREEN_MODE);}
+    return window(0.0, 0.0, title, font_path)
+
+def unsafe_set_maximize_flag()
+    VM "pyray.set_config_flags(pyray.FLAG_WINDOW_MAXIMIZED)"
+    {SetConfigFlags(FLAG_WINDOW_MAXIMIZED);}
+
+def unsafe_set_maximize_resize_flag()
+    VM "pyray.set_config_flags(pyray.FLAG_WINDOW_MAXIMIZED|pyray.FLAG_WINDOW_RESIZABLE)"
+    {SetConfigFlags(FLAG_WINDOW_MAXIMIZED | FLAG_WINDOW_RESIZABLE);}
+
+def unsafe_set_resize_flag()
+    VM "pyray.set_config_flags(pyray.FLAG_WINDOW_RESIZABLE)"
+    {SetConfigFlags(FLAG_WINDOW_RESIZABLE);}
+
+def window(cstr title, cstr font_path, "maximize" maximize, "resize"|blank resize)
+    if resize is blank: unsafe_set_maximize_flag()
+    else: unsafe_set_maximize_resize_flag()
+    return window(1280.0, 960.0, title, font_path)
+
+def window(size, cstr title, cstr font_path, "resize" resize)
+    if resize is blank: unsafe_set_resize_flat()
+    return window(size, title, font_path)
+
+def window()
+    doc "default windows creation"
+    doc "This had no title, the default font, starts maximed,"
+    doc "and can be resized."
+    return window("", cstr() maximize () resize)
 
 def WINDOW = window
 
-def is_open(on edit WINDOW)
+def maximize(on edit window WINDOW)
+    VM "pyray.maximize_window()"
+    {MaximizeWindow();}
+
+def screen_size(on window WINDOW)
+    VM "[(pyray.get_monitor_width(pyray.get_current_monitor()),pyray.get_monitor_height(pyray.get_current_monitor()))]"
+    {
+        builtins::float width = GetMonitorWidth(GetCurrentMonitor());
+        builtins::float height = GetMonitorHeight(GetCurrentMonitor());
+    }
+    return size(width, height)
+
+def owned_fullscreen(on edit window WINDOW)
+    VM "pyray.toggle_fullscreen()"
+    doc "toggles fullscreen mode"
+    doc "This is an incredibly intrusive operation to the operating system that grabs full control of"
+    doc "the monitor and may even leave it hampered to the default window's resolution if there if the"
+    doc "application is force-terminated (can be restored from operating system settings). Normal termination"
+    doc "or errors restore screen size, but in general do not run this operation unless you want full"
+    doc "control of the monitor. Prefer initializing windows with the maximized flag instead."
+    # if WINDOW.size.width==0.0 or WINDOW.size.height==0.0: fail "cannot toggle fullscreen on window with zero default size"
+    {ToggleFullscreen();}
+
+def unsafe_set_font(on edit WINDOW, cstr font_path)
+    VM "memory.set_global('font',pyray.load_font_ex($font_path,128,None,0))"
+    {
+        builtins::int __smolambda_n = 0;
+        for (builtins::int c = 32; c <= 126; c++)   __smolambda_codepoints[__smolambda_n++] = c;
+        __smolambda_codepoints[__smolambda_n++] = 0x2018;
+        __smolambda_codepoints[__smolambda_n++] = 0x2019;
+        for (int c = 0x2500; c <= 0x257F; c++) __smolambda_codepoints[__smolambda_n++] = c;
+        __smolambda_font = __smo_load_font(font_path, 128, __smolambda_codepoints, __smolambda_n);
+    }
+
+def set_font(on edit WINDOW, cstr|str _font_path)
+    font_path = cstr unsafe_temp _font_path
+    #if not WINDOW.ready: fail "failed to open window"
+    unsafe_set_font font_path
+
+def is_open(on WINDOW)
     VM "[not pyray.window_should_close()]"
     {builtins::bool ret = WindowShouldClose(); }
     return not ret
@@ -155,21 +234,22 @@ def sleep(nat milliseconds)
     VM "time.sleep($seconds*0.001)"
     { WaitTime((double)milliseconds/(double)1000.0); }
 
-local def TextureData(nat id, size size, nat mipmaps, nat format)
-    return compiler::args()
+def Texture(nat id, size size, nat mipmaps, nat format)
+    return class compiler::args()
     
-def Texture(TextureData _data)
-    data = [_data]
-    return class(data)
-
 def exists(Texture tex)
-    return 0!=len tex.data
+    return 0!=tex.id
 
-def unsafe_unload_texture(Texture tex)
-    if try data = tex.data[0]
-        {UnloadTexture((Texture2D){data__id, (int)data__size__width, (int)data__size__height, (int)data__mipmaps, (int)data__format});}
+def unsafe_unload_texture(Texture data)
+    {UnloadTexture((Texture2D){data__id, (int)data__size__width, (int)data__size__height, (int)data__mipmaps, (int)data__format});}
 
-def open(cstr path)
+def global()
+    doc ""
+    return singleton()
+def TEXTURES = global
+
+def unsafe_open_texture(cstr path)
+    VM "[*(lambda tex=pyray.load_texture($path):(tex.id,tex.width,tex.height,tex.mipmaps,tex.format))()]"
     {
         builtins::nat id = 0;
         builtins::float width = 0;
@@ -178,13 +258,50 @@ def open(cstr path)
         builtins::nat format = 0;
         __smolambda_ray_texture(path, id, width, height, mipmaps, format);
     }
-    if id==0: fail "failed to load texture"
-    ret = Texture(id, size(width, height), mipmaps, format)
+    return (id,width,height,mipmaps,format)
+
+
+def open(on global TEXTURES, cstr path)
+    doc "load a texture from a cstr path"
+    doc "This variation does not provide an automatic defer for unloading"
+    doc "the texture, but this may not be necessary typically."
+    doc "Even obscure scenarios, it may be handier to manage textures yourself"
+    doc "with `unsafe_unload_texture`. Or, if you want them to persist until"
+    doc "the end of program, load them with this operation and forget about"
+    doc "them; modern operating systems will automatically reclaim textures"
+    doc "when the program ends, so this function is SAFE."
+    texture_data = unsafe_open_texture path
+    if texture_data.id==0: fail "failed to load texture"
+    return Texture texture_data
+
+# def texture_bucket()
+#     doc "store textures on a bucket"
+#     doc "The main purpose of such a construct is to gather a bunch of textures to defer"
+#     doc "their release all at once. For example, it allows loader function to generate"
+#     doc "textures and return them to the main context. The textures are not meant to"
+#     doc "be retrievable from the bucket and must be stored elsewhere, such as on a map"
+#     doc "or a more efficient arena for fast referencing."
+#     unsafe_bucket = edit bucket()
+#     defer
+#         for element& in unsafe_bucket
+#             console(type"unsafe").print("released")
+#             try unsafe_unload_texture compiler::deref element.compiler::unsafe_attach_type(Texture[].unsafe_ptr)
+#     return class unsafe_bucket
+
+# def open(on edit texture_bucket TEXTURES, cstr path)
+#     doc "open a texture and store its closing defer on a texture bucket"
+#     ret = global().open path
+#     ret_ptr = mut last TEXTURES.unsafe_bucket.alloc(Texture[], 1  unsafe_first)
+#     ret_ptr = ret
+#     return ret
+
+def open(effect new TEXTURES, cstr path)
+    ret = global().open path
     defer: unsafe_unload_texture ret
     return ret
 
-def texture(on edit WINDOW, Texture _tex, position pos, color color)
-    tex = TextureData _tex.data[0]
+def texture(on edit WINDOW, Texture tex, position pos, color color)
+    VM "pyray.draw_texture(pyray.Texture($tex__id,int($tex__size__width),int($tex__size__height),$tex__mipmaps,$tex__format),int($pos__x),int($pos__y),pyray.Color($color__r,$color__g,$color__b,$color__a))"
     { 
         DrawTexture(
             (Texture2D){(int)tex__id, (int)tex__size__width, (int)tex__size__height, (int)tex__mipmaps, (int)tex__format},
@@ -193,8 +310,9 @@ def texture(on edit WINDOW, Texture _tex, position pos, color color)
         ); 
     }
 
-def texture(on edit WINDOW, Texture _tex, position pos, float scale, color color, "rotate", float rotation)
-    tex = TextureData _tex.data[0]
+
+def texture(on edit WINDOW, Texture tex, position pos, float scale, color color, "rotate", float rotation)
+    VM "pyray.draw_texture_ex(pyray.Texture($tex__id,int($tex__size__width),int($tex__size__height),$tex__mipmaps,$tex__format),pyray.Vector2($pos__x,$pos__y),$rotation,$scale,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     { 
         DrawTextureEx(
             (Texture2D){tex__id, (int)tex__size__width, (int)tex__size__height, (int)tex__mipmaps, (int)tex__format},
@@ -205,24 +323,29 @@ def texture(on edit WINDOW, Texture _tex, position pos, float scale, color color
         ); 
     }
 
-def texture(on edit WINDOW, Texture _tex, position pos, size size, color color, "rotate", float rotation)
-    tex = TextureData _tex.data[0]
+
+def texture(on edit WINDOW, Texture tex, position pos, size size, color color, "rotate", float rotation)
+    VM "(lambda scale:(lambda width,height:pyray.draw_texture_pro(pyray.Texture($tex__id,int($tex__size__width),int($tex__size__height),$tex__mipmaps,$tex__format),pyray.Rectangle(0,0,$tex__size__width,$tex__size__height),pyray.Rectangle($pos__x+width/2,$pos__y+height/2,width,height),pyray.Vector2(width/2,height/2),$rotation,pyray.Color($color__r,$color__g,$color__b,$color__a)))($tex__size__width*scale,$tex__size__height*scale))(min($size__width/$tex__size__width,$size__height/$tex__size__height))"
     scale_x = size.width/float tex.size.width
     scale_y = size.height/float tex.size.height
     scale = mut scale_x
     if scale_y<scale_x: scale = scale_y
+    width = float tex.size.width*scale
+    height = float tex.size.height*scale
     { 
-        DrawTextureEx(
+        DrawTexturePro(
             (Texture2D){tex__id, (int)tex__size__width, (int)tex__size__height, (int)tex__mipmaps, (int)tex__format},
-            (Vector2){(float)pos__x, (float)pos__y},
+            (Rectangle){0, 0, (float)tex__size__width, (float)tex__size__height},
+            (Rectangle){(float)pos__x+width/2, (float)pos__y+height/2, width, height},
+            (Vector2){width/2, height/2},
             (float)rotation,
-            (float)scale,
             (Color){color__r,color__g,color__b,color__a}
         ); 
     }
 
-def texture(on edit WINDOW, Texture _tex, position pos, float scale, color color, "rotate", position origin, float rotation)
-    tex = TextureData _tex.data[0]
+
+def texture(on edit WINDOW, Texture tex, position pos, float scale, color color, "rotate", position origin, float rotation)
+    VM "pyray.draw_texture_pro(pyray.Texture($tex__id,int($tex__size__width),int($tex__size__height),$tex__mipmaps,$tex__format),pyray.Rectangle(0,0,$tex__size__width,$tex__size__height),pyray.Rectangle($pos__x,$pos__y,$tex__size__width*$scale,$tex__size__height*$scale),pyray.Vector2($origin__x,$origin__y),$rotation,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTexturePro(
             (Texture2D){tex__id, (int)tex__size__width, (int)tex__size__height, (int)tex__mipmaps, (int)tex__format},
@@ -234,8 +357,9 @@ def texture(on edit WINDOW, Texture _tex, position pos, float scale, color color
         );
     }
 
-def texture(on edit WINDOW, Texture _tex, position pos, size size, color color, "rotate", position origin, float rotation)
-    tex = TextureData _tex.data[0]
+
+def texture(on edit WINDOW, Texture tex, position pos, size size, color color, "rotate", position origin, float rotation)
+    VM "pyray.draw_texture_pro(pyray.Texture($tex__id,int($tex__size__width),int($tex__size__height),$tex__mipmaps,$tex__format),pyray.Rectangle(0,0,$tex__size__width,$tex__size__height),pyray.Rectangle($pos__x,$pos__y,$size__width,$size__height),pyray.Vector2($origin__x,$origin__y),$rotation,pyray.Color($color__r,$color__g,$color__b,$color__a))"
     {
         DrawTexturePro(
             (Texture2D){tex__id, (int)tex__size__width, (int)tex__size__height, (int)tex__mipmaps, (int)tex__format},

@@ -73,8 +73,17 @@ def bucket()
         if try contents = mut cp::deref unsafe_ptr
             unsafe_free contents
             unsafe::free unsafe_ptr
-        
     return class(unsafe_ptr)
+
+def get(bucket allocator, nat i)
+    contents = cp::deref allocator.unsafe_ptr
+    if i>=contents.size: fail "out of bounds"
+    return contents.elements.unsafe::add(i*cp::value cp::size cp::ptr())
+
+def mutget(bucket allocator, nat i)
+    contents = cp::deref allocator.unsafe_ptr
+    if i>=contents.size: fail "out of bounds"
+    return contents.elements.unsafe::add(i*cp::value cp::size cp::ptr())
 
 local def unsafe_alloc(edit bucket allocator, nat|blank bytes)
     doc "bucket allocation"

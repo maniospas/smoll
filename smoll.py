@@ -54,7 +54,7 @@ except: pass
 finally: 
     sys.stdout = prev_stdout
     sys.stderr = prev_stderr
-gc.disable()
+#gc.disable()
 #gc.set_threshold(150000)
 
 RED   = "\033[31m"
@@ -104,25 +104,6 @@ def supports_ansi() -> bool:
     term = os.environ.get("TERM", "")
     if term == "dumb": return False
     return True
-
-def log_async_calls(func): 
-    # helper for debugging - currently unused
-    async def wrapper(*args, **kwargs):
-        task_name = f"{func.__name__} {id(asyncio.current_task())} {str(args)}"
-        print(f"Starting {task_name}")
-        try:
-            result = await func(*args, **kwargs)
-            print(f"Completed {task_name}")
-            return result
-        except Exception as e:
-            print(f"Failed {task_name}: {str(e)}")
-            raise
-    return wrapper
-
-def safeguard(fn, exc): 
-    # helper for debugging - currently unused
-    try: return fn()
-    except Exception: raise exc
 
 def strip_quotes(text: str) -> str:
     if len(text)>=2 and text[0]=="\"" and text[-1]=="\"": return text[1:-1]
@@ -2326,7 +2307,7 @@ class Token:
                             printid("```rust\n"+suggestion_splits[0]+"\n```")
                             #if len(suggestion_splits)>1: print("defined in "+suggestion_splits[1])
                         else: printid("\n- "+suggestion)
-            if is_lsp and self.file.is_main_file and errtype=="safety": return None
+            if is_lsp and self.file.is_main_file and errtype in ["safety", "parsing"]: return None
             raise FatalException
 
 
@@ -2378,7 +2359,7 @@ class Token:
             print(prefix+f"{RED}{pointer}{RESET}")
         
         if show_all_errors:
-            if errtype=="safety": return None
+            if errtype in ["safety", "parsing"]: return None
             raise FatalException
         errexit()
 
@@ -7108,6 +7089,7 @@ def _load(file: File, is_main_file: bool=False, err_token:Token|None=None) -> tu
     has_spaces = False
     bracket_depth = 0
     bracket_indent_stack = []
+    insist_on_fatal_exit = False
     try:
         f = file.open()
         for line in f:
@@ -7165,7 +7147,10 @@ def _load(file: File, is_main_file: bool=False, err_token:Token|None=None) -> tu
                     token_start = col
                     while True:
                         col += 1
-                        if col==len(line): Token(line[token_start:col], file, row, token_start + 1 + count_spaces).error("syntax", "string never closed (strings cannot continue across multiple lines) - "+line[token_start:col])
+                        if col==len(line): 
+                            line = line[:-1]+"\"\n"
+                            col -= 1
+                            Token(line[token_start:col], file, row, token_start + 1 + count_spaces).error("syntax", "string never closed (strings cannot continue across multiple lines) - "+line[token_start:col])
                         if line[col]=="\"" and (line[col-1]!="\\" or col<2 or line[col-2]=="\\"): break
                     col += 1
                     tokens.append(Token(line[token_start:col], file, row, token_start + 1 + count_spaces))
@@ -7229,12 +7214,19 @@ def _load(file: File, is_main_file: bool=False, err_token:Token|None=None) -> tu
                 print(1)
                 # message (may span multiple lines))
                 printid(str(err))
+                tokens.append(Token("syntax error", file, row, 0))
             raise FatalException
-        print(f"[{RED}X{RESET}] {PURPLE}file read error{RESET} {err}")
-        path = Path(file.path).resolve()
-        location = f"{path.as_uri()}#L{row+1} line {row+1}"
-        print(f"{RED}at{RESET} {location}")
-        errexit()
+        else:
+            if not isinstance(err, FatalException):
+                print(f"[{RED}X{RESET}] {PURPLE}file read error{RESET} {err}")
+                path = Path(file.path).resolve()
+                location = f"{path.as_uri()} line {row+1}"
+                print(f"{RED}at{RESET} {location}")
+            insist_on_fatal_exit = file.is_main_file
+            if show_all_errors: tokens.append(Token("syntax error", file, row, 0))
+            else: errexit()
+
+    if insist_on_fatal_exit: errexit()
 
     processed_tokens = list()
     len_tokens = len(tokens)

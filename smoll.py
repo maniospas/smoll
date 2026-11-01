@@ -2255,7 +2255,7 @@ class File:
         self.error_redirect: Optional["token"] = None
         self._cached_lazy_context: Optional["File"] = None
 
-    def lazy_context(self)->File:
+    def lazy_context(self)->"File":
         if self._cached_lazy_context: return self._cached_lazy_context
         # if self._cached_lazy_context is not None and len(self._cached_lazy_context.localdefs)==len(self.localdefs):
         #     return self._cached_lazy_context
